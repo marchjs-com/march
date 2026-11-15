@@ -1,4 +1,4 @@
-// SiteSection (hadi-march/landing): the frame of every website block — width, vertical rhythm, a tone (plain, muted,
+// SiteSection (march/landing): the frame of every website block — width, vertical rhythm, a tone (plain, muted,
 // inverse, brand) and an optional heading group (eyebrow, title, lead) that enters with Reveal. Blocks put their
 // content inside; pages stack sections.
 import "./site-section.css";

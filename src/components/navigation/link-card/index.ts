@@ -1,4 +1,4 @@
-// LinkCard (hadi-march/navigation): a card that is one link: an icon tile, a title, a description, a small text at the
+// LinkCard (march/navigation): a card that is one link: an icon tile, a title, a description, a small text at the
 // end and an arrow that appears on hover. Every part is optional or yours: the lead (own node instead of the tile), the
 // arrow (off, or your own), the colour of the tile.
 import "./link-card.css";

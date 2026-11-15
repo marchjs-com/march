@@ -1,4 +1,4 @@
-// Overlay (hadi-march/ui): a decorative layer that lives inside its container — an image, a muted looping video, an SVG,
+// Overlay (march/ui): a decorative layer that lives inside its container — an image, a muted looping video, an SVG,
 // a canvas drawn by a function, or a CSS effect (glass, gradient, mesh, noise, vignette, spotlight, grid, dots). Layers
 // stack in the order they are added (the first one is lowest); background layers sit under the container's content,
 // `front` ones above it. Overlays never take input: clicks, hover, touch and the wheel go to what is underneath; they are

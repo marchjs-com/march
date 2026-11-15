@@ -1,5 +1,5 @@
-// hadi-march/sw — opt-in offline cache. Turn on with `sw: true` in march.config.js (the build writes sw.js), then:
-//   import { registerServiceWorker } from "hadi-march/sw"
+// march/sw — opt-in offline cache. Turn on with `sw: true` in march.config.js (the build writes sw.js), then:
+//   import { registerServiceWorker } from "march/sw"
 //   registerServiceWorker({ onUpdate: () => toast("A new version is ready", { action: { label: "Reload", onClick: applyUpdate } }) })
 // Chunks are cached the first time they arrive (cache-first; hashed names never change), the page is network-first
 // with an offline fallback, old versions are deleted when a new one activates. CSP: needs only worker-src/script-src 'self'.

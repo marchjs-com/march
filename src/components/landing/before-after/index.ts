@@ -1,4 +1,4 @@
-// BeforeAfter (hadi-march/landing): two layers on top of each other and a divider that reveals one or the other.
+// BeforeAfter (march/landing): two layers on top of each other and a divider that reveals one or the other.
 // Drag anywhere (a press jumps the divider there), use the handle with the keyboard (arrows, Shift ×10, Home / End),
 // or set `follow` so the divider tracks the pointer without a press. Horizontal or vertical; mirrored in RTL.
 // When it first scrolls into view the divider sways once to show it can move (not with reduced motion).

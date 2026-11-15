@@ -1,7 +1,7 @@
 // PerformanceManager: Core Web Vitals (LCP, CLS, INP) plus FCP and TTFB as reactive values with a rating, user
 // timing marks and measures, timed functions and long tasks — all from the browser's own PerformanceObserver.
 //
-//   import { perf } from "hadi-march/managers/perf";
+//   import { perf } from "march/managers/perf";
 //   const p = perf();
 //   p.vital("lcp")            // { value: 1830, rating: "good" } or undefined until measured (reactive)
 //   p.mark("search:start");  …;  p.measure("search", "search:start")      // → ms

@@ -16,7 +16,7 @@ Each manager: `src/managers/<name>/index.ts` (+ `ui.ts` when it has UI), a test 
 Configure a manager at app start, before components subscribe: listeners added with `on()` belong to the instance and
 end with it.
 
-## ViewportManager — `hadi-march/managers/viewport`
+## ViewportManager — `march/managers/viewport`
 
 The one place March calls `matchMedia`. Each signal starts listening when it is first read.
 
@@ -33,7 +33,7 @@ configureViewport({ breakpoints: { xs: 0, md: 768, lg: 1024 }, mobile: "md", des
 Flags for `when:`: mobile, tablet, desktop, dark, light, reducedMotion, reducedData, highContrast, touch, mouse, hover,
 online, offline, visible, portrait, landscape, or a breakpoint name (at least that wide). A typo throws.
 
-## ConsentManager — `hadi-march/managers/consent` (+ `/ui`)
+## ConsentManager — `march/managers/consent` (+ `/ui`)
 
 Categories `necessary` (always on), `preferences`, `analytics`, `marketing`, `thirdParty` (or your own). The record
 `{ version, date, choices, method }` is kept in localStorage (`m.consent`), checked against the policy `version` and
@@ -55,7 +55,7 @@ await consent.granted("marketing")
 "Reject all" sits next to "Accept all" with the same weight. Texts are English source with a Turkish pack; the legal
 wording belongs to the app (`title`, `text` props). Analytics and log shipping should gate on `consent`.
 
-## CommandManager — `hadi-march/managers/command` (+ `/ui`)
+## CommandManager — `march/managers/command` (+ `/ui`)
 
 ```tsx
 const save = command({ id: "doc.save", title: () => t`Save`, icon, shortcut: "mod+s", group: "File",
@@ -77,7 +77,7 @@ bindCommandKeys()                                         // bind every shortcut
 
 ## Environment managers
 
-Each lives in `src/managers/<name>/` (import `hadi-march/managers/<name>`), follows the same pattern (lazy, one
+Each lives in `src/managers/<name>/` (import `march/managers/<name>`), follows the same pattern (lazy, one
 instance, `configureX()` / `disposeX()`) and reports through `emit()`. Showcase: Temel › Ortam yöneticileri.
 
 ```ts

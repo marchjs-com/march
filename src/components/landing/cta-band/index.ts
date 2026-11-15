@@ -1,4 +1,4 @@
-// CtaBand (hadi-march/landing): the "ready to start?" band near the end of a page — a rounded panel with a title, a
+// CtaBand (march/landing): the "ready to start?" band near the end of a page — a rounded panel with a title, a
 // lead and actions over a themed background: gradient (brand colours), mesh, glass, plain or a video. A light follows
 // the pointer; the panel rises in when it scrolls into view.
 import "./cta-band.css";

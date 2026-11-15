@@ -1,7 +1,7 @@
 // RateLimitManager: throttle, debounce and quotas in one place, with reactive state (pending, remaining, reset time)
 // and cleanup with the component. Quotas are shared by key across the app (e.g. "search" or "api:/export").
 //
-//   import { rateLimit } from "hadi-march/managers/rate";
+//   import { rateLimit } from "march/managers/rate";
 //   const r = rateLimit();
 //   const save = r.debounce(() => api.save(doc), 500, { maxWait: 3000 });   save()  save.flush()  save.pending()
 //   const onScroll = r.throttle(update, 100);                                // leading + trailing

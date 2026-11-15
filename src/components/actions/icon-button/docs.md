@@ -23,7 +23,7 @@ tooltip (`title`), so an icon-only control is never unnamed. Leaving it out thro
 | `size` | `xs` `sm` `md` `lg` | `md` | 1.5 / 1.875 / 2.25 / 2.75 rem |
 | `variant` | `danger` `solid` `raised` | — | `danger`: red icon; `solid`: filled with the accent; `raised`: surface, border and shadow |
 | `shape` | `round` | — | a circle |
-| `m:color` | color token | — | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | — | Common prop (march/props): the colour token of the component and everything in it. |
 | `pressed` | boolean / accessor | — | toggle button: `aria-pressed` and the pressed look (`is-pressed`); unset: a plain button |
 | `inverse` | boolean / accessor | `false` | light icon, hover and focus ring for dark media; with `raised`: a light disc |
 | `href` | Href | — | renders a link: the router's Link inside the app, a plain `<a>` for an external address |

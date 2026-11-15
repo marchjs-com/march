@@ -1,6 +1,6 @@
-// hadi-march/net: one place for all traffic. Never call fetch() / new WebSocket() in app code — use net or an Api class.
+// march/net: one place for all traffic. Never call fetch() / new WebSocket() in app code — use net or an Api class.
 //
-//   import { net, Api, api, auth, cache } from "hadi-march/net";
+//   import { net, Api, api, auth, cache } from "march/net";
 //   net.use(auth({ token: () => session.token, refresh: renew }), cache());
 //   const users = await net.get<User[]>("/api/users", { category: "users", cache: "5m" });
 //   net.get("/api/search", { query: { q }, category: "search", policy: "latest" });   // older search aborted

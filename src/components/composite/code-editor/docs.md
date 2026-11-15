@@ -6,7 +6,7 @@ too), a suggestion list opens at the caret, ranges can be marked (a flash for "t
 the owner reads `value` and decides what it means (the showcase reads a component's props from it).
 
 ```tsx
-import { CodeEditor, jsxCompleter } from "hadi-march/ui";
+import { CodeEditor, jsxCompleter } from "march/ui";
 
 <CodeEditor bind:value={$code} lang="tsx" message={$note} status={$bad ? "error" : "ok"}
   complete={jsxCompleter({ tag: "Button", props: [
@@ -54,7 +54,7 @@ typed and on Ctrl + Space (names already written are left out); the values of a 
 | `sources` / `source` / `onSourceChange` | `{ value, label }[]` / string / `(v) => void` | — / the first | chips under the list that filter the rows by their `source` (`"all"`: every row); the owner keeps the choice |
 | `multiline` | boolean | `true` | `false`: Enter does not write a new line |
 | `readonly`, `disabled` | boolean | `false` | |
-| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | accent | Common prop (march/props): the colour token of the component and everything in it. |
 | `onBlur` | `(e) => void` | — | focus left the field (tidy the code here) |
 | `inputRef` | `(textarea) => void` | — | the text field |
 | `lineNumbers` | boolean / accessor | `false` | a gutter with each line's number (a wrapped line keeps one) |

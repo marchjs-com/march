@@ -14,7 +14,7 @@ import { tmpdir } from "node:os";
 // 15.75 KB since extensions and interceptors (dom/extend.ts: extend, intercept, defineExtension, <Extensions>, the
 // pipeline, partial targets inside / partOf and its tools) became core (+3.4 KB; docs/internal/size-watch.md). Apps that do not import them pay 0.
 // 15.8 KB since sx works on components (the sx common prop and _sxClass shared with elements) and its scales are
-// exported (SX); m:text-color lives in hadi-march/props (docs/internal/size-watch.md).
+// exported (SX); m:text-color lives in march/props (docs/internal/size-watch.md).
 // 15.9 KB since sx has a colour key (the 24 colour words of sx color: the text colour, which replaced m:text-color).
 export const BUDGET = { core: 15.9 * 1024, minimal: 5 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -55,17 +55,17 @@ export async function buildApp(source) {
     return { js, css, jsGzip: gz(js), cssGzip: gz(css) };
   } finally { rmSync(dir, { recursive: true, force: true }); }
 }
-export const BUTTON_APP = `import "hadi-march/css/tokens.css";
-import { render, h } from "hadi-march";
-import { Button } from "hadi-march/ui";
+export const BUTTON_APP = `import "march/css/tokens.css";
+import { render, h } from "march";
+import { Button } from "march/ui";
 render(() => h(Button, { variant: "primary" }, "Merhaba"), document.body);
 `;
 /**
  * A typical small app (what most users ship first): signals, a keyed list, a condition and one component, written the
  * way the docs show it (JSX through the March plugin). Its JS gzip is the size that matters to an app, not the barrel.
  */
-export const TYPICAL_APP = `import { render, signal, For, If } from "hadi-march";
-import { Button } from "hadi-march/ui";
+export const TYPICAL_APP = `import { render, signal, For, If } from "march";
+import { Button } from "march/ui";
 const todos = signal([{ id: 1, text: "Write docs", done: false }]);
 const text = signal("");
 const add = () => { const t = text().trim(); if (t) { todos.set([...todos(), { id: Date.now(), text: t, done: false }]); text.set(""); } };

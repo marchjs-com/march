@@ -1,4 +1,4 @@
-// Gantt (hadi-march/components/data/gantt): tasks on a time axis with dependency arrows (finish → start), drag to move
+// Gantt (march/components/data/gantt): tasks on a time axis with dependency arrows (finish → start), drag to move
 // or resize a bar, drag its knob to set progress, a today line and day / week / month scales. Successors that would
 // start before their predecessor ends are pushed later (`cascade`). Dates via core/date + Intl, drags via behaviors/drag.
 import "./gantt.css";

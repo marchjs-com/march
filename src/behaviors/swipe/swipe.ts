@@ -1,4 +1,4 @@
-// Swipe behavior (hadi-march/behaviors/swipe): one source for "follow the finger, then settle" gestures — sheets and
+// Swipe behavior (march/behaviors/swipe): one source for "follow the finger, then settle" gestures — sheets and
 // drawers, pull to refresh, swipe to reply, story navigation, lightbox paging. Axis lock (the first clear movement
 // decides; the other axis is left to the page's own scrolling), a veto before the gesture is claimed, velocity from the
 // last 100 ms for flings, rubber-band resistance past a limit, tap and hold for presses that never became a swipe, and

@@ -162,7 +162,7 @@ const BASE: Record<string, string> = {
   ease: "cubic-bezier(.25,.1,.25,1)", "ease-in": "cubic-bezier(.42,0,1,1)", "ease-out": "cubic-bezier(0,0,.58,1)", "ease-in-out": "cubic-bezier(.42,0,.58,1)",
   easeOutQuart: "cubic-bezier(.25,1,.5,1)",
 };
-// older camelCase names (hadi-march/motion easing.ts) → token names
+// older camelCase names (march/motion easing.ts) → token names
 const ALIAS: Record<string, string> = { easeInCubic: "in", easeOutCubic: "out", easeInOutCubic: "in-out", easeOutExpo: "expo", easeOutBack: "back", easeOutBounce: "bounce", easeOutElastic: "elastic" };
 for (const [k, v] of Object.entries(BASE)) defineEasing(k, v);
 defineEasing("linear", linear);

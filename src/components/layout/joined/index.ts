@@ -1,4 +1,4 @@
-// Joined (hadi-march/layout): parts drawn as one piece. Folder: src/components/layout/joined/.
+// Joined (march/layout): parts drawn as one piece. Folder: src/components/layout/joined/.
 import "./joined.css";
 import { h } from "../../../dom/h.ts";
 import { rest, val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";

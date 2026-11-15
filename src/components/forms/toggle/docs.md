@@ -14,7 +14,7 @@ pages); the track takes the color token when on.
 | `value` / `bind:value` | boolean (`null` with `tristate`) | `false` (`null` with `tristate`) | |
 | `tristate` | boolean | `false` | three states: on, off, not set (`null`, the thumb in the middle); a click goes not set → on → off → not set. For a prop where unset differs from `false` |
 | `label` or children | node | — | |
-| `m:color` | ColorToken | primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | ColorToken | primary | Common prop (march/props): the colour token of the component and everything in it. |
 | `disabled`, `readonly` | boolean | — | |
 | `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 

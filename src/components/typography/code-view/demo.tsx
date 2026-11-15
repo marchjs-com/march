@@ -7,7 +7,7 @@ export const code = `<CodeView code={source} lang="tsx" copy />
 <CodeView code={snippet} lang="sh" toolbar={false} />`
 
 const SAMPLE: Record<string, string> = {
-  tsx: `import { signal } from "hadi-march";
+  tsx: `import { signal } from "march";
 
 // a counter: only the text node changes on click
 export function Counter(props: { start?: number }) {
@@ -20,11 +20,11 @@ export function Counter(props: { start?: number }) {
   json: `{
   "name": "hadi-panel",
   "private": true,
-  "dependencies": { "hadi-march": "^0.2.0" },
+  "dependencies": { "march": "^0.2.0" },
   "seats": 48
 }`,
   sh: `# install and start the dev server
-npm install hadi-march
+npm i github:tlghn/hadimarch
 npx march dev --port 5173`,
 }
 

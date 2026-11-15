@@ -1,4 +1,4 @@
-// FlowControls (hadi-march/ui): run, pause, step and reset a flow, choose the speed, see the state and the clock; and
+// FlowControls (march/ui): run, pause, step and reset a flow, choose the speed, see the state and the clock; and
 // FlowTimeline, the run record as bars on a time axis (one row per executed node, a playhead while it runs).
 // The runner (createFlowRunner) executes a FlowStore and writes the state FlowCanvas draws: glowing running nodes,
 // a shake on error, dots and counters on the edges.

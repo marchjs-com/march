@@ -1,4 +1,4 @@
-// TimeRuler (hadi-march/data): the ruler above a timeline: ticks, time labels and a playhead. Read-only it shows
+// TimeRuler (march/data): the ruler above a timeline: ticks, time labels and a playhead. Read-only it shows
 // where a run or an animation is; with `onSeek` the ruler is draggable (press anywhere to jump) and the playhead is a
 // slider (arrow keys, Home / End). Tick distances are picked for the duration or given; labels, the playhead, its
 // colour and the names are yours. Rows under the ruler share its scale with `timePercent(ms, duration)`.

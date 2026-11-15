@@ -7,7 +7,7 @@
 import { signal } from "../core/reactive.ts";
 
 /** Augment to type permission, role and method names:
- *  `declare module "hadi-march/data" { interface AccessRegister { perms: "users.edit" | "users.view"; roles: "admin" } }` */
+ *  `declare module "march/data" { interface AccessRegister { perms: "users.edit" | "users.view"; roles: "admin" } }` */
 export interface AccessRegister {}
 type Reg<K extends string> = AccessRegister extends Record<K, infer V extends string> ? V : string;
 /** Permission name (`string` unless narrowed through `AccessRegister`). "*" grants all. */

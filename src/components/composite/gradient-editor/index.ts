@@ -1,4 +1,4 @@
-// GradientEditor (hadi-march/ui): build a CSS gradient. Folder: src/components/composite/gradient-editor/.
+// GradientEditor (march/ui): build a CSS gradient. Folder: src/components/composite/gradient-editor/.
 //   <GradientEditor bind:value={$bg} />      value: "linear-gradient(120deg, #f2801f 0%, #a3338c 100%)"
 // Type (linear, radial, conic), an angle dial, a stop bar (click to add, drag to move, drag down or Delete to remove),
 // a ColorPicker for the selected stop, presets (the HADİ gradient first) and the CSS to copy.

@@ -1,4 +1,4 @@
-// ActivityBar (hadi-march/ui): the narrow icon bar at the edge of an editor that switches the side view (Files,
+// ActivityBar (march/ui): the narrow icon bar at the edge of an editor that switches the side view (Files,
 // Search, Source control…). A tablist: ↑ ↓ (← → when horizontal, mirrored in RTL) move, Enter / Space choose,
 // choosing the active view again collapses it (value null). An indicator glides to the active view (motion engine).
 // Items can sit at the end of the bar (settings, account) and carry count badges.

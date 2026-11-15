@@ -16,7 +16,7 @@ global speed, "pause all" and reduced motion apply (reduced motion keeps only th
 | `onToggle` | `(next) => void` | — | the owner updates `liked` and the count (optimistic) |
 | `count` | number / accessor | — | CountRoll next to the heart, hidden at 0 |
 | `size` | `sm` `md` `lg` | `md` | |
-| `m:color` | ColorToken | `brand-pink` | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | ColorToken | `brand-pink` | Common prop (march/props): the colour token of the component and everything in it. |
 | `burst` | boolean | true | particles on like |
 | `colors` | `brand` `single` | `brand` | particle colors |
 | `label` | string | "Like" | accessible name |

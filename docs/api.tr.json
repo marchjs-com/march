@@ -1,5 +1,5 @@
 {
- "hadi-march": {
+ "march": {
   "extend": "Bileşenlere sarmalayıcı olmadan yeni özellik kazandırır: `extend([Button, Link], track)`, `extend(\"*\", testIds)`; hedef bir bileşen, liste, `\"*\"` ya da `{ test }`. Kaldıran bir fonksiyon döner.",
   "inside": "Kısmi hedef: bir bileşenin içinde (her derinlikte) çizilen her B: `extend(inside(Button, Spinner), ext)`; zincir (`inside(Toolbar, Button, Icon)`), liste ve `\"*\"` alır. Yol DOM'dan değil bileşen sahipliğinden gelir.",
   "partOf": "Kısmi hedef: yalnız A'nın kendi B parçası (B'nin en yakın bileşen atası A): `intercept(partOf(Button, Spinner), …)`; <If>, <For> gibi akış bileşenleri araya girmez.",
@@ -47,7 +47,7 @@
   "provide": "Geçerli sahipte bu çağrıdan sonra oluşturulan her şey için bir bağlam değeri sağlar.",
   "reactive": "Bir işlevi reaktif erişimci olarak etiketler (derleyici çıktısı ve h() kullanıcıları için).",
   "read": "Reaktif erişimci olabilecek bir değeri okur.",
-  "registerTransition": "Bir JS geçişi kaydeder (hadi-march/motion tarafından kullanılır).",
+  "registerTransition": "Bir JS geçişi kaydeder (march/motion tarafından kullanılır).",
   "render": "`render(() => <App />, document.getElementById(\"app\"))`",
   "runWithOwner": "`fn`'i daha önce yakalanmış bir sahiple çalıştırır (eşzamansız devamlar için).",
   "safeUrl": "Yalnızca güvenli URL şemalarına izin verir (göreli URL'ler sorun değildir).",
@@ -69,7 +69,7 @@
   "useContext": "En yakın sağlanan değeri (veya varsayılanı) okur.",
   "version": "Kitaplık sürümü."
  },
- "hadi-march/router": {
+ "march/router": {
   "_resetRouter": "Yönlendirici durumunu sıfırlar (testler için).",
   "_router": "Outlet modülü için iç yapılar (herkese açık API değildir).",
   "back": "Geçmişte bir kayıt geri gider.",
@@ -97,14 +97,14 @@
   "route": "Geçerli eşleşme (reaktif).",
   "routeError": "Yüklenemeyen bir sayfanın varsayılan hata görünümü, yeniden dene düğmesiyle.",
   "Router": "Outlet ağacını oluşturur: geçerli rotanın düzenleri (gezinmeler boyunca canlı tutulur) ve sayfa. Proplar: `loading` (ilk yükleme), `skeleton` (tıklamadan 100 ms sonra gelmemiş sayfa) vb.",
-  "setHeadHandler": "Her rotanın head bilgisini alır (hadi-march/seo kurar); \"bulunamadı\" durumunda `to` null olur.",
+  "setHeadHandler": "Her rotanın head bilgisini alır (march/seo kurar); \"bulunamadı\" durumunda `to` null olur.",
   "setMeta": "document.title ve <meta name=\"description\"> değerlerini ayarlar (yalnız DOM API'leri).",
-  "setNavigationWrapper": "Her sayfa değişimini sarar (hadi-march/motion View Transitions için kullanır).",
+  "setNavigationWrapper": "Her sayfa değişimini sarar (march/motion View Transitions için kullanır).",
   "setQuery": "Değerleri sorgu dizesine birleştirir (null/undefined/\"\" anahtarı kaldırır). Varsayılan olarak geçmişi değiştirir.",
   "transitionOutlet": "İçeriği değişen outlet'i işaretler; böylece View Transition yalnız o bölümü canlandırır (kabuk yerinde kalır).",
   "hrefOf": "Rotanın sayfaya yazılacak bağlantısı: geçmiş kipinde geçerli adrese göre göreli (\"../flow\"), her kökte ve yeni sekmede doğru; hash kipinde \"#/flow\"."
  },
- "hadi-march/data": {
+ "march/data": {
   "IconTile": "Renkli yuvarlak köşeli karedeki simge: `<IconTile icon={users} tone=\"primary\" />`",
   "TimeRuler": "Zaman çizelgesinin üstündeki cetvel: tikler, zaman etiketleri ve oynatma başı; `onSeek` verilirse sürüklenir ve baş bir kaydırıcı olur: `<TimeRuler duration={2000} value={$now} onSeek={seek} />`",
   "timeTicks": "Bir süre için cetvel tiklerini üretir: her `step` ms'de ara tik, her `major` ms'de etiketli tik (verilmezse süreye göre seçilir).",
@@ -141,18 +141,18 @@
   "Timeline": "`<Timeline items={[{ time, title, body, tone, icon }]} />` — time Date/epoch/ISO (biçimlendirilir) ya da metin olabilir.",
   "Tree": "Genişletilebilir ağaç (role=tree; ↑ ↓ gezinir, → açar, ← kapatır, Enter seçer): `<Tree nodes={files} onSelect={…} />`"
  },
- "hadi-march/schema": {
+ "march/schema": {
   "fieldType": "Özel bir alan türü kaydeder: `fieldType(\"iban\", { coerce, check, empty })`.",
   "options": "`options` değerini [{ value, label }] biçimine normalleştirir.",
   "schema": "Şema oluşturur. Değer türü tanımdan çıkarılır (`Infer<typeof S>`); sabit birleşim türü için seçim `options` değerini `as const` ile bildirin. Alan seçenekleri: type, label, required, min, max (sayı değeri veya metin uzunluğu) vb.",
   "TYPES": "Alan türleri ve temel davranışları. `fieldType(name, def)` ile genişletilir."
  },
- "hadi-march/ui": {
+ "march/ui": {
   "IconPicker": "Simge seçici: seçili simgeyi ve adını gösteren düğme; açılan panelde arama, süzgeç çipleri ve bütün simgelerin ızgarası (inline ile düğmesiz).",
   "ICON_GROUPS": "IconPicker süzgeç çiplerinin hazır listesi: oklar, dosya, medya, iletişim, kişi, düzen, dolu.",
   "typeScriptPlugin": "TypeScript dil servisi eklentisi: bir worker içinde çalışır; bütün JavaScript / TypeScript / DOM API tamamlaması, hata ve uyarıların yerleri. CSP Trusted Types ile çalışıyorsa trusted-types march-worker gerekir.",
   "AppPreview": "IDE kabuğunun önizleme paneli: araç çubuğunda önizlemenin kendi teması, vurgu rengi ve açık / koyu kipi (yalnız önizleme etkilenir), ortada gösterilen içerik; araç çubuğu ve her seçici kapatılabilir.",
-  "marchLanguagePlugin": "March kodu için öneriler: import sonrası hadi-march bileşenleri ve işlevleri (seçince içe aktarma satırı tamamlanır), from sonrası alt yollar, JSX içinde bileşenler.",
+  "marchLanguagePlugin": "March kodu için öneriler: import sonrası march bileşenleri ve işlevleri (seçince içe aktarma satırı tamamlanır), from sonrası alt yollar, JSX içinde bileşenler.",
   "codeEditorPlugin": "march-app-ui eklentisi: kod dosyalarını (.ts, .tsx, .js, .css, .json…) March'ın CodeEditor'ında açar; öneriler bir dil servisi eklentisinden gelebilir.",
   "debuggerPlugin": "march-app-ui hata ayıklayıcı eklentisi: Debugger paneli, kod editöründe satır numarası oluğu (tıkla ya da F9: kesme noktası; duraklatılmış satır vurgulanır) ve F5 / F8 / F10 / F11 komutları; derlemede kod enstrümante edilir, kayıt üstünde durulur.",
   "Debugger": "Hata ayıklayıcı paneli: Devam, üstünden / içine / dışına adım, geri adım ve zaman çizelgesi; koşullu kesme noktaları, logpoint, debugger; ve hatada durma; izlenen ifadeler, kapsam (yerel / kapanış / modül) ve çağrı yığını.",
@@ -530,10 +530,10 @@
   "Window": "Alanı içinde taşınır, boyutlanır pencere: kenara kenetlenir, küçülür, alanı kaplar, kapanır; HADİ, Mac ya da Windows görünümü.",
   "Wizard": "Prop'lar: steps [{ title, description, fields?: [names], schema?: schema(), validate?(values) → {name: msg} | string | null, render?(form) → node }], schema (her adımın kendi şeması varsa isteğe bağlı), initial ve diğerleri."
  },
- "hadi-march/components/registry.gen.ts": {
+ "march/components/registry.gen.ts": {
   "registry": "Her bileşen klasörü: meta, Kod sekmesi parçası ve tembel demo / oyun alanı yükleyicileri."
  },
- "hadi-march/table": {
+ "march/table": {
   "CellEditor": "Tablonun geçerli düzenlemesi (`table.editing()`) için satır içi hücre düzenleyici: sütun türüne göre input / select / checkbox; Enter kaydeder, Escape iptal eder, doğrulama iletisi altında görünür. <Table> ve DataGrid tarafından ortak kullanılır.",
   "column": "Tek bir sütun tanımını normalleştirir.",
   "createTable": "Başsız (headless) tablo. Seçenekler: rows | source, columns | schema, rowKey (\"id\"), pageSize (25), pageSizes, paging (true | false | \"cursor\"), paramNames, sort, filters, search, storageKey, urlKey, urlDelay, virtual ve diğerleri.",
@@ -552,7 +552,7 @@
   "toJSON": "Sütun anahtarıyla anahtarlanmış nesnelerden oluşan JSON dizisi (`formatted` verilmedikçe ham değerler).",
   "windowRange": "Çizilecek [start, end) satırları ve üstlerindeki/altlarındaki boşluk yükseklikleri."
  },
- "hadi-march/charts": {
+ "march/charts": {
   "arcPath": "Halka diliminin SVG yolu (pasta dilimi için r0 = 0).",
   "AreaChart": "Alan grafiği (`stacked` görünür serileri üst üste yığar).",
   "BarChart": "Çubuk grafiği. Prop'lar için docs/charts.md dosyasına bakın.",
@@ -573,10 +573,10 @@
   "Stat": "KPI kutusu: etiket, biçimlendirilmiş değer, oklu fark (varsayılan olarak kesir: 0.12 → \"+12%\"), isteğe bağlı sparkline. `previous` farkı hesaplar; `invert` düşüşü iyi sayar (ör. maliyet); `deltaFormat` |fark| değerini biçimlendirir.",
   "timeTicks": "Takvim sınırlarında işaret değerleri (epoch ms): saniye … gün, hafta, ay, çeyrek, yıl."
  },
- "hadi-march/crud": {
+ "march/crud": {
   "crud": "Şema ve veri kaynağından tam bir liste + form ekranı: tablo, arama, oluşturma, düzenleme, silme, izinler."
  },
- "hadi-march/lazy": {
+ "march/lazy": {
   "chunksOf": "Derleme manifestine göre bir dinamik import'un (kaynak anahtarı) dosyaları, bilinmiyorsa null.",
   "lazy": "`const Map = lazy(() => import(\"./Map.tsx\"), { when: \"visible\", placeholder: \"card\", height: \"20rem\" })` sonra `<Map … />`. `Map.preload()` onu ısıtır (üzerine gelme, boşta). Sonraki çizimler eşzamanlıdır (iskelet yok).",
   "loadDelay": "Yapay yükleme gecikmesi (0 = kapalı).",
@@ -587,18 +587,18 @@
   "runLoad": "Bir rotayı veya tembel parçayı yükler: dosyalarını önceden yükler, demo gecikmesine uyar, sonra (yük çalıştırıcısı üzerinden) çalıştırır.",
   "saveData": "Kullanıcı veri tasarrufu istediyse veya bağlantı 2G sınıfındaysa true: tahmini indirmeler atlanır.",
   "setLoadDelay": "Demo / test: her tembel bileşen ve rota parçası yüklenmeden önce yapay gecikme (ms) ekler (\"yavaş 3G\").",
-  "setLoadRunner": "Rota ve lazy() parça yüklemeleri `r` üzerinden geçer (hadi-march/net içe aktarılınca kendini kurar).",
+  "setLoadRunner": "Rota ve lazy() parça yüklemeleri `r` üzerinden geçer (march/net içe aktarılınca kendini kurar).",
   "setPreloadManifest": "Başka bir manifest kullanır (testler, özel sunucular).",
   "skeleton": "Verilen türde bir iskelet: tek öğe; şekli (satırlar, sıralar, çubuklar, alanlar) CSS çizer (lazy.css).",
   "whenIdle": "Tarayıcı boştayken `fn` işlevini çalıştırır (setTimeout yedekli). İptal işlevi döndürür."
  },
- "hadi-march/sw": {
+ "march/sw": {
   "applyUpdate": "Bekleyen sürümü etkinleştirir ve devralınca sayfayı yeniden yükler.",
   "registerServiceWorker": "Çalışanı kaydeder (desteklenmeyen yerlerde, ör. file:// veya eski tarayıcılarda işlem yapmaz). Kaydı veya null döndürür.",
   "swState": "\"unsupported\" | \"installing\" | \"ready\" | \"update\" (yeni sürüm bekliyor) | \"blocked\" (CSP Trusted Types) | \"error\".",
   "unregisterServiceWorker": "Çalışanı ve önbelleklerini kaldırır (ayarlar › \"çevrimdışı verileri temizle\")."
  },
- "hadi-march/motion": {
+ "march/motion": {
   "animate": "Bir öğeyi (veya herhangi bir motor hedefini) canlandırır. Bir Playback döndürür; `finished` bitince veya iptal edilince çözülür.",
   "animateEl": "Animation nesnesine ihtiyaç duyan bir bileşen (marquee, küçük bir pop) için ham WAAPI animasyonu: her motor animasyonu gibi genel hızı, \"tümünü duraklat\" ve azaltılmış hareketi izler. WAAPI yoksa null.",
   "animateValue": "Bir değeri from → to oynatır; her karede `onUpdate(value)` çağrılır. Diziler yerinde doldurulur (ayırma yok).",
@@ -617,7 +617,7 @@
   "defineDriver": "Yeni bir hedef türü için sürücü kaydeder. Sonraki kayıtlar öncekilere ve yerleşiklere üstün gelir.",
   "defineEasing": "Adlandırılmış bir yumuşatma kaydeder: işlev, CSS yumuşatma dizesi veya bir Ease. Temalar ve uygulamalar kendilerininkini ekleyebilir.",
   "defineMotion": "Motoru genişletir: anahtar kareler, yumuşatmalar, ön ayarlar ve karakterler; hepsi her yerde adıyla kullanılır.",
-  "definePageTransition": "`meta.transition` olarak kullanılabilen bir geçiş türü ekler (ör. hadi-march/motion page-fx içindeki varyantlar).",
+  "definePageTransition": "`meta.transition` olarak kullanılabilen bir geçiş türü ekler (ör. march/motion page-fx içindeki varyantlar).",
   "defineTransition": "Özel bir geçiş tanımlar: `defineTransition(\"pop\", (o) => [{ transform: \"scale(.5)\" }, { transform: \"none\" }])`.",
   "displace": "Türbülans ile bozar: yer değiştirme ölçeği `from` → `to` canlanır (su, ısı, glitch-in).",
   "drag": "Eylem: öğeyi işaretçiyle sürükler (klavye: odaktayken ok tuşları 10px kaydırır).",
@@ -723,7 +723,7 @@
   "staggerIn": "Bir öğe kümesini sırayla getirir (hazır anahtar kareler, motor kademesi: doğrusal, merkezden ya da ızgarada).",
   "stickyReveal": "Yapışkan sahneli uzun bölüm: bölüm kaydıkça adımlar sırayla gelir (her biri belirip yükselir, sonra çıkar). Bölüm kendi üzerine `--m-scroll` (0..1) yazar. Durdurma işlevi döndürür."
  },
- "hadi-march/motion/text": {
+ "march/motion/text": {
   "blurIn": "Kelimeler netleşir (filter).",
   "bounce": "Karakterler sırayla zıplar.",
   "bounceIn": "Karakterler düşer ve taban çizgisinde zıplar.",
@@ -786,22 +786,22 @@
   "wordCycle": "Kelimeler sırayla aşağıdan girip yukarıdan çıkar.",
   "zoomIn": "Karakterler büyük boyuttan küçülerek yerine oturur."
  },
- "hadi-march/motion/text/meta": {
+ "march/motion/text/meta": {
   "TEXT_ANIMATIONS": "Tüm metin animasyonları; aile (enter, exit, loop, decorate, change, interactive), bölme kipi ve maliyetiyle."
  },
- "hadi-march/fx": {
+ "march/fx": {
   "Aurora": "İçeriğin arkasında animasyonlu, bulanık renk lekeleri. `<Aurora colors={[\"#6d5dfc\", \"#22d3ee\", \"#a3e635\"]} />`",
   "confetti": "Bir noktadan (varsayılan ekran merkezi) konfeti patlaması. Bitince tuvalini kaldırır.",
   "Noise": "Tanecik katmanı saran bileşen: `<Noise>…</Noise>` (.m-noise kullanır).",
   "Particles": "İsteğe bağlı bağlantı çizgileri ve imleç çekimi olan yüzen parçacıklar. `<Particles count={80} links={120} speed={0.3} color=\"var(--m-primary)\" interactive class=\"m-fx-fill\" />`",
   "spotlight": "Bir öğe üzerinde imleci izleyen radyal ışık (--m-spot-x/--m-spot-y ayarlar). `use:spotlight`"
  },
- "hadi-march/props": {
+ "march/props": {
   "withParts": "`m:parts` ortak prop'unun elle yazımı: içeride çizilen bileşenlere türüne göre özellik verir (ebeveynin verdiğini ezer, en yakın kapsam kazanır): `withParts(new Map([[Avatar, { size: \"lg\" }]]), () => h(PostCard, props))`.",
   "mProps": "Ortak (`m:`) prop'ları elle uygular: `mProps(h(Card, props), { \"no-select\": true })`. Öğeye ya da bileşenin kök öğelerine yazar; değer fonksiyon olabilir (canlı).",
   "registerMProp": "Yeni bir ortak prop ekler: `registerMProp(\"tone\", (el, v) => …)` ile `m:tone` her öğede ve bileşende çalışır."
  },
- "hadi-march/store": {
+ "march/store": {
   "derive": "Türetilmiş değer (computed): `const total = derive(() => app.cart.items.reduce(…))`.",
   "history": "Bir depo düğümü için geri al/yinele (değişiklik grubu başına anlık görüntü).",
   "on": "Bir yolu dinler (`node`a göreli): \"cart.items\", \"users.*.name\", \"logs.**\". Depoya göre tür denetimlidir.",
@@ -811,7 +811,7 @@
   "storeLog": "Deponun geliştirme değişiklik günlüğü (son 1000 değişiklik; üretimde boş).",
   "subscribe": "`node` ve altındaki (depo veya içindeki herhangi bir iç içe nesne/dizi) her değişikliği dinler. Abonelikten çıkma işlevini döndürür."
  },
- "hadi-march/channel": {
+ "march/channel": {
   "channel": "Tek bir kanal: `const cartChanged = channel<{ count: number }>(\"cart.changed\", { sticky: true })`.",
   "channelDevtools": "Geliştirici araçları: son iletiler, canlı izleme, kanal tablosu. DEV.enabled iken açıktır; `configure({ enabled, size })`.",
   "channelScope": "Geçerli bileşende bir kanal kapsamı başlatır: altında (ve içinde) kullanılan `scoped` kanallar kendi iletilerine, dinleyicilerine ve kalıcı değerlerine sahip olur; böylece bir bileşenin iki kopyası birbirini duymaz.",
@@ -823,34 +823,34 @@
   "setChannelErrorHandler": "Dinleyici hatalarının gideceği yeri belirler. Hatalı bir dinleyici diğerlerini durdurmaz. İşleyici yoksa hata dinleyicinin kendi hata sınırına (catchError / <Try>) gider, o da yoksa mikro görevde yeniden fırlatılır.",
   "useChannel": "Kapsamlı bir kanalı geçerli bileşenin kapsamına bağlar. Kurulum sırasında çağırın ve tutamacı olay işleyicilerinde ve zamanlayıcılarda kullanın (bunlar sahipsiz çalışır ve aksi halde uygulama genelindeki veri yoluna ulaşır)."
  },
- "hadi-march/behaviors/drag": {
+ "march/behaviors/drag": {
   "arrowStep": "Ok / Home / End / Page tuşları → bir adım (basış başına −1 … 1, Shift veya Page tuşlarıyla ×10); diğer tuşlar için null.",
   "draggable": "Bir öğeyi sürüklenebilir yapar: üzerine (veya `handle` üzerine) her basış bir pointerDrag oturumu başlatır. Temizleme işlevini döndürür. Eylem olarak çalışır: `<div use:draggable={[draggable, { handle: \".grip\", onMove: (p) => … }]}>`.",
   "track": "`el` üzerinde başlayan imleç sürüklemelerini izler. Temizleme işlevini döndürür (geçerli sahiple de çalışır)."
  },
- "hadi-march/behaviors/roving-focus": {
+ "march/behaviors/roving-focus": {
   "rovingFocus": "Ok tuşları `container` öğelerinin arasında gezinir; yalnızca etkin öğe Tab durağıdır. Durdurma işlevini döndürür."
  },
- "hadi-march/behaviors/resize-handle": {
+ "march/behaviors/resize-handle": {
   "resizeHandle": "`el` öğesini yeniden boyutlandırma ayırıcısı yapar. Temizleme işlevini döndürür (geçerli sahiple de çalışır)."
  },
- "hadi-march/behaviors/list-nav": {
+ "march/behaviors/list-nav": {
   "listNav": "Bir alanın gösterdiği seçenekler üzerinde klavye gezintisi (aria-activedescendant deseni). Tuşu işlediyse true döndüren bir keydown işleyicisi döndürür. Home / End için Ctrl / ⌘ gerekir (o olmadan imleci alanda hareket ettirirler).",
   "moveCursor": "Bir gezinti tuşu için sonraki imleç dizini; tuş gezinti tuşu değilse null. Sınırlıdır, başa sarmaz."
  },
- "hadi-march/behaviors/dropzone": {
+ "march/behaviors/dropzone": {
   "dropzone": "`el` öğesinin bırakılan dosyaları almasını sağlar. Temizleme işlevini döndürür (geçerli sahiple de çalışır)."
  },
- "hadi-march/behaviors/swipe": {
+ "march/behaviors/swipe": {
   "fling": "`pos` konumunda `v` hızıyla (px / ms) bırakmanın duracağı yeri, sınırlı olarak hesaplar (en yakın noktaya oturtmak için).",
   "nearest": "`points` içinde `target`a en yakın duruş noktası.",
   "rubberBand": "Sınırı aşınca direnç: `over` px çekme, `k·√over` px harekete karşılık gelir (varsayılan 4·√over).",
   "swipeable": "`el` öğesini kaydırılabilir yapar. Temizleme işlevini döndürür. Eylem olarak çalışır: `<div use:swipeable={[swipeable, opts]}>`."
  },
- "hadi-march/behaviors/dismiss": {
+ "march/behaviors/dismiss": {
   "dismiss": "`el` (ve `inside`) dışındaki basışları ve Escape tuşunu izler. Durdurma işlevini döndürür (geçerli sahiple de çalışır)."
  },
- "hadi-march/i18n": {
+ "march/i18n": {
   "dir": "Etkin dilin metin yönü (sinyal).",
   "format": "ICU biçimli bir iletiyi değerlerle biçimlendirir. Kesme işaretleri olduğu gibidir (ICU tırnaklaması yok: Türkçe/İngilizce metinler bunları kullanır). {x}, {n, plural, …} (#, =N ile, offset yok), {s, select, …}, {n, number[, …} desteklenir.",
   "loadLocale": "Tembel bir paket kaydeder: `setLocale(loc)` ilk çağrıldığında yüklenir.",
@@ -858,17 +858,17 @@
   "typed": "Bir katalog için türlü çevirici: anahtarlar var olmalı ve her değişken verilmelidir.",
   "unused": "`loc` içinde olup bu oturumda hiçbir kodun aramadığı anahtarlar (eskimiş çeviriler)."
  },
- "hadi-march/icons": {
+ "march/icons": {
   "defineIcon": "Saf işlev: kullanılmayan simgeler paketlerden çıkarılır (esbuild @__NO_SIDE_EFFECTS__ işaretini dikkate alır).",
   "Icon": "`<Icon of={users} size=\"lg\" />`",
   "isIconDef": "Değer bir simge tanımı mı (defineIcon)?",
   "svgIcon": "Bir simgeyi <svg> öğesi olarak oluşturur. Etiket verilmedikçe süslemedir (aria-hidden).",
   "paintIcon": "Bir ikonu var olan <svg> içine çizer (öznitelik ve şekiller değişir): canlı ikonlar yerinde yeniden boyanır."
  },
- "hadi-march/icons/catalog": {
+ "march/icons/catalog": {
   "ICONS": "Tüm yerleşik simgeler ada göre (simge seçiciler ve arama için; paketleri küçük tutmak için tek tek simge içe aktarın)."
  },
- "hadi-march/theme": {
+ "march/theme": {
   "COLOR_TOKENS": "Bir bileşenin `color` prop'unun kabul ettiği renk belirteçleri (src/css/colors.css). Yalnızca tema belirteçleri, ham CSS rengi asla; böylece tema değişince her bileşen tutarlı kalır. defineTheme ile ad eklenebilir (marka / kategori renkleri).",
   "contrast": "İki hex rengin WCAG karşıtlık oranı.",
   "contrastTheme": "Yüksek Karşıtlık: erişilebilirlik için siyah, beyaz, güçlü mavi / sarı.",
@@ -895,7 +895,7 @@
   "themeCss": "Bir tema için CSS: `[data-m-theme=\"id\"]` açık, koyu (sistem veya data-theme=\"dark\"). `isDefault`, data-m-theme olmayan <html> öğesini de hedefler.",
   "THEMES": "Yerleşik temalar, varsayılan ilk sırada."
  },
- "hadi-march/net": {
+ "march/net": {
   "acceptLanguage": "March dilinden (veya kendi işlevinizden) Accept-Language üstbilgisi.",
   "api": "Bir Api sınıfının tek örneği (Net başına). `api(UsersApi)`, `api(UsersApi, { net: testNet })`.",
   "Api": "Türlü bir API için temel sınıf: uç nokta başına bir yöntem, net üzerinden önbellekli sorgular ve geçersiz kılma.",
@@ -919,7 +919,7 @@
   "net": "Uygulamanın Net örneği.",
   "Net": "İstek istemcisi: temel URL, zaman aşımı, geri çekilmeli yeniden deneme, eşzamanlılık sınırı, ara katmanlar, aktarımlar.",
   "normalizeErrors": "Hata normalleştirme: yaygın gövde biçimlerindeki alan hataları `context.fields` içine gider; `map` hatayı değiştirebilir.",
-  "onInvalidate": "Diğer katmanlar (hadi-march/net api → veri sorguları) net.invalidate() işlevine bağlanır.",
+  "onInvalidate": "Diğer katmanlar (march/net api → veri sorguları) net.invalidate() işlevine bağlanır.",
   "parseBody": "Bir gövdeyi türüne göre ayrıştırır (boş JSON null olur; ayrıştırılamayan JSON metin kalır).",
   "record": "Her yanıtı `into` içine kaydeder (yöntem + url + sorgu anahtarıyla).",
   "replay": "Bir kayıttan yanıt verir; bilinmeyen istekler ağa devam eder (`strict` ile başarısız olur).",
@@ -933,7 +933,7 @@
   "timing": "Server-Timing ve toplam süre: ctx.state.ms, ctx.state.serverTiming ({ name: ms }).",
   "WsTransport": "Bir WebSocket üzerinden istekler: `net.request({ url: \"ws:/rpc\", body: { type: \"getUser\", id } })` gövdeyi gönderir ve yanıtla çözülür; `stream(\"ws:/path#topic\")` bir konuya abone olur."
  },
- "hadi-march/net/mock": {
+ "march/net/mock": {
   "crud": "Bir yol altında durum tutan CRUD: liste (?q= arama, ?limit= / ?offset=), al, oluştur, güncelle (PUT / PATCH), sil.",
   "fake": "Tohumlu sahte veri: adlar, e-postalar, kelimeler, tarihler, sayılar ve aynı tohum için tekrarlanan listeler.",
   "fromOpenApi": "Bir OpenAPI 3 belgesinin her işlemi için işleyiciler (örnekleri, yoksa şemalardan üretilen veri).",
@@ -946,14 +946,14 @@
   "rng": "Belirleyici rastgele sayılar (mulberry32).",
   "sample": "Bir JSON şeması için örnek veri (tohumlu; $ref, enum, format, example izler)."
  },
- "hadi-march/errors": {
-  "emitError": "Bir hatayı toplayıcıya iletir (hadi-march/errors kurulu değilse etkisizdir).",
+ "march/errors": {
+  "emitError": "Bir hatayı toplayıcıya iletir (march/errors kurulu değilse etkisizdir).",
   "ErrorInline": "Bir hedef için satır içi hata (\"inline\" kuralı): form bölümü, kart, liste.",
   "ErrorPage": "\"page\" kuralı için tam sayfa hata görünümü (sayfa içeriğinin geldiği yere koyun, örn. <Outlet/> üstüne).",
   "errors": "Yakalanan hatalar: son liste, dinleyiciler, raporlama ve temizleme.",
-  "setErrorSink": "hadi-march/errors toplayıcıyı buraya kurar; o zamana dek bildirilen hatalar hiçbir yere gitmez."
+  "setErrorSink": "march/errors toplayıcıyı buraya kurar; o zamana dek bildirilen hatalar hiçbir yere gitmez."
  },
- "hadi-march/managers": {
+ "march/managers": {
   "a11y": "Erişilebilirlik yöneticisi. Her yöntem tek örneğe gider (ilk kullanımda oluşturulur).",
   "a11yManager": "Erişilebilirlik yöneticisinin kendisi: get(), configure(), dispose(), alive().",
   "announce": "`text` metnini ekran okuyuculara söyler (varsayılan olarak nazik).",
@@ -1096,14 +1096,14 @@
   "viewportManager": "Görünüm alanı yöneticisi (get, configure, dispose).",
   "windowManager": "Pencere yöneticisi (get, configure, dispose)."
  },
- "hadi-march/managers/consent/ui": {
+ "march/managers/consent/ui": {
   "ConsentBanner": "Alt şerit; geçerli politika sürümü için geçerli bir karar yokken gösterilir.",
   "ConsentGate": "Alt öğelerini yalnız `category` verilmişken çizer; aksi halde yerinde izin verilebilen bir yer tutucu gösterir.",
   "hideConsentBanner": "Şeridi kapatır; üzerinde yapılan bir seçim bunu çağırır. Saklı karar değişince veya silinince geri gelir.",
   "openConsentPreferences": "Ayrıntılı panel. Kullanıcı bir seçimi kaydettiyse true, kapattıysa false ile çözülür.",
   "showConsentBanner": "Saklı bir karar olsa bile şeridi yeniden gösterir (\"çerez ayarları\" bağlantısı, demolar)."
  },
- "hadi-march/managers/command/ui": {
+ "march/managers/command/ui": {
   "bindCommandKeys": "Kayıtlı her komutun kısayolunu bağlar (ui/keys üzerinden). Komutlar değişince yeniden bağlar. unbind döndürür. Basit bağlama: kapsam yok, çakışmada en yeni komut kazanır.",
   "commandBinding": "Bir araç çubuğu / durum çubuğu öğesini komut kimliğine bağlar (OverflowToolbar, StatusBar): kendi `label`, `icon`, `shortcut`, `disabled` ve `onSelect` değerleri komutunkilerin yerine geçer. Tepkisel: sonradan kaydedilen komut da alınır.",
   "CommandButton": "Bir komuta bağlı Button: komutu çalıştırır, meşgul durumunu gösterir, `when` ve `can` değerlerini izler.",
@@ -1111,10 +1111,10 @@
   "commandMenuItem": "Bir komut, menü girdisi olarak (Menu, ileride ContextMenu): label, icon, shortcut, disabled, hidden.",
   "CommandToolbar": "Kayıt defterinden doldurulan araç çubuğu (düğme grubu)."
  },
- "hadi-march/managers/undo": {
+ "march/managers/undo": {
   "undoHistory": "Aynı motorla ayrı bir geçmiş (birleştirme penceresi, işlemler, kaydedilmiş nokta); olaylar hiçbir yere gitmez."
  },
- "hadi-march/flow": {
+ "march/flow": {
   "boundsOf": "Düğümlerin dünya birimlerinde sınırları.",
   "createFlow": "Akış deposu: `const flow = createFlow({ types, doc })`, ardından `<FlowCanvas flow={flow} />`.",
   "createFlowRunner": "`const runner = createFlowRunner(flow)`; `<FlowControls runner={runner} flow={flow} />`",
@@ -1138,13 +1138,13 @@
   "portsOf": "Bir düğüm türünün girişleri ve çıkışları (eksikse boş listeler).",
   "validateFlow": "Bir belgenin sorunları (okunabilir cümleler); geçerliyse boş."
  },
- "hadi-march/context-menu": {
+ "march/context-menu": {
   "ContextMenu": "`<ContextMenu items={(target) => [{ label: \"Copy\", onSelect: copy }, \"-\", remove]}>{area}</ContextMenu>`"
  },
- "hadi-march/managers/undo/history": {
+ "march/managers/undo/history": {
   "create": "Verilen yapılandırmayla bir geri alma yığını; `pub` olaylarını bildirir (UndoManager bunu kanalına bağlar)."
  },
- "hadi-march/seo": {
+ "march/seo": {
   "_resetHead": "applyHead'in yazdıklarını unutur (testler).",
   "_resetSeo": "Sıfırlar (testler).",
   "applyHead": "Etiketleri document.head'e yazar: yerinde günceller, artık istenmeyenleri geri yükler veya kaldırır. `scripts: false` JSON-LD'ye dokunmaz (ne yazılır ne kaldırılır: derlemeden gelen bloklar kalır).",
@@ -1162,44 +1162,44 @@
   "twitterTags": "Twitter / X <meta name=\"twitter:…\"> etiketleri.",
   "useHead": "Çağıran bileşen yaşadığı sürece başlık etiketleri ekler (onunla birlikte kaldırılır). `input` bir işlev olabilir: izlenir, içinde okunan sinyaller başlığı günceller."
  },
- "hadi-march/seo/hydrate": {
+ "march/seo/hydrate": {
   "hydrate": "Önceden oluşturulmuş HTML'i (data-m-prerender) titremeden devralır; yoksa normal çizer.",
   "prerenderedFor": "URL, `el` içine önceden oluşturulmuş rotayı gösteriyorsa true (data-m-prerender: karma yönlendirmede \"#/x\", aksi halde \"/x\"). Geçmiş yönlendirmesi yolun sonunu karşılaştırır, böylece her tabanda çalışır; \"/\" yalnız klasör URL'sine uyar.",
   "HYDRATING_ATTR": "hydrate() uygulamayı ekran dışında kurarken <html> üzerinde duran öznitelik: giriş animasyonları ön işlenmiş içeriği yeniden oynatmaz."
  },
- "hadi-march/managers/accessibility/ui": {
+ "march/managers/accessibility/ui": {
   "AccessibilitySettings": "Tüm tercihler, değiştikçe uygulanır.",
   "openAccessibilityPanel": "Ayarlar bir iletişim kutusunda."
  },
- "hadi-march/managers/shortcut-hint": {
+ "march/managers/shortcut-hint": {
   "comboOf": "aria-keyshortcuts (\"Control+Shift+S\", birden çoksa ilki) veya data-hotkey (\"mod+shift+s\") → formatKey için bir birleşim."
  },
- "hadi-march/managers/shortcut-hint/ui": {
+ "march/managers/shortcut-hint/ui": {
   "holdHint": "Alt bilgi veya yardım sayfası için \"Kısayolları görmek için Alt'a basılı tutun\" satırı.",
   "ShortcutHelp": "Gruplanmış yardım listesi; etkin olmayanlar (başka kapsam, kipli pencere altında) soluk gösterilir.",
   "ShortcutHints": "Bir kez bağlayın (ör. uygulama kabuğunda)."
  },
- "hadi-march/dom/safe": {
+ "march/dom/safe": {
   "RICH_SCHEMA": "Zengin metin: paragraflar, başlıklar, alıntılar, listeler, kod, bağlantılar, vurgu."
  },
- "hadi-march/dom/sanitize": {
+ "march/dom/sanitize": {
   "BLOCKS": "Blok düzeyi öğeler (normalizeBlocks bunları en üst düzeyde tutar).",
   "decodeEntities": "Karakter başvurularını çözer (&amp; &#39; &#x1F600; ve yaygın adlandırılmış olanlar).",
   "normalizeBlocks": "`root`'un alt öğelerini temiz bir blok listesi yapar: satır içi düğüm dizileri <p> içine sarılır, <div> ve diğer kapsayıcılar düzleştirilir, bloklar arası boşluk kaldırılır, <li> / <blockquote> içindeki <p> açılır.",
   "parseHtml": "Bir HTML dizesini izin verilen düğümlerden oluşan bir parçaya ayrıştırır. Satır içi stiller yalnızca ofis uygulamalarının stil olarak kodladığı vurguyu (font-weight, font-style, text-decoration) korumak için okunur; asla kopyalanmaz.",
   "sanitizeNode": "`node`'un alt öğelerini şemadan geçirerek (parseHtml ile aynı kurallar) yeni bir parçaya kopyalar."
  },
- "hadi-march/dom/to-markdown": {
+ "march/dom/to-markdown": {
   "toMarkdown": "Bir DOM ağacını (alt öğeleri blok olan bir kök: p, h1–h6, blockquote, ul / ol, pre, hr) Markdown olarak yazar."
  },
- "hadi-march/base": {
+ "march/base": {
   "_resetAppBase": "Önbelleğe alınmış kökü unutur (testler ya da belgenin <base> etiketi değiştiğinde).",
   "appBase": "Uygulamanın kök yolu: /app/ altındaki uygulama için \"/app\", alan adı kökünde \"\" (sonda eğik çizgi yok).",
   "appBaseUrl": "Uygulamanın kök klasörü URL olarak (\"/\" ile biter); tarayıcı dışında null.",
   "appUrl": "Genel bir dosya ya da uygulama yolunu uygulama kökü altında tam URL yapar; baştaki \"/\" uygulama kökü demektir. Tam URL, data:, blob: ve \"#…\" olduğu gibi geçer.",
   "setAppBase": "Kökü elle ayarlar (\"/app/\" ya da tam URL); null yeniden otomatik bulmaya döner."
  },
- "hadi-march/icons/packs": {
+ "march/icons/packs": {
   "Icon": "Ad ile ikon bileşeni (\"lucide:user\" gibi paket önekiyle); paket tembel yükleniyorsa geldiğinde çizilir.",
   "icon": "Ad ile ikon (\"lucide:user\" gibi paket önekiyle); önek yoksa March seti.",
   "iconPack": "Bu kimlikle kayıtlı paket, varsa.",
@@ -1210,7 +1210,7 @@
   "parseIconRef": "\"lucide:user\" → [\"lucide\", \"user\"] olarak böler; önek yoksa March seti.",
   "registerIconPack": "İkon seti ekler; icon(\"id:…\") ve <Icon name=\"id:…\"> onu kullanır. Geri kaldıran bir işlev döndürür."
  },
- "hadi-march/landing": {
+ "march/landing": {
   "actionButtons": "Bir eylem listesi için düğmeler (ilki birincil): Hero, CtaBand ve Pricing ortak kullanır.",
   "Appear": "Parçalar: her alt öğe kendi adımında belirir. `<Appear><li>Bir</li><li>İki</li></Appear>` (liste çizer).",
   "BeforeAfter": "Önce / sonra karşılaştırması: `<BeforeAfter before={eski} after={yeni} beforeLabel=\"Önce\" afterLabel=\"Sonra\" />`; sürükle, bas, klavye ya da `follow` ile imleci izle.",
@@ -1253,7 +1253,7 @@
   "Testimonials": "Kullanıcı yorumları: `<Testimonials variant=\"wall\" items={[{ quote: \"…\", name: \"Ada\", role: \"CTO, HADİ\", rating: 5 }]} />`.",
   "VideoBackground": "Video arka plan: `<VideoBackground src=\"/clip.webm\" poster=\"/clip.jpg\"><h1>…</h1></VideoBackground>`."
  },
- "hadi-march/components/composite/theme-editor": {
+ "march/components/composite/theme-editor": {
   "applyDraft": "Bir taslağı kaydeder ve tüm uygulamayı ona geçirir (setColorTheme).",
   "contrastAudit": "Bir kipin WCAG denetimleri: metin çiftleri 4,5:1, vurgular ve göstergeler 3:1 ister (WCAG 1.4.11); her hata için bir düzeltme önerilir.",
   "decodeDraft": "encodeDraft kodundan taslak üretir (kod bir taslak değilse null).",
@@ -1279,19 +1279,19 @@
   "toneScale": "Bir rengin 10 adımlı ton ölçeği: 500'ün altında beyaza doğru açılır, üstünde siyaha doğru koyulaşır.",
   "typeScale": "Bir taslağın px cinsinden yazı boyutları (2xs … 5xl): taban × oran^adım; adımlar, 1,2 oranı yerleşik ölçeği verecek biçimde ayarlıdır."
  },
- "hadi-march/components/data/data-grid": {
+ "march/components/data/data-grid": {
   "DataGrid": "Gruplama, toplam satırları ve seçim içeren veri ızgarası: `<DataGrid rows={rows} columns={[{ key: \"amount\", aggregate: \"sum\" }]} groupBy={[\"region\"]} selectable />`"
  },
- "hadi-march/components/data/gantt": {
+ "march/components/data/gantt": {
   "Gantt": "Görevleri zaman ekseninde çubuklarla gösteren Gantt şeması: `<Gantt tasks={$tasks} scale=\"week\" onChange={(task) => save(task)} />`"
  },
- "hadi-march/components/data/scheduler": {
+ "march/components/data/scheduler": {
   "Scheduler": "Etkinliklerin taşınıp oluşturulabildiği takvim: `<Scheduler events={$events} view=\"week\" onChange={(ev, r) => save(ev.id, r)} onCreate={(r) => add(r)} />`"
  },
- "hadi-march/components/data/tree-view": {
+ "march/components/data/tree-view": {
   "TreeView": "Tembel yükleme, çoklu seçim, arama ve sürüklemeyle büyük ağaç görünümü: `<TreeView nodes={files} load={(n) => api.children(n.id)} selection=\"multiple\" search={$q} draggable />`"
  },
- "hadi-march/app-ui": {
+ "march/app-ui": {
   "addMissing": "Düzende olmayan panelleri kendi yerlerine (`place`) ekler.",
   "allot": "Pikseli ağırlıklara böler, en küçük boyutları korur; sığmazsa orantılı küçültür.",
   "allPanels": "Ağaçtaki bütün panel kimlikleri.",

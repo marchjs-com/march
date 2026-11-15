@@ -1,4 +1,4 @@
-// FollowButton (hadi-march/ui): Follow → Following (or Requested for a private account) with a morph: the pill's
+// FollowButton (march/ui): Follow → Following (or Requested for a private account) with a morph: the pill's
 // width springs from one label to the other, the filled Aktivite background turns into an outline, the + turns into a
 // tick, and a small burst of the four HADİ colors marks a new follow (motion engine; reduced motion keeps only the
 // state change). Hovering "Following" warns in red before you unfollow.

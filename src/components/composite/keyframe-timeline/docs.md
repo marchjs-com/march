@@ -50,4 +50,4 @@ right in every writing direction, as in any timeline.
 
 Card (the frame), Toolbar with IconButton and Segmented (transport), TimeRuler (ruler and playhead), ListRow and
 StatusDot (lane labels), Field and NumberInput (time and value), EasingCurveEditor (the selected keyframe's easing);
-the motion engine's timeline, easings and clock; the drag behavior (`hadi-march/behaviors/drag`) for the keyframes.
+the motion engine's timeline, easings and clock; the drag behavior (`march/behaviors/drag`) for the keyframes.

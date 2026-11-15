@@ -9,7 +9,7 @@ the barrel, the registry and the catalogues; `--check` (and `npm test`) fails wh
 ## Start
 
 ```
-march gen component <Name> --category <id> [--parts A,B]   # in the hadi-march repo: the folder below, then gen-registry
+march gen component <Name> --category <id> [--parts A,B]   # in the march repo: the folder below, then gen-registry
 march check component <category>/<name>
 ```
 
@@ -23,13 +23,13 @@ march check component <category>/<name>
 | `docs.md` | first paragraph + first code block feed the catalogues; `## Props`, `## Accessibility`, `## Composed of` |
 | `demo.tsx` | showcase stage: `default (props: { values })` draws it for the Playground values. A thunk that rebuilds the component reads the values itself (`{() => { const v = { ...props.values }; return <X tone={v.tone} /> }}`): a value only passed on as a prop becomes a live getter the component reads once, untracked, and the option changes nothing. An option that acts on the next interaction shows its effect at once (a `sc-demo-call` line, or the state it shapes opened) |
 | `playground.ts` | options with an effect only (`visibleWhen` while they have none); choices go through ChoicePicker |
-| `meta.ts` | `name`, `status` (stable / experimental / deprecated), `since`, `summary`, `category`, `composedOf`, `behaviors`, `hubs`; `entry` for a heavy feature with its own package entry (e.g. `hadi-march/flow`): it stays out of the `hadi-march/ui` barrel and the registry, and its page imports `demo.tsx` + `playground.ts` (type-only meta import) itself |
+| `meta.ts` | `name`, `status` (stable / experimental / deprecated), `since`, `summary`, `category`, `composedOf`, `behaviors`, `hubs`; `entry` for a heavy feature with its own package entry (e.g. `march/flow`): it stays out of the `march/ui` barrel and the registry, and its page imports `demo.tsx` + `playground.ts` (type-only meta import) itself |
 
 ## Category
 
 `src/components/categories.ts` is the one list: layout, typography, actions, forms, data, feedback, overlays,
 navigation, media, motion, social, composite, landing. `meta.category` names it and must match the folder; the
-category is the subpath (`import { Chip } from "hadi-march/actions"`), the showcase menu group, and the section in
+category is the subpath (`import { Chip } from "march/actions"`), the showcase menu group, and the section in
 docs/components.md and the AI catalogue. A component built from other components (NavSidebar, Wizard, ThemeMenu,
 CommandPalette, ConsentBanner …) is **composite**: `meta.composedOf` must name its parts, each a registered component,
 and the showcase card shows "Şunlardan oluşur" with links to them. Missing parts are written as their own components

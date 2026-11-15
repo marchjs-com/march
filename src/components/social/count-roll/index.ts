@@ -1,4 +1,4 @@
-// CountRoll (hadi-march/ui): a number that rolls when it changes. Only the digits that changed move, upward when the
+// CountRoll (march/ui): a number that rolls when it changes. Only the digits that changed move, upward when the
 // value grows and downward when it shrinks (an odometer), on the motion engine. Compact by default (1,2 B / 12K) in the
 // active locale; screen readers get the full value once, never the moving pieces. This is the one odometer: the
 // landing Counter's `mode="roll"` draws through it (the digits themselves are motion/digits.ts).

@@ -1,4 +1,4 @@
-/* hadi-march/errors: page / inline error views and the developer layer. Tokens only. */
+/* march/errors: page / inline error views and the developer layer. Tokens only. */
 .m-error-page { display: grid; gap: var(--m-space-2, .5rem); padding: var(--m-space-6, 1.5rem); border: 1px solid var(--m-danger); border-radius: var(--m-radius-3); background: var(--m-surface); }
 .m-error-title { margin: 0; font-weight: 600; color: var(--m-danger-text, var(--m-danger)); }
 .m-error-actions { display: flex; flex-wrap: wrap; gap: var(--m-space-2, .5rem); }

@@ -1,7 +1,7 @@
 // FeatureFlagManager: turn features on and off without a release — fixed values, gradual rollout by a stable user
 // hash, A/B variants, conditions, remote values and local overrides (kept across reloads, for testing).
 //
-//   import { flags, configureFlags } from "hadi-march/managers/flags";
+//   import { flags, configureFlags } from "march/managers/flags";
 //   configureFlags({
 //     user: () => session.id,
 //     flags: {

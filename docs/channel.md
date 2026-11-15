@@ -1,11 +1,11 @@
-# Channels (`hadi-march/channel`)
+# Channels (`march/channel`)
 
 Typed messages between parts of an app that do not know each other: a button adds to the cart, the badge in the top
 bar updates; a chart is clicked, a list elsewhere filters. A separate module: it costs nothing until imported.
 
 ```ts
 // src/channels.ts — the one place where names and payloads are declared
-import { defineChannels, of } from "hadi-march/channel";
+import { defineChannels, of } from "march/channel";
 export const ch = defineChannels({
   "cart.changed": of<{ count: number }>({ sticky: true }),
   "cart.cleared": of(),                                   // no payload
@@ -67,7 +67,7 @@ Wildcard listeners live on the bus of the scope they are created in.
 
 ## Across tabs (`crossTab: true`)
 
-All crossTab channels share one `BroadcastChannel("hadi-march:channels")` (same origin only). A message is delivered
+All crossTab channels share one `BroadcastChannel("march:channels")` (same origin only). A message is delivered
 in this tab synchronously and posted to the others; there `from` is `"tab"` and it is not posted again. A sticky
 crossTab channel asks the open tabs for their last value when it is declared, so a tab opened later catches up.
 

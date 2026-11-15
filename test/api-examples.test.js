@@ -28,7 +28,7 @@ test("the indexes, the per-example modules and the signature files are up to dat
 
 test("examples load lazily: nothing at start-up, the API page's index loads the part of an example", () => {
   const index = readFileSync(new URL("../examples/showcase/src/api-examples.gen.ts", import.meta.url), "utf8");
-  assert.doesNotMatch(index, /^import (?!type )(?!\{ runLoad \} from "hadi-march\/lazy";$)/m, "the index imports no example statically");
+  assert.doesNotMatch(index, /^import (?!type )(?!\{ runLoad \} from "march\/lazy";$)/m, "the index imports no example statically");
   assert.doesNotMatch(index, /api-examples\/[a-z0-9-]+\.tsx"/, "the index never loads a whole group file");
   const main = readFileSync(new URL("../examples/showcase/src/main.tsx", import.meta.url), "utf8");
   assert.doesNotMatch(main, /api-examples/);
@@ -53,9 +53,9 @@ test("examples load lazily: nothing at start-up, the API page's index loads the 
 });
 
 test("a group file splits into examples that import only what they use", () => {
-  const src = `import { signal, computed } from "hadi-march";
-import { Button, Badge } from "hadi-march/ui";
-import type { Manager } from "hadi-march/managers";
+  const src = `import { signal, computed } from "march";
+import { Button, Badge } from "march/ui";
+import type { Manager } from "march/managers";
 import { examples } from "./types.ts";
 import "./g.css";
 export { default as SIG } from "./g.sig.gen.ts";
@@ -67,14 +67,14 @@ function Box() { return <Badge>{fmt(null as never)}</Badge> }
 const lazyKit = () => import("./_kit.tsx")
 
 export default examples({
-  "hadi-march": {
+  "march": {
     signal: {
       code: \`signal(1)\`,
       run: () => { ensure(); const n = signal(1); return <Button onClick={() => n.set(2)}>{n}</Button> },
     },
     Signal: { code: "x", run: () => <Box /> },
   },
-  "hadi-march/ui": {
+  "march/ui": {
     Badge: { code: "x", run: () => lazyKit() },
   },
 })
@@ -84,15 +84,15 @@ export default examples({
   const keys = fileKeys(["signal", "Signal"]);
   assert.notEqual(keys.get("signal").toLowerCase(), keys.get("Signal").toLowerCase());
   const sig = files[`gen/g/main--${keys.get("signal")}${ONE}`];
-  assert.match(sig, /^import \{ signal \} from "hadi-march";$/m);
-  assert.match(sig, /^import \{ Button \} from "hadi-march\/ui";$/m);
+  assert.match(sig, /^import \{ signal \} from "march";$/m);
+  assert.match(sig, /^import \{ Button \} from "march\/ui";$/m);
   assert.match(sig, /^import \{ ensure \} from "\.\/_ready\.tsx";$/m, "a helper that writes a let stays with it");
   assert.match(sig, /^import "\.\.\/\.\.\/g\.css";$/m);
   assert.doesNotMatch(sig, /computed|Badge|{ examples }|SIG/);
   const box = files["gen/g/_box.tsx"];
-  assert.match(box, /^import \{ Badge \} from "hadi-march\/ui";$/m);
+  assert.match(box, /^import \{ Badge \} from "march\/ui";$/m);
   assert.match(box, /^import \{ fmt \} from "\.\/_fmt\.tsx";$/m);
-  assert.match(files["gen/g/_fmt.tsx"], /^import type \{ Manager \} from "hadi-march\/managers";$/m, "a name used only as a type is a type import");
+  assert.match(files["gen/g/_fmt.tsx"], /^import type \{ Manager \} from "march\/managers";$/m, "a name used only as a type is a type import");
   assert.match(files["gen/g/_lazy-kit.tsx"], /import\("\.\.\/\.\.\/_kit\.tsx"\)/, "a relative import() is rebased");
   assert.match(files["gen/g/_ready.tsx"], /^let ready = false$/m);
   assert.match(files["gen/g/_ready.tsx"], /^export \{ ready, ensure \};$/m);

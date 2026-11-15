@@ -1,5 +1,5 @@
-// hadi-march/motion/text — text animations. Every animation is its own export and tree-shakes on its own:
-//   import { dissolve, shake } from "hadi-march/motion/text";
+// march/motion/text — text animations. Every animation is its own export and tree-shakes on its own:
+//   import { dissolve, shake } from "march/motion/text";
 //   dissolve(el); shake(el, { by: "word", stagger: 40 });
 // All run on the motion engine (global speed, pause all, reduced motion) and share one small core: splitText()
 // (accessible, grapheme and RTL safe) and the stagger runner. Catalog for tools and docs: ./meta.ts.

@@ -1,4 +1,4 @@
-// Kanban (hadi-march/ui). Folder: src/components/data/kanban/. Cards move with the drag behavior (mouse and pen at
+// Kanban (march/ui). Folder: src/components/data/kanban/. Cards move with the drag behavior (mouse and pen at
 // once, touch after a long press so the board still scrolls) or with Alt+← / Alt+→.
 import "./kanban.css";
 import { signal, untrack } from "../../../core/reactive.ts";

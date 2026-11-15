@@ -1,4 +1,4 @@
-// Alert / Notice (hadi-march/feedback): a message in one of the tones, with an optional title, icon and dismiss button.
+// Alert / Notice (march/feedback): a message in one of the tones, with an optional title, icon and dismiss button.
 import "./alert.css";
 import { signal, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";

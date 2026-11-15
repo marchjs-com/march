@@ -23,7 +23,7 @@ height follows. Back / Next buttons and a step counter come with it.
 | `onFinish` | `() => void` | — | the last step's button |
 | `vertical` | boolean / accessor | `false` | steps in a column beside the panel (live; stacked when narrow) |
 | `morph` | boolean / accessor | `true` | morph between steps; `false`: the highlight and the panel change at once |
-| `m:color` | ColorToken | theme primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | ColorToken | theme primary | Common prop (march/props): the colour token of the component and everything in it. |
 | `highlight` | boolean | `true` | the liquid highlight around the current step |
 | `counter` | boolean / `(i, n) => node` | `true` | the "2 / 4" counter between Back and Next, or your own content |
 | `labels` | `{ back?, next?, step?: (i, n) => string }` | "Back", "Next", "Step n of m" | button texts and the panel's accessible name (the last button is `finishLabel`) |

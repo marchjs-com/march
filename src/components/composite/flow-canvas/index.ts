@@ -1,4 +1,4 @@
-// FlowCanvas (hadi-march/ui): a node editor on an endless canvas. Pan (drag the background with the hand tool, the
+// FlowCanvas (march/ui): a node editor on an endless canvas. Pan (drag the background with the hand tool, the
 // middle button, Space or one finger; wheel), zoom (Ctrl/⌘ + wheel, pinch, + / −), snap to the grid, nodes with
 // ports and form fields, bezier edges drawn in on the motion engine, values flowing along the edges as moving dots,
 // box and multi selection, copy / paste (ClipboardManager), undo (UndoManager), minimap, layered auto layout,

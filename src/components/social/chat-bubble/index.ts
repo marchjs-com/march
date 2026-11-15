@@ -1,4 +1,4 @@
-// ChatBubble (hadi-march/ui): one chat message. Mine: an Aktivite-blue gradient with light text; theirs: the card
+// ChatBubble (march/ui): one chat message. Mine: an Aktivite-blue gradient with light text; theirs: the card
 // color with a line. Bubbles of one sender group (first / middle / last) and only the last keeps the 6px "tail"
 // corner. Inside: sender name (group chats, a HADİ color per sender), reply quote, text (emoji-only messages grow), time
 // and delivery ticks (sending · sent · delivered · read), reaction chips. Drag it sideways to reply (motion engine

@@ -1,4 +1,4 @@
-// Faq (hadi-march/landing): frequently asked questions as an Accordion. `split` puts the heading and a contact line at
+// Faq (march/landing): frequently asked questions as an Accordion. `split` puts the heading and a contact line at
 // the start and the questions at the end; `search` adds a SearchBox that narrows the list with the shared fuzzy ranking
 // (accent- and case-insensitive, typo tolerant) and says how many questions match.
 import "./faq.css";

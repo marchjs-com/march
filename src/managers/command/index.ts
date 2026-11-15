@@ -1,7 +1,7 @@
 // CommandManager: one registry of user commands. The command palette, menus, context menus, toolbars and buttons all
 // show the same entry, with the same permission, availability, busy state and shortcut.
 //
-//   import { command, commands } from "hadi-march/managers/command";
+//   import { command, commands } from "march/managers/command";
 //   const save = command({
 //     id: "doc.save", title: () => t`Save`, icon: saveIcon, shortcut: "mod+s", group: "File",
 //     can: "docs.edit",                          // permission: hidden everywhere when it fails

@@ -50,7 +50,7 @@ $items.peek()                            // read without tracking (explicit API 
   delay ms / options: entrance once in view), `m:can={allowed}` (hidden when false; `{ allow, else: "disable" }`
   disables), `m:test="id"` (data-testid): use these instead of writing the same thing per component (no own
   `data-m-color` line, no Tooltip wrapper for a plain hint, no reveal action for a plain entrance).
-  By hand: `mProps(h(Card, props), { "no-select": true })` from `hadi-march/props`;
+  By hand: `mProps(h(Card, props), { "no-select": true })` from `march/props`;
   a new member: `registerMProp(name, (el, value) => …)`. `m:parts={{ Avatar: { size: "lg" }, LikeButton: { color: "brand-blue" } }}`
   gives props to the components drawn INSIDE (keys: component names in scope; they win over what the parent gave;
   the nearest scope wins; by hand `withParts(new Map([[Avatar, {…}]]), () => h(PostCard, props))`). Never add a
@@ -65,7 +65,7 @@ $items.peek()                            // read without tracking (explicit API 
   components. Only inside a part of the page: `<Extensions use={[ext, [Button, ext2]]}>`; one instance opts out with
   `m:extend={false}` (or `={["name"]}`). Only where it stands: `inside(Card, Badge)` (any depth), `partOf(Button,
   Spinner)` (Button's own part), as the target. Each returns a remover; a throwing extension is skipped, not fatal. Types:
-  `declare module "hadi-march" { interface ExtensionProps extends ExtensionPropsOf<typeof ext> {} }`. Debug:
+  `declare module "march" { interface ExtensionProps extends ExtensionPropsOf<typeof ext> {} }`. Debug:
   `extensions.list()`, `extensions.of(el)`.
 - Async component: `async function Page() { const data = await api(); return <View data={data} /> }` — wrap in
   `<Try loading={…} fallback={(e, retry) => …}>` (or rely on the default spinner / error box).
@@ -123,7 +123,7 @@ File based: `src/pages/index.jsx` → `/`, `src/pages/users/[id].jsx` → `/user
 Addresses are normal paths under the app's base (`createRouter({ routes })` = `mode: "history", base: "auto"`): the
 base comes from `<base href>`, the base `march build` writes, or the entry script's folder. Route paths start with "/"
 and mean "under the base"; never write the base yourself, never a `#/` link, never a root-absolute file path. Public
-files (`public/media/a.jpg`): `appUrl("media/a.jpg")` from `hadi-march/base` (a bare relative path resolves against
+files (`public/media/a.jpg`): `appUrl("media/a.jpg")` from `march/base` (a bare relative path resolves against
 the route's address). Where the address cannot change (`file://`, a sandboxed iframe) the router uses `#/x` by
 itself. `march build` with `seo: { prerender: true }` writes `<route>/index.html` per page and `404.html` for routes
 with params, so the same `dist/` works on Cloudflare Pages, Netlify, GitHub Pages, S3, in a sub-folder and from files.
@@ -143,7 +143,7 @@ shown; the server must enforce permissions.
 - Use `t`…`` for user-visible text in libraries and multi-language apps.
 - Use classes, `sx`, design tokens (`--m-*`). For dynamic geometry use SVG attributes or the `style` **object** prop.
 - Clean up manual subscriptions with `onCleanup`.
-- Test with `node --test` + `hadi-march/testing` (`renderTest`, `installDom`).
+- Test with `node --test` + `march/testing` (`renderTest`, `installDom`).
 
 **Identifiers in English, user-facing text via i18n**
 - Names in code are English: `$pending`, `CATEGORY_ICONS`, `id: "members"`, `href: "/members"`, `.sc-card`, `--m-brand-orange`.
@@ -179,8 +179,8 @@ Overlays never take input; put content after them. `front` only for foreground e
   when they are not on the first screen: `lazy(load, { when: "visible", placeholder: "table", height: "30rem" })`
   (`pick: "Name"` for a named export). Always reserve a size for below-the-fold parts. Keep the entry under 15 KB gzip: run `march build` and read the report. If
   the entry is over budget, move the listed modules behind `import()`/`lazy()`.
-- Import named exports (`import { Card } from "hadi-march/ui"`), never `import * as` from a March module. Use
-  `hadi-march/icons/catalog` for icon galleries.
+- Import named exports (`import { Card } from "march/ui"`), never `import * as` from a March module. Use
+  `march/icons/catalog` for icon galleries.
 - Leave `<Link>` prefetch on (default hover). Do not prefetch everything by hand.
 - Credit is optional and never required (the licence stays MIT): `<MadeWithMarch />` (`variant` text / badge / small, link constant `MARCH_URL`) or `credit: true` in `march.config.js` (adds `<!-- Built with March -->` to the built `index.html` and prints the one-line console banner in production too, from a separate tiny `credit.js`; off by default). `march dev` prints the banner once per page; `banner: false` turns it off. Production never prints it otherwise and the app bundle never contains it (size effect 0). The link comes from one constant, `MARCH_URL` in `src/brand.js`. Add it to a footer when the user wants it; never add it unasked.
 - Set `budget` in `march.config.js` for production apps (`{ entry, route, part, routes: { "/x": bytes }, parts: { "src/x.ts": { limit, why } }, fail: true }`); `parts` gives one lazy part (by its import source) its own limit with a written reason, e.g. a third-party library loaded on demand. Turn on `sw: true` when offline use matters.
@@ -219,7 +219,7 @@ Overlays never take input; put content after them. `front` only for foreground e
 ## 10. Testing pattern
 
 ```js
-import { installDom, renderTest } from "hadi-march/testing";
+import { installDom, renderTest } from "march/testing";
 installDom();
 const s = renderTest(() => h(App, {}), { mock: { "GET /api/users": [{ id: 1, name: "Ada" }] } });
 await s.wait(() => s.sees("Ada"));
@@ -227,7 +227,7 @@ await s.click("Delete"); await s.confirm();
 assert.ok(!s.sees("Ada"));
 ```
 
-Run tests with `node --import hadi-march/register --test` (needed for .jsx/.tsx, and for any `hadi-march` import when
+Run tests with `node --import march/register --test` (needed for .jsx/.tsx, and for any `march` import when
 March is installed under node_modules, where node will not strip types itself; node >= 22.18).
 
 Module references: `docs/core.md`, `docs/ui.md`, `docs/forms.md`, `docs/table.md`, `docs/charts.md`.
@@ -252,7 +252,7 @@ type Product = Infer<typeof Product>;    // { title: string; price: number | nul
 - Typed i18n catalog: `const tt = typed<typeof en>(); tt("cart.items", { n })` — missing variables are errors.
 - Restrict permission names by augmenting `AccessRegister`.
 
-## 12. Store (hadi-march/store)
+## 12. Store (march/store)
 
 ```ts
 const app = store({ user: { name: "Ada" }, cart: { items: [] as Item[] } });
@@ -265,7 +265,7 @@ readonly(app); snapshot(app); derive(() => app.cart.items.length);
 ```
 Do not keep references to plain objects you put into a store and mutate them — mutate through the store.
 
-## 12b. Channels (hadi-march/channel)
+## 12b. Channels (march/channel)
 
 ```ts
 // channels.ts — every channel of the app, once: a wrong name or payload is a compile error
@@ -296,7 +296,7 @@ const editor = useChannel(ch["editor.changed"]); // in setup; use `editor.emit` 
 - A listener's error never stops the others; it goes to `setChannelErrorHandler` (the errors module) or the listener's `<Try>`.
 - Dev: `channelDevtools.traffic()` / `.watch(fn)` / `.channels()` show the message flow. Details: `docs/channel.md`.
 
-## 13. i18n (hadi-march/i18n)
+## 13. i18n (march/i18n)
 
 ICU messages: `"{n, plural, =0 {No items} one {# item} other {# items}}"`, `"{g, select, female {…} other {…}}"`,
 `"{d, date, short}"`, `"{x, number, percent}"`. `loadLocale("de", () => import("./de.js"))` + `await setLocale("de")`
@@ -313,13 +313,13 @@ has its own error boundary (message + retry); the levels above stay interactive 
 `navigate(to, { modal: true })` opens the page over the current one in `<Outlet name="modal">{(page, close) => <Dialog open onClose={close}>{page()}</Dialog>}</Outlet>`;
 back closes it, a direct visit or reload shows the full page. Page transitions animate only the outlet that changed. `createRouter({ redirects })`,
 `<Link preload="hover|visible|none">`, `beforeLeave(() => !dirty() || confirm(…))` (links, navigate, back/forward, tab close),
-`setMeta({ title, description })` (for full head control use `hadi-march/seo`, §14a), `queryParam("tab")` signal. `navigate()` is async.
+`setMeta({ title, description })` (for full head control use `march/seo`, §14a), `queryParam("tab")` signal. `navigate()` is async.
 Instant navigation: the path (active links, breadcrumb) changes on the click; a page not here in 100 ms is replaced by
 its skeleton (route `skeleton`, else `<Router skeleton>`, else `loading`); after 150 ms a thin top bar (`.m-nav-bar`)
 and a spinner on the clicked link show. A newer click aborts the older navigation: pass `navigationSignal()` to fetches
 a page starts. Give every app a `<Router skeleton>` shaped like its pages (no layout jump).
 
-## 14a. SEO (hadi-march/seo)
+## 14a. SEO (march/seo)
 
 Head tags go through the SEO module, never through `document.title =` or hand-made `<meta>` elements:
 ```tsx
@@ -329,7 +329,7 @@ useHead(() => ({ title: $product.name, og: { image: $product.photo }, jsonLd: ld
 ```
 Order: defaults → route head → `useHead` (later wins; a component's head leaves with it). `march.config.js`
 `seo: { site, prerender: true, sitemap: true, robots: true }` writes each param-less route's HTML at build time plus
-`sitemap.xml` / `robots.txt`; then mount with `hydrate(() => <Router />, el)` from `hadi-march/seo/hydrate` instead of
+`sitemap.xml` / `robots.txt`; then mount with `hydrate(() => <Router />, el)` from `march/seo/hydrate` instead of
 `render`. Hash routing prerenders only the start page and gets no automatic canonical. Check pages with
 `march seo check` (title, description, canonical, img alt). Every `<img>` needs `alt` (`alt=""` when decorative).
 Under a Trusted Types CSP use `installSeo({ jsonLd: false })` (run-time script text is blocked) and ship JSON-LD at build time.
@@ -356,7 +356,7 @@ Every prop of a component's props interface carries one JSDoc with its English t
 stay as written). The API reference and the playground's Properties (in the page's language) read them;
 `test/api-docs.test.js` lists the props without one.
 
-## 14c. Widget points (hadi-march/widget, re-exported by ui)
+## 14c. Widget points (march/widget, re-exported by ui)
 
 A widget point is a named place other code fills: `widgetPoint<Input>(id, { defaults })`, `point.provide({ id, slot,
 order, when, render(input, ctx) })` (returns remove; removed with the owner), `<Widget sources={[point]} input={…} />`.
@@ -369,7 +369,7 @@ second code block: use the point.
 ## 15. Motion and fx
 
 ```tsx
-import "hadi-march/motion";                    // registers blur/fly transitions and <For animate> FLIP
+import "march/motion";                    // registers blur/fly transitions and <For animate> FLIP
 const $x = spring(() => $target, { stiffness: 200, damping: 20 });
 <div style={{ transform: `translateX(${$x}px)` }} use:drag={{ axis: "x" }} transition:blur />
 <For each={$items} key="id" animate>{(it) => <li use:reveal>{it().name}</li>}</For>
@@ -384,12 +384,12 @@ screens.
 
 ### 15a. Animation ALWAYS goes through motion (one engine)
 
-Every animation — DOM, CSS variables, canvas, WebGL, plain values — runs on the one motion engine (`hadi-march/motion`,
+Every animation — DOM, CSS variables, canvas, WebGL, plain values — runs on the one motion engine (`march/motion`,
 src/motion/engine). Never write a private `requestAnimationFrame` loop, `setInterval` animation or raw `el.animate()`:
 the engine's clock is what global speed, "Stop all", reduced motion, slow motion and off-screen pausing act on.
 
 ```ts
-import { animate, timeline, keyframes, stagger, track, canvas2d, webgl, onFrame, motion } from "hadi-march/motion";
+import { animate, timeline, keyframes, stagger, track, canvas2d, webgl, onFrame, motion } from "march/motion";
 keyframes("cardIn", { opacity: [0, 1], transform: ["translateY(12px)", "translateY(0px)"] }, { duration: 320, easing: "expo" });
 animate(el, "cardIn");                                        // WAAPI (compositor) where it can, the clock otherwise
 const tl = timeline().add(".card", "cardIn", { stagger: stagger(40, { from: "center" }) })
@@ -414,19 +414,19 @@ Rules:
 - Check: `node tools/motion-audit.mjs` (headless Edge: Stop all, speed, 200-item stagger: no long task).
 Reference: docs/motion.md. The showcase page "Animasyon motoru" (/animation) shows every piece.
 
-### 15a2. Text animations (hadi-march/motion/text)
+### 15a2. Text animations (march/motion/text)
 
-56 text animations, one export each (tree-shaken): `import { rise, wave, typewriter, counter } from "hadi-march/motion/text"`.
+56 text animations, one export each (tree-shaken): `import { rise, wave, typewriter, counter } from "march/motion/text"`.
 Call `name(el, { by, duration, stagger, easing, delay, from, out, iterations })`; it returns `{ playback, finished,
 replay(), stop() }`. Never split text by hand or animate letters with your own loop: `splitText(el, "char" | "word" |
 "line")` keeps an accessible copy, grapheme clusters (Turkish letters, emoji), RTL and joining scripts safe.
 - Entrances put the plain text back when done; `out: true` plays any of them as an exit. Loops run until `stop()`.
 - Content effects (typewriter, scramble, counter, wordCycle…) change what is shown; readers keep the real text.
 - `typeLoop`, `wordCycle`, `morph` take `words` (or the text split at `|`); `counter` reads the number in the text.
-- Catalog: `TEXT_ANIMATIONS` in `hadi-march/motion/text/meta`. Reference: src/motion/text/docs.md. Showcase: Hareket ›
+- Catalog: `TEXT_ANIMATIONS` in `march/motion/text/meta`. Reference: src/motion/text/docs.md. Showcase: Hareket ›
   Metin animasyonları (/text-motion).
 
-### 15a3. Behaviors (hadi-march/behaviors/*)
+### 15a3. Behaviors (march/behaviors/*)
 One interaction, written once, attached to any element; each behavior is its own subpath (docs/behaviors.md).
 - **drag** — `draggable(el, { handle, scroll, onMove, onEnd })` or `pointerDrag(downEvent, opts)`: threshold (click stays
   a click), pointer capture, Escape cancels, edge auto-scroll on the motion clock, `p.di` along the writing direction
@@ -449,10 +449,10 @@ One interaction, written once, attached to any element; each behavior is its own
 - **dismiss** — `dismiss(panel, { inside, onDismiss(why), on, escape })`: outside press + Escape (capture phase) for
   popovers, menus and pickers. Never add document pointerdown / click / Escape listeners for that yourself.
 
-## 15a. Websites (hadi-march/landing)
+## 15a. Websites (march/landing)
 
 Blocks for product pages, home pages, portfolios and talks. Each is a folder in src/components/landing/ built from
-existing components, animated on the motion engine, themed, RTL and i18n ready. Import only from `hadi-march/landing`
+existing components, animated on the motion engine, themed, RTL and i18n ready. Import only from `march/landing`
 (it is not in the ui barrel, so other pages never download it); load a marketing page as its own lazy route.
 
 - Frame: `SiteNav` (solid | transparent | floating, shrink, hide, Drawer menu; `#id` links scroll to sections),
@@ -462,12 +462,12 @@ existing components, animated on the motion engine, themed, RTL and i18n ready. 
   (pinned media, colour per step), `HorizontalScroll`, `Roadmap` (fills with the scroll), `CtaBand`.
 - Sell: `Pricing` (monthly / yearly, prices roll), `Testimonials` (grid | marquee | wall | slider), `Faq` (search).
 - Portfolio: `ProjectGrid` (filters, FLIP) + `ProjectDetail`; `sharedTransition("project-" + id, cover, update)`
-  (hadi-march/motion) grows the card cover into the detail cover and back.
+  (march/motion) grows the card cover into the detail cover and back.
 - Talks: `Presentation` + `Slide` + `Appear` (fragments); `bind:index` to a query parameter; `presenterUrl` opens the
   speaker window (same deck name stays in step across windows); print = one slide per page.
 - Effects: `Reveal` / `use:revealOnScroll` (fade, up, start, end, scale, blur, flip; stagger; `scrub`), `Parallax`
   (layers by speed, pointer depth), `ScrollProgress`, `VideoBackground` (poster first, quiet on save-data).
-- Scroll-linked code goes through the motion scroll core (hadi-march/motion: `scrollTimeline`, `onScrollProgress`,
+- Scroll-linked code goes through the motion scroll core (march/motion: `scrollTimeline`, `onScrollProgress`,
   `parallaxLayers`, `scrollIndicator`, `stickyReveal`); the blocks are built on it. Never add your own scroll listener or
   rAF loop. Numbers that roll use `rollDigits` (motion/digits.ts), shared by Counter and CountRoll.
 
@@ -486,7 +486,7 @@ Full samples: showcase › Web tasarım araçları › Örnek uygulamalar › A�
 ### 15c. Ready-made animations (all on the engine, each its own export)
 
 ```ts
-import { drawPath, morphPath, followPath, clipReveal, filterBlur, displace, goo } from "hadi-march/motion";
+import { drawPath, morphPath, followPath, clipReveal, filterBlur, displace, goo } from "march/motion";
 drawPath(svg.querySelectorAll("path"), { stagger: 80 });       // stroke draws in (pathLength=1, no measuring)
 morphPath(pathEl, starD, { easing: "spring" });                // any two paths: different point counts are resampled
 followPath(dot, roadD, { rotate: true, trail: roadEl });       // along a path, the trail drawn in the same frame
@@ -514,13 +514,13 @@ installThemeWave();                                            // setTheme / set
 const stop = spotlight(document, { selector: ".card" });       // one pointer light over every card near the pointer
 ```
 
-## 15b. Network and errors (hadi-march/net, hadi-march/errors)
+## 15b. Network and errors (march/net, march/errors)
 
 **Never call `fetch()`, `new WebSocket()` or `new EventSource()` in app code. All traffic goes through `net` or an
 `Api` class** (one place for priority, retry, auth, cache, mock, logging and error handling).
 
 ```ts
-import { net, Api, api, auth, cache, acceptLanguage, idempotencyKey, normalizeErrors, socket } from "hadi-march/net";
+import { net, Api, api, auth, cache, acceptLanguage, idempotencyKey, normalizeErrors, socket } from "march/net";
 net.use(auth({ token: () => session.token, refresh: renew }), acceptLanguage(), idempotencyKey(), cache(), normalizeErrors());
 
 class UsersApi extends Api {
@@ -532,20 +532,20 @@ class UsersApi extends Api {
   live = this.stream<UserEvent>("ws:/api/users/events#users");
 }
 const users = api(UsersApi);
-const list = users.list.query();          // hadi-march/data query, key ["users", "/", null]
+const list = users.list.query();          // march/data query, key ["users", "/", null]
 const save = users.update.mutation();     // after success: net cache + data queries of "users" refetch
 ```
 - Policies: `dedupe` (default for GET: same key in flight → one shared request), `latest` (search: the older request of
   the category is aborted), `queue` (one after another per category), `parallel` (default for writes).
 - Priority: `route` > `data` > `prefetch`; prefetch waits while a page loads. Page and `lazy()` chunk loads already go
-  through net once `hadi-march/net` is imported.
+  through net once `march/net` is imported.
 - Retry (backoff + jitter, Retry-After) only for idempotent requests; writes are retried only with `idempotencyKey()`.
   `timeout` per attempt; offline requests wait in the offline queue (`offline: "fail"` to fail fast).
 - Middleware is `(ctx, next)`: code before `await next()` sees `ctx.req`, after it `ctx.res` or the thrown AppError.
 - `net.pending("users")` is a reactive count; `net.on("net:error", …)` for events.
 - WebSocket: `socket(url, opts)` (reconnect, heartbeat, `subscribe(topic)`, `request(msg)` by correlation id, offline
   send queue, `shared: true` for one connection across tabs). SSE: `this.stream("sse:/path")`.
-- Mock: `import "hadi-march/net/mock"; net.mock({ ...crud("/api/users", seed), "GET /api/me": me }, { delay, errorRate })`,
+- Mock: `import "march/net/mock"; net.mock({ ...crud("/api/users", seed), "GET /api/me": me }, { delay, errorRate })`,
   `net.mock(openapiDoc)`, `net.mock(false)`. `march dev --mock` → `mockRequested()` is true. Tests use the same mock.
 - `march gen api openapi.json --classes` writes Api classes + interfaces.
 
@@ -567,11 +567,11 @@ Throw `new AppError(msg, { type, code })` for domain errors; never show `e.messa
 - Components created outside `render()` (e.g. in an event handler) get their own root — prefer `openDialog()` for UI
   created on demand so it is disposed when closed.
 
-## 16b. Flows (hadi-march/flow) and ContextMenu (hadi-march/context-menu)
+## 16b. Flows (march/flow) and ContextMenu (march/context-menu)
 
 Node-based flows have their own entry (pages that do not show a flow never load it):
 ```tsx
-import { createFlow, FlowCanvas, FlowPalette, FlowControls, FlowTimeline, createFlowRunner, emit } from "hadi-march/flow";
+import { createFlow, FlowCanvas, FlowPalette, FlowControls, FlowTimeline, createFlowRunner, emit } from "march/flow";
 const flow = createFlow({ types: [{ type: "check", label: "Check", inputs: [{ id: "in" }], outputs: [{ id: "yes" }, { id: "no" }],
   fields: [{ key: "limit", label: "Limit", kind: "number", default: 400 }], run: ({ input, data }) => (input.total >= data.limit ? emit({ yes: input }) : emit({ no: input })) }], doc })
 const runner = createFlowRunner(flow)
@@ -582,24 +582,24 @@ flow.load(doc, "Import")  // validateFlow(doc, types) first; one undo step (Undo
 Changes go through `flow.change(label, fn)` (one undo step); copy / paste use ClipboardManager. A node's `run` returns a
 value (all outputs), `emit({ port: value })` (chosen outputs) or throws (fails; what follows is skipped).
 `<ContextMenu items={(target) => [...MenuItem]}>` opens Menu items at the pointer (Shift+F10 / Menu key too).
-`<Field label="…">{control}</Field>` (hadi-march/forms, src/forms/field.ts) labels a control without the form engine.
+`<Field label="…">{control}</Field>` (march/forms, src/forms/field.ts) labels a control without the form engine.
 A heavy feature like this marks `entry` in its meta.ts: it stays out of the ui barrel and its page imports its demo.
 
-## 17. Managers (hadi-march/managers/*)
+## 17. Managers (march/managers/*)
 
 One instance each, started on first use, `configureX()` for global options, `disposeX()` to shut down. Import each
 from its own path. Full reference: `docs/managers.md`.
 
 **ViewportManager** — never call `matchMedia` or add resize / online / visibility listeners yourself:
 ```tsx
-import { viewport } from "hadi-march/managers/viewport";
+import { viewport } from "march/managers/viewport";
 const vp = viewport();  vp.mobile()  vp.up("lg")  vp.dark()  vp.reducedMotion()  vp.online()  vp.visible()  vp.safeArea()
 <aside when:desktop>…</aside>   <video when:reducedData={false} />   vp.container(el).name()   // container size class
 ```
 
 **ConsentManager** — analytics, log shipping and third-party code run only behind consent:
 ```tsx
-import { consent, configureConsent } from "hadi-march/managers/consent";
+import { consent, configureConsent } from "march/managers/consent";
 configureConsent({ version: "2026-11", policyHref: "/privacy" });
 const track = consent.gate("analytics", send);   consent.whenGranted("thirdParty", () => loadMap());
 // lazy UI: <ConsentBanner text={…app's legal text…} />, openConsentPreferences(), <ConsentGate category="thirdParty">
@@ -607,8 +607,8 @@ const track = consent.gate("analytics", send);   consent.whenGranted("thirdParty
 
 **CommandManager** — register a user command once; palette, menus, toolbars and buttons read the registry:
 ```tsx
-import { command } from "hadi-march/managers/command";
-import { commandItems, CommandButton } from "hadi-march/managers/command/ui";
+import { command } from "march/managers/command";
+import { commandItems, CommandButton } from "march/managers/command/ui";
 command({ id: "doc.save", title: () => t`Save`, shortcut: "mod+s", group: "File", can: "docs.edit", when: () => $dirty,
   run: async ({ signal }, doc) => api.save(doc, { signal }) });
 <button command:doc.save>Save</button>   <Menu items={commandItems({ group: "File" })} />   <CommandButton command="doc.save" />
@@ -619,7 +619,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 ## Component catalogue (folders in src/components)
 
 <!-- components:begin (generated by tools/gen-registry.js) -->
-### Layout — `hadi-march/layout`
+### Layout — `march/layout`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
@@ -641,7 +641,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | StatusBar | experimental | Bottom strip of an editor or app: start / end items, text or buttons (actions or command ids), tones with a breathing busy dot, live announcements, low-priority items to a … menu when narrow. | ListRow, Menu, Tooltip, StatusDot |
 | Window | stable | A movable, resizable window inside its area: dock to an edge, minimize, fill, close; Windows, Mac or HADİ look. | PanelHeader, IconButton, ResizeHandle |
 
-### Typography — `hadi-march/typography`
+### Typography — `march/typography`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
@@ -651,7 +651,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | OverflowText | stable | Text that scrolls only when it does not fit: hover, focus, always or while visible; bounce, loop or once; RTL-aware fade; Marquee is the endless ticker. | — |
 | SectionLabel | experimental | The small heading of a group inside a panel (menu, palette, sidebar, property grid): uppercase and faint, with an icon, a count and an actions slot. | — |
 
-### Actions — `hadi-march/actions`
+### Actions — `march/actions`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
@@ -667,7 +667,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | ScrollToTop | stable | Back-to-top button: shows after the page is scrolled down, scrolls back on the motion engine; puts itself into BottomRightControls. | IconButton, BottomRightControls |
 | UndoRedo | experimental | The undo / redo button pair of an editor (IconButtons): fed by an undo stack or four props; the tooltip names the step and the shortcut. | IconButton |
 
-### Forms — `hadi-march/forms`
+### Forms — `march/forms`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
@@ -703,7 +703,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | TimeInput | stable | Native time field ("HH:MM", seconds with step), with min / max. | — |
 | Toggle | stable | On / off switch (role="switch") whose thumb slides toward the inline end and mirrors in RTL. | — |
 
-### Data display — `hadi-march/data`
+### Data display — `march/data`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
@@ -724,7 +724,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | ListRow, Chevron, Spinner, Button, Badge, Empty |
 | VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
 
-### Feedback — `hadi-march/feedback`
+### Feedback — `march/feedback`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
@@ -740,7 +740,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Spinner | stable | A turning ring while something loads: three sizes, one colour or the theme's several (brand), an accessible label. | — |
 | StatusDot | experimental | A small dot in a tone or theme colour, still or pulsing (ring / blink); an image with a label, decoration without one. | — |
 
-### Overlays — `hadi-march/overlays`
+### Overlays — `march/overlays`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
@@ -751,7 +751,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Toast | stable | Short, non-blocking messages: toast(message, { kind, action, timeout }) returns an id; undo actions, up to five stacked, a host mounts itself. | Portal, Alert, Button |
 | Tooltip | stable | Short hint on hover (after a delay) and on keyboard focus, positioned by the popover engine and linked with aria-describedby; Esc hides it. | — |
 
-### Navigation — `hadi-march/navigation`
+### Navigation — `march/navigation`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
@@ -766,7 +766,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Steps | stable | Progress through stages: done, current and upcoming steps with titles and descriptions; clickable when onSelect is given; horizontal or vertical. | CheckMark |
 | Tabs | stable | Tabbed panels: roving focus (← → Home End, mirrored in RTL), icons, badges, closable and changed tabs, an actions slot, a line or pill look, the active tab optionally kept in the URL. | Badge, StatusDot |
 
-### Media — `hadi-march/media`
+### Media — `march/media`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
@@ -776,13 +776,13 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Overlay | stable | A decorative layer inside its container: an image, a muted looping video, an SVG, a canvas drawing or a CSS effect (glass, mesh, noise …); never takes input. | — |
 | Picture | experimental | An image from a picture object ({ src, alt, width, height, srcset, sizes }) or a ready node passed through: lazy by default, eager for the first screen, fit and a fallback. | — |
 
-### Motion — `hadi-march/motion`
+### Motion — `march/motion`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | EasingCurveEditor | experimental | Cubic-bezier easing editor: draggable handles, the engine's named curves as presets, live preview on the motion engine clock, registers the curve by name (defineEasing). | Card, Button, NumberInput |
 
-### Social — `hadi-march/social`
+### Social — `march/social`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
@@ -800,7 +800,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | TypingIndicator | experimental | Three dots lifting in turn (motion engine) and an optional "… is typing" line; a polite status for screen readers. | StatusDot |
 | VerifiedMark | experimental | The verified-account badge beside a name: an image with an accessible name; own icon, text, colour and size. | — |
 
-### Composite — `hadi-march/composite`
+### Composite — `march/composite`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
@@ -838,7 +838,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | TreeEditor | experimental | JSON value as an editable tree: HADİ-colored type badges (click to convert), inline key / value editing, add / duplicate / delete, search, schema checks, own undo history. | Badge, IconButton, Toggle, TextInput, SearchBox, OptionList, UndoRedo, Empty, EditorFrame, Popover |
 | Wizard | stable | One form split into steps: each step validates its own fields before Next, values survive Back, a later step opens once the ones before it pass. | Steps, Progress, Button, Alert |
 
-### Landing — `hadi-march/landing`
+### Landing — `march/landing`
 
 | Component | Status | What | Composed of |
 |---|---|---|---|

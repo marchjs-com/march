@@ -45,5 +45,5 @@ The text field has `aria-invalid` while it does not parse. The preview names the
 
 IconButton (eyedropper), Segmented (format), Slider (hue and opacity, each over its own track), TextInput (the value),
 Swatch (palette colors, the contrast marks, the shared checkerboard), Badge (contrast), SectionLabel (palette names);
-the drag behavior (`hadi-march/behaviors/drag`) for the area, the motion engine's color parser, the theme's contrast
+the drag behavior (`march/behaviors/drag`) for the area, the motion engine's color parser, the theme's contrast
 helper.

@@ -3,7 +3,7 @@
 import { untrack } from "../../../core/reactive.ts";
 import { ThemeEditor, presetCopy, draftFromColor, type ThemeEditorTab, type ThemeDraft } from "./index.ts";
 
-export const code = `import { ThemeEditor, registerDraft, applyDraft, presetCopy } from "hadi-march/components/composite/theme-editor"
+export const code = `import { ThemeEditor, registerDraft, applyDraft, presetCopy } from "march/components/composite/theme-editor"
 
 <ThemeEditor />                                    // HADİ copy, a share link (?theme=…) or the saved draft
 <ThemeEditor bind:value={$draft} base="night" tabs={["colors", "type"]} storageKey={false} onSave={(d) => api.save(d)} />
@@ -15,7 +15,7 @@ applyDraft(draft)       // … and switch the whole app to it
 // the model: plain data in, theme out
 import { presetDraft, draftFromTheme, draftFromColor, deriveDark, draftToTheme, draftTokens, draftVars,
   draftCode, draftCss, draftJson, importTheme, normalizeDraft, encodeDraft, decodeDraft, shareUrl, sharedDraft,
-  toneScale, typeScale, contrastAudit, PRESETS } from "hadi-march/components/composite/theme-editor"
+  toneScale, typeScale, contrastAudit, PRESETS } from "march/components/composite/theme-editor"
 
 const d = draftFromColor("#0e7490", "HADİ")        // or presetDraft("night"), draftFromTheme(myDef), presetCopy("neon")
 d.dark = deriveDark(d.light)

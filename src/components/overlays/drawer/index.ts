@@ -1,4 +1,4 @@
-// Drawer (hadi-march/ui): a sheet from any edge — start / end (logical: mirrored in RTL), top, bottom. Drag to close,
+// Drawer (march/ui): a sheet from any edge — start / end (logical: mirrored in RTL), top, bottom. Drag to close,
 // snap points, modal or non-modal. Reuses the Dialog frame (focus, Escape, stacking, aria) inside a Portal layer;
 // every movement runs on the motion engine (transform only), the gesture only feeds it offsets.
 import { signal, effect, untrack, onCleanup, createRoot } from "../../../core/reactive.ts";

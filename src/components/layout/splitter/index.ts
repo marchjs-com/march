@@ -1,4 +1,4 @@
-// Splitter (hadi-march/ui): two resizable panes, side by side (horizontal) or stacked (vertical). Right-to-left aware:
+// Splitter (march/ui): two resizable panes, side by side (horizontal) or stacked (vertical). Right-to-left aware:
 // the start pane is on the right in RTL, so dragging and the arrow keys follow what the user sees.
 import "./splitter.css";
 import { signal, effect, untrack } from "../../../core/reactive.ts";

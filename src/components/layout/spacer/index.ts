@@ -1,4 +1,4 @@
-// Spacer (hadi-march/ui): its own module so a top bar does not pull in the rest of app.ts (menus, dialogs).
+// Spacer (march/ui): its own module so a top bar does not pull in the rest of app.ts (menus, dialogs).
 import "./spacer.css";
 import { h } from "../../../dom/h.ts";
 

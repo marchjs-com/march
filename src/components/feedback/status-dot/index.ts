@@ -1,4 +1,4 @@
-// StatusDot (hadi-march/feedback): one small dot in a tone or a theme colour, still or pulsing. With a `label` it is
+// StatusDot (march/feedback): one small dot in a tone or a theme colour, still or pulsing. With a `label` it is
 // an image screen readers read ("Online"); without one it is decoration (aria-hidden) next to text that says the same.
 // Used wherever a state is shown as a dot: live marks, status bars, "changed" marks, timeline and kanban points.
 import "./status-dot.css";

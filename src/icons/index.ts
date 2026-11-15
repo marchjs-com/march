@@ -1,5 +1,5 @@
-// hadi-march/icons — the March icon set and <Icon>. Every icon is its own export (tree-shaken):
-//   import { Icon, users, search } from "hadi-march/icons";
+// march/icons — the March icon set and <Icon>. Every icon is its own export (tree-shaken):
+//   import { Icon, users, search } from "march/icons";
 //   <Icon of={users} />            decorative, inherits the text color and font size (1.25em by default)
 //   <Icon of={search} label="Search" size="lg" />
 // Components that take an `icon` prop (Button, NavMenu items, Empty, Card, Stat…) accept an icon directly: icon={users}.
@@ -11,7 +11,7 @@ export type { IconDef } from "./svg.ts";
 export * from "./all.ts";
 
 export interface IconProps {
-  /** The icon to draw (e.g. `users` from hadi-march/icons). @tr Çizilecek ikon (ör. hadi-march/icons'tan `users`). */
+  /** The icon to draw (e.g. `users` from march/icons). @tr Çizilecek ikon (ör. march/icons'tan `users`). */
   of: IconDef;
   /** "xs" 12px · "sm" 14px · "md" 16px (default) · "lg" 20px · "xl" 24px — or inherit with "em". @tr "xs" 12px · "sm" 14px · "md" 16px (varsayılan) · "lg" 20px · "xl" 24px — ya da "em" ile yazı boyutunu alır. */
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "em";

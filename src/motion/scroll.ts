@@ -27,7 +27,7 @@ const REVEAL: Frames = [{ opacity: 0, transform: "translateY(24px)" }, { opacity
 /** Action: fade/slide in once when visible. `use:reveal={{ delay: 100, frames }}` */
 export function reveal(el: Element, raw?: unknown): () => void {
   const o = (raw && typeof raw === "object" ? raw : {}) as { delay?: number; duration?: number; frames?: Frames };
-  // a prerendered page being taken over (hadi-march/seo hydrate sets this on <html>): the element is already on screen
+  // a prerendered page being taken over (march/seo hydrate sets this on <html>): the element is already on screen
   if (el.ownerDocument?.documentElement.hasAttribute("data-m-hydrating")) return () => {};
   if (!reducedMotion()) setStyle(el, { opacity: "0" });
   return inView(el, { once: true, enter: () => { setStyle(el, { opacity: null }); animate(el, o.frames ?? REVEAL, { duration: o.duration ?? 600, delay: o.delay ?? 0, easing: "easeOutExpo" }); } });

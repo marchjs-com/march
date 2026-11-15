@@ -9,7 +9,7 @@
 //   }
 //   const users = api(UsersApi);
 //   await users.byId({ id: "7" });                      // typed params, typed result
-//   const list = users.list.query();                     // hadi-march/data query, key ["users", "/", null]
+//   const list = users.list.query();                     // march/data query, key ["users", "/", null]
 //   const save = users.update.mutation();                // invalidates "users" (net cache + data queries)
 //   users.live.subscribe((e) => …);
 import { invalidate as invalidateQueries, query as dataQuery, mutation as dataMutation, type Query, type QueryOptions, type Mutation, type MutationOptions } from "../data/query.ts";
@@ -17,7 +17,7 @@ import { signal, onCleanup, getOwner, type Accessor } from "../core/reactive.ts"
 import { AppError } from "../errors/app-error.ts";
 import { onInvalidate, type Net, type RequestOptions } from "./core.ts";
 
-/** A validator: hadi-march/schema (`validate` → { ok, errors }), anything with `parse` (zod-like) or a function. */
+/** A validator: march/schema (`validate` → { ok, errors }), anything with `parse` (zod-like) or a function. */
 export type Validator<R> = ((x: unknown) => R) | { parse(x: unknown): unknown } | { validate(x: unknown): unknown };
 export type CallOptions = Omit<RequestOptions, "url" | "method" | "params" | "body">;
 export interface EndpointOptions<R> extends CallOptions { schema?: Validator<R> }
@@ -29,7 +29,7 @@ export interface Endpoint<P, R> {
   (...args: EndpointArgs<P>): Promise<R>;
   readonly method: string;
   readonly path: string;
-  /** The hadi-march/data cache key for these variables: [category, path, vars]. */
+  /** The march/data cache key for these variables: [category, path, vars]. */
   key(vars?: P): unknown[];
   /** The url these variables produce. */
   url(vars?: P): string;
@@ -95,7 +95,7 @@ export class Api {
 
   private netOf(): Net {
     const n = this.net ?? defaultNet?.();
-    if (!n) throw new Error("March: no Net instance (import hadi-march/net)");
+    if (!n) throw new Error("March: no Net instance (import march/net)");
     hook(n);
     return n;
   }

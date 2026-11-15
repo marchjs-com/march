@@ -1,9 +1,9 @@
-// `march gen component <name>` inside the hadi-march repository: one folder with every file the checklist asks for.
+// `march gen component <name>` inside the march repository: one folder with every file the checklist asks for.
 /** @returns {Record<string, string>} file name → content */
 export function libComponent(folder, Name, category = "layout", composedOf = []) {
   const cls = `m-${folder}`;
   return {
-    "index.ts": `// ${Name} (hadi-march/ui). Draws only: state comes from shared engines and behaviors.
+    "index.ts": `// ${Name} (march/ui). Draws only: state comes from shared engines and behaviors.
 import "./${folder}.css";
 import { h } from "../../../dom/h.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";

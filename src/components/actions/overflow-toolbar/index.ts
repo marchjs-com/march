@@ -1,4 +1,4 @@
-// OverflowToolbar (hadi-march/ui): a toolbar whose items that do not fit go to a "More" menu, lowest priority first.
+// OverflowToolbar (march/ui): a toolbar whose items that do not fit go to a "More" menu, lowest priority first.
 // Items are plain actions or command ids (the Command manager: label, icon, shortcut, availability and busy state come
 // from the command, so the palette, menus and this toolbar show the same thing). Toggle items (aria-pressed),
 // separators, roving focus with the arrow keys (mirrored in RTL), tooltips with the shortcut.

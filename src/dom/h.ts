@@ -313,7 +313,7 @@ function bindProp(el: Element, what: string, value: unknown): void {
 const TRANSITIONS: Record<string, string> = { fade: "m-t-fade", slide: "m-t-slide", scale: "m-t-scale" };
 export type TransitionFn = (el: Element, opts: unknown, dir: "in" | "out") => Promise<void> | void;
 const JS_TRANSITIONS = new Map<string, TransitionFn>();
-/** Register a JS transition (used by hadi-march/motion). */
+/** Register a JS transition (used by march/motion). */
 export function registerTransition(name: string, fn: TransitionFn): void { JS_TRANSITIONS.set(name, fn); }
 function transition(el: MarchEl, name: string, opts: unknown): void {
   const js = JS_TRANSITIONS.get(name);
@@ -323,7 +323,7 @@ function transition(el: MarchEl, name: string, opts: unknown): void {
     return;
   }
   const cls = TRANSITIONS[name];
-  if (!cls) throw new Error(`March: unknown transition "${name}" (fade, slide, scale; more in hadi-march/motion).`);
+  if (!cls) throw new Error(`March: unknown transition "${name}" (fade, slide, scale; more in march/motion).`);
   el.classList.add(`${cls}-in`);
   el[LEAVE] = () => new Promise<void>((resolve) => {
     el.classList.remove(`${cls}-in`);

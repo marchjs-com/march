@@ -1,7 +1,7 @@
 // ConsentManager: cookie and KVKK / GDPR consent — categories, a versioned and dated record kept in storage, gates that
 // keep analytics, log shipping and third-party code off until the user agrees, and withdrawal.
 //
-//   import { consent, configureConsent } from "hadi-march/managers/consent";
+//   import { consent, configureConsent } from "march/managers/consent";
 //   configureConsent({ version: "2026-11" });            // a new version asks everyone again
 //   consent.has("analytics")                               // reactive
 //   consent.on("analytics", (granted) => …)                // state of one category changed ("change" = any)
@@ -9,7 +9,7 @@
 //   consent.whenGranted("thirdParty", () => loadMap())     // runs now or once granted; its cleanup runs on withdrawal
 //   <div consent:thirdParty>…</div>  <p consent:thirdParty={false}>…</p>   (embeds: <ConsentGate> from ./ui)
 //
-// The banner and the preferences panel are a separate, lazy module: hadi-march/managers/consent/ui.
+// The banner and the preferences panel are a separate, lazy module: march/managers/consent/ui.
 // Legal texts belong to the app; March gives the frame (categories, record, gates, UI).
 import { signal, computed, effect, untrack, getOwner, runWithOwner, onCleanup, DEV } from "../../core/reactive.ts";
 import { registerNamespace } from "../../dom/h.ts";

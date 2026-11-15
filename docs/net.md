@@ -1,4 +1,4 @@
-# hadi-march/net and hadi-march/errors
+# march/net and march/errors
 
 One place for all traffic, one collector for all errors. App code never calls `fetch()` / `new WebSocket()` itself.
 
@@ -14,10 +14,10 @@ One place for all traffic, one collector for all errors. App code never calls `f
 | `retry` | 2 (delay 300 ms ×2, max 10 s, jitter) | only for idempotent requests (GET/HEAD/OPTIONS/PUT/DELETE, or `idempotent: true`) and retryable errors (network, timeout, 408/429/5xx); `Retry-After` is honoured |
 | `offline` | `wait` | `wait`: held in the offline queue until online (`net.offlineQueue()`); `fail`: AppError `offline` |
 | `cache` | — | freshness for the `cache()` middleware: `"30s"`, `"5m"`, ms |
-| `invalidates` | — | categories / key prefixes cleared after success (net cache + hadi-march/data queries) |
+| `invalidates` | — | categories / key prefixes cleared after success (net cache + march/data queries) |
 | `use` | — | middleware for this request only |
 | `meta` | — | free data for middleware; `meta.target` becomes `error.context.target` (inline error slot) |
-| `report` | `true` | `false`: a failure is not sent to hadi-march/errors |
+| `report` | `true` | `false`: a failure is not sent to march/errors |
 | `run` | — | run a function instead of a transport (chunk loads use it) |
 
 Events: `net:start`, `net:progress`, `net:retry`, `net:done`, `net:error`, `net:abort`, `net:revalidate`
@@ -37,14 +37,14 @@ called again (retry and the auth refresh do).
 ## Transports
 
 `HttpTransport` (fetch, download progress), `WsTransport` (`ws:` urls: request by correlation id, `#topic` streams),
-`SseTransport` (`sse:` urls), `MockTransport` (hadi-march/net/mock). All implement `send(ctx)` and optionally
+`SseTransport` (`sse:` urls), `MockTransport` (march/net/mock). All implement `send(ctx)` and optionally
 `stream(url, onMessage, { signal })`. Register your own with `net.transport(t, "name")`.
 
 ## Api classes
 
 `this.get/post/put/patch/delete<Result, Vars>(path, opts)` returns an endpoint: call it with the variables (path
 `:params` are taken from them; the rest is the query for GET/DELETE and the body otherwise), or use `.query(vars)`,
-`.mutation()`, `.key(vars)`, `.url(vars)`. `schema` validates the response (hadi-march/schema, anything with `parse`, or
+`.mutation()`, `.key(vars)`, `.url(vars)`. `schema` validates the response (march/schema, anything with `parse`, or
 a function). `this.stream<T>("ws:/path#topic")` → `subscribe(fn)` / `latest()`. `api(Cls)` gives one instance;
 `api(Cls, { net })` binds another Net (tests).
 
@@ -61,8 +61,8 @@ BroadcastChannel), `protocol` (how topics, ids and pings look on the wire), `fac
 ## Mock
 
 ```ts
-import "hadi-march/net/mock";
-import { crud, reply, fake, mockSocketServer } from "hadi-march/net/mock";
+import "march/net/mock";
+import { crud, reply, fake, mockSocketServer } from "march/net/mock";
 const m = net.mock({ ...crud("/api/users", (f) => f.list(20, (i) => ({ id: String(i + 1), name: f.name() }))),
   "POST /api/login": (r) => (r.body.password ? { token: "t" } : reply(401, { message: "Wrong password" })) },
   { delay: [80, 250], errorRate: 0.05, seed: 7 });

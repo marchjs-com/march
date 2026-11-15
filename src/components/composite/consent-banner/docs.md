@@ -4,7 +4,7 @@ The consent manager's UI. A bottom banner asks until there is a valid decision f
 all sits next to Accept all, with the same weight); the preferences panel lists every category as a Card with a Toggle
 (a Dialog on wide screens, a bottom sheet on phones); `ConsentGate` keeps third-party content behind a placeholder that
 can allow it in place. The module is lazy on purpose: load it with
-`lazy(() => import("hadi-march/managers/consent/ui"), { pick: "ConsentBanner" })`.
+`lazy(() => import("march/managers/consent/ui"), { pick: "ConsentBanner" })`.
 
 ```tsx
 <ConsentBanner title="Cookies" text="We use analytics to measure visits." />

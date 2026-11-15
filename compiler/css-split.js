@@ -1,5 +1,5 @@
 // "Only what you use is bundled" for CSS. March components import their own stylesheet (`import "./button.css"`), but
-// esbuild adds the CSS of every module it reaches, even through a barrel (`hadi-march/ui`) whose exports are unused.
+// esbuild adds the CSS of every module it reaches, even through a barrel (`march/ui`) whose exports are unused.
 // So the March plugin takes those imports out of esbuild's hands and, after the build, gives each output JS file the CSS
 // of the March modules whose code actually landed in it (metafile bytesInOutput > 0):
 //   - initial entry → appended to its CSS bundle (linked from index.html; a bundle is created when missing)
@@ -36,7 +36,7 @@ export function setupCssSplit(build) {
   const entries = new Set([].concat(o.entryPoints ?? []).map((e) => resolve(cwd, typeof e === "string" ? e : e.in)));
   build.onResolve({ filter: /\.css$/ }, (a) => {
     if (a.kind !== "import-statement" || !a.importer || !/\.(ts|tsx|js|jsx|mjs)$/.test(a.importer)) return undefined;
-    const css = resolve(a.resolveDir, a.path.startsWith("hadi-march/css/") ? join(SRC, a.path.slice("hadi-march/".length)) : a.path);
+    const css = resolve(a.resolveDir, a.path.startsWith("march/css/") ? join(SRC, a.path.slice("march/".length)) : a.path);
     // March components always; app stylesheets imported by modules other than the entry (lazy pages, components) too, so
     // they follow their code as well. Left to esbuild: the entry's own imports and CSS with relative url()s (fonts).
     if (!isMarchModule(a.importer)) {

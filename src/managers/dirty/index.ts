@@ -1,7 +1,7 @@
 // DirtyStateManager: which parts of the app hold unsaved changes, and a warning before they are lost — closing or
 // reloading the tab (beforeunload) and leaving the page in the router (one confirmation for all of them).
 //
-//   import { dirtyState } from "hadi-march/managers/dirty";
+//   import { dirtyState } from "march/managers/dirty";
 //   const d = dirtyState();
 //   d.track("profile", () => form.dirty(), "Profile form")   // reactive source; removed with the component
 //   d.mark("draft", "Draft note")   d.clean("draft")           // or set by hand

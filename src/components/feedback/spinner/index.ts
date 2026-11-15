@@ -1,4 +1,4 @@
-// Spinner (hadi-march/feedback): a ring that turns while something loads; one colour or the theme's several.
+// Spinner (march/feedback): a ring that turns while something loads; one colour or the theme's several.
 import "./spinner.css";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";

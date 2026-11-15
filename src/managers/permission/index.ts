@@ -2,7 +2,7 @@
 // Requests run only from a user action (a click); a permission tied to a consent category is not requested until the
 // user agreed to that category (ConsentManager): request() then resolves "blocked" without a browser prompt.
 //
-//   import { permissions, configurePermissions } from "hadi-march/managers/permission";
+//   import { permissions, configurePermissions } from "march/managers/permission";
 //   configurePermissions({ consent: { geolocation: "preferences" } });
 //   permissions().state("notifications")                  // "granted" | "denied" | "prompt" | "unsupported" (reactive)
 //   await permissions().request("camera", { rationale: () => confirmDialog("…") })

@@ -1,4 +1,4 @@
-// StoryProgress (hadi-march/ui): the segmented bars on top of a story: a line Progress in segments. Earlier segments are
+// StoryProgress (march/ui): the segmented bars on top of a story: a line Progress in segments. Earlier segments are
 // full, later ones empty and the current one fills over `duration` on the motion engine (an essential animation: it
 // keeps time with reduced motion too, and "pause all" / the global speed apply). Pausing holds the fill; onDone fires
 // when it is full.

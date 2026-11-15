@@ -1,4 +1,4 @@
-/* hadi-march/motion — motion tokens, page transitions, scroll reveal and visual effect utilities.
+/* march/motion — motion tokens, page transitions, scroll reveal and visual effect utilities.
    Everything respects prefers-reduced-motion. No inline styles: dynamic values come through CSSOM custom properties. */
 :root {
   --m-dur-1: 120ms; --m-dur-2: 200ms; --m-dur-3: 320ms; --m-dur-4: 600ms;
@@ -83,7 +83,7 @@
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none; }
 }
 
-/* stateMorph (hadi-march/motion micro.ts): a button between states; colours from the theme tokens */
+/* stateMorph (march/motion micro.ts): a button between states; colours from the theme tokens */
 [data-m-state] { color: transparent !important; overflow: hidden; white-space: nowrap; }
 [data-m-state] > :not(.m-state-icon):not(.m-sr-only) { visibility: hidden; }
 [data-m-state="success"] { background: var(--m-success) !important; border-color: var(--m-success) !important; --m-state-fg: var(--m-on-success-fill, var(--m-surface)); }

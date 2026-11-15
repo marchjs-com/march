@@ -1,4 +1,4 @@
-// VideoBackground (hadi-march/landing): a muted, looping video behind content — a hero, a CTA band, a slide. Built on
+// VideoBackground (march/landing): a muted, looping video behind content — a hero, a CTA band, a slide. Built on
 // Overlay: the poster shows first and stays on save-data, 2G and reduced motion; the video plays only while visible and
 // stops when it leaves the page. A tint keeps text readable; a small pause button stops the motion (WCAG 2.2.2).
 import "./video-background.css";

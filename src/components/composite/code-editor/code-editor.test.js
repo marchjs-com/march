@@ -123,7 +123,7 @@ test("CodeEditor: every part can be turned off or replaced", () => {
 test("CodeEditor: source chips filter the rows; a row's head line is written at the top once", async () => {
   const code = signal("x");
   const picked = [];
-  const complete = (c) => ({ from: c.caret - 1, items: [{ label: "Button", source: "march", head: 'import { Button } from "hadi-march/ui"' }, { label: "BigInt", source: "js" }] });
+  const complete = (c) => ({ from: c.caret - 1, items: [{ label: "Button", source: "march", head: 'import { Button } from "march/ui"' }, { label: "BigInt", source: "js" }] });
   const sources = [{ value: "march", label: "March" }, { value: "js", label: "JS" }, { value: "all", label: "All" }];
   const [el, dispose] = mount(() => h(CodeEditor, { value: code, complete, sources, onSourceChange: (v) => picked.push(v) }));
   const input = caretOf(el.querySelector("textarea"));
@@ -140,7 +140,7 @@ test("CodeEditor: source chips filter the rows; a row's head line is written at 
   chip("March").click();
   await tick();
   key(input, "Tab");
-  assert.equal(code(), 'import { Button } from "hadi-march/ui"\nButton', "the import is written at the top");
+  assert.equal(code(), 'import { Button } from "march/ui"\nButton', "the import is written at the top");
   dispose();
 });
 

@@ -1,7 +1,7 @@
 // SessionManager: how long the signed-in session lasts, a warning before it ends, extension on activity, and the same
 // deadline in every tab (localStorage): extending in one tab extends all, signing out in one ends all.
 //
-//   import { session, configureSession } from "hadi-march/managers/session";
+//   import { session, configureSession } from "march/managers/session";
 //   configureSession({ duration: 30 * 60_000, warnBefore: 2 * 60_000, onExpire: () => signOut() });
 //   session().start()      session().remaining()  session().warning()      // reactive, ticks every second
 //   <Dialog open={session().warning}>… <Button on:click={() => session().extend()}>Stay signed in</Button>

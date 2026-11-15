@@ -1,6 +1,6 @@
 // UndoManager: one undo / redo history for the app, built on the command registry.
 //
-//   import { undoStack, undoCommands } from "hadi-march/managers/undo";
+//   import { undoStack, undoCommands } from "march/managers/undo";
 //   const u = undoStack();
 //   u.push({ label: "Rename", undo: () => set(old), redo: () => set(next) });  // record a change already made
 //   u.run("Delete row", () => remove(row), () => insert(row));               // do it now and record it

@@ -30,13 +30,13 @@ test("<Icon> follows live props: size, icon and label repaint the same <svg>", (
 
 test("deep imports rewrite the import header only, never an import written inside a string", async () => {
   const { deepImports } = await import("../compiler/deep-imports.js");
-  const barrels = { "hadi-march/icons": resolve("src/icons/index.ts") };
-  const src = 'import { For } from "hadi-march";// page\nimport { Icon, users } from "hadi-march/icons";\nimport {\n  a\n} from "./x";\n'
-    + 'const code = `import { Icon, users } from "hadi-march/icons"`;\n';
+  const barrels = { "march/icons": resolve("src/icons/index.ts") };
+  const src = 'import { For } from "march";// page\nimport { Icon, users } from "march/icons";\nimport {\n  a\n} from "./x";\n'
+    + 'const code = `import { Icon, users } from "march/icons"`;\n';
   const out = deepImports(src, barrels);
-  assert.match(out, /^import \{ For \} from "hadi-march";/);
+  assert.match(out, /^import \{ For \} from "march";/);
   assert.match(out, /import \{ users \} from "[^"]*src\/icons\/glyphs\/users\.ts";/);
-  assert.ok(out.endsWith('const code = `import { Icon, users } from "hadi-march/icons"`;\n'), "the code sample is untouched");
+  assert.ok(out.endsWith('const code = `import { Icon, users } from "march/icons"`;\n'), "the code sample is untouched");
 });
 
 test("icon packs: icon() and <Icon name> resolve 'pack:name' and plain names (March) through registerIconPack, lazily", async () => {

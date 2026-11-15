@@ -1,7 +1,7 @@
 // Forms example: a sign-up form, a settings screen with EditForm (load → edit → save with a reason) and standalone inputs.
-// Load the stylesheets once: hadi-march/css/tokens.css, hadi-march/css/ui.css and hadi-march/css/forms.css.
-import { schema } from "hadi-march/schema"
-import { Form, EditForm, Field, Combobox, CodeInput, DateRangePicker, MarkdownEditor, ToastHost } from "hadi-march/ui"
+// Load the stylesheets once: march/css/tokens.css, march/css/ui.css and march/css/forms.css.
+import { schema } from "march/schema"
+import { Form, EditForm, Field, Combobox, CodeInput, DateRangePicker, MarkdownEditor, ToastHost } from "march/ui"
 
 const Signup = schema({
   name: { type: "text", required: true, max: 60, autocomplete: "name" },

@@ -1,4 +1,4 @@
-// KeyValue (hadi-march/ui). Folder: src/components/data/key-value/. Every row is a StatTile as a term (dt / dd) with
+// KeyValue (march/ui). Folder: src/components/data/key-value/. Every row is a StatTile as a term (dt / dd) with
 // a text value: the label, value and hint typography is the tile's.
 import "./key-value.css";
 import { h } from "../../../dom/h.ts";

@@ -16,7 +16,7 @@ A row of slides that scrolls and snaps: one to four per view on wide screens (a 
 | `arrows` | `boolean` | `true` | the previous / next buttons |
 | `prevIcon`, `nextIcon` | node / glyph | chevrons | what the buttons show |
 | `dots` | `boolean` / `(index, active) => node` | `true` | `false`: no dots; a function draws its own content in each dot button |
-| `m:color` | colour token | `primary` | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | colour token | `primary` | Common prop (march/props): the colour token of the component and everything in it. |
 | `smooth` | `boolean` | `true` | `false`: buttons and dots jump instead of scrolling smoothly |
 | children | nodes | | the slides |
 | `class` | class value | | |

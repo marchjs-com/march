@@ -1,4 +1,4 @@
-// Progress (hadi-march/ui).
+// Progress (march/ui).
 import "./progress.css";
 import { computed, effect, untrack, getOwner, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";

@@ -2,7 +2,7 @@
 // connection is back — in order, with backoff retries and an Idempotency-Key per item, so a retried write is not
 // applied twice. Reads stay with net (its own offline wait and cache); this is for the user's changes.
 //
-//   import { sync } from "hadi-march/managers/sync";
+//   import { sync } from "march/managers/sync";
 //   sync().enqueue({ url: "/api/notes", method: "POST", body: note })   // sent now, or as soon as possible
 //   sync().pending()  sync().status()  sync().queue()  sync().lastSync()   // reactive
 //   sync().flush()    sync().retry(id)   sync().remove(id)

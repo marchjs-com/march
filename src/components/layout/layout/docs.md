@@ -17,7 +17,7 @@ repeat it, and later page-wide features land in one place.
   with the page; its title goes to the document through `titleTemplate`.
 
 ```tsx
-import { Layout, defineLayout, defineLayoutFeature, scrollToTopFeature } from "hadi-march/layout";
+import { Layout, defineLayout, defineLayoutFeature, scrollToTopFeature } from "march/layout";
 
 <Layout header={<TopBar/>} nav={<SideNav/>} titleTemplate="%s · HADİ"><Outlet/></Layout>
 

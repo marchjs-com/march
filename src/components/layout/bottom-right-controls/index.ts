@@ -1,4 +1,4 @@
-// Page corners (hadi-march/layout): four fixed corners — top-start, top-end, bottom-start, bottom-end (start/end
+// Page corners (march/layout): four fixed corners — top-start, top-end, bottom-start, bottom-end (start/end
 // mirror in RTL) — that page-wide controls put themselves into: a back-to-top button, a chat bubble, a feedback button,
 // a connection badge. Controls do not each pick a fixed position and overlap: they stack in their corner, in `order`.
 // BottomRightControls is the bottom-end corner (the one most controls want).

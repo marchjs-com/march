@@ -1,5 +1,5 @@
 // Showcase stage for FlowCanvas: the sample order flow with the Playground values. Code is shown in the Code tab.
-// FlowCanvas has its own entry (hadi-march/flow): the flow page imports this demo statically.
+// FlowCanvas has its own entry (march/flow): the flow page imports this demo statically.
 import { computed } from "../../../core/reactive.ts";
 import { FlowCanvas, createFlow } from "./index.ts";
 import { sampleTypes, sampleDoc } from "./sample.ts";

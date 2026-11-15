@@ -1,4 +1,4 @@
-// ScrollToTop (hadi-march/ui): a "back to top" button that shows once the page is scrolled down and, when pressed,
+// ScrollToTop (march/ui): a "back to top" button that shows once the page is scrolled down and, when pressed,
 // scrolls back to the top smoothly (at once with reduced motion). By default it puts
 // itself into the page corner (BottomRightControls), so it never overlaps other corner controls; `inline` renders it
 // where it is written instead. It follows whatever scrolls — the window or an app shell's scrolling main area.

@@ -1,6 +1,6 @@
 // ConsentBanner (composite: Button, Card, Dialog, Toggle) — the consent UI, built from existing components: <ConsentBanner> (Button), openConsentPreferences() (Dialog on wide
 // screens, bottom Drawer on mobile, a Card + Toggle per category) and <ConsentGate> (placeholder for third-party content).
-// Lazy on purpose: load it with lazy(() => import("hadi-march/managers/consent/ui"), { pick: "ConsentBanner" }).
+// Lazy on purpose: load it with lazy(() => import("march/managers/consent/ui"), { pick: "ConsentBanner" }).
 import "./consent-banner.css";
 import { signal, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";

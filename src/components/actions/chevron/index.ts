@@ -1,4 +1,4 @@
-// Chevron (hadi-march/actions): the small arrow that turns when something opens (accordion, disclosure, tree row,
+// Chevron (march/actions): the small arrow that turns when something opens (accordion, disclosure, tree row,
 // grouped table row, select). It points to `direction` while closed and turns when `open`: end → down, start → down,
 // down → up, up → down; right-to-left pages mirror end / start. Without `open` it follows the nearest ancestor that
 // carries the state (`aria-expanded`, or the `<summary>` of an open `<details>`), so a trigger button needs no wiring.
@@ -22,7 +22,7 @@ export interface ChevronProps {
   size?: MaybeFn<"xs" | "sm" | "md" | "lg" | undefined>;
   /** The turn: "smooth" (default), "spring", or `false` (jumps). @tr Dönüş: "smooth" (varsayılan), "spring" ya da `false` (sıçrar). */
   motion?: MaybeFn<"smooth" | "spring" | false | undefined>;
-  /** Own icon drawn pointing to the inline end (an icon of hadi-march/icons, text or a node); it turns the same way. @tr Satır sonuna bakacak şekilde çizilen kendi ikonun (hadi-march/icons ikonu, metin ya da düğüm); aynı şekilde döner. */
+  /** Own icon drawn pointing to the inline end (an icon of march/icons, text or a node); it turns the same way. @tr Satır sonuna bakacak şekilde çizilen kendi ikonun (march/icons ikonu, metin ya da düğüm); aynı şekilde döner. */
   icon?: unknown;
   /** Keeps the box but draws nothing (a tree leaf lines up with its siblings). @tr Kutuyu korur ama hiçbir şey çizmez (ağaç yaprağı kardeşleriyle hizalanır). */
   leaf?: MaybeFn<boolean | undefined>;

@@ -46,7 +46,7 @@ export function shownDigits(src) {
   for (const m of code.matchAll(/(["'`])((?:\\.|(?!\1)[^\\\n])*)\1/g)) {
     const v = m[2];
     if (!/\d/.test(v)) continue;
-    if (/^(hadi-march|\.\.?\/)/.test(v)) continue; // import
+    if (/^(march|\.\.?\/)/.test(v)) continue; // import
     if (/^\/[\w/-]*$/.test(v)) continue; // a route path ("/managers-a11y"): an address, not a count
     if (/^[\w-]+(\s+[\w-]+)*$/.test(v) && /-|^[a-z]/.test(v) && !/\s\d|^\d/.test(v)) continue; // class / token names (sc-h2, m-grid-3)
     if (/^-?[\d.]+(px|rem|em|ms|s|%|deg|fr|vh|vw)?(\s+-?[\d.]+(px|rem|em|ms|s|%|deg|fr|vh|vw)?)*$/.test(v)) continue; // CSS value

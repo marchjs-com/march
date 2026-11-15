@@ -1,5 +1,5 @@
 // Accessibility settings UI, built from existing controls: <AccessibilitySettings> (Segmented, Slider, Toggle) inline,
-// openAccessibilityPanel() in a Dialog. Lazy on purpose: load it with lazy(() => import("hadi-march/managers/accessibility/ui")).
+// openAccessibilityPanel() in a Dialog. Lazy on purpose: load it with lazy(() => import("march/managers/accessibility/ui")).
 import { h } from "../../dom/h.ts";
 import { t, messages } from "../../core/i18n.ts";
 import { Button } from "../../ui/button.ts";

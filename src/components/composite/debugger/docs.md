@@ -5,7 +5,7 @@ A debugger panel for code that runs in the page: the playground's preview, a plu
 is recorded with the names in scope and the call stack, and the debugger stops on the recording.
 
 ```tsx
-import { Debugger, CodeEditor, createDebugSession } from "hadi-march/ui";
+import { Debugger, CodeEditor, createDebugSession } from "march/ui";
 
 const session = createDebugSession({ persist: "my-ide.debug" });   // evaluate: your evaluator (default: a blob: module)
 <CodeEditor lineNumbers bind:value={$code}
@@ -35,8 +35,8 @@ The showcase playground lends its TypeScript worker to the preview: `instrument`
 files and `run` runs them (each a module from a blob: URL, no eval). Set breakpoints in the editor's gutter, then Start:
 
 ```tsx
-import { Debugger, CodeEditor, createDebugSession } from "hadi-march/ui"
-import { instrument, run } from "hadi-march/playground"   // the playground only
+import { Debugger, CodeEditor, createDebugSession } from "march/ui"
+import { instrument, run } from "march/playground"   // the playground only
 
 const session = createDebugSession({ persist: "my-ide.debug" })
 const $code = `let sum = 0

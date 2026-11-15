@@ -1,5 +1,5 @@
 // Neutral demo content shared by the landing demos and the showcase sample pages: a product UI mock (pure markup, no
-// image request), wordmark logos, and sample data. Not exported from hadi-march/landing.
+// image request), wordmark logos, and sample data. Not exported from march/landing.
 
 /** A product screen drawn with markup: sidebar, KPI tiles, an area chart and a list. Sized by its container. */
 export function MockApp(props: { class?: string }) {

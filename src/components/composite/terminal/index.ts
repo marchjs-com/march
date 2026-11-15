@@ -1,4 +1,4 @@
-// Terminal (hadi-march/components/composite/terminal): an extensible command line in the page.
+// Terminal (march/components/composite/terminal): an extensible command line in the page.
 //  - Commands: a function, or a spec with a description, typed arguments (choices, required, rest), options
 //    (--name=value, -f), sub-commands and a handler; handlers may be async and are cancelled with Ctrl+C (io.signal).
 //    Built in: help, clear, history. Every terminal also takes the commands registered with defineTerminalCommands()

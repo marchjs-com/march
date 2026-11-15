@@ -1,4 +1,4 @@
-// PostCard (hadi-march/ui): one post in a social feed. Header (Avatar, name with a verified mark, relative time and
+// PostCard (march/ui): one post in a social feed. Header (Avatar, name with a verified mark, relative time and
 // place, a ⋯ Menu), MediaGrid, an action row (LikeButton, comments and shares as rolling counts) and a caption that
 // folds to three lines. A double tap on the photos likes the post: a large heart pops over the photo and bursts in the
 // four HADİ colors (heartPop / heartBurst: motion/burst.ts).
@@ -85,7 +85,7 @@ export interface PostCardProps {
   avatar?: boolean | undefined;
   /** The time in the header: true (default, relative), false, or `(time) => content`. @tr Başlıktaki zaman: true (varsayılan, göreli), false ya da `(time) => içerik`. */
   time?: boolean | ((time: Post["time"]) => unknown) | undefined;
-  /** Own icons (an icon of hadi-march/icons, text or a node); `false` hides the verified mark, the place pin or the large heart. @tr Kendi ikonların (hadi-march/icons ikonu, metin ya da düğüm); `false` onay işaretini, yer iğnesini ya da büyük kalbi gizler. */
+  /** Own icons (an icon of march/icons, text or a node); `false` hides the verified mark, the place pin or the large heart. @tr Kendi ikonların (march/icons ikonu, metin ya da düğüm); `false` onay işaretini, yer iğnesini ya da büyük kalbi gizler. */
   verifiedIcon?: unknown;
   /** The place pin before the location (icon, text or node); `false` hides it. @tr Konumun önündeki yer iğnesi (ikon, metin ya da düğüm); `false` gizler. */
   placeIcon?: unknown;

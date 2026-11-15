@@ -1,4 +1,4 @@
-// FeatureGrid (hadi-march/landing): what a product does, as a grid. Four looks:
+// FeatureGrid (march/landing): what a product does, as a grid. Four looks:
 //   cards  Cards with an IconTile, title and text; a soft light follows the pointer across the grid
 //   plain  no boxes, icon and text only (dense marketing pages)
 //   list   icon beside the text, two columns (a checklist of benefits)

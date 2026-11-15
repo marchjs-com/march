@@ -22,7 +22,7 @@ Hovering "Following" turns it red before you unfollow.
 | `labels` | `{ follow, following, requested }` | built-in texts | your own button texts; any subset |
 | `ariaLabel` | `(state, name) => string` | built-in sentences | your own accessible name |
 | `icon` | boolean / `(state) => node` | `true` | the + / tick / clock: off, or your own |
-| `m:color` | ColorToken | `brand-blue` | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | ColorToken | `brand-blue` | Common prop (march/props): the colour token of the component and everything in it. |
 | `burst` | boolean | true | the dots on a new follow |
 | `morph` | boolean | true | the width spring and the icon turn |
 | `class` | string | — | on the button (`m-follow`; parts: `m-follow-ico`, `m-follow-text`) |

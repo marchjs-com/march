@@ -1,4 +1,4 @@
-// Grid (hadi-march/layout): responsive columns that never overflow; fill / balance the last row, equal rows. Pure CSS
+// Grid (march/layout): responsive columns that never overflow; fill / balance the last row, equal rows. Pure CSS
 // (grid.css is written by tools/gen-grid.js).
 import "../../../ui/display.css";
 import "./grid.css";

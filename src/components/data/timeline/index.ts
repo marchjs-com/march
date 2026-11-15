@@ -1,4 +1,4 @@
-// Timeline (hadi-march/ui). Folder: src/components/data/timeline/.
+// Timeline (march/ui). Folder: src/components/data/timeline/.
 import "./timeline.css";
 import { h } from "../../../dom/h.ts";
 import { applyPipe, toDate } from "../../../core/pipes.ts";

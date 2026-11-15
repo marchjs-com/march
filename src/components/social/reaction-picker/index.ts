@@ -1,4 +1,4 @@
-// ReactionPicker (hadi-march/ui): a row (or grid) of emoji to react with. It pops in (scale + staggered emoji on the
+// ReactionPicker (march/ui): a row (or grid) of emoji to react with. It pops in (scale + staggered emoji on the
 // motion engine), the picked one sits on a soft accent circle, hovering lifts an emoji, and arrow keys move between
 // them (mirrored in RTL). The same piece is the composer's emoji panel (layout="grid").
 import { h } from "../../../dom/h.ts";

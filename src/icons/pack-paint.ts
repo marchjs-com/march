@@ -1,4 +1,4 @@
-// The shared drawing layer of icon packs (hadi-march/icons/<pack>): an icon's `paint` hook, run by paintIcon after its
+// The shared drawing layer of icon packs (march/icons/<pack>): an icon's `paint` hook, run by paintIcon after its
 // shapes. Kept out of the start-up code: it loads with the first pack icon.
 //   grid      vb: "0 0 256 256" (Phosphor), "0 -960 960 960" (Material Symbols)…; default 24×24
 //   stroke    sw: the set's own stroke width (Lucide 2, Heroicons 1.5…) on each shape (it wins over the inherited

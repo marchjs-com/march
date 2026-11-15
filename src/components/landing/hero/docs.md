@@ -49,4 +49,4 @@ frame flat and the layers still.
 
 ## Composed of
 
-SectionHead (the copy, with Reveal), Badge, Picture, Reveal, Overlay, Aurora (hadi-march/fx), VideoBackground, Parallax; `scrollTimeline` (motion scroll core).
+SectionHead (the copy, with Reveal), Badge, Picture, Reveal, Overlay, Aurora (march/fx), VideoBackground, Parallax; `scrollTimeline` (motion scroll core).

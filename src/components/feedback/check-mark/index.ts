@@ -1,4 +1,4 @@
-// CheckMark (hadi-march/feedback): the yes / no / partly mark of comparison tables, plan features and check lists:
+// CheckMark (march/feedback): the yes / no / partly mark of comparison tables, plan features and check lists:
 // ✓, ✕ or – with the text a screen reader reads ("Yes", "No", "Partly"). The text is hidden by default (`text` shows
 // it beside the mark); `label={false}` makes the mark decoration when the line around it already says it. Each glyph
 // can be replaced or switched off, the look is plain, a soft disc or a filled disc, the colour follows the value
@@ -20,7 +20,7 @@ import { minus } from "../../../icons/glyphs/minus.ts";
 export type CheckMarkValue = boolean | "partial";
 /** Texts of a CheckMark, one per value. */
 export interface CheckMarkLabels { yes?: string; no?: string; partial?: string }
-/** Own glyphs of a CheckMark, one per value: an icon of hadi-march/icons, text or a node; `false` draws none. */
+/** Own glyphs of a CheckMark, one per value: an icon of march/icons, text or a node; `false` draws none. */
 export interface CheckMarkIcons { yes?: unknown; no?: unknown; partial?: unknown }
 
 /** Ready transitions between two values: the glyphs turn into each other, cross-fade, pop, or the new one is drawn as a stroke. */

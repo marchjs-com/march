@@ -42,7 +42,7 @@ waits (detached, alive) when it goes. The showcase shell has `title`, `toolbar` 
 
 ## Widget points
 
-`src/widget/index.ts` (`hadi-march/widget`, re-exported by `hadi-march/ui`): `widgetPoint`, `Widget`, `pickMain`.
+`src/widget/index.ts` (`march/widget`, re-exported by `march/ui`): `widgetPoint`, `Widget`, `pickMain`.
 First consumer: `src/ui/code-widget.ts` (`codeView` point, `CodeViewer`, Copy, Fullscreen) with `src/ui/highlight.ts`
 (`tokenize`, `tokenLines`). The showcase Demo card's Code tab draws `<Widget sources={[codeView]} />`. Contribution points extend this module; there is one registry.
 
@@ -74,10 +74,10 @@ src/net/  src/errors/  src/channel/  src/motion/   (modules)
 - Rarely used pieces of the core sit in their own modules so a lazy page that uses one does not grow the start-up chunk:
   `dom/switch.ts` (Switch, Match), `dom/await.ts`, `dom/dynamic.ts` beside `dom/flow.ts` (If, For, Try), and
   `core/i18n-tools.ts` (missing, unused, setFallbackLocale) beside `core/i18n.ts`.
-- Categories: `src/components/categories.ts` (folder, subpath `hadi-march/<category>`, showcase menu group, catalogue
+- Categories: `src/components/categories.ts` (folder, subpath `march/<category>`, showcase menu group, catalogue
   section); `meta.category` must match the folder.
-- `tools/gen-registry.js` writes `src/components/index.ts` (re-exported by `hadi-march/ui`), one barrel per category
-  (`src/components/<category>/index.ts`, the `hadi-march/<category>` export), `src/components/registry.gen.ts`
+- `tools/gen-registry.js` writes `src/components/index.ts` (re-exported by `march/ui`), one barrel per category
+  (`src/components/<category>/index.ts`, the `march/<category>` export), `src/components/registry.gen.ts`
   (showcase `ComponentDemo`), `docs/components.md` and the AI_INSTRUCTIONS catalogue from these folders; nobody edits
   them by hand, so two changes that add folders do not conflict. `--check` runs in `npm test` (test/registry.test.js).
 - Moved so far (old path kept as a one-line re-export): `src/ui/chip.ts` → `src/components/actions/chip/`.

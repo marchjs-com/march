@@ -1,4 +1,4 @@
-// Carousel (hadi-march/ui).
+// Carousel (march/ui).
 import "./carousel.css";
 import { signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";

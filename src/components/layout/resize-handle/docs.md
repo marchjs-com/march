@@ -35,7 +35,7 @@ owner that runs its own gesture (a window corner, the end of a calendar event).
 | `label` | string | "Resize" | accessible name |
 | `line` | `hover` `always` `none` | `hover` | the line |
 | `grip` | boolean / node | `false` | a visible grip in the middle: a short bar, or your own node |
-| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | accent | Common prop (march/props): the colour token of the component and everything in it. |
 | `disabled` | boolean | `false` | no pointer, no focus |
 | `ref` | `(el) => void` | — | the element |
 | `class` | class value | — | |
@@ -51,4 +51,4 @@ itself focusable with arrow keys). The focus ring is the line itself; on touch s
 
 ## Composed of
 
-The resize-handle behavior (`hadi-march/behaviors/resize-handle`).
+The resize-handle behavior (`march/behaviors/resize-handle`).

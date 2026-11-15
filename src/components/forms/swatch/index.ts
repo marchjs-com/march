@@ -1,4 +1,4 @@
-// Swatch (hadi-march/forms): a sample of a colour or a gradient: the squares of a colour picker's palette, the
+// Swatch (march/forms): a sample of a colour or a gradient: the squares of a colour picker's palette, the
 // presets of a gradient editor, the tones of a theme scale. `color` is any CSS colour or gradient (set through the
 // CSSOM as a custom property, never a style string) or a theme token. With `onClick` it is a button that says whether
 // it is selected; without it, a picture. Transparent colours show over a checkerboard: the one checkerboard of the

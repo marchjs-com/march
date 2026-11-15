@@ -1,5 +1,5 @@
 // Enter/leave transitions for the `transition:` directive: fade, slide, scale, blur, fly. Registered when
-// hadi-march/motion is imported. Leaving elements stay in the DOM until their animation finished.
+// march/motion is imported. Leaving elements stay in the DOM until their animation finished.
 import { registerTransition } from "../dom/h.ts";
 import { animate, type Frames } from "./animate.ts";
 

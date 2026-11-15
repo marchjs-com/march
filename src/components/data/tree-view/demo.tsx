@@ -1,6 +1,6 @@
 // Showcase stage for TreeView: a project tree of ~3 000 nodes; folders marked "lazy" load their children on open.
-import { signal, untrack } from "hadi-march";
-import { TextInput } from "hadi-march/forms";
+import { signal, untrack } from "march";
+import { TextInput } from "march/forms";
 import { TreeView, type TreeViewNode } from "./index.ts";
 
 export const code = `<TreeView nodes={files} selection="multiple" draggable search={$q}

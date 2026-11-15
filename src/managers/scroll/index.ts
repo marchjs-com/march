@@ -1,7 +1,7 @@
 // ScrollManager: page scroll position and direction, a reference-counted scroll lock (no layout jump: the scrollbar
 // width is kept as padding), saved positions per key (back/forward, tabs, lists) and scrollspy.
 //
-//   import { scroll } from "hadi-march/managers/scroll";
+//   import { scroll } from "march/managers/scroll";
 //   const s = scroll();
 //   s.y()  s.direction()  s.progress()                       // reactive, listening starts on first read
 //   const release = s.lock();   …   release();               // nested locks are counted

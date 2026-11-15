@@ -79,11 +79,11 @@ export function setLoadDelay(ms: number): void { delayMs = Math.max(0, ms | 0); 
 /** The artificial load delay (0 = off). */
 export const loadDelay = (): number => delayMs;
 
-/** What a chunk load is, for whoever runs it (hadi-march/net: priority, retry, events, the request log). */
+/** What a chunk load is, for whoever runs it (march/net: priority, retry, events, the request log). */
 export interface LoadInfo { kind: "route" | "part"; key: string }
 type LoadRunner = <T>(fn: () => Promise<T>, info: LoadInfo) => Promise<T>;
 let runner: LoadRunner | null = null;
-/** Route and lazy() chunk loads go through `r` (hadi-march/net installs itself when it is imported). */
+/** Route and lazy() chunk loads go through `r` (march/net installs itself when it is imported). */
 export function setLoadRunner(r: LoadRunner | null): void { runner = r; }
 /** Load a route or lazy part: preload its files, honour the demo delay, then run it (through the load runner). */
 export function runLoad<T>(fn: () => Promise<T>, info: LoadInfo): Promise<T> {

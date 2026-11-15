@@ -1,4 +1,4 @@
-// Tooltip (hadi-march/ui): a short hint on hover and keyboard focus, linked with aria-describedby.
+// Tooltip (march/ui): a short hint on hover and keyboard focus, linked with aria-describedby.
 // Folder: src/components/overlays/tooltip/.
 import "../../actions/menu/menu.css";
 import "./tooltip.css";

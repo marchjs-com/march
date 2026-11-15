@@ -1,4 +1,4 @@
-// StatsBand (hadi-march/landing): a row of big numbers ("12k teams", "99.9 % uptime") that count up when the band
+// StatsBand (march/landing): a row of big numbers ("12k teams", "99.9 % uptime") that count up when the band
 // scrolls into view (Counter), with a label and an optional note. Plain, divided by lines, or as cards.
 import "./stats-band.css";
 import { h } from "../../../dom/h.ts";

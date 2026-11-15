@@ -1,4 +1,4 @@
-// UndoRedo (hadi-march/actions): the undo / redo pair of an editor, built from IconButton. Feed it an undo stack
+// UndoRedo (march/actions): the undo / redo pair of an editor, built from IconButton. Feed it an undo stack
 // (`history`: canUndo / canRedo / undo / redo, and `past` / `future` for the step names) or the four props
 // (`canUndo`, `canRedo`, `onUndo`, `onRedo`). The tooltip names the step ("Undo: Rename") and the shortcut. Names,
 // icons, size, which button shows and the shortcut text are yours.

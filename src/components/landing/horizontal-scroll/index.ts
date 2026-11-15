@@ -1,4 +1,4 @@
-// HorizontalScroll (hadi-march/landing): a pinned section whose panels move sideways while the page scrolls down — the
+// HorizontalScroll (march/landing): a pinned section whose panels move sideways while the page scrolls down — the
 // vertical scroll distance equals the track's overflow, so the last panel arrives as the section ends. A progress line
 // under the panels follows. RTL moves the other way. On touch screens and with reduced motion it becomes a native
 // horizontal scroller with snap points (no pinning).

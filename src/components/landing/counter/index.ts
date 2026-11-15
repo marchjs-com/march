@@ -1,4 +1,4 @@
-// Counter (hadi-march/landing): an animated number. It counts up when it scrolls into view and glides to every new
+// Counter (march/landing): an animated number. It counts up when it scrolls into view and glides to every new
 // value; `roll` turns each digit like an odometer (the digits that change roll, the rest stay): that mode is drawn by
 // CountRoll, the one odometer. Formatted with
 // Intl.NumberFormat for the current locale (grouping, decimals, currency, percent, compact). Screen readers get the

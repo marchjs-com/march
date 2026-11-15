@@ -28,7 +28,7 @@ of its own, the frame shows the focus.
 | `disabled` | boolean / accessor | `false` | dims the frame (`is-disabled`) |
 | `readonly` | boolean / accessor | `false` | marks the frame `is-readonly` |
 | `ring` | boolean | `true` | focus ring around the frame |
-| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | accent | Common prop (march/props): the colour token of the component and everything in it. |
 | `class` | class | — | |
 | `children` | nodes | — | the editing area |
 | other attributes | | | `style`, `data-*`, `id`, `ref`, listeners go to the frame |

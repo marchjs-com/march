@@ -1,4 +1,4 @@
-// ProfileHeader (hadi-march/ui): the top of a profile. A cover (photo, or the four HADİ colors in a soft gradient) with
+// ProfileHeader (march/ui): the top of a profile. A cover (photo, or the four HADİ colors in a soft gradient) with
 // a bottom dim; the avatar in a StoryRing overlapping it (opens the stories); name with a verified mark, handle and bio;
 // stats as buttons with rolling counts (CountRoll); a FollowButton that morphs, a Message button and a ⋯ Menu. Following
 // bumps the follower count, so the number rolls with the button.
@@ -69,7 +69,7 @@ export interface ProfileHeaderProps {
   labels?: MaybeFn<ProfileHeaderLabels | undefined>;
   /** The stats row: true (default: all three), false, or the ones to show in order (`["followers", "following"]`). @tr İstatistik satırı: true (varsayılan: üçü de), false ya da sırasıyla gösterilecekler (`["followers", "following"]`). */
   stats?: MaybeFn<boolean | readonly ("posts" | "followers" | "following")[] | undefined>;
-  /** Own icons (an icon of hadi-march/icons, text or a node); `false` hides the verified mark or the Message icon. @tr Kendi ikonların (hadi-march/icons ikonu, metin ya da düğüm); `false` onay işaretini ya da Message ikonunu gizler. */
+  /** Own icons (an icon of march/icons, text or a node); `false` hides the verified mark or the Message icon. @tr Kendi ikonların (march/icons ikonu, metin ya da düğüm); `false` onay işaretini ya da Message ikonunu gizler. */
   verifiedIcon?: unknown;
   /** Own icon of the Message button (icon, text or node); `false` hides it. @tr Message düğmesinin kendi ikonu (ikon, metin ya da düğüm); `false` gizler. */
   messageIcon?: unknown;

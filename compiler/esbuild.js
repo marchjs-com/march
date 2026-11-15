@@ -1,6 +1,6 @@
 // esbuild plugin: compiles March `.jsx` files (JSX + language features) to plain JS, extracts css`` blocks into the
-// CSS bundle, collects t`` keys and resolves `hadi-march/*` to this copy of March (no npm install needed when vendored).
-//   import { march } from "hadi-march/esbuild";
+// CSS bundle, collects t`` keys and resolves `march/*` to this copy of March (no npm install needed when vendored).
+//   import { march } from "march/esbuild";
 //   esbuild.build({ entryPoints: ["src/main.jsx"], bundle: true, plugins: [march({ components: "src/components" })] })
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync, statSync, readdirSync, readFileSync } from "node:fs";
@@ -13,11 +13,11 @@ import { setupCssSplit } from "./css-split.js";
 import { deepImports } from "./deep-imports.js";
 import { pruneBareImports } from "./prune-imports.js";
 
-// hadi-march/icons/<pack> and …/<pack>/pack: the icon packs made by `march icons add` (src/icons/packs/<id>/)
+// march/icons/<pack> and …/<pack>/pack: the icon packs made by `march icons add` (src/icons/packs/<id>/)
 function iconPackModules() {
   let ids = [];
   try { ids = readdirSync(join(MARCH_ROOT, "src/icons/packs")); } catch { /* none */ }
-  return ids.flatMap((id) => [[`hadi-march/icons/${id}`, `src/icons/packs/${id}/index.js`], [`hadi-march/icons/${id}/pack`, `src/icons/packs/${id}/pack.js`]]);
+  return ids.flatMap((id) => [[`march/icons/${id}`, `src/icons/packs/${id}/index.js`], [`march/icons/${id}/pack`, `src/icons/packs/${id}/pack.js`]]);
 }
 
 /**
@@ -69,12 +69,14 @@ export function march(opts = {}) {
       const css = new Map();
       if (opts.cssSplit !== false) setupCssSplit(build);
 
-      // hadi-march/* → files of this March copy
-      const files = Object.fromEntries([...MODULES, ["hadi-march/icons", "src/icons/index.ts"], ["hadi-march/icons/catalog", "src/icons/catalog.ts"], ["hadi-march/icons/packs", "src/icons/packs.ts"], ...iconPackModules(), ["hadi-march/theme", "src/theme/index.ts"], ["hadi-march/seo", "src/seo/index.ts"], ["hadi-march/seo/hydrate", "src/seo/hydrate.ts"], ["hadi-march/seo/prerendered", "src/seo/prerendered.ts"], ["hadi-march/base", "src/base/index.ts"], ["hadi-march/testing", "src/testing/index.ts"]].map(([spec, rel]) => [spec, join(MARCH_ROOT, rel)]));
+      // march/* → files of this March copy
+      const files = Object.fromEntries([...MODULES, ["march/icons", "src/icons/index.ts"], ["march/icons/catalog", "src/icons/catalog.ts"], ["march/icons/packs", "src/icons/packs.ts"], ...iconPackModules(), ["march/theme", "src/theme/index.ts"], ["march/seo", "src/seo/index.ts"], ["march/seo/hydrate", "src/seo/hydrate.ts"], ["march/seo/prerendered", "src/seo/prerendered.ts"], ["march/base", "src/base/index.ts"], ["march/testing", "src/testing/index.ts"]].map(([spec, rel]) => [spec, join(MARCH_ROOT, rel)]));
       // named imports from March barrels go straight to the defining module (see deep-imports.js); off with deepImports: false
-      const deep = opts.deepImports === false ? (c) => c : (c) => (c.includes("hadi-march") ? deepImports(c, files) : c);
+      const deep = opts.deepImports === false ? (c) => c : (c) => (c.includes("march") ? deepImports(c, files) : c);
       const cwd = build.initialOptions.absWorkingDir ?? process.cwd();
-      build.onResolve({ filter: /^hadi-march(\/[\w-]+){1,3}$|^hadi-march$/ }, (a) => (files[a.path] ? { path: files[a.path] } : undefined));
+      build.onResolve({ filter: /^march(\/[\w-]+){1,3}$|^march$/ }, (a) => (files[a.path] ? { path: files[a.path] } : undefined));
+      // the old name (hadi-march, before November 2026) still resolves, for a while: the same files as march
+      build.onResolve({ filter: /^hadi-march(\/|$)/ }, (a) => build.resolve(a.path.slice("hadi-".length), { kind: a.kind, importer: a.importer, resolveDir: a.resolveDir }));
       // second pass of march build: small lazy chunks join their parent (static) or a group chunk (see rewriteDynamic)
       const inline = opts.inline ?? {};
       const fixDyn = (code, file) => (inline[file] ? rewriteDynamic(code, inline[file]) : code);
@@ -84,7 +86,7 @@ export function march(opts = {}) {
       if (Object.keys(inline).some((f) => f.startsWith(join(MARCH_ROOT, "src")))) {
         build.onLoad({ filter: /\.(ts|js)$/, namespace: "file" }, async (a) => (inline[a.path] && a.path.startsWith(join(MARCH_ROOT, "src")) ? { contents: rewriteDynamic(await readFile(a.path, "utf8"), inline[a.path]), loader: a.path.endsWith(".ts") ? "ts" : "js", resolveDir: dirname(a.path) } : undefined));
       }
-      build.onResolve({ filter: /^hadi-march\/css\// }, (a) => ({ path: join(MARCH_ROOT, "src", a.path.slice("hadi-march/".length)) }));
+      build.onResolve({ filter: /^march\/css\// }, (a) => ({ path: join(MARCH_ROOT, "src", a.path.slice("march/".length)) }));
 
       build.onLoad({ filter, namespace: "file" }, async (a) => {
         const source = await readFile(a.path, "utf8");
@@ -105,7 +107,7 @@ export function march(opts = {}) {
       build.onLoad({ filter: /\.(ts|js|mjs)$/, namespace: "file" }, async (a) => {
         if (a.path.endsWith(".d.ts") || a.path.includes(sep + "node_modules" + sep) || a.path.startsWith(join(MARCH_ROOT, "src")) || a.path.startsWith(join(MARCH_ROOT, "compiler")) || !a.path.startsWith(cwd)) return undefined;
         const code = await readFile(a.path, "utf8");
-        if (!code.includes("hadi-march") && !code.includes("import(")) return undefined;
+        if (!code.includes("march") && !code.includes("import(")) return undefined;
         return { contents: fixDyn(deep(tagLoaders(code, a.path, cwd)), a.path), loader: a.path.endsWith(".ts") ? "ts" : "js", resolveDir: dirname(a.path) };
       });
       build.onResolve({ filter: /^march-css:/ }, (a) => ({ path: a.path.slice(10), namespace: "march-css" }));

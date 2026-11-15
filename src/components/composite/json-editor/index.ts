@@ -1,4 +1,4 @@
-// JsonEditor (hadi-march/ui, also hadi-march/forms): JSON as text or as a tree. Folder: src/components/composite/json-editor/.
+// JsonEditor (march/ui, also march/forms): JSON as text or as a tree. Folder: src/components/composite/json-editor/.
 //   <JsonEditor bind:value={$config} mode="tree" schema={schema} />
 // Text: live parse errors with line / column, Format, Tab indents. Tree: TreeEditor (loaded the first time it is shown)
 // with type badges, inline editing and its own undo history. Both views check the same schema and `validate`.

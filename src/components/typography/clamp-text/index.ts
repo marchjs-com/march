@@ -1,4 +1,4 @@
-// ClampText (hadi-march/typography): text folded to N lines with a "more" / "less" switch that appears only when the
+// ClampText (march/typography): text folded to N lines with a "more" / "less" switch that appears only when the
 // text does not fit. Uncontrolled by default; `open` + `onOpenChange` control it from outside. Both texts are yours,
 // the switch can be turned off (`expandable={false}`: the fold only) and "less" too (`collapsible={false}`).
 import "./clamp-text.css";

@@ -1,4 +1,4 @@
-// Rating (hadi-march/ui).
+// Rating (march/ui).
 import "./rating.css";
 import { signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
@@ -26,7 +26,7 @@ export interface RatingProps {
   label?: MaybeFn<string | undefined>;
   /** Mark size: `sm`, `md` (default) or `lg`. @tr İşaret boyutu: `sm`, `md` (varsayılan) ya da `lg`. */
   size?: "sm" | "md" | "lg";
-  /** The empty mark instead of the star outline: an icon of hadi-march/icons, or `(n) => node` for your own drawing. @tr Yıldız çerçevesi yerine boş işaret: hadi-march/icons'tan bir ikon ya da kendi çiziminiz için `(n) => node`. */
+  /** The empty mark instead of the star outline: an icon of march/icons, or `(n) => node` for your own drawing. @tr Yıldız çerçevesi yerine boş işaret: march/icons'tan bir ikon ya da kendi çiziminiz için `(n) => node`. */
   icon?: IconDef | ((n: number) => unknown) | undefined;
   /** The filled mark instead of the filled star (same forms as `icon`). @tr Dolu yıldız yerine dolu işaret (`icon` ile aynı biçimler). */
   iconOn?: IconDef | ((n: number) => unknown) | undefined;

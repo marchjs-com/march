@@ -1,4 +1,4 @@
-// hadi-march/seo: head resolution, DOM writer, router integration, JSON-LD, the check, prerender helpers, hydrate.
+// march/seo: head resolution, DOM writer, router integration, JSON-LD, the check, prerender helpers, hydrate.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../src/testing/index.ts";
@@ -175,8 +175,8 @@ test("march build with seo.prerender: a page per route, head, sitemap, robots; m
     writeFileSync(join(dir, "src/pages/about.jsx"), `export const head = (to) => ({ title: "About", description: ${JSON.stringify(desc("About"))} })\nexport default function About() { return <main><h1>About us</h1></main> }\n`);
     writeFileSync(join(dir, "src/pages/users/[id].jsx"), "export default function User(p) { return <h1>{p.params.id}</h1> }\n");
     writeFileSync(join(dir, "src/main.jsx"), [
-      "import { installSeo } from 'hadi-march/seo'",
-      "import { hydrate } from 'hadi-march/seo/hydrate'",
+      "import { installSeo } from 'march/seo'",
+      "import { hydrate } from 'march/seo/hydrate'",
       "import routes from './routes.gen.js'",
       "installSeo({ site: 'https://shop.example', titleTemplate: '%s · Shop', defaults: { og: { siteName: 'Shop' } } })",
       "createRouter({ routes })",

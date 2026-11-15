@@ -1,4 +1,4 @@
-// Skeleton (hadi-march/feedback): placeholder lines or a block shaped like the content that is on its way.
+// Skeleton (march/feedback): placeholder lines or a block shaped like the content that is on its way.
 import "./skeleton.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";

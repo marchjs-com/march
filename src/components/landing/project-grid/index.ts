@@ -1,4 +1,4 @@
-// ProjectGrid (hadi-march/landing): portfolio work as cover cards with filter chips. Choosing a filter fades out what no
+// ProjectGrid (march/landing): portfolio work as cover cards with filter chips. Choosing a filter fades out what no
 // longer matches and glides the rest into their new places (FLIP on the motion engine); new matches scale in. Opening
 // a card hands its cover to `onOpen` (for a shared element transition into ProjectDetail) or, without it, shows the
 // cover in the Lightbox. Covers keep their size reserved (no layout shift) and load lazily.

@@ -1,4 +1,4 @@
-// ContextMenu (hadi-march/ui): the menu that opens where you right-click (or press Shift+F10 / the Menu key on the
+// ContextMenu (march/ui): the menu that opens where you right-click (or press Shift+F10 / the Menu key on the
 // focused element). It is the same menu as <Menu> — items, actions, separators, shortcuts, roving keyboard — only
 // anchored to a point instead of a button. `items` may depend on what was clicked: it receives the event target.
 import { signal, untrack } from "../../../core/reactive.ts";

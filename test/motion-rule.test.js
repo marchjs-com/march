@@ -36,7 +36,7 @@ test("animations go through the motion engine (inventory of raw requestAnimation
       if (/\bsetInterval\s*\(/.test(code) && /\$\w+\s*=|style|transform|width/.test(code)) bad.push(`${r}:${i + 1}: ${line.trim()}`);
     });
   }
-  assert.deepEqual(bad, [], `use hadi-march/motion (animate, onFrame, frameLoop, animateEl):\n${bad.join("\n")}`);
+  assert.deepEqual(bad, [], `use march/motion (animate, onFrame, frameLoop, animateEl):\n${bad.join("\n")}`);
 });
 
 test("animateEl: a component's raw animation follows the global speed, pause all and resume", async () => {

@@ -6,7 +6,7 @@ March draws icons as SVG built with `createElementNS` (no `innerHTML`, Trusted T
 ## The March set
 
 ```tsx
-import { Icon, users, search } from "hadi-march/icons";
+import { Icon, users, search } from "march/icons";
 
 <Icon of={users} />                       // decorative: inherits the text color, 16 px
 <Icon of={search} size="lg" label="Search" />  // "xs" 12 · "sm" 14 · "md" 16 · "lg" 20 · "xl" 24 · "em" (font size)
@@ -14,7 +14,7 @@ import { Icon, users, search } from "hadi-march/icons";
 ```
 
 Props may be live: `<Icon of={$icon} size={$size} />` repaints the same `<svg>` in place. For galleries and pickers,
-`hadi-march/icons/catalog` exports every built-in icon as data (`ICONS`) in one module.
+`march/icons/catalog` exports every built-in icon as data (`ICONS`) in one module.
 
 ## Open-source icon packs
 
@@ -23,20 +23,20 @@ so only what you use is bundled (one Tabler icon is a few hundred bytes).
 
 | Subpath | Set | License | Drawn as |
 | --- | --- | --- | --- |
-| `hadi-march/icons/lucide` | Lucide | ISC | stroke 2 px, 24 grid |
-| `hadi-march/icons/tabler` | Tabler Icons (outline) | MIT | stroke 2 px, 24 grid |
-| `hadi-march/icons/heroicons` | Heroicons (24 outline) | MIT | stroke 1.5 px, 24 grid |
-| `hadi-march/icons/phosphor` | Phosphor (regular) | MIT | fill, 256 grid |
-| `hadi-march/icons/feather` | Feather | MIT | stroke 2 px, 24 grid |
-| `hadi-march/icons/material-symbols` | Material Symbols (outlined, 400) | Apache-2.0 | fill, 960 grid |
-| `hadi-march/icons/remix` | Remix Icon (line and fill) | Apache-2.0 | fill, 24 grid |
-| `hadi-march/icons/bootstrap` | Bootstrap Icons | MIT | fill, 16 grid |
-| `hadi-march/icons/simple-icons` | Simple Icons (brands) | CC0-1.0 | fill, 24 grid |
+| `march/icons/lucide` | Lucide | ISC | stroke 2 px, 24 grid |
+| `march/icons/tabler` | Tabler Icons (outline) | MIT | stroke 2 px, 24 grid |
+| `march/icons/heroicons` | Heroicons (24 outline) | MIT | stroke 1.5 px, 24 grid |
+| `march/icons/phosphor` | Phosphor (regular) | MIT | fill, 256 grid |
+| `march/icons/feather` | Feather | MIT | stroke 2 px, 24 grid |
+| `march/icons/material-symbols` | Material Symbols (outlined, 400) | Apache-2.0 | fill, 960 grid |
+| `march/icons/remix` | Remix Icon (line and fill) | Apache-2.0 | fill, 24 grid |
+| `march/icons/bootstrap` | Bootstrap Icons | MIT | fill, 16 grid |
+| `march/icons/simple-icons` | Simple Icons (brands) | CC0-1.0 | fill, 24 grid |
 
 ```tsx
-import { Icon } from "hadi-march/icons";
-import { rocket } from "hadi-march/icons/lucide";
-import { chartBar } from "hadi-march/icons/tabler";
+import { Icon } from "march/icons";
+import { rocket } from "march/icons/lucide";
+import { chartBar } from "march/icons/tabler";
 
 <Icon of={rocket} size="lg" />
 <Button icon={chartBar}>Report</Button>
@@ -57,8 +57,8 @@ March set does not mirror by itself: components that use its arrows flip them wh
 ### Icons by name
 
 ```tsx
-import { registerIconPack, icon, loadIcon, Icon } from "hadi-march/icons/packs";
-import lucide from "hadi-march/icons/lucide/pack";
+import { registerIconPack, icon, loadIcon, Icon } from "march/icons/packs";
+import lucide from "march/icons/lucide/pack";
 
 registerIconPack(lucide);
 
@@ -68,7 +68,7 @@ registerIconPack(lucide);
 await loadIcon("lucide:rocket");                  // IconDef | undefined once the pack has loaded
 ```
 
-`Icon` from `hadi-march/icons/packs` is the `<Icon>` of `hadi-march/icons` plus `name`. `icon(name)` is reactive: read
+`Icon` from `march/icons/packs` is the `<Icon>` of `march/icons` plus `name`. `icon(name)` is reactive: read
 in a component it updates when the pack arrives (or when the pack is registered later); until then, and for an unknown
 name, it is an icon without shapes, so it is safe in any icon prop. A component that draws its icon once (a button)
 shows it as soon as the pack is already loaded: `await loadIcon(…)` first, or import the icon directly.
@@ -78,7 +78,7 @@ set is any object with `{ id, name, license, resolve(name) }` (`resolve` may ret
 { vb, sw, fill, rtl, eo })` makes icons drawn by the shared layer:
 
 ```ts
-import { registerIconPack, packIcon } from "hadi-march/icons/packs";
+import { registerIconPack, packIcon } from "march/icons/packs";
 
 const hadi = { star: packIcon("star", ["M12 2 15 9h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"], { fill: true }) };
 registerIconPack({ id: "hadi", name: "HADİ", license: "MIT", resolve: (n) => hadi[n] });

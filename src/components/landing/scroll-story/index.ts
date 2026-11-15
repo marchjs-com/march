@@ -1,4 +1,4 @@
-// ScrollStory (hadi-march/landing): scrollytelling. The media column stays pinned while the text steps scroll past;
+// ScrollStory (march/landing): scrollytelling. The media column stays pinned while the text steps scroll past;
 // the step nearest the middle of the viewport is the active one — its picture cross-fades in (motion engine), the dots
 // follow, and with `theme` the whole section takes that step's colour (a CSS transition on the background). When the
 // section is narrow (under 820 px of its own width: a phone, a narrow column) nothing is pinned: every step is a card

@@ -1,4 +1,4 @@
-// IconButton (hadi-march/ui): an icon-only button with a required accessible name. Folder: src/components/actions/icon-button/.
+// IconButton (march/ui): an icon-only button with a required accessible name. Folder: src/components/actions/icon-button/.
 import "./icon-button.css";
 import { h } from "../../../dom/h.ts";
 import { val, cx, rest, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";

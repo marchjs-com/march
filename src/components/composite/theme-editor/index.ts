@@ -1,4 +1,4 @@
-// ThemeEditor (hadi-march/components/composite/theme-editor): make a whole theme and see it live.
+// ThemeEditor (march/components/composite/theme-editor): make a whole theme and see it live.
 //   <ThemeEditor />                                   starts from HADİ (or a share link / the saved theme)
 //   <ThemeEditor bind:value={$draft} base="night" />  the draft is plain data (model.ts)
 // Base preset or from scratch; every color token for light and dark with a ColorPicker, tone scales and a WCAG

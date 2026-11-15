@@ -6,7 +6,7 @@ drag and drop (before / after / inside, with edge auto-scroll and auto-open of a
 the path to every hit open and highlights the matching text. For a short static tree, `<Tree>` is enough.
 
 ```tsx
-import { TreeView } from "hadi-march/components/data/tree-view";
+import { TreeView } from "march/components/data/tree-view";
 
 <TreeView nodes={files} selection="multiple" draggable search={$q}
   load={(node) => api.children(node.id)}
@@ -38,7 +38,7 @@ import { TreeView } from "hadi-march/components/data/tree-view";
 | `ghost` | `(nodes) => node` | first label + count | content of the drag ghost |
 | `labels` | `{ loading?, retry?, empty?, noMatch? }` | built-in texts | your own texts; `loading(label)` and `noMatch(query)` are functions |
 | `animate` | boolean | `true` | opening, landing and ghost animations |
-| `m:color` | ColorToken | the accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | ColorToken | the accent | Common prop (march/props): the colour token of the component and everything in it. |
 | `label` | string | "Tree" | accessible name |
 | `class` | class | — | extra class on the tree |
 
@@ -50,7 +50,7 @@ import { TreeView } from "hadi-march/components/data/tree-view";
 ```
 
 Shared pieces it uses: `createAxis` / `createViewport` (core/virtual), `createSelection` / `moveCursor`
-(core/selection), `pointerDrag` (hadi-march/motion), `markText` (ui/mark) and `matchRanges` (core/text), the drag layer
+(core/selection), `pointerDrag` (march/motion), `markText` (ui/mark) and `matchRanges` (core/text), the drag layer
 (`openLayer("drag")`).
 
 ## Accessibility

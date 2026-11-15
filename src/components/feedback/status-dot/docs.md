@@ -14,7 +14,7 @@ either an image with a name (`label`) or decoration next to text that already sa
 | Prop | Type | Default | |
 |---|---|---|---|
 | `tone` | `neutral` `primary` `info` `success` `warn` `danger` | `success` | meaning of the dot |
-| `m:color` | color token | — | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | — | Common prop (march/props): the colour token of the component and everything in it. |
 | `pulse` | boolean / `"ring"` / `"blink"` | `false` | `true` and `"ring"`: a breathing ring; `"blink"`: the dot fades |
 | `size` | `xs` `sm` `md` `lg` | `md` | |
 | `label` | string | — | accessible name; without it the dot is `aria-hidden` |

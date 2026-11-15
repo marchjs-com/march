@@ -1,4 +1,4 @@
-// ErrorBox (hadi-march/feedback): what went wrong, in words, with a retry button.
+// ErrorBox (march/feedback): what went wrong, in words, with a retry button.
 import "./error-box.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";

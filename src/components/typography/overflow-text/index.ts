@@ -1,4 +1,4 @@
-// OverflowText / Marquee (hadi-march/ui): text that scrolls only when it does not fit. Triggers: hover, focus, always,
+// OverflowText / Marquee (march/ui): text that scrolls only when it does not fit. Triggers: hover, focus, always,
 // visible; modes: bounce, loop, once. Direction-aware (dir="auto", RTL scrolls the other way), fade mask at the
 // logical edges, prefers-reduced-motion respected, screen readers read the text once (copies are aria-hidden).
 // Motion is WAAPI on a transform only; no inline style attribute.

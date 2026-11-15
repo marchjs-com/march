@@ -1,4 +1,4 @@
-// Layout (hadi-march/layout): the frame the screens of an app share, with changeable behavior.
+// Layout (march/layout): the frame the screens of an app share, with changeable behavior.
 //
 //  Regions   top, header, nav, aside, footer around the content (the AppShell frame: sticky sidebar that becomes a
 //            drawer on narrow screens, sticky header, skip link) and the four page corners (top/bottom × start/end,

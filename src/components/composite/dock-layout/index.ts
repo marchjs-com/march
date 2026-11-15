@@ -1,4 +1,4 @@
-// DockLayout (hadi-march/ui): an IDE workspace, the dock of march-app-ui (after HADİ Studio Kit). Tab groups in rows and
+// DockLayout (march/ui): an IDE workspace, the dock of march-app-ui (after HADİ Studio Kit). Tab groups in rows and
 // columns; drag a tab to a side of a group (a new split), onto its centre or between tabs (a tab), or to the outer edge.
 // Closing never deletes, it collapses the group to a strip (vertical in a row, horizontal in a column) and keeps its size
 // for the way back. Groups fill the whole area, layouts come from presets, are saved and loaded (plain JSON).
@@ -34,7 +34,7 @@ import type { DockTree, Preset, PanelDef, Rects, Rect, Zone, Hit, TreeSpec } fro
 import tr from "./tr.ts";
 
 messages("tr", tr);
-// preset helpers and types here; every tree operation is exported from hadi-march/app-ui
+// preset helpers and types here; every tree operation is exported from march/app-ui
 export { row, col, tabs } from "./model.ts";
 export type { DockTree, LayoutNode, TabsNode, SplitNode, Preset, PanelDef, PanelPlace, TreeSpec, Zone, Side, Rect } from "./model.ts";
 

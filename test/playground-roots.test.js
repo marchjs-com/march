@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 const { findRoots, exportRoots } = await import("../examples/showcase/src/playground/roots.ts");
 
-const SRC = `import { Debugger, CodeEditor, createDebugSession } from "hadi-march/ui";
+const SRC = `import { Debugger, CodeEditor, createDebugSession } from "march/ui";
 
 const session = createDebugSession({ persist: "my-ide.debug" });   // a comment with <Tag> in it
 

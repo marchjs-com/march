@@ -14,7 +14,7 @@ export interface ComponentMeta {
   /** One line for catalogues. */
   summary: string;
   /** Category (src/components/categories.ts): the folder src/components/<category>/<name>/, the subpath
-   *  hadi-march/<category>, the showcase menu group and the catalogue section. */
+   *  march/<category>, the showcase menu group and the catalogue section. */
   category: CategoryId;
   /** March components it is built from: a complex component reuses these instead of copying their work. A
    *  "composite" component must name at least one, and each must be a registered component. */
@@ -22,15 +22,15 @@ export interface ComponentMeta {
   /** Behaviors (src/behaviors) and shared engines (positioning, collection, field, variants …) it uses. */
   behaviors?: readonly string[];
   hubs?: readonly string[];
-  /** Own package entry instead of the hadi-march/ui barrel (heavy features used on few pages), e.g. "hadi-march/flow". */
+  /** Own package entry instead of the march/ui barrel (heavy features used on few pages), e.g. "march/flow". */
   entry?: string;
   /** Showcase page path that shows it. */
   showcase?: string;
   /** Showcase demo family: folders with the same name load in one lazy demo module (tools/gen-registry.js). */
   demoGroup?: string;
   /**
-   * `false`: a large component kept out of the `hadi-march/ui` barrel (a barrel re-export puts a module into the static
-   * graph of every page that imports the barrel). Import it from `hadi-march/components/<folder>`.
+   * `false`: a large component kept out of the `march/ui` barrel (a barrel re-export puts a module into the static
+   * graph of every page that imports the barrel). Import it from `march/components/<folder>`.
    */
   barrel?: boolean;
   /** The class of the root element ("m-btn") when it is not the first class the folder's stylesheet styles: tools

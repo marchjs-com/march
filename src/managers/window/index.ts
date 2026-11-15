@@ -1,7 +1,7 @@
 // WindowManager: this tab's visibility and focus, and the other open tabs of the app (BroadcastChannel): how many,
 // which one leads (runs the poller, owns the socket), and messages between them.
 //
-//   import { appWindow } from "hadi-march/managers/window";
+//   import { appWindow } from "march/managers/window";
 //   const w = appWindow();
 //   w.visible()  w.focused()  w.count()  w.leader()  w.tabs()          // reactive
 //   w.broadcast("cart", { count: 3 });   w.on("cart", (data, from) => …)
@@ -40,7 +40,7 @@ export interface AppWindow {
   dispose(): void;
 }
 
-const DEFAULTS: WindowConfig = { channel: "hadi-march:window", heartbeat: 2000, ttl: 6000 };
+const DEFAULTS: WindowConfig = { channel: "march:window", heartbeat: 2000, ttl: 6000 };
 
 type Wire = { k: "hello" | "ping" | "bye" | "msg"; from: string; since: number; visible: boolean; focused: boolean; type?: string; data?: unknown };
 

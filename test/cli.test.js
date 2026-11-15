@@ -61,7 +61,7 @@ test("OpenAPI → client and schemas; mock server answers from examples", () => 
 });
 
 test("templates compile", () => {
-  for (const src of [templates.page("users/[id]"), templates.component("UserCard"), templates.crud("products")]) compile(src, { runtime: "hadi-march" });
+  for (const src of [templates.page("users/[id]"), templates.component("UserCard"), templates.crud("products")]) compile(src, { runtime: "march" });
 });
 
 test("march build bundles a tiny app with routes and public files", () => {
@@ -88,7 +88,7 @@ test("march build bundles a tiny app with routes and public files", () => {
 test("installed under node_modules: register runs .tsx/.ts, march build bundles (node does not strip types there itself)", () => {
   const dir = mkdtempSync(join(tmpdir(), "march-installed-"));
   try {
-    const pkg = join(dir, "node_modules", "hadi-march");
+    const pkg = join(dir, "node_modules", "march");
     const root = fileURLToPath(new URL("..", import.meta.url));
     const files = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).files;
     for (const f of [...files, "package.json"]) if (existsSync(join(root, f))) cpSync(join(root, f), join(pkg, f), { recursive: true });
@@ -101,13 +101,13 @@ test("installed under node_modules: register runs .tsx/.ts, march build bundles 
     writeFileSync(join(dir, "src/main.tsx"), "import routes from './routes.gen.js'\ncreateRouter({ routes })\nrender(() => <Router />, document.getElementById('app'))\n");
     writeFileSync(join(dir, "check.test.mjs"), [
       "import { test } from 'node:test'; import assert from 'node:assert/strict';",
-      "import { installDom } from 'hadi-march/testing'; installDom();",
-      "const { signal } = await import('hadi-march'); const { default: Home } = await import('./src/pages/index.tsx');",
+      "import { installDom } from 'march/testing'; installDom();",
+      "const { signal } = await import('march'); const { default: Home } = await import('./src/pages/index.tsx');",
       "test('works', () => { assert.equal(signal(2)(), 2); assert.equal(typeof Home, 'function'); });",
     ].join("\n"));
     const run = (args) => { try { execFileSync(process.execPath, args, { cwd: dir, stdio: "pipe" }); } catch (e) { assert.fail(String(e.stderr) + String(e.stdout)); } };
-    run(["--import", "hadi-march/register", "--test", "check.test.mjs"]);
-    run(["--import", "hadi-march/register", "--input-type=module", "-e", "await import('hadi-march/compiler')"]);
+    run(["--import", "march/register", "--test", "check.test.mjs"]);
+    run(["--import", "march/register", "--input-type=module", "-e", "await import('march/compiler')"]);
     try { execFileSync(process.execPath, [join(pkg, "cli", "march.js"), "build"], { cwd: dir, stdio: "pipe" }); } catch (e) { assert.fail(String(e.stderr) + String(e.stdout)); }
     assert.match(readFileSync(join(dir, "dist/index.html"), "utf8"), /assets\/main-[\w-]+\.js/);
     assert.ok(existsSync(join(pkg, "types", "jsx.d.ts")), "types/ is part of the package files");
@@ -225,7 +225,7 @@ test("console banner: dev client prints one line once per page; banner: false re
     writeFileSync(join(dir, "package.json"), "{\"type\":\"module\"}");
     // production default: nothing printed, no banner code in any bundle, no extra file, size identical with banner: false
     const a = buildJs("{}"), b = buildJs("{ banner: false }");
-    assert.doesNotMatch(a.text, /March v|hadi-march\.banner/);
+    assert.doesNotMatch(a.text, /March v|march\.banner/);
     assert.equal(a.text.length, b.text.length, "banner config changes no production byte");
     assert.ok(!a.dist.includes("credit.js") && !/credit\.js/.test(a.html));
     // credit: true prints in production too, from a separate tiny file (the bundle is untouched)
@@ -258,7 +258,7 @@ test("console banner: dev client prints one line once per page; banner: false re
     } finally { child.kill(); await new Promise((r) => setTimeout(r, 500)); try { rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch { /* temp dir, the OS cleans it */ } }
   };
   const on = await serve("{}", 5391), off = await serve("{ banner: false }", 5392);
-  assert.match(on, /^if \(!globalThis\[Symbol\.for\("hadi-march\.banner"\)\]\)/);
+  assert.match(on, /^if \(!globalThis\[Symbol\.for\("march\.banner"\)\]\)/);
   assert.ok(on.includes("EventSource"));
   assert.doesNotMatch(off, /March v/);
   assert.ok(off.startsWith("// March dev client"));

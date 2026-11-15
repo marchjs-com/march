@@ -11,7 +11,7 @@
 //   import { examples } from "./types.ts"
 //   export { default as SIG } from "./<group>.sig.gen.ts"
 //   export default examples({
-//     "hadi-march": {                       ← a subpath, two spaces in
+//     "march": {                       ← a subpath, two spaces in
 //       computed: {                         ← an export of it, four spaces in
 //         code: `const total = computed(() => price() * qty())`,
 //         run: () => <Computed />,          ← the live result (a component may take { values } from `play`)
@@ -37,13 +37,13 @@ const INDEX = "examples/showcase/src/api-examples.gen.ts";
 /* Subpaths with exports added after their examples were written (base path, icon packs, landing, motion scroll / list,
  * menu and form helpers): their examples are the next group. */
 export const PENDING = new Set([
-  "hadi-march/base", "hadi-march/icons", "hadi-march/icons/packs", "hadi-march/landing", "hadi-march/motion",
-  "hadi-march/router", "hadi-march/seo/hydrate", "hadi-march/ui",
+  "march/base", "march/icons", "march/icons/packs", "march/landing", "march/motion",
+  "march/router", "march/seo/hydrate", "march/ui",
   // march-app-ui: the core is in, its pages come step by step
-  "hadi-march/app-ui",
-  // large components outside their category barrel (hadi-march/components/<category>/<name>)
-  "hadi-march/components/composite/theme-editor", "hadi-march/components/data/data-grid",
-  "hadi-march/components/data/gantt", "hadi-march/components/data/scheduler", "hadi-march/components/data/tree-view",
+  "march/app-ui",
+  // large components outside their category barrel (march/components/<category>/<name>)
+  "march/components/composite/theme-editor", "march/components/data/data-grid",
+  "march/components/data/gantt", "march/components/data/scheduler", "march/components/data/tree-view",
 ]);
 
 /** Example files: group → { subs: { subpath → Set<name> }, plays: Set<"subpath#name"> (with a Playground) }, read by
@@ -97,7 +97,7 @@ export function fileKeys(names) {
   for (const n of names) count.set(n.toLowerCase(), (count.get(n.toLowerCase()) ?? 0) + 1);
   return new Map([...names].map((n) => [n, count.get(n.toLowerCase()) > 1 ? strict(n) : kebab(n)]));
 }
-const subKey = (sub) => (sub === "hadi-march" ? "main" : sub.slice("hadi-march/".length).replace(/\//g, "."));
+const subKey = (sub) => (sub === "march" ? "main" : sub.slice("march/".length).replace(/\//g, "."));
 /** The generated module of an export's example, relative to api-examples/ (`names`: all names of that subpath in the group). */
 export const exampleModule = (group, sub, name, names) => `gen/${group}/${subKey(sub)}--${fileKeys(names).get(name)}${ONE}`;
 /** A part, relative to api-examples/. */
@@ -353,7 +353,7 @@ export function generate(root = ROOT) {
   const exports = new Map(apis.flatMap((a) => a.items.map((i) => [`${a.subpath}#${i.name}`, i])));
   const entryOf = new Map(packageEntries(root));
   const pkgExports = (sub) => {
-    const key = sub === "hadi-march" ? "." : `./${sub.slice("hadi-march/".length)}`;
+    const key = sub === "march" ? "." : `./${sub.slice("march/".length)}`;
     return runtimeExports(join(root, entryOf.get(key)));
   };
   for (const [group, { subs }] of files) {
@@ -410,7 +410,7 @@ export function generate(root = ROOT) {
     "// The live example of an export (subpath#name) is in one of the lazy parts api-examples/gen/part-NN.ex.tsx, generated\n" +
     "// from the group files examples/showcase/src/api-examples/<group>.tsx. Per subpath: the parts holding its examples,\n" +
     "// each with the first name of its alphabetical range. Only the API page imports this file.\n" +
-    'import { runLoad } from "hadi-march/lazy";\n' +
+    'import { runLoad } from "march/lazy";\n' +
     'import type { ApiExample, ApiExampleModule } from "./api-examples/types.ts";\n' +
     "type Part = { default: Record<string, ApiExample<any>> };\n" +
     `const parts: (() => Promise<Part>)[] = [\n${parts.map((_, i) => `  () => import("./api-examples/${partModule(i)}"),\n`).join("")}];\n` +

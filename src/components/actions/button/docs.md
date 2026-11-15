@@ -29,7 +29,7 @@ action handles confirmation, the reason prompt and the success / error toasts. I
 | `variant` | `primary` `secondary` `ghost` `danger` `dark` `link` | `secondary` | `link`: no fill or padding, inherits the font of the text around it; `color` tints it |
 | `size` | `sm` `md` `lg` | `md` | the icons follow it |
 | `weight` | `light` `regular` `medium` `strong` | `medium` | the label's font weight, in the theme's font |
-| `m:color` | ColorToken | theme primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | ColorToken | theme primary | Common prop (march/props): the colour token of the component and everything in it. |
 | `icon` / `iconEnd` | icon | — | leading / trailing icon |
 | `loading` | boolean / accessor | — | spinner, `aria-busy`, disabled |
 | `spinner` | boolean / node / icon | `true` | the loading spinner: `false` keeps the icon, a node or icon replaces it (an icon turns) |

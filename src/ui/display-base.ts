@@ -1,4 +1,4 @@
-// Shared display types: tones, header actions. (hadi-march/ui; split from display.ts so each component is its own module and chunk).
+// Shared display types: tones, header actions. (march/ui; split from display.ts so each component is its own module and chunk).
 import "./display.css";
 import "./button.css";
 import { untrack } from "../core/reactive.ts";

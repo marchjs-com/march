@@ -21,11 +21,11 @@ createRouter({ routes, base: "/app" })                // a fixed base
    the start page and `../assets/main.js` on `motion/index.html` both point at the same root);
 4. otherwise the domain root (or the page's folder for `file://`).
 
-`hadi-march/base` gives the same answer to app code: `appBase()` is the path (`"/app"`, `""` at the root), `appUrl()`
+`march/base` gives the same answer to app code: `appBase()` is the path (`"/app"`, `""` at the root), `appUrl()`
 resolves a public file under it on every route, `setAppBase()` sets it yourself.
 
 ```tsx
-import { appUrl } from "hadi-march/base";
+import { appUrl } from "march/base";
 <img src={appUrl("media/photo.jpg")} alt="" />      // /app/media/photo.jpg on /app/, /app/users/7, /app/motion/svg…
 ```
 

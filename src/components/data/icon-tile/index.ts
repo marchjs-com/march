@@ -1,4 +1,4 @@
-// IconTile (hadi-march/data): an icon in a tinted, rounded square (cards, list rows, empty states, flow nodes). The
+// IconTile (march/data): an icon in a tinted, rounded square (cards, list rows, empty states, flow nodes). The
 // tint is a named tone or any theme colour token; soft, outline or solid; square or round; decorative unless it has a
 // `label`. Children replace the icon.
 import "./icon-tile.css";

@@ -1,6 +1,6 @@
 // The March language plugin of march-app-ui: suggestions that know March's exports, without a compiler. After `import`
-// every component and function of hadi-march is offered and picking one writes the whole import
-// (`import { Button } from "hadi-march/ui"`); inside `{ … }` the names of the subpath written after `from`; after
+// every component and function of march is offered and picking one writes the whole import
+// (`import { Button } from "march/ui"`); inside `{ … }` the names of the subpath written after `from`; after
 // `from "` the subpaths; in JSX after `<` the components; elsewhere the names already imported. It provides the
 // "language" service the code editor plugin asks.
 import type { CodeCompleteContext, CodeCompletion, CodeSuggestion } from "../code-editor/index.ts";
@@ -22,8 +22,8 @@ export interface MarchLanguageOptions {
 const described = (r: CodeSuggestion, x: { name: string; kind: string; doc: string; sub: string }): CodeSuggestion => ({ ...r, doc: { kind: x.kind, signature: `import { ${x.name} } from "${x.sub}"`, ...(x.doc ? { doc: x.doc } : {}) } });
 const word = (before: string): string => /[\w$]*$/.exec(before)?.[0] ?? "";
 const fits = (name: string, w: string): boolean => !w || name.toLowerCase().startsWith(w.toLowerCase());
-// the main subpaths come first in the list (a component is offered from hadi-march/ui before its own deep path)
-const rank = (sub: string): number => (sub === "hadi-march" ? 0 : sub === "hadi-march/ui" ? 1 : sub.split("/").length);
+// the main subpaths come first in the list (a component is offered from march/ui before its own deep path)
+const rank = (sub: string): number => (sub === "march" ? 0 : sub === "march/ui" ? 1 : sub.split("/").length);
 
 /** Suggestions for March code from March's catalog: `marchLanguagePlugin({ catalog: () => fetch(url).then((r) => r.json()) })`. */
 export function marchLanguagePlugin(o: MarchLanguageOptions): AppPlugin {
@@ -80,7 +80,7 @@ export function marchLanguagePlugin(o: MarchLanguageOptions): AppPlugin {
     // elsewhere: the March names this file imports, then every other export (picking one writes its import at the top)
     if (w.length >= 1 || ctx.forced) {
       const imported = new Set<string>();
-      for (const m of value.matchAll(/import\s+(?:type\s+)?\{([^}]*)\}\s*from\s*["']hadi-march[^"']*["']/g)) for (const n of (m[1] ?? "").split(",")) { const id = n.trim().replace(/^type\s+/, "").split(/\s+as\s+/).pop(); if (id) imported.add(id); }
+      for (const m of value.matchAll(/import\s+(?:type\s+)?\{([^}]*)\}\s*from\s*["']march[^"']*["']/g)) for (const n of (m[1] ?? "").split(",")) { const id = n.trim().replace(/^type\s+/, "").split(/\s+as\s+/).pop(); if (id) imported.add(id); }
       const mine = all.filter((x) => imported.has(x.name) && fits(x.name, w)).map((x) => described(row(x.name, `${x.kind} · ${x.sub}`), x));
       const more = w.length < 2 && !ctx.forced ? [] : all.filter((x) => !imported.has(x.name) && fits(x.name, w))
         .map((x) => described({ ...row(x.name, `${x.kind} · ${x.sub} · + import`), head: `import { ${x.name} } from "${x.sub}"` }, x));

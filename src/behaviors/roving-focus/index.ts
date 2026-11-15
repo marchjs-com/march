@@ -1,4 +1,4 @@
-// hadi-march/behaviors/roving-focus — roving tabindex: a toolbar, list or grid is one Tab stop; arrow keys, Home and End
+// march/behaviors/roving-focus — roving tabindex: a toolbar, list or grid is one Tab stop; arrow keys, Home and End
 // move inside it (ArrowLeft / ArrowRight swap in RTL). The FocusManager's focus.roving() and focus:roving are this.
 //   const stop = rovingFocus(toolbar, { orientation: "horizontal" })     <div use:rovingFocus={[rovingFocus, { … }]}>
 import { roving as rovingKey } from "../../ui/focus.ts";

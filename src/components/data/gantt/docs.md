@@ -7,7 +7,7 @@ predecessor ends are pushed later, keeping their length. A today line marks the 
 pinned while the timeline scrolls.
 
 ```tsx
-import { Gantt } from "hadi-march/components/data/gantt";
+import { Gantt } from "march/components/data/gantt";
 
 <Gantt tasks={$tasks} scale="day" cascade
   onChange={(task) => api.save(task)}
@@ -43,7 +43,7 @@ import { Gantt } from "hadi-march/components/data/gantt";
 ```
 
 Dates come from `core/date` (`diffDays`, `addDays`, `startOfWeek`, `dateFormat` …), drags from `pointerDrag`
-(hadi-march/motion).
+(march/motion).
 
 ## Accessibility
 

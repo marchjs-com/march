@@ -1,4 +1,4 @@
-// Card (hadi-march/ui). Folder: src/components/data/card/.
+// Card (march/ui). Folder: src/components/data/card/.
 import "./card.css";
 import { h } from "../../../dom/h.ts";
 import { rest, val, cx, type ClassProp, type MaybeFn } from "../../../ui/util.ts";

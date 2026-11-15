@@ -1,4 +1,4 @@
-// LogoCloud (hadi-march/landing): "trusted by" logos. `grid` lines them up (equal cells, they light up on hover);
+// LogoCloud (march/landing): "trusted by" logos. `grid` lines them up (equal cells, they light up on hover);
 // `marquee` runs them as an endless ticker (Marquee: fades at the edges, stops off screen, reduced motion keeps it
 // still, screen readers read each name once). Logos are muted to one tone by default so no brand shouts.
 import "./logo-cloud.css";

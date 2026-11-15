@@ -1,5 +1,5 @@
 // AppError: the one error shape of March (net, WebSocket, boundaries, window errors). Small on purpose: net
-// imports it without pulling the whole errors module; hadi-march/errors installs the sink that collects them.
+// imports it without pulling the whole errors module; march/errors installs the sink that collects them.
 
 export type ErrorType =
   | "network" | "offline" | "timeout" | "abort" | "http" | "auth" | "forbidden" | "notFound" | "validation"
@@ -76,7 +76,7 @@ export const isAbort = (e: unknown): boolean => (e as { name?: string; type?: st
 
 type Sink = (e: AppError) => void;
 let sink: Sink | null = null;
-/** hadi-march/errors installs the collector here; until then reported errors go nowhere. */
+/** march/errors installs the collector here; until then reported errors go nowhere. */
 export function setErrorSink(fn: Sink | null): void { sink = fn; }
-/** Hand an error to the collector (no-op when hadi-march/errors is not installed). */
+/** Hand an error to the collector (no-op when march/errors is not installed). */
 export function emitError(e: AppError): void { sink?.(e); }

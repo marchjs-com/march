@@ -33,7 +33,7 @@ and shares; the caption folds to three lines with a "more" button.
 | `class` | | | on the article |
 
 ```tsx
-import { star, zap } from "hadi-march/icons"
+import { star, zap } from "march/icons"
 <PostCard post={post} avatar={false} time={(t) => new Date(t).toLocaleDateString()} commentIcon={zap} bigHeart={<Icon of={star} />}
   likeColor="brand-orange" viewAll={false} labels={{ more: "read on", comments: (n) => `${n} answers` }} />
 ```

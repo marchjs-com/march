@@ -1,6 +1,6 @@
 // March ui — accessible components, dialogs, toasts, navigation, command palette and shortcuts.
-// Styles: import "hadi-march/css/tokens.css"; each component brings its own CSS (the March esbuild plugin bundles only
-// what you use, per lazy chunk). Without the plugin, import "hadi-march/css/ui.css" (everything).
+// Styles: import "march/css/tokens.css"; each component brings its own CSS (the March esbuild plugin bundles only
+// what you use, per lazy chunk). Without the plugin, import "march/css/ui.css" (everything).
 export { action, isAction } from "./action.ts";
 export type { Action, ActionOptions, ReasonOptions } from "./action.ts";
 export { Button, IconButton, ActionButton, ButtonGroup, CopyButton } from "./button.ts";
@@ -63,7 +63,7 @@ export { Carousel } from "./carousel.ts";
 export { Tree } from "./tree.ts";
 export { Kanban } from "./kanban.ts";
 export { Splitter } from "./splitter.ts";
-// Portal is part of the core (hadi-march); listed here too so composite components can name it in composedOf
+// Portal is part of the core (march); listed here too so composite components can name it in composedOf
 export { Portal, PortalTarget } from "../dom/portal.ts";
 export type { OverflowTextProps, MarqueeTrigger, MarqueeMode } from "./marquee.ts";
 export type { AvatarGroupProps } from "./avatar-group.ts";

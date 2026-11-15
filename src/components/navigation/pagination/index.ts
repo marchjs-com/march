@@ -1,4 +1,4 @@
-// Pagination (hadi-march/ui): numbered pages, or `variant="simple"` (Previous / Next, with or without a page count).
+// Pagination (march/ui): numbered pages, or `variant="simple"` (Previous / Next, with or without a page count).
 import "./pagination.css";
 import { computed, untrack, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";

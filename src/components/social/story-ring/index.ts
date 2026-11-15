@@ -1,4 +1,4 @@
-// StoryRing (hadi-march/ui): an Avatar in a ring that tells the story state. new: the four HADİ colors in a sweep ·
+// StoryRing (march/ui): an Avatar in a ring that tells the story state. new: the four HADİ colors in a sweep ·
 // seen: a quiet line · close: friends-only green · none: no ring. As a button it opens the stories; while they load the
 // ring turns (motion engine; still with reduced motion). An optional label sits under it (story trays).
 import { effect, untrack, onCleanup } from "../../../core/reactive.ts";

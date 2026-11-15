@@ -1,4 +1,4 @@
-// Menu and Dropdown (hadi-march/ui): a trigger button with a floating menu of items / actions, or any floating content.
+// Menu and Dropdown (march/ui): a trigger button with a floating menu of items / actions, or any floating content.
 // Folder: src/components/actions/menu/.
 import "./menu.css";
 import { signal, untrack } from "../../../core/reactive.ts";

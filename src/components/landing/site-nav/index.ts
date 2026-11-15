@@ -1,4 +1,4 @@
-// SiteNav (hadi-march/landing): the top bar of a website. Sticky; `transparent` starts see-through over a hero and
+// SiteNav (march/landing): the top bar of a website. Sticky; `transparent` starts see-through over a hero and
 // turns solid (glass) after a few pixels of scroll; `floating` is a centred glass pill; `shrink` makes it lower once
 // scrolled; `hide` slides it away while scrolling down and back on scrolling up. A pill slides under the hovered link
 // (motion engine, mirrored in RTL) and rests on the current one. On narrow screens the links move into a Drawer.

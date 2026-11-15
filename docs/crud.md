@@ -1,4 +1,4 @@
-# crud (`hadi-march/crud`)
+# crud (`march/crud`)
 
 `crud(source, options)` returns a complete list/create/edit/delete view built from `Table`, `Form`, dialogs and `action()`.
 

@@ -92,14 +92,14 @@ export interface ExtensionDef<P extends Props = Props> {
 }
 /**
  * Props added to every component's JSX type. Declare yours once, app-wide:
- * `declare module "hadi-march" { interface ExtensionProps { track?: string } }`, or from an extension:
+ * `declare module "march" { interface ExtensionProps { track?: string } }`, or from an extension:
  * `interface ExtensionProps extends ExtensionPropsOf<typeof track> {}`.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ExtensionProps {}
 /**
  * Props added to one March component's JSX type, by its export name:
- * `declare module "hadi-march" { interface ComponentExtensions { Button: { confirm?: boolean } } }`.
+ * `declare module "march" { interface ComponentExtensions { Button: { confirm?: boolean } } }`.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ComponentExtensions {}
@@ -217,7 +217,7 @@ function asTarget(t: ExtensionTarget): Target {
   return t as Target;
 }
 
-/** Not for direct use: built-in members (hadi-march/props puts m:parts and the m: common props here). */
+/** Not for direct use: built-in members (march/props puts m:parts and the m: common props here). */
 export function _builtin(name: string, builtin: Builtin): () => void {
   return add("*", defineExtension({ name, order: 1e9 }), builtin);
 }
@@ -552,7 +552,7 @@ export const extensions = {
   },
   /**
    * Name components for tests and tools when a build shortens function names: `extensions.name({ Button, Card })` or
-   * `extensions.name(await import("hadi-march/ui"))` (every export whose name starts with a capital letter).
+   * `extensions.name(await import("march/ui"))` (every export whose name starts with a capital letter).
    */
   name(components: Record<string, unknown>): void {
     for (const k of Object.keys(components)) {

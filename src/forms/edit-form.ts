@@ -1,4 +1,4 @@
-// EditForm (hadi-march/forms): load → edit → save with a reason prompt and a success notice. Its own module so the
+// EditForm (march/forms): load → edit → save with a reason prompt and a success notice. Its own module so the
 // dialog and toast it uses by default reach only the apps that use it (useForm, Form and Wizard stay without them).
 import { signal, untrack, provide } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";

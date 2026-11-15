@@ -19,7 +19,7 @@ children or drag and drop use TreeView.
 | `label` | string | "Tree" | accessible name |
 | `chevron` | boolean / `(node, open) => node` | `true` | the open / close arrow, off, or your own (`open()` is live) |
 | `toggle` | `row` `chevron` | `row` | what opens / closes a branch on click: the whole row, or only the arrow (a click on the row then only selects) |
-| `m:color` | ColorToken | the accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | ColorToken | the accent | Common prop (march/props): the colour token of the component and everything in it. |
 | `class` | class | — | extra class on the tree |
 
 ```tsx

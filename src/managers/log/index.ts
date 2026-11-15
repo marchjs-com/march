@@ -2,7 +2,7 @@
 // ring buffer (a reactive list for panels) and a batched beacon to a server — with scoped child loggers, context
 // fields and redaction of secret-looking keys.
 //
-//   import { logger, configureLog, consoleTransport, memoryTransport, beaconTransport } from "hadi-march/managers/log";
+//   import { logger, configureLog, consoleTransport, memoryTransport, beaconTransport } from "march/managers/log";
 //   configureLog({ level: "info", transports: [consoleTransport(), beaconTransport("/log", { allow: () => consent.has("analytics") })] });
 //   const log = logger().child("checkout", { cart: 3 });
 //   log.info("paid", { total: 42, card: "4242…" })        // card is redacted

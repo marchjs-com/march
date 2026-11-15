@@ -1,4 +1,4 @@
-// RowTools (hadi-march/forms): the tools of one row in an editable list: move up, move down, remove. Built from
+// RowTools (march/forms): the tools of one row in an editable list: move up, move down, remove. Built from
 // IconButton. Give the row's `index` and the list's `count` and the arrows switch off at the ends. Which tools show
 // (`actions`), their names, icons, size and colour are yours.
 import "./row-tools.css";

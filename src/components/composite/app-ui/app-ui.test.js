@@ -99,15 +99,15 @@ test("AppPreview: the stage takes its own theme, mode and accent; each picker is
 test("marchLanguagePlugin: after import every export, picking writes the whole import; from \"…\" the subpaths", async () => {
   const { marchLanguagePlugin } = await import("./index.ts");
   const { createAppKit } = await import("./kit.ts");
-  const catalog = { subpaths: [{ subpath: "hadi-march", items: [["signal", "function"]] }, { subpath: "hadi-march/ui", items: [["Button", "component"], ["ButtonGroup", "component"]] }] };
+  const catalog = { subpaths: [{ subpath: "march", items: [["signal", "function"]] }, { subpath: "march/ui", items: [["Button", "component"], ["ButtonGroup", "component"]] }] };
   const kit = createAppKit([marchLanguagePlugin({ catalog })]);
   const lang = kit.service("language");
   const ask = (value) => lang.complete("a.tsx", { value, caret: value.length, before: value, forced: true, typed: "" });
   const a = await ask("import Bu");
-  assert.deepEqual(a.items.map((x) => x.insert), ['{ Button } from "hadi-march/ui"', '{ ButtonGroup } from "hadi-march/ui"']);
-  const b = await ask('import { Button } from "hadi-march/');
-  assert.deepEqual(b.items.map((x) => x.label), ["hadi-march/ui"]);
-  const c = await ask('import { signal } from "hadi-march"\nconst a = sig');
+  assert.deepEqual(a.items.map((x) => x.insert), ['{ Button } from "march/ui"', '{ ButtonGroup } from "march/ui"']);
+  const b = await ask('import { Button } from "march/');
+  assert.deepEqual(b.items.map((x) => x.label), ["march/ui"]);
+  const c = await ask('import { signal } from "march"\nconst a = sig');
   assert.deepEqual(c.items.map((x) => x.label), ["signal"], "elsewhere: the imported names");
   kit.dispose();
 });
@@ -118,7 +118,7 @@ test("instrument.js: one-line calls, every line keeps its number; steps, scopes,
   const ts = (await import("typescript")).default;
   const box = { self: {} };
   vm.runInNewContext(readFileSync(new URL("./instrument.js", import.meta.url), "utf8"), box);
-  const src = 'import { signal } from "hadi-march"\nconst items = signal([1])\nfunction add(x: number) {\n  let z = x + 1\n  if (z > 2) debugger\n  return z\n}\nexport const C = () => <p on:click={() => items.set([2])}>{add(1)}</p>\n';
+  const src = 'import { signal } from "march"\nconst items = signal([1])\nfunction add(x: number) {\n  let z = x + 1\n  if (z > 2) debugger\n  return z\n}\nexport const C = () => <p on:click={() => items.set([2])}>{add(1)}</p>\n';
   const r = JSON.parse(JSON.stringify(box.self.marchInstrument(ts, "a.tsx", src, 0))); // out of the vm context
   assert.equal(r.code.split("\n").length, src.split("\n").length, "no new lines");
   assert.ok(!/\bdebugger\b/.test(r.code), "the debugger statement is our step now");

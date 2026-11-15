@@ -20,7 +20,7 @@ const input = (el, v, type = "input") => { el.value = v; el.dispatchEvent(new Ev
 /** Open a toolbar / row menu of a table: the floating panel (Popover) loads on first use and is drawn in the overlay layer. */
 const openMenu = async (el, cls) => { click(el.querySelector(`.${cls} button`)); for (let i = 0; i < 20 && !document.querySelector(".m-table-menu-body"); i++) await tick(5); return document.querySelector(".m-table-menu-body"); };
 const closeMenu = (el, cls) => click(el.querySelector(`.${cls} button`));
-/** Minimal action object (same shape as hadi-march/ui action()). */
+/** Minimal action object (same shape as march/ui action()). */
 function act(label, fn) {
   const busy = signal(false);
   return { kind: "march.action", label: () => label, opts: {}, busy: () => busy(), visible: () => true, disabled: () => busy(),

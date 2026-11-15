@@ -1,4 +1,4 @@
-# Table (`hadi-march/table`)
+# Table (`march/table`)
 
 A data table for client-side arrays or server APIs: sorting, filtering, search, paging, virtual scrolling, column layout,
 selection with bulk actions, row actions, expandable rows, inline editing, CSV/JSON export, saved views, URL sync,
@@ -7,8 +7,8 @@ keyboard navigation and a card layout for small screens.
 It is a separate module. Nothing in the core imports it, so it only reaches your bundle where you import it.
 
 ```js
-import { Table, createTable } from "hadi-march/table";
-import "hadi-march/css/table.css"; // or a <link> tag; it uses the tokens from tokens.css
+import { Table, createTable } from "march/table";
+import "march/css/table.css"; // or a <link> tag; it uses the tokens from tokens.css
 ```
 
 ```jsx
@@ -71,7 +71,7 @@ You can override any field: `Person.columns({ name: { editable: true, pin: "left
 | prop | |
 |---|---|
 | `selectable` | Adds a checkbox column, select-all (this page or all matching rows) and Shift+click range selection. |
-| `bulkActions` | Action objects (`action()` from `hadi-march/ui`). They run with the array of selected rows and clear the selection when they succeed. |
+| `bulkActions` | Action objects (`action()` from `march/ui`). They run with the array of selected rows and clear the selection when they succeed. |
 | `rowActions` | Action objects that run with the row. Up to 2 show inline. With more, they go into a ⋮ menu (`rowActionsInline` overrides this). |
 | `onRowClick(row, event)` | Called when a row is clicked or Enter is pressed on it. Clicks on buttons, inputs and links are ignored. |
 | `expand(row)` | Content for an expandable row. With no `onRowClick`, a row click toggles it. |
@@ -114,7 +114,7 @@ pass a function that receives the whole params object.
 <Table source={(p) => api.list({ after: p.after, first: p.size })} paging="cursor" paramNames={{ cursor: "after" }} columns={columns} />
 ```
 
-Requests go through `query()` from `hadi-march/data`. The key is the mapped params, so you get caching, de-duplication,
+Requests go through `query()` from `march/data`. The key is the mapped params, so you get caching, de-duplication,
 retry for temporary errors, and aborting of old requests. `table.refetch()` reloads the data. While a new page loads,
 the previous rows stay visible with `aria-busy`. A failed request shows its message and a Retry button. To refetch
 after a mutation, use `invalidate(["march.table", queryKey])`.

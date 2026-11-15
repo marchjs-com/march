@@ -10,6 +10,6 @@ export default defineMeta({
   behaviors: [],
   hubs: [],
   showcase: "/managers",
-  // lazy on purpose (hadi-march/managers/consent/ui): it brings Toggle and the dialog; kept out of the hadi-march/ui barrel
+  // lazy on purpose (march/managers/consent/ui): it brings Toggle and the dialog; kept out of the march/ui barrel
   barrel: false,
 });

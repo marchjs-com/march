@@ -1,4 +1,4 @@
-// ImageCropper (hadi-march/ui): crop, rotate, zoom and mirror an image. Folder: src/components/composite/image-cropper/.
+// ImageCropper (march/ui): crop, rotate, zoom and mirror an image. Folder: src/components/composite/image-cropper/.
 //   <ImageCropper src={url} bind:value={$crop} aspect={1} api={(c) => cropper = c} />   cropper.toBlob("image/webp")
 // The frame stays centered (drag its corners to resize it, or pick an aspect); drag the image to pan, wheel / slider /
 // + − to zoom, 90° buttons and a fine angle slider to rotate, a button to mirror. The image always covers the frame.

@@ -1,4 +1,4 @@
-// Pricing (hadi-march/landing): plans side by side with a monthly / yearly switch. Switching morphs every price: the
+// Pricing (march/landing): plans side by side with a monthly / yearly switch. Switching morphs every price: the
 // digits roll to the new amount (Counter, odometer mode), the "per month" line and the yearly saving cross-fade, and
 // the thumb of the switch slides (Segmented, sliding indicator). The featured plan is lifted with a glowing brand border. Plans are Cards in an
 // equal-height row; on phones they stack with the featured plan first.

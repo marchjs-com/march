@@ -1,4 +1,4 @@
-// LikeButton (hadi-march/ui): a heart toggle with a count. Liking pops the heart on a spring, rings it and throws a
+// LikeButton (march/ui): a heart toggle with a count. Liking pops the heart on a spring, rings it and throws a
 // burst of particles in the four HADİ colors (motion engine: global speed, pause and reduced motion apply; with
 // reduced motion only the fill changes). heartBurst() / heartPop() (motion/burst.ts, re-exported here) are the same
 // effects for any element (a double-tap on a photo, a comment, a story).

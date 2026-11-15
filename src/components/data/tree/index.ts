@@ -1,4 +1,4 @@
-// Tree (hadi-march/ui). Folder: src/components/data/tree/.
+// Tree (march/ui). Folder: src/components/data/tree/.
 import "./tree.css";
 import { signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";

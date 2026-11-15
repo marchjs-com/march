@@ -1,4 +1,4 @@
-// Steps (hadi-march/ui).
+// Steps (march/ui).
 import "./steps.css";
 import { h } from "../../../dom/h.ts";
 import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";

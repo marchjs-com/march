@@ -3,7 +3,7 @@ import { getOwner, untrack, onCleanup, effect, runWithOwner, _cell, _setCell, _o
 import { insert, removeNode, disposeDetached, LEAVE } from "./h.ts";
 import { val, call } from "./flow.ts";
 
-/** Installed by hadi-march/motion: (elements, mutate, opts) → void. Measures, runs `mutate`, animates the deltas. */
+/** Installed by march/motion: (elements, mutate, opts) → void. Measures, runs `mutate`, animates the deltas. */
 export type FlipHook = (elements: Element[], mutate: () => void, opts: unknown) => void;
 let flipHook: FlipHook | null = null;
 /** Hook `<For animate>` uses to animate reordering (installFlip() sets the motion FLIP here). */
@@ -18,7 +18,7 @@ export interface ForProps<T> {
   children: (item: Accessor<T>, index: Accessor<number>) => unknown;
   /** Rendered while the list is empty. @tr Liste boşken gösterilir. */
   fallback?: unknown;
-  /** FLIP-animate moves, enter and leave (needs hadi-march/motion). @tr Yer değiştirme, giriş ve çıkışı FLIP ile canlandırır (hadi-march/motion gerekir). */
+  /** FLIP-animate moves, enter and leave (needs march/motion). @tr Yer değiştirme, giriş ve çıkışı FLIP ile canlandırır (march/motion gerekir). */
   animate?: unknown;
 }
 interface Row<T> { nodes: Node[]; item: Cell<T>; index: Cell<number> | null; o: Owner; /** key */ k: unknown; /** position in the previous order */ at: number }
@@ -27,7 +27,7 @@ interface Row<T> { nodes: Node[]; item: Cell<T>; index: Cell<number> | null; o: 
  * Keyed list. `<For each={items} key="id">{(item, index) => …}</For>`; `item` and `index` are accessors.
  * Rows are reused by key; when an item with the same key changes, only that row's bindings update.
  * Reordering moves the fewest rows (longest increasing subsequence); clearing the whole list, filling an empty one and
- * appending take fast paths. `animate` (with hadi-march/motion loaded): FLIP-animate moves, enter and leave.
+ * appending take fast paths. `animate` (with march/motion loaded): FLIP-animate moves, enter and leave.
  */
 export function For<T>(props: ForProps<T>): DocumentFragment {
   const doc = globalThis.document;

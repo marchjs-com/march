@@ -6,7 +6,7 @@ whatever scrolls: the window or a scrolling container. By default it puts itself
 Layout it is the `scrollToTop` feature (on by default).
 
 ```tsx
-import { ScrollToTop } from "hadi-march/ui";
+import { ScrollToTop } from "march/ui";
 
 <ScrollToTop />                          // once; shows after 320 px
 <ScrollToTop threshold={600} order={-1} />
@@ -27,7 +27,7 @@ import { ScrollToTop } from "hadi-march/ui";
 | `label` | Accessible name and tooltip (string or accessor); default "Back to top" (translated). |
 | `icon` | The icon (a node or an icon); default: an up arrow. |
 | `m:color` | Color token of the icon and border; default: text colour, the theme's primary on hover. |
-| Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| Common prop (march/props): the colour token of the component and everything in it. |
 | `smooth` | Scroll back smoothly (default `true`); `false` jumps at once. |
 | `class` | Extra classes on the button (`.m-to-top`). |
 

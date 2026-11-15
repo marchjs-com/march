@@ -3,7 +3,7 @@ import { addCornerControl, type Corner } from "./index.ts";
 import { Button } from "../../actions/button/index.ts";
 import { signal, effect, onCleanup } from "../../../core/reactive.ts";
 
-export const code = `import { addCornerControl, BottomRightControls } from "hadi-march/layout"
+export const code = `import { addCornerControl, BottomRightControls } from "march/layout"
 
 const off = addCornerControl("bottom-end", <button>Geri bildirim</button>, 10)
 off()  // take it out (also when the component goes away)`

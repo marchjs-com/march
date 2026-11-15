@@ -28,7 +28,7 @@ export interface LazyOptions<P> {
   /** Reserved size so nothing moves when the component arrives: a CSS length, or an aspect ratio ("16 / 9"). */
   height?: string;
   aspect?: string;
-  /** Named export to use instead of `default`: `lazy(() => import("hadi-march/charts"), { pick: "LineChart" })`. */
+  /** Named export to use instead of `default`: `lazy(() => import("march/charts"), { pick: "LineChart" })`. */
   pick?: string;
   /** Automatic retries after a failed load, with growing pauses (default 3; 0 shows the error at once). */
   retries?: number;
@@ -74,7 +74,7 @@ export function lazy<P = Record<string, unknown>>(load: () => Promise<Loaded<P>>
     onCleanup(() => { alive = false; });
     const ph = opts.placeholder ?? (opts.fallback ? opts.fallback : "block");
     const fb = typeof ph === "function" ? untrack(() => (ph as (p: P) => unknown)(props)) : ph === "none" ? null : skeleton(ph);
-    // built while hydrate() takes over a prerendered page (hadi-march/seo): its content is already on screen, no fade-in
+    // built while hydrate() takes over a prerendered page (march/seo): its content is already on screen, no fade-in
     const still = !!globalThis.document?.documentElement.hasAttribute("data-m-hydrating");
     const slot = h("div", {
       class: () => `m-lazy-slot is-${state()}${opts.height || opts.aspect ? " m-lazy-sized" : ""}${still ? " m-lazy-still" : ""}`, "aria-busy": () => (state() === "wait" ? "true" : null),

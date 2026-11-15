@@ -1,7 +1,7 @@
 // FocusManager: where keyboard focus is and where it goes back to. Focus traps (stacked: only the newest is active),
 // focus restore, focus-visible (the last input was a keyboard) and roving tabindex for toolbars, lists and grids.
 //
-//   import { focus } from "hadi-march/managers/focus";
+//   import { focus } from "march/managers/focus";
 //   const release = focus.trap(panel)            // Tab stays inside; release() gives focus back to where it was
 //   const back = focus.remember(); …; back()     // restore later
 //   focus.visible()                              // reactive: the user is moving with the keyboard (data-m-focus-visible on <html>)

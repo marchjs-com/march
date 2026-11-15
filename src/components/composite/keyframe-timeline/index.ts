@@ -1,4 +1,4 @@
-// KeyframeTimeline (hadi-march/ui): edit and play a keyframe timeline on the motion engine. Folder: src/components/composite/keyframe-timeline/.
+// KeyframeTimeline (march/ui): edit and play a keyframe timeline on the motion engine. Folder: src/components/composite/keyframe-timeline/.
 //   <KeyframeTimeline bind:value={$model} />
 // Transport (play / pause, back to start, loop, speed), a ruler you scrub, a playhead you drag, one lane per track with
 // its value curve and draggable keyframes (snapped to 50 ms; Alt for free), and an inspector with an EasingCurveEditor

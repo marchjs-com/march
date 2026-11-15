@@ -9,7 +9,7 @@ tilt and rise (their state, focus and listeners stay), so what comes apart is ex
   The shadow, surface and ring plates are plain boxes that copy the element's computed look.
 
 ```tsx
-import { ExplodedView } from "hadi-march/ui";
+import { ExplodedView } from "march/ui";
 
 <ExplodedView bind:open={$apart} onPick={(id) => $picked = id} active={$picked}
   parts={[{ selector: ".m-avatar", label: "Avatar" }, { selector: ".m-like", label: "LikeButton", level: 2 }]}>
@@ -34,7 +34,7 @@ import { ExplodedView } from "hadi-march/ui";
 | `motion` | `smooth` `spring` `none` / `false` | `smooth` | |
 | `onPick` | `(id, el) => void` | — | a plate was pressed while apart (`id`: the part's id / label, or `shadow` `surface` `content` `ring`) |
 | `active` | id / accessor | — | the plate shown as chosen |
-| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | accent | Common prop (march/props): the colour token of the component and everything in it. |
 | `label` | string / accessor | "Exploded view" | accessible name of the group while apart |
 | `class` | class | — | |
 

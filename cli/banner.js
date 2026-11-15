@@ -8,5 +8,5 @@ export function bannerSource(version, tip = "") {
   const args = [`%c🧡 March v${v} · ${MARCH_URL}`, "color:#f97316;font-weight:600"];
   const tipLine = tip ? `console.log(${JSON.stringify(tip)});` : "";
   // once per page: a flag on globalThis (re-mounts, repeated script runs and HMR re-evaluation never print it twice)
-  return `if (!globalThis[Symbol.for("hadi-march.banner")]) { globalThis[Symbol.for("hadi-march.banner")] = true; console.log(...${JSON.stringify(args)});${tipLine} }\n`;
+  return `if (!globalThis[Symbol.for("march.banner")]) { globalThis[Symbol.for("march.banner")] = true; console.log(...${JSON.stringify(args)});${tipLine} }\n`;
 }

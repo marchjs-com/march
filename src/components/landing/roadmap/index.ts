@@ -1,4 +1,4 @@
-// Roadmap (hadi-march/landing): a Timeline whose line fills as you scroll — a product roadmap, a company story or a
+// Roadmap (march/landing): a Timeline whose line fills as you scroll — a product roadmap, a company story or a
 // work history. Each entry has a status (done, now, next); the dot of every entry the fill has passed lights up and the
 // current one pulses. The fill is the motion core's scrollIndicator (scaleY).
 import "./roadmap.css";

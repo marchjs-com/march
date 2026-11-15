@@ -1,4 +1,4 @@
-// EditorFrame (hadi-march/ui): the frame of an editor — a border with a focus ring around a head bar (toolbar, search,
+// EditorFrame (march/ui): the frame of an editor — a border with a focus ring around a head bar (toolbar, search,
 // tabs, status), the editing area and a foot bar (counts, hints). MarkdownEditor, RichTextEditor and TreeEditor are
 // drawn in it; your own editor gets the same look. The two bars are PanelHeaders: each can be left out, shown by a
 // condition, or given its own attributes.

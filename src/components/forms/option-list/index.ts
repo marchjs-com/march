@@ -1,4 +1,4 @@
-// OptionList (hadi-march/ui): a list of choices inside a panel — a theme or accent picker, a type menu, the
+// OptionList (march/ui): a list of choices inside a panel — a theme or accent picker, a type menu, the
 // suggestions under a field. Rows are a lead (icon, swatch, avatar), a label, a hint, a trailing part and a tick on
 // the chosen one. Three roles: "radio" (one choice, default), "listbox" (one or many), "menu" (commands). Keys come
 // from the list-nav behavior: arrows / Home / End move focus among the rows, or — with `keysFrom` — the keys of a

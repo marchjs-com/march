@@ -339,7 +339,7 @@ export function _enter<T>(owner: Owner | null, value: T): T {
 // ------------------------------------------------------------------ errors
 const ERROR = Symbol("m.error");
 let errorHook: ((e: unknown, handled: boolean) => void) | null = null;
-/** Observe every error a boundary handles (handled) or that escapes (hadi-march/errors installs itself here). */
+/** Observe every error a boundary handles (handled) or that escapes (march/errors installs itself here). */
 export function setErrorHook(fn: ((e: unknown, handled: boolean) => void) | null): void { errorHook = fn; }
 function handleError(err: unknown, owner: OwnerNode | null): void {
   for (let o = owner; o; o = o.parent) {

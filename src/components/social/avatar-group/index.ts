@@ -1,4 +1,4 @@
-// AvatarGroup (hadi-march/social): overlapping avatars and a "+N" bubble for the people that do not fit. Every part is
+// AvatarGroup (march/social): overlapping avatars and a "+N" bubble for the people that do not fit. Every part is
 // yours: the accessible name, the bubble (off, or your own content), the spacing, a colour and a shape for all avatars.
 import "./avatar-group.css";
 import { untrack } from "../../../core/reactive.ts";

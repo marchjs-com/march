@@ -1,7 +1,7 @@
 // AnnouncerManager: one pair of live regions for the whole app, so screen readers hear what changed without moving
 // focus ("3 results", "Saved", "Upload failed"). Polite waits for the reader to finish; assertive interrupts.
 //
-//   import { announce, announcer } from "hadi-march/managers/announcer";
+//   import { announce, announcer } from "march/managers/announcer";
 //   announce("Saved")                                   // polite
 //   announce("Connection lost", { politeness: "assertive" })
 //   announcer.history()                                 // last messages (reactive): devtools, demos, tests

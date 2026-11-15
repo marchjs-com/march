@@ -105,8 +105,8 @@ test("css extraction, t keys, line numbers preserved", () => {
 
 test("auto imports: runtime names and components; declared names are not imported", async () => {
   const auto = await loadAutoImports();
-  const out = compile("const x = signal(1); const e = <For each={a}>{(i) => i}</For>; function effect() {}", { autoImports: { ...auto, MyBox: "./MyBox.jsx" }, runtime: "hadi-march" }).code;
-  assert.match(out, /import \{ For, signal \} from "hadi-march";/);
+  const out = compile("const x = signal(1); const e = <For each={a}>{(i) => i}</For>; function effect() {}", { autoImports: { ...auto, MyBox: "./MyBox.jsx" }, runtime: "march" }).code;
+  assert.match(out, /import \{ For, signal \} from "march";/);
   assert.doesNotMatch(out, /import \{[^}]*effect/);
   assert.match(compile("const e = <MyBox/>", { autoImports: { MyBox: "./MyBox.jsx" } }).code, /import \{ MyBox \} from "\.\/MyBox\.jsx"/);
 });
@@ -172,7 +172,7 @@ export function App() {
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test("esbuild plugin bundles .jsx with css and resolves hadi-march", async () => {
+test("esbuild plugin bundles .jsx with css and resolves march", async () => {
   const esbuild = await import("esbuild");
   const { march } = await import("../compiler/esbuild.js");
   const dir = mkdtempSync(join(tmpdir(), "march-eb-"));

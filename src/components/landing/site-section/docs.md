@@ -19,7 +19,7 @@ heading group (eyebrow, title, lead) that enters with Reveal. Pages are a stack 
 | `width` | `narrow` `default` `wide` `full` | `default` | 46 / 72 / 84 rem / edge to edge |
 | `space` | `none` `sm` `md` `lg` | `md` | vertical padding (fluid) |
 | `level` | 1–3 | 2 | heading level |
-| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | accent | Common prop (march/props): the colour token of the component and everything in it. |
 | `reveal` | Reveal options / `false` | `{ effect: "up", stagger: 90 }` | entrance of the heading group |
 | `class`, `id` | — | — | on the section; other attributes pass through |
 

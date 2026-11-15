@@ -1,4 +1,4 @@
-// RichTextEditor (hadi-march/ui): contenteditable rich text with Markdown in / out. Folder: src/components/composite/rich-text-editor/.
+// RichTextEditor (march/ui): contenteditable rich text with Markdown in / out. Folder: src/components/composite/rich-text-editor/.
 //   <RichTextEditor bind:value={$md} mentions={people} placeholder="Write…" />
 // Toolbar (paragraph / headings, bold, italic, strike, code, link, lists, quote, code block, undo / redo), @mentions and
 // :emoji suggestions, Markdown shortcuts while typing ("# ", "- ", "1. ", "> ", "``` "), paste cleaned through the safe

@@ -1,4 +1,4 @@
-// AppUI (hadi-march/app-ui, also hadi-march/ui): the core of March IDE, march-app-ui, the base of an IDE shell. A top
+// AppUI (march/app-ui, also march/ui): the core of March IDE, march-app-ui, the base of an IDE shell. A top
 // bar (title, your tools, the Layout menu: ready-made and saved layouts, the panel list), a side slot (an ActivityBar),
 // the DockLayout workspace and a status slot (a StatusBar). Plugins (kit.ts) add file types, panels, commands and
 // services: a panel that shows a `file` is drawn by the file type that opens its path (codeEditorPlugin: code files in

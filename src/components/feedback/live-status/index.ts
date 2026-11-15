@@ -1,4 +1,4 @@
-// LiveStatus (hadi-march/ui): the line that says what just changed — "3 selected", "21–40 of 120", "Build: 9 – 13 Nov".
+// LiveStatus (march/ui): the line that says what just changed — "3 selected", "21–40 of 120", "Build: 9 – 13 Nov".
 // A polite live region (role="status"): shown as text, or only read (`visible={false}`). With `help` a hint line comes
 // before it (how to drag, which keys work) that the host points at with aria-describedby. One definition for the
 // table engine's counters, DataGrid's row count and the hint + status pair under Scheduler and Gantt.

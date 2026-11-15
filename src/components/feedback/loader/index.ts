@@ -1,4 +1,4 @@
-// Loader and the boot loader. (hadi-march/ui; split from display.ts so each component is its own module and chunk).
+// Loader and the boot loader. (march/ui; split from display.ts so each component is its own module and chunk).
 import "./loader.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";

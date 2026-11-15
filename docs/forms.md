@@ -1,11 +1,11 @@
-# Forms (`hadi-march/ui` → `src/forms`)
+# Forms (`march/ui` → `src/forms`)
 
 Schema-driven forms, a field wrapper with correct ARIA wiring, and a complete set of inputs. Everything is exported by
-`hadi-march/ui` (which re-exports `src/forms/index.ts`). Load the styles once:
+`march/ui` (which re-exports `src/forms/index.ts`). Load the styles once:
 
 ```js
-import "hadi-march/css/tokens.css"
-import "hadi-march/css/forms.css"   // buttons (.m-btn) come from ui.css
+import "march/css/tokens.css"
+import "march/css/forms.css"   // buttons (.m-btn) come from ui.css
 ```
 
 Rules shared by every control:
@@ -20,8 +20,8 @@ Rules shared by every control:
 ## Quick start
 
 ```jsx
-import { schema } from "hadi-march/schema"
-import { Form } from "hadi-march/ui"
+import { schema } from "march/schema"
+import { Form } from "march/ui"
 
 const Signup = schema({
   name: { type: "text", required: true, max: 60 },
@@ -343,7 +343,7 @@ inheritance of `data-m-color`); a control's own `m:color` overrides it. Per opti
 DatePicker) take the color of their control.
 
 Tokens: `primary`, `info`, `success`, `warning`, `danger`, `neutral`, `special`, `brand-orange`, `brand-blue`,
-`brand-green`, `brand-purple`, `brand-gold`, `brand-pink`, `cat-1` … `cat-8` (`COLOR_TOKENS` in `hadi-march/theme`). Text
+`brand-green`, `brand-purple`, `brand-gold`, `brand-pink`, `cat-1` … `cat-8` (`COLOR_TOKENS` in `march/theme`). Text
 on a filled state is chosen for legibility (white when it reaches the brand minimum, otherwise near-black).
 
 

@@ -124,7 +124,7 @@ export function hoverParallax(el: Element, raw?: unknown): () => void {
 // ── state morph ──
 export type ButtonState = "idle" | "loading" | "success" | "error";
 export interface StateMorphOptions {
-  /** Confetti from the button on success (hadi-march/fx, loaded on demand; never with reduced motion). */
+  /** Confetti from the button on success (march/fx, loaded on demand; never with reduced motion). */
   confetti?: boolean;
   duration?: number;
   /** Text announced to screen readers for each state (default: translated "Loading", "Done", "Failed"). */

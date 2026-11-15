@@ -1,15 +1,15 @@
-# UI (`hadi-march/ui`)
+# UI (`march/ui`)
 
 Accessible components, dialogs, toasts, navigation, a command palette and keyboard shortcuts. Load the styles once:
 
 ```js
-import "hadi-march/css/tokens.css"
-import "hadi-march/css/ui.css"
+import "march/css/tokens.css"
+import "march/css/ui.css"
 ```
 
 Every component uses the design tokens (light/dark), never inline styles (popover positions use CSSOM style objects, which
 CSP allows), and inserts text as text nodes. User-facing default strings go through ``t`…` `` so apps can translate them.
-Props may be values, signals or accessors; JSX props are live. `hadi-march/ui` also re-exports the forms module.
+Props may be values, signals or accessors; JSX props are live. `march/ui` also re-exports the forms module.
 
 ## Actions
 

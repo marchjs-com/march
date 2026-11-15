@@ -1,4 +1,4 @@
-# SEO (`hadi-march/seo`)
+# SEO (`march/seo`)
 
 Head tags per route, Open Graph / Twitter cards, JSON-LD, build-time prerendering with hydration, `sitemap.xml`,
 `robots.txt` and a page check. Integrated with the router: a route (or its page module) declares its `head`, the
@@ -7,7 +7,7 @@ router hands it over on every navigation.
 ## Head tags
 
 ```tsx
-import { installSeo, useHead, ld } from "hadi-march/seo";
+import { installSeo, useHead, ld } from "march/seo";
 
 installSeo({
   site: "https://shop.example",          // origin (+ base): canonical, og:url, absolute og:image
@@ -77,7 +77,7 @@ export default {
 };
 ```
 
-`march build` bundles the app once more for node, runs each route inside March's test DOM (`hadi-march/testing`) and
+`march build` bundles the app once more for node, runs each route inside March's test DOM (`march/testing`) and
 writes `dist/<route>/index.html` with the page markup and its head. The CSS of the route's chunks becomes
 `<link rel="stylesheet">` and its JS `<link rel="modulepreload">`, so the page is styled before any script runs.
 Timers the app starts are cleared; a route that throws is left to the browser (a warning, not a failure).
@@ -86,7 +86,7 @@ Browser APIs the test DOM lacks (`ResizeObserver`, `IntersectionObserver`…) ar
 In the browser, `hydrate()` replaces `render()`:
 
 ```tsx
-import { hydrate } from "hadi-march/seo/hydrate";
+import { hydrate } from "march/seo/hydrate";
 hydrate(() => <Router />, document.getElementById("app"));
 ```
 
@@ -98,16 +98,16 @@ such as `#/charts` on a page prerendered for `#/`) the stale content is dropped 
 `hydrate()` without prerendered content is `render()`.
 
 With a tight entry budget, keep `hydrate` out of the entry: ask `prerenderedFor(el)` from the tiny
-`hadi-march/seo/prerendered` (no router) and load `hydrate` only on the prerendered route; every other URL renders at
+`march/seo/prerendered` (no router) and load `hydrate` only on the prerendered route; every other URL renders at
 once, as before.
 
 ```tsx
-import { prerenderedFor } from "hadi-march/seo/prerendered";
+import { prerenderedFor } from "march/seo/prerendered";
 const app = () => <Router />;
-if (prerenderedFor(el)) void import("hadi-march/seo/hydrate").then((m) => m.hydrate(app, el));
+if (prerenderedFor(el)) void import("march/seo/hydrate").then((m) => m.hydrate(app, el));
 else { el.replaceChildren(); render(app, el); }
 ```
-(`hadi-march/seo/hydrate` is about 1 KB; under a `chunks.minSize` add it to `chunks.allow`.)
+(`march/seo/hydrate` is about 1 KB; under a `chunks.minSize` add it to `chunks.allow`.)
 
 Every route without params gets its own `<route>/index.html` (`seo.routes` adds the pages under a wildcard route);
 asset paths follow each page's depth, so a static host without rewrites opens every page directly. Routes with params

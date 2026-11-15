@@ -1,4 +1,4 @@
-// SectionLabel (hadi-march/ui): the small heading of a group inside a panel — a menu, a palette, a sidebar, a property
+// SectionLabel (march/ui): the small heading of a group inside a panel — a menu, a palette, a sidebar, a property
 // grid, an editor side panel. Small, uppercase, faint; an icon before it, a count after it and an actions slot at the
 // end. One look for every such label.
 import "./section-label.css";

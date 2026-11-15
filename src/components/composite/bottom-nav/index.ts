@@ -1,4 +1,4 @@
-// BottomNav (hadi-march/ui): the mobile tab bar. A colored bubble slides to the active tab (motion engine, FLIP), the
+// BottomNav (march/ui): the mobile tab bar. A colored bubble slides to the active tab (motion engine, FLIP), the
 // active icon pops, tabs carry count / dot badges, and an optional raised Create button in the middle wears a slowly
 // turning ring of the four HADİ colors (decorative: it stays still with reduced motion).
 import { effect, untrack, onCleanup, signal } from "../../../core/reactive.ts";

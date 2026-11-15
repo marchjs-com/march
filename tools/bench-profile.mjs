@@ -65,7 +65,7 @@ const settle = async () => { gc(); await new Promise((r) => setTimeout(r, 20)); 
 await build({
   stdin: { contents: entry, resolveDir: SC, sourcefile: "bench-profile.ts", loader: "ts" },
   bundle: true, splitting: true, format: "esm", outdir: out, minify: !cpu, absWorkingDir: SC,
-  alias: { "hadi-march": join(ROOT, "src") },
+  alias: { "march": join(ROOT, "src") },
   define: { "process.env.NODE_ENV": '"production"', __VUE_OPTIONS_API__: "true", __VUE_PROD_DEVTOOLS__: "false", __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "false" },
   plugins: [march({ components: join(SC, "src/components"), cssSplit: false })],
   loader: { ".css": "empty" }, logLevel: "error",

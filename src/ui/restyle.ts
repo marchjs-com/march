@@ -1,5 +1,5 @@
 // A page-wide restyle (color theme, light / dark, accent) lands in one step; a transition (the theme wave of
-// hadi-march/motion) can be put around it. Its own tiny module: the theme code and the motion helper both import it,
+// march/motion) can be put around it. Its own tiny module: the theme code and the motion helper both import it,
 // neither imports the other.
 
 /** Runs a restyle: `apply` writes the new look (call it once, now or inside a View Transition). */
@@ -12,7 +12,7 @@ let ahead: (() => void) | null = null;
  * `apply` once. `null` removes it. `prepare`, when given, runs just before a setter changes anything for a new look
  * (its controls show the new choice at once; the look itself may land later, a color theme once its stylesheet is
  * in): the moment to take a picture of the old look. Returns a function that removes this one. `installThemeWave()`
- * (hadi-march/motion) uses it to bring the new look in with a transition.
+ * (march/motion) uses it to bring the new look in with a transition.
  */
 export function setRestyleTransition(fn: RestyleTransition | null, prepare?: () => void): () => void {
   around = fn;

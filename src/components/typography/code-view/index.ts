@@ -1,4 +1,4 @@
-// CodeView: read-only code block with line numbers, wrap, copy and syntax colours (hadi-march/ui). Folder: src/components/typography/code-view/.
+// CodeView: read-only code block with line numbers, wrap, copy and syntax colours (march/ui). Folder: src/components/typography/code-view/.
 import "./code-view.css";
 import { signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";

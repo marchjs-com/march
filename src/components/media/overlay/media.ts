@@ -39,7 +39,7 @@ export function mountCanvas(root: HTMLElement, draw: DrawFn, animate: boolean): 
   if (!ctx) return;
   // the engine's clock drives the loop: global speed, "pause all" and off-screen stop reach the canvas too
   let w = 0, h = 0, dpr = 1, visible = true, time = 0, stop: (() => void) | null = null;
-  // a twin: the copy of this canvas in a painted theme wave's veil (hadi-march/motion themeWave), drawn by the same
+  // a twin: the copy of this canvas in a painted theme wave's veil (march/motion themeWave), drawn by the same
   // function at the same moment, in the colours where it sits (the old look), until the wave is over
   let twin: CanvasRenderingContext2D | null = null;
   const pointer = (): { x: number; y: number } | null => (root as HTMLElement & { mPointer?: { x: number; y: number } | null }).mPointer ?? null;

@@ -1,10 +1,10 @@
-// Table example: a client-side people table and a server-side orders table built with hadi-march/table.
-// Load the stylesheets once: hadi-march/css/tokens.css and hadi-march/css/table.css.
-import { render, h } from "hadi-march";
-import { createRouter } from "hadi-march/router";
-import { schema } from "hadi-march/schema";
-import { action } from "hadi-march/ui";
-import { Table } from "hadi-march/table";
+// Table example: a client-side people table and a server-side orders table built with march/table.
+// Load the stylesheets once: march/css/tokens.css and march/css/table.css.
+import { render, h } from "march";
+import { createRouter } from "march/router";
+import { schema } from "march/schema";
+import { action } from "march/ui";
+import { Table } from "march/table";
 
 const Person = schema({
   name: { type: "text", required: true, max: 60 },

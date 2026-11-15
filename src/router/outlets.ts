@@ -24,7 +24,7 @@ async function resolve(table: CompiledRoute[], to: string): Promise<Slot | null>
 /** Wrap every named / modal outlet swap: `apply` puts the new page in; `from` / `to` are null when the outlet fills / empties. */
 export type OutletWrapper = (name: string, apply: () => void, o: { to: RouteTarget | null; from: RouteTarget | null }) => void | Promise<void>;
 let wrap: OutletWrapper | null = null;
-/** Set by hadi-march/motion pageTransitions() (this module loads only where a named outlet is used). */
+/** Set by march/motion pageTransitions() (this module loads only where a named outlet is used). */
 export function setOutletWrapper(fn: OutletWrapper | null): void { wrap = fn; }
 
 /** Put a page into a slot, through the outlet transition when one is set. */

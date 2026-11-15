@@ -1,4 +1,4 @@
-// hadi-march/behaviors/list-nav — keyboard movement through a list or a wrapped grid, written once:
+// march/behaviors/list-nav — keyboard movement through a list or a wrapped grid, written once:
 //   moveCursor({ key, index, count, columns, page, ctrl, rtl })   the next index for a key (pure; arrows, Home / End,
 //                                                                 Page Up / Down; ArrowLeft / Right swap in RTL)
 //   listNav({ count, active, onPick, … })                         a keydown handler for the aria-activedescendant

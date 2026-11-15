@@ -1,7 +1,7 @@
 // LayerManager: one view of the portal layer stack (dom/portal.ts) — which layer is on top, z-order, the order Escape
 // closes them in, and the page scroll lock while a layer that asks for it is open.
 //
-//   import { layer } from "hadi-march/managers/layer";
+//   import { layer } from "march/managers/layer";
 //   const l = layer.open("popover", node, { onEscape: close, lockScroll: false });   // returns a handle
 //   l.close()   l.isTop()   l.index()
 //   layer.stack()   layer.top()   layer.modal()   layer.scrollLocked()     // reactive

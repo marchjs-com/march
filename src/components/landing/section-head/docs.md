@@ -29,7 +29,7 @@ block can enter with Reveal when it scrolls into view.
 | `align` | `start` `center` `end` | `center` | |
 | `size` | `sm` `md` `lg` `xl` | `md` | scale of the title: card · section · call to action · hero |
 | `width` | `text` `full` | `text` | a readable measure, or the whole row |
-| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | accent | Common prop (march/props): the colour token of the component and everything in it. |
 | `reveal` | boolean / Reveal options | `false` | entrance on scroll: `true` = parts rise one after another |
 | `class` | class value | — | |
 

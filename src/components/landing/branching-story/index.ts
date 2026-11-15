@@ -1,4 +1,4 @@
-// BranchingStory (hadi-march/landing): a choose-your-own-path story. Each passage ends in choices; the reader's path
+// BranchingStory (march/landing): a choose-your-own-path story. Each passage ends in choices; the reader's path
 // collects as a trail at the top (any step rewinds to it) and the endings found so far are counted. A pick lights the
 // chosen button, fades the others and turns the page: the new passage swings in from the reading direction (back:
 // from the other side), mirrored in RTL. Keys 1–9 pick a choice. Focus moves to the new passage's heading. The stage

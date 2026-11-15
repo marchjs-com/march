@@ -1,5 +1,5 @@
 // Managers: app-wide services with one instance, lazy start, global config and dispose (see manager.ts).
-// Import a single manager by its own path (hadi-march/managers/viewport…) to bundle only that one.
+// Import a single manager by its own path (march/managers/viewport…) to bundle only that one.
 export { defineManager, emit, onManager, managerChannel, managerChannelOf } from "./manager.ts";
 export type { Manager, ManagerEvent, ManagerMessage, ManagerChannelMessage, Disposable } from "./manager.ts";
 export { viewport, configureViewport, disposeViewport, viewportManager } from "./viewport/index.ts";

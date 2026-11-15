@@ -1,4 +1,4 @@
-// ExplodedView (hadi-march/ui): takes what it holds apart, like an exploded drawing, and puts it back. The content is
+// ExplodedView (march/ui): takes what it holds apart, like an exploded drawing, and puts it back. The content is
 // never drawn again: the SAME elements tilt and lift (CSS `translate` on them, so their own transforms keep working).
 //   - with `parts` (selectors inside the content): each matching element rises as a plate with a name tag;
 //   - without: the layers of one element (the first one, or `target`): its shadow, its surface, its content and its

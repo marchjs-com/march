@@ -18,27 +18,27 @@ export const DOCS = "docs/api";
 /** Subpaths whose long-form docs (docs/api/<slug>/<name>.md) are still being written, in groups; the test fails for a
  *  missing doc of any other subpath, and when a listed subpath is already complete. */
 export const MD_PENDING = new Set([
-  "hadi-march", "hadi-march/app-ui", "hadi-march/base", "hadi-march/icons/packs", "hadi-march/landing", "hadi-march/seo/hydrate", "hadi-march/router", "hadi-march/data", "hadi-march/schema", "hadi-march/ui",
-  "hadi-march/components/registry.gen.ts", "hadi-march/table", "hadi-march/charts", "hadi-march/crud",
-  "hadi-march/lazy", "hadi-march/sw", "hadi-march/motion", "hadi-march/motion/text", "hadi-march/motion/text/meta",
-  "hadi-march/fx", "hadi-march/store", "hadi-march/props", "hadi-march/channel", "hadi-march/behaviors/drag",
-  "hadi-march/behaviors/roving-focus", "hadi-march/behaviors/resize-handle", "hadi-march/behaviors/list-nav",
-  "hadi-march/behaviors/dropzone", "hadi-march/behaviors/swipe", "hadi-march/behaviors/dismiss", "hadi-march/i18n",
-  "hadi-march/icons", "hadi-march/icons/catalog", "hadi-march/theme", "hadi-march/net", "hadi-march/net/mock",
-  "hadi-march/errors", "hadi-march/managers", "hadi-march/managers/consent/ui", "hadi-march/managers/command/ui",
-  "hadi-march/managers/undo", "hadi-march/flow", "hadi-march/context-menu", "hadi-march/managers/undo/history",
-  "hadi-march/seo", "hadi-march/seo/hydrate", "hadi-march/managers/accessibility/ui",
-  "hadi-march/managers/shortcut-hint", "hadi-march/managers/shortcut-hint/ui", "hadi-march/dom/safe",
-  "hadi-march/dom/sanitize", "hadi-march/dom/to-markdown",
-  // large components outside their category barrel (hadi-march/components/<category>/<name>)
-  "hadi-march/components/composite/theme-editor", "hadi-march/components/data/data-grid",
-  "hadi-march/components/data/gantt", "hadi-march/components/data/scheduler", "hadi-march/components/data/tree-view",
+  "march", "march/app-ui", "march/base", "march/icons/packs", "march/landing", "march/seo/hydrate", "march/router", "march/data", "march/schema", "march/ui",
+  "march/components/registry.gen.ts", "march/table", "march/charts", "march/crud",
+  "march/lazy", "march/sw", "march/motion", "march/motion/text", "march/motion/text/meta",
+  "march/fx", "march/store", "march/props", "march/channel", "march/behaviors/drag",
+  "march/behaviors/roving-focus", "march/behaviors/resize-handle", "march/behaviors/list-nav",
+  "march/behaviors/dropzone", "march/behaviors/swipe", "march/behaviors/dismiss", "march/i18n",
+  "march/icons", "march/icons/catalog", "march/theme", "march/net", "march/net/mock",
+  "march/errors", "march/managers", "march/managers/consent/ui", "march/managers/command/ui",
+  "march/managers/undo", "march/flow", "march/context-menu", "march/managers/undo/history",
+  "march/seo", "march/seo/hydrate", "march/managers/accessibility/ui",
+  "march/managers/shortcut-hint", "march/managers/shortcut-hint/ui", "march/dom/safe",
+  "march/dom/sanitize", "march/dom/to-markdown",
+  // large components outside their category barrel (march/components/<category>/<name>)
+  "march/components/composite/theme-editor", "march/components/data/data-grid",
+  "march/components/data/gantt", "march/components/data/scheduler", "march/components/data/tree-view",
 ]);
 /** Raw bytes per docs file, about (a file is fetched whole: neighbours in package order share one; gzip ≈ 1/4). */
 const GROUP_BYTES = 75_000;
 
-/** "hadi-march/ui" → "ui", "hadi-march" → "core" (the URL and docs folder segment). */
-export const slugOf = (subpath) => (subpath === "hadi-march" ? "core" : subpath.slice("hadi-march/".length).replace(/\.gen\.ts$/, "-gen"));
+/** "march/ui" → "ui", "march" → "core" (the URL and docs folder segment). */
+export const slugOf = (subpath) => (subpath === "march" ? "core" : subpath.slice("march/".length).replace(/\.gen\.ts$/, "-gen"));
 
 const flat = (s) => s.replace(/\s+/g, " ").trim();
 const docText = (parts) => flat(ts.displayPartsToString(parts ?? []));
@@ -61,7 +61,7 @@ export function collect(root = ROOT) {
   const apis = packageApis(root);
   const entries = new Map();
   for (const [sub, target] of packageEntries(root)) {
-    entries.set(sub === "." ? "hadi-march" : `hadi-march/${sub.slice(2)}`, join(root, target));
+    entries.set(sub === "." ? "march" : `march/${sub.slice(2)}`, join(root, target));
   }
   const program = ts.createProgram([...entries.values()], { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler, allowImportingTsExtensions: true, noEmit: true, jsx: ts.JsxEmit.Preserve, skipLibCheck: true, allowJs: true });
   const checker = program.getTypeChecker();

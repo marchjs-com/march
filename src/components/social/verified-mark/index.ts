@@ -1,4 +1,4 @@
-// VerifiedMark (hadi-march/social): the "verified account" badge beside a name (post author, profile header, user
+// VerifiedMark (march/social): the "verified account" badge beside a name (post author, profile header, user
 // row). An image with a name screen readers read ("Verified"); the icon, the text, the colour and the size are yours.
 import "./verified-mark.css";
 import { h } from "../../../dom/h.ts";
@@ -11,7 +11,7 @@ import { badgeCheck } from "../../../icons/glyphs/badgeCheck.ts";
 export interface VerifiedMarkProps {
   /** Accessible name (default "Verified"); `false`: decorative (the text beside it says it). @tr Erişilebilir ad (varsayılan "Doğrulanmış"); `false`: süs amaçlı (yanındaki metin zaten söyler). */
   label?: MaybeFn<string | false | undefined>;
-  /** Own icon (an icon of hadi-march/icons, text or a node). @tr Kendi ikonunuz (hadi-march/icons'tan bir ikon, metin ya da düğüm). */
+  /** Own icon (an icon of march/icons, text or a node). @tr Kendi ikonunuz (march/icons'tan bir ikon, metin ya da düğüm). */
   icon?: unknown;
   /** sm (beside body text, default) · md (beside a heading) · lg. @tr sm (gövde metninin yanında, varsayılan) · md (başlığın yanında) · lg. */
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;

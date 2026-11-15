@@ -1,7 +1,7 @@
 // IdleManager: is the user doing anything? Pointer, keyboard, wheel, touch and scroll count as activity; after
 // `timeout` ms without any, idle() turns true. Session and Presence build on it.
 //
-//   import { idle, configureIdle } from "hadi-march/managers/idle";
+//   import { idle, configureIdle } from "march/managers/idle";
 //   configureIdle({ timeout: 5 * 60_000 });
 //   idle().idle()                       // reactive
 //   idle().onIdle(() => pauseVideo())   idle().onActive(() => refresh())   idle().onActivity(extendSession)

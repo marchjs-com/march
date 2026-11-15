@@ -6,7 +6,7 @@ import { splitFlap, scramble, decode, odometer, pop, glitch } from "../../../mot
 import { heart } from "../../../icons/glyphs/heart.ts";
 import { Icon } from "../../../icons/index.ts";
 
-export const code = `import { splitFlap } from "hadi-march/motion/text"
+export const code = `import { splitFlap } from "march/motion/text"
 <LiveCounter value={$online} label="kişi şu an HADİ'de" />                        // fed by your server
 <LiveCounter from={18420} rate={40} effect={splitFlap} dotColor="brand-orange"
   bubble={(d) => <b>❤ {d}</b>} beat={false} label="kişi bu hafta katıldı" />`

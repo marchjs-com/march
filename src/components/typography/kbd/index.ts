@@ -1,4 +1,4 @@
-// Kbd (hadi-march/ui). Folder: src/components/typography/kbd/.
+// Kbd (march/ui). Folder: src/components/typography/kbd/.
 import "./kbd.css";
 import { h } from "../../../dom/h.ts";
 import { formatKey } from "../../../ui/keys.ts";

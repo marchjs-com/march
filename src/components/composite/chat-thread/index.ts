@@ -1,4 +1,4 @@
-// ChatThread (hadi-march/ui): a conversation. ChatBubbles grouped into runs per sender (the tail on the last one),
+// ChatThread (march/ui): a conversation. ChatBubbles grouped into runs per sender (the tail on the last one),
 // day separators, the TypingIndicator at the bottom, a ReactionPicker that pops under a message, and motion: your new
 // message rises from the composer on a spring, theirs slides in from its side. It sticks to the bottom while you are
 // there; scrolled up, new messages wait behind a "↓ N new" button. Rows are keyed (an edit or a reaction updates one

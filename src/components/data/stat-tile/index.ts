@@ -1,8 +1,8 @@
-// StatTile (hadi-march/data): one value with its label ("1,2 B · Takipçi"): the tile of a profile's numbers, one item of a
+// StatTile (march/data): one value with its label ("1,2 B · Takipçi"): the tile of a profile's numbers, one item of a
 // stats band, a summary figure above a list. The value is text or a node (a Counter that rolls); a hint line is
 // optional. Plain by default, a soft tile or a bordered card on request; with `onClick` it is a button, with `href` a
 // link, with `term` it renders `<dt>` / `<dd>` for use inside a `<dl>`. (The KPI box with a delta and a sparkline is
-// the Stat of hadi-march/charts: it draws its label and value with this tile.)
+// the Stat of march/charts: it draws its label and value with this tile.)
 import "./stat-tile.css";
 import { h } from "../../../dom/h.ts";
 import { routerLink } from "../../../dom/link.ts";
@@ -36,7 +36,7 @@ export interface StatTileProps {
   hintIn?: "tile" | "value" | undefined;
   /** "figure" (default): the value is a heavy number · "text": the value reads as body text that wraps (a details list). @tr "figure" (varsayılan): değer kalın bir sayıdır · "text": değer alt satıra geçen gövde metni gibi okunur (ayrıntı listesi). */
   emphasis?: "figure" | "text" | undefined;
-  /** An extra class on a part, for a host that keeps its own class names (the KPI box of hadi-march/charts): `{ value, label, hint }`. @tr Kendi sınıf adlarını koruyan bir ev sahibi için bir parçaya ek sınıf (hadi-march/charts'ın KPI kutusu): `{ value, label, hint }`. */
+  /** An extra class on a part, for a host that keeps its own class names (the KPI box of march/charts): `{ value, label, hint }`. @tr Kendi sınıf adlarını koruyan bir ev sahibi için bir parçaya ek sınıf (march/charts'ın KPI kutusu): `{ value, label, hint }`. */
   partClass?: Partial<Record<"value" | "label" | "hint", string>> | undefined;
   /** Extra CSS classes on the tile. @tr Karoya eklenen CSS sınıfları. */
   class?: ClassProp;

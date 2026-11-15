@@ -301,7 +301,7 @@ export interface Captured { veil: HTMLElement; w: number; h: number; release(aft
 
 /**
  * Takes the old look now: the veil goes up over the page (still whole: it looks exactly like the page) with a live
- * copy of it. Taken before a theme setter changes anything on the page (hadi-march/ui calls the restyle transition's
+ * copy of it. Taken before a theme setter changes anything on the page (march/ui calls the restyle transition's
  * prepare first), so even the controls that show the choice are in their old state on the copy. Changes of the page
  * are not copied until the wave runs (`release`): they belong to the new look. Null when the page's styles are not
  * ready yet (the wave then takes its copy when it runs). A copy nobody runs is taken down after a few seconds.
@@ -666,7 +666,7 @@ function mirror(body: HTMLElement, page: HTMLElement, twins: Twins): { release(a
   win.addEventListener("input", onValue, true);
   win.addEventListener("change", onValue, true);
   win.addEventListener("scroll", onScroll, { capture: true, passive: true });
-  // a canvas whose drawer takes its copy (it hears "m-wave-twin": hadi-march/ui Overlay does) is drawn twice by it, in
+  // a canvas whose drawer takes its copy (it hears "m-wave-twin": march/ui Overlay does) is drawn twice by it, in
   // the colours of each look; any other has its picture copied every frame
   const stops: (() => void)[] = [];
   const canvases = [...body.querySelectorAll("canvas")].map((c) => [c, twins.get(c)] as const).filter((x): x is readonly [HTMLCanvasElement, HTMLCanvasElement] => {

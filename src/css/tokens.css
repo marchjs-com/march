@@ -3,7 +3,7 @@
    this file derives everything else (surfaces, hover and soft tints, borders, shadows, radii) with color-mix(), so a theme
    switch is one attribute: <html data-m-theme="hadi|cream|night|neon|indigo|minimal|contrast">. Light / dark: automatic
    (prefers-color-scheme) unless [data-theme="light"|"dark"] is set on <html>. Components read only these tokens.
-   Self-hosted fonts: import "hadi-march/css/font.css". No inline styles are ever needed (CSP: style-src 'self'). */
+   Self-hosted fonts: import "march/css/font.css". No inline styles are ever needed (CSP: style-src 'self'). */
 @import "./themes/hadi.css";
 @import "./colors.css";
 
@@ -100,7 +100,7 @@ a { color: var(--m-primary-text); text-underline-offset: .2em; text-decoration-t
 .m-muted { color: var(--m-muted); } .m-faint { color: var(--m-faint); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; } }
 
-/* ---- icons (hadi-march/icons) */
+/* ---- icons (march/icons) */
 .m-svg { display: inline-block; flex: none; width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: var(--m-icon-stroke, 1.75);
   stroke-linecap: round; stroke-linejoin: round; vertical-align: -.15em; }
 .m-svg-fill { fill: currentColor; stroke: none; } .m-svg-rtl:dir(rtl) { scale: -1 1; }

@@ -1,4 +1,4 @@
-// Window (hadi-march/layout): a movable, resizable window inside its area (the nearest positioned ancestor).
+// Window (march/layout): a movable, resizable window inside its area (the nearest positioned ancestor).
 //   <div class="desk"><Window title="Notlar" chrome="mac" persist="notes">…</Window></div>
 // Title bar: drag to move, double click fills the area; drag to an edge to dock (start / end half, bottom half,
 // top = fill). Buttons: minimize (title bar only, at the bottom), fill / restore, close. Edges and corners resize.

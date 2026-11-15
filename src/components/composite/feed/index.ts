@@ -1,4 +1,4 @@
-// Feed (hadi-march/ui): a social feed. PostCards in a VirtualList (only the posts near the viewport are in the DOM)
+// Feed (march/ui): a social feed. PostCards in a VirtualList (only the posts near the viewport are in the DOM)
 // inside a PullToRefresh (the feed is the scroll area). Skeleton cards while the first page loads and while the next
 // page loads at the end (infinite scroll), a "N new posts" pill that brings you to the top, and an end mark.
 import { signal, computed } from "../../../core/reactive.ts";

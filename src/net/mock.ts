@@ -1,6 +1,6 @@
 // Mock provider: answer requests in the browser (or node tests) without a server.
 //
-//   import "hadi-march/net/mock";
+//   import "march/net/mock";
 //   const m = net.mock({
 //     ...crud("/users", (f) => f.list(20, (i) => ({ id: String(i + 1), name: f.name(), email: f.email() }))),
 //     "GET /me": { id: "1", name: "Alex" },

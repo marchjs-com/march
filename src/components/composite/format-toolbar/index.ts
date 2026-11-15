@@ -1,4 +1,4 @@
-// FormatToolbar (hadi-march/ui): the formatting bar of a text editor — bold, italic, headings, lists, link, undo… One
+// FormatToolbar (march/ui): the formatting bar of a text editor — bold, italic, headings, lists, link, undo… One
 // table of tools (name, icon, shortcut) and one bar built from Toolbar + IconButton (`pressed`) + Divider with a single
 // Tab stop (behaviors/roving-focus). MarkdownEditor and RichTextEditor use it; your own editor can too: you choose the
 // tools and their order, the names, the icons, the shortcut hints, the colour and the size, and run `onTool`.

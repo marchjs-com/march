@@ -1,4 +1,4 @@
-# Core (`hadi-march`)
+# Core (`march`)
 
 ## Signals
 | API | Notes |
@@ -46,13 +46,13 @@ own props. The list is open: `m:no-select`, `m:parts`, `m:color`, `m:theme`, `m:
   work: without selection it cannot be replaced or corrected). `false` makes the subtree selectable again, also
   inside a blocked ancestor: the nearest `m:no-select` wins. `null` / `undefined`: not set.
 - How it compiles: a constant on a native element becomes the attribute `data-m-no-select` in the template (no
-  runtime code; the CSS rules are in `hadi-march/css/props.css`, loaded with the first use). A live value, and every
-  component, compile to `mProps(node, { "no-select": value })` from `hadi-march/props`, which sets the attribute on
+  runtime code; the CSS rules are in `march/css/props.css`, loaded with the first use). A live value, and every
+  component, compile to `mProps(node, { "no-select": value })` from `march/props`, which sets the attribute on
   the element or on each root element of the component's output (a component that returns a live region is followed).
   The component never sees the prop. Content a component renders elsewhere (a dialog or menu in a portal) is not
   inside its root and is not covered: put the prop on that content.
 - By hand: `mProps(h(Card, props), { "no-select": true })`; on a native element `h("div", { "m:no-select": true })`
-  also works once `hadi-march/props` is imported.
+  also works once `march/props` is imported.
 - `m:parts` (props for the parts): gives props to the components drawn **inside** the element or component, by
   component, whatever draws them. No component needs a prop of its own for this.
   ```jsx
@@ -67,7 +67,7 @@ own props. The list is open: `m:no-select`, `m:parts`, `m:color`, `m:theme`, `m:
   outer one for the same component. Values stay live for the props that were named when a part was created (a prop
   added to the object later reaches parts drawn after that). All parts of one kind get the same props (the three
   IconButtons of a card). A component that is called as a plain function instead of through JSX / `h()` is not
-  reached. By hand: `withParts(map, () => h(PostCard, props))` from `hadi-march/props`.
+  reached. By hand: `withParts(map, () => h(PostCard, props))` from `march/props`.
 - `m:color="brand-blue"` (a colour token): the colour scope of the element and everything in it (`data-m-color`; the
   components read `--m-accent`). `m:theme="night"` (a colour theme id): the subtree drawn in that theme (`data-m-theme`;
   the theme's stylesheet is loaded on first use, the subtree takes the theme's text colour). `m:dir="rtl"` and
@@ -87,7 +87,7 @@ own props. The list is open: `m:no-select`, `m:parts`, `m:color`, `m:theme`, `m:
   disabled instead (`inert`, `aria-disabled`, dimmed: `data-m-can="disable"`). `true` / `undefined`: as it is. It only
   shows or hides: checking the right itself stays on the server.
 - A new member: `registerMProp("tone", (el, value) => { … })` makes `m:tone` work everywhere (called again when a live
-  value changes). An attribute-only prop can also be added to the compiler's `M_ATTRS` table (`hadi-march/compiler`) so
+  value changes). An attribute-only prop can also be added to the compiler's `M_ATTRS` table (`march/compiler`) so
   constants cost nothing at runtime.
 - Accessibility: blocked text cannot be selected with the keyboard either (Shift + arrows, Ctrl/Cmd + A skips it), so
   it cannot be copied, looked up, translated from the selection menu or read by select-to-speak tools. Screen readers
@@ -100,7 +100,7 @@ Give any component (March's, yours, another package's) new props and change what
 without a wrapper component and without forking it. Design: [internal/extensions.md](internal/extensions.md).
 
 ```tsx
-import { extend, intercept, defineExtension, Extensions, extensions } from "hadi-march"
+import { extend, intercept, defineExtension, Extensions, extensions } from "march"
 
 // a new prop and what it does
 export const track = defineExtension({
@@ -157,7 +157,7 @@ intercept(Card, { name: "badge", render: (next, p) => (p.isNew ? <div>{next()}<B
   renders.
 - Cost: with nothing registered `createComponent` runs as before (no hook). With extensions: one pass over the
   matching ones per component (`node bench/extensions.js`).
-- Types: `declare module "hadi-march" { interface ExtensionProps extends ExtensionPropsOf<typeof track> {} }` adds the
+- Types: `declare module "march" { interface ExtensionProps extends ExtensionPropsOf<typeof track> {} }` adds the
   props to every component's JSX type; `interface ComponentExtensions { Button: { confirm?: boolean } }` to one March
   component (by export name). `defineExtension<{ track: string }>(…)` types `ctx.props` and the specs.
 - Tools: `extensions.list()` (reactive: name, target, scope, what it does, the props it adds), `extensions.of(el)`
@@ -195,7 +195,7 @@ inline-block, flex, inline-flex, grid, none). Classes live in `css/sx.css`.
 elements (like the `m:` props; the component does not need to know `sx`), beside the class it gives them itself.
 
 ## Styles
-Import `hadi-march/css/tokens.css` and `hadi-march/css/sx.css` (plus module CSS: `ui.css`, `forms.css`, `table.css`,
+Import `march/css/tokens.css` and `march/css/sx.css` (plus module CSS: `ui.css`, `forms.css`, `table.css`,
 `charts/charts.css`). Theme with `--m-*` custom properties; dark mode follows the system unless `data-theme` is set.
 
 ## TypeScript

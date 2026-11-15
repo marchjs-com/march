@@ -36,15 +36,15 @@ The only build tool is [esbuild](https://esbuild.github.io/) (TypeScript is opti
 ```bash
 npm i github:tlghn/hadimarch#<commit-sha>   # pin a commit; not on the npm registry yet
 npm i -D esbuild typescript
-node node_modules/hadi-march/cli/march.js dev      # index.html + src/main.tsx, live reload, error overlay
-node node_modules/hadi-march/cli/march.js build    # dist/: release build (chunk planning, budgets, prerender)
-node node_modules/hadi-march/cli/march.js build --dev [--watch]   # fast build: one pass, incremental with --watch
-node node_modules/hadi-march/cli/march.js check    # type-check, including March syntax
+node node_modules/march/cli/march.js dev      # index.html + src/main.tsx, live reload, error overlay
+node node_modules/march/cli/march.js build    # dist/: release build (chunk planning, budgets, prerender)
+node node_modules/march/cli/march.js build --dev [--watch]   # fast build: one pass, incremental with --watch
+node node_modules/march/cli/march.js check    # type-check, including March syntax
 ```
 
-Node runs `.ts`/`.tsx` sources directly: `node --import hadi-march/register --test` for component tests. March ships its
-TypeScript sources; node refuses to strip types under `node_modules`, so the CLI, the compiler and `hadi-march/register`
-strip or relocate March's own files themselves (node >= 22.18). Importing `hadi-march` from plain node needs `--import hadi-march/register`.
+Node runs `.ts`/`.tsx` sources directly: `node --import march/register --test` for component tests. March ships its
+TypeScript sources; node refuses to strip types under `node_modules`, so the CLI, the compiler and `march/register`
+strip or relocate March's own files themselves (node >= 22.18). Importing `march` from plain node needs `--import march/register`.
 
 ## The language (compiled by the esbuild plugin)
 
@@ -72,21 +72,21 @@ Runtime names and your `src/components/*` are auto-imported. Without the compile
 
 | Import | What |
 |---|---|
-| `hadi-march` | signals, store basics, JSX runtime, control flow, pipes, `t`, `define()` |
-| `hadi-march/props` | `m:` common props for every element and component (`m:no-select`), `mProps`, `registerMProp` |
-| `hadi-march/store` | `subscribe`, `on(store, "users.*.name")`, `persist`, `history`, `readonly`, `snapshot`, `derive` |
-| `hadi-march/i18n` | ICU `format`, `loadLocale`, `dir`, `typed<Catalog>()`; `hadi-march/i18n/tr` Turkish pack |
-| `hadi-march/router` | file routes, `_layout` files, redirects, guards, `beforeLeave`, preload, `setMeta`, typed `Href` |
-| `hadi-march/seo` | route `head`, `useHead`, Open Graph / Twitter, JSON-LD (`ld.*`), prerender + `hydrate`, sitemap/robots, `march seo check` |
-| `hadi-march/data` | `query`, `mutation`, `invalidate`, `fetchJson`; `setAccess`, `can`, `<Can>`, `<Gate>` |
-| `hadi-march/schema` | `schema({...})`, `Infer<>`, validation, coercion, columns |
-| `hadi-march/ui` | Page, AppShell, NavMenu, CommandPalette, Dialog (`confirm`/`prompt`/`askReason`), Toast, Tabs, forms… |
-| `hadi-march/table` | sort, filters, saved views, server paging, virtual scroll, selection, inline edit, CSV, URL sync |
-| `hadi-march/crud` | `crud(source, { schema })` list/create/edit/delete |
-| `hadi-march/charts` | Line, Area, Bar, Pie, Sparkline, Stat, Heatmap, ProgressRing, BarList |
-| `hadi-march/motion` | `animate`, `spring`, `tween`, `timeline`, FLIP `<For animate>`, `inView`/`reveal`/`parallax`, page transitions, `drag`/`swipe`/`magnet`/`tilt` |
-| `hadi-march/fx` | `Particles`, `Aurora`, `Noise`, `spotlight`, `confetti` |
-| `hadi-march/testing` | tiny DOM for `node --test`, `renderTest()`, `mockFetch` |
+| `march` | signals, store basics, JSX runtime, control flow, pipes, `t`, `define()` |
+| `march/props` | `m:` common props for every element and component (`m:no-select`), `mProps`, `registerMProp` |
+| `march/store` | `subscribe`, `on(store, "users.*.name")`, `persist`, `history`, `readonly`, `snapshot`, `derive` |
+| `march/i18n` | ICU `format`, `loadLocale`, `dir`, `typed<Catalog>()`; `march/i18n/tr` Turkish pack |
+| `march/router` | file routes, `_layout` files, redirects, guards, `beforeLeave`, preload, `setMeta`, typed `Href` |
+| `march/seo` | route `head`, `useHead`, Open Graph / Twitter, JSON-LD (`ld.*`), prerender + `hydrate`, sitemap/robots, `march seo check` |
+| `march/data` | `query`, `mutation`, `invalidate`, `fetchJson`; `setAccess`, `can`, `<Can>`, `<Gate>` |
+| `march/schema` | `schema({...})`, `Infer<>`, validation, coercion, columns |
+| `march/ui` | Page, AppShell, NavMenu, CommandPalette, Dialog (`confirm`/`prompt`/`askReason`), Toast, Tabs, forms… |
+| `march/table` | sort, filters, saved views, server paging, virtual scroll, selection, inline edit, CSV, URL sync |
+| `march/crud` | `crud(source, { schema })` list/create/edit/delete |
+| `march/charts` | Line, Area, Bar, Pie, Sparkline, Stat, Heatmap, ProgressRing, BarList |
+| `march/motion` | `animate`, `spring`, `tween`, `timeline`, FLIP `<For animate>`, `inView`/`reveal`/`parallax`, page transitions, `drag`/`swipe`/`magnet`/`tilt` |
+| `march/fx` | `Particles`, `Aurora`, `Noise`, `spotlight`, `confetti` |
+| `march/testing` | tiny DOM for `node --test`, `renderTest()`, `mockFetch` |
 
 Docs: [`docs/`](docs) · Examples: [`examples/`](examples) (counter, form, router, async, table, charts, **showcase**) ·
 Türkçe: [`README.tr.md`](README.tr.md) · Changes: [`CHANGELOG.md`](CHANGELOG.md)
@@ -99,9 +99,9 @@ Built-in themes (`src/theme/presets.ts` → `src/css/themes.css`): **hadi** (def
 Bricolage Grotesque), cream, night, neon, indigo, minimal, contrast. Switching is one attribute, no inline styles:
 
 ```js
-import "hadi-march/css/font.css";      // self-hosted Inter, Figtree, Bricolage Grotesque (OFL), font-src 'self'
-import "hadi-march/css/tokens.css";     // tokens + every built-in theme
-import { setColorTheme, setTheme, ThemePicker } from "hadi-march/ui";
+import "march/css/font.css";      // self-hosted Inter, Figtree, Bricolage Grotesque (OFL), font-src 'self'
+import "march/css/tokens.css";     // tokens + every built-in theme
+import { setColorTheme, setTheme, ThemePicker } from "march/ui";
 
 setColorTheme("neon");                 // <html data-m-theme="neon">, remembered in localStorage
 setTheme("dark");                      // light | dark | system
@@ -109,18 +109,18 @@ setTheme("dark");                      // light | dark | system
 <section data-m-theme="night">…</section>   // scope a theme to part of the page
 ```
 
-Write your own: `defineTheme({ id, name, font, display, radius, light: {...}, dark: {...} })` from `hadi-march/theme`,
+Write your own: `defineTheme({ id, name, font, display, radius, light: {...}, dark: {...} })` from `march/theme`,
 write `themeCss(def)` to a .css file at build time, load it, and `registerThemes([{ id, name }])` to offer it in pickers.
-Icons: `hadi-march/icons` (160 original SVG icons, each a separate export, rendered with createElementNS) and optional open-source packs, one export per icon: `hadi-march/icons/lucide`, `/tabler`, `/heroicons`, `/phosphor`, `/feather`, `/material-symbols`, `/remix`, `/bootstrap`, `/simple-icons` (licenses included; `march icons add` updates them). See [docs/icons.md](docs/icons.md).
+Icons: `march/icons` (160 original SVG icons, each a separate export, rendered with createElementNS) and optional open-source packs, one export per icon: `march/icons/lucide`, `/tabler`, `/heroicons`, `/phosphor`, `/feather`, `/material-symbols`, `/remix`, `/bootstrap`, `/simple-icons` (licenses included; `march icons add` updates them). See [docs/icons.md](docs/icons.md).
 Live gallery of everything: `node examples/showcase/build.mjs --serve`.
 
 ## Only what you use is bundled
 
 Every component lives in its own module with its own stylesheet (`src/ui/button.ts` + `src/ui/button.css`, …). Apps
-import `hadi-march/css/tokens.css` (variables, base styles and the default HADİ theme) and the components they use; the
+import `march/css/tokens.css` (variables, base styles and the default HADİ theme) and the components they use; the
 March esbuild plugin (`march build` / `march dev`) does the rest:
 
-- **JS:** modules are side-effect free (`sideEffects` lists only CSS and `hadi-march/motion/install`), so unused code is
+- **JS:** modules are side-effect free (`sideEffects` lists only CSS and `march/motion/install`), so unused code is
   tree-shaken. A `<Button href>` binds to the router only when the app has one.
 - **CSS follows code:** a component's stylesheet goes into the output chunk where the component's code landed. The initial
   entry's CSS is linked from `index.html`; lazy pages and shared chunks get their own `.css`, loaded by the chunk before it
@@ -128,10 +128,10 @@ March esbuild plugin (`march build` / `march dev`) does the rest:
 - **Themes on demand:** only the default theme is in the bundle; `setColorTheme("neon")` loads `themes/neon.css`
   (`march build` copies the built-in themes to `dist/themes/`; `setThemeBase()` or `registerThemes([{ id, href }])`
   for other locations).
-- **Motion:** `hadi-march/motion` has no side effects; `import "hadi-march/motion/install"` (or call
+- **Motion:** `march/motion` has no side effects; `import "march/motion/install"` (or call
   `installTransitions()` / `installFlip()`) for the extra `transition:` names and `<For animate>`.
 
-Without the plugin, `hadi-march/css/ui.css` and `hadi-march/css/forms.css` still bundle every component's CSS.
+Without the plugin, `march/css/ui.css` and `march/css/forms.css` still bundle every component's CSS.
 
 | What                                         | before (one stylesheet, router always) | now            |
 | -------------------------------------------- | -------------------------------------- | -------------- |
@@ -157,7 +157,7 @@ arrives is cached.
   fewer requests); the old chunk files become re-export stubs, so lazy pages share the same instances.
 - **No waterfalls.** `march build` writes a chunk manifest into `index.html` (a JSON data block, CSP safe). The compiler
   tags each `() => import()` with its key, so loading a route fetches all of its files at once with
-  `<link rel="modulepreload">`. Named imports from `hadi-march/ui` etc. are compiled to the defining module, and bare
+  `<link rel="modulepreload">`. Named imports from `march/ui` etc. are compiled to the defining module, and bare
   imports of chunks the entry does not use are removed. Without both, esbuild would put page-only code into a chunk the
   entry must load.
 - **Prefetch.** `<Link>` prefetches its route on hover/focus (`prefetch="hover" | "visible" | "idle" | "none"`). When idle after
@@ -165,7 +165,7 @@ arrives is cached.
   priority, at most 6). Both are off when the user saves data or the connection is 2G-class.
 - **Cache.** File names are content-hashed; `march build` writes a `_headers` file (Netlify / Cloudflare Pages format)
   that serves `assets/*` as `immutable` and revalidates the page. With `sw: true` in `march.config.js` it also writes
-  `sw.js`: `import { registerServiceWorker } from "hadi-march/sw"` caches chunks the first time they arrive, opens
+  `sw.js`: `import { registerServiceWorker } from "march/sw"` caches chunks the first time they arrive, opens
   the app offline on the second visit and deletes the caches of older versions. `register()` is a Trusted Types sink:
   under `require-trusted-types-for 'script'` the CSP must allow the `march-sw` policy.
 - **Budget.** Every build prints the gzip size of the entry, of each route (by its path, e.g. `/data`) and of each lazy
@@ -175,7 +175,7 @@ arrives is cached.
   the build lists its largest modules (`march build --analyze` always does). The goal is under 15 KB of entry JS and an
   LCP under 1 s on slow 4G.
 - **Icons** are one module each (`src/icons/glyphs/`, generated from `set.ts`). An icon gallery reads
-  `hadi-march/icons/catalog` instead of `import * as icons`.
+  `march/icons/catalog` instead of `import * as icons`.
 
 `npm run bench` creates/updates keyed lists of 1,000 and 10,000 rows and runs table, chart (10k–100k points with LTTB)
 and animation scenarios. Only changed bindings update; keyed rows are reused and moved, never re-created.
@@ -195,7 +195,7 @@ MIT. The licence is unchanged and nothing below is required.
 If you made something with March, we would be glad if you added this line to your project or used the component:
 
 ```tsx
-import { MadeWithMarch } from "hadi-march/ui";
+import { MadeWithMarch } from "march/ui";
 
 <MadeWithMarch />                      // Developed with March and 💗
 <MadeWithMarch variant="badge" />      // or "small"

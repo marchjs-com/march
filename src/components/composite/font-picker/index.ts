@@ -1,4 +1,4 @@
-// FontPicker (hadi-march/ui): choose a typeface from the fonts of the device and a web font catalog (Google Fonts by
+// FontPicker (march/ui): choose a typeface from the fonts of the device and a web font catalog (Google Fonts by
 // default) in one searchable list. Each name is drawn in its own type (only the letters shown are requested, only for
 // the rows in view), a specimen shows your own sample text with size, weight and italic, and the list narrows by
 // category, subset, favourites and order. It opens as a popover, a dialog, or sits inline. Folder:

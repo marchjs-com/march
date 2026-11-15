@@ -20,7 +20,7 @@ is a transform written in the scroll scene's write phase.
 | `badges` | boolean / `(status, text) => node` | `true` | status badge next to each title, or your own mark |
 | `scroll` | boolean | `true` | fill with the scroll (off: full line) |
 | `rail` | boolean | `true` | the line and its fill (off: dots only) |
-| `m:color` | color token | brand gradient + accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | brand gradient + accent | Common prop (march/props): the colour token of the component and everything in it. |
 | `labels` | `{ done?, now?, next? }` | `Done` `In progress` `Planned` | texts of the statuses |
 | `reveal` | Reveal options / `false` | `{ effect: "start", stagger: 90 }` | entrance of the entries |
 | `class` | class | — | on the root |

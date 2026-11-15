@@ -11,7 +11,7 @@ hint line comes before it; give it `helpId` and point the widget at it with `ari
 <section aria-describedby="plan-help">…</section>
 ```
 
-For a one-off message that has no place on screen ("Saved"), call `announce()` (hadi-march/managers/announcer) instead.
+For a one-off message that has no place on screen ("Saved"), call `announce()` (march/managers/announcer) instead.
 
 ## Props
 

@@ -28,7 +28,7 @@ disabled or hidden, and `query="tab"` keeps the active tab in the URL (`?tab=id`
 | `labels` | `{ close?, dirty? }` | "Close", "unsaved changes" | tooltip of the close mark, accessible name of the "changed" dot |
 | `activation` | `"auto"` `"manual"` | `"auto"` | `"manual"`: the arrow keys only move focus, Enter / Space select |
 | `tabProps` | `(tab) => attrs` | — | extra attributes and events of a tab button (`onPointerdown` to drag it, `onContextmenu`, `class`) |
-| `m:color` | ColorToken | theme primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | ColorToken | theme primary | Common prop (march/props): the colour token of the component and everything in it. |
 | `indicator` | boolean | `true` | the underline of the active tab |
 | `motion` | `"none"` `"fade"` `"rise"` `"slide"` / `(panel, dir) => void` | the panel rises in once | `"none"`: no motion; the named ones play on every switch (`slide` comes from the side of the new tab); a function gets the panel element and the direction (`1` later tab, `-1` earlier) |
 | `class` | ClassProp | — | extra class on the root |

@@ -1,4 +1,4 @@
-// StatusBar (hadi-march/ui): the strip at the bottom of an editor or app: items at the start and the end, plain text or
+// StatusBar (march/ui): the strip at the bottom of an editor or app: items at the start and the end, plain text or
 // buttons (an action or a command id), tones (info / success / warn / danger / busy). When the bar is too narrow the
 // lowest-priority items leave for a "…" menu. Items marked `live` are announced when their text changes.
 import "./status-bar.css";

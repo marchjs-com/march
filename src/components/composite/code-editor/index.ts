@@ -1,4 +1,4 @@
-// CodeEditor (hadi-march/ui): a small code field: the text is coloured as it is typed (the CodeView colours, so
+// CodeEditor (march/ui): a small code field: the text is coloured as it is typed (the CodeView colours, so
 // unfinished code too), a suggestion list opens at the caret (you supply `complete`; `jsxCompleter` is the ready one
 // for a JSX tag: prop names, then values inside quotes), ranges can be marked (a short flash, an error underline) and
 // a foot line says what the owner thinks of the code. It does not run or compile anything: the owner reads `value`.

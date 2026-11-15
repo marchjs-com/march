@@ -1,4 +1,4 @@
-// Parallax (hadi-march/landing): layered depth. Each layer (an image or any node, placed with Overlay) moves at its own
+// Parallax (march/landing): layered depth. Each layer (an image or any node, placed with Overlay) moves at its own
 // speed while the section scrolls past (motion parallaxLayers), and — with `pointer` — shifts with the mouse by its depth
 // (motion hoverParallax). Transform only; layers get room to travel so no edge ever shows. Reduced motion: still layers.
 import "./parallax.css";

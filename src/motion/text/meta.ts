@@ -1,4 +1,4 @@
-// Catalog of hadi-march/motion/text: every animation with its family and the shared options it reads. Tools, docs and
+// Catalog of march/motion/text: every animation with its family and the shared options it reads. Tools, docs and
 // the showcase use it (a test checks that every exported animation is listed). Not imported by the animations.
 export type TextFamily = "enter" | "loop" | "decorate" | "content" | "interactive";
 /** Shared options an animation reads (the rest have no effect on it). */

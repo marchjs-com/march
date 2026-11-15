@@ -23,7 +23,7 @@ screen reader reads. The text is visually hidden unless `text` shows it; every g
 | `icons` | `{ yes, no, partial }` | check / x / minus | own glyph per value (icon, text or node); `false` draws none |
 | `variant` | `plain` `soft` `solid` `bare` | `plain` | the glyph alone, on a tinted disc, on a filled disc; `bare`: the glyph in the colour and at the text size of what it sits in (a step dot) |
 | `size` | `sm` `md` `lg` | `md` | |
-| `m:color` | color token | by value | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | by value | Common prop (march/props): the colour token of the component and everything in it. |
 | `motion` | `flip` `fade` `pop` `draw` / `none` `false` / `(next, prev, change) => …` | `none` | the transition when the value changes: the glyphs turn into each other (`flip`), cross-fade, pop, or the new stroke is drawn; your own function gets the arriving and the leaving glyph and `{ from, to }` (return a promise: the leaving glyph is removed when it settles). Runs on the motion engine; with reduced motion the glyph changes at once |
 | `class` | class | — | |
 | other attributes | | | `data-*`, `title`, `id` go to the root |

@@ -1,4 +1,4 @@
-// PeriodNav (hadi-march/ui): previous · today · next — the group a calendar steps its period with (the Scheduler bar,
+// PeriodNav (march/ui): previous · today · next — the group a calendar steps its period with (the Scheduler bar,
 // the month arrows of a Calendar with the month name between them). Built from ButtonGroup, IconButton and Button; the
 // arrows swap in right-to-left; every text, both icons, the today button and the title are yours.
 import "./period-nav.css";

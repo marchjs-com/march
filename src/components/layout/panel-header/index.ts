@@ -1,4 +1,4 @@
-// PanelHeader (hadi-march/ui): the bar on top of a panel — a dialog, a drawer, a window, a dock tab group, a card, a
+// PanelHeader (march/ui): the bar on top of a panel — a dialog, a drawer, a window, a dock tab group, a card, a
 // board column, an editor. Lead slot + icon + title + subtitle, then free content, a count / badge, the actions slot
 // and the close button. Every part is optional, has its own text and can be replaced; `as="footer"` draws the same
 // bar at the bottom of a panel (status text + actions). Pointer / key handlers and `ref` reach the root, so the bar

@@ -1,7 +1,7 @@
-// LiveCounter (hadi-march/landing): a number that grows while you watch ("people on HADİ right now"). Give it a value
+// LiveCounter (march/landing): a number that grows while you watch ("people on HADİ right now"). Give it a value
 // (a signal fed by your server) or a start and a `rate` per minute: it then adds small random steps on the motion
 // clock, only while it is on screen. Every part is yours to choose: how the digits change (`effect`: the odometer roll,
-// none, or any text animation of hadi-march/motion/text: scramble, splitFlap, odometer, glitch…), the live dot (off,
+// none, or any text animation of march/motion/text: scramble, splitFlap, odometer, glitch…), the live dot (off,
 // a colour, or your own node), the "+N" bubble that rises on every increase (off, a colour, or your own content) and
 // the small beat of the number. Screen readers read the label and the value; moving digits and bubbles are hidden.
 import "./live-counter.css";
@@ -19,7 +19,7 @@ import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { Counter, formatCount } from "../counter/index.ts";
 import { withColor } from "../../../theme/colors.ts";
 
-/** A text animation of hadi-march/motion/text (`scramble`, `splitFlap`, `odometer`, `pop`…): `(el, options) => { stop }`. */
+/** A text animation of march/motion/text (`scramble`, `splitFlap`, `odometer`, `pop`…): `(el, options) => { stop }`. */
 export type LiveCounterEffect = (el: HTMLElement, options?: never) => { stop(): void };
 
 export interface LiveCounterProps {

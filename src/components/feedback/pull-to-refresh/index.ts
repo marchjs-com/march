@@ -1,4 +1,4 @@
-// PullToRefresh (hadi-march/ui): pull the top of a scroll area down (touch, pen or mouse) past a threshold to run an
+// PullToRefresh (march/ui): pull the top of a scroll area down (touch, pen or mouse) past a threshold to run an
 // async refresh. A spinning indicator follows the pull; the motion engine settles and spins it. Keyboard users get a
 // Refresh button that appears on focus; the state is announced through a live region.
 import { signal, onCleanup } from "../../../core/reactive.ts";

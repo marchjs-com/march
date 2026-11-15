@@ -1,7 +1,7 @@
 // ClipboardManager: copy and paste in one place — text, rich (HTML) and file content, a "copied" signal for feedback,
 // a short history and paste handling. Falls back to a hidden textarea where the async Clipboard API is missing.
 //
-//   import { clipboard } from "hadi-march/managers/clipboard";
+//   import { clipboard } from "march/managers/clipboard";
 //   await clipboard().copy("token-123")              // true when it worked
 //   await clipboard().copy({ text: "Hi", html: "<b>Hi</b>" })
 //   clipboard().copied()                             // true for `resetMs` after a copy (button feedback)

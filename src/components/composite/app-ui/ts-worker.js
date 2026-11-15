@@ -6,10 +6,10 @@
 let LS = null, libUrl = "", policy = null;
 const files = new Map(); // path → { text, version }
 const libs = new Map();
-// what March code needs to be read without March's own types: any import of hadi-march is `any`, JSX is open
+// what March code needs to be read without March's own types: any import of march is `any`, JSX is open
 const ENV = "/march-env.d.ts";
-const ENV_TEXT = `declare module "hadi-march";
-declare module "hadi-march/*";
+const ENV_TEXT = `declare module "march";
+declare module "march/*";
 declare namespace JSX { interface IntrinsicElements { [name: string]: any } interface Element {} interface ElementChildrenAttribute { children: {} } }
 `;
 const OPTIONS = () => ({

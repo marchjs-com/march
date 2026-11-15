@@ -1,4 +1,4 @@
-// ButtonGroup (hadi-march/ui): related buttons side by side, spaced or attached. Folder: src/components/actions/button-group/.
+// ButtonGroup (march/ui): related buttons side by side, spaced or attached. Folder: src/components/actions/button-group/.
 import "./button-group.css";
 import "../button/button.css";
 import { h } from "../../../dom/h.ts";

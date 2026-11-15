@@ -3,7 +3,7 @@
 // exactly where an installed March lives. Two ways around it, both without module hooks inside hooks threads:
 //  - importTs (compiler: sx, auto-import table): imports from a mirror of March's src/ in the OS temp folder (outside
 //    node_modules, so node strips types itself). The mirror is keyed by the sources' sizes and mtimes and built once.
-//  - stripTypes (hadi-march/register's load hook): strips the types of a single file with module.stripTypeScriptTypes.
+//  - stripTypes (march/register's load hook): strips the types of a single file with module.stripTypeScriptTypes.
 import { readdirSync, statSync, existsSync, cpSync, mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join, relative, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
@@ -42,7 +42,7 @@ function mirror() {
   const src = join(ROOT, "src");
   const h = createHash("sha256").update(ROOT);
   for (const f of walk(src)) { const s = statSync(f); h.update(`${relative(src, f)}|${s.size}|${s.mtimeMs}\n`); }
-  const dir = join(tmpdir(), `hadi-march-src-${h.digest("hex").slice(0, 16)}`);
+  const dir = join(tmpdir(), `march-src-${h.digest("hex").slice(0, 16)}`);
   if (!existsSync(join(dir, ".complete"))) {
     // build in a private folder, then rename: parallel processes (node --test) never see a half-copied mirror
     const tmp = `${dir}.${process.pid}.${Date.now()}`;

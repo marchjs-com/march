@@ -1,4 +1,4 @@
-// JsonView: collapsible read-only JSON tree (hadi-march/ui). Folder: src/components/data/json-view/.
+// JsonView: collapsible read-only JSON tree (march/ui). Folder: src/components/data/json-view/.
 import "./json-view.css";
 import { signal, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";

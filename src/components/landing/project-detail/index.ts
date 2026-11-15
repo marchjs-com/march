@@ -1,4 +1,4 @@
-// ProjectDetail (hadi-march/landing): the page of one project — a back link, a big title, the facts (role, client, year,
+// ProjectDetail (march/landing): the page of one project — a back link, a big title, the facts (role, client, year,
 // services as chips), the cover (marked as the shared element, so a ProjectGrid card can grow into it), the story, a
 // gallery that opens in the Lightbox, and the next project. Text enters with Reveal.
 import "./project-detail.css";

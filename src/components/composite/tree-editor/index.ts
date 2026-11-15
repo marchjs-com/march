@@ -1,4 +1,4 @@
-// TreeEditor (hadi-march/ui): edit a JSON value as a tree. Folder: src/components/composite/tree-editor/.
+// TreeEditor (march/ui): edit a JSON value as a tree. Folder: src/components/composite/tree-editor/.
 //   <TreeEditor bind:value={$config} schema={configSchema} />
 // Each row: key (editable in objects), a type badge (click: convert to another type), the value (text / number field,
 // switch for booleans, a count for containers) and actions (add, duplicate, delete). Schema problems mark their rows;

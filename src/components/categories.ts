@@ -1,5 +1,5 @@
 // Component categories: the one list behind the folders (src/components/<category>/<name>/), the subpaths
-// (hadi-march/<category>), the showcase menu groups, docs/components.md and the AI catalogue. A component names its
+// (march/<category>), the showcase menu groups, docs/components.md and the AI catalogue. A component names its
 // category in meta.ts; tools/gen-registry.js fails when it is missing or does not match the folder.
 
 export interface Category {

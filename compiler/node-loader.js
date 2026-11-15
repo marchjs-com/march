@@ -1,5 +1,5 @@
 // Node module hooks: import March `.jsx` / `.tsx` files directly in node (tests, scripts). Registered by compiler/register.js:
-//   node --import hadi-march/register --test
+//   node --import march/register --test
 // Project components are auto-imported from ./src/components (override: MARCH_COMPONENTS=dir1,dir2).
 import { readFile } from "node:fs/promises";
 import { resolve, isAbsolute } from "node:path";

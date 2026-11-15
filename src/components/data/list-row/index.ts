@@ -1,4 +1,4 @@
-// ListRow (hadi-march/data): the one row every list is made of: a lead (icon, avatar, dot, thumbnail), a title, a sub
+// ListRow (march/data): the one row every list is made of: a lead (icon, avatar, dot, thumbnail), a title, a sub
 // text and a trail (badge, shortcut, arrow, meta). It is a link with `href`, a button with `onClick`, or a plain
 // element (`as`: div, li, span, label) for rows whose host owns the behaviour (an option of a listbox, a tree item, a
 // file line). Role, ARIA, `tabindex`, `data-*`, `ref` and listeners pass through to that element, so a menu, a

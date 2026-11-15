@@ -21,7 +21,7 @@ fold it again. Captions, bios, descriptions in cards and feeds.
 | `defaultOpen` | `boolean` | `false` | first state when uncontrolled |
 | `onOpenChange` | `(open) => void` | | |
 | `labels` | `{ more?, less? }` | "more" / "less" (translated) | text or a node |
-| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | accent | Common prop (march/props): the colour token of the component and everything in it. |
 | `as` | `p` `div` `span` | `p` | element of the text |
 | `class` | class value | | |
 

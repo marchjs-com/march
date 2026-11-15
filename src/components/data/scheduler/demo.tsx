@@ -1,5 +1,5 @@
 // Showcase stage for Scheduler: a team calendar around today (neutral demo data). Drag on an empty slot creates.
-import { signal, computed, untrack } from "hadi-march";
+import { signal, computed, untrack } from "march";
 import { Scheduler, type SchedulerEvent, type SchedulerRange } from "./index.ts";
 import { todayIso, addDays, startOfWeek } from "../../../core/date.ts";
 

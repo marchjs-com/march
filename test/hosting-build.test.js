@@ -19,11 +19,11 @@ function app(config) {
   writeFileSync(join(dir, "public/media/a.png"), "");
   writeFileSync(join(dir, "package.json"), "{\"type\":\"module\"}");
   writeFileSync(join(dir, "src/pages/index.jsx"), "export default function Home() { return <main><h1>Home</h1><Link href=\"/docs/intro\">Intro</Link></main> }\n");
-  writeFileSync(join(dir, "src/pages/about.jsx"), "import { appUrl } from 'hadi-march/base'\nexport default function About() { return <main><h1>About</h1><img src={appUrl('media/a.png')} alt=\"\" /><Link href=\"/docs/intro\">Intro</Link></main> }\n");
+  writeFileSync(join(dir, "src/pages/about.jsx"), "import { appUrl } from 'march/base'\nexport default function About() { return <main><h1>About</h1><img src={appUrl('media/a.png')} alt=\"\" /><Link href=\"/docs/intro\">Intro</Link></main> }\n");
   writeFileSync(join(dir, "src/pages/docs/intro.jsx"), "export default function Intro() { return <main><h1>Intro</h1><Link href=\"/\">Home</Link></main> }\n");
   writeFileSync(join(dir, "src/pages/broken.jsx"), "export default function Broken() { throw new Error('needs a browser') }\n");
   writeFileSync(join(dir, "src/pages/users/[id].jsx"), "export default function User(p) { return <h1>{p.params.id}</h1> }\n");
-  writeFileSync(join(dir, "src/main.jsx"), "import { hydrate } from 'hadi-march/seo/hydrate'\nimport routes from './routes.gen.js'\ncreateRouter({ routes })\nhydrate(() => <Router />, document.getElementById('app'))\n");
+  writeFileSync(join(dir, "src/main.jsx"), "import { hydrate } from 'march/seo/hydrate'\nimport routes from './routes.gen.js'\ncreateRouter({ routes })\nhydrate(() => <Router />, document.getElementById('app'))\n");
   writeFileSync(join(dir, "march.config.js"), `export default ${JSON.stringify(config)}\n`);
   let log = "";
   try { log = execFileSync(process.execPath, [CLI, "build"], { cwd: dir, encoding: "utf8", stdio: "pipe", timeout: 180000 }); } catch (e) { rmSync(dir, { recursive: true, force: true }); assert.fail(String(e.stderr) + String(e.stdout)); }

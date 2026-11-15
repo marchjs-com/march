@@ -63,7 +63,7 @@ export interface StatProps<D = unknown> {
   spark?: DataProp<D>;
   /** The value of a sparkline row: a key or getter. @tr Eğilim çizgisi satırının değeri: bir anahtar ya da getter. */
   sparkY?: Field<D> | undefined;
-  /** An icon (hadi-march/icons) shown next to the label. @tr Etiketin yanında gösterilen ikon (hadi-march/icons). */
+  /** An icon (march/icons) shown next to the label. @tr Etiketin yanında gösterilen ikon (march/icons). */
   icon?: unknown;
 }
 export interface ProgressRingProps {
@@ -185,7 +185,7 @@ export function Stat<D>(props: StatProps<D>): Element {
   const hasSpark = computed(() => !!read(props.spark as MaybeReactive<unknown>));
   const tone = (): string => { const d = dir(); if (!d || d === "flat") return "m-stat-neutral"; return (d === "up") !== !!read(props.invert) ? "m-stat-good" : "m-stat-bad"; };
   return h("div", { class: () => ["m-stat", read(props.class)].filter(Boolean).join(" ") },
-    // label over value: the StatTile of hadi-march/data (one drawing of the tile); the delta pill and the sparkline are the chart's own
+    // label over value: the StatTile of march/data (one drawing of the tile); the delta pill and the sparkline are the chart's own
     h(StatTile, {
       align: "start", order: "label", partClass: { label: "m-stat-label", value: "m-stat-value" },
       label: [isIconDef(props.icon) ? h("span", { class: "m-stat-icon", "aria-hidden": "true" }, svgIcon(props.icon)) : null, h("span", {}, () => read(props.label) ?? "")],

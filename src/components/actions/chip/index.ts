@@ -1,4 +1,4 @@
-// Chip (hadi-march/ui): a label pill — static, toggle (filters) or removable. Folder: src/components/actions/chip/.
+// Chip (march/ui): a label pill — static, toggle (filters) or removable. Folder: src/components/actions/chip/.
 import "./chip.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";

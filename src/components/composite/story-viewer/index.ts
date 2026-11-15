@@ -1,4 +1,4 @@
-// StoryViewer (hadi-march/ui): full-screen stories. StoryProgress bars on top fill on the motion engine; a tap on the
+// StoryViewer (march/ui): full-screen stories. StoryProgress bars on top fill on the motion engine; a tap on the
 // start third goes back and anywhere else forward (mirrored in RTL); pressing and holding pauses; a horizontal swipe
 // changes person with a slide; dragging down shrinks the story and closes it past a threshold. A reply field and a
 // LikeButton sit at the bottom (typing pauses). Keyboard: ← → move, Space pauses, Esc closes (Dialog).

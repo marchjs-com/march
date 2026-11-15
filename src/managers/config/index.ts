@@ -1,7 +1,7 @@
 // ConfigManager: the app's settings in layers — defaults < environment < remote < runtime overrides — read by dotted
 // path, reactive, with the layer each value came from and an optional check.
 //
-//   import { appConfig, configureAppConfig } from "hadi-march/managers/config";
+//   import { appConfig, configureAppConfig } from "march/managers/config";
 //   configureAppConfig({ defaults: { api: { baseUrl: "/api", timeout: 30000 }, ui: { density: "comfortable" } } });
 //   const c = appConfig();
 //   c.get("api.baseUrl")            // reactive; "/api" until a higher layer sets it

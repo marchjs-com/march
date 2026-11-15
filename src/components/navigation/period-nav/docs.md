@@ -26,7 +26,7 @@ Calendar) and the today button follows. The arrows swap in right-to-left text.
 | `rtl` | boolean / accessor | direction of the app | the default chevrons swap |
 | `attached` | boolean | `true` without a title | buttons joined into one control |
 | `size` | `sm` `md` | `md` | size of the arrows |
-| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | accent | Common prop (march/props): the colour token of the component and everything in it. |
 | `partClass` | `{ prev, next, today, title }` | | an extra class on a part (a host that keeps its own class names) |
 | `class` | class value | | |
 

@@ -6,7 +6,7 @@ current locale: month and weekday names, the first day of the week, 12 / 24 hour
 Overlapping events share the column width; all-day and multi-day events sit in their own lane as bars.
 
 ```tsx
-import { Scheduler } from "hadi-march/components/data/scheduler";
+import { Scheduler } from "march/components/data/scheduler";
 
 <Scheduler events={$events} view="week" step={15}
   onChange={(event, range) => api.update(event.id, range)}
@@ -52,7 +52,7 @@ import { Scheduler } from "hadi-march/components/data/scheduler";
 ```
 
 Calendar math is shared in `core/date` (`monthGrid`, `startOfWeek`, `splitDateTime`, `joinDateTime`, `weekdayNames`,
-`formatMinutes`, `dateFormat` …), drags in `pointerDrag` (hadi-march/motion).
+`formatMinutes`, `dateFormat` …), drags in `pointerDrag` (march/motion).
 
 ## Accessibility
 

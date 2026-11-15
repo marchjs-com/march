@@ -1,4 +1,4 @@
-// Popover (hadi-march/ui): a trigger and a floating panel next to it — filters, a column picker, a link form, a date
+// Popover (march/ui): a trigger and a floating panel next to it — filters, a column picker, a link form, a date
 // panel, a list of choices. Built on floating() (placement, flip, Portal layer) and the dismiss behavior (outside
 // press, Escape); focus goes into the panel and back to the trigger. Open state is its own or yours (`open`,
 // `bind:open`); the trigger is any node, or the panel hangs on an `anchor` you give (a field, a caret).

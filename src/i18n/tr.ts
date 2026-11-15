@@ -1,4 +1,4 @@
-// Turkish locale pack for March's built-in texts. Usage: import tr from "hadi-march/i18n/tr"; messages("tr", tr);
+// Turkish locale pack for March's built-in texts. Usage: import tr from "march/i18n/tr"; messages("tr", tr);
 const tr: Record<string, string> = {
   "Try again": "Tekrar dene",
   "This page could not be loaded.": "Bu sayfa yüklenemedi.",
@@ -18,7 +18,7 @@ const tr: Record<string, string> = {
   "Stack": "Çağrı yığını",
   "Could not load this part.": "Bu bölüm yüklenemedi.",
   "0 rows": "0 satır",
-  // landing (hadi-march/landing)
+  // landing (march/landing)
   "Play background video": "Arka plan videosunu oynat",
   "Pause background video": "Arka plan videosunu durdur",
   "Open menu": "Menüyü aç",

@@ -39,7 +39,7 @@ export async function check({ cwd = process.cwd(), srcDir = "src", components = 
   }
   const base = existsSync(resolve(cwd, tsconfig)) ? ts.readConfigFile(resolve(cwd, tsconfig), ts.sys.readFile).config ?? {} : {};
   const options = ts.convertCompilerOptionsFromJson({ ...(base.compilerOptions ?? {}), noEmit: true, jsx: "preserve", allowJs: true, rootDir: undefined }, cwd).options;
-  options.paths = { "hadi-march": [join(MARCH_ROOT, "src", "index.js")], "hadi-march/*": [join(MARCH_ROOT, "src", "*")] };
+  options.paths = { "march": [join(MARCH_ROOT, "src", "index.js")], "march/*": [join(MARCH_ROOT, "src", "*")] };
   const program = ts.createProgram([...map.keys()], options);
   const diags = ts.getPreEmitDiagnostics(program).filter((d) => !d.file || map.has(resolve(d.file.fileName)));
   for (const d of diags) {

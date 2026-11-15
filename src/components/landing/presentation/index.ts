@@ -1,4 +1,4 @@
-// Presentation (hadi-march/landing): slides in the browser. `<Presentation>` holds `<Slide>`s; `<Appear>` reveals its
+// Presentation (march/landing): slides in the browser. `<Presentation>` holds `<Slide>`s; `<Appear>` reveals its
 // children one per step (fragments). Navigation: arrow keys, Page Up / Down, Space, Home / End, the mouse wheel, swipes
 // and the buttons; `F` goes full screen, `P` opens the speaker window. Slides change with a slide, fade or zoom transition
 // on the motion engine (mirrored in RTL). The slide number can live in the URL (`bind:index`). The speaker view shows the

@@ -1,4 +1,4 @@
-// VirtualList (hadi-march/ui): a long list that only keeps the rows near the viewport in the DOM. Rows can have any
+// VirtualList (march/ui): a long list that only keeps the rows near the viewport in the DOM. Rows can have any
 // height: each row is measured when it renders (ResizeObserver) and an estimate stands in until then; rows above the
 // viewport that change height keep the content still (scroll anchoring). Rows keep their DOM while they stay in range
 // and get an accessor to their item, so an updated item (a like) updates the row instead of rebuilding it. The scroll

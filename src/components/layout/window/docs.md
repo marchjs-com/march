@@ -5,7 +5,7 @@ dock it to half of the area by dropping it on an edge, fill the area, fold it to
 `"hadi"` (default), `"mac"` and `"windows"`.
 
 ```tsx
-import { Window } from "hadi-march/layout";
+import { Window } from "march/layout";
 
 <div class="desk">                                   {/* position: relative; any size */}
   <Window title="Notlar" chrome="mac" persist="notes">…</Window>
@@ -18,7 +18,7 @@ import { Window } from "hadi-march/layout";
 - `persist` keeps place, size and state in localStorage.
 - The window stays reachable: when the area shrinks, the window moves and shrinks with it.
 - Geometry is logical: in a right-to-left page x runs from the right.
-- `TerminalWindow` (hadi-march/composite) is a Terminal in a Window.
+- `TerminalWindow` (march/composite) is a Terminal in a Window.
 
 ## Props
 

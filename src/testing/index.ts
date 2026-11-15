@@ -1,6 +1,6 @@
 // Test helpers for `node --test` (no browser): render a component into the tiny DOM and drive it like a user.
 //
-//   import { installDom, renderTest } from "hadi-march/testing";
+//   import { installDom, renderTest } from "march/testing";
 //   installDom();
 //   const s = renderTest(() => <Counter />, { mock: { "GET /api/users": [{ id: 1, name: "Ada" }] } });
 //   await s.click("Add");  await s.type("Name", "Grace");  await s.confirm();  assert.ok(s.sees("Grace"));

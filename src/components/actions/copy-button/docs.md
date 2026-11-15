@@ -4,7 +4,7 @@ Copies text to the clipboard. The button says "Copied" (or swaps its icon for a 
 when the clipboard is not available a toast reports the failure.
 
 ```tsx
-<CopyButton text="npm i hadi-march" />
+<CopyButton text="npm i github:tlghn/hadimarch" />
 <CopyButton text={() => token} iconOnly label="Copy key" />
 <CopyButton text={link} icon={share} label="Copy link" copiedLabel="Link copied" copiedIcon={heart} copiedColor="brand-blue" duration={3000} />
 <CopyButton text={code} errorText={false} onError={report} />   // no toast: you handle the failure

@@ -1,4 +1,4 @@
-// CornerMark (hadi-march/media): a small round mark in a corner of a picture, a card or an avatar: the "video" sign
+// CornerMark (march/media): a small round mark in a corner of a picture, a card or an avatar: the "video" sign
 // on a tile, the arrow that appears on a project cover, the "+" on a story ring. The parent must be positioned
 // (`position: relative`). Corner, icon, colour, size and look are yours; decorative unless it has a `label`.
 import "./corner-mark.css";

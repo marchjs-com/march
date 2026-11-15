@@ -1,5 +1,5 @@
 // Router helpers apps call from a page or a part (not from the start-up shell): their own module, so the start-up chunk
-// carries only the router itself (router.ts). Same import path: hadi-march/router.
+// carries only the router itself (router.ts). Same import path: march/router.
 import { effect, untrack, onCleanup, getOwner } from "../core/reactive.ts";
 import { _router as I, query, setQuery, type Match, type RouteTarget } from "./router.ts";
 import { preloadChunks, loaderKey, saveData } from "../dom/preload.ts";

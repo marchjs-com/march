@@ -2,7 +2,7 @@
 // and a feature list (share, vibrate, WebGL, WebGPU, Bluetooth…). For layout signals (breakpoints, pointer, dark) use
 // ViewportManager; this one answers "should the app do the heavy thing here?".
 //
-//   import { device } from "hadi-march/managers/device";
+//   import { device } from "march/managers/device";
 //   const d = device();
 //   d.network().effectiveType   d.lowEnd()   d.supports("share")   d.battery()?.level   await d.storage()
 //

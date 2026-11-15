@@ -1,4 +1,4 @@
-// hadi-march/channel — typed messages between components that do not know each other.
+// march/channel — typed messages between components that do not know each other.
 //
 //   export const ch = defineChannels({                       // channels.ts: every name and payload in one place
 //     "cart.changed": of<{ count: number }>({ sticky: true }),
@@ -281,7 +281,7 @@ export function defineChannels<M extends Record<string, Spec<any>>>(spec: M): Ch
 // ------------------------------------------------------------------ across tabs
 // One BroadcastChannel for the whole app. Wire format: { n: name, p: payload } (a message), { n, q: 1 } (a new tab asks
 // for the last value of a sticky channel), { n, p, r: 1 } (an answer; ignored once this tab has a value).
-const TAB_NAME = "hadi-march:channels";
+const TAB_NAME = "march:channels";
 let bc: BroadcastChannel | null | undefined;
 function tabs(): BroadcastChannel | null {
   if (bc === undefined) {

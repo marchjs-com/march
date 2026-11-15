@@ -1,7 +1,7 @@
 // Prerender (static site generation) for `march build` with `seo: { prerender }` in march.config.js.
 // The app is bundled once more as a single file for node, then run per route inside March's small test DOM
-// (hadi-march/testing): the router renders the route as it would in a browser, the page's head tags are applied, and
-// the finished <head> + <body> are written as that route's index.html. In the browser hydrate() (hadi-march/seo/hydrate)
+// (march/testing): the router renders the route as it would in a browser, the page's head tags are applied, and
+// the finished <head> + <body> are written as that route's index.html. In the browser hydrate() (march/seo/hydrate)
 // takes the markup over. Also writes sitemap.xml and robots.txt.
 //
 // History routing: every route without params gets its own <route>/index.html (asset paths relative to that depth, or
@@ -106,9 +106,9 @@ export async function prerender({ cwd, cfg, esbuild, out, importSeo, log = conso
   };
   const entry = resolve(cwd, cfg.entry).split("\\").join("/");
   // the test DOM and the app: two files, so the DOM exists before the app's first line runs
-  await esbuild.build({ ...shared, stdin: { contents: 'export { installDom } from "hadi-march/testing";', resolveDir: cwd, loader: "js" }, outfile: join(tmp, "dom.mjs") });
+  await esbuild.build({ ...shared, stdin: { contents: 'export { installDom } from "march/testing";', resolveDir: cwd, loader: "js" }, outfile: join(tmp, "dom.mjs") });
   // (the app namespace is kept as a value: an entry inside a package with "sideEffects" would otherwise be dropped)
-  await esbuild.build({ ...shared, stdin: { contents: `export { _router as __router } from "hadi-march/router";\nimport * as app from ${JSON.stringify(entry)};\nexport const __app = app;`, resolveDir: cwd, loader: "js" }, outfile: join(tmp, "app.mjs") });
+  await esbuild.build({ ...shared, stdin: { contents: `export { _router as __router } from "march/router";\nimport * as app from ${JSON.stringify(entry)};\nexport const __app = app;`, resolveDir: cwd, loader: "js" }, outfile: join(tmp, "app.mjs") });
   const { installDom } = await import(pathToFileURL(join(tmp, "dom.mjs")).href);
 
   const template = readFileSync(join(out, "index.html"), "utf8");

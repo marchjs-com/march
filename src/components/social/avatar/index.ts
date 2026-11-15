@@ -1,4 +1,4 @@
-// Avatar (hadi-march/social): a person's picture, or their initials on a colour taken from the name when there is no
+// Avatar (march/social): a person's picture, or their initials on a colour taken from the name when there is no
 // image or it fails to load. Every part is yours: a ready text or an icon instead of the initials, a fixed theme
 // colour, the shape, the accessible name (or none: `decorative` beside a visible name), or your own content.
 import "./avatar.css";

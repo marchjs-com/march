@@ -1,4 +1,4 @@
-// SearchBox (hadi-march/ui): the search field — icon, input, clear button, shortcut hint. The value is debounced
+// SearchBox (march/ui): the search field — icon, input, clear button, shortcut hint. The value is debounced
 // (`debounce={0}`: at once), Escape clears, Enter searches now. It can drive a list of options as a combobox
 // (`controls` + `activeDescendant`, keys through `onKeyDown`). Every part can be turned off or replaced.
 import "../../../ui/field.css";

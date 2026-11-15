@@ -154,7 +154,7 @@ class Transformer {
   helper(k) { this.helpers.add(k); return H[k]; }
 
   imports(code = "") {
-    const rt = this.opts.runtime ?? "hadi-march";
+    const rt = this.opts.runtime ?? "march";
     const lines = [];
     // a template its parent element took in is not referenced any more: declare only the used ones
     const tpls = [...(this.tpls ?? [])].filter(([name]) => code.includes(`${name}(`));
@@ -173,14 +173,14 @@ class Transformer {
       if (spec.endsWith("#default")) { for (const n of names) lines.push(`import ${n} from ${JSON.stringify(spec.slice(0, -8))};`); continue; }
       lines.push(`import { ${names.sort().join(", ")} } from ${JSON.stringify(spec)};`);
     }
-    const mp = this.opts.props ?? "hadi-march/props";
+    const mp = this.opts.props ?? "march/props";
     // m:parts names components: each must be in scope (declared here or auto-imported)
     for (const [name, at] of this.partNames ?? []) {
       if (!this.declared.has(name) && !Object.prototype.hasOwnProperty.call(auto, name)) throw fail(this.src, at, `m:parts: "${name}" is not a component in scope (import it, or pass a Map of components)`);
     }
     if (this.mParts) lines.push(`import { withParts as ${PARTS_HELPER} } from ${JSON.stringify(mp)};`);
     if (this.mHelper) lines.push(`import { mProps as ${M_HELPER} } from ${JSON.stringify(mp)};`);
-    else if (this.mCss) lines.push(`import ${JSON.stringify(this.opts.propsCss ?? "hadi-march/css/props.css")};`);
+    else if (this.mCss) lines.push(`import ${JSON.stringify(this.opts.propsCss ?? "march/css/props.css")};`);
     for (const [name, spec] of tpls) lines.push(`const ${name} = ${H.tpl}(${spec});`);
     return lines.join(" ");
   }
@@ -810,7 +810,7 @@ class Transformer {
       if (a.spread) { props.push(`...${a.spread}`); continue; }
       const key = /^[A-Za-z_$][\w$]*$/.test(a.name) ? a.name : JSON.stringify(a.name);
       if (a.name.startsWith("use:")) {
-        // use:action={arg} → [action, arg]; the action is a function in scope (or auto-imported, e.g. from hadi-march/motion)
+        // use:action={arg} → [action, arg]; the action is a function in scope (or auto-imported, e.g. from march/motion)
         const fn = a.name.slice(4);
         if (!/^[A-Za-z_$][\w$.]*$/.test(fn)) throw fail(this.src, this.pos, `invalid action name in ${a.name}`);
         this.used.add(fn.split(".")[0]);

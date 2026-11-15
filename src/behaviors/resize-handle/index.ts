@@ -1,4 +1,4 @@
-// hadi-march/behaviors/resize-handle — a separator the user drags or steps with the keyboard to resize something
+// march/behaviors/resize-handle — a separator the user drags or steps with the keyboard to resize something
 // (split panes, a sidebar, a table column, a panel). Built on the drag behavior:
 //   resizeHandle(grip, { value: () => width, set: (w, done) => …, min: 160, max: 480, reset: () => … })
 //   <span use:resizeHandle={[resizeHandle, { … }]} />

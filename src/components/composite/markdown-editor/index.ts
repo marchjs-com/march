@@ -1,4 +1,4 @@
-// MarkdownEditor (hadi-march/ui, also hadi-march/forms): Markdown source with a live preview. Folder: src/components/composite/markdown-editor/.
+// MarkdownEditor (march/ui, also march/forms): Markdown source with a live preview. Folder: src/components/composite/markdown-editor/.
 //   <MarkdownEditor bind:value={$md} view="split" />
 // Views: write, preview, split (resizable, scrolls in sync) and rich (the same value in a RichTextEditor, loaded on
 // first use). The toolbar and shortcuts write Markdown syntax as native undo steps; Enter continues lists, Tab indents

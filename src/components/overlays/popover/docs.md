@@ -59,4 +59,4 @@ without moving focus. Escape is taken before a dialog underneath sees it. The pa
 
 ## Composed of
 
-PanelHeader (title bar, footer), Button (a text trigger), `floating()` (hadi-march/ui popover) and the dismiss behavior.
+PanelHeader (title bar, footer), Button (a text trigger), `floating()` (march/ui popover) and the dismiss behavior.

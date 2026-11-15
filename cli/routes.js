@@ -51,7 +51,7 @@ export function genRoutes(pagesDir, outFile) {
 export interface PageParams {
 ${routes.map((r) => `  ${JSON.stringify(r)}: { ${paramsOf(r).map((p) => `${p}: string`).join("; ")} };`).join("\n")}
 }
-declare module "hadi-march/router" {
+declare module "march/router" {
   interface Register { routes: ${routes.length ? routes.map((r) => JSON.stringify(r)).join(" | ") : "never"} }
 }
 `;

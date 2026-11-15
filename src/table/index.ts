@@ -1,7 +1,7 @@
-// hadi-march/table — data table: client or server data, multi-sort, filters, search, paging, virtual scrolling,
+// march/table — data table: client or server data, multi-sort, filters, search, paging, virtual scrolling,
 // column layout (hide, reorder, resize, pin), selection with bulk actions, row actions, expandable rows, inline edit,
 // CSV/JSON export, saved views, URL sync, keyboard grid navigation and a card layout for small screens.
-// Separate module: import it only where a table is used. Styles: hadi-march/css/table.css.
+// Separate module: import it only where a table is used. Styles: march/css/table.css.
 export { createTable, column, formatValue, mapParams } from "./state.ts";
 export type { TableOptions, TableState, TableQuery, TableParams, TablePage, ParamNames, ColState, TableSnapshot, SavedView, EditState, ActiveFilter, ExportFileOptions, TableAction, RowAction, BulkAction } from "./state.ts";
 export { Table, FilterControl, CellEditor } from "./render.ts";

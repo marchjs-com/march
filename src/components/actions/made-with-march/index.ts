@@ -1,4 +1,4 @@
-// MadeWithMarch (hadi-march/ui): an optional "Developed with March and 💗" line. Folder: src/components/made-with-march/.
+// MadeWithMarch (march/ui): an optional "Developed with March and 💗" line. Folder: src/components/made-with-march/.
 import "./made-with-march.css";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";

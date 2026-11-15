@@ -1,4 +1,4 @@
-// hadi-march/behaviors/drag — the one source of pointer dragging (resize handles, column and tab reordering, tree and
+// march/behaviors/drag — the one source of pointer dragging (resize handles, column and tab reordering, tree and
 // calendar items, canvas nodes, sheets). Two levels:
 //   pointerDrag(downEvent, { onStart, onMove, onEnd, onClick, scroll, threshold })   one session from a pointerdown
 //   draggable(el, { handle, onMove, … })  /  <div use:draggable={[draggable, opts]}>   binds an element

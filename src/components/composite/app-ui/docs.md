@@ -78,7 +78,7 @@ drawn texts).
 ## Suggestions for March code
 
 `marchLanguagePlugin({ catalog })` gives the code editor suggestions that know March's exports: after `import` every
-component and function (picking one writes `import { Button } from "hadi-march/ui"`), inside `{ … }` the names of the
+component and function (picking one writes `import { Button } from "march/ui"`), inside `{ … }` the names of the
 subpath after `from`, after `from "` the subpaths, after `<` the components, elsewhere the names already imported and
 then every other export (from two letters; picking one writes its import at the top). The code editor shows March's
 rows first, then TypeScript's, one row per name, with chips under the list: March (default), TS, JS, All; the choice

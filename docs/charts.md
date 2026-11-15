@@ -1,6 +1,6 @@
 # Charts
 
-`hadi-march/charts` is a separate module of SVG charts built on March signals. It is never imported by the core, so apps that do not use charts do not pay for them.
+`march/charts` is a separate module of SVG charts built on March signals. It is never imported by the core, so apps that do not use charts do not pay for them.
 
 - **Reactive and fine-grained.** Marks are keyed lists; every SVG attribute is bound through a computed value. When data changes, only the elements whose geometry really changed are written (a series whose shape did not change keeps its `<path>` untouched).
 - **CSP safe.** No inline style strings, no `innerHTML`. Colors come from classes and CSS custom properties; positions are SVG attributes (`x`, `y`, `d`, `transform`). The tooltip is placed with the CSSOM (`el.style.setProperty`), which a strict `style-src` allows.
@@ -9,7 +9,7 @@
 - **Fast with large data.** Line and area charts downsample with LTTB above about 2 × the plot width.
 
 ```jsx
-import { LineChart, BarChart, PieChart, Stat } from "hadi-march/charts";
+import { LineChart, BarChart, PieChart, Stat } from "march/charts";
 
 let $sales = await api.sales();
 
@@ -214,7 +214,7 @@ Series classes are `m-chart-series-0` … `m-chart-series-7` (they set `--m-c`).
 ## Scales
 
 ```js
-import { scaleLinear, scaleTime, scaleBand, niceTicks } from "hadi-march/charts";
+import { scaleLinear, scaleTime, scaleBand, niceTicks } from "march/charts";
 
 niceTicks(0, 97, 5);             // { min: 0, max: 100, step: 20, ticks: [0, 20, 40, 60, 80, 100] }
 const y = scaleLinear([0, 100], [200, 0]);

@@ -1,4 +1,4 @@
-// ResizeHandle (hadi-march/ui): the ready element of the resize-handle behavior — a thin strip on an edge (or a corner)
+// ResizeHandle (march/ui): the ready element of the resize-handle behavior — a thin strip on an edge (or a corner)
 // of what it resizes, with one look everywhere: a line that lights up on hover, focus and while dragging. Give it
 // `value` + `set` and it is a full separator (drag, arrows, Home / End, Enter resets, ARIA). Without them it is the
 // bare grip for an owner that runs its own gesture (a window corner, a calendar event end): pointer events pass

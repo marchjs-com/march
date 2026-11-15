@@ -1,5 +1,5 @@
 // Showcase stage for Gantt: a product launch plan around today (neutral demo data).
-import { signal, computed, untrack } from "hadi-march";
+import { signal, computed, untrack } from "march";
 import { Gantt, type GanttTask } from "./index.ts";
 import { Button } from "../../../ui/button.ts";
 import { todayIso, addDays } from "../../../core/date.ts";

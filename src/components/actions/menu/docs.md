@@ -21,7 +21,7 @@ separators (`"-"`). `args` are passed to every action and `onSelect`.
 | `icon` | icon | — | icon-only trigger |
 | `trigger` | node | — | custom trigger content |
 | `variant` / `size` | Button variants / sizes | `secondary` / `md` | trigger look |
-| `m:color` | color token | theme primary | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | theme primary | Common prop (march/props): the colour token of the component and everything in it. |
 | `class` | class | — | extra classes on the trigger |
 | `placement` | Placement | `bottom-start` | panel side (flips when there is no room) |
 | `panelClass` | string | — | class on the panel |

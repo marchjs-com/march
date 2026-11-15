@@ -1,4 +1,4 @@
-// ReplyQuote (hadi-march/social): the small box that shows which message is being answered — who said it and a cut of
+// ReplyQuote (march/social): the small box that shows which message is being answered — who said it and a cut of
 // what was said, behind a coloured bar. Inside a message bubble it is the quote over the answer; above a message field
 // it is the "replying to" preview with a cancel button. The lines kept, the colour, the bar, the cancel button and
 // every text are yours.

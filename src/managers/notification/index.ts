@@ -2,7 +2,7 @@
 // browser notification is not allowed) the message goes to the toast bridge; while it is hidden and permission is
 // granted, to a system notification. Every message is kept in a small inbox (unread count, history).
 //
-//   import { notifications } from "hadi-march/managers/notification";
+//   import { notifications } from "march/managers/notification";
 //   notifications().notify({ title: "Upload finished", body: "report.pdf", onClick: () => open(…) })
 //   button.onclick = () => notifications().request()      // asks only from a click (PermissionManager)
 //   configureNotifications({ native: "always" })            // or "never"; toast: (n) => mySnackbar(n)
@@ -38,7 +38,7 @@ export interface NotificationRecord { id: number; title: string; body: string; k
 export interface NotificationConfig {
   /** When a system notification is used: "hidden" (tab not visible, default), "always", "never". */
   native: "hidden" | "always" | "never";
-  /** In-app bridge. Default: hadi-march toast. null = system notifications only (dropped when not allowed). */
+  /** In-app bridge. Default: march toast. null = system notifications only (dropped when not allowed). */
   toast: ((n: NotifyOptions & { id: number }) => void) | null;
   /** Inbox size. Default 50. */
   keep: number;

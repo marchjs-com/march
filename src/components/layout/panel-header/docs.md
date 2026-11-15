@@ -37,7 +37,7 @@ and yours to replace. `as="footer"` draws the same bar under a panel (status tex
 | `tone` | `plain` `muted` | `plain` | `muted`: the tinted bar of editors |
 | `drag` | boolean | `false` | the bar is a drag handle (no text selection, no touch scrolling) |
 | `align` | `center` `start` | `center` | cross-axis alignment of the parts |
-| `m:color` | color token | — | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | — | Common prop (march/props): the colour token of the component and everything in it. |
 | `ref` | `(el) => void` | — | the root element; attach a drag behavior here |
 | `class` | class value | — | |
 | `partClass` | `{ titles, title, subtitle, meta, actions }` | — | an extra class on a part (a host that keeps its own class names) |

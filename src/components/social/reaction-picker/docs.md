@@ -23,7 +23,7 @@ between emoji (mirrored in RTL; up / down move by rows in the grid), Home / End 
 | `emojiLabel` | `(emoji) => string` | the emoji | accessible name of an emoji button |
 | `moreLabel` | string | "More emoji" | accessible name of the + button |
 | `moreIcon` | node | + | your own content for that button |
-| `m:color` | ColorToken | `brand-blue` | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | ColorToken | `brand-blue` | Common prop (march/props): the colour token of the component and everything in it. |
 | `class` | string | — | on the root (`m-react`; parts: `m-react-e`, `m-react-more`) |
 
 ```tsx

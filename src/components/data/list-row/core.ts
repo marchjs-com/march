@@ -8,7 +8,7 @@ import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import type { OverflowTextProps } from "../../typography/overflow-text/index.ts";
 
 export interface ListRowProps {
-  /** Lead slot: an icon of hadi-march/icons, short text (emoji), or a node (Avatar, StatusDot, an image). @tr Baş yuvası: hadi-march/icons'tan bir ikon, kısa metin (emoji) ya da bir düğüm (Avatar, StatusDot, bir görsel). */
+  /** Lead slot: an icon of march/icons, short text (emoji), or a node (Avatar, StatusDot, an image). @tr Baş yuvası: march/icons'tan bir ikon, kısa metin (emoji) ya da bir düğüm (Avatar, StatusDot, bir görsel). */
   lead?: MaybeFn<unknown>;
   /** The main line: text (scrolls when it does not fit) or a node. Children work too. @tr Ana satır: metin (sığmazsa kayar) ya da bir düğüm. Alt ögeler de olur. */
   title?: MaybeFn<unknown>;

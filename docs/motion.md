@@ -1,4 +1,4 @@
-# Motion engine (hadi-march/motion)
+# Motion engine (march/motion)
 
 One keyframe-based engine for every animation: DOM, CSS variables, canvas, WebGL and plain values play on the same
 playback model and the same clock, under one global control. Source: `src/motion/engine/`. The older API (`animate`,
@@ -48,7 +48,7 @@ and reduced-motion rules.
 
 ## Text animations
 
-`hadi-march/motion/text` adds 56 text animations on this engine (one export each, a shared split core of about
+`march/motion/text` adds 56 text animations on this engine (one export each, a shared split core of about
 1.5 KB gzip). See [src/motion/text/docs.md](../src/motion/text/docs.md).
 ## One engine for everything (inventory)
 
@@ -70,7 +70,7 @@ or a `setInterval` that moves something fails the tests.
 
 ## Ready-made animations
 
-Each is a separate export of `hadi-march/motion` built on `animate()` / `animateValue()`, so tree shaking keeps only
+Each is a separate export of `march/motion` built on `animate()` / `animateValue()`, so tree shaking keeps only
 what a page imports and global speed, "Stop all" and reduced motion reach every one. Showcase: Hareket › SVG,
 Morph, Sayfa geçişi efektleri, Mikro etkileşimler, Kaydırma, Listeler.
 
@@ -118,7 +118,7 @@ Morph, Sayfa geçişi efektleri, Mikro etkileşimler, Kaydırma, Listeler.
     changing direction; a nozzle sweeping row by row; patches bursting out from the pressed point.
   The showcase's choice of shape and length is on Motion › Page transitions (Tema geçişleri, `examples/showcase/src/wave.ts`).
 - `installThemeWave()` puts it around every `setTheme` / `setColorTheme` / `setAccent` (through `setRestyleTransition`
-  of hadi-march/ui), so ThemeMenu, ThemePicker, ThemeToggle and AccentPicker all spread from the pressed point (the
+  of march/ui), so ThemeMenu, ThemePicker, ThemeToggle and AccentPicker all spread from the pressed point (the
   focused control for a key press). It returns the function that turns it off.
 - `spotlight(root, { selector, reach, look, litClass, xVar, yVar })` lights every card near the pointer from the real
   pointer position (`--m-spot-x` / `--m-spot-y` inside each card, class `is-lit`), also from the gap between two cards,
@@ -158,7 +158,7 @@ it at once (its layer animations are removed), and a newer navigation replaces a
 - `use:press={{ scale, easing }}` — the release can be a spring (`"spring-wobbly"` brings its own duration).
 - `stateMorph(button, "loading" | "success" | "error" | "idle", { confetti, labels })` — narrows to a circle with a
   spinner, draws a check or a cross (error shakes), colours from the tokens via `data-m-state` (motion.css), announces
-  the state in a polite live region, `aria-busy` while loading; `confetti: true` loads hadi-march/fx on demand.
+  the state in a polite live region, `aria-busy` while loading; `confetti: true` loads march/fx on demand.
 
 ### Scroll (src/motion/scroll-fx.ts)
 A paused Playback is seeked by scroll progress (read phase, once per frame), so keyframes, timelines and easings are the

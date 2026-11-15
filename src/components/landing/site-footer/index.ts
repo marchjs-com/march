@@ -1,4 +1,4 @@
-// SiteFooter (hadi-march/landing): the end of a website — brand and a short line about the product, link columns,
+// SiteFooter (march/landing): the end of a website — brand and a short line about the product, link columns,
 // social links, an optional Newsletter and a bottom row (copyright, legal links, a "back to top" button). Columns fold to
 // two per row on tablets and stack on phones. An optional big wordmark fills the last line (a modern touch).
 import "./site-footer.css";

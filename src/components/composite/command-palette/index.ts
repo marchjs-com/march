@@ -117,7 +117,7 @@ export interface PaletteButtonProps {
   label?: MaybeFn<string | undefined>;
   /** The shortcut shown in the hint (default "mod+k"). @tr İpucunda gösterilen kısayol (varsayılan "mod+k"). */
   shortcut?: string;
-  /** The search icon: default, false (none), or your own (an icon of hadi-march/icons, text or a node). @tr Arama ikonu: varsayılan, false (yok) ya da kendi ikonun (hadi-march/icons ikonu, metin ya da düğüm). */
+  /** The search icon: default, false (none), or your own (an icon of march/icons, text or a node). @tr Arama ikonu: varsayılan, false (yok) ya da kendi ikonun (march/icons ikonu, metin ya da düğüm). */
   icon?: unknown;
   /** The shortcut hint (Ctrl+K / ⌘K) at the end. Default true. @tr Sondaki kısayol ipucu (Ctrl+K / ⌘K). Varsayılan true. */
   kbd?: boolean | undefined;

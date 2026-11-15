@@ -1,6 +1,6 @@
 // AccessibilityManager: the user's accessibility preferences, kept and applied app-wide, plus a quick page audit.
 //
-//   import { a11y, configureA11y } from "hadi-march/managers/accessibility";
+//   import { a11y, configureA11y } from "march/managers/accessibility";
 //   a11y.prefs()                         // { motion, contrast, fontScale, underlineLinks, textSpacing, strongFocus } (reactive)
 //   a11y.set({ fontScale: 1.25 })        // saved (localStorage) and applied to <html> at once
 //   a11y.reset()
@@ -8,7 +8,7 @@
 //
 // Applied as attributes on <html> (data-m-a11y-contrast, -links, -spacing, -focus) that accessibility.css styles,
 // a root font-size for text scale (every size is in rem), and the motion engine's reduced-motion override.
-// The settings panel is lazy: hadi-march/managers/accessibility/ui.
+// The settings panel is lazy: march/managers/accessibility/ui.
 import "./accessibility.css";
 import { signal, untrack } from "../../core/reactive.ts";
 import { setReducedOverride } from "../../motion/engine/prefs.ts";

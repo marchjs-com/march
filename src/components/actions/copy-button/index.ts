@@ -1,4 +1,4 @@
-// CopyButton (hadi-march/ui): copies text to the clipboard and says so. Folder: src/components/actions/copy-button/.
+// CopyButton (march/ui): copies text to the clipboard and says so. Folder: src/components/actions/copy-button/.
 import "./copy-button.css";
 import { signal, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";

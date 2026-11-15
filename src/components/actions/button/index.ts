@@ -1,4 +1,4 @@
-// Button and ActionButton (hadi-march/ui): the button, and an action() drawn as one. Folder: src/components/actions/button/.
+// Button and ActionButton (march/ui): the button, and an action() drawn as one. Folder: src/components/actions/button/.
 import "./button.css";
 import { untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";

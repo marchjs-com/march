@@ -1,4 +1,4 @@
-// ColorPicker (hadi-march/ui): saturation / brightness area, hue and alpha sliders, eyedropper, palettes (HADİ colors,
+// ColorPicker (march/ui): saturation / brightness area, hue and alpha sliders, eyedropper, palettes (HADİ colors,
 // the theme's palette, recent picks), text input in hex / rgb / hsl, contrast check. Folder: src/components/composite/color-picker/.
 //   <ColorPicker bind:value={$color} alpha format="hex" />
 import "./color-picker.css";
@@ -52,7 +52,7 @@ export interface ColorPickerProps extends ControlProps<string> {
   formats?: boolean | undefined;
   /** The text field with the value (default true). @tr Değeri gösteren metin alanı (varsayılan true). */
   input?: boolean | undefined;
-  /** Own eyedropper icon (an icon of hadi-march/icons, text or a node). @tr Kendi damlalık ikonun (hadi-march/icons ikonu, metin ya da düğüm). */
+  /** Own eyedropper icon (an icon of march/icons, text or a node). @tr Kendi damlalık ikonun (march/icons ikonu, metin ya da düğüm). */
   eyedropperIcon?: unknown;
   /** Own texts: names of the sliders, the buttons and the default palettes. @tr Kendi metinlerin: kaydırıcıların, düğmelerin ve varsayılan paletlerin adları. */
   labels?: ColorPickerLabels | undefined;

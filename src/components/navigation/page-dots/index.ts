@@ -1,4 +1,4 @@
-// PageDots (hadi-march/navigation): one dot per page, the current one longer and coloured (carousels, stories,
+// PageDots (march/navigation): one dot per page, the current one longer and coloured (carousels, stories,
 // onboarding steps). With `onChange` (or bind:value) the dots are buttons: click, arrow keys, Home / End; without it
 // they only show the position. Names, colour, size, look and the content of a dot are yours.
 import "./page-dots.css";

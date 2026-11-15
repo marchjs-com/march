@@ -8,26 +8,26 @@ import { importTs } from "./load-ts.js";
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 /** Module specifier → file (relative to the March root). Order = priority when two modules export the same name. */
 export const MODULES = [
-  ["hadi-march", "src/index.ts"],
-  ["hadi-march/store", "src/store/index.ts"],
-  ["hadi-march/props", "src/props/index.ts"],
-  ["hadi-march/i18n", "src/i18n/index.ts"],
-  ["hadi-march/ui", "src/ui/index.ts"],
-  ["hadi-march/data", "src/data/index.ts"],
-  ["hadi-march/router", "src/router/index.ts"],
-  ["hadi-march/lazy", "src/lazy/index.ts"],
-  ["hadi-march/sw", "src/sw/index.ts"],
-  ["hadi-march/schema", "src/schema/index.ts"],
-  ["hadi-march/table", "src/table/index.ts"],
-  ["hadi-march/crud", "src/crud/index.ts"],
-  ["hadi-march/charts", "src/charts/index.ts"],
-  ["hadi-march/motion", "src/motion/index.ts"],
-  ["hadi-march/fx", "src/fx/index.ts"],
+  ["march", "src/index.ts"],
+  ["march/store", "src/store/index.ts"],
+  ["march/props", "src/props/index.ts"],
+  ["march/i18n", "src/i18n/index.ts"],
+  ["march/ui", "src/ui/index.ts"],
+  ["march/data", "src/data/index.ts"],
+  ["march/router", "src/router/index.ts"],
+  ["march/lazy", "src/lazy/index.ts"],
+  ["march/sw", "src/sw/index.ts"],
+  ["march/schema", "src/schema/index.ts"],
+  ["march/table", "src/table/index.ts"],
+  ["march/crud", "src/crud/index.ts"],
+  ["march/charts", "src/charts/index.ts"],
+  ["march/motion", "src/motion/index.ts"],
+  ["march/fx", "src/fx/index.ts"],
 ];
 
 /**
  * @param {{ specifier?: (spec: string, file: string) => string, components?: string|string[] }} [o]
- *   specifier: how imports are written (default: the bare "hadi-march/…" specifier)
+ *   specifier: how imports are written (default: the bare "march/…" specifier)
  *   components: directories whose `Name.jsx` files are auto-imported as `Name`
  */
 export async function loadAutoImports(o = {}) {

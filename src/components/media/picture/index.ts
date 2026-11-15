@@ -1,4 +1,4 @@
-// Picture (hadi-march/media): one way to draw "an image or my own node". Components that take a cover, a logo or a
+// Picture (march/media): one way to draw "an image or my own node". Components that take a cover, a logo or a
 // media slot accept `{ src, alt, width, height, srcset, sizes }` or a ready node; Picture turns the object into an
 // <img> (lazy and decoded off the main thread; `loading="eager"` for the first screen) and passes a node through as
 // it is. Media is the viewer (video, audio, dialog); Picture is only the image element.

@@ -1,8 +1,8 @@
 // Type tests: extensions. defineExtension keeps its props' types; ExtensionProps / ComponentExtensions add props to
 // the JSX types of every component / one March component; intercept's props / on / render are typed.
 /// <reference path="../types/jsx.d.ts" />
-import { defineExtension, extend, intercept, withExtensions, type ExtensionPropsOf } from "hadi-march";
-import { Button } from "hadi-march/ui";
+import { defineExtension, extend, intercept, withExtensions, type ExtensionPropsOf } from "march";
+import { Button } from "march/ui";
 
 const track = defineExtension<{ track: string }>({
   name: "track",
@@ -18,7 +18,7 @@ extend("*", track);
 // @ts-expect-error — a spec for a prop the extension does not have
 defineExtension<{ track: string }>({ name: "x", props: { nope: {} } });
 
-declare module "hadi-march" {
+declare module "march" {
   interface ExtensionProps extends ExtensionPropsOf<typeof track> {}
   interface ComponentExtensions { Button: { confirm?: boolean } }
 }

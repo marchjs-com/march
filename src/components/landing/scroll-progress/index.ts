@@ -1,4 +1,4 @@
-// ScrollProgress (hadi-march/landing): a thin bar that fills as the page (or one article) is read. Fixed to the top or
+// ScrollProgress (march/landing): a thin bar that fills as the page (or one article) is read. Fixed to the top or
 // placed inline; brand gradient or the accent; a Progress line whose fill the motion core's scrollIndicator drives. RTL
 // fills from the right. It is a progressbar for assistive technology, with the percentage as its value.
 import "./scroll-progress.css";

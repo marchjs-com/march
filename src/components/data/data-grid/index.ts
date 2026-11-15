@@ -1,4 +1,4 @@
-// DataGrid (hadi-march/ui): a spreadsheet-like grid for large data, built on the table engine (createTable: sorting,
+// DataGrid (march/ui): a spreadsheet-like grid for large data, built on the table engine (createTable: sorting,
 // filters, search, column layout, selection, inline edit, CSV) and the shared virtual window (core/virtual.ts) for
 // BOTH rows and columns, so 100 000 rows × many columns stay smooth. Adds grouping with aggregates, pinned columns,
 // drag to reorder / resize columns, a keyboard cell cursor and a totals footer. Folder: src/components/data/data-grid/.

@@ -1,9 +1,9 @@
-# Text animations (hadi-march/motion/text)
+# Text animations (march/motion/text)
 
 56 text animations, each its own export. Import only what you use; tree shaking leaves the rest out.
 
 ```ts
-import { rise, wave, typewriter, counter } from "hadi-march/motion/text";
+import { rise, wave, typewriter, counter } from "march/motion/text";
 
 rise(heading);                                  // characters rise from below, then the plain text comes back
 wave(badge, { stagger: 80 });                   // a loop: stop() ends it
@@ -42,7 +42,7 @@ splitFlap` take `chars`; `counter` takes `start`, `end`, `decimals`, `locale`; `
 - **Interactive** — magnetic, repel.
 
 The catalog with each animation's family and the shared options it reads is `TEXT_ANIMATIONS` in
-`hadi-march/motion/text/meta` (a test keeps it equal to the exports).
+`march/motion/text/meta` (a test keeps it equal to the exports).
 
 ## The core: splitText()
 

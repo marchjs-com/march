@@ -31,7 +31,7 @@ export interface RouteTarget { path: string; params: Record<string, string>; que
 export type GuardResult = boolean | string | void | undefined;
 export type Guard = (to: RouteTarget) => GuardResult | Promise<GuardResult>;
 export interface RouteDef { path: string; component?: Component; load?: Loader; layouts?: Loader[]; meta?: Record<string, unknown>; title?: string; preload?: boolean;
-  /** Head tags of this route (hadi-march/seo: title, description, og, jsonLd…); a page module's `head` export wins. */ head?: unknown;
+  /** Head tags of this route (march/seo: title, description, og, jsonLd…); a page module's `head` export wins. */ head?: unknown;
   /** Shown at once (after 100 ms) while this page loads; else the Router's `skeleton`, else its `loading`. */ skeleton?: unknown;
   /** Keep the page when only its params change (/api/core/batch → /api/core/computed): it reads them with params()
    *  and keeps its own state (search text, scroll, open panels). Default: a new page per params. */ keep?: boolean }
@@ -47,7 +47,7 @@ export interface RouterOptions {
   mode?: "history" | "hash";
   /**
    * The base path every route lives under (default "auto": a <base href>, else the base `march build` wrote into
-   * index.html, else the folder of the entry script — see appBase() in hadi-march). Or a path: "/app".
+   * index.html, else the folder of the entry script — see appBase() in march). Or a path: "/app".
    */
   base?: string;
   guard?: Guard;
@@ -65,7 +65,7 @@ export interface RouterOptions {
   outlets?: Record<string, RouteTable | RouteDef[]>;
 }
 
-/** Augmented by the generated pages.d.ts: `declare module "hadi-march/router" { interface Register { routes: "/" | "/users/:id" } }`. */
+/** Augmented by the generated pages.d.ts: `declare module "march/router" { interface Register { routes: "/" | "/users/:id" } }`. */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Register {}
 type Seg<S extends string> = S extends `:${string}?` ? string : S extends `:${string}` ? string : S extends `*${string}` ? string : S;
@@ -117,9 +117,9 @@ const leaveGuards = new Set<() => boolean | Promise<boolean>>();
 
 let navWrapper: ((apply: () => void, o: { pop: boolean }) => void | Promise<void>) | null = null;
 let headHandler: ((to: RouteTarget | null, head: unknown, title: string | undefined) => void) | null = null;
-/** Receive each route's head (hadi-march/seo installs it); `to` is null on "not found". */
+/** Receive each route's head (march/seo installs it); `to` is null on "not found". */
 export function setHeadHandler(fn: typeof headHandler): void { headHandler = fn; }
-/** Wrap every page swap (hadi-march/motion uses it for View Transitions). */
+/** Wrap every page swap (march/motion uses it for View Transitions). */
 export function setNavigationWrapper(fn: typeof navWrapper): void { navWrapper = fn; }
 
 /** Current path (reactive). */

@@ -1,7 +1,7 @@
 # UndoRedo
 
 The undo / redo pair in the bar of an editor. Give it an undo stack (`undoStack()` / `undoHistory()` of
-hadi-march/managers/undo) and it follows it: the buttons switch off when there is nothing to undo or redo, and the
+march/managers/undo) and it follows it: the buttons switch off when there is nothing to undo or redo, and the
 tooltip names the step and the shortcut ("Undo: Rename (Ctrl+Z)"). Or drive it with four props.
 
 ```tsx
@@ -24,11 +24,11 @@ tooltip names the step and the shortcut ("Undo: Rename (Ctrl+Z)"). Or drive it w
 | `icons` | `{ undo?, redo? }` | | |
 | `partClass` | `{ undo?, redo? }` | | an extra class on a button (a host that keeps its own class names) |
 | `size` | `xs` `sm` `md` `lg` | IconButton default | |
-| `m:color` | color token | | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | | Common prop (march/props): the colour token of the component and everything in it. |
 | `disabled` | `boolean` / accessor | `false` | both buttons off (read-only editors) |
 | `class` | class value | | |
 
-The component shows the shortcut; binding the keys is the editor's job (`undoKeys(event, history)` of hadi-march/ui in
+The component shows the shortcut; binding the keys is the editor's job (`undoKeys(event, history)` of march/ui in
 its `keydown` handler).
 
 ## Accessibility

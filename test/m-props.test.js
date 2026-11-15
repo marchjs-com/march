@@ -17,7 +17,7 @@ test("compiler: a constant m:no-select on a native element is a plain attribute 
   assert.equal(M_ATTRS["no-select"], ATTR);
   const on = c("const a = <div m:no-select><input /></div>");
   assert.match(on, /\["data-m-no-select",""\]/);
-  assert.ok(on.includes('import "hadi-march/css/props.css";'), "only the CSS file is loaded");
+  assert.ok(on.includes('import "march/css/props.css";'), "only the CSS file is loaded");
   assert.doesNotMatch(on, /mProps/);
   assert.match(c("const a = <div m:no-select={true}>x</div>"), /\["data-m-no-select",""\]/);
   assert.match(c("const a = <div m:no-select={false}>x</div>"), /\["data-m-no-select","false"\]/);

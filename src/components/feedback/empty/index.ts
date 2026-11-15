@@ -1,4 +1,4 @@
-// Empty (hadi-march/feedback): an empty state with an icon, a title, a line of text and the next step.
+// Empty (march/feedback): an empty state with an icon, a title, a line of text and the next step.
 import "./empty.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";

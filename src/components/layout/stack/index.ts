@@ -1,4 +1,4 @@
-// Layout primitives: Stack, Toolbar, Divider (hadi-march/layout). Grid has its own folder (../grid).
+// Layout primitives: Stack, Toolbar, Divider (march/layout). Grid has its own folder (../grid).
 import "../../../ui/display.css";
 import "./stack.css";
 import { h } from "../../../dom/h.ts";

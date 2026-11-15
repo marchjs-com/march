@@ -1,4 +1,4 @@
-// Breadcrumbs (hadi-march/ui): a path (folder › file › symbol). A crumb is a link, a button, or — with `siblings` —
+// Breadcrumbs (march/ui): a path (folder › file › symbol). A crumb is a link, a button, or — with `siblings` —
 // a menu of the items next to it (jump to another file in the same folder). When the path does not fit, the middle
 // crumbs collapse into a "…" menu (the first and the last stay). Separators point the reading direction (RTL mirrored).
 import "./breadcrumbs.css";

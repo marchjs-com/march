@@ -10,6 +10,6 @@ export default defineMeta({
   behaviors: [],
   hubs: [],
   showcase: "/forms",
-  // the form engine comes with it: kept out of the hadi-march/ui barrel (hadi-march/forms exports it)
+  // the form engine comes with it: kept out of the march/ui barrel (march/forms exports it)
   barrel: false,
 });

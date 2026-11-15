@@ -2,7 +2,7 @@
 // has a shortcut (aria-keyshortcuts, data-hotkey — command: buttons set aria-keyshortcuts themselves); "?" opens a
 // help list of every described shortcut (HotkeyManager bindings and ui/keys.ts shortcuts), grouped.
 //
-//   import { shortcutHints } from "hadi-march/managers/shortcut-hint";
+//   import { shortcutHints } from "march/managers/shortcut-hint";
 //   shortcutHints.visible()   shortcutHints.show()   shortcutHints.hide()   shortcutHints.openHelp()
 //   shortcutHints.entries()   // [{ combo, label, description, group, active }] (reactive)
 //   <ShortcutHints />         // from ./ui (lazy): draws the badges and the help dialog; mount once

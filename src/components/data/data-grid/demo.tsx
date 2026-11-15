@@ -1,5 +1,5 @@
 // Showcase stage for DataGrid: up to 100 000 generated orders (deterministic, neutral demo data).
-import { signal } from "hadi-march";
+import { signal } from "march";
 import { DataGrid, type DataGridColumn } from "./index.ts";
 
 export const code = `<DataGrid rows={$orders} rowKey="id" selectable groupBy={["region"]}

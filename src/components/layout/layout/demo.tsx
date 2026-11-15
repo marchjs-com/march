@@ -1,7 +1,7 @@
 // Showcase stage for Layout: regions switched on and off; the page itself sits in the app's Layout (back-to-top corner).
 import { Layout } from "./index.ts";
 
-export const code = `import { Layout, defineLayout, scrollToTopFeature } from "hadi-march/layout"
+export const code = `import { Layout, defineLayout, scrollToTopFeature } from "march/layout"
 
 <Layout><AppShell …><Outlet /></AppShell></Layout>              // app root: back-to-top on
 

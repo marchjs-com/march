@@ -47,7 +47,7 @@ export interface RequestOptions {
   use?: readonly Middleware[];
   /** Free-form data for middleware (log labels, query keys…). */
   meta?: Record<string, unknown>;
-  /** Report a final failure to hadi-march/errors (default true). */
+  /** Report a final failure to march/errors (default true). */
   report?: boolean;
   /** Run this function instead of a transport (chunk loads, custom RPC). Its result is the response data. */
   run?: (signal: AbortSignal) => unknown;
@@ -489,5 +489,5 @@ export class Net {
 }
 
 const invalidators = new Set<(prefix: string) => void>();
-/** Other layers (hadi-march/net api → data queries) hook into net.invalidate(). */
+/** Other layers (march/net api → data queries) hook into net.invalidate(). */
 export function onInvalidate(fn: (prefix: string) => void): () => void { invalidators.add(fn); return () => invalidators.delete(fn); }

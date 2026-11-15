@@ -2,7 +2,7 @@
 
 One value with its label: the numbers of a profile, an item of a stats band, a figure above a list. The value is text
 or a node (a Counter that rolls), a hint line is optional, and the tile becomes a button with `onClick` or a link with
-`href`. For a KPI box with a delta and a sparkline use the `StatTile` of `hadi-march/charts`.
+`href`. For a KPI box with a delta and a sparkline use the `StatTile` of `march/charts`.
 
 ```tsx
 <StatTile value="128" label="Posts" />
@@ -18,7 +18,7 @@ or a node (a Counter that rolls), a hint line is optional, and the tile becomes 
 | `value` | text / number / node / accessor | — | the figure |
 | `label` | text / node | — | what it counts |
 | `hint` | text / node | — | a small line under them |
-| `m:color` | color token | — | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | — | Common prop (march/props): the colour token of the component and everything in it. |
 | `align` | `start` `center` `end` | `center` | |
 | `size` | `sm` `md` `lg` `xl` | `md` | |
 | `variant` | `plain` `tile` `card` | `plain` | soft background, or border and surface |

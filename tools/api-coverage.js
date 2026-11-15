@@ -93,7 +93,7 @@ function managerSummary(name, file) {
 /** Entries of package.json "exports" that are code: [subpath key ("./ui"), target file ("./src/ui/index.ts")]. The
  *  component wildcard ("./components/*") is opened to the component folders (src/components/<category>/<name>/) that
  *  have a runtime export no named entry gives: a large component kept out of its category barrel (meta.barrel === false)
- *  is imported from hadi-march/components/<category>/<name> and is listed under that subpath. Other wildcards (CSS
+ *  is imported from march/components/<category>/<name> and is listed under that subpath. Other wildcards (CSS
  *  files, icon packs) are not app APIs of their own. */
 export function packageEntries(root = ROOT) {
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
@@ -125,7 +125,7 @@ export function packageApis(root = ROOT) {
     if (/^\.\/(compiler|esbuild|register|testing)$/.test(sub)) continue;
     const names = [...runtimeExports(join(root, target))].sort(([a], [b]) => a.localeCompare(b));
     out.push({
-      subpath: sub === "." ? "hadi-march" : `hadi-march/${sub.slice(2)}`,
+      subpath: sub === "." ? "march" : `march/${sub.slice(2)}`,
       items: names.map(([name, at]) => {
         const file = relative(root, at.file).replace(/\\/g, "/");
         // single icons: one SVG path set each, shown on the Icons page; their summary is their name

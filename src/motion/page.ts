@@ -21,7 +21,7 @@ export type PageTransitionType = "fade" | "slide" | "scale" | "none" | (string &
 /** Keyframes of one side of a named transition (see definePageTransition). */
 export type PageTransitionFrames = (side: "in" | "out", dir: Dir, rtl: boolean, distance: number) => Keyframe[];
 const EXTRA = new Map<string, PageTransitionFrames>();
-/** Add a transition type usable as `meta.transition` (e.g. the variants in hadi-march/motion page-fx). */
+/** Add a transition type usable as `meta.transition` (e.g. the variants in march/motion page-fx). */
 export function definePageTransition(name: string, frames: PageTransitionFrames): void { EXTRA.set(name, frames); }
 /** A route's `meta.transition`: a type, or a type with its own timing. */
 export interface PageTransitionSpec { type?: PageTransitionType; duration?: number; easing?: string; distance?: number }

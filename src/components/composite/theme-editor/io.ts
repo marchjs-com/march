@@ -10,8 +10,8 @@ const ident = (json: string): string => json.replace(/"([A-Za-z_$][\w$]*)":/g, "
 export function draftCode(d: ThemeDraft): string {
   const { swatches: _s, ...def } = draftToTheme(d);
   const v = d.id.replace(/-(\w)/g, (_, c: string) => c.toUpperCase());
-  return `import { defineTheme, themeCss } from "hadi-march/theme"
-import { registerThemes } from "hadi-march/ui"
+  return `import { defineTheme, themeCss } from "march/theme"
+import { registerThemes } from "march/ui"
 
 export const ${v} = defineTheme(${ident(JSON.stringify(def, null, 2))})
 

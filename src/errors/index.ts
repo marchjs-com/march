@@ -1,7 +1,7 @@
-// hadi-march/errors: one collector for every error — window.onerror, unhandled rejections, <Try>/<Outlet> boundaries,
+// march/errors: one collector for every error — window.onerror, unhandled rejections, <Try>/<Outlet> boundaries,
 // net and WebSocket failures — normalized to AppError, de-duplicated, shown by rules, optionally reported.
 //
-//   import { errors, ErrorPage } from "hadi-march/errors";
+//   import { errors, ErrorPage } from "march/errors";
 //   errors.install({ dev: import.meta.env?.DEV });
 //   errors.rule({ type: "auth" }, "page");              // toast | inline | page | silent | (e) => …
 //   errors.rule({ type: "validation" }, "inline");      // <ErrorInline target="profile" />  (context.target)

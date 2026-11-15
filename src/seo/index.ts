@@ -1,4 +1,4 @@
-// hadi-march/seo — head tags per route, Open Graph / Twitter cards, JSON-LD, and the client half of prerendering.
+// march/seo — head tags per route, Open Graph / Twitter cards, JSON-LD, and the client half of prerendering.
 //
 //   installSeo({ site: "https://shop.example", titleTemplate: "%s · Shop", defaults: { og: { siteName: "Shop" } } })
 //   createRouter({ routes: { "/about": { load, head: { title: "About", description: "…" } } } })   // or `export const head` in the page
@@ -6,7 +6,7 @@
 //
 // Sources merge in order: defaults → the current route → components (later wins); everything is reactive and a
 // component's head goes away with it. `march build` with `seo: { prerender }` writes each route's HTML (head included)
-// at build time; hydrate() (hadi-march/seo/hydrate) takes it over in the browser. See docs/seo.md.
+// at build time; hydrate() (march/seo/hydrate) takes it over in the browser. See docs/seo.md.
 import { signal, effect, createRoot, onCleanup, getOwner, untrack } from "../core/reactive.ts";
 import { setHeadHandler, _router, type RouteTarget } from "../router/router.ts";
 import { resolveHead, applyHead, type HeadInput, type Tag } from "./head.ts";

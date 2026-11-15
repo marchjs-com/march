@@ -1,4 +1,4 @@
-// Testimonials (hadi-march/landing): what customers say, in four layouts:
+// Testimonials (march/landing): what customers say, in four layouts:
 //   grid     quote cards in equal rows
 //   marquee  two endless rows of cards drifting at different speeds (Marquee; still with reduced motion)
 //   wall     a masonry wall that fades out at the bottom, with a "Show more" button that opens it up

@@ -1,17 +1,17 @@
 # Behaviors
 
 A behavior is one interaction written once and attached to any element: `src/behaviors/<name>/` (index.ts, the
-implementation, a test), imported from its own subpath `hadi-march/behaviors/<name>` so an app downloads only the
+implementation, a test), imported from its own subpath `march/behaviors/<name>` so an app downloads only the
 behaviors it uses. Components list theirs in `meta.ts › behaviors`. Every behavior works as a `use:` action:
 `<div use:draggable={[draggable, options]}>` (the return value is the cleanup).
 
-## drag — `hadi-march/behaviors/drag`
+## drag — `march/behaviors/drag`
 
 The one source of pointer dragging: resize handles, column and tab reordering, tree and calendar items, canvas nodes,
 sheets. Do not write `pointermove` / `pointerup` / `setPointerCapture` loops in components; use this.
 
 ```ts
-import { draggable, pointerDrag } from "hadi-march/behaviors/drag";
+import { draggable, pointerDrag } from "march/behaviors/drag";
 
 // bind an element: each press on the handle is a session
 const off = draggable(card, { handle: ".grip", scroll: list, onMove: (p) => move(p.di, p.dy), onEnd: (p, cancelled) => cancelled ? revert() : drop(p) });
@@ -37,16 +37,16 @@ onStart, onEnd, rtl, area, clamp, buttons })` gives `{ x, y }` as 0–1 fraction
 asked), pixels and deltas, and calls `onMove` on the press itself so a click jumps. `arrowStep(keyEvent, rtl)` turns
 arrows / Page / Home / End into a step for the same controls.
 
-`hadi-march/motion`'s `pointerDrag` is the same function (re-exported). Gesture effects (`drag`, `swipe`, `tilt` in
-`hadi-march/motion`) are animations of an element following the pointer; they stay in the motion module.
+`march/motion`'s `pointerDrag` is the same function (re-exported). Gesture effects (`drag`, `swipe`, `tilt` in
+`march/motion`) are animations of an element following the pointer; they stay in the motion module.
 
-## roving-focus — `hadi-march/behaviors/roving-focus`
+## roving-focus — `march/behaviors/roving-focus`
 
 Roving tabindex: a toolbar, list or grid is one Tab stop; arrow keys, Home and End move inside it, and ArrowLeft /
 ArrowRight swap in a right-to-left container. `focus.roving()` and `focus:roving` of the FocusManager are this behavior.
 
 ```ts
-import { rovingFocus } from "hadi-march/behaviors/roving-focus";
+import { rovingFocus } from "march/behaviors/roving-focus";
 const stop = rovingFocus(toolbar, { orientation: "horizontal", onMove: (el) => select(el.dataset.id) });
 ```
 
@@ -59,12 +59,12 @@ const stop = rovingFocus(toolbar, { orientation: "horizontal", onMove: (el) => s
 
 The focus trap stays in the FocusManager: traps stack app-wide (only the newest is active), which needs one owner.
 
-## resize-handle — `hadi-march/behaviors/resize-handle`
+## resize-handle — `march/behaviors/resize-handle`
 
 A separator that resizes something: split panes (Splitter), a sidebar (NavSidebar), table and grid columns, panels.
 
 ```ts
-import { resizeHandle } from "hadi-march/behaviors/resize-handle";
+import { resizeHandle } from "march/behaviors/resize-handle";
 
 resizeHandle(grip, { value: () => width, set: (w, done) => { setWidth(w); if (done) save(); }, min: 160, max: 480, reset: () => setWidth(280) });
 ```
@@ -83,7 +83,7 @@ It sets `role="separator"`, the orientation, `aria-valuenow` (kept current) and 
 already has one. Dragging is the drag behavior (`di`, so RTL is mirrored; Escape puts the size back), and arrows swap in
 RTL. Clicks on the handle do not reach a header behind it (no accidental sort).
 
-## list-nav — `hadi-march/behaviors/list-nav`
+## list-nav — `march/behaviors/list-nav`
 
 Keyboard movement through options, written once. `moveCursor({ key, index, count, columns, page, ctrl, rtl })` is the
 pure step (arrows, Home / End, Page Up / Down; a wrapped grid with `columns`; ArrowLeft / Right swap in RTL): DataGrid
@@ -97,21 +97,21 @@ const onKey = listNav({ count: () => rows().length, active, onPick: (i) => run(r
 input.addEventListener("keydown", onKey);
 ```
 
-## dropzone — `hadi-march/behaviors/dropzone`
+## dropzone — `march/behaviors/dropzone`
 
 An element that takes dropped (and, with `paste: true`, pasted) files: `dropzone(zone, { onFiles, onOver, accept,
 onReject, single, paste, disabled })`. Enter / leave are counted, so passing over the zone's children does not flicker;
 only drags that carry files count; the zone has `is-drop-over` while one is over it. `accepts(file, "image/*,.pdf")` is
 the `<input accept>` check (FileUpload validates with it). Keep a click / keyboard way to choose files next to it.
 
-## swipe — `hadi-march/behaviors/swipe`
+## swipe — `march/behaviors/swipe`
 
 "Follow the finger, then settle" gestures: sheets and drawers, pull to refresh, swipe to reply, story navigation.
 `swipeable(el, opts)` listens on the element (pointer capture once the gesture is claimed); the helpers are the shared
 physics.
 
 ```ts
-import { swipeable, rubberBand, fling, nearest } from "hadi-march/behaviors/swipe";
+import { swipeable, rubberBand, fling, nearest } from "march/behaviors/swipe";
 
 swipeable(sheet, {
   axis: "y", accept: (p) => p.dy > 0,                       // claim only a downward swipe; anything else stays the page's
@@ -130,10 +130,10 @@ swipeable(sheet, {
 
 `rubberBand(over, k = 4)` is the resistance past a limit, `fling(pos, v, ms = 160)` where a release comes to rest
 (velocity capped), `nearest(points, target)` the snap point. The click that ends a mouse swipe is swallowed. Drawer,
-PullToRefresh, ChatBubble (swipe to reply) and StoryViewer use it; `swipe()` in hadi-march/motion is the animation
+PullToRefresh, ChatBubble (swipe to reply) and StoryViewer use it; `swipe()` in march/motion is the animation
 gesture effect (direction events), not this.
 
-## dismiss — `hadi-march/behaviors/dismiss`
+## dismiss — `march/behaviors/dismiss`
 
 Close a light surface — popover, menu, picker, a `<details>` menu — on a press outside it or Escape:
 `dismiss(panel, { inside: [trigger], onDismiss: (why) => close(why === "escape") })`. `inside` (elements or a getter)

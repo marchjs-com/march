@@ -3,7 +3,7 @@
 An extensible command line in the page — for a playground, a dev console, an admin panel or a product demo.
 
 ```tsx
-import { Terminal, defineTerminalCommands, ansi } from "hadi-march/components/composite/terminal";
+import { Terminal, defineTerminalCommands, ansi } from "march/components/composite/terminal";
 
 <Terminal prompt="hadi$ " welcome="[info] help yaz" persist="demo" scheme="auto" cursor="block" commands={{
   echo: (a, io) => io.print(a.rest.join(" ")),

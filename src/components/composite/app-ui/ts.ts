@@ -34,7 +34,7 @@ export interface TypeScriptService {
   instrument(files: Record<string, string>): Promise<{ files: Record<string, string>; metas: DebugMeta[] }>;
 }
 export interface TypeScriptPluginOptions {
-  /** URL of ts-worker.js (hadi-march's src/components/composite/app-ui/ts-worker.js, served by the app). */
+  /** URL of ts-worker.js (march's src/components/composite/app-ui/ts-worker.js, served by the app). */
   worker: string;
   /** URL of typescript.js (the typescript package's lib/typescript.js). */
   typescript: string;

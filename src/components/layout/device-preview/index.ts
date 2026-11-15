@@ -1,4 +1,4 @@
-// DevicePreview (hadi-march/layout): shows content as on a real phone or tablet — a device body with its notch or
+// DevicePreview (march/layout): shows content as on a real phone or tablet — a device body with its notch or
 // camera, status bar and home indicator, the real screen size, portrait or landscape — and makes the mouse act like a
 // finger: the cursor becomes a touch dot, dragging scrolls (with a fling), a long press opens the context menu, and
 // pointer events say "touch". The screen is an <OverlayScope> (drawers and dialogs open inside it) and the m-site

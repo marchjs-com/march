@@ -1,14 +1,14 @@
 // CacheManager: an in-memory cache for computed or fetched values — TTL ("30s" / "5m", the same syntax as net), LRU
 // eviction, tags, stale-while-revalidate and in-flight dedupe. After appCache().follow(onInvalidate) (from
-// hadi-march/net), net.invalidate("users") also clears entries tagged "users" (or whose key starts with it), so one
+// march/net), net.invalidate("users") also clears entries tagged "users" (or whose key starts with it), so one
 // call refreshes the request cache and this one.
 //
-//   import { appCache } from "hadi-march/managers/cache";
+//   import { appCache } from "march/managers/cache";
 //   const c = appCache();
 //   c.set("rates", data, { ttl: "5m", tags: ["money"] });   c.get("rates")
 //   const user = await c.wrap(`user:${id}`, () => net.get(`/api/users/${id}`), { ttl: "1m", swr: true });
 //   c.invalidate("money")   c.stats()   c.entries()        // stats and entries are reactive (devtools, panels)
-//   c.follow(onInvalidate)                                  // import { onInvalidate } from "hadi-march/net"
+//   c.follow(onInvalidate)                                  // import { onInvalidate } from "march/net"
 import { signal, type Accessor } from "../../core/reactive.ts";
 import { ms as duration } from "../duration.ts";
 import { defineManager } from "../manager.ts";

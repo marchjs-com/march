@@ -1,4 +1,4 @@
-// OverlayScope (hadi-march/layout): a box that layers opened inside it open in. A drawer, a dialog, a menu or a toast
+// OverlayScope (march/layout): a box that layers opened inside it open in. A drawer, a dialog, a menu or a toast
 // of a site preview, a device frame, a dashboard panel or a demo stays in it instead of covering the whole page:
 // fixed-positioned overlays cover the box (it is their containing block), a modal one makes only the box inert, and
 // openDialog / openDrawer / <Portal layer> find it by themselves (target: "page" opens on the page anyway).

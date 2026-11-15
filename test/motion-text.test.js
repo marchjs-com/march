@@ -1,4 +1,4 @@
-// hadi-march/motion/text: the split core (accessible, grapheme / RTL safe, revertible), every animation on the engine
+// march/motion/text: the split core (accessible, grapheme / RTL safe, revertible), every animation on the engine
 // (ends, loops, exits, reduced motion, pause all), the catalog and the size budget per animation.
 import { test, beforeEach } from "node:test";
 import assert from "node:assert/strict";
@@ -155,7 +155,7 @@ test("size: one text animation import stays small, each further one adds little"
   for (const [n, v] of Object.entries(s.each)) assert.ok(v <= TEXT_BUDGET.each, `${n} adds ${v} B > ${TEXT_BUDGET.each} B`);
 });
 
-test("hadi-march/motion/text is a side-effect free package entry", () => {
+test("march/motion/text is a side-effect free package entry", () => {
   const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
   assert.equal(pkg.exports["./motion/text"], "./src/motion/text/index.ts");
   assert.ok(!pkg.sideEffects.some((p) => p.includes("motion/text")), "not marked as having side effects");

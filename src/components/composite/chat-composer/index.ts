@@ -1,4 +1,4 @@
-// ChatComposer (hadi-march/ui): the message field of a chat. An attach Menu whose + turns 45° while open, a growing
+// ChatComposer (march/ui): the message field of a chat. An attach Menu whose + turns 45° while open, a growing
 // Textarea (Enter sends, Shift+Enter breaks the line), an emoji panel (ReactionPicker grid; the emoji goes in at the
 // caret), and one round button that morphs: a microphone (Heyecan) while the field is empty, a send arrow (Aktivite)
 // once there is text. Recording shows a pulsing dot, a running timer and a live waveform (motion engine); Esc or
@@ -56,7 +56,7 @@ export interface ChatComposerProps {
   disabled?: MaybeFn<boolean | undefined>;
   /** Own texts (names of the field and the buttons, the reply line, the recording status). Defaults: the built-in texts. @tr Kendi metinlerin (alanın ve düğmelerin adları, yanıt satırı, kayıt durumu). Varsayılan: yerleşik metinler. */
   labels?: MaybeFn<ChatComposerLabels | undefined>;
-  /** Own icons (an icon of hadi-march/icons, an emoji / short text, or a node). Defaults: plus, smile, send arrow, microphone. @tr Kendi ikonların (hadi-march/icons ikonu, emoji / kısa metin ya da düğüm). Varsayılan: artı, gülen yüz, gönder oku, mikrofon. */
+  /** Own icons (an icon of march/icons, an emoji / short text, or a node). Defaults: plus, smile, send arrow, microphone. @tr Kendi ikonların (march/icons ikonu, emoji / kısa metin ya da düğüm). Varsayılan: artı, gülen yüz, gönder oku, mikrofon. */
   attachIcon?: unknown;
   /** Own icon of the emoji button (default: a smile). @tr Emoji düğmesinin kendi ikonu (varsayılan: gülen yüz). */
   emojiIcon?: unknown;

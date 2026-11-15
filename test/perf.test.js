@@ -33,10 +33,10 @@ const ENTRY_BUDGET = 16 * 1024;
 
 test("entry has no chart/table code; the manifest lists the lazy route's files; loaders are tagged", async () => {
   const app = await buildApp({
-    "main.tsx": `import { h, render } from "hadi-march"\nimport { createRouter, Router } from "hadi-march/router"\ncreateRouter({ routes: { "/": () => import("./home.tsx"), "/sales": () => import("./sales.tsx"), "/rows": () => import("./rows.tsx") } })\nrender(() => h(Router, {}), document.body)\n`,
+    "main.tsx": `import { h, render } from "march"\nimport { createRouter, Router } from "march/router"\ncreateRouter({ routes: { "/": () => import("./home.tsx"), "/sales": () => import("./sales.tsx"), "/rows": () => import("./rows.tsx") } })\nrender(() => h(Router, {}), document.body)\n`,
     "home.tsx": `export default function Home() { return <h1>Merhaba</h1> }\n`,
-    "sales.tsx": `import { LineChart } from "hadi-march/charts"\nexport default function Sales() { return <LineChart data={[{ x: 1, y: 2 }]} x="x" y="y" /> }\n`,
-    "rows.tsx": `import { Table } from "hadi-march/table"\nexport default function Rows() { return <Table rows={[]} columns={[]} /> }\n`,
+    "sales.tsx": `import { LineChart } from "march/charts"\nexport default function Sales() { return <LineChart data={[{ x: 1, y: 2 }]} x="x" y="y" /> }\n`,
+    "rows.tsx": `import { Table } from "march/table"\nexport default function Rows() { return <Table rows={[]} columns={[]} /> }\n`,
   });
   try {
     const m = chunkManifest(app.meta, { cwd: app.dir, outdir: app.outdir, entry: "main.tsx" });
@@ -153,14 +153,14 @@ test("service worker: precache on install, one cache per version, old versions d
 test("barrel imports compile to the defining module; the entry does not load page-only code it merely reaches", async () => {
   const { deepImports } = await import("../compiler/deep-imports.js");
   const ui = resolve("src/ui/index.ts");
-  const out = deepImports(`import { Card, Badge as B, type CardProps } from "hadi-march/ui";`, { "hadi-march/ui": ui });
+  const out = deepImports(`import { Card, Badge as B, type CardProps } from "march/ui";`, { "march/ui": ui });
   assert.match(out, /import \{ Card \} from "[^"]*src\/components\/data\/card\/index\.ts";/);
   assert.match(out, /import \{ Badge as B \} from "[^"]*src\/components\/data\/badge\/index\.ts";/);
-  assert.match(out, /import \{ type CardProps \} from "hadi-march\/ui";/, "type-only names stay on the barrel");
+  assert.match(out, /import \{ type CardProps \} from "march\/ui";/, "type-only names stay on the barrel");
   const app = await buildApp({
-    "main.tsx": `import { render } from "hadi-march"\nimport { Badge, Avatar } from "hadi-march/ui"\nimport { createRouter, Router } from "hadi-march/router"\ncreateRouter({ routes: { "/": () => import("./a.tsx"), "/b": () => import("./b.tsx") } })\nrender(() => <div><Badge>1</Badge><Router /></div>, document.body)\nexport const keep = Avatar\n`,
-    "a.tsx": `import { Card, CodeView } from "hadi-march/ui"\nexport default () => <Card title="A"><CodeView code="x" /></Card>\n`,
-    "b.tsx": `import { Card, Timeline } from "hadi-march/ui"\nexport default () => <Card title="B"><Timeline items={[]} /></Card>\n`,
+    "main.tsx": `import { render } from "march"\nimport { Badge, Avatar } from "march/ui"\nimport { createRouter, Router } from "march/router"\ncreateRouter({ routes: { "/": () => import("./a.tsx"), "/b": () => import("./b.tsx") } })\nrender(() => <div><Badge>1</Badge><Router /></div>, document.body)\nexport const keep = Avatar\n`,
+    "a.tsx": `import { Card, CodeView } from "march/ui"\nexport default () => <Card title="A"><CodeView code="x" /></Card>\n`,
+    "b.tsx": `import { Card, Timeline } from "march/ui"\nexport default () => <Card title="B"><Timeline items={[]} /></Card>\n`,
   });
   try {
     const m = chunkManifest(app.meta, { cwd: app.dir, outdir: app.outdir, entry: "main.tsx" });
@@ -185,9 +185,9 @@ test("mergeEntry: the entry and its static chunks become one file; old chunks re
   const { mergeEntry } = await import("../compiler/merge-entry.js");
   const esbuild = (await import("esbuild")).default ?? (await import("esbuild"));
   const app = await buildApp({
-    "main.tsx": `import { render } from "hadi-march"\nimport { createRouter, Router } from "hadi-march/router"\ncreateRouter({ routes: { "/": () => import("./a.tsx"), "/b": () => import("./b.tsx") } })\nrender(() => h(Router, {}), document.body)\n`,
-    "a.tsx": `import { Card } from "hadi-march/ui"\nexport default () => <Card title="A">a</Card>\n`,
-    "b.tsx": `import { Card, Badge } from "hadi-march/ui"\nexport default () => <Card title="B"><Badge>b</Badge></Card>\n`,
+    "main.tsx": `import { render } from "march"\nimport { createRouter, Router } from "march/router"\ncreateRouter({ routes: { "/": () => import("./a.tsx"), "/b": () => import("./b.tsx") } })\nrender(() => h(Router, {}), document.body)\n`,
+    "a.tsx": `import { Card } from "march/ui"\nexport default () => <Card title="A">a</Card>\n`,
+    "b.tsx": `import { Card, Badge } from "march/ui"\nexport default () => <Card title="B"><Badge>b</Badge></Card>\n`,
   });
   try {
     const entryKey = Object.keys(app.meta.outputs).find((k) => app.meta.outputs[k].entryPoint === "main.tsx");
@@ -245,9 +245,9 @@ test("rehash after merge: a file name always means the same bytes across builds 
   const { mergeEntry, rehashOutputs } = await import("../compiler/merge-entry.js");
   const esbuild = await import("esbuild");
   const files = (v) => ({
-    "main.tsx": `import { render } from "hadi-march"\nimport { createRouter, Router } from "hadi-march/router"\ncreateRouter({ routes: { "/": () => import("./a.tsx"), "/b": () => import("./b.tsx") } })\nrender(() => h(Router, {}), document.body)\nconsole.log(${JSON.stringify(v)})\n`,
-    "a.tsx": `import { Card } from "hadi-march/ui"\nexport default () => <Card title="A">a</Card>\n`,
-    "b.tsx": `import { Card, Badge } from "hadi-march/ui"\nexport default () => <Card title="B"><Badge>b</Badge></Card>\n`,
+    "main.tsx": `import { render } from "march"\nimport { createRouter, Router } from "march/router"\ncreateRouter({ routes: { "/": () => import("./a.tsx"), "/b": () => import("./b.tsx") } })\nrender(() => h(Router, {}), document.body)\nconsole.log(${JSON.stringify(v)})\n`,
+    "a.tsx": `import { Card } from "march/ui"\nexport default () => <Card title="A">a</Card>\n`,
+    "b.tsx": `import { Card, Badge } from "march/ui"\nexport default () => <Card title="B"><Badge>b</Badge></Card>\n`,
   });
   const build = async (v) => {
     const app = await buildApp(files(v));
@@ -296,12 +296,12 @@ test("packChunks: entry stubs and tiny shared chunks fold away; every import sti
   const { packChunks } = await import("../compiler/pack-chunks.js");
   const esbuild = await import("esbuild");
   const app = await buildApp({
-    "main.tsx": `import { render } from "hadi-march"\nimport { createRouter, Router } from "hadi-march/router"\ncreateRouter({ routes: { "/": () => import("./a.tsx"), "/b": () => import("./b.tsx"), "/c": () => import("./c.tsx") } })\nrender(() => h(Router, {}), document.body)\n`,
+    "main.tsx": `import { render } from "march"\nimport { createRouter, Router } from "march/router"\ncreateRouter({ routes: { "/": () => import("./a.tsx"), "/b": () => import("./b.tsx"), "/c": () => import("./c.tsx") } })\nrender(() => h(Router, {}), document.body)\n`,
     "s1.ts": `export const one = (x: number) => x + 1\n`,
     "s2.ts": `export const two = (x: number) => x * 2\n`,
-    "a.tsx": `import { one } from "./s1.ts"\nimport { two } from "./s2.ts"\nimport { Card } from "hadi-march/ui"\nexport default () => <Card title={String(one(two(1)))}>a</Card>\n`,
-    "b.tsx": `import { one } from "./s1.ts"\nimport { Badge } from "hadi-march/ui"\nexport default () => <Badge>{one(1)}</Badge>\n`,
-    "c.tsx": `import { two } from "./s2.ts"\nimport { Card, Badge } from "hadi-march/ui"\nexport default () => <Card title="c"><Badge>{two(2)}</Badge></Card>\n`,
+    "a.tsx": `import { one } from "./s1.ts"\nimport { two } from "./s2.ts"\nimport { Card } from "march/ui"\nexport default () => <Card title={String(one(two(1)))}>a</Card>\n`,
+    "b.tsx": `import { one } from "./s1.ts"\nimport { Badge } from "march/ui"\nexport default () => <Badge>{one(1)}</Badge>\n`,
+    "c.tsx": `import { two } from "./s2.ts"\nimport { Card, Badge } from "march/ui"\nexport default () => <Card title="c"><Badge>{two(2)}</Badge></Card>\n`,
   });
   try {
     const entryKey = Object.keys(app.meta.outputs).find((k) => app.meta.outputs[k].entryPoint === "main.tsx");
@@ -322,8 +322,8 @@ test("packChunks: small shared code with no free host goes to one common chunk; 
   const { packChunks } = await import("../compiler/pack-chunks.js");
   const esbuild = await import("esbuild");
   const app = await buildApp({
-    "main.tsx": `import { render } from "hadi-march"
-import { createRouter, Router } from "hadi-march/router"
+    "main.tsx": `import { render } from "march"
+import { createRouter, Router } from "march/router"
 createRouter({ routes: { "/a": () => import("./a.tsx"), "/b": () => import("./b.tsx"), "/c": () => import("./c.tsx") } })
 render(() => h(Router, {}), document.body)
 `,
@@ -368,8 +368,8 @@ test("packChunks forced step: routes already over budget may grow; a shared chun
   const { packChunks } = await import("../compiler/pack-chunks.js");
   const esbuild = await import("esbuild");
   const files = {
-    "main.tsx": `import { render } from "hadi-march"
-import { createRouter, Router } from "hadi-march/router"
+    "main.tsx": `import { render } from "march"
+import { createRouter, Router } from "march/router"
 createRouter({ routes: { "/a": () => import("./a.tsx"), "/b": () => import("./b.tsx"), "/c": () => import("./c.tsx") } })
 render(() => h(Router, {}), document.body)
 `,
@@ -438,9 +438,9 @@ test("start-up does not grow with the page count: more pages add only their rout
   const app = async (n) => {
     const names = Array.from({ length: n }, (_, i) => `p${i}`);
     const files = {
-      "main.tsx": `import { render } from "hadi-march"\nimport { createRouter, Router } from "hadi-march/router"\ncreateRouter({ routes: { ${names.map((p) => `"/${p}": () => import("./${p}.tsx")`).join(", ")} } })\nrender(() => h(Router, {}), document.body)\n`,
+      "main.tsx": `import { render } from "march"\nimport { createRouter, Router } from "march/router"\ncreateRouter({ routes: { ${names.map((p) => `"/${p}": () => import("./${p}.tsx")`).join(", ")} } })\nrender(() => h(Router, {}), document.body)\n`,
     };
-    for (const p of names) files[`${p}.tsx`] = `import { Card } from "hadi-march/ui"\nexport default () => <Card title="${p}">${"page body ".repeat(40)}${p}</Card>\n`;
+    for (const p of names) files[`${p}.tsx`] = `import { Card } from "march/ui"\nexport default () => <Card title="${p}">${"page body ".repeat(40)}${p}</Card>\n`;
     const a = await buildApp(files);
     try {
       const m = chunkManifest(a.meta, { cwd: a.dir, outdir: a.outdir, entry: "main.tsx" });
@@ -464,7 +464,7 @@ test("packChunks last step: random pages and shared code, added and removed — 
   const app = (seed, pages) => {
     const r = rng(seed), files = {}, nShared = 12;
     for (let i = 0; i < nShared; i++) files[`s${i}.ts`] = shared(r, i);
-    files["main.tsx"] = `import { render } from "hadi-march"\nimport { createRouter, Router } from "hadi-march/router"\ncreateRouter({ routes: { ${pages.map((p) => `"/${p}": () => import("./${p}.tsx")`).join(", ")} } })\nrender(() => h(Router, {}), document.body)\n`;
+    files["main.tsx"] = `import { render } from "march"\nimport { createRouter, Router } from "march/router"\ncreateRouter({ routes: { ${pages.map((p) => `"/${p}": () => import("./${p}.tsx")`).join(", ")} } })\nrender(() => h(Router, {}), document.body)\n`;
     for (const p of pages) {
       const r2 = rng(seed * 31 + p.length * 7 + p.charCodeAt(p.length - 1));
       const use = [...new Set(Array.from({ length: 1 + Math.floor(r2() * 4) }, () => Math.floor(r2() * nShared)))];
@@ -505,7 +505,7 @@ test("packChunks last step: random pages and shared code, added and removed — 
 
 test("index.html lists only the manifest keys some code can look up (tagged loaders), the size report all of them", async () => {
   const app = await buildApp({
-    "main.tsx": `import { render } from "hadi-march"\nimport { lazy } from "hadi-march/lazy"\nconst Tagged = lazy(() => import("./tagged.tsx"))\nconst plain: Record<string, () => Promise<unknown>> = { p: (): Promise<unknown> => import("./plain.tsx") }\nrender(() => <div><Tagged />{String(!!plain)}</div>, document.body)\n`,
+    "main.tsx": `import { render } from "march"\nimport { lazy } from "march/lazy"\nconst Tagged = lazy(() => import("./tagged.tsx"))\nconst plain: Record<string, () => Promise<unknown>> = { p: (): Promise<unknown> => import("./plain.tsx") }\nrender(() => <div><Tagged />{String(!!plain)}</div>, document.body)\n`,
     "tagged.tsx": `export default () => <p>tagged</p>\n`,
     "plain.tsx": `export default () => <p>plain</p>\n`,
   });

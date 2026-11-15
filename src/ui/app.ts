@@ -13,7 +13,7 @@ import { arrowUpRight } from "../icons/glyphs/arrowUpRight.ts";
 import { OverflowText } from "./marquee.ts";
 
 export interface BrandProps {
-  /** The mark: an icon (hadi-march/icons, e.g. one made with defineIcon), text or a node. @tr İşaret: bir ikon (hadi-march/icons, ör. defineIcon ile yapılmış), metin ya da bir düğüm. */
+  /** The mark: an icon (march/icons, e.g. one made with defineIcon), text or a node. @tr İşaret: bir ikon (march/icons, ör. defineIcon ile yapılmış), metin ya da bir düğüm. */
   mark?: unknown;
   /** The product name shown next to the mark. @tr İşaretin yanında gösterilen ürün adı. */
   name: MaybeFn<unknown>;

@@ -1,4 +1,4 @@
-// IconPicker (hadi-march/ui): choose an icon. A button shows the chosen icon and its name; it opens a panel with a search
+// IconPicker (march/ui): choose an icon. A button shows the chosen icon and its name; it opens a panel with a search
 // (by name, Turkish or English words), filter chips (arrows, files, media, messages, people, layout, filled) and a grid
 // of every icon. Composed of Dropdown, SearchBox, Chip, IconButton, Spinner and Empty. The value is the icon's export
 // name ("plus"); `icons` takes another set (default: every built-in icon). `packs` adds icon sets (Lucide, Tabler…) as

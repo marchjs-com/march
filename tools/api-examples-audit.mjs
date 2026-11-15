@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Opens every API example on the showcase API page (#/api/<subpath>/<name>, built showcase in examples/showcase/dist)
 // in a headless browser and reports the ones whose page throws, whose live demo renders nothing, or that overflow.
-//   node tools/api-examples-audit.mjs [--sub hadi-march/ui] [--width 390] [--base http://…]
+//   node tools/api-examples-audit.mjs [--sub march/ui] [--width 390] [--base http://…]
 // Build first: node examples/showcase/build.mjs. Exit 1 on a problem.
 import { openHeadless, flag, sleep } from "./lib/headless.mjs";
 import { exampleFiles } from "./api-examples.js";

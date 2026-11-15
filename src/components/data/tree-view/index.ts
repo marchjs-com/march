@@ -1,4 +1,4 @@
-// TreeView (hadi-march/components/data/tree-view): a large, virtual tree — lazy children (loaded on first open), single /
+// TreeView (march/components/data/tree-view): a large, virtual tree — lazy children (loaded on first open), single /
 // multiple selection, drag and drop (before / after / inside, with auto-scroll and auto-open), search that keeps the
 // path to every hit open and highlights it, full tree keyboard model. Built on the shared virtual window
 // (core/virtual) and selection model (core/selection); the small <Tree> stays for short static trees.

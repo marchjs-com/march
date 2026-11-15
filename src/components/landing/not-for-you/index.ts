@@ -1,4 +1,4 @@
-// NotForYou (hadi-march/landing): the anti-landing block. It says plainly who the product is NOT for (and, optionally,
+// NotForYou (march/landing): the anti-landing block. It says plainly who the product is NOT for (and, optionally,
 // who it is for). With `check` every line is a toggle card: red at first ("That's me", "Not you? Tap it!"); a tap
 // strikes it out, turns it green and reveals the item's positive side (`instead`), with `markedHint` under the label. A verdict line under the list sums it up
 // honestly, e.g. "2 of 4 still apply". The verdict is announced politely.

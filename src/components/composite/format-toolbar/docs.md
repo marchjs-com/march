@@ -26,7 +26,7 @@ keydown handler of the editor and the bar run the same tools. `formatToolName(to
 | `keys` | `{ tool: "Control+B" / false }` | `FORMAT_KEYS` | `aria-keyshortcuts` per tool; `false` removes one |
 | `hints` | boolean | `false` | the shortcut in the tooltip too: "Bold (Ctrl+B)" |
 | `size` | `xs` `sm` `md` | `sm` | size of the buttons |
-| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | accent | Common prop (march/props): the colour token of the component and everything in it. |
 | `prefix` | string | — | extra class names for a host: `<prefix>-toolbar`, `-tool`, `-sep`, `-tool-own` |
 | `attrs` | `(tool) => attributes` | — | extra attributes of a tool button (`aria-haspopup`, `ref`, `class`) |
 | `class` | class | — | |

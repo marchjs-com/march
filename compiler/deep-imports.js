@@ -1,4 +1,4 @@
-// Barrel → direct imports. `import { NavSidebar, toast } from "hadi-march/ui"` becomes
+// Barrel → direct imports. `import { NavSidebar, toast } from "march/ui"` becomes
 //   import { NavSidebar } from "<march>/src/components/composite/nav-sidebar/index.ts"; import { toast } from "<march>/src/ui/toast.ts";
 // Tree shaking drops unused exports either way, but code splitting decides chunks by which FILES an entry reaches:
 // through a barrel the entry "reaches" every module (forms, editors, date pickers…) and esbuild puts the ones pages
@@ -83,7 +83,7 @@ function statementStarts(code) {
 }
 
 function rewrite(code, barrels, live) {
-  return code.replace(/import\s*\{([^}]*)\}\s*from\s*(["'])(hadi-march(?:\/[\w-]+)?)\2\s*;?/g, (all, list, q, spec, at) => {
+  return code.replace(/import\s*\{([^}]*)\}\s*from\s*(["'])(march(?:\/[\w-]+)?)\2\s*;?/g, (all, list, q, spec, at) => {
     const index = barrels[spec];
     if (!index || !live.has(at)) return all;
     const map = exportMap(index);

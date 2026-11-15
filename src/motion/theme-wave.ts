@@ -24,7 +24,7 @@ export interface ThemeWaveOptions {
   shape?: ThemeWaveShape | undefined;
   /** ms (default 700 for the circle, 2200 for the drip, 1600 for the other painted shapes). */
   duration?: number | undefined;
-  /** The address of spray-worklet.js on your own origin (from hadi-march/src/motion/): the "spray" shape draws with it
+  /** The address of spray-worklet.js on your own origin (from march/src/motion/): the "spray" shape draws with it
    *  (thousands of fine specks); without it, or where CSS Paint is missing, it sprays soft spots. */
   worklet?: string | undefined;
   /** CSS easing of the circle (default a fast start with a soft landing). */

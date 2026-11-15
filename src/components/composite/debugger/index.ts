@@ -1,4 +1,4 @@
-// Debugger (hadi-march/ui): the panel of a debugger over a DebugSession (session.ts): the controls (Start, Continue,
+// Debugger (march/ui): the panel of a debugger over a DebugSession (session.ts): the controls (Start, Continue,
 // Step over / into / out, Step back, Stop) with where it stopped and why, a timeline of the recording (time travel),
 // and the sections Watch (expressions evaluated at every stop), Scope (local / closure / module names with their values
 // then), Call stack (a frame shows its own place and scope), Breakpoints (on / off, condition, logpoint message) and

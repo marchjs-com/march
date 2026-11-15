@@ -4,6 +4,12 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
 
 ## 0.1.0 — unreleased
 
+### The package is `march` (was `hadi-march`)
+- **Breaking:** imports are `march`, `march/ui`, `march/app-ui`, `march/icons`… (the product's name; the repository
+  stays tlghn/hadimarch). The March compiler's esbuild plugin and the playground still resolve `hadi-march/…` to the
+  same files for a while. `Symbol.for("march.banner")` and the `march:channels` tab channel follow the new name.
+  Earlier entries below keep the old name.
+
 ### march-app-ui: the core of March IDE; DockLayout on its model (later in 0.1.0)
 - New `AppUI` (`hadi-march/app-ui`, also `hadi-march/ui`): the core of March IDE and the base of an IDE shell, after HADİ
   Studio Kit. A top bar (title, `tools`, the Layout menu: presets, saved layouts, the panel list), a `side` slot (an

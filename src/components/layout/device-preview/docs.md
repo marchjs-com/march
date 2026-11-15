@@ -9,7 +9,7 @@ The screen is an `OverlayScope` (drawers, dialogs and menus of the content open 
 container (the website blocks answer to its width), so a site in it behaves as on the device.
 
 ```tsx
-import { DevicePreview, DEVICES } from "hadi-march/layout";
+import { DevicePreview, DEVICES } from "march/layout";
 
 <DevicePreview device="iphone-15"><MySite /></DevicePreview>
 <DevicePreview device="ipad" landscape touch={false}>…</DevicePreview>

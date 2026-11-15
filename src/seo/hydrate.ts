@@ -1,4 +1,4 @@
-// hadi-march/seo/hydrate — take over HTML written by `march build` (seo.prerender) without a blank frame.
+// march/seo/hydrate — take over HTML written by `march build` (seo.prerender) without a blank frame.
 //
 //   hydrate(() => <Router />, document.getElementById("app"))      // instead of render(...)
 //

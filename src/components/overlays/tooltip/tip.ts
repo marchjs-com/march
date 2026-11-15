@@ -1,4 +1,4 @@
-// The hint of m:tip (hadi-march/props): Tooltip's bubble on an element that is already there, no wrapper. Loaded by
+// The hint of m:tip (march/props): Tooltip's bubble on an element that is already there, no wrapper. Loaded by
 // the common prop the first time one is used. Folder: src/components/overlays/tooltip/.
 import "../../actions/menu/menu.css";
 import "./tooltip.css";

@@ -32,7 +32,7 @@ preview with an orange bar sits above.
 | `class` | | | on the form |
 
 ```tsx
-import { arrowUp } from "hadi-march/icons"
+import { arrowUp } from "march/icons"
 <ChatComposer onSend={send} sendIcon={arrowUp} sendColor="brand-green" micColor="brand-purple"
   labels={{ message: "Write to the club", replyingTo: (name) => `Answer to ${name}` }} wave={false} motion={false} />
 ```

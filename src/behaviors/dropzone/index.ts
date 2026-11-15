@@ -1,4 +1,4 @@
-// hadi-march/behaviors/dropzone — an element that takes files dropped on it (and, if asked, pasted into it):
+// march/behaviors/dropzone — an element that takes files dropped on it (and, if asked, pasted into it):
 //   dropzone(zone, { onFiles: (files) => upload(files), onOver: (on) => over.set(on), accept: "image/*,.pdf" })
 //   <div use:dropzone={[dropzone, { … }]}>
 // Enter / leave are counted, so moving over the zone's own children does not flicker the "over" state; only drags that

@@ -1,4 +1,4 @@
-// LiveFeed (hadi-march/landing): a living wall. New items slide in at the top (list) or pop into the first cell (wall)
+// LiveFeed (march/landing): a living wall. New items slide in at the top (list) or pop into the first cell (wall)
 // and the oldest leave, so the page looks inhabited. Items come from `items` (a reactive list, newest first: push from
 // a socket or a store) or from `next()`, which the feed calls every `every` ms while it is on screen. It starts full and
 // keeps its size: a leaving item is lifted out of the flow while it fades, wall cards have one height (no layout shift). The feed pauses

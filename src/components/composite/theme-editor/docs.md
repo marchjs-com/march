@@ -14,7 +14,7 @@ come the defineTheme module, the stylesheet (themeCss) and JSON; in go pasted JS
 <ThemeEditor bind:value={$draft} base="night" />
 ```
 
-Import it from `hadi-march/components/composite/theme-editor` (a large component: it stays out of the `hadi-march/ui`
+Import it from `march/components/composite/theme-editor` (a large component: it stays out of the `march/ui`
 barrel). The Colors tab, the preview, saving and the other tabs (one chunk) load as chunks of their own.
 
 ## Props
@@ -44,7 +44,7 @@ barrel). The Colors tab, the preview, saving and the other tabs (one chunk) load
 ```
 
 The texts inside the tabs and the preview are ordinary `t` texts: the locale pack translates them, and
-`messages(locale(), { "Contrast": "Readability" })` (hadi-march/i18n) replaces any of them by its English source.
+`messages(locale(), { "Contrast": "Readability" })` (march/i18n) replaces any of them by its English source.
 
 ## Theme draft and tokens
 

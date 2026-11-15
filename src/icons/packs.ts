@@ -1,13 +1,13 @@
-// hadi-march/icons/packs — icons by name from any icon set: icon("tabler:chart-bar"), <Icon name="lucide:user" />.
-//   import { registerIconPack, icon, Icon } from "hadi-march/icons/packs";
-//   import lucide from "hadi-march/icons/lucide/pack";      // or your own: { id, name, license, resolve(name) }
+// march/icons/packs — icons by name from any icon set: icon("tabler:chart-bar"), <Icon name="lucide:user" />.
+//   import { registerIconPack, icon, Icon } from "march/icons/packs";
+//   import lucide from "march/icons/lucide/pack";      // or your own: { id, name, license, resolve(name) }
 //   registerIconPack(lucide);
 //   <Icon name="lucide:user" />   <Icon name="user" />   (no prefix: the March set)
 //   <Button icon={icon("tabler:chart-bar")}>…</Button>    (any icon prop)
 // A pack's icons load on first use (its resolve may return a promise); icon() is reactive and draws nothing until the
-// icon is there. For the smallest bundles import single icons instead: import { user } from "hadi-march/icons/lucide".
+// icon is there. For the smallest bundles import single icons instead: import { user } from "march/icons/lucide".
 // Packs are made with `march icons add <pack>` (cli/icons.js): open-source sets converted to March's format, each with
-// its license. Nothing here is part of the start-up code: <Icon> from hadi-march/icons stays as small as it was.
+// its license. Nothing here is part of the start-up code: <Icon> from march/icons stays as small as it was.
 import { signal, type Signal } from "../core/reactive.ts";
 import { Icon as BaseIcon, type IconProps } from "./index.ts";
 import type { IconDef } from "./svg.ts";
@@ -95,7 +95,7 @@ export interface NamedIconProps extends Omit<IconProps, "of"> {
   name?: string | undefined;
 }
 
-/** `<Icon name="lucide:user" size="lg" />` — <Icon> from hadi-march/icons plus `name`; props may be live. */
+/** `<Icon name="lucide:user" size="lg" />` — <Icon> from march/icons plus `name`; props may be live. */
 export function Icon(props: NamedIconProps): SVGSVGElement {
   return BaseIcon({
     get of() { return props.of ?? icon(props.name); },

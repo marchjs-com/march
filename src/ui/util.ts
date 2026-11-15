@@ -4,7 +4,7 @@ import { h } from "../dom/h.ts";
 import { svgIcon, isIconDef } from "../icons/svg.ts";
 export * from "../core/util.ts";
 
-/** Render an icon prop: an IconDef (hadi-march/icons) becomes an SVG, a string (emoji, short text) an aria-hidden span; nodes pass through. */
+/** Render an icon prop: an IconDef (march/icons) becomes an SVG, a string (emoji, short text) an aria-hidden span; nodes pass through. */
 export function icon(x: unknown, cls = "m-icon"): unknown {
   if (x == null || x === false) return null;
   if (isIconDef(x)) return h("span", { class: cls, "aria-hidden": "true" }, svgIcon(x));

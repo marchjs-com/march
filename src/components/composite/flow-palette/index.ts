@@ -1,4 +1,4 @@
-// FlowPalette (hadi-march/ui): the node types of a flow, by category, with a search box. Drag one onto a FlowCanvas
+// FlowPalette (march/ui): the node types of a flow, by category, with a search box. Drag one onto a FlowCanvas
 // to place it where you drop it (snapped to the grid), or press Enter / click to add it in the middle of the view.
 // The dragged card floats in the "drag" layer (dragGhost) and settles into place on the motion engine.
 import "./flow-palette.css";

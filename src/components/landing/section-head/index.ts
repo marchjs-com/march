@@ -1,4 +1,4 @@
-// SectionHead (hadi-march/landing): the heading group of a page section — eyebrow, title, lead, actions and a small
+// SectionHead (march/landing): the heading group of a page section — eyebrow, title, lead, actions and a small
 // note, stacked and aligned as one block. Hero, SiteSection, CtaBand, Faq, Newsletter and ProjectDetail all open with
 // this group; here it is one component: alignment, title level and scale, colour, an optional entrance (Reveal).
 import "./section-head.css";

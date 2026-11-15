@@ -1,7 +1,7 @@
 // LocationManager: the user's position as a signal. Nothing is asked until locate() or watch() runs — call them from a
 // click. Permission state and consent go through PermissionManager (a category set there blocks the request).
 //
-//   import { locator } from "hadi-march/managers/location";
+//   import { locator } from "march/managers/location";
 //   const loc = locator();
 //   button.onclick = () => loc.locate();           loc.position()?.lat   loc.status()   loc.error()
 //   const stop = loc.watch();                       loc.distanceTo({ lat: 41.01, lng: 28.97 })   // metres

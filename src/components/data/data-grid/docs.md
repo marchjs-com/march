@@ -6,7 +6,7 @@ view are in the DOM, so 100 000 rows × many columns scroll smoothly. On top it 
 footer, pinned columns, drag to reorder and resize columns, and a keyboard cell cursor.
 
 ```tsx
-import { DataGrid } from "hadi-march/components/data/data-grid";
+import { DataGrid } from "march/components/data/data-grid";
 
 <DataGrid rows={$orders} rowKey="id" selectable groupBy={["region"]}
   columns={[
@@ -52,15 +52,15 @@ import { DataGrid } from "hadi-march/components/data/data-grid";
 `emptyGroup`, `selectAll`, `selectRow`, `sortAsc`, `sortDesc`, `clearSort`, `group`, `ungroup`, `pinStart`, `pinEnd`,
 `unpin`, `hide`, `sum`, `average`, `minimum`, `maximum`, `count`, `distinct`, and the functions `filtersActive(n)`,
 `rows(n)`, `selected(n)`, `columnMenu(column)`, `resize(column)`. The texts inside filter controls and cell editors
-belong to the table engine (`hadi-march/table`).
+belong to the table engine (`march/table`).
 
 Column extras: `aggregate` is `"sum" | "avg" | "min" | "max" | "count" | "distinct"` or `(values, rows) => result`;
 `groupable: false` hides "Group by this column". Every `createTable` column option works (`pin`, `width`, `format`,
 `filter`, `editable`, `validate`, `render` …).
 
 Shared engines it uses, each importable on its own: `createAxis` / `createViewport` (core/virtual), `createSelection` /
-`moveCursor` (core/selection), `groupRows` / `aggregate` / `aggregates` (hadi-march/data), `pointerDrag`
-(hadi-march/motion), `CellEditor` / `FilterControl` (hadi-march/table).
+`moveCursor` (core/selection), `groupRows` / `aggregate` / `aggregates` (march/data), `pointerDrag`
+(march/motion), `CellEditor` / `FilterControl` (march/table).
 
 ## Interaction
 

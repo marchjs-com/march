@@ -9,11 +9,11 @@
 //   march gen routes                                 src/pages/** → src/routes.gen.js (+ pages.d.ts param types)
 //   march gen page users/[id] | gen component Name | gen crud products
 //   march gen api openapi.json [--out src/api.gen.js] typed client + schemas from an OpenAPI 3 document
-//                 [--classes]                       hadi-march/net Api classes + interfaces instead (src/api.gen.ts)
+//                 [--classes]                       march/net Api classes + interfaces instead (src/api.gen.ts)
 //   march i18n [--messages src/i18n]                 report keys missing from translation files
 //   march check [--src src]                          type-check .tsx/.ts including March syntax (pipes, modifiers…)
 //   march seo check [--dir dist] [--no-canonical]    built pages: missing title / description / canonical / img alt…
-//   march icons list | add lucide … | gallery <dir>  open-source icon sets → hadi-march/icons/<pack> (see cli/icons.js)
+//   march icons list | add lucide … | gallery <dir>  open-source icon sets → march/icons/<pack> (see cli/icons.js)
 // Config (optional): march.config.js exporting { entry, outdir, publicDir, pagesDir, components, alias, define, port, html,
 //   base: "/" | "/app/" | "./" (asset URLs in index.html; "./" = works from any sub-folder), redirects: true (_redirects for
 //   Cloudflare Pages / Netlify, absolute base only), fallback404: false (no 404.html), stableNames: true (or --stable-names:
@@ -113,7 +113,7 @@ function writeHtml(cfg, meta, { dev }, manifest = null, entryFiles = null) {
   const data = manifest && Object.keys(manifest).length ? `<script type="application/json" id="march-manifest">${JSON.stringify(manifest).replace(/</g, "\\u003c")}</script>` : "";
   // the entry's own chunks are announced up front: fetched in parallel with the entry instead of after it is parsed
   const pre = (entryFiles ?? []).filter((f) => /\.js(\?|$)/.test(f) && `${base}${f}` !== js).map((f) => `<link rel="modulepreload" href="${base}${f}">`).join("");
-  // an absolute base ("/app/") is written down for the router and appUrl() (hadi-march/base); a relative build ("./")
+  // an absolute base ("/app/") is written down for the router and appUrl() (march/base); a relative build ("./")
   // finds its root from the entry script instead
   const baseTag = base.startsWith("/") ? `<meta name="march-base" content="${base.replace(/\/?$/, "/")}">` : "";
   const tags = `${cfg.credit === true ? "<!-- Built with March -->" : ""}${baseTag}${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : cfg.credit === true ? `<script src="${base}credit.js"></script>` : ""}`;
@@ -376,7 +376,7 @@ async function dev() {
   const send = (ev, data) => { for (const c of clients) c.write(`event: ${ev}\ndata: ${JSON.stringify(data)}\n\n`); };
 
   const opts = buildOptions(cfg, esbuild, { dev: true });
-  // --mock: the app may switch to hadi-march/net's in-browser mock (`if (mockRequested()) net.mock(handlers)`)
+  // --mock: the app may switch to march/net's in-browser mock (`if (mockRequested()) net.mock(handlers)`)
   if (mockSpec) opts.define = { ...opts.define, "globalThis.MARCH_MOCK": "true" };
   opts.plugins.push({ name: "march-dev", setup(b) {
     b.onStart(() => { if (existsSync(resolve(cwd, cfg.pagesDir))) genRoutes(resolve(cwd, cfg.pagesDir), resolve(cwd, "src/routes.gen.js")); });
@@ -463,9 +463,9 @@ async function i18n() {
   if (missing) process.exitCode = 1;
 }
 
-/** Inside the hadi-march repository: `march gen component` makes a component folder, `march check component` checks one. */
+/** Inside the march repository: `march gen component` makes a component folder, `march check component` checks one. */
 function isLibrary() {
-  try { return JSON.parse(readFileSync(resolve(cwd, "package.json"), "utf8")).name === "hadi-march" && existsSync(resolve(cwd, "src/components")); } catch { return false; }
+  try { return JSON.parse(readFileSync(resolve(cwd, "package.json"), "utf8")).name === "march" && existsSync(resolve(cwd, "src/components")); } catch { return false; }
 }
 async function libComponent(name, put) {
   const folder = name.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
@@ -498,7 +498,7 @@ async function typecheck() {
   if (n) process.exitCode = 1;
 }
 
-/** hadi-march/seo (TypeScript; also when March is installed under node_modules). */
+/** march/seo (TypeScript; also when March is installed under node_modules). */
 async function seoModule() {
   const { importTs } = await import("../compiler/load-ts.js");
   return importTs(new URL("../src/seo/index.ts", import.meta.url));
@@ -534,7 +534,7 @@ const icons = async () => (await import("./icons.js")).main(argv.slice(1));
 // `march build --dev [--watch]`: the fast build (buildDev).
 const run = { dev, build: () => (flag("--dev") === true || flag("--watch") === true ? buildDev({ watch: flag("--watch") === true }) : build()), gen, i18n, check: typecheck, seo, icons }[cmd];
 if (!run) {
-  console.log("March\n  march dev [--port 5173] [--mock openapi.json]\n  march build [--no-minify]\n  march gen routes|page|component|crud|api <name>\n  march i18n [--messages src/i18n]\n  march check [--src src]   (type-check, full March syntax)\n  march check component <name>   (in the hadi-march repo: the component checklist)\n  march seo check [--dir dist]   (titles, descriptions, canonical, img alt)\n  march icons list | add <pack…|all> | gallery <dir>   (open-source icon sets as icon packs)");
+  console.log("March\n  march dev [--port 5173] [--mock openapi.json]\n  march build [--no-minify]\n  march gen routes|page|component|crud|api <name>\n  march i18n [--messages src/i18n]\n  march check [--src src]   (type-check, full March syntax)\n  march check component <name>   (in the march repo: the component checklist)\n  march seo check [--dir dist]   (titles, descriptions, canonical, img alt)\n  march icons list | add <pack…|all> | gallery <dir>   (open-source icon sets as icon packs)");
   process.exit(cmd ? 1 : 0);
 }
 await run();

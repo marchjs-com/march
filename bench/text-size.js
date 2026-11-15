@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Cost of hadi-march/motion/text, per animation (minified + gzip, tree-shaken like an app build).
+// Cost of march/motion/text, per animation (minified + gzip, tree-shaken like an app build).
 //   engine   what any engine animation already pays (timeline + clock + drivers)
 //   core     the shared text core on top of the engine (split + runner), measured with the smallest animation
 //   each     what one more animation adds once the core is there

@@ -1,6 +1,6 @@
-// hadi-march/motion — animations for March apps (separate module; the core does not grow). Side-effect free: import only
+// march/motion — animations for March apps (separate module; the core does not grow). Side-effect free: import only
 // what you use. To enable the extra `transition:` names (blur, fly + WAAPI fade/slide/scale) and `<For animate>` FLIP,
-// call installTransitions() / installFlip() once, or import "hadi-march/motion/install" (does both).
+// call installTransitions() / installFlip() once, or import "march/motion/install" (does both).
 // Everything honors prefers-reduced-motion and uses only transform/opacity via WAAPI or CSSOM.
 // All of it runs on ONE engine (./engine): keyframes, timelines, easing, drivers, one clock, global control.
 

@@ -1,11 +1,11 @@
-// Hero (hadi-march/landing): the first screen of a website, in seven looks that share one structure — an eyebrow pill,
+// Hero (march/landing): the first screen of a website, in seven looks that share one structure — an eyebrow pill,
 // a large title (a highlighted part gets the brand gradient), a lead, actions and a note — plus a stage that changes by
 // variant:
 //   centered  calm, centred copy over a soft grid
 //   split     copy at the start, media at the end (stacks on phones)
 //   video     a VideoBackground behind the copy
 //   mesh      a gradient mesh with a pointer spotlight and grain
-//   aurora    drifting colour blobs (hadi-march/fx Aurora)
+//   aurora    drifting colour blobs (march/fx Aurora)
 //   product   copy, then a product frame that tilts in 3D and flattens as you scroll (Overlay glass, scrollTimeline)
 //   parallax  layered depth behind the copy (Parallax)
 // The copy enters with Reveal; hero media loads eagerly with its size reserved (no layout shift).

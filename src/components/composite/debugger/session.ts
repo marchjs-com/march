@@ -1,4 +1,4 @@
-// The debugger's session (hadi-march/ui, Debugger): what the instrumented code reports (instrument.js writes the calls),
+// The debugger's session (march/ui, Debugger): what the instrumented code reports (instrument.js writes the calls),
 // kept as a recording, and the debugger's controls over it. The code runs at its own speed on the page's thread (a
 // page cannot freeze itself and stay usable), so pausing is done on the recording: every step is kept with a copy of
 // the names in scope at that moment and the call stack; a breakpoint (its condition true), a `debugger;` statement or

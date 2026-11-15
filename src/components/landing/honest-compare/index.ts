@@ -1,4 +1,4 @@
-// HonestCompare (hadi-march/landing): a comparison table that also shows where the product is behind. Each cell is
+// HonestCompare (march/landing): a comparison table that also shows where the product is behind. Each cell is
 // yes / partly / no or a short text; a row where another column scores higher than `us` is marked "behind" and keeps
 // its note visible (why, and what is planned). A summary counts ahead / even / behind rows, and a toggle shows only
 // the rows where the product loses. A real table (caption, column and row headers); marks carry text for screen

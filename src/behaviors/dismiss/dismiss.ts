@@ -1,4 +1,4 @@
-// Dismiss behavior (hadi-march/behaviors/dismiss): close something light — a popover, a menu, a picker, a details menu —
+// Dismiss behavior (march/behaviors/dismiss): close something light — a popover, a menu, a picker, a details menu —
 // when the user presses outside it or hits Escape. One home for the "outside pointer + Escape" pair that popovers,
 // table menus and pickers each wrote themselves. Escape is taken in the capture phase, so the innermost open thing
 // closes before a dialog underneath sees the key.

@@ -1,7 +1,7 @@
 // StorageManager: one API over localStorage, sessionStorage, memory and IndexedDB, with a key prefix, expiry, a data
 // version and migrations. Blocked or full storage never throws: the value stays in memory and an "error" is reported.
 //
-//   import { storage, persisted } from "hadi-march/managers/storage";
+//   import { storage, persisted } from "march/managers/storage";
 //   configureStorage({ prefix: "app.", version: 2, migrations: { 2: (v, key) => key === "prefs" ? { ...v, dense: false } : v } });
 //   const s = storage();
 //   await s.area("idb").set("draft", bigObject)     // every area has the same async API

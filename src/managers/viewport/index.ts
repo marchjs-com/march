@@ -1,7 +1,7 @@
 // ViewportManager: the one signal source for the environment — breakpoints (viewport and container), color scheme,
 // reduced motion / data, pointer, online, tab visibility, orientation and safe areas. Every matchMedia() goes here.
 //
-//   import { viewport } from "hadi-march/managers/viewport";
+//   import { viewport } from "march/managers/viewport";
 //   const vp = viewport();
 //   vp.mobile()  vp.breakpoint()  vp.up("lg")  vp.dark()  vp.reducedMotion()  vp.online()  vp.visible()
 //   <aside when:desktop>…</aside>   <p when:reducedMotion={false}>…</p>   <video when:reducedData={false} />

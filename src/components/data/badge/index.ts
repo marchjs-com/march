@@ -1,4 +1,4 @@
-// Badge and count labels (hadi-march/ui). Folder: src/components/data/badge/.
+// Badge and count labels (march/ui). Folder: src/components/data/badge/.
 import "./badge.css";
 import { h } from "../../../dom/h.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";

@@ -23,7 +23,7 @@ export interface ChoiceLook {
   size?: ChoiceSize | undefined;
   /** Box corners (checkboxes; radios are round). Default "rounded". @tr Kutu köşeleri (onay kutuları; radyolar yuvarlaktır). Varsayılan "rounded". */
   shape?: ChoiceShape | undefined;
-  /** An icon (hadi-march/icons) shown instead of the drawn tick. @tr Çizilen tik yerine gösterilen ikon (hadi-march/icons). */
+  /** An icon (march/icons) shown instead of the drawn tick. @tr Çizilen tik yerine gösterilen ikon (march/icons). */
   icon?: IconDef | undefined;
   /** false: no animation. @tr false: animasyon yok. */
   animate?: boolean | undefined;

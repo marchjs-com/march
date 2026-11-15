@@ -22,7 +22,7 @@ let $period = "monthly"
 | `toggle` | boolean | `true` | show the switch |
 | `currency` | ISO code | `EUR` | Intl currency format for the locale |
 | `saving` | node | — | badge next to the switch, bright on yearly |
-| `m:color` | color token | brand gradient + accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | brand gradient + accent | Common prop (march/props): the colour token of the component and everything in it. |
 | `featureIcon` | boolean / `(included) => node` | `true` | the tick / dash in front of a feature, or your own mark |
 | `featureColor` | color token | `success` | colour of the tick |
 | `per` | boolean | `true` | the "/ month · billed yearly" lines |

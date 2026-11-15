@@ -6,7 +6,7 @@ each pick a fixed position and overlap: they stack in their corner in `order`. `
 corner. Inside a Layout use `useLayout().add(corner, node)` or the `corners` prop.
 
 ```tsx
-import { addCornerControl, BottomRightControls, CornerControls } from "hadi-march/layout";
+import { addCornerControl, BottomRightControls, CornerControls } from "march/layout";
 
 const off = addCornerControl("bottom-end", <button>Geri bildirim</button>, 10)  // lower order = nearer the edge
 off()                                                                           // also on component cleanup

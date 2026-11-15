@@ -4,7 +4,7 @@ A box that layers opened inside it open in. A drawer, a dialog, a menu or a toas
 dashboard panel or a component demo stays in it instead of covering the whole page.
 
 ```tsx
-import { OverlayScope } from "hadi-march/layout";
+import { OverlayScope } from "march/layout";
 
 <OverlayScope class="preview"><MySite /></OverlayScope>      // its SiteNav drawer opens inside the preview
 

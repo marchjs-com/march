@@ -129,7 +129,7 @@ async function sizes() {
     const entry = id === "svelte" ? "src/bench/apps/svelte.ts" : id === "lit" ? "src/bench/apps/lit.ts" : id === "solid" ? "src/bench/apps/solid.gen.js" : id === "vue" ? "src/bench/apps/vue.ts" : a.src[0];
     const r = await build({
       entryPoints: [join(SC, entry)], bundle: true, minify: true, format: "esm", write: false, absWorkingDir: SC, logLevel: "error",
-      alias: { "hadi-march": join(ROOT, "src") },
+      alias: { "march": join(ROOT, "src") },
       define: { "process.env.NODE_ENV": '"production"', __VUE_OPTIONS_API__: "true", __VUE_PROD_DEVTOOLS__: "false", __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "false" },
       // the canonical app alone: the realistic scenarios riding in the same chunk are left out of this column
       plugins: [{ name: "no-scenarios", setup: (b) => { b.onResolve({ filter: /scenarios\/\w+\.ts$/ }, (x) => (x.importer.includes("apps") ? { path: x.path, namespace: "no-scen" } : undefined)); b.onLoad({ filter: /.*/, namespace: "no-scen" }, () => ({ contents: "export const scenarios = {}", loader: "js" })); } }, march({ components: join(SC, "src/components"), cssSplit: false })], loader: { ".css": "empty" },

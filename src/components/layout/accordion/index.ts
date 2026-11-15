@@ -1,4 +1,4 @@
-// Accordion (hadi-march/ui).
+// Accordion (march/ui).
 import "./accordion.css";
 import { signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";

@@ -35,7 +35,7 @@ let $slide = Number(queryParam("slide")() ?? 0)
 | `class` | class | — | on the deck |
 
 ```tsx
-import { animate } from "hadi-march/motion"
+import { animate } from "march/motion"
 <Presentation progressColor="brand-orange" counter={(i, n) => `${i + 1} / ${n}`} fullscreen={false}
   labels={{ previous: "Back", next: "Forward" }} icons={{ next: arrowRight }}
   transition={(incoming, outgoing, dir) => animate(incoming, { opacity: [0, 1], transform: [`rotate(${8 * dir}deg)`, "rotate(0deg)"] }, { duration: 600 })}>

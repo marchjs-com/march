@@ -1,4 +1,4 @@
-// Stepper (hadi-march/ui): progress through stages with morphing motion. It draws Steps and adds a liquid highlight
+// Stepper (march/ui): progress through stages with morphing motion. It draws Steps and adds a liquid highlight
 // that stretches from the old step to the new one and settles there, and step panels that morph into each other —
 // the old one blurs and slides out, the new one slides in from the direction of travel (mirrored in RTL) while the
 // frame's height follows. Everything runs on the motion engine; reduced motion switches instantly.

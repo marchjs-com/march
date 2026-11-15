@@ -24,7 +24,7 @@ const stack: Layer[] = [];
 const roots = new WeakMap<HTMLElement, HTMLElement>();
 // where a layer opened from here belongs: set by the OverlayScope module when an app uses it (the core stays small)
 let scopeOf: () => HTMLElement | null = () => null;
-/** @internal Install the overlay-scope lookup (hadi-march/layout OverlayScope). */
+/** @internal Install the overlay-scope lookup (march/layout OverlayScope). */
 export const _setScopeOf = (f: () => HTMLElement | null): void => { scopeOf = f; };
 const inerted = new Set<Element>();
 /** Bumped on every open / close, so layers() is reactive (the Layer manager and devtools follow the stack). */

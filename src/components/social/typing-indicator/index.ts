@@ -1,4 +1,4 @@
-// TypingIndicator (hadi-march/ui): three dots that lift in turn (motion engine, staggered loop; still with reduced
+// TypingIndicator (march/ui): three dots that lift in turn (motion engine, staggered loop; still with reduced
 // motion) and an optional "… is typing" line. A polite status, so screen readers hear who is typing once.
 import { effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";

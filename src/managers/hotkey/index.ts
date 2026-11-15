@@ -1,7 +1,7 @@
 // HotkeyManager: keyboard shortcuts with scopes, key sequences ("g h"), pause / resume and a reactive list for help
 // screens. Parsing, matching and labels come from ui/keys.ts (mod = ⌘ on macOS, Ctrl elsewhere).
 //
-//   import { hotkeys } from "hadi-march/managers/hotkey";
+//   import { hotkeys } from "march/managers/hotkey";
 //   hotkeys.bind("mod+k", openSearch, { description: "Search", group: "General" })
 //   hotkeys.bind("g h", goHome, { description: "Go home" })              // a sequence: g, then h within 1 s
 //   const leave = hotkeys.enter("editor")                                 // scope: "editor" bindings + global ones

@@ -1,7 +1,7 @@
-// Charts example: a small dashboard built with hadi-march/charts.
+// Charts example: a small dashboard built with march/charts.
 // Load the stylesheet once (src/charts/charts.css), e.g. with a <link> tag or your bundler's CSS import.
-import { render } from "hadi-march";
-import { LineChart, AreaChart, BarChart, PieChart, Sparkline, Stat, ProgressRing, BarList, Heatmap } from "hadi-march/charts";
+import { render } from "march";
+import { LineChart, AreaChart, BarChart, PieChart, Sparkline, Stat, ProgressRing, BarList, Heatmap } from "march/charts";
 
 const day = 864e5;
 const start = Date.now() - 29 * day;

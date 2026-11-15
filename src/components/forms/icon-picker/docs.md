@@ -2,7 +2,7 @@
 
 Choose an icon. A button shows the chosen icon and its name; it opens a panel with a search (by name), filter chips
 (arrows, files, media, messages, people, layout, filled) and a grid of every built-in icon. The value is the icon's
-export name (`"plus"`); `ICONS[name]` (hadi-march/icons/catalog) gives the icon itself.
+export name (`"plus"`); `ICONS[name]` (march/icons/catalog) gives the icon itself.
 
 ```tsx
 let $icon = "plus"
@@ -15,7 +15,7 @@ is first chosen (or when the value names it), once for the page; a value from it
 The grid draws `pageSize` icons (240) and the next page as it is scrolled to its end, so thousands of icons stay quick.
 
 ```tsx
-const packs = [{ id: "lucide", label: "Lucide", count: 2356, load: () => import("hadi-march/icons/lucide").then((m) => Object.fromEntries(Object.values(m).map((d) => [d.name, d]))) }]
+const packs = [{ id: "lucide", label: "Lucide", count: 2356, load: () => import("march/icons/lucide").then((m) => Object.fromEntries(Object.values(m).map((d) => [d.name, d]))) }]
 <IconPicker packs={packs} value={$icon} onChange={(n) => $icon = n} />
 ```
 

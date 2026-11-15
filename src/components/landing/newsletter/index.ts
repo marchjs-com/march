@@ -1,4 +1,4 @@
-// Newsletter (hadi-march/landing): an email sign-up. Inline (field + button on one line) or stacked. While sending the
+// Newsletter (march/landing): an email sign-up. Inline (field + button on one line) or stacked. While sending the
 // button shows its spinner; on success the form folds away and a check with the thank-you line pops in; on an error the
 // field shakes and the message is announced. Motion engine only; reduced motion swaps without movement.
 import "./newsletter.css";

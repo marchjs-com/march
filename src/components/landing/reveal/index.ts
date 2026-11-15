@@ -1,4 +1,4 @@
-// Reveal (hadi-march/landing): children animate in when they scroll into view — fade, rise, fall, slide from the start
+// Reveal (march/landing): children animate in when they scroll into view — fade, rise, fall, slide from the start
 // or the end (mirrored in RTL), scale, blur or a 3D flip — one after another (stagger). `scrub` ties the effect to the
 // scroll position instead of playing once. Motion engine only (transform / opacity / filter), reduced motion shows
 // the content at once. Before it is revealed the content is hidden by CSS, so nothing flashes.

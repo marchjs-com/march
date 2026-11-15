@@ -1,4 +1,4 @@
-// The small shared core of hadi-march/motion/text: options, stagger order and one runner. Every text animation is a
+// The small shared core of march/motion/text: options, stagger order and one runner. Every text animation is a
 // thin function over it, so importing one animation costs a few hundred bytes on top of the engine.
 // Everything plays on the motion engine (one timeline per call): global speed, "pause all", slow motion and reduced
 // motion apply. With reduced motion an animation jumps to its end state (loops stay still at their start).

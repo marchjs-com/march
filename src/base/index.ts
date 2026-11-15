@@ -1,4 +1,4 @@
-// hadi-march/base — the app's root URL (its base path): the folder that holds index.html, assets/, themes/ and the
+// march/base — the app's root URL (its base path): the folder that holds index.html, assets/, themes/ and the
 // public files, whatever route the page shows. One answer for the router, the chunk preloader, theme stylesheets and public files, so an app
 // works at the domain root, in a sub-folder (example.com/app/), from files (file://) and inside an iframe alike.
 //

@@ -1,4 +1,4 @@
-// March data (hadi-march/data): queries, mutations and access (query.ts), grouping (group.ts) and the "data"
+// March data (march/data): queries, mutations and access (query.ts), grouping (group.ts) and the "data"
 // category components. Library code imports ./query.ts directly: this barrel also re-exports the components (each with
 // its stylesheet), which a table, an API client or a CRUD screen must not pull in.
 export * from "./query.ts";

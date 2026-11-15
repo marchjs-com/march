@@ -2,7 +2,7 @@
 // active (working in this app), idle (no input for a while), away (tab hidden), offline. The user's state across all
 // open tabs is the most present one; other people (from a socket) are kept with setPeer().
 //
-//   import { presence, configurePresence } from "hadi-march/managers/presence";
+//   import { presence, configurePresence } from "march/managers/presence";
 //   configurePresence({ report: (state) => socket.send({ type: "presence", state }), heartbeat: 30_000 });
 //   presence().state()   presence().overall()   presence().peers()      // reactive
 //   socket.on("presence", (p) => presence().setPeer(p.userId, p.state, { name: p.name }))

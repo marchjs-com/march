@@ -27,7 +27,7 @@ ruler use the same scale with `timePercent(ms, duration)`.
 | `keyStep` | `number` (ms) | `100` | one arrow key press (Shift: ten times) |
 | `head` | `boolean` / node | `true` | the playhead, or your own grip |
 | `headClass` | `string` | | extra class of the playhead |
-| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | accent | Common prop (march/props): the colour token of the component and everything in it. |
 | `labels` | `{ ruler?, playhead? }` | "Time ruler", "Playhead" (translated) | |
 | `class` | class value | | |
 

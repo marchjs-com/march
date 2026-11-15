@@ -1,4 +1,4 @@
-// Drag behavior (hadi-march/behaviors/drag), the one source of pointer dragging. pointerDrag(): one pointer drag session for components that move or resize things on a grid (DataGrid columns,
+// Drag behavior (march/behaviors/drag), the one source of pointer dragging. pointerDrag(): one pointer drag session for components that move or resize things on a grid (DataGrid columns,
 // Scheduler events, Gantt bars, TreeView and FileManager items). Movement threshold (a click stays a click), pointer
 // capture, Escape cancels, and edge auto-scroll of a scroll container driven by the motion clock (onFrame), so global
 // pause and speed apply. Deltas include the container's scroll change: positions stay right while it scrolls.

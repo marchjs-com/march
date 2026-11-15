@@ -131,7 +131,7 @@
 
 /* stat */
 .m-stat { display: flex; flex-direction: column; gap: 6px; min-width: 0; color: var(--m-chart-text); }
-/* label over value is a StatTile (hadi-march/data) at the KPI box's own measure */
+/* label over value is a StatTile (march/data) at the KPI box's own measure */
 .m-stat > .m-stat-tile.is-start { align-items: stretch; gap: 6px; color: inherit; }
 .m-stat .m-stat-label { display: flex; align-items: center; gap: 8px; overflow: visible; white-space: normal; color: var(--m-chart-muted); font-size: var(--m-text-sm, 13px); font-weight: 500; }
 .m-stat-icon { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 7px; color: var(--m-primary, #4f46e5);

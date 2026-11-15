@@ -1,4 +1,4 @@
-// MediaGrid (hadi-march/ui): the photos of a post. 1 → one frame at its own shape (between 4:5 and 1.91:1), 2 → side
+// MediaGrid (march/ui): the photos of a post. 1 → one frame at its own shape (between 4:5 and 1.91:1), 2 → side
 // by side, 3 → one large and two stacked, 4 → 2×2, more → 2×2 with "+N" on the last tile. Every tile is a button
 // (open in a lightbox); a Skeleton shimmers until the image arrives, then it fades in. With onDoubleTap a single tap
 // waits a moment so a double tap (like) never also opens the photo.

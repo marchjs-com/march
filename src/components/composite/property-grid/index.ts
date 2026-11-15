@@ -1,4 +1,4 @@
-// PropertyGrid (hadi-march/ui): an inspector. Grouped, searchable property rows, each edited with the form control of
+// PropertyGrid (march/ui): an inspector. Grouped, searchable property rows, each edited with the form control of
 // its type (TextInput, NumberInput, Slider, Toggle, Select, Segmented, ColorInput, Textarea, or any `control`).
 // Every change is an undo step (Undo manager; typing in one field merges into one step), and unsaved changes are
 // registered with the DirtyState manager (leave warning, saveAll). Rows show what differs from the saved values and can

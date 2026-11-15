@@ -1,4 +1,4 @@
-// Scheduler (hadi-march/components/data/scheduler): month / week / day calendar of events. Drag an event to move it
+// Scheduler (march/components/data/scheduler): month / week / day calendar of events. Drag an event to move it
 // (snapped to `step` minutes or whole days), drag its edge to resize, drag on an empty slot to create one; every date
 // and time is formatted with Intl in the current locale (first day of week, month and weekday names, 12/24 h).
 // Calendar math lives in core/date (shared with the date inputs and Gantt), drags in behaviors/drag.

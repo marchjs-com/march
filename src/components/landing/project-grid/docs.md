@@ -20,7 +20,7 @@ transition into ProjectDetail — or, without it, shows the cover in the Lightbo
 | `lightbox` | boolean | `true` | without `onOpen`: cover in the Lightbox |
 | `allLabel` | string | `All` | text of the "all" chip |
 | `filtersLabel` | string | `Filter projects` | accessible name of the chip group |
-| `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
+| `m:color` | color token | accent | Common prop (march/props): the colour token of the component and everything in it. |
 | `arrow` | boolean / `(project) => node` | `true` | the arrow badge on the cover, or your own content |
 | `motion` | boolean | `true` | animate the filter change (false: swap at once) |
 | `reveal` | Reveal options / `false` | `{ effect: "up", stagger: 70 }` | entrance of the cards |
@@ -31,7 +31,7 @@ transition into ProjectDetail — or, without it, shows the cover in the Lightbo
 <ProjectGrid projects={work} arrow={false} motion={false} reveal={false} filtersLabel="Filter the work" />
 ```
 
-Each cover is marked `data-m-shared="project-<id>"`; `sharedTransition(name, fromElement, update)` (hadi-march/motion)
+Each cover is marked `data-m-shared="project-<id>"`; `sharedTransition(name, fromElement, update)` (march/motion)
 morphs it into the element with the same mark in the next view (ProjectDetail's cover), and back.
 
 ## Accessibility
