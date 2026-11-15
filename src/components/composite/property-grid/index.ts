@@ -182,7 +182,7 @@ export function PropertyGrid(props: PropertyGridProps): Element {
       h("div", { class: "m-pg-label" },
         h("label", { id: labelId, for: id, class: "m-pg-name", title: () => labelOf(p) }, () => labelOf(p)),
         props.changeMarks === false ? null : () => (changed() ? h(StatusDot, { class: "m-pg-dot", tone: "primary", size: "xs", title: L().changed ?? t`Changed`, label: L().changed ?? t`changed` }) : null),
-        p.description && h("span", { id: descId, class: "m-pg-desc" }, p.description)),
+        p.description && h("span", { id: descId, class: "m-pg-desc", title: p.description }, p.description)),
       h("div", { class: "m-pg-editor" }, control,
         () => (errors()[p.key] ? h("span", { id: errId, class: "m-pg-error", role: "alert" }, errors()[p.key]) : null)),
       props.resetButtons === false ? null : h(IconButton, {
