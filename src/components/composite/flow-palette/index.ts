@@ -19,29 +19,31 @@ import { dragGhost, type DragGhost } from "../../../behaviors/drag/ghost.ts";
 import { NODE_W, type FlowStore, type FlowNodeType } from "../flow-canvas/model.ts";
 import { withColor } from "../../../theme/colors.ts";
 export interface FlowPaletteProps {
+  /** The flow store new nodes are added to. @tr Yeni düğümlerin eklendiği akış deposu. */
   flow: FlowStore;
-  /** Types to offer. Default: every type of the flow. */
+  /** Types to offer. Default: every type of the flow. @tr Sunulacak türler. Varsayılan: akışın her türü. */
   types?: readonly FlowNodeType[];
-  /** Grid step used when dropping (match the canvas `snap`). Default 16. */
+  /** Grid step used when dropping (match the canvas `snap`). Default 16. @tr Bırakırken kullanılan ızgara adımı (tuvalin `snap` değeriyle eşleştir). Varsayılan 16. */
   snap?: number;
-  /** Show the search box. Default true. */
+  /** Show the search box. Default true. @tr Arama kutusunu göster. Varsayılan true. */
   search?: MaybeFn<boolean | undefined>;
-  /** The category titles (default true). */
+  /** The category titles (default true). @tr Kategori başlıkları (varsayılan true). */
   categories?: MaybeFn<boolean | undefined>;
-  /** The description line of a card (default true). */
+  /** The description line of a card (default true). @tr Kartın açıklama satırı (varsayılan true). */
   descriptions?: MaybeFn<boolean | undefined>;
-  /** The grip dots at the end of a card (default true). */
+  /** The grip dots at the end of a card (default true). @tr Kartın sonundaki tutma noktaları (varsayılan true). */
   grip?: MaybeFn<boolean | undefined>;
-  /** Own card content: `(type) => node`. The card stays a button: drag, click and Enter work as before. */
+  /** Own card content: `(type) => node`. The card stays a button: drag, click and Enter work as before. @tr Kendi kart içeriğin: `(type) => node`. Kart düğme olarak kalır: sürükleme, tıklama ve Enter eskisi gibi çalışır. */
   renderCard?: ((type: FlowNodeType) => unknown) | undefined;
-  /** What a search without a match shows: true (default text), false (nothing) or your own node. */
+  /** What a search without a match shows: true (default text), false (nothing) or your own node. @tr Eşleşmeyen aramanın gösterdiği: true (varsayılan metin), false (hiçbir şey) ya da kendi düğümün. */
   empty?: boolean | Node | undefined;
-  /** The tilt of a dragged card, its melt into the canvas and its fly-back (default true). */
+  /** The tilt of a dragged card, its melt into the canvas and its fly-back (default true). @tr Sürüklenen kartın eğilmesi, tuvale erimesi ve geri uçuşu (varsayılan true). */
   motion?: boolean | undefined;
-  /** Own texts: the region name, the search box, the screen reader hint of a card, the "no match" text. */
+  /** Own texts: the region name, the search box, the screen reader hint of a card, the "no match" text. @tr Kendi metinlerin: bölge adı, arama kutusu, kartın ekran okuyucu ipucu, "eşleşme yok" metni. */
   labels?: { region?: string; search?: string; hint?: string; empty?: string } | undefined;
-  /** Called after a node is added. */
+  /** Called after a node is added. @tr Bir düğüm eklendikten sonra çağrılır. */
   onAdd?: (id: string, type: FlowNodeType) => void;
+  /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp;
 }
 

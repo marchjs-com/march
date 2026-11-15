@@ -71,87 +71,89 @@ export interface FontPickerLabels {
 }
 
 export interface FontPickerProps extends ControlProps<string> {
-  /** How the picker shows: "popover" (default: a panel by its button), "dialog" (a window), "inline" (the panel itself). */
+  /** How the picker shows: "popover" (default: a panel by its button), "dialog" (a window), "inline" (the panel itself). @tr Seçicinin görünüşü: "popover" (varsayılan: düğmesinin yanında panel), "dialog" (pencere), "inline" (panelin kendisi). */
   view?: "popover" | "dialog" | "inline" | undefined;
-  /** Fonts of the device: true (default: the built-in list), false, or your own families (`source: "system"`, `stack`). */
+  /** Fonts of the device: true (default: the built-in list), false, or your own families (`source: "system"`, `stack`). @tr Cihazın yazı tipleri: true (varsayılan: yerleşik liste), false ya da kendi ailelerin (`source: "system"`, `stack`). */
   system?: boolean | readonly FontFamily[] | undefined;
-  /** Web fonts: the built-in Google Fonts catalog (default, loaded when the picker first opens), your own families, a function that loads them, or false. */
+  /** Web fonts: the built-in Google Fonts catalog (default, loaded when the picker first opens), your own families, a function that loads them, or false. @tr Web yazı tipleri: yerleşik Google Fonts kataloğu (varsayılan, seçici ilk açıldığında yüklenir), kendi ailelerin, onları yükleyen bir işlev ya da false. */
   catalog?: false | readonly FontFamily[] | (() => Promise<readonly FontFamily[]>) | undefined;
-  /** Where web fonts are loaded from: "google" (default), the address of your own server that answers `/css2?family=…`, a function `(request) => stylesheet address`, or false (never load). */
+  /** Where web fonts are loaded from: "google" (default), the address of your own server that answers `/css2?family=…`, a function `(request) => stylesheet address`, or false (never load). @tr Web yazı tiplerinin yüklendiği yer: "google" (varsayılan), `/css2?family=…` isteğine yanıt veren kendi sunucunun adresi, `(request) => stylesheet address` işlevi ya da false (hiç yükleme). */
   source?: FontSource | undefined;
-  /** Ask before the first request to the font source (it sees the visitor's address); the answer is remembered. Default false. */
+  /** Ask before the first request to the font source (it sees the visitor's address); the answer is remembered. Default false. @tr Yazı tipi kaynağına ilk istekten önce sor (kaynak ziyaretçinin adresini görür); yanıt hatırlanır. Varsayılan false. */
   askConsent?: boolean | undefined;
-  /** Every pick and every change of weight / italic, with the CSS to use the font. */
+  /** Every pick and every change of weight / italic, with the CSS to use the font. @tr Her seçimde ve her kalınlık / italik değişikliğinde, yazı tipini kullanmak için CSS ile çağrılır. */
   onPick?: ((choice: FontChoice) => void) | undefined;
-  /** Weight chosen at first (default 400; the family's nearest weight is used). */
+  /** Weight chosen at first (default 400; the family's nearest weight is used). @tr Başta seçili kalınlık (varsayılan 400; ailenin en yakın kalınlığı kullanılır). */
   weight?: number | undefined;
-  /** Italic at first. */
+  /** Italic at first. @tr Başta italik. */
   italic?: boolean | undefined;
-  /** Load the picked web font into the page before the value changes (default true); false: you load it (`onPick` gives `url`). */
+  /** Load the picked web font into the page before the value changes (default true); false: you load it (`onPick` gives `url`). @tr Değer değişmeden önce seçilen web yazı tipini sayfaya yükle (varsayılan true); false: sen yüklersin (`onPick` `url` verir). */
   load?: boolean | undefined;
-  /** What a row draws in its type: "name" (default) or "sample" (the sample text, the name under it). */
+  /** What a row draws in its type: "name" (default) or "sample" (the sample text, the name under it). @tr Bir satırın kendi yazı tipiyle çizdiği: "name" (varsayılan) ya da "sample" (örnek metin, altında ad). */
   preview?: "name" | "sample" | undefined;
-  /** The sample text of the specimen (and of the rows with `preview="sample"`). */
+  /** The sample text of the specimen (and of the rows with `preview="sample"`). @tr Örnek gösterimin örnek metni (ve `preview="sample"` satırlarının). */
   sample?: string | undefined;
-  /** The sample text was edited. */
+  /** The sample text was edited. @tr Örnek metin düzenlenince çağrılır. */
   onSample?: ((text: string) => void) | undefined;
-  /** Category shown at first / followed when it changes ("all" by default). */
+  /** Category shown at first / followed when it changes ("all" by default). @tr Başta gösterilen / değişince izlenen kategori (varsayılan "all"). */
   category?: FontCategory | "all" | undefined;
-  /** Order: "popular" (default), "name", "newest". */
+  /** Order: "popular" (default), "name", "newest". @tr Sıralama: "popular" (varsayılan), "name", "newest". */
   sort?: FontSort | undefined;
-  /** Only families with this subset ("latin-ext", "cyrillic", "arabic"…); "all" by default. */
+  /** Only families with this subset ("latin-ext", "cyrillic", "arabic"…); "all" by default. @tr Yalnız bu alt kümeye sahip aileler ("latin-ext", "cyrillic", "arabic"…); varsayılan "all". */
   subset?: string | undefined;
-  /** The search field (default true). */
+  /** The search field (default true). @tr Arama alanı (varsayılan true). */
   search?: boolean | undefined;
-  /** The category switcher: true (default), false, or the categories to offer. */
+  /** The category switcher: true (default), false, or the categories to offer. @tr Kategori seçici: true (varsayılan), false ya da sunulacak kategoriler. */
   categories?: boolean | readonly FontCategory[] | undefined;
-  /** The order switcher: true (default), false, or the orders to offer. */
+  /** The order switcher: true (default), false, or the orders to offer. @tr Sıralama seçici: true (varsayılan), false ya da sunulacak sıralamalar. */
   sorts?: boolean | readonly FontSort[] | undefined;
-  /** The subset list: true (default: every subset of the catalog), false, or the subsets to offer. */
+  /** The subset list: true (default: every subset of the catalog), false, or the subsets to offer. @tr Alt küme listesi: true (varsayılan: kataloğun her alt kümesi), false ya da sunulacak alt kümeler. */
   subsets?: boolean | readonly string[] | undefined;
-  /** Favourites: the star on each row, the Favourites group and the "only favourites" filter (default true). */
+  /** Favourites: the star on each row, the Favourites group and the "only favourites" filter (default true). @tr Favoriler: her satırdaki yıldız, Favoriler grubu ve "yalnız favoriler" süzgeci (varsayılan true). */
   favorites?: boolean | undefined;
-  /** A star was pressed. */
+  /** A star was pressed. @tr Bir yıldıza basılınca çağrılır. */
   onFavorite?: ((family: string, on: boolean) => void) | undefined;
-  /** Recent picks kept in their own group (default 5; 0: none). */
+  /** Recent picks kept in their own group (default 5; 0: none). @tr Kendi grubunda tutulan son seçimler (varsayılan 5; 0: yok). */
   recent?: number | undefined;
-  /** The specimen: the chosen font with your sample text, size, weight, italic and the CSS (default true). */
+  /** The specimen: the chosen font with your sample text, size, weight, italic and the CSS (default true). @tr Örnek gösterim: seçilen yazı tipi örnek metnin, boyut, kalınlık, italik ve CSS ile (varsayılan true). */
   specimen?: boolean | undefined;
-  /** In the specimen: the size slider (default true). */
+  /** In the specimen: the size slider (default true). @tr Örnek gösterimde boyut kaydırıcısı (varsayılan true). */
   sizeControl?: boolean | undefined;
-  /** In the specimen: weight and italic (default true). */
+  /** In the specimen: weight and italic (default true). @tr Örnek gösterimde kalınlık ve italik (varsayılan true). */
   styleControls?: boolean | undefined;
-  /** In the specimen: the `font-family` line with a copy button (default true). */
+  /** In the specimen: the `font-family` line with a copy button (default true). @tr Örnek gösterimde kopyalama düğmeli `font-family` satırı (varsayılan true). */
   css?: boolean | undefined;
-  /** The second line of a row: category and number of styles (default true). */
+  /** The second line of a row: category and number of styles (default true). @tr Satırın ikinci satırı: kategori ve stil sayısı (varsayılan true). */
   meta?: boolean | undefined;
-  /** How many families match, next to the filters (default true). */
+  /** How many families match, next to the filters (default true). @tr Süzgeçlerin yanında kaç ailenin eşleştiği (varsayılan true). */
   count?: boolean | undefined;
-  /** "Fonts on this device" where the browser can list them (asks the visitor; default true). */
+  /** "Fonts on this device" where the browser can list them (asks the visitor; default true). @tr Tarayıcı listeleyebiliyorsa "Bu cihazdaki yazı tipleri" (ziyaretçiye sorar; varsayılan true). */
   deviceFonts?: boolean | undefined;
-  /** Close the popover / dialog after a pick (default false: weight and italic can still be set). */
+  /** Close the popover / dialog after a pick (default false: weight and italic can still be set). @tr Seçimden sonra popover / pencereyi kapat (varsayılan false: kalınlık ve italik yine ayarlanabilir). */
   closeOnPick?: boolean | undefined;
-  /** Where favourites, recent picks and the consent are remembered (default "fonts"); false: only while the page is open. */
+  /** Where favourites, recent picks and the consent are remembered (default "fonts"); false: only while the page is open. @tr Favorilerin, son seçimlerin ve iznin hatırlandığı anahtar (varsayılan "fonts"); false: yalnız sayfa açıkken. */
   storageKey?: string | false | undefined;
-  /** Open state of the popover / dialog (yours); without it the picker keeps its own. */
+  /** Open state of the popover / dialog (yours); without it the picker keeps its own. @tr Popover / pencerenin açık durumu (senin); verilmezse seçici kendisininkini tutar. */
   open?: boolean | Signal<boolean> | undefined;
+  /** Called when the popover / dialog opens or closes. @tr Popover / pencere açılınca ya da kapanınca çağrılır. */
   onOpenChange?: ((open: boolean) => void) | undefined;
-  /** Your own button: a node, or `(api) => node` with `api.toggle()`, `api.font()`. Default: a button with the name in its type. */
+  /** Your own button: a node, or `(api) => node` with `api.toggle()`, `api.font()`. Default: a button with the name in its type. @tr Kendi düğmen: bir düğüm ya da `api.toggle()`, `api.font()` ile `(api) => node`. Varsayılan: adı kendi yazı tipiyle yazılı bir düğme. */
   trigger?: unknown | ((api: { toggle(): void; open(): void; close(): void; font(): FontFamily | undefined }) => unknown) | undefined;
-  /** Size of the default button. */
+  /** Size of the default button. @tr Varsayılan düğmenin boyutu. */
   size?: "sm" | "md" | "lg" | undefined;
-  /** Where the popover opens (default "bottom-start"). */
+  /** Where the popover opens (default "bottom-start"). @tr Popover'ın açıldığı yer (varsayılan "bottom-start"). */
   placement?: "bottom-start" | "bottom" | "bottom-end" | "top-start" | "top" | "top-end" | undefined;
-  /** Entrance of the popover / dialog: "scale" (default), "fade", "rise", "none". */
+  /** Entrance of the popover / dialog: "scale" (default), "fade", "rise", "none". @tr Popover / pencerenin girişi: "scale" (varsayılan), "fade", "rise", "none". */
   motion?: "scale" | "fade" | "rise" | "none" | undefined;
-  /** Draw the inside of a row yourself. */
+  /** Draw the inside of a row yourself. @tr Bir satırın içini kendin çiz. */
   renderRow?: ((font: FontFamily, state: { selected: boolean; favorite: boolean }) => unknown) | undefined;
-  /** Shown when nothing matches: text or a node (default "No fonts match"). */
+  /** Shown when nothing matches: text or a node (default "No fonts match"). @tr Hiçbir şey eşleşmeyince gösterilen: metin ya da düğüm (varsayılan "No fonts match"). */
   empty?: unknown;
-  /** Own texts. */
+  /** Own texts. @tr Kendi metinlerin. */
   labels?: FontPickerLabels | undefined;
+  /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp;
-  /** Class of the panel (the popover, the dialog body or the inline box). */
+  /** Class of the panel (the popover, the dialog body or the inline box). @tr Panelin sınıfı (popover, pencere gövdesi ya da satır içi kutu). */
   panelClass?: string | undefined;
 }
 

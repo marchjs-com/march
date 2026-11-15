@@ -36,23 +36,24 @@ export interface ConsentLabels {
 }
 
 export interface ConsentTexts {
-  /** Banner / panel title. */
+  /** Banner / panel title. @tr Bant / panel başlığı. */
   title?: Text;
-  /** Banner text: the app's own wording (its legal text). */
+  /** Banner text: the app's own wording (its legal text). @tr Bant metni: uygulamanın kendi ifadesi (hukuki metni). */
   text?: Text;
-  /** Label of the policy link (shown when configureConsent({ policyHref }) is set). */
+  /** Label of the policy link (shown when configureConsent({ policyHref }) is set). @tr Politika bağlantısının etiketi (configureConsent({ policyHref }) verildiğinde görünür). */
   policyLabel?: Text;
-  /** Own texts for the buttons and the preferences panel. */
+  /** Own texts for the buttons and the preferences panel. @tr Düğmeler ve tercihler paneli için kendi metinlerin. */
   labels?: ConsentLabels | undefined;
 }
 
 export interface ConsentBannerProps extends ConsentTexts {
-  /** Show even when a decision is already stored (demos); a choice made on the banner still closes it. */
+  /** Show even when a decision is already stored (demos); a choice made on the banner still closes it. @tr Bir karar zaten kayıtlıyken bile göster (demolar); bant üzerinde yapılan seçim yine de kapatır. */
   always?: boolean;
-  /** Render in place, in the page flow, instead of the bottom layer (demos). */
+  /** Render in place, in the page flow, instead of the bottom layer (demos). @tr Alt katman yerine yerinde, sayfa akışında çiz (demolar). */
   inline?: boolean;
-  /** The Customize button that opens the preferences panel. Default true. Reject and Accept always stay, side by side. */
+  /** The Customize button that opens the preferences panel. Default true. Reject and Accept always stay, side by side. @tr Tercihler panelini açan Customize düğmesi. Varsayılan true. Reject ve Accept her zaman yan yana kalır. */
   customize?: boolean | undefined;
+  /** Extra classes on the banner. @tr Banda eklenen sınıflar. */
   class?: ClassProp;
 }
 
@@ -126,14 +127,17 @@ export async function openConsentPreferences(p: ConsentTexts = {}): Promise<bool
 }
 
 export interface ConsentGateProps {
+  /** The consent category the content needs (e.g. "thirdParty"); the children show once it is allowed. @tr İçeriğin gerektirdiği izin kategorisi (ör. "thirdParty"); izin verilince alt öğeler görünür. */
   category: string;
-  /** What the placeholder says (default: a generic "This content is blocked" text). */
+  /** What the placeholder says (default: a generic "This content is blocked" text). @tr Yer tutucunun söylediği (varsayılan: genel bir "Bu içerik engellendi" metni). */
   label?: Text;
-  /** Own texts for the placeholder's buttons (`allow`, `preferences`) and for the panel it opens. */
+  /** Own texts for the placeholder's buttons (`allow`, `preferences`) and for the panel it opens. @tr Yer tutucunun düğmeleri (`allow`, `preferences`) ve açtığı panel için kendi metinlerin. */
   labels?: ConsentLabels | undefined;
-  /** The Preferences button of the placeholder. Default true. */
+  /** The Preferences button of the placeholder. Default true. @tr Yer tutucunun Preferences düğmesi. Varsayılan true. */
   preferences?: boolean | undefined;
+  /** Extra classes on the placeholder. @tr Yer tutucuya eklenen sınıflar. */
   class?: ClassProp;
+  /** The content shown once the category is allowed. @tr Kategoriye izin verilince gösterilen içerik. */
   children?: unknown;
 }
 

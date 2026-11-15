@@ -33,38 +33,43 @@ export interface BottomNavItem {
 }
 
 export interface BottomNavProps {
+  /** The tabs: each with an id, a label and an icon. @tr Sekmeler: her birinin id'si, etiketi ve ikonu. */
   items: readonly BottomNavItem[];
-  /** Active item id. */
+  /** Active item id. @tr Etkin öğenin id'si. */
   value: MaybeFn<string | null | undefined>;
+  /** Called with the id of the tab a person picked. @tr Seçilen sekmenin id'siyle çağrılır. */
   onChange?: ((id: string) => void) | undefined;
-  /** Shows the raised Create button in the middle. With `createActions` it runs on a long press (the default action). */
+  /** Shows the raised Create button in the middle. With `createActions` it runs on a long press (the default action). @tr Ortada yükseltilmiş Create düğmesini gösterir. `createActions` ile birlikte uzun basışta çalışır (varsayılan eylem). */
   onCreate?: (() => void) | undefined;
-  /** The Create button opens a menu of these actions (new post, story, live…). Live. */
+  /** The Create button opens a menu of these actions (new post, story, live…). Live. @tr Create düğmesi bu eylemlerin menüsünü açar (yeni gönderi, hikâye, canlı yayın…). Canlı. */
   createActions?: MaybeFn<readonly BottomNavAction[] | null | undefined>;
-  /** Look of the Create menu: "fan" (round buttons on an arc, default), "stack" (pills above the button) or "sheet" (a list from the bottom). */
+  /** Look of the Create menu: "fan" (round buttons on an arc, default), "stack" (pills above the button) or "sheet" (a list from the bottom). @tr Create menüsünün görünümü: "fan" (yay üzerinde yuvarlak düğmeler, varsayılan), "stack" (düğmenin üstünde hap şeklinde) ya da "sheet" (alttan açılan liste). */
   createMenu?: MaybeFn<CreateMenuLook | undefined>;
-  /** Title of the Create menu (the sheet's heading and the menu's name). `false`: no heading (the menu keeps its name). */
+  /** Title of the Create menu (the sheet's heading and the menu's name). `false`: no heading (the menu keeps its name). @tr Create menüsünün başlığı (sheet başlığı ve menünün adı). `false`: başlık yok (menü adını korur). */
   createTitle?: MaybeFn<string | false | undefined>;
-  /** The grab handle on top of the "sheet" menu. Default true. */
+  /** The grab handle on top of the "sheet" menu. Default true. @tr "sheet" menüsünün üstündeki tutamaç. Varsayılan true. */
   createHandle?: boolean | undefined;
-  /** Called with the action a person picked (after its own `run`). */
+  /** Called with the action a person picked (after its own `run`). @tr Seçilen eylemle (kendi `run`'ından sonra) çağrılır. */
   onAction?: ((id: string) => void) | undefined;
+  /** Accessible name of the Create button (default "Create"). @tr Create düğmesinin erişilebilir adı (varsayılan "Create"). */
   createLabel?: MaybeFn<string | undefined>;
+  /** Own icon of the Create button (default: a plus). @tr Create düğmesinin kendi ikonu (varsayılan: artı). */
   createIcon?: unknown;
-  /** Ring colors of the Create button: color tokens ("brand-orange", "primary" …) or CSS colors; `false`: no ring. Default: the four HADİ colors (a theme's brand tokens first). */
+  /** Ring colors of the Create button: color tokens ("brand-orange", "primary" …) or CSS colors; `false`: no ring. Default: the four HADİ colors (a theme's brand tokens first). @tr Create düğmesinin halka renkleri: renk token'ları ("brand-orange", "primary" …) ya da CSS renkleri; `false`: halka yok. Varsayılan: dört HADİ rengi (önce temanın marka token'ları). */
   ring?: readonly string[] | false | undefined;
-  /** The colored bubble behind the active tab. Default true; `false`: the active tab is marked by its color only. */
+  /** The colored bubble behind the active tab. Default true; `false`: the active tab is marked by its color only. @tr Etkin sekmenin arkasındaki renkli kabarcık. Varsayılan true; `false`: etkin sekme yalnız rengiyle belli olur. */
   bubble?: MaybeFn<boolean | undefined>;
-  /** Motion (bubble slide, icon pop, button bounce, ring turn, menu fly-out). Default true; `false`: everything changes at once. */
+  /** Motion (bubble slide, icon pop, button bounce, ring turn, menu fly-out). Default true; `false`: everything changes at once. @tr Hareket (kabarcık kayması, ikon zıplaması, düğme sekmesi, halka dönüşü, menü açılışı). Varsayılan true; `false`: her şey anında değişir. */
   motion?: MaybeFn<boolean | undefined>;
-  /** Show labels under the icons. Default true (the label stays the accessible name either way). */
+  /** Show labels under the icons. Default true (the label stays the accessible name either way). @tr İkonların altında etiketleri göster. Varsayılan true (etiket her durumda erişilebilir ad olarak kalır). */
   labels?: MaybeFn<boolean | undefined>;
-  /** floating: a rounded bar with room around it · flat: edge to edge. Default floating. */
+  /** floating: a rounded bar with room around it · flat: edge to edge. Default floating. @tr floating: çevresinde boşluk olan yuvarlak çubuk · flat: kenardan kenara. Varsayılan floating. */
   variant?: MaybeFn<"floating" | "flat" | undefined>;
-  /** brand: each tab's own color · accent: the theme accent for all. Default brand. */
+  /** brand: each tab's own color · accent: the theme accent for all. Default brand. @tr brand: her sekmenin kendi rengi · accent: hepsine temanın vurgu rengi. Varsayılan brand. */
   tint?: MaybeFn<"brand" | "accent" | undefined>;
-  /** Accessible name of the navigation landmark. */
+  /** Accessible name of the navigation landmark. @tr Gezinme bölgesinin erişilebilir adı. */
   label?: MaybeFn<string | undefined>;
+  /** Extra classes on the bar. @tr Çubuğa eklenen sınıflar. */
   class?: ClassProp;
 }
 

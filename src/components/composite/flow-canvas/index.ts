@@ -50,22 +50,23 @@ export * from "./model.ts";
 export { Minimap } from "./minimap.ts";
 
 export interface FlowCanvasProps {
+  /** The flow store the canvas shows and edits (createFlow). @tr Tuvalin gösterdiği ve düzenlediği akış deposu (createFlow). */
   flow: FlowStore;
-  /** Grid step in world units for snapping and the dotted background; 0 turns snapping off. Default 16. */
+  /** Grid step in world units for snapping and the dotted background; 0 turns snapping off. Default 16. @tr Hizalama ve noktalı arka plan için dünya biriminde ızgara adımı; 0 hizalamayı kapatır. Varsayılan 16. */
   snap?: MaybeFn<number | undefined>;
-  /** Show the minimap. Default true. */
+  /** Show the minimap. Default true. @tr Mini haritayı göster. Varsayılan true. */
   minimap?: MaybeFn<boolean | undefined>;
-  /** Drag on the empty canvas: "select" draws a selection box (pan with Space / middle button), "pan" moves the view. Default "select". */
+  /** Drag on the empty canvas: "select" draws a selection box (pan with Space / middle button), "pan" moves the view. Default "select". @tr Boş tuvalde sürükleme: "select" seçim kutusu çizer (Space / orta tuşla kaydır), "pan" görünümü kaydırır. Varsayılan "select". */
   tool?: MaybeFn<"select" | "pan" | undefined>;
-  /** Show the field controls inside nodes. Default true. */
+  /** Show the field controls inside nodes. Default true. @tr Düğümlerin içindeki alan denetimlerini göster. Varsayılan true. */
   fields?: MaybeFn<boolean | undefined>;
-  /** Accessible name. */
+  /** Accessible name. @tr Erişilebilir ad. */
   label?: MaybeFn<string | undefined>;
-  /** The zoom bar: true (default), false, or the parts to keep: "zoom" (− % +), "fit", "layout". */
+  /** The zoom bar: true (default), false, or the parts to keep: "zoom" (− % +), "fit", "layout". @tr Yakınlaştırma çubuğu: true (varsayılan), false ya da tutulacak parçalar: "zoom" (− % +), "fit", "layout". */
   controls?: MaybeFn<boolean | readonly ("zoom" | "fit" | "layout")[] | undefined>;
-  /** The context menu: true (default), false, or a function that gets the built-in items and returns the ones to show. */
+  /** The context menu: true (default), false, or a function that gets the built-in items and returns the ones to show. @tr Bağlam menüsü: true (varsayılan), false ya da yerleşik öğeleri alıp gösterilecekleri döndüren bir işlev. */
   menu?: boolean | ((items: MenuItem[], target: Element) => readonly MenuItem[]) | undefined;
-  /** Draw-in of edges, moving dots, glow / shake / pop of nodes, the view and layout tweens (default true). */
+  /** Draw-in of edges, moving dots, glow / shake / pop of nodes, the view and layout tweens (default true). @tr Kenarların çizilerek gelmesi, kayan noktalar, düğümlerin parlama / sarsılma / zıplaması, görünüm ve düzen geçişleri (varsayılan true). */
   motion?: MaybeFn<boolean | undefined>;
   /**
    * Own texts; each falls back to the built-in one. Names: `editor` and `node` (role descriptions), `menu`, `minimap`,
@@ -73,6 +74,7 @@ export interface FlowCanvasProps {
    * `ungroup`, `delete`, `paste`, `selectAll`, `add(type)`), ports and edges (`input(port)`, `output(port)`,
    * `connection(from, to)`, `values(count)`) and what is announced (`connected`, `cannotConnect`, `choosePort`,
    * `arranged(n)`, `copied(n)`, `pasted(n)`, `deleted(n)`, `selected(n)`).
+   * @tr Kendi metinlerin; her biri verilmezse yerleşik metne döner. Adlar: `editor` ve `node` (rol açıklamaları), `menu`, `minimap`, yakınlaştırma çubuğu (`view`: adı, `zoomIn`, `zoomOut`, `fit`, `layout`), menü öğeleri (`copy`, `cut`, `duplicate`, `group`, `ungroup`, `delete`, `paste`, `selectAll`, `add(type)`), bağlantı noktaları ve kenarlar (`input(port)`, `output(port)`, `connection(from, to)`, `values(count)`) ve duyurulanlar (`connected`, `cannotConnect`, `choosePort`, `arranged(n)`, `copied(n)`, `pasted(n)`, `deleted(n)`, `selected(n)`).
    */
   labels?: {
     editor?: string; node?: string; menu?: string; minimap?: string; view?: string;
@@ -85,6 +87,7 @@ export interface FlowCanvasProps {
     arranged?: ((count: number) => string) | undefined; copied?: ((count: number) => string) | undefined; pasted?: ((count: number) => string) | undefined;
     deleted?: ((count: number) => string) | undefined; selected?: ((count: number) => string) | undefined;
   } | undefined;
+  /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp;
 }
 

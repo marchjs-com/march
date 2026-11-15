@@ -86,36 +86,41 @@ export interface DockApi {
 }
 
 export interface DockLayoutProps {
+  /** The panels to arrange: each with an id, a title and its content. @tr Yerleştirilecek paneller: her birinin id'si, başlığı ve içeriği. */
   panels: MaybeFn<readonly DockPanel[]>;
-  /** Ready-made layouts by name (`row`, `col`, `tabs`); the first (or `preset`) is the default. */
+  /** Ready-made layouts by name (`row`, `col`, `tabs`); the first (or `preset`) is the default. @tr Adıyla hazır düzenler (`row`, `col`, `tabs`); ilki (ya da `preset`) varsayılandır. */
   presets?: Readonly<Record<string, Preset>> | undefined;
+  /** The name of the preset to start with (default: the first of `presets`). @tr Başlangıçta kullanılacak hazır düzenin adı (varsayılan: `presets` içindeki ilki). */
   preset?: string | undefined;
-  /** The default layout without presets (default: the first panel, the others at their `place`). */
+  /** The default layout without presets (default: the first panel, the others at their `place`). @tr Hazır düzen yokken varsayılan düzen (varsayılan: ilk panel, diğerleri kendi `place` yerlerinde). */
   layout?: TreeSpec | undefined;
-  /** Keep the layout and saved layouts under this key. */
+  /** Keep the layout and saved layouts under this key. @tr Düzeni ve kaydedilen düzenleri bu anahtar altında sakla. */
   persist?: string | undefined;
-  /** Where (default localStorage); sync or async. */
+  /** Where (default localStorage); sync or async. @tr Nerede saklanacağı (varsayılan localStorage); eşzamanlı ya da eşzamansız. */
   storage?: DockStorage | undefined;
-  /** Accessible name of the workspace. */
+  /** Accessible name of the workspace. @tr Çalışma alanının erişilebilir adı. */
   label?: MaybeFn<string | undefined>;
-  /** Command id prefix for the palette (default "dock"); false: none. */
+  /** Command id prefix for the palette (default "dock"); false: none. @tr Komut paleti için komut id öneki (varsayılan "dock"); false: komut yok. */
   commands?: string | false | undefined;
+  /** Called once with the layout's API (open, close, focus, load, layoutMenu…). @tr Düzenin API'siyle (open, close, focus, load, layoutMenu…) bir kez çağrılır. */
   api?: ((api: DockApi) => void) | undefined;
+  /** Called with the new layout tree after every change. @tr Her değişiklikten sonra yeni düzen ağacıyla çağrılır. */
   onChange?: ((layout: DockTree) => void) | undefined;
-  /** A closable tab's close mark: remove the panel from `panels` here; return false to keep it. */
+  /** A closable tab's close mark: remove the panel from `panels` here; return false to keep it. @tr Kapatılabilir sekmenin kapatma işareti: paneli burada `panels` içinden çıkar; tutmak için false döndür. */
   onClose?: ((panel: string) => boolean | void | Promise<boolean | void>) | undefined;
-  /** The buttons of a group: true (default), false, or the ones to keep. Keyboard and `api` stay. */
+  /** The buttons of a group: true (default), false, or the ones to keep. Keyboard and `api` stay. @tr Bir grubun düğmeleri: true (varsayılan), false ya da tutulacak olanlar. Klavye ve `api` kalır. */
   actions?: MaybeFn<boolean | readonly DockAction[] | undefined>;
-  /** Below this width (px) the workspace is one tab group, no drag (default 560). */
+  /** Below this width (px) the workspace is one tab group, no drag (default 560). @tr Bu genişliğin (px) altında çalışma alanı tek sekme grubudur, sürükleme yok (varsayılan 560). */
   narrow?: number | undefined;
-  /** The short slide when the layout changes (default true; none with reduced motion). */
+  /** The short slide when the layout changes (default true; none with reduced motion). @tr Düzen değişince kısa kayma (varsayılan true; azaltılmış harekette yok). */
   motion?: MaybeFn<boolean | undefined>;
-  /** Own icons of the group buttons. */
+  /** Own icons of the group buttons. @tr Grup düğmelerinin kendi ikonları. */
   icons?: { menu?: unknown; maximize?: unknown; restore?: unknown; collapse?: unknown } | undefined;
-  /** Own texts; each falls back to the built-in one. */
+  /** Own texts; each falls back to the built-in one. @tr Kendi metinlerin; her biri verilmezse yerleşik metne döner. */
   labels?: { menu?: string; maximize?: string; restore?: string; collapse?: string; panels?: string; strip?: string } | undefined;
-  /** id of the root (an ActivityBar's `controls`). */
+  /** id of the root (an ActivityBar's `controls`). @tr Kökün id'si (bir ActivityBar'ın `controls` değeri). */
   id?: string | undefined;
+  /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp;
 }
 

@@ -25,45 +25,53 @@ export interface FeedLabels {
 }
 
 export interface FeedProps extends Pick<PostCardProps, "onLike" | "onComment" | "onShare" | "onOpenMedia" | "onAuthor" | "menu" | "clamp"> {
+  /** The posts, in order (each drawn by a PostCard). @tr Gönderiler, sırasıyla (her biri bir PostCard ile çizilir). */
   posts: MaybeFn<readonly Post[]>;
-  /** First page is loading: skeleton cards. */
+  /** First page is loading: skeleton cards. @tr İlk sayfa yükleniyor: iskelet kartlar. */
   loading?: MaybeFn<boolean | undefined>;
-  /** More pages exist (infinite scroll). */
+  /** More pages exist (infinite scroll). @tr Daha fazla sayfa var (sonsuz kaydırma). */
   hasMore?: MaybeFn<boolean | undefined>;
-  /** Pull to refresh (and the keyboard Refresh button). */
+  /** Pull to refresh (and the keyboard Refresh button). @tr Çekip yenile (ve klavye için Refresh düğmesi). */
   onRefresh?: (() => unknown) | undefined;
-  /** Next page; skeleton cards show at the end until it settles. */
+  /** Next page; skeleton cards show at the end until it settles. @tr Sonraki sayfa; o bitene dek sonda iskelet kartlar görünür. */
   onLoadMore?: (() => unknown) | undefined;
-  /** New posts waiting above: shows the "N new posts" pill. */
+  /** New posts waiting above: shows the "N new posts" pill. @tr Yukarıda bekleyen yeni gönderiler: "N new posts" hapını gösterir. */
   newCount?: MaybeFn<number | undefined>;
-  /** The pill was pressed (merge the new posts); the feed scrolls to the top. */
+  /** The pill was pressed (merge the new posts); the feed scrolls to the top. @tr Hapa basıldı (yeni gönderileri birleştir); akış en üste kayar. */
   onShowNew?: (() => void) | undefined;
-  /** card: framed posts with space · flat: edge to edge with dividers. Default card. */
+  /** card: framed posts with space · flat: edge to edge with dividers. Default card. @tr card: aralıklı, çerçeveli gönderiler · flat: ayraçlarla kenardan kenara. Varsayılan card. */
   variant?: MaybeFn<"card" | "flat" | undefined>;
-  /** Shown when there are no posts and nothing loads. */
+  /** Shown when there are no posts and nothing loads. @tr Gönderi yokken ve bir şey yüklenmiyorken gösterilir. */
   empty?: unknown;
+  /** Accessible name of the feed (default "Feed"). @tr Akışın erişilebilir adı (varsayılan "Feed"). */
   label?: MaybeFn<string | undefined>;
-  /** Own texts (loading names, empty and end texts, the pill). */
+  /** Own texts (loading names, empty and end texts, the pill). @tr Kendi metinlerin (yükleme adları, boş ve son metinleri, hap). */
   labels?: MaybeFn<FeedLabels | undefined>;
-  /** The end mark: true (default: four dots and a text), false, or your own content. */
+  /** The end mark: true (default: four dots and a text), false, or your own content. @tr Son işareti: true (varsayılan: dört nokta ve bir metin), false ya da kendi içeriğin. */
   end?: unknown;
-  /** The new-posts pill: true (default), false, or `(count) => content`. */
+  /** The new-posts pill: true (default), false, or `(count) => content`. @tr Yeni gönderiler hapı: true (varsayılan), false ya da `(count) => content`. */
   newPill?: boolean | ((count: number) => unknown) | undefined;
-  /** Color of the pill (default: Aktivite blue). */
+  /** Color of the pill (default: Aktivite blue). @tr Hapın rengi (varsayılan: Aktivite mavisi). */
   newColor?: ColorToken | undefined;
-  /** Skeleton posts while the first page loads. Default 3. */
+  /** Skeleton posts while the first page loads. Default 3. @tr İlk sayfa yüklenirken iskelet gönderi sayısı. Varsayılan 3. */
   skeletons?: number | undefined;
-  /** Draw a post yourself instead of the PostCard: `(post) => node` (`post` is an accessor). */
+  /** Draw a post yourself instead of the PostCard: `(post) => node` (`post` is an accessor). @tr PostCard yerine gönderiyi kendin çiz: `(post) => node` (`post` bir erişimci). */
   renderPost?: ((post: () => Post) => unknown) | undefined;
-  /** More PostCard props for every post (labels, icons, avatar, time …). */
+  /** More PostCard props for every post (labels, icons, avatar, time …). @tr Her gönderiye verilecek ek PostCard özellikleri (etiketler, ikonlar, avatar, zaman …). */
   postProps?: Partial<Omit<PostCardProps, "post">> | undefined;
-  /** Motion of the pill. Default true. */
+  /** Motion of the pill. Default true. @tr Hapın hareketi. Varsayılan true. */
   motion?: MaybeFn<boolean | undefined>;
+  /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp;
 }
 
 /** A post-shaped placeholder: avatar, two lines, a photo, an action row. */
-export function PostSkeleton(props: { media?: boolean; variant?: "card" | "flat" | undefined }): Element {
+export function PostSkeleton(props: {
+  /** The photo block (default true). @tr Fotoğraf bloğu (varsayılan true). */
+  media?: boolean;
+  /** card (default) or flat, as the feed's posts. @tr Akıştaki gönderiler gibi card (varsayılan) ya da flat. */
+  variant?: "card" | "flat" | undefined;
+}): Element {
   return h("div", { class: cx("m-feed-skel", `m-post-${props.variant ?? "card"}`), "aria-hidden": "true" },
     h("div", { class: "m-feed-skel-head" }, h(Skeleton, { shape: "circle", class: "m-feed-skel-av" }), h(Skeleton, { lines: 2 })),
     props.media !== false ? h(Skeleton, { block: true, height: "lg", class: "m-feed-skel-media", colors: "brand" }) : null,

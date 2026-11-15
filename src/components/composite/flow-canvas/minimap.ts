@@ -10,10 +10,11 @@ import { NODE_W, boundsOf, type FlowStore, type NodeState } from "./model.ts";
 import { isRtl } from "../../../core/util.ts";
 
 export interface MinimapProps {
+  /** The flow store whose nodes and view the minimap draws. @tr Mini haritanın düğümlerini ve görünümünü çizdiği akış deposu. */
   flow: FlowStore;
-  /** Canvas size in pixels. */
+  /** Canvas size in pixels. @tr Tuvalin piksel cinsinden boyutu. */
   size: () => { w: number; h: number };
-  /** Accessible name (default "Minimap: click to move the view"). */
+  /** Accessible name (default "Minimap: click to move the view"). @tr Erişilebilir ad (varsayılan "Minimap: click to move the view"). */
   label?: (() => string | undefined) | undefined;
 }
 

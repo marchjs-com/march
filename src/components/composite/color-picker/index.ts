@@ -34,28 +34,29 @@ export interface ColorPickerLabels {
 }
 
 export interface ColorPickerProps extends ControlProps<string> {
-  /** Alpha slider and alpha in the value (default true). */
+  /** Alpha slider and alpha in the value (default true). @tr Saydamlık kaydırıcısı ve değerde saydamlık (varsayılan true). */
   alpha?: boolean | undefined;
-  /** Text format of the value (default "hex"); the switcher changes it. */
+  /** Text format of the value (default "hex"); the switcher changes it. @tr Değerin metin biçimi (varsayılan "hex"); biçim seçici bunu değiştirir. */
   format?: C.ColorFormat | undefined;
-  /** Palettes under the picker. Default: HADİ colors, the theme palette and recent picks. */
+  /** Palettes under the picker. Default: HADİ colors, the theme palette and recent picks. @tr Seçicinin altındaki paletler. Varsayılan: HADİ renkleri, tema paleti ve son seçilenler. */
   palettes?: readonly ColorPalette[] | false | undefined;
-  /** Recent picks kept (default 8; 0 hides them). */
+  /** Recent picks kept (default 8; 0 hides them). @tr Tutulan son seçim sayısı (varsayılan 8; 0 gizler). */
   recent?: number | undefined;
-  /** Eyedropper button where the browser has one (default true). */
+  /** Eyedropper button where the browser has one (default true). @tr Tarayıcıda varsa damlalık düğmesi (varsayılan true). */
   eyedropper?: boolean | undefined;
-  /** Contrast against white and black (default true). */
+  /** Contrast against white and black (default true). @tr Beyaza ve siyaha karşı kontrast (varsayılan true). */
   contrast?: boolean | undefined;
-  /** The old / new preview next to the sliders (default true). */
+  /** The old / new preview next to the sliders (default true). @tr Kaydırıcıların yanında eski / yeni önizleme (varsayılan true). */
   preview?: boolean | undefined;
-  /** The HEX / RGB / HSL switcher (default true). */
+  /** The HEX / RGB / HSL switcher (default true). @tr HEX / RGB / HSL seçici (varsayılan true). */
   formats?: boolean | undefined;
-  /** The text field with the value (default true). */
+  /** The text field with the value (default true). @tr Değeri gösteren metin alanı (varsayılan true). */
   input?: boolean | undefined;
-  /** Own eyedropper icon (an icon of hadi-march/icons, text or a node). */
+  /** Own eyedropper icon (an icon of hadi-march/icons, text or a node). @tr Kendi damlalık ikonun (hadi-march/icons ikonu, metin ya da düğüm). */
   eyedropperIcon?: unknown;
-  /** Own texts: names of the sliders, the buttons and the default palettes. */
+  /** Own texts: names of the sliders, the buttons and the default palettes. @tr Kendi metinlerin: kaydırıcıların, düğmelerin ve varsayılan paletlerin adları. */
   labels?: ColorPickerLabels | undefined;
+  /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp;
 }
 

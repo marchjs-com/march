@@ -31,31 +31,33 @@ export type { MarchCatalog, MarchExport, MarchLanguageOptions } from "./march-la
 export type AppPanel = (Omit<DockPanel, "content"> & { content: () => unknown; file?: undefined }) | (Omit<DockPanel, "content"> & { file: AppFile; content?: undefined });
 
 export interface AppUIProps extends Omit<DockLayoutProps, "panels"> {
+  /** The panels: DockPanels, or ones that show a file (drawn by the file type that opens its path). @tr Paneller: DockPanel'ler ya da bir dosya gösterenler (yolunu açan dosya türü çizer). */
   panels: MaybeFn<readonly AppPanel[]>;
-  /** Plugins: file types (code editor…), panels, commands, services. */
+  /** Plugins: file types (code editor…), panels, commands, services. @tr Eklentiler: dosya türleri (kod düzenleyici…), paneller, komutlar, servisler. */
   plugins?: readonly AppPlugin[] | undefined;
-  /** Text at the start of the top bar; empty or null: none. */
+  /** Text at the start of the top bar; empty or null: none. @tr Üst çubuğun başındaki metin; boş ya da null: yok. */
   title?: MaybeFn<string | null | undefined>;
-  /** A short note beside the title, quiet and smaller, written as a code comment ("// …"; the "//" is added). */
+  /** A short note beside the title, quiet and smaller, written as a code comment ("// …"; the "//" is added). @tr Başlığın yanında sessiz ve daha küçük kısa not, kod yorumu gibi yazılır ("// …"; "//" eklenir). */
   description?: MaybeFn<string | null | undefined>;
-  /** What starts the description (default "//"); "" for none. */
+  /** What starts the description (default "//"); "" for none. @tr Açıklamanın başındaki işaret (varsayılan "//"); hiç olmasın diye "". */
   descriptionMark?: string | undefined;
-  /** Your items in the top bar, before the Layout menu. */
+  /** Your items in the top bar, before the Layout menu. @tr Üst çubukta, Layout menüsünden önceki kendi öğelerin. */
   tools?: unknown;
-  /** Beside the workspace, at the start (an ActivityBar). */
+  /** Beside the workspace, at the start (an ActivityBar). @tr Çalışma alanının başında, yanında (bir ActivityBar). */
   side?: unknown;
-  /** Under the workspace (a StatusBar). */
+  /** Under the workspace (a StatusBar). @tr Çalışma alanının altında (bir StatusBar). */
   status?: unknown;
-  /** The top bar (default true); false: only the workspace (open the layout menu yourself: `api.layoutMenu()`). */
+  /** The top bar (default true); false: only the workspace (open the layout menu yourself: `api.layoutMenu()`). @tr Üst çubuk (varsayılan true); false: yalnız çalışma alanı (düzen menüsünü kendin aç: `api.layoutMenu()`). */
   bar?: MaybeFn<boolean | undefined>;
-  /** Name (tooltip) of the Layout menu button, an icon button (default "Layout"); false: no button. */
+  /** Name (tooltip) of the Layout menu button, an icon button (default "Layout"); false: no button. @tr Layout menüsü ikon düğmesinin adı (ipucu) (varsayılan "Layout"); false: düğme yok. */
   layoutLabel?: MaybeFn<string | undefined> | false;
-  /** The Layout menu button at the end of the top bar (default true; live); false hides it (as `layoutLabel={false}`). */
+  /** The Layout menu button at the end of the top bar (default true; live); false hides it (as `layoutLabel={false}`). @tr Üst çubuğun sonundaki Layout menüsü düğmesi (varsayılan true; canlı); false gizler (`layoutLabel={false}` gibi). */
   layoutMenu?: MaybeFn<boolean | undefined>;
-  /** Own icon of the Layout menu button. */
+  /** Own icon of the Layout menu button. @tr Layout menüsü düğmesinin kendi ikonu. */
   layoutIcon?: unknown;
-  /** The plugin kit once it runs (add or remove plugins later). */
+  /** The plugin kit once it runs (add or remove plugins later). @tr Eklenti kiti çalışmaya başlayınca çağrılır (sonradan eklenti ekle ya da kaldır). */
   kit?: ((kit: AppKit) => void) | undefined;
+  /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp;
 }
 

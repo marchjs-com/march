@@ -71,27 +71,29 @@ export interface CommandPaletteLabels {
 }
 
 export interface CommandPaletteProps {
-  /** Optional intent search: resolves ids of commands/pages/actions (or hrefs) with a reason. */
+  /** Optional intent search: resolves ids of commands/pages/actions (or hrefs) with a reason. @tr İsteğe bağlı niyet araması: komut / sayfa / eylem id'lerini (ya da adresleri) bir gerekçeyle döndürür. */
   ask?: (query: string) => Promise<{ results?: readonly AskResult[] | null } | null | undefined>;
-  /** ms before `ask` runs by itself when local results are weak (default 600). */
+  /** ms before `ask` runs by itself when local results are weak (default 600). @tr Yerel sonuçlar zayıfken `ask`'ın kendiliğinden çalışmasından önceki süre, ms (varsayılan 600). */
   askDelay?: number;
+  /** Placeholder of the search field (default: the built-in text). @tr Arama alanının yer tutucusu (varsayılan: yerleşik metin). */
   placeholder?: MaybeFn<string | undefined>;
-  /** Toggle shortcut (default "mod+k"); false = none. */
+  /** Toggle shortcut (default "mod+k"); false = none. @tr Aç / kapa kısayolu (varsayılan "mod+k"); false = yok. */
   shortcut?: string | false;
-  /** Maximum local results (default 50). */
+  /** Maximum local results (default 50). @tr En fazla yerel sonuç sayısı (varsayılan 50). */
   limit?: number;
-  /** Extra commands for this palette only. */
+  /** Extra commands for this palette only. @tr Yalnız bu palete ait ek komutlar. */
   commands?: readonly Command[] | null | undefined;
+  /** Called with the entry that ran. @tr Çalışan girdiyle çağrılır. */
   onRun?: (entry: PaletteEntry) => void;
-  /** Own texts (dialog and field names, empty state, key hint, the Ask row). */
+  /** Own texts (dialog and field names, empty state, key hint, the Ask row). @tr Kendi metinlerin (pencere ve alan adları, boş durum, tuş ipucu, Ask satırı). */
   labels?: MaybeFn<CommandPaletteLabels | undefined>;
-  /** The key hint under the list: true (default), false, or your own content. */
+  /** The key hint under the list: true (default), false, or your own content. @tr Listenin altındaki tuş ipucu: true (varsayılan), false ya da kendi içeriğin. */
   hint?: unknown;
-  /** Own content for "no results" (default: the `labels.empty` text). */
+  /** Own content for "no results" (default: the `labels.empty` text). @tr "Sonuç yok" için kendi içeriğin (varsayılan: `labels.empty` metni). */
   empty?: unknown;
-  /** Icon of the Ask row (default: sparkles); false: none. */
+  /** Icon of the Ask row (default: sparkles); false: none. @tr Ask satırının ikonu (varsayılan: sparkles); false: yok. */
   askIcon?: unknown;
-  /** Extra class on the dialog. */
+  /** Extra class on the dialog. @tr Pencereye eklenen sınıf. */
   class?: ClassProp;
 }
 
@@ -111,12 +113,15 @@ export function CommandPalette(props: CommandPaletteProps): unknown {
 }
 
 export interface PaletteButtonProps {
+  /** The button's text (default "Search…"). @tr Düğmenin metni (varsayılan "Search…"). */
   label?: MaybeFn<string | undefined>;
+  /** The shortcut shown in the hint (default "mod+k"). @tr İpucunda gösterilen kısayol (varsayılan "mod+k"). */
   shortcut?: string;
-  /** The search icon: default, false (none), or your own (an icon of hadi-march/icons, text or a node). */
+  /** The search icon: default, false (none), or your own (an icon of hadi-march/icons, text or a node). @tr Arama ikonu: varsayılan, false (yok) ya da kendi ikonun (hadi-march/icons ikonu, metin ya da düğüm). */
   icon?: unknown;
-  /** The shortcut hint (Ctrl+K / ⌘K) at the end. Default true. */
+  /** The shortcut hint (Ctrl+K / ⌘K) at the end. Default true. @tr Sondaki kısayol ipucu (Ctrl+K / ⌘K). Varsayılan true. */
   kbd?: boolean | undefined;
+  /** Extra classes on the button. @tr Düğmeye eklenen sınıflar. */
   class?: string;
 }
 /** A search-field-looking button that opens the command palette: `<PaletteButton label="Search…" />` (shows Ctrl+K / ⌘K). */

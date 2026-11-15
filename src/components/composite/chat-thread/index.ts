@@ -43,26 +43,31 @@ export interface ChatMessage {
 }
 
 export interface ChatThreadProps {
+  /** The messages, oldest first. @tr Mesajlar, en eskisi önce. */
   messages: MaybeFn<readonly ChatMessage[]>;
-  /** Names typing now. */
+  /** Names typing now. @tr Şu an yazanların adları. */
   typing?: MaybeFn<readonly string[] | undefined>;
-  /** Group chat: sender names (a HADİ color each) and avatars on runs. */
+  /** Group chat: sender names (a HADİ color each) and avatars on runs. @tr Grup sohbeti: gönderen adları (her birine bir HADİ rengi) ve ardışık mesajlarda avatarlar. */
   group?: MaybeFn<boolean | undefined>;
-  /** Toggle your reaction (from a chip or the picker). */
+  /** Toggle your reaction (from a chip or the picker). @tr Tepkini aç / kapa (bir çipten ya da seçiciden). */
   onReact?: ((m: ChatMessage, emoji: string) => void) | undefined;
+  /** Called with a message to answer; shows its Reply action. @tr Yanıtlanacak mesajla çağrılır; verilince mesajın Yanıtla eylemi görünür. */
   onReply?: ((m: ChatMessage) => void) | undefined;
+  /** Called with a failed message to send again; shows its Retry action. @tr Gönderilemeyen mesajı yeniden göndermek için onunla çağrılır; verilince Yeniden dene eylemi görünür. */
   onRetry?: ((m: ChatMessage) => void) | undefined;
-  /** Messages closer than this (minutes) join a run. Default 5. */
+  /** Messages closer than this (minutes) join a run. Default 5. @tr Aralarında bundan (dakika) az süre olan mesajlar bir dizide birleşir. Varsayılan 5. */
   runMinutes?: number | undefined;
+  /** Accessible name of the message log (default "Messages"). @tr Mesaj günlüğünün erişilebilir adı (varsayılan "Messages"). */
   label?: MaybeFn<string | undefined>;
-  /** Day separators: true (default: "Today", "Yesterday", a date), false, or `(date) => content` for your own wording. */
+  /** Day separators: true (default: "Today", "Yesterday", a date), false, or `(date) => content` for your own wording. @tr Gün ayraçları: true (varsayılan: "Today", "Yesterday", tarih), false ya da kendi ifaden için `(date) => content`. */
   days?: boolean | ((date: Date) => unknown) | undefined;
-  /** The "N new" button shown while scrolled up: true (default), false, or `(count) => content`. */
+  /** The "N new" button shown while scrolled up: true (default), false, or `(count) => content`. @tr Yukarı kaydırılmışken görünen "N new" düğmesi: true (varsayılan), false ya da `(count) => content`. */
   jump?: boolean | ((count: number) => unknown) | undefined;
-  /** Color of the "N new" button (default: Aktivite blue). */
+  /** Color of the "N new" button (default: Aktivite blue). @tr "N new" düğmesinin rengi (varsayılan: Aktivite mavisi). */
   jumpColor?: ColorToken | undefined;
-  /** Motion (new messages rise / slide in, smooth scroll to the bottom). Default true. */
+  /** Motion (new messages rise / slide in, smooth scroll to the bottom). Default true. @tr Hareket (yeni mesajlar yükselir / kayar, en alta yumuşak kaydırma). Varsayılan true. */
   motion?: MaybeFn<boolean | undefined>;
+  /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp;
 }
 

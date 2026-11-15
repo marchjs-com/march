@@ -25,26 +25,27 @@ export type AppPreviewToolbar = boolean | { theme?: boolean; accent?: boolean; m
 /** A language of the preview (the language tool lists them): its code ("" for the default texts) and its name. */
 export interface AppPreviewLanguage { value: string; label: string }
 export interface AppPreviewProps {
-  /** The preview's color theme (a signal keeps it; default "": the page's theme, whatever it becomes). */
+  /** The preview's color theme (a signal keeps it; default "": the page's theme, whatever it becomes). @tr Önizlemenin renk teması (bir sinyal tutar; varsayılan "": sayfanın teması, ne olursa olsun). */
   theme?: Signal<string> | undefined;
-  /** Its accent ("primary": the theme's own). */
+  /** Its accent ("primary": the theme's own). @tr Vurgu rengi ("primary": temanın kendi rengi). */
   accent?: Signal<ColorToken> | undefined;
-  /** Light / dark ("system": the page's). */
+  /** Light / dark ("system": the page's). @tr Açık / koyu ("system": sayfanınki). */
   mode?: Signal<ThemeMode> | undefined;
-  /** The preview's language (a code from `languages`; "" the default texts). */
+  /** The preview's language (a code from `languages`; "" the default texts). @tr Önizlemenin dili (`languages` içinden bir kod; "" varsayılan metinler). */
   language?: Signal<string> | undefined;
-  /** The languages the language tool offers. */
+  /** The languages the language tool offers. @tr Dil aracının sunduğu diller. */
   languages?: MaybeFn<readonly AppPreviewLanguage[] | undefined>;
-  /** The toolbar's pickers to show (default none: the bar is hidden while it has nothing to show). */
+  /** The toolbar's pickers to show (default none: the bar is hidden while it has nothing to show). @tr Araç çubuğunda gösterilecek seçiciler (varsayılan hiçbiri: gösterecek bir şey yokken çubuk gizlenir). */
   toolbar?: MaybeFn<AppPreviewToolbar | undefined>;
-  /** Your items at the start of the toolbar. */
+  /** Your items at the start of the toolbar. @tr Araç çubuğunun başındaki kendi öğelerin. */
   tools?: unknown;
-  /** Accessible name of the toolbar (default "Preview tools"). */
+  /** Accessible name of the toolbar (default "Preview tools"). @tr Araç çubuğunun erişilebilir adı (varsayılan "Preview tools"). */
   label?: MaybeFn<string | undefined>;
-  /** What the preview shows, in the middle of the stage. */
+  /** What the preview shows, in the middle of the stage. @tr Önizlemenin sahnenin ortasında gösterdiği içerik. */
   children?: unknown;
-  /** Under the stage (the shown component's code). */
+  /** Under the stage (the shown component's code). @tr Sahnenin altı (gösterilen bileşenin kodu). */
   footer?: unknown;
+  /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp;
 }
 

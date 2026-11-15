@@ -34,31 +34,33 @@ export * from "./runner.ts";
 const stateTone = (s: RunState): "neutral" | "primary" | "warn" | "success" | "danger" => ({ idle: "neutral", running: "primary", paused: "warn", done: "success", error: "danger" } as const)[s];
 
 export interface FlowControlsProps {
+  /** The flow runner the buttons drive (createFlowRunner). @tr Düğmelerin yönettiği akış çalıştırıcısı (createFlowRunner). */
   runner: FlowRunner;
-  /** The flow (for the node counter). */
+  /** The flow (for the node counter). @tr Akış (düğüm sayacı için). */
   flow?: FlowStore;
-  /** Speed choices. Default [0.5, 1, 2, 4]; false hides the speed switch. */
+  /** Speed choices. Default [0.5, 1, 2, 4]; false hides the speed switch. @tr Hız seçenekleri. Varsayılan [0.5, 1, 2, 4]; false hız seçiciyi gizler. */
   speeds?: readonly number[] | false;
-  /** Show FlowTimeline under the buttons. Default false. */
+  /** Show FlowTimeline under the buttons. Default false. @tr Düğmelerin altında FlowTimeline göster. Varsayılan false. */
   timeline?: MaybeFn<boolean | undefined>;
-  /** The Step button (default true). */
+  /** The Step button (default true). @tr Step düğmesi (varsayılan true). */
   step?: MaybeFn<boolean | undefined>;
-  /** The Reset button (default true). */
+  /** The Reset button (default true). @tr Reset düğmesi (varsayılan true). */
   reset?: MaybeFn<boolean | undefined>;
-  /** The state chip: "Ready", "Running" … (default true). */
+  /** The state chip: "Ready", "Running" … (default true). @tr Durum çipi: "Ready", "Running" … (varsayılan true). */
   status?: MaybeFn<boolean | undefined>;
-  /** The clock (default true). */
+  /** The clock (default true). @tr Saat (varsayılan true). */
   clock?: MaybeFn<boolean | undefined>;
-  /** The "n / m nodes" counter (default true; needs `flow`). */
+  /** The "n / m nodes" counter (default true; needs `flow`). @tr "n / m nodes" sayacı (varsayılan true; `flow` gerekir). */
   count?: MaybeFn<boolean | undefined>;
-  /** Own icons for the buttons: an icon, a string or a node each. */
+  /** Own icons for the buttons: an icon, a string or a node each. @tr Düğmeler için kendi ikonların: her biri bir ikon, metin ya da düğüm. */
   icons?: { run?: unknown; pause?: unknown; step?: unknown; reset?: unknown } | undefined;
-  /** Own texts: the toolbar name, the buttons, the speed switch, the five states and the counter. */
+  /** Own texts: the toolbar name, the buttons, the speed switch, the five states and the counter. @tr Kendi metinlerin: araç çubuğunun adı, düğmeler, hız seçici, beş durum ve sayaç. */
   labels?: {
     toolbar?: string; run?: string; pause?: string; resume?: string; step?: string; reset?: string; speed?: string;
     ready?: string; running?: string; paused?: string; finished?: string; failed?: string;
     count?: ((done: number, total: number) => string) | undefined;
   } | undefined;
+  /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp;
 }
 
@@ -102,17 +104,19 @@ export function FlowControls(props: FlowControlsProps): Element {
 }
 
 export interface FlowTimelineProps {
+  /** The flow runner whose run the timeline draws. @tr Zaman çizelgesinin çalıştırmasını çizdiği akış çalıştırıcısı. */
   runner: FlowRunner;
-  /** Clicking a row focuses that node on the canvas. */
+  /** Clicking a row focuses that node on the canvas. @tr Bir satıra tıklamak o düğümü tuvalde odaklar. */
   flow?: FlowStore;
-  /** The time axis with its ticks and playhead (default true). */
+  /** The time axis with its ticks and playhead (default true). @tr Çentikleri ve oynatma imleciyle zaman ekseni (varsayılan true). */
   axis?: MaybeFn<boolean | undefined>;
-  /** What is shown before the first run: true (default text), false (nothing) or your own node. */
+  /** What is shown before the first run: true (default text), false (nothing) or your own node. @tr İlk çalıştırmadan önce gösterilen: true (varsayılan metin), false (hiçbir şey) ya da kendi düğümün. */
   empty?: boolean | Node | undefined;
-  /** Rows fade in and the running bar breathes (default true). */
+  /** Rows fade in and the running bar breathes (default true). @tr Satırlar belirerek gelir ve çalışan çubuk nefes alır (varsayılan true). */
   motion?: boolean | undefined;
-  /** Own texts: the region name, the text before the first run, and what a row says after its node's name. */
+  /** Own texts: the region name, the text before the first run, and what a row says after its node's name. @tr Kendi metinlerin: bölge adı, ilk çalıştırmadan önceki metin ve bir satırın düğüm adından sonra söylediği. */
   labels?: { region?: string; empty?: string; row?: ((start: string, duration: string) => string) | undefined } | undefined;
+  /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp;
 }
 

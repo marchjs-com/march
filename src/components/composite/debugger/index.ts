@@ -82,34 +82,37 @@ const ICONS: Record<DebuggerIcon, IconDef> = {
 };
 
 export interface DebuggerProps {
+  /** The debug session the panel shows and drives (createDebugSession). @tr Panelin gösterdiği ve yönettiği hata ayıklama oturumu (createDebugSession). */
   session: DebugSession;
-  /** Start (idle) or restart (a run is on) a run: the host builds the code with the debugger's calls. No button without it. */
+  /** Start (idle) or restart (a run is on) a run: the host builds the code with the debugger's calls. No button without it. @tr Bir çalıştırmayı başlat (boştayken) ya da yeniden başlat (çalışırken): kodu hata ayıklayıcı çağrılarıyla ana uygulama derler. Verilmezse düğme yok. */
   onStart?: (() => void) | undefined;
-  /** End the run (default: `session.end()`); the host may build the code again without the calls. */
+  /** End the run (default: `session.end()`); the host may build the code again without the calls. @tr Çalıştırmayı bitir (varsayılan: `session.end()`); ana uygulama kodu çağrılar olmadan yeniden derleyebilir. */
   onStop?: (() => void) | undefined;
-  /** A frame, a breakpoint or an output line was pressed: show that file at that line. */
+  /** A frame, a breakpoint or an output line was pressed: show that file at that line. @tr Bir çerçeveye, kesme noktasına ya da çıktı satırına basıldı: o dosyayı o satırda göster. */
   onReveal?: ((file: string, line: number) => void) | undefined;
-  /** The sections, in this order (default: watch, scope, stack, breakpoints, output). */
+  /** The sections, in this order (default: watch, scope, stack, breakpoints, output). @tr Bölümler, bu sırayla (varsayılan: watch, scope, stack, breakpoints, output). */
   sections?: MaybeFn<readonly DebuggerSection[] | undefined>;
   /**
    * How the sections stand: one per row, or two side by side in a row whose divider is dragged (default: watch | scope,
    * breakpoints | stack, then output). A section of `sections` the layout does not name gets a row of its own.
+   * @tr Bölümlerin dizilişi: satır başına bir tane ya da ayracı sürüklenen bir satırda yan yana iki tane (varsayılan: watch | scope, breakpoints | stack, sonra output). Düzende adı geçmeyen bölüm kendi satırını alır.
    */
   layout?: readonly (DebuggerSection | readonly [DebuggerSection, DebuggerSection])[] | undefined;
-  /** Lines of the output shown at once (default 4; it scrolls, the newest line in view). */
+  /** Lines of the output shown at once (default 4; it scrolls, the newest line in view). @tr Çıktının bir anda görünen satır sayısı (varsayılan 4; kayar, en yeni satır görünür kalır). */
   outputLines?: number | undefined;
-  /** The sections open at first (default: all). */
+  /** The sections open at first (default: all). @tr Başta açık olan bölümler (varsayılan: hepsi). */
   open?: readonly DebuggerSection[] | undefined;
-  /** The timeline of the recording, to go back and forth in time (default true). */
+  /** The timeline of the recording, to go back and forth in time (default true). @tr Zamanda ileri geri gitmek için kaydın zaman çizelgesi (varsayılan true). */
   timeline?: MaybeFn<boolean | undefined>;
-  /** The switches: pause on exceptions, stop on entry, breakpoints on (default true). */
+  /** The switches: pause on exceptions, stop on entry, breakpoints on (default true). @tr Anahtarlar: istisnada dur, girişte dur, kesme noktaları açık (varsayılan true). */
   options?: MaybeFn<boolean | undefined>;
-  /** Your icons, by button (false: the button's text only, as its tooltip stays). */
+  /** Your icons, by button (false: the button's text only, as its tooltip stays). @tr Düğmeye göre kendi ikonların (false: yalnız düğmenin metni, ipucu kalır). */
   icons?: Partial<Record<DebuggerIcon, unknown>> | undefined;
-  /** Your texts. */
+  /** Your texts. @tr Kendi metinlerin. */
   labels?: Partial<DebuggerLabels> | undefined;
-  /** How deep a value opens at first (default 0: closed). */
+  /** How deep a value opens at first (default 0: closed). @tr Bir değerin başta ne kadar derin açıldığı (varsayılan 0: kapalı). */
   depth?: number | undefined;
+  /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp;
 }
 

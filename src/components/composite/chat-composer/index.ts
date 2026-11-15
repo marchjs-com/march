@@ -36,35 +36,45 @@ export interface ChatComposerLabels {
 }
 
 export interface ChatComposerProps {
+  /** Called with the message text when it is sent. @tr Mesaj gönderilince metniyle çağrılır. */
   onSend: (text: string) => void;
-  /** Enables the microphone; called with the recording length (ms). */
+  /** Enables the microphone; called with the recording length (ms). @tr Mikrofonu açar; kaydın süresiyle (ms) çağrılır. */
   onVoice?: ((ms: number) => void) | undefined;
-  /** Attach menu items (photo, file, location …). */
+  /** Attach menu items (photo, file, location …). @tr Ekleme menüsünün öğeleri (fotoğraf, dosya, konum …). */
   attachments?: readonly MenuItem[] | undefined;
-  /** Emoji panel button. Default true. */
+  /** Emoji panel button. Default true. @tr Emoji paneli düğmesi. Varsayılan true. */
   emoji?: MaybeFn<boolean | undefined>;
+  /** The message being answered: a reply line above the field; null: none. @tr Yanıtlanan mesaj: alanın üstünde yanıt satırı; null: yok. */
   replyTo?: MaybeFn<{ name: string; text: string } | null | undefined>;
+  /** Called when the reply line is closed; it shows a close mark. @tr Yanıt satırı kapatılınca çağrılır; verilince kapatma işareti görünür. */
   onCancelReply?: (() => void) | undefined;
-  /** Called while typing (throttled to once a second): send "typing…" to the others. */
+  /** Called while typing (throttled to once a second): send "typing…" to the others. @tr Yazarken çağrılır (saniyede en fazla bir kez): diğerlerine "yazıyor…" gönder. */
   onTyping?: (() => void) | undefined;
+  /** Placeholder of the field (default "Message"). @tr Alanın yer tutucusu (varsayılan "Message"). */
   placeholder?: MaybeFn<string | undefined>;
+  /** Not editable, nothing can be sent. @tr Devre dışı: düzenlenemez, bir şey gönderilemez. */
   disabled?: MaybeFn<boolean | undefined>;
-  /** Own texts (names of the field and the buttons, the reply line, the recording status). Defaults: the built-in texts. */
+  /** Own texts (names of the field and the buttons, the reply line, the recording status). Defaults: the built-in texts. @tr Kendi metinlerin (alanın ve düğmelerin adları, yanıt satırı, kayıt durumu). Varsayılan: yerleşik metinler. */
   labels?: MaybeFn<ChatComposerLabels | undefined>;
-  /** Own icons (an icon of hadi-march/icons, an emoji / short text, or a node). Defaults: plus, smile, send arrow, microphone. */
+  /** Own icons (an icon of hadi-march/icons, an emoji / short text, or a node). Defaults: plus, smile, send arrow, microphone. @tr Kendi ikonların (hadi-march/icons ikonu, emoji / kısa metin ya da düğüm). Varsayılan: artı, gülen yüz, gönder oku, mikrofon. */
   attachIcon?: unknown;
+  /** Own icon of the emoji button (default: a smile). @tr Emoji düğmesinin kendi ikonu (varsayılan: gülen yüz). */
   emojiIcon?: unknown;
+  /** Own icon of the send button (default: an arrow). @tr Gönder düğmesinin kendi ikonu (varsayılan: ok). */
   sendIcon?: unknown;
+  /** Own icon of the microphone button (default: a microphone). @tr Mikrofon düğmesinin kendi ikonu (varsayılan: mikrofon). */
   micIcon?: unknown;
-  /** Color of the round button while it sends (default: Aktivite blue) and while it is the microphone (default: Heyecan orange). */
+  /** Color of the round button while it sends (default: Aktivite blue) and while it is the microphone (default: Heyecan orange). @tr Yuvarlak düğmenin gönderirken rengi (varsayılan: Aktivite mavisi) ve mikrofonken rengi (varsayılan: Heyecan turuncusu). */
   sendColor?: ColorToken | undefined;
+  /** Color of the round button while it is the microphone (default: Heyecan orange). @tr Yuvarlak düğme mikrofonken rengi (varsayılan: Heyecan turuncusu). */
   micColor?: ColorToken | undefined;
-  /** The live waveform while recording. Default true. */
+  /** The live waveform while recording. Default true. @tr Kayıt sırasında canlı dalga biçimi. Varsayılan true. */
   wave?: boolean | undefined;
-  /** The pulsing dot while recording. Default true. */
+  /** The pulsing dot while recording. Default true. @tr Kayıt sırasında yanıp sönen nokta. Varsayılan true. */
   recordingDot?: boolean | undefined;
-  /** Motion (button morph, reply slide, waveform, dot pulse). Default true. */
+  /** Motion (button morph, reply slide, waveform, dot pulse). Default true. @tr Hareket (düğme dönüşümü, yanıt kayması, dalga biçimi, nokta atımı). Varsayılan true. */
   motion?: MaybeFn<boolean | undefined>;
+  /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp;
 }
 

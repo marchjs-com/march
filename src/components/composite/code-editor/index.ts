@@ -134,125 +134,136 @@ export type CodeRename = { from: number; to: number; locations: readonly CodeRan
 type Maybe<T> = T | null | undefined | Promise<T | null | undefined>;
 
 export interface CodeEditorProps extends ControlProps<string> {
-  /** Colours: js / ts / jsx / tsx (default "tsx"), css, html, json, sh; "" for none. */
+  /** Colours: js / ts / jsx / tsx (default "tsx"), css, html, json, sh; "" for none. @tr Renklendirme: js / ts / jsx / tsx (varsayılan "tsx"), css, html, json, sh; hiçbiri için "". */
   lang?: string | undefined;
   /** Suggestions for the caret's place: called after typing and on Ctrl + Space; null / no items: no list. A promise
-   * (a language service in a worker) opens the list when it resolves, if the text and the caret did not move. */
+   * (a language service in a worker) opens the list when it resolves, if the text and the caret did not move.
+   * @tr İmlecin yeri için öneriler: yazdıktan sonra ve Ctrl + Space ile çağrılır; null / öğe yok: liste yok. Bir promise (worker'daki dil servisi) çözülünce, metin ve imleç kımıldamadıysa listeyi açar. */
   complete?: ((ctx: CodeCompleteContext) => CodeCompletion | null | undefined | Promise<CodeCompletion | null | undefined>) | undefined;
-  /** The definition of the row picked out in the list (its kind, signature, documentation), shown under the list. */
+  /** The definition of the row picked out in the list (its kind, signature, documentation), shown under the list. @tr Listede seçili satırın tanımı (türü, imzası, belgesi), listenin altında gösterilir. */
   describe?: ((item: CodeSuggestion, ctx: { value: string; at: number }) => CodeDoc | null | undefined | Promise<CodeDoc | null | undefined>) | undefined;
   /**
    * Inside a call's parentheses: its signature over the caret, the parameter being written lit, with its documentation.
    * Asked when "(" or "," is typed and while the caret moves inside the call; ")" or Escape closes it.
+   * @tr Bir çağrının parantezleri içinde: imleç üstünde imzası, yazılan parametre vurgulu ve belgesiyle. "(" ya da "," yazılınca ve imleç çağrı içinde kımıldarken sorulur; ")" ya da Escape kapatır.
    */
   signature?: ((ctx: { value: string; caret: number }) => CodeSignature | null | undefined | Promise<CodeSignature | null | undefined>) | undefined;
-  /** Marked ranges (reactive). */
+  /** Marked ranges (reactive). @tr İşaretli aralıklar (reaktif). */
   marks?: MaybeFn<readonly CodeMark[] | undefined>;
-  /** The foot line: what the owner says about the code (a text or a node; reactive). `false`: no foot bar. */
+  /** The foot line: what the owner says about the code (a text or a node; reactive). `false`: no foot bar. @tr Alt satır: sahibinin kod hakkında söylediği (metin ya da düğüm; reaktif). `false`: alt çubuk yok. */
   message?: MaybeFn<unknown>;
-  /** The dot before the message: "ok" (default) or "error". `false`: no dot. */
+  /** The dot before the message: "ok" (default) or "error". `false`: no dot. @tr Mesajdan önceki nokta: "ok" (varsayılan) ya da "error". `false`: nokta yok. */
   status?: MaybeFn<"ok" | "error" | false | undefined>;
-  /** Your own node at the end of the foot line, before the shortcuts and copy buttons (default none). */
+  /** Your own node at the end of the foot line, before the shortcuts and copy buttons (default none). @tr Alt satırın sonunda, kısayol ve kopyala düğmelerinden önce kendi düğümün (varsayılan yok). */
   hint?: unknown;
   /**
    * The editor's keys, as in an IDE: Tab / Shift+Tab indent and outdent (the lines of a selection too), Enter keeps the
    * indent (one more after `{ ( [`), Ctrl+/ comments lines, Alt+↑ / ↓ move them, Shift+Alt+↑ / ↓ copy them,
    * Ctrl+Shift+K deletes them, Ctrl+Space suggests, Ctrl+S saves (`onSave`), Esc then Tab leaves the editor. `false`:
    * none (Tab moves the focus); `{ comment: false, … }` turns single ones off.
+   * @tr IDE'deki gibi düzenleyici tuşları: Tab / Shift+Tab girinti ekler ve azaltır (seçimin satırlarında da), Enter girintiyi korur (`{ ( [` sonrası bir fazla), Ctrl+/ satırları yorum yapar, Alt+↑ / ↓ taşır, Shift+Alt+↑ / ↓ kopyalar, Ctrl+Shift+K siler, Ctrl+Space önerir, Ctrl+S kaydeder (`onSave`), Esc ardından Tab düzenleyiciden çıkar. `false`: hiçbiri (Tab odağı taşır); `{ comment: false, … }` tek tek kapatır.
    */
   keys?: false | Partial<Record<CodeCommand, boolean>> | undefined;
-  /** Spaces of one indent (default 2). */
+  /** Spaces of one indent (default 2). @tr Bir girintinin boşluk sayısı (varsayılan 2). */
   tabSize?: number | undefined;
-  /** Ctrl+S (⌘S): the owner saves (the browser's own "save page" does not open). */
+  /** Ctrl+S (⌘S): the owner saves (the browser's own "save page" does not open). @tr Ctrl+S (⌘S): sahibi kaydeder (tarayıcının kendi "sayfayı kaydet" penceresi açılmaz). */
   onSave?: ((value: string) => void) | undefined;
-  /** The shortcuts button in the foot line: a menu of every key (default true). */
+  /** The shortcuts button in the foot line: a menu of every key (default true). @tr Alt satırdaki kısayollar düğmesi: her tuşun menüsü (varsayılan true). */
   shortcuts?: boolean | undefined;
-  /** More rows for the shortcuts menu: the app's keys (a debugger's F5…), shown under the editor's. */
+  /** More rows for the shortcuts menu: the app's keys (a debugger's F5…), shown under the editor's. @tr Kısayollar menüsüne ek satırlar: uygulamanın tuşları (hata ayıklayıcının F5'i…), düzenleyicininkilerin altında. */
   moreShortcuts?: MaybeFn<readonly CodeShortcut[] | undefined>;
-  /** Name of the shortcuts button and its menu (default "Keyboard shortcuts", translated). */
+  /** Name of the shortcuts button and its menu (default "Keyboard shortcuts", translated). @tr Kısayollar düğmesinin ve menüsünün adı (varsayılan "Keyboard shortcuts", çevrilir). */
   shortcutsLabel?: MaybeFn<string> | undefined;
-  /** The copy button (default true). */
+  /** The copy button (default true). @tr Kopyala düğmesi (varsayılan true). */
   copy?: boolean | undefined;
-  /** Text of the copy button (default "Copy", translated). */
+  /** Text of the copy button (default "Copy", translated). @tr Kopyala düğmesinin metni (varsayılan "Copy", çevrilir). */
   copyLabel?: MaybeFn<string> | undefined;
-  /** Accessible name of the text field (default "Code", translated). */
+  /** Accessible name of the text field (default "Code", translated). @tr Metin alanının erişilebilir adı (varsayılan "Code", çevrilir). */
   label?: MaybeFn<string | undefined>;
-  /** Accessible name of the suggestion list (default "Suggestions", translated). */
+  /** Accessible name of the suggestion list (default "Suggestions", translated). @tr Öneri listesinin erişilebilir adı (varsayılan "Suggestions", çevrilir). */
   suggestionsLabel?: MaybeFn<string | undefined>;
   /**
    * Chips under the suggestion list that filter the rows by their `source`: `[{ value: "march", label: "March" },
    * { value: "all", label: "All" }]`. None (default): no chips, every row shows.
+   * @tr Öneri listesinin altında satırları `source` değerine göre süzen çipler: `[{ value: "march", label: "March" }, { value: "all", label: "All" }]`. Yoksa (varsayılan): çip yok, her satır görünür.
    */
   sources?: readonly CodeSource[] | undefined;
   /**
    * How suggestions come while typing: "list" (default: the list opens) or "ghost" (the likeliest row is written
    * faintly after the caret, a match of the same case first; Tab takes it). Ctrl + Space opens the list either way.
+   * @tr Yazarken önerilerin gelişi: "list" (varsayılan: liste açılır) ya da "ghost" (en olası satır imleçten sonra soluk yazılır, önce aynı büyüklük harfli eşleşme; Tab alır). Ctrl + Space her iki durumda listeyi açar.
    */
   suggest?: "list" | "ghost" | undefined;
-  /** Characters that open the list even with suggest="ghost" (default "."): `console.` lists its members. */
+  /** Characters that open the list even with suggest="ghost" (default "."): `console.` lists its members. @tr suggest="ghost" iken bile listeyi açan karakterler (varsayılan "."): `console.` üyelerini listeler. */
   listOn?: string | undefined;
-  /** With suggest="ghost": the list opens too once the word is this long (default 3); 0: only with Ctrl+Space or `listOn`. */
+  /** With suggest="ghost": the list opens too once the word is this long (default 3); 0: only with Ctrl+Space or `listOn`. @tr suggest="ghost" iken kelime bu uzunluğa varınca liste de açılır (varsayılan 3); 0: yalnız Ctrl+Space ya da `listOn` ile. */
   listAfter?: number | undefined;
-  /** The chosen chip (default: the first); `onSourceChange` tells the owner (to keep it). */
+  /** The chosen chip (default: the first); `onSourceChange` tells the owner (to keep it). @tr Seçili çip (varsayılan: ilki); `onSourceChange` sahibine bildirir (tutması için). */
   source?: MaybeFn<string | undefined>;
+  /** Called with the chip a person picked. @tr Seçilen çiple çağrılır. */
   onSourceChange?: ((value: string) => void) | undefined;
-  /** Enter writes a new line (default true); false: one line of code, Enter does nothing. */
+  /** Enter writes a new line (default true); false: one line of code, Enter does nothing. @tr Enter yeni satır yazar (varsayılan true); false: tek satır kod, Enter bir şey yapmaz. */
   multiline?: boolean | undefined;
-  /** How a "flash" mark shows: "glow" (default) or "none" / false. */
+  /** How a "flash" mark shows: "glow" (default) or "none" / false. @tr "flash" işaretinin görünüşü: "glow" (varsayılan) ya da "none" / false. */
   flash?: "glow" | "none" | false | undefined;
-  /** Called when focus leaves the editor (the owner may tidy the code). */
+  /** Called when focus leaves the editor (the owner may tidy the code). @tr Odak düzenleyiciden çıkınca çağrılır (sahibi kodu düzenleyebilir). */
   onBlur?: ((e: FocusEvent) => void) | undefined;
-  /** The textarea (to focus it, to read the selection). */
+  /** The textarea (to focus it, to read the selection). @tr textarea öğesi (odaklamak, seçimi okumak için). */
   inputRef?: ((el: HTMLTextAreaElement) => void) | undefined;
-  /** Line numbers in a gutter at the start of each line (wrapped lines keep one number). */
+  /** Line numbers in a gutter at the start of each line (wrapped lines keep one number). @tr Her satırın başında oluktaki satır numaraları (kaydırılan satırlar tek numara tutar). */
   lineNumbers?: MaybeFn<boolean | undefined>;
-  /** Marks in the gutter, by line (breakpoints…); shown with `lineNumbers`. */
+  /** Marks in the gutter, by line (breakpoints…); shown with `lineNumbers`. @tr Oluktaki işaretler, satıra göre (kesme noktaları…); `lineNumbers` ile görünür. */
   lineMarks?: MaybeFn<readonly CodeLineMark[] | undefined>;
-  /** A line lit across the editor (a debugger's paused line): a number or `{ line, kind }`; scrolled into view when it changes. */
+  /** A line lit across the editor (a debugger's paused line): a number or `{ line, kind }`; scrolled into view when it changes. @tr Düzenleyici boyunca vurgulu satır (hata ayıklayıcının durduğu satır): bir sayı ya da `{ line, kind }`; değişince görünüme kaydırılır. */
   activeLine?: MaybeFn<CodeActiveLine | number | null | undefined>;
-  /** A press on the gutter at a line, or F9 at the caret's line (toggle a breakpoint…). */
+  /** A press on the gutter at a line, or F9 at the caret's line (toggle a breakpoint…). @tr Bir satırda oluğa basış ya da imlecin satırında F9 (kesme noktası aç / kapa…). */
   onGutter?: ((line: number, e: MouseEvent | KeyboardEvent) => void) | undefined;
   /**
    * Syntax colours: "ide" (default: an IDE's palette from the theme's category colours — keywords, types, functions,
    * members, strings, numbers each their own, light and dark) or "theme" (the CodeView colours).
+   * @tr Sözdizimi renkleri: "ide" (varsayılan: temanın kategori renklerinden IDE paleti; anahtar sözcükler, türler, işlevler, üyeler, dizgeler, sayılar ayrı renkte, açık ve koyu) ya da "theme" (CodeView renkleri).
    */
   palette?: MaybeFn<"ide" | "theme" | undefined>;
-  /** Brackets coloured by depth (three colours, one with no mate red). Default true. */
+  /** Brackets coloured by depth (three colours, one with no mate red). Default true. @tr Derinliğe göre renkli parantezler (üç renk, eşi olmayan kırmızı). Varsayılan true. */
   bracketColors?: MaybeFn<boolean | undefined>;
-  /** The bracket beside the caret and its mate boxed. Default true. */
+  /** The bracket beside the caret and its mate boxed. Default true. @tr İmlecin yanındaki parantez ve eşi kutu içinde. Varsayılan true. */
   matchBrackets?: MaybeFn<boolean | undefined>;
-  /** A thin line at each step of a line's indent. Default true. */
+  /** A thin line at each step of a line's indent. Default true. @tr Satır girintisinin her adımında ince çizgi. Varsayılan true. */
   guides?: MaybeFn<boolean | undefined>;
-  /** The caret's line lit (while the editor has the focus). Default true. */
+  /** The caret's line lit (while the editor has the focus). Default true. @tr İmlecin satırı vurgulu (düzenleyici odaktayken). Varsayılan true. */
   currentLine?: MaybeFn<boolean | undefined>;
-  /** The other places of the selected text, or of the word at the caret, lit. Default true. */
+  /** The other places of the selected text, or of the word at the caret, lit. Default true. @tr Seçili metnin ya da imleçteki kelimenin diğer yerleri vurgulu. Varsayılan true. */
   occurrences?: MaybeFn<boolean | undefined>;
   /**
    * Brackets and quotes close themselves: `(` writes `()` with the caret between, a selection is wrapped, typing the
    * closer steps over it, Backspace between an empty pair removes both, `>` after `<div` writes `</div>`. Default true.
+   * @tr Parantezler ve tırnaklar kendini kapatır: `(` imleç arada `()` yazar, seçim sarılır, kapatanı yazmak üstünden geçer, boş çift arasında Backspace ikisini de siler, `<div` sonrası `>` `</div>` yazar. Varsayılan true.
    */
   autoClose?: MaybeFn<boolean | undefined>;
-  /** Pasted lines move to the indent of the line they land on (their inner indent kept). Default true. */
+  /** Pasted lines move to the indent of the line they land on (their inner indent kept). Default true. @tr Yapıştırılan satırlar düştükleri satırın girintisine taşınır (iç girintileri korunur). Varsayılan true. */
   pasteIndent?: MaybeFn<boolean | undefined>;
-  /** Text size in px; Ctrl + = / Ctrl + - / Ctrl + 0 change it (`onFontSizeChange` keeps it). Default: the theme's small text. */
+  /** Text size in px; Ctrl + = / Ctrl + - / Ctrl + 0 change it (`onFontSizeChange` keeps it). Default: the theme's small text. @tr px cinsinden yazı boyutu; Ctrl + = / Ctrl + - / Ctrl + 0 değiştirir (`onFontSizeChange` tutar). Varsayılan: temanın küçük metni. */
   fontSize?: MaybeFn<number | undefined>;
+  /** Called with the new text size (px; undefined after Ctrl + 0). @tr Yeni yazı boyutuyla çağrılır (px; Ctrl + 0 sonrası undefined). */
   onFontSizeChange?: ((px: number | undefined) => void) | undefined;
-  /** Line height (default 1.7). */
+  /** Line height (default 1.7). @tr Satır yüksekliği (varsayılan 1.7). */
   lineHeight?: MaybeFn<number | undefined>;
-  /** F12 or Ctrl + click: where the name at a place is defined in this text (the range is selected and scrolled to). */
+  /** F12 or Ctrl + click: where the name at a place is defined in this text (the range is selected and scrolled to). @tr F12 ya da Ctrl + tıklama: bir yerdeki adın bu metinde tanımlandığı yer (aralık seçilir ve oraya kaydırılır). */
   definition?: ((ctx: { value: string; at: number }) => Maybe<CodeRange>) | undefined;
-  /** F2: the name at the caret and every place it is written; a small field asks the new name. */
+  /** F2: the name at the caret and every place it is written; a small field asks the new name. @tr F2: imleçteki ad ve yazıldığı her yer; küçük bir alan yeni adı sorar. */
   rename?: ((ctx: { value: string; at: number }) => Maybe<CodeRename>) | undefined;
-  /** Shift + Alt + F: the edits that format the text (one undo step). */
+  /** Shift + Alt + F: the edits that format the text (one undo step). @tr Shift + Alt + F: metni biçimlendiren düzenlemeler (tek geri alma adımı). */
   format?: ((value: string) => Maybe<readonly CodeEdit[]>) | undefined;
   /**
    * The undo history (Ctrl+Z, Ctrl+Y / Ctrl+Shift+Z): `limit` steps (default 500; a typed word is one step). With a
    * `key` it is kept in the browser session (sessionStorage) for that key, so it survives the editor being drawn again
    * and a reload while the text is the same. `false`: the browser's own undo.
+   * @tr Geri alma geçmişi (Ctrl+Z, Ctrl+Y / Ctrl+Shift+Z): `limit` adım (varsayılan 500; yazılan bir kelime bir adım). `key` ile o anahtar için tarayıcı oturumunda (sessionStorage) tutulur; metin aynıyken düzenleyici yeniden çizilse ve sayfa yenilense de kalır. `false`: tarayıcının kendi geri alması.
    */
   history?: false | { key?: string | undefined; limit?: number | undefined } | undefined;
-  /** The pointer rests on a word: what it is (its type, signature, documentation), shown over it. */
+  /** The pointer rests on a word: what it is (its type, signature, documentation), shown over it. @tr Fare işaretçisi bir kelimenin üstünde durunca: ne olduğu (türü, imzası, belgesi), üstünde gösterilir. */
   hover?: ((ctx: { value: string; at: number }) => Maybe<CodeDoc>) | undefined;
+  /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp;
 }
 

@@ -9,28 +9,29 @@ import { type ColorToken } from "../../../theme/colors.ts";
 import { PanelHeader, type PanelHeaderProps } from "../../layout/panel-header/index.ts";
 
 export interface EditorFrameProps {
-  /** Content of the head bar: a toolbar, a search box (a node or an accessor). */
+  /** Content of the head bar: a toolbar, a search box (a node or an accessor). @tr Üst çubuğun içeriği: araç çubuğu, arama kutusu (düğüm ya da erişimci). */
   head?: unknown;
-  /** End side of the head bar: view tabs, status, undo / redo. */
+  /** End side of the head bar: view tabs, status, undo / redo. @tr Üst çubuğun bitiş tarafı: görünüm sekmeleri, durum, geri al / yinele. */
   actions?: MaybeFn<unknown>;
-  /** The head bar: shown when `head` or `actions` is given (default); `false` (or an accessor) hides it. */
+  /** The head bar: shown when `head` or `actions` is given (default); `false` (or an accessor) hides it. @tr Üst çubuk: `head` ya da `actions` verilince görünür (varsayılan); `false` (ya da erişimci) gizler. */
   showHead?: MaybeFn<boolean | undefined>;
-  /** Other props of the head bar (PanelHeader): `sticky`, `class`, `tone`, `divider`, `size`, `aria-*`. */
+  /** Other props of the head bar (PanelHeader): `sticky`, `class`, `tone`, `divider`, `size`, `aria-*`. @tr Üst çubuğun (PanelHeader) diğer özellikleri: `sticky`, `class`, `tone`, `divider`, `size`, `aria-*`. */
   headProps?: Partial<PanelHeaderProps> | undefined;
-  /** Content of the foot bar: counts, hints (a node or an accessor). */
+  /** Content of the foot bar: counts, hints (a node or an accessor). @tr Alt çubuğun içeriği: sayımlar, ipuçları (düğüm ya da erişimci). */
   foot?: unknown;
-  /** The foot bar: shown when `foot` is given (default); `false` (or an accessor) hides it. */
+  /** The foot bar: shown when `foot` is given (default); `false` (or an accessor) hides it. @tr Alt çubuk: `foot` verilince görünür (varsayılan); `false` (ya da erişimci) gizler. */
   showFoot?: MaybeFn<boolean | undefined>;
-  /** Other props of the foot bar (PanelHeader): `divider`, `class`, `actions`, `aria-live`. */
+  /** Other props of the foot bar (PanelHeader): `divider`, `class`, `actions`, `aria-live`. @tr Alt çubuğun (PanelHeader) diğer özellikleri: `divider`, `class`, `actions`, `aria-live`. */
   footProps?: Partial<PanelHeaderProps> | undefined;
-  /** Dims the frame. */
+  /** Dims the frame. @tr Çerçeveyi soluklaştırır. */
   disabled?: MaybeFn<boolean | undefined>;
-  /** Marks the frame `is-readonly` (the editor styles what that means). */
+  /** Marks the frame `is-readonly` (the editor styles what that means). @tr Çerçeveyi `is-readonly` olarak işaretler (bunun anlamını düzenleyici biçimlendirir). */
   readonly?: MaybeFn<boolean | undefined>;
-  /** The focus ring around the frame while something inside has focus (default true). */
+  /** The focus ring around the frame while something inside has focus (default true). @tr İçeride bir şey odaktayken çerçevenin çevresindeki odak halkası (varsayılan true). */
   ring?: MaybeFn<boolean | undefined>;
+  /** Extra classes on the frame. @tr Çerçeveye eklenen sınıflar. */
   class?: ClassProp;
-  /** The editing area (and anything after it: panels, pop-ups). */
+  /** The editing area (and anything after it: panels, pop-ups). @tr Düzenleme alanı (ve ondan sonraki her şey: paneller, açılır öğeler). */
   children?: unknown;
   /** Other attributes go to the frame: `style`, `data-*`, `id`, `ref`, listeners. */
   [attr: string]: unknown;
