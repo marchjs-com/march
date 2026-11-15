@@ -171,6 +171,11 @@ export function collect(root = ROOT) {
       out.push(rec);
     }
   }
+  // the common props (`m:color`, `m:tip`…): the members of src/props' CommonProps interface, with their texts
+  const propsSf = program.getSourceFile(join(root, "src/props/index.ts").split("\\").join("/")) ?? program.getSourceFiles().find((f) => /src[\\/]props[\\/]index\.ts$/.test(f.fileName));
+  const cp = propsSf?.statements.find((s) => ts.isInterfaceDeclaration(s) && s.name.text === "CommonProps");
+  out.common = cp ? checker.getTypeAtLocation(cp).getProperties().map((m) => ({ name: m.getName(), doc: docText(m.getDocumentationComment(checker)),
+    tr: docText(m.getJsDocTags(checker).find((t) => t.name === "tr")?.text) })) : [];
   return out;
 }
 
@@ -231,7 +236,9 @@ export function generate(root = ROOT) {
   const icons = packageApis(root).reduce((s, a) => s + a.items.filter((i) => i.kind === "icon").length, 0);
   for (const lang of ["en", "tr"]) {
     files[`${OUT}/index.${lang}.json`] = JSON.stringify({ icons, subpaths: [...bySub].map(([subpath, docs]) => ({ subpath, slug: slugOf(subpath),
-      items: docs.map((d) => [d.name, d.kind, clip((lang === "tr" && d.tr) || firstSentence(d.doc)), d.status, fileOf.get(`${d.subpath}#${d.name}`)]) })) });
+      items: docs.map((d) => [d.name, d.kind, clip((lang === "tr" && d.tr) || firstSentence(d.doc)), d.status, fileOf.get(`${d.subpath}#${d.name}`)]) })),
+      // the common props' texts in this language: [name, text] (the playground's Properties)
+      common: recs.common.map((c) => [c.name, (lang === "tr" && c.tr) || c.doc]) });
   }
   const missingMd = recs.filter((r) => !existsSync(join(root, mdPath(r.subpath, r.name)))).map((r) => `${r.subpath} › ${r.name}`);
   const undocMembers = recs.flatMap((r) => (r.members ?? []).filter((m) => !m.summary).map((m) => `${r.subpath} › ${r.name}.${m.name}`));
@@ -239,7 +246,8 @@ export function generate(root = ROOT) {
   // every component prop declared in March's sources: an English JSDoc and its `@tr` Turkish (the playground's
   // Properties and the API page show them), one row per declaration
   const undocProps = [...new Map(recs.flatMap((r) => (r.props ?? []).filter((p) => p.src.startsWith("src/") && (!p.doc || !p.tr))
-    .map((p) => [`${p.src} ${p.name}`, `${p.src} ${r.name}.${p.name}${p.doc ? "" : " (English)"}${p.tr ? "" : " (@tr)"}`]))).values()];
+    .map((p) => [`${p.src} ${p.name}`, `${p.src} ${r.name}.${p.name}${p.doc ? "" : " (English)"}${p.tr ? "" : " (@tr)"}`]))).values(),
+    ...(recs.common.length ? recs.common.filter((c) => !c.doc || !c.tr).map((c) => `src/props/index.ts CommonProps.${c.name}`) : ["src/props/index.ts: the CommonProps interface is missing"])];
   return { files, recs, missingMd: missingMd.filter((m) => !MD_PENDING.has(m.split(" › ")[0])), mdDone, undocMembers, undocProps };
 }
 

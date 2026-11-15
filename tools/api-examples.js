@@ -284,6 +284,8 @@ export function signature({ file, local }) {
     let depth = 0, out = "";
     for (; i < src.length && out.length < 800; i++) {
       const c = src[i];
+      // a comment inside the head (a prop's JSDoc in an inline props type) is not part of the signature
+      if (c === "/" && src[i + 1] === "*") { const end = src.indexOf("*/", i + 2); if (end > 0) { i = end + 1; continue; } }
       if (depth === 0 && stop(c, i)) break;
       if ("(<[{".includes(c)) depth++;
       else if (")]}".includes(c) || (c === ">" && src[i - 1] !== "=")) depth = Math.max(0, depth - 1);

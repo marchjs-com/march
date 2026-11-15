@@ -15,6 +15,33 @@ const KEYS = new Set<string>();
 let installed = false;
 
 /**
+ * The built-in common props, each with its text (English, `@tr` Turkish): tools/api-docs.js writes them to the API
+ * index, the playground shows them under each `m:` property. A type only: it costs nothing at run time.
+ */
+export interface CommonProps {
+  /** The colour token of the element and everything in it (`data-m-color`; the components read `--m-accent`). @tr Öğenin ve içindeki her şeyin renk belirteci (`data-m-color`; bileşenler `--m-accent`'i okur). */
+  "m:color"?: string | (() => string | null | undefined) | null;
+  /** The writing direction of the subtree: `ltr`, `rtl` or `auto`. @tr Alt ağacın yazı yönü: `ltr`, `rtl` ya da `auto`. */
+  "m:dir"?: "ltr" | "rtl" | "auto" | (() => "ltr" | "rtl" | "auto" | null | undefined) | null;
+  /** The language of the subtree (`lang`, e.g. `ar`): reading, hyphenation and fonts follow it. @tr Alt ağacın dili (`lang`, ör. `ar`): okuma, heceleme ve yazı tipleri buna uyar. */
+  "m:lang"?: string | (() => string | null | undefined) | null;
+  /** true: nothing in the subtree can be selected (text in inputs and editors stays selectable); false: selection is back inside a blocked one. @tr true: alt ağaçta hiçbir şey seçilemez (girdi ve düzenleyicilerdeki metin seçilebilir kalır); false: engellenmiş bir alanın içinde seçimi geri açar. */
+  "m:no-select"?: boolean | (() => boolean | null | undefined) | null;
+  /** Fades and rises in once when it comes into view: true, a delay in ms, or `{ delay, duration, frames }`. Already in place with reduced motion. @tr Görüş alanına girince bir kez belirip yükselir: true, ms cinsinden gecikme ya da `{ delay, duration, frames }`. Azaltılmış harekette baştan yerindedir. */
+  "m:reveal"?: boolean | number | Record<string, unknown> | null;
+  /** A stable handle for tests (`data-testid`). @tr Testler için kalıcı bir tutamak (`data-testid`). */
+  "m:test"?: string | (() => string | null | undefined) | null;
+  /** The subtree drawn in another colour theme (its stylesheet is loaded on first use). @tr Alt ağaç başka bir renk temasında çizilir (temanın stil dosyası ilk kullanımda yüklenir). */
+  "m:theme"?: string | (() => string | null | undefined) | null;
+  /** A hint on hover and on keyboard focus (Tooltip's bubble, loaded on first use), with no wrapper element. @tr Üzerine gelince ve klavyeyle odaklanınca görünen ipucu (Tooltip balonu, ilk kullanımda yüklenir); sarmalayıcı öğe eklemez. */
+  "m:tip"?: string | (() => string | null | undefined) | false | null;
+  /** What the user may not use is not there (false: hidden); `{ allow, else: "disable" }` shows it disabled instead. @tr Kullanıcının kullanamayacağı şey görünmez (false: gizli); `{ allow, else: "disable" }` onu devre dışı gösterir. */
+  "m:can"?: boolean | { allow?: unknown; else?: "hide" | "disable" } | null;
+  /** Props for the components drawn inside, by component name: `{ Avatar: { size: "lg" } }`. @tr İçinde çizilen bileşenlere, bileşen adına göre prop'lar: `{ Avatar: { size: "lg" } }`. */
+  "m:parts"?: Record<string, Record<string, unknown>> | (() => Record<string, Record<string, unknown>> | null | undefined);
+}
+
+/**
  * Add a common prop: `registerMProp("tone", (el, v) => …)` makes `m:tone` work on every element and component.
  * Register before the first render that uses it. A built-in member of the extension pipeline (extend()): the
  * compiler applies `m:` props itself, so it only runs for `h(Comp, { "m:tone": … })` written by hand.

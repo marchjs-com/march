@@ -548,8 +548,6 @@ export function Router(props: {
   loading?: Renderable;
   /** Shown when a page is not here 100 ms after a click (a route's own `skeleton` wins). @tr Tıklamadan 100 ms sonra sayfa hâlâ gelmemişse gösterilir (rotanın kendi `skeleton`'ı önceliklidir). */
   skeleton?: Renderable;
-  /** Not used by Router; kept so older code still type-checks. @tr Router kullanmaz; eski kod tür denetiminden geçsin diye duruyor. */
-  fallback?: unknown;
   /** The page shown when no route matches. @tr Hiçbir rota eşleşmeyince gösterilen sayfa. */
   notFound?: Renderable;
   /** The page shown when a route's access check fails. @tr Rotanın erişim denetimi geçmeyince gösterilen sayfa. */
