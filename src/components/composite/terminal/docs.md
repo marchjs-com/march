@@ -49,6 +49,7 @@ defineTerminalCommands({ ping: (_a, io) => io.print(ansi.green("pong")) })   // 
 | `label` | Accessible name of the output log. |
 | `blink` | The cursor blinks (default `true`); `false` keeps it lit. |
 | `builtins` | The built-in `help`, `clear`, `history` (default `true`); `false` leaves only your commands. A command of yours with the same name replaces one of them. |
+| `fallback` | `(line, io) => unknown`: a line that names no command runs here instead of "command not found" (a REPL: evaluate it as code). Async, Ctrl+C aborts it, its error is printed. |
 | `labels` | Own texts: `{ command, historySearch, notFound(name) }` (the input's accessible name, the Ctrl+R prompt, the "command not found" line). |
 | `class` | On the root (`m-term`); parts: `m-term-out`, `-row`, `-echo`, `-line`, `-prompt`, `-input`, `-caret`, `-table`, `-bar`, `-spin`, `-link`. |
 

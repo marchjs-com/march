@@ -105,6 +105,9 @@ export interface TerminalProps {
   blink?: boolean;
   /** The built-in `help`, `clear` and `history` commands (default true); false leaves only yours (same names in `commands` replace them one by one). */
   builtins?: boolean;
+  /** A line that names no command runs here instead of the "command not found" line (a REPL: evaluate it as code).
+   *  Like a command: async, aborted by Ctrl+C (io.signal), its error printed. */
+  fallback?: ((line: string, io: TerminalIO) => unknown) | undefined;
   /** Own texts: the input's accessible name, the Ctrl+R prompt and the "command not found" line. */
   labels?: { command?: string; historySearch?: string; notFound?: (name: string) => string } | undefined;
   class?: ClassProp;
@@ -246,16 +249,22 @@ export function Terminal(props: TerminalProps): Element {
     at = hist.length;
     const words = tokenizeCommand(lineText);
     const found = resolve(words);
+    if (!found && props.fallback) { const fb = props.fallback; await runIt((io) => fb(lineText, io)); return; }
     if (!found) { print(props.labels?.notFound?.(words[0] ?? "") ?? (props.builtins === false && !all().has("help") ? t`command not found: ${words[0]}` : t`command not found: ${words[0]} (try help)`), { tone: "error" }); return; }
     const { spec, path, rest } = found;
     if (!spec.run) { print(`${usageOf(path.join(" "), spec.args, spec.options)}`, { tone: "muted" }); if (spec.sub) print(`  ${Object.keys(spec.sub).join("  ")}`); return; }
     let parsed: Parsed;
     try { parsed = parseArgs(rest, spec.args, spec.options); } catch (e) { print(`${path.join(" ")}: ${(e as Error).message}`, { tone: "error" }); print(usageOf(path.join(" "), spec.args, spec.options), { tone: "muted" }); return; }
-    ctl = new AbortController();
+    const run = spec.run;
+    await runIt((io) => run(parsed, io));
+  };
+  /** Run a handler: busy while it runs, Ctrl+C aborts it, its error is printed. */
+  const runIt = async (fn: (io: TerminalIO) => unknown): Promise<void> => {
+    const c = (ctl = new AbortController());
     busy.set(true);
-    try { await spec.run(parsed, ioFor(ctl.signal)); }
-    catch (e) { if (!ctl.signal.aborted) print((e as Error)?.message ?? String(e), { tone: "error" }); }
-    finally { if (ctl.signal.aborted) print("^C", { tone: "muted" }); ctl = null; busy.set(false); scrollDown(); }
+    try { await fn(ioFor(c.signal)); }
+    catch (e) { if (!c.signal.aborted) print((e as Error)?.message ?? String(e), { tone: "error" }); }
+    finally { if (c.signal.aborted) print("^C", { tone: "muted" }); ctl = null; busy.set(false); scrollDown(); }
   };
 
   const complete = (): void => {

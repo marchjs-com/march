@@ -131,3 +131,16 @@ test("TerminalWindow: the terminal's props stay live through the window (prompt,
   assert.ok(term.classList.contains("m-term-cursor-underline"));
   dispose();
 });
+
+test("fallback: a line that names no command runs there (a REPL); commands still win; its error is printed", async () => {
+  const seen = [];
+  const m = mount({ commands: { hi: (_a, io) => io.print("hello") }, fallback: async (line, io) => { seen.push(line); if (line === "boom") throw new Error("patladı"); io.print(`= ${line.length}`); } });
+  await m.api.exec("1 + 2");
+  await m.api.exec("hi");
+  await m.api.exec("boom");
+  assert.deepEqual(seen, ["1 + 2", "boom"]);
+  const r = rows(m.host);
+  assert.ok(r.includes("= 5") && r.includes("hello") && r.some((x) => /patladı/.test(x)));
+  assert.ok(!r.some((x) => /command not found/.test(x)));
+  m.dispose();
+});
