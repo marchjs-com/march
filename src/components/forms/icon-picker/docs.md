@@ -10,7 +10,7 @@ let $icon = "plus"
 <IconPicker inline groups={false} value={$icon} onChange={(n) => $icon = n} />
 ```
 
-**More icon sets.** `packs` adds sets (Lucide, Tabler, Phosphor…) to a list above the grid. A set is loaded only when it
+**More icon sets.** `packs` adds sets (Lucide, Tabler, Phosphor…) as chips above the grid; several can be on at once (their icons together), the last one stays on. A set is loaded only when it
 is first chosen (or when the value names it), once for the page; a value from it is `"id:name"` (`"lucide:arrow-left"`).
 The grid draws `pageSize` icons (240) and the next page as it is scrolled to its end, so thousands of icons stay quick.
 
@@ -49,5 +49,5 @@ chosen one; the number of icons shown is announced (polite) while searching.
 
 ## Composed of
 
-Dropdown (the button and its panel), Select (the icon set), SearchBox (the search), Chip (the filters), IconButton
+Dropdown (the button and its panel), Chip (the icon sets and the filters; both combine), SearchBox (the search), Chip (the filters), IconButton
 (every icon), Spinner (a set loading), Empty (no match).

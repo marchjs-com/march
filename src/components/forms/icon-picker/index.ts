@@ -1,9 +1,10 @@
 // IconPicker (hadi-march/ui): choose an icon. A button shows the chosen icon and its name; it opens a panel with a search
 // (by name, Turkish or English words), filter chips (arrows, files, media, messages, people, layout, filled) and a grid
-// of every icon. Composed of Dropdown, SearchBox, Chip, IconButton, Select, Spinner and Empty. The value is the icon's
-// export name ("plus"); `icons` takes another set (default: every built-in icon). `packs` adds icon sets (Lucide,
-// Tabler…) chosen above the grid: a set loads when it is first chosen (its `load`), and a value from it is "id:name"
-// ("lucide:arrow-left"). The grid draws its icons a page at a time, the next page as it is scrolled to the end.
+// of every icon. Composed of Dropdown, SearchBox, Chip, IconButton, Spinner and Empty. The value is the icon's export
+// name ("plus"); `icons` takes another set (default: every built-in icon). `packs` adds icon sets (Lucide, Tabler…) as
+// chips above the grid, several at once: a set loads when it is first chosen (its `load`), and a value from it is
+// "id:name" ("lucide:arrow-left"). The filter chips combine too (arrows or files). The grid draws its icons a page at a
+// time, the next page as it is scrolled to the end.
 import "./icon-picker.css";
 import { signal, computed, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
@@ -16,7 +17,6 @@ import { SearchBox } from "../search-box/index.ts";
 import { Chip } from "../../actions/chip/index.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { Empty } from "../../feedback/empty/index.ts";
-import { Select } from "../select/index.ts";
 import { Spinner } from "../../feedback/spinner/index.ts";
 import tr from "./tr.ts";
 
@@ -103,31 +103,44 @@ export function IconPicker(props: IconPickerProps): unknown {
     if (p) ensure(p);
     return loaded()[id]?.[n];
   };
-  // the set shown ("" is `icons`): the value's own at first
+  // the sets shown ("" is `icons`; several at once): the value's own at first
   const first = split(value() ?? "")[0];
-  const setId = signal(packs.some((p) => p.id === first) ? first : "");
-  const set = (): Readonly<Record<string, IconDef>> | null => {
-    const p = packs.find((x) => x.id === setId());
+  const setIds = signal<string[]>([packs.some((p) => p.id === first) ? first : ""]);
+  /** A set's icons, or null while it loads (choosing a pack loads it). */
+  const iconsOf = (id: string): Readonly<Record<string, IconDef>> | null => {
+    const p = packs.find((x) => x.id === id);
     if (!p) return base;
     ensure(p);
     return loaded()[p.id] ?? null;
   };
-  const q = signal(""), group = signal<string | null>(null), limit = signal(step);
+  /** Every chosen set is there (none is still loading). */
+  const ready = (): boolean => setIds().every((id) => iconsOf(id) !== null);
+  const q = signal(""), chosenGroups = signal<string[]>([]), limit = signal(step);
   const groups = props.groups === false ? [] : props.groups ?? ICON_GROUPS;
-  const shown = computed(() => {
-    const icons = set();
-    if (!icons) return [];
-    const needle = q().trim().toLowerCase();
-    const g = groups.find((x) => x.id === group());
-    return Object.keys(icons).filter((n) => {
-      const d = icons[n] as IconDef;
-      if (g && !(typeof g.match === "function" ? g.match(n, d) : g.match.test(n))) return false;
-      return !needle || words(n).includes(needle) || n.toLowerCase().includes(needle) || (d.name ?? "").includes(needle) || t(words(n)).toLowerCase().includes(needle);
-    });
+  /** The icons that fit: of every chosen set (in the chips' order), in any chosen filter, holding the search. */
+  const shown = computed((): { v: string; n: string; d: IconDef }[] => {
+    const needle = q().trim().toLowerCase(), gs = groups.filter((x) => chosenGroups().includes(x.id)), out: { v: string; n: string; d: IconDef }[] = [];
+    for (const id of setIds()) {
+      const icons = iconsOf(id);
+      if (!icons) continue;
+      for (const n of Object.keys(icons)) {
+        const d = icons[n] as IconDef;
+        if (gs.length && !gs.some((g) => (typeof g.match === "function" ? g.match(n, d) : g.match.test(n)))) continue;
+        if (needle && !(words(n).includes(needle) || n.toLowerCase().includes(needle) || (d.name ?? "").includes(needle) || t(words(n)).toLowerCase().includes(needle))) continue;
+        out.push({ v: id ? `${id}:${n}` : n, n, d });
+      }
+    }
+    return out;
   });
   // a new search, filter or set starts at the first page again
   const restart = (): void => limit.set(step);
-  const valueOf = (n: string): string => (setId.peek() ? `${setId.peek()}:${n}` : n);
+  /** Add or take out a chip's value (a set: at least one stays). */
+  const toggle = (list: typeof setIds, v: string, keepOne: boolean): void => {
+    const now = list.peek(), on = now.includes(v);
+    if (on && keepOne && now.length === 1) return;
+    list.set(on ? now.filter((x) => x !== v) : [...now, v]);
+    restart();
+  };
   const name = (): string => { const v = value(); return v ? words(split(v)[1]) : t`No icon`; };
   const trigger = [() => { const v = value(), d = v ? defOf(v) : undefined; return d ? icon(d, "m-icon m-ipk-cur") : h("span", { class: "m-ipk-none", "aria-hidden": "true" }); }, h("span", { class: "m-ipk-name" }, name)];
   // the next page when the grid is scrolled near its end
@@ -135,28 +148,25 @@ export function IconPicker(props: IconPickerProps): unknown {
     const el = e.currentTarget as HTMLElement;
     if (limit.peek() < shown().length && el.scrollTop + el.clientHeight >= el.scrollHeight - 48) limit.set(limit.peek() + step);
   };
-  const setOptions = (): { value: string; label: string }[] => [
+  const sets = (): { value: string; label: string }[] => [
     { value: "", label: `${val(props.setLabel) ?? "March"} (${Object.keys(base).length})` },
     ...packs.map((p) => ({ value: p.id, label: p.count ? `${val(p.label)} (${p.count})` : val(p.label) })),
   ];
   const grid = (close: (refocus?: boolean) => void): unknown => {
-    const icons = set();
-    if (!icons) return h("div", { class: "m-ipk-loading" }, h(Spinner, { size: "sm", label: () => t`Loading icons` }));
+    if (!shown().length && !ready()) return h("div", { class: "m-ipk-loading" }, h(Spinner, { size: "sm", label: () => t`Loading icons` }));
     if (!shown().length) return h(Empty, { size: "sm", title: () => t`No icon matches` });
     return h("div", { class: "m-ipk-grid", role: "listbox", "aria-label": () => val(props.label) ?? t`Icon`, onScroll: more },
       props.none === false ? null : h(IconButton, { class: "m-ipk-item m-ipk-off", label: () => t`No icon`, pressed: () => value() === null, onClick: () => { pick(null); close(true); } }, h("span", { class: "m-ipk-none", "aria-hidden": "true" })),
-      () => shown().slice(0, limit()).map((n) => {
-        const v = valueOf(n);
-        return h(IconButton, { class: "m-ipk-item", icon: icons[n], label: words(n), pressed: () => value() === v, onClick: () => { pick(v); close(true); } });
-      }));
+      () => shown().slice(0, limit()).map(({ v, n, d }) => h(IconButton, { class: "m-ipk-item", icon: d, label: words(n), pressed: () => value() === v, onClick: () => { pick(v); close(true); } })));
   };
   const panel = (close: (refocus?: boolean) => void, cls?: unknown): Element => h("div", { class: cx("m-ipk", cls as string), role: "group", "aria-label": () => val(props.label) ?? t`Icon` },
-      packs.length ? h(Select, { class: "m-ipk-set", size: "sm", placeholder: false, "aria-label": () => t`Icon set`, value: setId, options: setOptions, onChange: () => restart() }) : null,
+      packs.length ? h("div", { class: "m-ipk-sets", role: "group", "aria-label": () => t`Icon set` },
+        sets().map((x) => h(Chip, { size: "sm", selected: () => setIds().includes(x.value), onClick: () => toggle(setIds, x.value, true) }, x.label))) : null,
       h(SearchBox, { value: q, size: "sm", placeholder: () => val(props.placeholder) ?? t`Search icons`, label: () => t`Search icons`, debounce: 0, onSearch: restart }),
       groups.length ? h("div", { class: "m-ipk-groups", role: "group", "aria-label": () => t`Filter` },
-        groups.map((g) => h(Chip, { size: "sm", selected: () => group() === g.id, onClick: () => { group.set(group.peek() === g.id ? null : g.id); restart(); } }, () => val(g.label)))) : null,
-      () => { set(); shown(); return grid(close); },
-      h("p", { class: "m-ipk-count", "aria-live": "polite" }, () => (set() ? t`${shown().length} icons` : t`Loading icons`))) as Element;
+        groups.map((g) => h(Chip, { size: "sm", selected: () => chosenGroups().includes(g.id), onClick: () => toggle(chosenGroups, g.id, false) }, () => val(g.label)))) : null,
+      () => { shown(); ready(); return grid(close); },
+      h("p", { class: "m-ipk-count", "aria-live": "polite" }, () => (ready() ? t`${shown().length} icons` : t`Loading icons`))) as Element;
   if (props.inline) return panel(() => undefined, cx("m-ipk-inline", val(props.class)));
   return h(Dropdown, {
     trigger, variant: "secondary", size: props.size ?? "sm", label: () => `${val(props.label) ?? t`Icon`}: ${name()}`, placement: "bottom-start",

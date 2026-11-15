@@ -45,12 +45,14 @@ test("IconPicker packs: a set loads when chosen, its value is id:name; the grid 
   const items = () => [...el.querySelectorAll(".m-ipk-item")];
   assert.equal(items().length, 1, "the base set first");
   assert.equal(loads, 0, "nothing loads before the set is chosen");
-  const select = el.querySelector(".m-ipk-set select") ?? el.querySelector("select");
-  select.value = "1";
-  select.dispatchEvent(new Event("change", { bubbles: true }));
+  const chip = (text) => [...el.querySelectorAll(".m-ipk-sets button")].find((b) => b.textContent.includes(text));
+  chip("Dots").click();
   await tick(); await tick();
   assert.equal(loads, 1);
-  assert.equal(items().length, 10, "first page");
+  assert.equal(items().length, 10, "first page: plus (March) and nine dots: both sets at once");
+  chip("March").click();
+  await tick();
+  assert.equal(items().length, 10, "March off: the dots alone (the first page)");
   const grid = el.querySelector(".m-ipk-grid");
   Object.defineProperty(grid, "scrollHeight", { value: 100, configurable: true });
   Object.defineProperty(grid, "clientHeight", { value: 100, configurable: true });
@@ -61,5 +63,21 @@ test("IconPicker packs: a set loads when chosen, its value is id:name; the grid 
   items()[3].click();
   assert.equal(value(), "dots:dot-3");
   assert.match(el.querySelector(".m-ipk-count").textContent, /30/);
+  dispose();
+});
+
+test("IconPicker: filter chips combine (arrows or filled); the last set chip stays on", async () => {
+  const icons = { plus: { name: "plus", d: [] }, arrowLeft: { name: "arrow-left", d: [] }, heart: { name: "heart", d: [], fill: true } };
+  const { el, dispose } = mount(() => h(IconPicker, { inline: true, none: false, icons, packs: [{ id: "x", label: "X", load: async () => ({}) }] }));
+  const items = () => [...el.querySelectorAll(".m-ipk-item")].map((b) => b.getAttribute("aria-label"));
+  const groupChip = (i) => [...el.querySelectorAll(".m-ipk-groups button")][i];
+  groupChip(0).click(); await tick();
+  assert.deepEqual(items(), ["arrow left"]);
+  groupChip(6).click(); await tick();
+  assert.deepEqual(items(), ["arrow left", "heart"], "arrows or filled");
+  const march = [...el.querySelectorAll(".m-ipk-sets button")][0];
+  march.click(); await tick();
+  assert.equal(march.getAttribute("aria-pressed") ?? march.className.includes("is-selected") + "", march.getAttribute("aria-pressed") ?? "true", "the only set stays chosen");
+  assert.deepEqual(items(), ["arrow left", "heart"]);
   dispose();
 });

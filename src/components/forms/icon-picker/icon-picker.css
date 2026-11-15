@@ -5,7 +5,8 @@
 .m-ipk-none { display: inline-block; inline-size: 1rem; block-size: 1rem; border: 1.5px dashed var(--m-border); border-radius: var(--m-radius-1); flex: none; }
 .m-ipk-panel { inline-size: min(22rem, calc(100vw - 16px)); }
 .m-ipk { display: grid; gap: var(--m-space-2); padding: var(--m-space-2); }
-.m-ipk-groups { display: flex; flex-wrap: wrap; gap: var(--m-space-1); }
+.m-ipk-groups, .m-ipk-sets { display: flex; flex-wrap: wrap; gap: var(--m-space-1); }
+.m-ipk-sets { padding-block-end: var(--m-space-1); border-block-end: var(--m-border-w, 1px) solid var(--m-border); }
 .m-ipk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(2.25rem, 1fr)); gap: 2px; max-block-size: 15rem; overflow: hidden auto; }
 .m-icon-btn.m-ipk-item { inline-size: 100%; aspect-ratio: 1; }
 .m-ipk-loading { display: grid; place-items: center; min-block-size: 6rem; }
