@@ -117,3 +117,51 @@ test("CodeEditor: every part can be turned off or replaced", () => {
   assert.ok(c.querySelector("textarea").hasAttribute("disabled"));
   dispose();
 });
+
+test("CodeEditor: source chips filter the rows; a row's head line is written at the top once", async () => {
+  const code = signal("x");
+  const picked = [];
+  const complete = (c) => ({ from: c.caret - 1, items: [{ label: "Button", source: "march", head: 'import { Button } from "hadi-march/ui"' }, { label: "BigInt", source: "js" }] });
+  const sources = [{ value: "march", label: "March" }, { value: "js", label: "JS" }, { value: "all", label: "All" }];
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, complete, sources, onSourceChange: (v) => picked.push(v) }));
+  const input = caretOf(el.querySelector("textarea"));
+  type(input, "B", 1, "B");
+  await tick();
+  const list = () => document.querySelector(".m-ced-list");
+  const labels = () => [...list().querySelectorAll("[role=option]")].map((o) => o.textContent);
+  assert.ok(labels().join().includes("Button") && !labels().join().includes("BigInt"), "the first chip: March rows only");
+  const chip = (t) => [...list().querySelectorAll(".m-ced-sources .m-chip2")].find((c) => c.textContent === t).querySelector("button");
+  chip("JS").click();
+  await tick();
+  assert.deepEqual(picked, ["js"]);
+  assert.ok(labels().join().includes("BigInt") && !labels().join().includes("Button"));
+  chip("March").click();
+  await tick();
+  key(input, "Tab");
+  assert.equal(code(), 'import { Button } from "hadi-march/ui"\nButton', "the import is written at the top");
+  dispose();
+});
+
+test("CodeEditor: suggest=\"ghost\" writes the likeliest row faintly (same case first); Tab takes it; Ctrl + Space opens the list", async () => {
+  const code = signal("");
+  const complete = (c) => { const w = /\w*$/.exec(c.before)[0]; return { from: c.caret - w.length, items: [{ label: "button" }, { label: "Button", head: "import { Button } from \"x\"" }] }; };
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, complete, suggest: "ghost" }));
+  const input = caretOf(el.querySelector("textarea"));
+  type(input, "Bu", 2, "u");
+  await tick();
+  assert.equal(document.querySelector(".m-ced-list"), null, "no list while typing");
+  assert.equal(el.querySelector(".m-ced-ghost")?.textContent, "tton", "the row of the same case");
+  assert.ok(key(input, "Tab").defaultPrevented);
+  assert.equal(code(), "import { Button } from \"x\"\nButton", "Tab writes the row and its head line");
+  assert.equal(el.querySelector(".m-ced-ghost"), null);
+  type(input, "bu", 2, "u");
+  await tick();
+  assert.equal(el.querySelector(".m-ced-ghost")?.textContent, "tton");
+  key(input, "Escape");
+  await tick();
+  assert.equal(el.querySelector(".m-ced-ghost"), null, "Escape drops the ghost");
+  key(input, " ", { ctrlKey: true, code: "Space" });
+  await tick();
+  assert.ok(document.querySelector(".m-ced-list"), "Ctrl + Space opens the list");
+  dispose();
+});

@@ -17,12 +17,12 @@ export { Tabs, Tab } from "./tabs.ts";
 export type { TabsProps, TabProps, TabSpec, TabDescriptor } from "./tabs.ts";
 export {
   Card, Badge, countLabel, Empty, Spinner, ErrorBox, Skeleton, Alert, Notice, Kbd, Avatar, initials, CodeView, JsonView, KeyValue, Timeline,
-  Stack, Grid, Toolbar, Divider, Loader, bootLoader,
+  Stack, Grid, Toolbar, Divider, Joined, Loader, bootLoader,
 } from "./display.ts";
 export type {
   Tone, ActionsProp, CardProps, BadgeProps, EmptyProps, SpinnerProps, ErrorBoxProps, SkeletonProps, AlertProps, KbdProps, AvatarProps,
   CodeViewProps, JsonViewProps, KeyValueProps, KeyValueItem, TimelineProps, TimelineItem, Align, StackProps, GridProps, ToolbarProps,
-  DividerProps, LoaderProps,
+  DividerProps, JoinedProps, JoinedRadius, LoaderProps,
 } from "./display.ts";
 export { Page, Section, ListDetail, Pager, SearchBox, AppShell } from "./layout.ts";
 export type { PageProps, Breadcrumb, SectionProps, ListDetailProps, PagerProps, SearchBoxProps, AppShellProps } from "./layout.ts";

@@ -72,13 +72,17 @@ export function marchLanguagePlugin(o: MarchLanguageOptions): AppPlugin {
     }
     // <Bu|  in JSX: the components
     if (/<[\w$]*$/.test(before) && /^[A-Z]/.test(w || "A")) {
-      return done(caret, w, all.filter((x) => x.kind === "component" && fits(x.name, w)).map((x) => row(x.name, x.sub)));
+      const has = (n: string): boolean => new RegExp(`import\s+(?:type\s+)?\{[^}]*\b${n}\b[^}]*\}`).test(value);
+      return done(caret, w, all.filter((x) => x.kind === "component" && fits(x.name, w)).map((x) => (has(x.name) ? row(x.name, x.sub) : { ...row(x.name, `${x.sub} · + import`), head: `import { ${x.name} } from "${x.sub}"` })));
     }
-    // elsewhere: the March names this file imports
+    // elsewhere: the March names this file imports, then every other export (picking one writes its import at the top)
     if (w.length >= 1 || ctx.forced) {
       const imported = new Set<string>();
       for (const m of value.matchAll(/import\s+(?:type\s+)?\{([^}]*)\}\s*from\s*["']hadi-march[^"']*["']/g)) for (const n of (m[1] ?? "").split(",")) { const id = n.trim().replace(/^type\s+/, "").split(/\s+as\s+/).pop(); if (id) imported.add(id); }
-      return done(caret, w, all.filter((x) => imported.has(x.name) && fits(x.name, w)).map((x) => row(x.name, `${x.kind} · ${x.sub}`)));
+      const mine = all.filter((x) => imported.has(x.name) && fits(x.name, w)).map((x) => row(x.name, `${x.kind} · ${x.sub}`));
+      const more = w.length < 2 && !ctx.forced ? [] : all.filter((x) => !imported.has(x.name) && fits(x.name, w))
+        .map((x) => ({ ...row(x.name, `${x.kind} · ${x.sub} · + import`), head: `import { ${x.name} } from "${x.sub}"` }));
+      return done(caret, w, [...mine, ...more]);
     }
     return null;
   }

@@ -1,0 +1,15 @@
+/* March — Joined. Imported by its component module (only what you use is bundled); tokens.css provides the variables. */
+.m-joined { display: flex; flex-direction: column; min-inline-size: 0; overflow: hidden; border: var(--m-border-w, 1px) solid var(--m-border);
+  border-radius: var(--m-joined-r, var(--m-radius)); background: var(--m-surface); }
+.m-joined-h { flex-direction: row; }
+.m-joined-bare { border-color: transparent; }
+.m-joined-r0 { --m-joined-r: var(--m-radius-0); }
+.m-joined-r1 { --m-joined-r: var(--m-radius-1); }
+.m-joined-r2 { --m-joined-r: var(--m-radius-2); }
+.m-joined-r3 { --m-joined-r: var(--m-radius-3); }
+.m-joined-r4 { --m-joined-r: var(--m-radius-4); }
+.m-joined-rf { --m-joined-r: var(--m-radius-full); }
+/* the parts lose their own frame (whatever component they are): the whole draws one for all of them */
+.m-joined > * { min-inline-size: 0; margin: 0 !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+.m-joined-lines:not(.m-joined-h) > * + * { border-block-start: var(--m-border-w, 1px) solid var(--m-border) !important; }
+.m-joined-lines.m-joined-h > * + * { border-inline-start: var(--m-border-w, 1px) solid var(--m-border) !important; }

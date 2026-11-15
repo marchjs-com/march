@@ -19,4 +19,9 @@
 .m-ced-msg.is-error { color: var(--m-warn-text); }
 .m-ced-msg-text { min-inline-size: 0; }
 .m-ced-hint { display: inline-flex; align-items: center; gap: var(--m-space-1); white-space: nowrap; }
+/* suggest="ghost": the rest of the likeliest row after the caret, faint; it takes no room (the text after it stays put) */
+.m-ced-ghost-at { position: relative; display: inline-block; inline-size: 0; }
+.m-ced-ghost { position: absolute; inset-inline-start: 0; inset-block-start: 0; white-space: pre; color: var(--m-muted); opacity: .75; pointer-events: none; }
+.m-ced-sources { display: flex; flex-wrap: wrap; align-items: center; gap: var(--m-space-1); padding: var(--m-space-1) var(--m-space-2); border-block-start: var(--m-border-w, 1px) solid var(--m-border); font-family: var(--m-font); }
+.m-ced-none { color: var(--m-muted); font-size: var(--m-text-xs); }
 .m-ced-list { min-inline-size: 14rem; max-inline-size: min(26rem, 90vw); font-family: var(--m-font-mono); }

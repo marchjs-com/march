@@ -90,3 +90,18 @@ test("treeKey: the keys Tree and TreeView share (mirrored in right-to-left)", as
   assert.equal(treeKey(" ", { kids: false, open: false }), "select");
   assert.equal(treeKey("x", { kids: true, open: true }), null);
 });
+
+test("Tree: toggle=\"chevron\" opens only from the arrow", () => {
+  const picked = [];
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(Tree, { nodes: [{ id: "a", label: "A", children: [{ id: "b", label: "B" }] }], toggle: "chevron", onSelect: (n) => picked.push(n.id) }), el);
+  const li = el.querySelector(".m-tree-li");
+  const row = li.querySelector(".m-tree-row");
+  row.click();
+  assert.equal(li.getAttribute("aria-expanded"), "false", "a row click only selects");
+  assert.deepEqual(picked, ["a"]);
+  row.querySelector("[data-chev]").dispatchEvent(new (globalThis.MouseEvent ?? globalThis.Event)("click", { bubbles: true }));
+  assert.equal(li.getAttribute("aria-expanded"), "true");
+  assert.deepEqual(picked, ["a"], "the arrow does not select");
+  dispose();
+});

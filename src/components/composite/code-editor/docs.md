@@ -40,6 +40,8 @@ typed and on Ctrl + Space (names already written are left out); the values of a 
 | `copyLabel` | string / accessor | "Copy" | its text |
 | `label` | string / accessor | "Code" | accessible name of the field |
 | `suggestionsLabel` | string / accessor | "Suggestions" | accessible name of the list |
+| `suggest` | `list` `ghost` | `list` | while typing: the list opens, or the likeliest row (same case first) is written faintly after the caret and Tab takes it; Ctrl + Space opens the list either way |
+| `sources` / `source` / `onSourceChange` | `{ value, label }[]` / string / `(v) => void` | — / the first | chips under the list that filter the rows by their `source` (`"all"`: every row); the owner keeps the choice |
 | `multiline` | boolean | `true` | `false`: Enter does not write a new line |
 | `readonly`, `disabled` | boolean | `false` | |
 | `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
@@ -47,9 +49,10 @@ typed and on Ctrl + Space (names already written are left out); the values of a 
 | `inputRef` | `(textarea) => void` | — | the text field |
 | `id`, `name`, `class` | | | |
 
-A suggestion: `{ label, hint?, insert?, back?, again? }`: `insert` replaces the word being written (default: the
+A suggestion: `{ label, hint?, insert?, back?, again?, source?, head? }`: `insert` replaces the word being written (default: the
 label), `back` moves the caret back into what was inserted (`variant=""` → inside the quotes), `again` asks for
-suggestions right after the pick (the values of the prop just written).
+suggestions right after the pick (the values of the prop just written), `source` is what the `sources` chips filter
+by, `head` a line written at the top of the text with the pick when it is not there yet (the row's import).
 
 ## Accessibility
 

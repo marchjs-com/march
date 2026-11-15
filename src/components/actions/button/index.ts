@@ -12,9 +12,13 @@ import { type ColorToken } from "../../../theme/colors.ts";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "dark" | "link";
 export type ButtonSize = "sm" | "md" | "lg";
+export type ButtonWeight = "light" | "regular" | "medium" | "strong";
 const SIZES: Record<string, string | undefined> = { sm: "m-btn-sm", lg: "m-btn-lg" };
 /** Size class of a button, shared by IconButton and the Menu / Dropdown trigger: `sm` / `lg` → their class (none for `md`). */
 export const buttonSizeClass = (s: ButtonSize | null | undefined): string | undefined => (s ? SIZES[s] : undefined);
+
+/** The font weight of a button's label (`medium`, the default, sets none): set on its style, so it costs no CSS. */
+const WEIGHTS: Record<string, string> = { light: "var(--m-weight-light)", regular: "var(--m-weight-regular)", strong: "var(--m-weight-bold)" };
 
 /** `aria-pressed` value of a `pressed` prop (shared with IconButton): null when the prop is not set, so a plain button carries no state. */
 export const pressedAttr = (p: MaybeFn<boolean | null | undefined>): "true" | "false" | null => { const v = val(p); return v == null ? null : v ? "true" : "false"; };
@@ -46,6 +50,8 @@ export interface ButtonProps {
   pressed?: MaybeFn<boolean | null | undefined>;
   /** `pill`: fully rounded ends. */
   shape?: MaybeFn<"pill" | undefined>;
+  /** The label's font weight in the theme's font: light, regular, medium (default) or strong. */
+  weight?: MaybeFn<ButtonWeight | undefined>;
   /** Renders a link: the router's Link inside the app, a plain `<a>` for an external address. */
   href?: MaybeFn<ButtonHref>;
   disabled?: MaybeFn<boolean | null | undefined>;
@@ -58,7 +64,7 @@ export interface ButtonProps {
 /**
  * `<Button variant="primary" size="sm" loading={$saving} icon="+" href="/x" block>Save</Button>`
  * variant: primary | secondary (default) | ghost | danger | dark (ink fill: the text color, e.g. HADİ navy) | link (text that reads as a link, flows inline).
- * size: sm | md | lg. `href` renders a router Link. `pressed` makes it a toggle (aria-pressed); `shape="pill"` rounds the ends.
+ * size: sm | md | lg (the icons follow it). weight: light | regular | medium | strong. `href` renders a router Link. `pressed` makes it a toggle (aria-pressed); `shape="pill"` rounds the ends.
  */
 export function Button(props: ButtonProps): unknown {
   const loading = (): boolean => !!val(props.loading);
@@ -70,7 +76,8 @@ export function Button(props: ButtonProps): unknown {
     props.children != null && h("span", { class: "m-btn-label" }, props.children),
     props.iconEnd != null && icon(props.iconEnd),
   ];
-  const attrs = { ...rest(props, ["variant", "size", "loading", "spinner", "icon", "iconEnd", "block", "pressed", "shape", "href", "disabled", "type"]) };
+  const attrs: Record<string, unknown> = { ...rest(props, ["variant", "size", "loading", "spinner", "icon", "iconEnd", "block", "pressed", "shape", "weight", "href", "disabled", "type"]) };
+  if (props.weight != null) attrs["style"] = () => ({ ...(val(props["style"] as MaybeFn<Record<string, unknown> | undefined>) ?? {}), "font-weight": WEIGHTS[val(props.weight) ?? ""] ?? null });
   if (props.href != null) return buttonLink({ ...attrs, class: cls }, props.href as MaybeFn<ButtonHref>, body);
   return h("button", {
     "aria-pressed": () => pressedAttr(props.pressed), // the caller's own aria-pressed (in attrs) wins

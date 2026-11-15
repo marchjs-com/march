@@ -455,6 +455,7 @@
   "Skeleton": "Yüklenirken yer tutucu: `<Skeleton lines={3} />`, `<Skeleton block height=\"lg\" />`.",
   "Slider": "Geçerli değeri gösteren aralık kaydırıcısı. Prop'lar: min, max, step, format(v).",
   "sorter": "Paletle paylaşılan sıralama yardımcısı: \"alpha\" (varsayılan, etkin dilin Intl.Collator'ı), \"none\" ya da bir karşılaştırma işlevi.",
+  "Joined": "Parçaları tek bir bütün gibi çizer: içine konan her şey kendi çerçevesini, köşesini, boşluğunu ve gölgesini bırakır; bütünün tek çerçevesi ve köşesi, aralarda çizgi; dikey ya da yatay.",
   "Spacer": "Satırda esnek boşluk (sonraki öğeleri sona iter).",
   "Spinner": "`<Spinner size=\"sm\" label=\"Loading users\" />` — döner yükleme göstergesi.",
   "Splitter": "Yeniden boyutlandırılabilir iki bölme (tutamacı sürükleyin ya da üzerinde ok tuşları / Home / End; Enter sıfırlar).",

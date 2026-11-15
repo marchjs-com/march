@@ -157,18 +157,22 @@ export function themeModes(): Element {
  * swatch; "cards": a grid of preview cards, each a small page drawn by the theme (ThemePreview) over its name. `own`:
  * the list shows and changes another value (a preview's theme) instead of the page's.
  */
-export function themeList(view: "list" | "cards" = "list", own?: { value: () => string; onPick: (id: string) => void; mode?: (() => "light" | "dark" | null) | undefined }): Element {
+export function themeList(view: "list" | "cards" = "list", own?: { value: () => string; onPick: (id: string) => void; mode?: (() => "light" | "dark" | null) | undefined; page?: boolean | undefined }): Element {
   const cards = view === "cards";
+  // own.page: a first entry "Page theme" (the value ""): the preview follows the page's theme, whatever it becomes
   // `own`: the choice is someone else's (a preview's theme): the page's theme is not touched
   return h(OptionList<string>, {
     class: cx("m-theme-list", cards && "m-theme-cards"), label: () => t`Theme`, value: () => (own ? own.value() : themeName()), onPick: (id: string) => { if (own) own.onPick(id); else setColorTheme(id); },
     // theme names and descriptions are English in code; the locale pack translates them
-    options: () => infos().map((x) => ({ value: x.id, label: () => t(x.name), hint: x.description ? () => t(x.description ?? "") : undefined, icon: cards ? undefined : h(ThemeSwatch, { id: x.id, mode: own?.mode }) })),
+    options: () => [
+      ...(own?.page ? [{ value: "", label: () => t`Page theme`, hint: () => t(infos().find((x) => x.id === themeName())?.name ?? themeName()), icon: cards ? undefined : h(ThemeSwatch, { id: themeName(), mode: own.mode }) }] : []),
+      ...infos().map((x) => ({ value: x.id, label: () => t(x.name), hint: x.description ? () => t(x.description ?? "") : undefined, icon: cards ? undefined : h(ThemeSwatch, { id: x.id, mode: own?.mode }) })),
+    ],
     ...(cards ? {
       columns: 3, check: false,
       renderOption: (it: { value: string; label: unknown; hint?: unknown }) => h("span", { class: "m-theme-card" },
         // a name or description that does not fit scrolls while the card is hovered or focused (OverflowText)
-        h(ThemePreview, { id: it.value, mode: own?.mode }), h(OverflowText, { class: "m-theme-card-name", trigger: ["hover", "focus"], mode: "loop" }, it.label),
+        h(ThemePreview, { id: it.value || themeName(), mode: own?.mode }), h(OverflowText, { class: "m-theme-card-name", trigger: ["hover", "focus"], mode: "loop" }, it.label),
         it.hint ? h(OverflowText, { class: "m-theme-card-desc", trigger: ["hover", "focus"], mode: "loop" }, it.hint) : null),
     } : {}),
   }) as Element;

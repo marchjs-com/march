@@ -20,13 +20,14 @@ import { EditorFrame } from "../editor-frame/index.ts";
 import { OptionList } from "../../forms/option-list/index.ts";
 import { CopyButton } from "../../actions/copy-button/index.ts";
 import { Kbd } from "../../typography/kbd/index.ts";
+import { Chip } from "../../actions/chip/index.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { withColor } from "../../../theme/colors.ts";
 
 export { jsxCompleter, type JsxProp } from "./jsx.ts";
 
-messages("tr", { "Code": "Kod", "Suggestions": "Öneriler", "suggestions": "öneriler", "Copy": "Kopyala" });
+messages("tr", { "Code": "Kod", "Suggestions": "Öneriler", "suggestions": "öneriler", "Copy": "Kopyala", "Suggestion source": "Önerilerin kaynağı", "No suggestions here": "Bu kaynakta öneri yok" });
 
 /** One row of the suggestion list. */
 export interface CodeSuggestion {
@@ -40,7 +41,13 @@ export interface CodeSuggestion {
   back?: number;
   /** Ask for suggestions again right after the insert (the values of the prop just written). */
   again?: boolean;
+  /** Where the row comes from ("march", "ts", "js"…): the `sources` chips under the list filter by it. */
+  source?: string;
+  /** A line written at the top of the text with the pick, when the text does not have it yet (the row's import). */
+  head?: string;
 }
+/** A chip under the suggestion list: rows whose `source` is `value` ("all": every row). */
+export interface CodeSource { value: string; label: string }
 /** What `complete` returns: the rows and the range of the text they replace. */
 export interface CodeCompletion { from: number; to?: number; items: readonly CodeSuggestion[] }
 /** Where the caret is when suggestions are asked for. */
@@ -79,6 +86,19 @@ export interface CodeEditorProps extends ControlProps<string> {
   label?: MaybeFn<string | undefined>;
   /** Accessible name of the suggestion list (default "Suggestions", translated). */
   suggestionsLabel?: MaybeFn<string | undefined>;
+  /**
+   * Chips under the suggestion list that filter the rows by their `source`: `[{ value: "march", label: "March" },
+   * { value: "all", label: "All" }]`. None (default): no chips, every row shows.
+   */
+  sources?: readonly CodeSource[] | undefined;
+  /**
+   * How suggestions come while typing: "list" (default: the list opens) or "ghost" (the likeliest row is written
+   * faintly after the caret, a match of the same case first; Tab takes it). Ctrl + Space opens the list either way.
+   */
+  suggest?: "list" | "ghost" | undefined;
+  /** The chosen chip (default: the first); `onSourceChange` tells the owner (to keep it). */
+  source?: MaybeFn<string | undefined>;
+  onSourceChange?: ((value: string) => void) | undefined;
   /** Enter writes a new line (default true); false: one line of code, Enter does nothing. */
   multiline?: boolean | undefined;
   /** How a "flash" mark shows: "glow" (default) or "none" / false. */
@@ -98,6 +118,12 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const done = signal<{ from: number; to: number; items: readonly CodeSuggestion[] } | null>(null);
   const active = signal(0);
   const marks = (): readonly CodeMark[] => val(props.marks) ?? [];
+  // suggest="ghost": the rest of the likeliest row, shown faintly at the caret (`at`); Tab writes it
+  const ghost = signal<{ from: number; at: number; rest: string; item: CodeSuggestion } | null>(null);
+  // the source chips: the rows shown are the chosen source's ("all": every row)
+  const chosen = signal(untrack(() => val(props.source)) ?? props.sources?.[0]?.value ?? "all");
+  effect(() => { const s = val(props.source); if (s) chosen.set(s); });
+  const shown = computed((): readonly CodeSuggestion[] => { const items = done()?.items ?? [], s = chosen(); return !props.sources || s === "all" ? items : items.filter((it) => it.source === s); });
 
   // ---- the coloured copy under the (transparent) text field: same text, same wrapping
   const seen = new Set<string>();
@@ -105,6 +131,9 @@ export function CodeEditor(props: CodeEditorProps): Element {
     const src = get(), list = [...marks()].filter((m) => m.to > m.from).sort((a, b) => a.from - b.from);
     const out: unknown[] = [], now = new Set<string>();
     let at = 0;
+    const g = ghost();
+    let ghostDone = !g;
+    const ghostNode = (): unknown => h("span", { class: "m-ced-ghost-at" }, h("span", { class: "m-ced-ghost" }, g?.rest ?? ""));
     const push = (kind: string, text: string, mark: CodeMark | null): void => {
       const node = kind ? h("span", { class: `m-tok-${kind}` }, text) : text;
       if (!mark) { out.push(node); return; }
@@ -119,14 +148,17 @@ export function CodeEditor(props: CodeEditorProps): Element {
       let from = at;
       const end = at + text.length;
       while (from < end) {
+        if (!ghostDone && g!.at === from) { out.push(ghostNode()); ghostDone = true; }
         const m = list.find((x) => x.from < end && x.to > from) ?? null;
-        const stop = m ? (m.from > from ? m.from : Math.min(m.to, end)) : end;
+        let stop = m ? (m.from > from ? m.from : Math.min(m.to, end)) : end;
+        if (!ghostDone && g!.at > from && g!.at < stop) stop = g!.at;
         push(kind, text.slice(from - at, stop - at), m && m.from <= from ? m : null);
         from = stop;
       }
       at = end;
     }
     seen.clear(); for (const k of now) seen.add(k);
+    if (!ghostDone) out.push(ghostNode());
     out.push("​"); // the last (empty) line keeps its height
     return out;
   };
@@ -143,7 +175,11 @@ export function CodeEditor(props: CodeEditorProps): Element {
     if (!props.complete || ro()) return;
     const caret = input.selectionStart ?? input.value.length;
     const r = props.complete({ value: input.value, caret, before: input.value.slice(0, caret), forced, typed });
-    const show = (c: CodeCompletion | null | undefined): void => batch(() => { active.set(0); done.set(c && c.items.length ? { from: c.from, to: c.to ?? caret, items: c.items } : null); });
+    const show = (c: CodeCompletion | null | undefined): void => {
+      if (!forced && props.suggest === "ghost") { ghost.set(likeliest(c, caret)); return; }
+      ghost.set(null);
+      batch(() => { active.set(0); done.set(c && c.items.length ? { from: c.from, to: c.to ?? caret, items: c.items } : null); });
+    };
     // a language service answers later: the list opens only when the text and the caret are still where they were
     if (r && typeof (r as Promise<unknown>).then === "function") {
       const value = input.value, n = ++asked;
@@ -153,13 +189,38 @@ export function CodeEditor(props: CodeEditorProps): Element {
     show(r as CodeCompletion | null | undefined);
   };
   let asked = 0;
+  /** The row the ghost shows: the word written so far, completed; a row of the same case first, then any case. */
+  const likeliest = (c: CodeCompletion | null | undefined, caret: number): { from: number; at: number; rest: string; item: CodeSuggestion } | null => {
+    if (!c || !c.items.length) return null;
+    const typed = input.value.slice(c.from, caret);
+    if (!typed) return null;
+    // matched by the name; the ghost shows what Tab writes after the typed letters (the name's rest when the row writes more, an import)
+    const item = c.items.find((it) => it.label.startsWith(typed) && it.label !== typed) ?? c.items.find((it) => it.label.toLowerCase().startsWith(typed.toLowerCase()) && it.label.length > typed.length);
+    if (!item) return null;
+    const text = item.insert ?? item.label;
+    return { from: c.from, at: caret, rest: (text.toLowerCase().startsWith(typed.toLowerCase()) ? text : item.label).slice(typed.length), item };
+  };
+  /** Tab on a ghost: the row is written (its case wins over what was typed), with its head line. */
+  const takeGhost = (): void => {
+    const g = ghost.peek();
+    if (!g) return;
+    ghost.set(null);
+    const text = g.item.insert ?? g.item.label;
+    input.setRangeText(text, g.from, g.at, "end");
+    let caret = g.from + text.length - (g.item.back ?? 0);
+    if (g.item.head && !input.value.includes(g.item.head)) { input.setRangeText(`${g.item.head}\n`, 0, 0, "preserve"); caret += g.item.head.length + 1; }
+    input.setSelectionRange(caret, caret);
+    set(input.value);
+  };
   const close = (): void => { if (done.peek()) done.set(null); };
   const pick = (i: number): void => {
-    const d = done.peek(), item = d?.items[i];
+    const d = done.peek(), item = shown.peek()[i];
     if (!d || !item) return;
     const text = item.insert ?? item.label;
     input.setRangeText(text, d.from, d.to, "end");
-    const caret = d.from + text.length - (item.back ?? 0);
+    let caret = d.from + text.length - (item.back ?? 0);
+    // the row's import, at the top, when the text does not have it
+    if (item.head && !input.value.includes(item.head)) { input.setRangeText(`${item.head}\n`, 0, 0, "preserve"); caret += item.head.length + 1; }
     input.setSelectionRange(caret, caret);
     // `again`: the list stays open and takes the next rows (closing and opening it again would mount a second list)
     if (!item.again) done.set(null);
@@ -185,6 +246,11 @@ export function CodeEditor(props: CodeEditorProps): Element {
   };
 
   const onKeyDown = (e: KeyboardEvent): void => {
+    if (ghost.peek()) {
+      if (e.key === "Tab" && !e.shiftKey) { e.preventDefault(); takeGhost(); return; }
+      if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); ghost.set(null); return; }
+      if (!(e.ctrlKey || e.metaKey) && e.key.length > 1) ghost.set(null); // the caret moves: the ghost goes
+    }
     if ((e.ctrlKey || e.metaKey) && e.code === "Space") { e.preventDefault(); ask(true); return; }
     const d = done.peek();
     if (d) {
@@ -200,9 +266,9 @@ export function CodeEditor(props: CodeEditorProps): Element {
     readonly: () => !!props.readonly, disabled: () => !!props.disabled, "aria-label": () => val(props.label) ?? t`Code`,
     "aria-describedby": () => (props.message === false ? null : `${id}-msg`),
     onKeyDown,
-    onInput: (e: Event) => { set(input.value); const ie = e as InputEvent; ask(false, ie.inputType === "insertText" ? ie.data ?? "" : ""); },
-    onClick: close,
-    onBlur: (e: FocusEvent) => { close(); props.onBlur?.(e); },
+    onInput: (e: Event) => { ghost.set(null); set(input.value); const ie = e as InputEvent; ask(false, ie.inputType === "insertText" ? ie.data ?? "" : ""); },
+    onClick: () => { close(); ghost.set(null); },
+    onBlur: (e: FocusEvent) => { close(); ghost.set(null); props.onBlur?.(e); },
   }) as HTMLTextAreaElement;
   syncValue(input, get);
   props.inputRef?.(input);
@@ -211,12 +277,19 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const open = computed(() => !!done());
   const list = h(Popover, {
     anchor: () => anchor, open: () => open(), onOpenChange: (o: boolean) => { if (!o) close(); }, role: null, flush: true, autoFocus: false, placement: "bottom-start", panelClass: "m-ced-list",
-    children: (_close: unknown) => h(OptionList<number>, {
+    children: (_close: unknown) => [h(OptionList<number>, {
       id: `${id}-list`, keysFrom: input, active, inline: true, check: false, size: "sm", label: () => val(props.suggestionsLabel) ?? t`Suggestions`, empty: false,
-      options: () => (done()?.items ?? []).map((it, i) => ({ value: i, label: it.label, hint: it.hint })),
+      options: () => shown().map((it, i) => ({ value: i, label: it.label, hint: it.hint })),
       onPick: (i: number) => { pick(i); input.focus(); },
-    }),
+    }), props.sources?.length ? sourceBar() : null],
   });
+  // the chips under the list; a press keeps the focus in the text (the list stays open)
+  const sourceBar = (): unknown => h("div", { class: "m-ced-sources", role: "group", "aria-label": t`Suggestion source`, onPointerdown: (e: Event) => e.preventDefault() },
+    (props.sources ?? []).map((s) => h(Chip, {
+      size: "sm", selected: () => chosen() === s.value, children: s.label,
+      onClick: () => { chosen.set(s.value); active.set(0); props.onSourceChange?.(s.value); },
+    })),
+    () => (done() && !shown().length ? h("span", { class: "m-ced-none" }, t`No suggestions here`) : null));
 
   const status = (): "ok" | "error" | false => { const s = val(props.status); return s === undefined ? "ok" : s; };
   const hint = props.hint === false ? null : props.hint ?? (props.complete ? h("span", { class: "m-ced-hint" }, h(Kbd, {}, "Ctrl"), h(Kbd, {}, "Space"), () => t`suggestions`) : null);

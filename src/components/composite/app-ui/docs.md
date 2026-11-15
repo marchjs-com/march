@@ -59,7 +59,7 @@ with it. `requires` starts it after the plugins it needs; removing one removes t
 theme, accent and light / dark at the end: only the preview takes them) over a stage that shows the children in its
 middle. Every picker is off until asked for (`toolbar={{ theme: true, mode: true }}`, or `toolbar` for all of them): a
 picker added later stays hidden. The bar shows only while at least one picker (or your `tools`) does. `theme`, `accent`
-and `mode` take signals to keep the choices.
+and `mode` take signals to keep the choices; `footer` sits under the stage (the shown component's code).
 
 ```tsx
 <AppPreview theme={$theme} toolbar={{ theme: true, accent: true }} tools={<Button size="sm">Yenile</Button>}>
@@ -71,7 +71,10 @@ and `mode` take signals to keep the choices.
 
 `marchLanguagePlugin({ catalog })` gives the code editor suggestions that know March's exports: after `import` every
 component and function (picking one writes `import { Button } from "hadi-march/ui"`), inside `{ … }` the names of the
-subpath after `from`, after `from "` the subpaths, after `<` the components, elsewhere the names already imported.
+subpath after `from`, after `from "` the subpaths, after `<` the components, elsewhere the names already imported and
+then every other export (from two letters; picking one writes its import at the top). The code editor shows March's
+rows first, then TypeScript's, one row per name, with chips under the list: March (default), TS, JS, All; the choice
+is kept across visits. While typing the list stays closed: the likeliest row shows faintly after the caret (`suggest="ghost"`, same case first) and Tab writes it; Ctrl + Space opens the list.
 `catalog` is `{ subpaths: [{ subpath, items: [[name, kind, summary]] }] }` (the API reference's index) or a function
 that fetches it.
 

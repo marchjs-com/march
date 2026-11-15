@@ -3,9 +3,9 @@
 // March language plugin: March's exports) and, when it has none for the place, from the "typescript" service (the
 // whole JavaScript / TypeScript / DOM API); the TypeScript plugin's errors and warnings are underlined in the code
 // (red, amber) and counted under it with the first one's line and text.
-import { computed } from "../../../core/reactive.ts";
+import { computed, signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { CodeEditor, type CodeCompleteContext, type CodeCompletion, type CodeMark } from "../code-editor/index.ts";
+import { CodeEditor, type CodeCompleteContext, type CodeCompletion, type CodeMark, type CodeSuggestion } from "../code-editor/index.ts";
 import { definePlugin, type AppPlugin, type AppFile } from "./kit.ts";
 import type { TypeScriptService, CodeProblem } from "./ts.ts";
 
@@ -29,6 +29,16 @@ export function codeLang(path: string): string {
 }
 const lineCol = (text: string, at: number): string => { const before = text.slice(0, at).split("\n"); return `${before.length}:${(before[before.length - 1]?.length ?? 0) + 1}`; };
 
+// the suggestion sources (chips under the list): March first and by default; the choice is kept across visits
+const SOURCES = [{ value: "march", label: "March" }, { value: "ts", label: "TS" }, { value: "js", label: "JS" }, { value: "all", label: "All" }];
+const SOURCE_KEY = "march.code.source";
+const readSource = (): string => { try { return localStorage.getItem(SOURCE_KEY) ?? "march"; } catch { return "march"; } };
+const source = signal(readSource());
+// TypeScript's own words and types are "ts"; the rest of what it offers (the JS and DOM API, the file's names) "js"
+const TS_KINDS = new Set(["interface", "type", "enum", "alias", "type parameter", "module"]);
+const TS_WORDS = new Set(["abstract", "any", "as", "asserts", "declare", "enum", "implements", "infer", "interface", "is", "keyof", "namespace", "never", "private", "protected", "public", "readonly", "satisfies", "type", "unique", "unknown", "override", "boolean", "number", "string", "symbol", "bigint", "object"]);
+const sourceOf = (it: CodeSuggestion): string => (TS_KINDS.has(it.hint ?? "") || (it.hint === "keyword" && TS_WORDS.has(it.label)) ? "ts" : "js");
+
 /** `<AppUI plugins={[codeEditorPlugin()]} …>`: code files open in a code editor. */
 export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
   return definePlugin({
@@ -41,15 +51,24 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
           const tracked = ts?.track(file);
           const problems = computed((): readonly CodeProblem[] => tracked?.problems() ?? []);
           const errors = (): number => problems().filter((p) => p.error).length;
+          // March's rows first, then TypeScript's (JS and TS), one row per name; nothing on a blank (a space, a new
+          // line, an empty text) unless asked with Ctrl + Space
           const complete = async (c: CodeCompleteContext): Promise<CodeCompletion | null> => {
-            const own = await ctx.service<LanguageService>("language")?.complete?.(file.path, c);
-            if (own && own.items.length) return own;
-            const fromTs = ts ? await ts.complete(file.path, c).catch(() => null) : null;
-            return fromTs ?? o.complete?.(file.path, c) ?? null;
+            if (!c.forced && /(^|\s)$/.test(c.before)) return null;
+            const [own, fromTs] = await Promise.all([
+              Promise.resolve(ctx.service<LanguageService>("language")?.complete?.(file.path, c)).catch(() => null),
+              ts ? ts.complete(file.path, c).catch(() => null) : Promise.resolve(o.complete?.(file.path, c) ?? null),
+            ]);
+            const march = (own?.items ?? []).map((it) => ({ ...it, source: it.source ?? "march" }));
+            const names = new Set(march.map((it) => it.label));
+            const rest = (fromTs?.items ?? []).filter((it) => !names.has(it.label)).map((it) => ({ ...it, source: it.source ?? sourceOf(it) }));
+            const items = [...march, ...rest];
+            return items.length ? { from: own?.items.length ? own.from : fromTs?.from ?? c.caret, to: own?.items.length ? own.to ?? c.caret : fromTs?.to ?? c.caret, items } : null;
           };
           return h(CodeEditor, {
             class: "m-app-code", get value() { return file.text(); }, onChange: (text: string) => file.set?.(text), readonly: !file.set,
-            lang: codeLang(file.path), label: file.path, multiline: true, complete,
+            lang: codeLang(file.path), label: file.path, multiline: true, complete, suggest: "ghost",
+            sources: SOURCES, get source() { return source(); }, onSourceChange: (v: string) => { source.set(v); try { localStorage.setItem(SOURCE_KEY, v); } catch { /* private mode */ } },
             marks: (): CodeMark[] => problems().map((p) => ({ from: p.from, to: Math.max(p.to, p.from + 1), kind: p.error ? "error" : "warning", title: p.message })),
             // under the code: how many errors and warnings, and the first one with its line
             ...(ts ? {

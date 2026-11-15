@@ -31,7 +31,12 @@
 .m-btn-sm { min-height: var(--m-control-h-sm); padding: 0 .625rem; font-size: var(--m-text-sm); gap: .375rem; border-radius: var(--m-radius-1); }
 .m-btn-sm .m-svg { width: .875rem; height: .875rem; }
 .m-btn-lg { min-height: var(--m-control-h-lg); padding: 0 var(--m-space-5); font-size: var(--m-text-lg); }
+.m-btn-lg .m-svg { width: 1.25rem; height: 1.25rem; }
+/* the label sits on the icon's centre: its box is trimmed to the font's cap height (fonts with tall ascenders otherwise
+   push the text off the icon's line) */
+.m-btn-label { text-box: trim-both cap alphabetic; }
 .m-btn-pill { border-radius: var(--m-radius-full); }
 .m-btn-block { display: flex; width: 100%; }
 .m-btn.is-loading { cursor: progress; }
 .m-btn-spin-own { display: inline-flex; align-items: center; }
+.m-btn-spin-own > .m-svg { animation: m-spin calc(var(--m-dur-slow) * 4) linear infinite; }

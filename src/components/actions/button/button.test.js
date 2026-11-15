@@ -119,3 +119,17 @@ test("Button: href uses the router's Link inside the app, a plain link for an ex
   provideLink(null);
   m.dispose();
 });
+
+test("Button: weight", () => {
+  const w = signal("strong");
+  const m = mount(() => [h(Button, { weight: w }, "A"), h(Button, {}, "B")]);
+  const [a, b] = m.el.querySelectorAll("button");
+  assert.equal(a.style.getPropertyValue("font-weight"), "var(--m-weight-bold)");
+  assert.equal(a.hasAttribute("weight"), false);
+  w.set("light");
+  assert.equal(a.style.getPropertyValue("font-weight"), "var(--m-weight-light)");
+  w.set("medium");
+  assert.equal(a.style.getPropertyValue("font-weight"), "", "medium is the default: none");
+  assert.equal(b.style.getPropertyValue("font-weight"), "");
+  m.dispose();
+});

@@ -368,6 +368,7 @@ const tr: Record<string, string> = {
   "Collapse sidebar": "Kenar çubuğunu daralt",
   "Skip to content": "İçeriğe geç",
   "Theme": "Tema",
+  "Page theme": "Sayfa teması",
   "Appearance": "Görünüm",
   "Light": "Açık",
   "Dark": "Koyu",

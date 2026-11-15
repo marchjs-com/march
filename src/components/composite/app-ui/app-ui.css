@@ -17,8 +17,11 @@
 .m-app-code .m-ced-area { flex: 1 1 auto; min-block-size: 0; overflow: auto; align-content: start; }
 .m-app-code .m-ced-input { min-block-size: 100%; }
 /* AppPreview: the toolbar (your tools at the start, the preview's look at the end) over the stage */
-.m-app-pv { block-size: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr); }
-.m-app-pv-bar { display: flex; align-items: center; gap: var(--m-space-1); padding: 3px var(--m-space-2); border-block-end: 1px solid var(--m-border); }
+.m-app-pv { block-size: 100%; display: flex; flex-direction: column; }
+.m-app-pv > .m-app-pv-bar, .m-app-pv > .m-app-pv-foot { flex: none; }
+.m-app-pv > .m-app-pv-stage { flex: 1 1 auto; }
+.m-app-pv-foot { max-block-size: 40%; overflow: auto; }
+.m-app-pv-bar { display: flex; align-items: center; gap: var(--m-space-1); padding: 3px var(--m-space-2); }
 .m-app-pv-fill { flex: 1; }
-.m-app-pv-stage { min-block-size: 0; overflow: auto; display: grid; background: var(--m-bg); color: var(--m-text); }
+.m-app-pv-stage { min-block-size: 0; overflow: auto; display: grid; background: var(--m-bg); color: var(--m-text); font-family: var(--m-font); }
 .m-app-pv-accent { display: grid; place-items: center; min-block-size: 100%; padding: var(--m-space-4); box-sizing: border-box; }

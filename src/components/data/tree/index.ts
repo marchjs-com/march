@@ -19,6 +19,8 @@ export interface TreeProps {
   label?: string;
   /** The open / close arrow: true (default), false, or `(node, open) => node` (`open()` is live; yours does not turn by itself). */
   chevron?: boolean | ((node: TreeNode, open: () => boolean) => unknown) | undefined;
+  /** What opens / closes a branch on click: "row" (default: the whole row, which also selects it) or "chevron" (only the arrow; a click on the row only selects). */
+  toggle?: "row" | "chevron" | undefined;
   class?: ClassProp;
 }
 /** Expandable tree (role=tree; ↑ ↓ move, → opens then enters, ← closes then leaves, Enter selects): `<Tree nodes={files} onSelect={…} />` */
@@ -28,14 +30,17 @@ export function Tree(props: TreeProps): Element {
   const row = (node: TreeNode, level: number): Element => {
     const has = !!node.children?.length;
     const isOpen = (): boolean => open().has(node.id);
-    const act = (): void => { if (has) toggle(node.id); props.onSelect?.(node); };
+    const byArrow = props.toggle === "chevron";
+    const act = (): void => { if (has && !byArrow) toggle(node.id); props.onSelect?.(node); };
+    // toggle="chevron": the arrow opens / closes, the rest of the row only selects
+    const onClick = (e: MouseEvent): void => { if (byArrow && has && (e.target as Element).closest?.("[data-chev]")) { toggle(node.id); return; } act(); };
     const own = props.chevron;
     return h("li", { role: "treeitem", class: "m-tree-li", "aria-expanded": () => (has ? String(isOpen()) : null), "aria-selected": () => String(val(props.selected) === node.id), "aria-level": String(level) },
       treeRow({
         prefix: "m-tree", kids: has, open: isOpen, chevron: typeof own === "function" ? () => own(node, isOpen) : own,
-        icon: icon(node.icon, "m-tree-icon"), label: h(OverflowText, { class: "m-tree-label" }, node.label), meta: node.meta,
+        icon: icon(node.icon, "m-tree-icon"), label: h(OverflowText, { class: "m-tree-label" }, node.label), meta: node.meta, chevronAttrs: { "data-chev": "" },
       }, {
-        interactive: true, active: () => val(props.selected) === node.id, tabindex: "-1", "data-level": String(level), onClick: act,
+        interactive: true, active: () => val(props.selected) === node.id, tabindex: "-1", "data-level": String(level), onClick,
         onKeydown: (e: KeyboardEvent) => {
           const at = e.currentTarget as HTMLElement;
           const rows = [...(at.closest(".m-tree")?.querySelectorAll<HTMLElement>(".m-tree-row") ?? [])].filter((r) => r.offsetParent !== null || !r.closest("[hidden]"));

@@ -11,6 +11,6 @@
 /* m:can={{ allow: false, else: "disable" }}: shown, but out of reach (inert) and dimmed */
 [data-m-can="disable"] { opacity: .45; cursor: not-allowed; }
 
-/* m:theme="night": a subtree in another colour theme takes that theme's text colour too (its tokens come from the
-   theme's own [data-m-theme] rule; the inherited colour would still be the page's) */
-:where([data-m-theme]:not(:root)) { color: var(--m-text); }
+/* m:theme="night": a subtree in another colour theme takes that theme's text colour and font too (its tokens come from the
+   theme's own [data-m-theme] rule; the inherited colour and font would still be the page's) */
+:where([data-m-theme]:not(:root)) { color: var(--m-text); font-family: var(--m-font); }

@@ -24,3 +24,16 @@ test("Toggle: role=switch, aria-checked follows the value, disabled blocks click
   const off = mount(() => h(Toggle, { value: false, disabled: true }));
   assert.equal(off.el.querySelector("[role=switch]").hasAttribute("disabled"), true);
 });
+
+test("Toggle: tristate goes not set → on → off → not set", () => {
+  const v = signal(null);
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(Toggle, { tristate: true, value: v, label: "P" }), el);
+  const b = el.querySelector("button");
+  assert.equal(b.getAttribute("role"), "checkbox");
+  assert.equal(b.getAttribute("aria-checked"), "mixed");
+  b.click(); assert.equal(v(), true); assert.equal(b.getAttribute("aria-checked"), "true");
+  b.click(); assert.equal(v(), false); assert.equal(b.getAttribute("aria-checked"), "false");
+  b.click(); assert.equal(v(), null); assert.equal(b.getAttribute("aria-checked"), "mixed");
+  dispose();
+});

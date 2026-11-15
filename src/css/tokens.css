@@ -14,7 +14,7 @@
   --m-text-2xs: .6875rem; --m-text-xs: .75rem; --m-text-sm: .8125rem; --m-text-md: .875rem; --m-text-lg: 1rem;
   --m-text-xl: 1.25rem; --m-text-2xl: 1.5rem; --m-text-3xl: 2rem; --m-text-4xl: 2.75rem; --m-text-5xl: 3.75rem;
   --m-leading: 1.5; --m-leading-tight: 1.2; --m-tracking-tight: -.015em; --m-tracking-tighter: -.025em; --m-tracking-caps: .06em;
-  --m-weight-medium: 500; --m-weight-semibold: 600; --m-weight-bold: 700;
+  --m-weight-light: 300; --m-weight-regular: 400; --m-weight-medium: 500; --m-weight-semibold: 600; --m-weight-bold: 700;
 
   /* ---- space, size, radius (radius scale follows the theme's --m-r) */
   --m-space-0: 0; --m-space-px: 1px; --m-space-1: .25rem; --m-space-2: .5rem; --m-space-3: .75rem; --m-space-4: 1rem; --m-space-5: 1.5rem;

@@ -39,6 +39,8 @@ export interface ThemeMenuProps {
    */
   value?: MaybeFn<string | undefined>;
   onChange?: ((id: string) => void) | undefined;
+  /** With `value`: a first entry "Page theme" (the value `""`): the preview follows the page's theme. */
+  page?: boolean | undefined;
   /** Light or dark the swatches and cards are drawn in (with `value`: the preview's mode; default the page's). */
   mode?: MaybeFn<"light" | "dark" | "system" | null | undefined>;
   /** Button size (default "md"; "sm" for a slim toolbar). */
@@ -55,9 +57,10 @@ export function ThemeMenu(props: ThemeMenuProps = {}): unknown {
     : h(SectionLabel, { as: "p", class: "m-theme-menu-heading", "aria-hidden": "true", label: text }) as Element;
   // current: the trigger is the swatch and the name of the theme in use
   const look = (): "light" | "dark" | null => { const m = val(props.mode); return m === "light" || m === "dark" ? m : null; };
-  const own = props.onChange ? { value: (): string => val(props.value) ?? colorTheme(), onPick: props.onChange, mode: look } : undefined;
-  const current = (): string => (own ? own.value() : colorTheme());
-  const name = (): string => { const id = current(); return t(colorThemes().find((x) => x.id === id)?.name ?? id); };
+  const own = props.onChange ? { value: (): string => val(props.value) ?? colorTheme(), onPick: props.onChange, mode: look, page: props.page } : undefined;
+  // "" (Page theme): the page's
+  const current = (): string => (own ? own.value() || colorTheme() : colorTheme());
+  const name = (): string => { if (own && !own.value()) return t`Page theme`; const id = current(); return t(colorThemes().find((x) => x.id === id)?.name ?? id); };
   const trigger = props.current ? [() => h(ThemeSwatch, { id: current(), class: "m-theme-menu-swatch", mode: look }), h("span", { class: "m-theme-menu-name" }, name)] : undefined;
   return h(Dropdown, {
     ...(trigger ? { trigger, variant: "secondary" as const } : { icon: props.icon === false ? undefined : props.icon ?? paletteIcon }),
