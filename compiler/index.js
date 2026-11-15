@@ -764,8 +764,10 @@ class Transformer {
     // become the components themselves (a Map): names do not survive minifying. Any other expression is passed as it
     // is (a Map of components, or an accessor of one). The element is created inside the scope: withParts(parts, () => …)
     let parts = null;
-    if (!this.opts.typecheck && attrs.some((a) => a.name?.startsWith("m:"))) {
+    // sx on a component: its classes go on the component's root elements, like an m: prop (the component need not know it)
+    if (!this.opts.typecheck && attrs.some((a) => a.name?.startsWith("m:") || (isComp && a.name === "sx"))) {
       attrs = attrs.flatMap((a) => {
+        if (isComp && a.name === "sx") { mDyn.push(`"sx": ${a.dynamic ? `() => (${a.code})` : a.code}`); return []; }
         if (!a.name?.startsWith("m:")) return [a];
         const name = a.name.slice(2);
         if (name === "parts") {

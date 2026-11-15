@@ -5,7 +5,9 @@ import { SX } from "../src/core/sx.ts";
 
 const space = (n) => `var(--m-space-${n})`;
 const rules = [];
-const add = (cls, body) => rules.push(`.m-${cls}{${body}}`);
+// sx stands for an inline style (which CSP rules out): like one, it wins over the component's own CSS, so
+// <Button sx={{ p: 4 }}> changes the Button's padding (every declaration !important)
+const add = (cls, body) => rules.push(`.m-${cls}{${body.split(";").map((d) => `${d}!important`).join(";")}}`);
 const range = ([a, b]) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
 const sides = { p: ["padding"], px: ["padding-inline"], py: ["padding-block"], pt: ["padding-top"], pb: ["padding-bottom"], m: ["margin"], mx: ["margin-inline"], my: ["margin-block"], mt: ["margin-top"], mb: ["margin-bottom"] };
 for (const [k, props] of Object.entries(sides)) for (const n of range(SX[k])) add(`${k}-${n}`, props.map((p) => `${p}:${space(n)}`).join(";"));
@@ -17,10 +19,11 @@ for (const n of range(SX.shadow)) add(`shadow-${n}`, n ? `box-shadow:var(--m-sha
 const W = { auto: "width:auto", full: "width:100%", sm: "max-width:24rem;width:100%", md: "max-width:40rem;width:100%", lg: "max-width:64rem;width:100%", xl: "max-width:80rem;width:100%" };
 for (const v of SX.w) add(`w-${v}`, W[v]);
 const TEXT = { xs: "font-size:var(--m-text-xs)", sm: "font-size:var(--m-text-sm)", md: "font-size:var(--m-text-md)", lg: "font-size:var(--m-text-lg)", xl: "font-size:var(--m-text-xl)", "2xl": "font-size:var(--m-text-2xl)",
-  muted: "color:var(--m-muted)", danger: "color:var(--m-danger)", success: "color:var(--m-success)", warn: "color:var(--m-warn)", center: "text-align:center", right: "text-align:end", mono: "font-family:var(--m-font-mono)", bold: "font-weight:700" };
+  muted: "color:var(--m-muted)", danger: "color:var(--m-danger)", success: "color:var(--m-success)", warn: "color:var(--m-warn)", left: "text-align:start", center: "text-align:center", right: "text-align:end", mono: "font-family:var(--m-font-mono)", bold: "font-weight:700" };
 for (const v of SX.text) add(`text-${v}`, TEXT[v]);
 const FLEX = { row: "display:flex;flex-direction:row;align-items:center", col: "display:flex;flex-direction:column", wrap: "display:flex;flex-wrap:wrap", center: "display:flex;align-items:center;justify-content:center", between: "display:flex;align-items:center;justify-content:space-between", end: "display:flex;justify-content:flex-end", grow: "flex:1 1 auto;min-width:0" };
 for (const v of SX.flex) add(`flex-${v}`, FLEX[v]);
+for (const v of SX.display) add(`display-${v}`, `display:${v}`);
 add("grid-auto", "display:grid;grid-template-columns:repeat(auto-fill,minmax(14rem,1fr))");
 add("grid-fit", "display:grid;grid-template-columns:repeat(auto-fit,minmax(10rem,1fr))");
 const BP = { sm: "40rem", md: "48rem", lg: "64rem" };

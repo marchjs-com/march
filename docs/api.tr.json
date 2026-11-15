@@ -60,6 +60,7 @@
   "Switch": "`<Switch fallback={…}><Match when={a}>…</Match>…</Switch>` — doğru olan ilk Match kazanır.",
   "sx": "Bir sx nesnesini sınıf adlarına çözer. Bilinmeyen anahtar/değerlerde hata fırlatır (derleme sırasında derleyici yakalar).",
   "sxValue": "Derleyicinin sabit olmayan `sx={…}` çevresine koyduğu sarmalayıcı (h() yalnızca sınıf dizelerini alır, böylece dinamik sx kullanmayan uygulamalara çözücü girmez): nesne → sınıflar, işlev → değerinin sınıfları.",
+  "SX": "sx ölçekleri: her anahtarın sayı aralığı ya da sözcükleri (araçlar değerleri sunmak için okur).",
   "t": "Çeviri yapar. Etiketli şablon (`t\\`Hello ${x}\\``) veya `t(key, values)`. Reaktiftir: dil değişince yeniden çalışır.",
   "toDate": "Date, epoch ms/s, ISO dizesi ve {seconds}/{_seconds} zaman damgalarını kabul eder. Geçersizse null.",
   "Try": "Hata ve eşzamansız sınır. Hatada `fallback(error, reset)` çizilir; eşzamansız alt öğeler beklerken `loading` çizilir. Eşzamansız bileşenlerin ve içerideki efektlerin hatalarını da yakalar.",

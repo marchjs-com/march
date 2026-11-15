@@ -1,12 +1,14 @@
 // `sx` — design-token shorthands compiled to static utility classes (no inline styles, CSP safe).
 // `sx={{ p: 2, gap: 1, cols: 3 }}` → class "m-p-2 m-gap-1 m-cols-3". The compiler resolves literal objects at build time;
 // at runtime `sx(obj)` does the same for dynamic cases. Every class exists in css/march.css.
+/** The sx scales: each key's number range (`[0, 8]`) or its words; tools read it to offer the values (a playground's sx group). @tr sx ölçekleri: her anahtarın sayı aralığı (`[0, 8]`) ya da sözcükleri; araçlar değerleri sunmak için okur (bir playground'un sx grubu). */
 export const SX = {
   p: [0, 8], px: [0, 8], py: [0, 8], pt: [0, 8], pb: [0, 8],
   m: [0, 8], mx: [0, 8], my: [0, 8], mt: [0, 8], mb: [0, 8],
   gap: [0, 8], cols: [1, 12], span: [1, 12], radius: [0, 4], shadow: [0, 3], w: ["auto", "full", "sm", "md", "lg", "xl"],
-  text: ["xs", "sm", "md", "lg", "xl", "2xl", "muted", "danger", "success", "warn", "center", "right", "mono", "bold"],
+  text: ["xs", "sm", "md", "lg", "xl", "2xl", "muted", "danger", "success", "warn", "left", "center", "right", "mono", "bold"],
   flex: ["row", "col", "wrap", "center", "between", "end", "grow"], grid: ["auto", "fit"], hide: ["sm", "md", "lg"],
+  display: ["block", "inline", "inline-block", "flex", "inline-flex", "grid", "none"],
 } as const satisfies Record<string, readonly [number, number] | readonly string[]>;
 
 type SxSpec = typeof SX;

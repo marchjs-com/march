@@ -101,3 +101,16 @@ test("runtime m:text-color: the text colour token on the element (data-m-text-co
   for (const t of [...COLOR_TOKENS, "muted"]) assert.ok(css.includes(`[data-m-text-color="${t}"] { --m-text-color:`), t);
   assert.match(c('const a = <Card m:text-color="danger" />'), /"text-color": "danger"/);
 });
+
+test("sx on a component: the compiler sends it to mProps; its classes go on the root beside the root's own class", () => {
+  assert.match(c('const a = <Card sx={{ p: 2, display: "flex" }} />'), /_\$m\(_\$h\(Card, \{\}\), \{"sx": "m-p-2 m-display-flex"\}\)/);
+  assert.match(c('let $x = 1\nconst a = <Card sx={$x ? { p: 2 } : null} />'), /"sx": \(\) => \(/);
+  const el = document.createElement("div");
+  el.setAttribute("class", "m-card");
+  P.mProps(el, { sx: "m-p-2 m-text-left" });
+  assert.equal(el.getAttribute("class"), "m-card m-p-2 m-text-left");
+  P.mProps(el, { sx: { gap: 1 } });
+  assert.equal(el.getAttribute("class"), "m-card m-gap-1", "an object (by hand) resolves to classes");
+  P.mProps(el, { sx: null });
+  assert.equal(el.getAttribute("class"), "m-card");
+});

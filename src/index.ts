@@ -14,6 +14,6 @@ export { define } from "./dom/define.ts";
 export { pipe, applyPipe, toDate } from "./core/pipes.ts";
 export { t, locale, setLocale, messages } from "./core/i18n.ts";
 export { missing, setFallbackLocale } from "./core/i18n-tools.ts";
-export { sx, sxValue } from "./core/sx.ts";
+export { sx, sxValue, SX } from "./core/sx.ts";
 /** The library version. */
 export const version = "0.1.0";

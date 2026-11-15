@@ -3,7 +3,8 @@
 // a constant on a native element becomes a plain attribute at build time and only the CSS file is loaded.
 // New members are added with registerMProp(); the list is open.
 import { effect, computed, untrack, getOwner, runWithOwner, onCleanup, signal, reactive, isReactive, context, provide, useContext } from "../core/reactive.ts";
-import { registerNamespace } from "../dom/h.ts";
+import { registerNamespace, _prop } from "../dom/h.ts";
+import { sx as sxClasses, type Sx } from "../core/sx.ts";
 import { _builtin } from "../dom/extend.ts";
 import "../css/props.css";
 
@@ -98,6 +99,8 @@ const attr = (name: string): MProp => (el, v) => { if (v == null || v === false)
 registerMProp("color", attr("data-m-color"));
 // m:text-color="brand-blue": the text colour of the element and everything in it (m:color tints the fill and the accent)
 registerMProp("text-color", attr("data-m-text-color"));
+// sx on a component (the compiler sends it here): its classes on the component's root elements, beside their own class
+registerMProp("sx", (el, v) => _prop(el, el.localName, "sx", typeof v === "string" ? v : v && typeof v === "object" ? sxClasses(v as Sx) : ""));
 // m:dir="rtl" / m:lang="ar": writing direction and language of a subtree
 registerMProp("dir", attr("dir"));
 registerMProp("lang", attr("lang"));
