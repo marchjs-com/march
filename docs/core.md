@@ -95,6 +95,68 @@ own props. The list is open: `m:no-select`, `m:parts`, `m:color`, `m:theme`, `m:
   boards, a control pressed repeatedly), not for content people may want to copy; leave values such as codes, addresses
   and error messages selectable with `m:no-select={false}`. It is not copy protection: the text stays in the DOM.
 
+## Extensions and interceptors
+Give any component (March's, yours, another package's) new props and change what it gets and gives, from one place,
+without a wrapper component and without forking it. Design: [internal/extensions.md](internal/extensions.md).
+
+```tsx
+import { extend, intercept, defineExtension, Extensions, extensions } from "hadi-march"
+
+// a new prop and what it does
+export const track = defineExtension({
+  name: "track",
+  props: { track: { type: "string", doc: "Event sent on click" } },
+  setup: ({ props, roots, onCleanup }) => roots().forEach((el) => {
+    const send = () => analytics.send(props.track)
+    el.addEventListener("click", send); onCleanup(() => el.removeEventListener("click", send))
+  }),
+})
+extend([Button, IconButton], track)          // <Button track="save">Save</Button>
+extend("*", track)                           // every component given `track`
+
+// change props, callbacks and output of named components
+intercept(Button, { name: "small", props: (p) => ({ size: p.size ?? "sm" }) })
+intercept(Button, { name: "confirm", on: { onClick: (next, e, p) => (p.variant === "danger" ? ask().then((ok) => ok && next(e)) : next(e)) } })
+intercept(Card, { name: "badge", render: (next, p) => (p.isNew ? <div>{next()}<Badge>new</Badge></div> : next()) })
+
+<Extensions use={[track, [Button, smallButtons]]}>…</Extensions>   // only inside (withExtensions(list, render) by hand)
+<Button m:extend={false}>Plain</Button>                             // this instance takes none (["track"]: only that one)
+```
+
+- `extend(target, extension)`: `target` is a component, a list, `"*"` or `{ test: (component, info) => boolean }`.
+  It returns a function that removes the extension. `"*"` only adds props and `setup`, and runs only on instances
+  given one of its props (a component that does not use them pays nothing).
+- `defineExtension({ name, props, setup, on, render, order, target })`: a reusable extension, not registered.
+  `props` is either the new props (specs: `type`, `default`, `doc`, `values`) or a props interceptor (a function).
+  Declared props are kept out of the component's own props; `ctx.props` has both, read live.
+- `setup(ctx)`: once per instance, after it rendered, under its owner (`onCleanup`, effects and context work).
+  `ctx.roots()` gives its root elements (a live region is followed: setup runs once its first value exists).
+- `intercept(target, { props, on, render })` on named components only:
+  - `props(p, ctx)` returns the props to change, merged over `p`; it re-runs when what it reads changes (the
+    compiler's live props and `reactive()` values stay live). Callbacks and `children` are read once.
+  - `on: { onClick: (next, ...args, p) => … }` wraps callbacks: `next(...)` calls the original; not calling it stops
+    it. A callback the caller did not pass can be added.
+  - `render(next, p, ctx)`: `next(p?)` renders the component; return its output, a wrapped one, or anything else
+    (not calling `next` replaces the component entirely: it does not run).
+- Order: registration order, or `order` (lower runs outer: first for props, around the others for callbacks and
+  render). `m:parts` is a built-in that runs innermost, so it wins over interceptors.
+- Scope: `<Extensions use>` / `withExtensions(list, render)` reach every component created inside (now or later)
+  and add to the global ones; the nearest scope adds last. An item is an extension (its `target`, default `"*"`) or
+  `[target, extension]`. `use` may be an accessor (read when a component is created).
+- Errors: an extension that throws is reported with its name and the component's and skipped; the component still
+  renders.
+- Cost: with nothing registered `createComponent` runs as before (no hook). With extensions: one pass over the
+  matching ones per component (`node bench/extensions.js`).
+- Types: `declare module "hadi-march" { interface ExtensionProps extends ExtensionPropsOf<typeof track> {} }` adds the
+  props to every component's JSX type; `interface ComponentExtensions { Button: { confirm?: boolean } }` to one March
+  component (by export name). `defineExtension<{ track: string }>(…)` types `ctx.props` and the specs.
+- Tools: `extensions.list()` (reactive: name, target, scope, what it does, the props it adds), `extensions.of(el)`
+  (which extensions ran on the component of `el` and what each did; a props step has the props before and after),
+  `extensions.propsOf(Component)`, `extensions.name({ Button, Card })` (names for test targets and tools when a build
+  shortens function names). In development two extensions adding the same prop to the same component are reported.
+- `m:` common props are built-in extensions too: `h(Card, { "m:tip": "…" })` written by hand goes to the root elements
+  (the compiler applies them itself).
+
 ## Components
 Functions called once with a props object. Props from JSX are getters (live). Async components return a promise; while
 pending the nearest `<Try loading>` (or a default spinner) shows; rejections go to the nearest `<Try fallback>`.

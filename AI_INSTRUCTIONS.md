@@ -57,6 +57,15 @@ $items.peek()                            // read without tracking (explicit API 
   `parts` / `avatarProps` prop to a composite for this; inside a library component draw parts with `h(Comp, …)`,
   never by calling the component function, or `m:parts` cannot reach them. Content in a portal (dialog, menu) is outside the root: put
   the prop on that content.
+- Extensions (docs/core.md): to give components a new prop or change their behaviour, NEVER write a wrapper
+  component (`TrackedButton`, `SmallButton`). `extend([Button, Link], ext)` / `extend("*", ext)` adds props + `setup`
+  (`defineExtension({ name, props: { track: { type: "string" } }, setup({ props, roots, onCleanup }) {…} })`);
+  `intercept(Button, { name, props: (p) => ({ size: p.size ?? "sm" }), on: { onClick: (next, e, p) => … }, render:
+  (next, p) => … })` changes props (live), callbacks (`next` calls the original) and output (wrap or replace) of named
+  components. Only inside a part of the page: `<Extensions use={[ext, [Button, ext2]]}>`; one instance opts out with
+  `m:extend={false}` (or `={["name"]}`). Each returns a remover; a throwing extension is skipped, not fatal. Types:
+  `declare module "hadi-march" { interface ExtensionProps extends ExtensionPropsOf<typeof ext> {} }`. Debug:
+  `extensions.list()`, `extensions.of(el)`.
 - Async component: `async function Page() { const data = await api(); return <View data={data} /> }` — wrap in
   `<Try loading={…} fallback={(e, retry) => …}>` (or rely on the default spinner / error box).
 

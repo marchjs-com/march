@@ -236,3 +236,13 @@ test("bench: nothing registered (and everything removed again) costs nothing; ex
   assert.ok(r.twentyOther < r.none * 1.6, `20 for other components ${r.twentyOther.toFixed(1)} ms vs ${r.none.toFixed(1)} ms`);
   assert.ok(r.one < r.none * 6, `one extension ${r.one.toFixed(1)} ms vs ${r.none.toFixed(1)} ms`);
 });
+
+test("extensions.name: components named by their export names (minified builds), for test targets and tools", () => {
+  const f = function f() { return h("u", { class: "minified" }); };
+  extensions.name({ Underline: f, lower: () => null });
+  const off = intercept({ test: (c, info) => info.name === "Underline" }, { name: "by-export", render: () => h("b", null, "named") });
+  const { host, dispose } = mount(() => h(f, {}));
+  assert.equal(host.querySelector("b").textContent, "named");
+  assert.equal(extensions.list().find((r) => r.name === "by-export").target, "test");
+  dispose(); off();
+});

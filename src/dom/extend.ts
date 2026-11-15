@@ -441,6 +441,36 @@ export const extensions = {
     }
     return undefined;
   },
+  /** Remove every global extension (not the built-in m: props and m:parts): a fresh start for tests and reloads. */
+  clear(): void {
+    for (let i = entries.length - 1; i >= 0; i--) if (!entries[i]!.builtin) entries.splice(i, 1);
+    scopedSeen.clear();
+    changed();
+  },
+  /** Every component inside `root` (itself included) that extensions ran on, with what each did (tools). */
+  within(root: Element | null): ExtensionTrace[] {
+    const out: ExtensionTrace[] = [], seen = new Set<ExtensionTrace>();
+    if (!root) return out;
+    for (const el of [root, ...root.querySelectorAll("*")]) {
+      const t = traces.get(el);
+      if (!t || seen.has(t)) continue;
+      seen.add(t);
+      out.push({ component: t.component, steps: t.steps.map((s) => (s.before ? { ...s, before: snap(s.before), after: snap(s.after!) } : { ...s })) });
+    }
+    return out;
+  },
+  /**
+   * Name components for tests and tools when a build shortens function names: `extensions.name({ Button, Card })` or
+   * `extensions.name(await import("hadi-march/ui"))` (every export whose name starts with a capital letter).
+   */
+  name(components: Record<string, unknown>): void {
+    for (const k of Object.keys(components)) {
+      const c = components[k];
+      if (typeof c === "function" && /^[A-Z]/.test(k)) infos.set(c as AnyComp, { ...infoOf(c as AnyComp), name: k });
+    }
+    cache = new WeakMap();
+    version.update((v) => v + 1);
+  },
   /** The props extensions add to `component` (global ones), for tools such as a Properties panel. */
   propsOf(component: AnyComp): { extension: string; props: Record<string, ExtensionPropSpec> }[] {
     version();
