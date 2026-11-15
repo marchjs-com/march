@@ -12,17 +12,19 @@ import { RowTools } from "../row-tools/index.ts";
 import { TextInput } from "../text-input/index.ts";
 
 export interface KeyValueEditorProps extends ControlProps<Record<string, string | number>> {
+  /** Placeholder of the key fields (default "Key"). @tr Anahtar alanlarının yer tutucusu (varsayılan "Key"). */
   keyPlaceholder?: string | undefined;
+  /** Placeholder of the value fields (default "Value"). @tr Değer alanlarının yer tutucusu (varsayılan "Value"). */
   valuePlaceholder?: string | undefined;
-  /** Numeric-looking values become numbers. */
+  /** Numeric-looking values become numbers. @tr Sayıya benzeyen değerler sayı olur. */
   numbers?: boolean | undefined;
-  /** Texts: `key` / `value` (accessible names and default placeholders), `remove`, `add` ("Add row"), `duplicate` ("Duplicate key"). */
+  /** Texts: `key` / `value` (accessible names and default placeholders), `remove`, `add` ("Add row"), `duplicate` ("Duplicate key"). @tr Metinler: `key` / `value` (erişilebilir adlar ve varsayılan yer tutucular), `remove`, `add` ("Add row"), `duplicate` ("Duplicate key"). */
   labels?: { key?: string | undefined; value?: string | undefined; remove?: string | undefined; add?: unknown; duplicate?: unknown } | undefined;
-  /** The remove button of a row: `false` removes it. */
+  /** The remove button of a row: `false` removes it. @tr Satırın kaldırma düğmesi: `false` kaldırır. */
   removable?: boolean | undefined;
-  /** The "Add row" button: `false` removes it. */
+  /** The "Add row" button: `false` removes it. @tr "Add row" düğmesi: `false` kaldırır. */
   addable?: boolean | undefined;
-  /** Content of the remove button instead of the "×" icon (a node, text or `() => node`). */
+  /** Content of the remove button instead of the "×" icon (a node, text or `() => node`). @tr Kaldırma düğmesinde "×" ikonu yerine içerik (düğüm, metin ya da `() => node`). */
   removeIcon?: unknown;
 }
 

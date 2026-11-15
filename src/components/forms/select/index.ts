@@ -6,9 +6,9 @@ import { h } from "../../../dom/h.ts";
 import { model, ctl, cx, normOptions, same, type ControlProps, type OptionsProp } from "../../../forms/util.ts";
 
 export interface SelectProps<T = unknown> extends ControlProps<T | null> {
-  /** [value] or [{ value, label, disabled }]; may be live. */
+  /** [value] or [{ value, label, disabled }]; may be live. @tr [value] ya da [{ value, label, disabled }]; canlı olabilir. */
   options?: OptionsProp;
-  /** Text of the empty first option; false: no empty option (a choice that is never empty, e.g. a language). */
+  /** Text of the empty first option; false: no empty option (a choice that is never empty, e.g. a language). @tr Boş ilk seçeneğin metni; false: boş seçenek yok (hiç boş kalmayan bir seçim, ör. dil). */
   placeholder?: string | false | undefined;
 }
 

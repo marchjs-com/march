@@ -15,25 +15,27 @@ import { check } from "../../../icons/glyphs/check.ts";
 export const CHECKER = "m-checker";
 
 export interface SwatchProps {
-  /** A CSS colour ("#ff7a1a", "oklch(…)", "rgb(0 0 0 / .4)"), a gradient ("linear-gradient(…)") or a theme token ("brand-blue"). */
+  /** A CSS colour ("#ff7a1a", "oklch(…)", "rgb(0 0 0 / .4)"), a gradient ("linear-gradient(…)") or a theme token ("brand-blue"). @tr Bir CSS rengi ("#ff7a1a", "oklch(…)", "rgb(0 0 0 / .4)"), bir gradyan ("linear-gradient(…)") ya da bir tema token'ı ("brand-blue"). */
   color?: MaybeFn<string | null | undefined>;
-  /** Selected: a ring around it; announced as pressed (or checked / selected with a matching `role`). */
+  /** Selected: a ring around it; announced as pressed (or checked / selected with a matching `role`). @tr Seçili: çevresinde halka; basılı (ya da uygun `role` ile checked / selected) olarak duyurulur. */
   selected?: MaybeFn<boolean | undefined>;
-  /** Accessible name ("Orange"); also the tooltip of a clickable swatch. */
+  /** Accessible name ("Orange"); also the tooltip of a clickable swatch. @tr Erişilebilir ad ("Orange"); tıklanabilir renk kutusunun araç ipucu da olur. */
   label?: MaybeFn<string | null | undefined>;
-  /** xs · sm · md (default) · lg. */
+  /** xs · sm · md (default) · lg. @tr xs · sm · md (varsayılan) · lg. */
   size?: MaybeFn<"xs" | "sm" | "md" | "lg" | undefined>;
-  /** round (default: rounded square) · square · circle. */
+  /** round (default: rounded square) · square · circle. @tr round (varsayılan: yuvarlak köşeli kare) · square · circle. */
   shape?: MaybeFn<"round" | "square" | "circle" | undefined>;
-  /** Checkerboard under the colour (default true); `false` puts the page surface there. */
+  /** Checkerboard under the colour (default true); `false` puts the page surface there. @tr Rengin altında dama deseni (varsayılan true); `false` yerine sayfa yüzeyini koyar. */
   checker?: MaybeFn<boolean | undefined>;
-  /** Mark drawn on a selected swatch: `true` (a tick), an own icon / text / node, or `false` (default: the ring only). */
+  /** Mark drawn on a selected swatch: `true` (a tick), an own icon / text / node, or `false` (default: the ring only). @tr Seçili renk kutusuna çizilen işaret: `true` (tik), kendi ikon / metin / düğümünüz ya da `false` (varsayılan: yalnız halka). */
   mark?: unknown;
-  /** Makes it a button. */
+  /** Makes it a button. @tr Onu bir düğme yapar. */
   onClick?: ((e: MouseEvent) => void) | undefined;
+  /** Disables the clickable swatch. @tr Tıklanabilir renk kutusunu devre dışı bırakır. */
   disabled?: MaybeFn<boolean | undefined>;
+  /** Extra CSS classes on the swatch. @tr Renk kutusuna eklenen CSS sınıfları. */
   class?: ClassProp;
-  /** Content drawn over the colour (a short text such as "Aa"). */
+  /** Content drawn over the colour (a short text such as "Aa"). @tr Rengin üstüne çizilen içerik ("Aa" gibi kısa bir metin). */
   children?: unknown;
   /** Other attributes (`role`, `aria-*`, `data-*`, `tabindex`, `title`, `id`) go to the swatch. */
   [attr: string]: unknown;

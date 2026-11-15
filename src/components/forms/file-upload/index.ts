@@ -29,23 +29,27 @@ export type UploadProgress = number | { loaded: number; total: number };
 export type UploadFn<R = unknown> = (file: File, ctx: { onProgress: (p: UploadProgress) => void; signal: AbortSignal }) => Promise<R> | R;
 
 export interface FileUploadProps<R = unknown> extends ControlProps<unknown> {
-  /** "image/*,.pdf" */
+  /** "image/*,.pdf" @tr Kabul edilen dosya türleri, ör. "image/*,.pdf". */
   accept?: string | undefined;
+  /** Allows choosing several files; the value becomes an array. @tr Birden çok dosya seçilebilir; değer dizi olur. */
   multiple?: boolean | undefined;
-  /** Bytes. */
+  /** Bytes. @tr Dosya başına en büyük boyut, bayt. */
   maxSize?: number | undefined;
+  /** Most files allowed (with `multiple`). @tr İzin verilen en fazla dosya sayısı (`multiple` ile). */
   maxFiles?: number | undefined;
+  /** Uploads each file: `(file, { onProgress, signal }) => Promise`; the value becomes what it resolves with. @tr Her dosyayı yükler: `(file, { onProgress, signal }) => Promise`; değer onun döndürdüğü sonuç olur. */
   upload?: UploadFn<R> | undefined;
-  /** Drop zone text. */
+  /** Drop zone text. @tr Bırakma alanının metni. */
   label?: unknown;
+  /** Called with the message and the file when a file is rejected or its upload fails. @tr Bir dosya reddedilince ya da yüklemesi başarısız olunca mesaj ve dosyayla çağrılır. */
   onError?: ((message: string, file: File) => void) | undefined;
-  /** The small line under the drop text ("image/* · max 5 MB"): `false` removes it, a node / text / `() => node` replaces it. */
+  /** The small line under the drop text ("image/* · max 5 MB"): `false` removes it, a node / text / `() => node` replaces it. @tr Bırakma metninin altındaki küçük satır ("image/* · max 5 MB"): `false` kaldırır, düğüm / metin / `() => node` onun yerine geçer. */
   hint?: unknown;
-  /** Image thumbnails and audio players of the chosen files: `false` shows only names. */
+  /** Image thumbnails and audio players of the chosen files: `false` shows only names. @tr Seçilen dosyaların resim küçük görselleri ve ses oynatıcıları: `false` yalnız adları gösterir. */
   preview?: boolean | undefined;
-  /** Content of the remove button of a file instead of the "×" (a node, text or `() => node`). */
+  /** Content of the remove button of a file instead of the "×" (a node, text or `() => node`). @tr Bir dosyanın kaldırma düğmesinde "×" yerine içerik (düğüm, metin ya da `() => node`). */
   removeIcon?: unknown;
-  /** Every other text the control writes; each default is the built-in (translated) text. */
+  /** Every other text the control writes; each default is the built-in (translated) text. @tr Denetimin yazdığı diğer tüm metinler; her varsayılan yerleşik (çevrilmiş) metindir. */
   labels?: {
     /** "max 5 MB" in the hint. */
     max?: ((size: string) => string) | undefined;

@@ -26,20 +26,33 @@ import type { ClassProp } from "../core/util.ts";
 
 /** Props every control understands (id / aria wiring, state, focus handlers). */
 export interface CommonProps {
+  /** Element id (default: the id from the surrounding Field). @tr Öğenin id'si (varsayılan: çevreleyen Field'ın verdiği id). */
   id?: string | null | undefined;
+  /** Form field name sent with the form. @tr Formla gönderilen alan adı. */
   name?: string | undefined;
+  /** Extra CSS classes: a string, an array or `{ name: bool }`. @tr Ek CSS sınıfları: metin, dizi ya da `{ name: bool }`. */
   class?: ClassProp;
+  /** Disables the control. @tr Denetimi devre dışı bırakır. */
   disabled?: boolean | null | undefined;
+  /** Makes the control read-only. @tr Denetimi yalnız okunur yapar. */
   readonly?: boolean | null | undefined;
+  /** Marks the control as required. @tr Denetimi zorunlu olarak işaretler. */
   required?: boolean | null | undefined;
+  /** Marks the value as invalid (`aria-invalid` and the error style). @tr Değeri geçersiz olarak işaretler (`aria-invalid` ve hata görünümü). */
   invalid?: boolean | null | undefined;
+  /** Id(s) for `aria-describedby` (default: the Field's hint and error). @tr `aria-describedby` için id'ler (varsayılan: Field'ın ipucu ve hatası). */
   describedby?: string | null | undefined;
+  /** Id for `aria-labelledby` (default: the Field's label). @tr `aria-labelledby` için id (varsayılan: Field'ın etiketi). */
   labelledby?: string | null | undefined;
+  /** Accessible name when there is no visible label. @tr Görünür etiket yokken erişilebilir ad. */
   "aria-label"?: string | null | undefined;
+  /** Same as `aria-label`. @tr `aria-label` ile aynı. */
   ariaLabel?: string | null | undefined;
+  /** Called when the control loses focus. @tr Denetim odağı kaybedince çağrılır. */
   onBlur?: ((e: FocusEvent) => void) | undefined;
+  /** Called when the control gets focus. @tr Denetim odak alınca çağrılır. */
   onFocus?: ((e: FocusEvent) => void) | undefined;
-  /** The schema field (set when rendered by <Field>). */
+  /** The schema field (set when rendered by <Field>). @tr Şema alanı (<Field> ile çizilince verilir). */
   field?: Field | undefined;
 }
 
@@ -48,8 +61,11 @@ export interface CommonProps {
  * a live `value` + `onChange`, or an uncontrolled initial `value`.
  */
 export interface ControlProps<T> extends CommonProps {
+  /** The value: a plain value, a signal, or a getter with `bind:value`. @tr Değer: düz bir değer, bir sinyal ya da `bind:value` ile bir erişimci. */
   value?: T | Signal<T> | null | undefined;
+  /** Writes the value back (set by `bind:value`). @tr Değeri geri yazar (`bind:value` bunu verir). */
   setValue?: ((v: T) => void) | undefined;
+  /** Called with the new value on every change. @tr Her değişiklikte yeni değerle çağrılır. */
   onChange?: ((v: T) => void) | undefined;
 }
 

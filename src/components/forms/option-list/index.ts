@@ -33,41 +33,47 @@ export interface OptionItem<T = string> {
 export interface OptionState { selected: () => boolean; active: () => boolean; index: number }
 
 export interface OptionListProps<T = string> {
+  /** The rows: `[{ value, label, hint?, icon?, disabled? }]` (or an accessor). @tr Satırlar: `[{ value, label, hint?, icon?, disabled? }]` (ya da bir erişimci). */
   options: MaybeFn<readonly OptionItem<T>[]>;
-  /** The chosen value (an array with `multiple`): a signal (two-way), a value / accessor, or `bind:value`. */
+  /** The chosen value (an array with `multiple`): a signal (two-way), a value / accessor, or `bind:value`. @tr Seçilen değer (`multiple` ile dizi): sinyal (iki yönlü), değer / erişimci ya da `bind:value`. */
   value?: Signal<T | null> | Signal<readonly T[]> | MaybeFn<T | readonly T[] | null | undefined>;
+  /** Writes the chosen value back (set by `bind:value`). @tr Seçilen değeri geri yazar (`bind:value` bunu verir). */
   setValue?: ((v: never) => void) | undefined;
-  /** A row was chosen (click, Enter, Space). */
+  /** A row was chosen (click, Enter, Space). @tr Bir satır seçildi (tıklama, Enter, Space). */
   onPick?: ((value: T, item: OptionItem<T>, e: Event | null) => void) | undefined;
-  /** Several values can be chosen (listbox). */
+  /** Several values can be chosen (listbox). @tr Birden çok değer seçilebilir (listbox). */
   multiple?: boolean | undefined;
-  /** "radio" (default): one of many · "listbox": options, one or many · "menu": commands (checked when a value is given). */
+  /** "radio" (default): one of many · "listbox": options, one or many · "menu": commands (checked when a value is given). @tr "radio" (varsayılan): birden biri · "listbox": seçenekler, bir ya da çok · "menu": komutlar (değer verilince işaretli). */
   mode?: "radio" | "listbox" | "menu" | undefined;
-  /** The field whose keys drive the list (focus stays there; rows are highlighted through aria-activedescendant). */
+  /** The field whose keys drive the list (focus stays there; rows are highlighted through aria-activedescendant). @tr Tuşları listeyi yöneten alan (odak orada kalır; satırlar aria-activedescendant ile vurgulanır). */
   keysFrom?: Element | (() => Element | null | undefined) | undefined;
-  /** The highlighted row with `keysFrom` (your own signal when you need to read or reset it). */
+  /** The highlighted row with `keysFrom` (your own signal when you need to read or reset it). @tr `keysFrom` ile vurgulanan satır (okumanız ya da sıfırlamanız gerekirse kendi sinyaliniz). */
   active?: Signal<number> | undefined;
   /**
    * `false`: the list listens to no keys and touches no field. Rows are options with the ids `<id>-<index>`, the
    * highlight is your `active` signal (the row scrolls into view); you handle the keys and aria-activedescendant.
+   * @tr `false`: liste hiçbir tuşu dinlemez, hiçbir alana dokunmaz. Satırlar `<id>-<index>` id'li seçeneklerdir, vurgu sizin `active` sinyalinizdir (satır görünüme kayar); tuşları ve aria-activedescendant'ı siz yönetirsiniz.
    */
   keys?: boolean | undefined;
-  /** A label that does not fit: "ellipsis" (default) cuts it, "wrap" breaks it into lines. */
+  /** A label that does not fit: "ellipsis" (default) cuts it, "wrap" breaks it into lines. @tr Sığmayan etiket: "ellipsis" (varsayılan) keser, "wrap" satırlara böler. */
   overflow?: "ellipsis" | "wrap" | undefined;
-  /** Accessible name of the list. */
+  /** Accessible name of the list. @tr Listenin erişilebilir adı. */
   label?: MaybeFn<string | undefined>;
+  /** Id of the list; rows get `<id>-<index>` (default: generated). @tr Listenin id'si; satırlar `<id>-<index>` alır (varsayılan: üretilir). */
   id?: string | undefined;
-  /** The tick on a chosen row: true (default), false, your own icon, or `() => node` (called for every row). */
+  /** The tick on a chosen row: true (default), false, your own icon, or `() => node` (called for every row). @tr Seçilen satırdaki tik: true (varsayılan), false, kendi ikonunuz ya da `() => node` (her satır için çağrılır). */
   check?: boolean | unknown | (() => unknown) | undefined;
-  /** Rows per line (a grid of choices; default 1). */
+  /** Rows per line (a grid of choices; default 1). @tr Satır başına öğe sayısı (seçenek ızgarası; varsayılan 1). */
   columns?: number | undefined;
+  /** Row size: `sm` or `md` (default). @tr Satır boyutu: `sm` ya da `md` (varsayılan). */
   size?: MaybeFn<"sm" | "md" | undefined>;
-  /** Hint beside the label instead of under it. */
+  /** Hint beside the label instead of under it. @tr İpucu etiketin altında değil yanında. */
   inline?: boolean | undefined;
-  /** Shown when there are no options: text or a node (default "No results"); false for nothing. */
+  /** Shown when there are no options: text or a node (default "No results"); false for nothing. @tr Seçenek yokken gösterilen: metin ya da düğüm (varsayılan "No results"); hiçbir şey için false. */
   empty?: unknown | undefined;
-  /** Draw the inside of a row yourself. */
+  /** Draw the inside of a row yourself. @tr Satırın içini kendiniz çizin. */
   renderOption?: ((item: OptionItem<T>, state: OptionState) => unknown) | undefined;
+  /** Extra CSS classes on the list. @tr Listeye eklenen CSS sınıfları. */
   class?: ClassProp | undefined;
 }
 

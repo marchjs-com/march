@@ -57,17 +57,19 @@ fieldType("records", {
 });
 
 export interface RecordListEditorProps extends ControlProps<Values[]> {
-  /** Sub-schema: a spec object or a schema. */
+  /** Sub-schema: a spec object or a schema. @tr Alt şema: bir tanım nesnesi ya da şema. */
   fields?: RecordFields | undefined;
-  /** New-row values (or a function returning them). */
+  /** New-row values (or a function returning them). @tr Yeni satırın değerleri (ya da onları döndüren bir fonksiyon). */
   blank?: Values | (() => Values) | undefined;
+  /** Most rows allowed. @tr İzin verilen en fazla satır sayısı. */
   max?: number | undefined;
+  /** Text of the add button (default "Add row"). @tr Ekle düğmesinin metni (varsayılan "Add row"). */
   addLabel?: string | undefined;
-  /** Default true. */
+  /** Default true. @tr Satırların kaldırma düğmesi; varsayılan true. */
   removable?: boolean | undefined;
-  /** Default true. */
+  /** Default true. @tr Satırların taşıma düğmeleri; varsayılan true. */
   sortable?: boolean | undefined;
-  /** Fields per line (default: number of fields, max 6). */
+  /** Fields per line (default: number of fields, max 6). @tr Satır başına alan sayısı (varsayılan: alan sayısı, en çok 6). */
   cols?: number | undefined;
 }
 

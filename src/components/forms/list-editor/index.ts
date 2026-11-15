@@ -12,21 +12,23 @@ import { RowTools } from "../row-tools/index.ts";
 import { TextInput } from "../text-input/index.ts";
 
 export interface ListEditorProps extends ControlProps<string[]> {
+  /** Placeholder of the add field (default "Add an item"). @tr Ekleme alanının yer tutucusu (varsayılan "Add an item"). */
   placeholder?: string | undefined;
-  /** Most items. */
+  /** Most items. @tr En fazla öğe sayısı. */
   max?: number | undefined;
-  /** Skip duplicates (default true). */
+  /** Skip duplicates (default true). @tr Yinelenenleri atlar (varsayılan true). */
   unique?: boolean | undefined;
+  /** Text of the add button (default "Add"). @tr Ekle düğmesinin metni (varsayılan "Add"). */
   addLabel?: string | undefined;
-  /** Accessible names: `item` (`(position) => text`, default "Item 2"), `moveUp`, `moveDown`, `remove`. */
+  /** Accessible names: `item` (`(position) => text`, default "Item 2"), `moveUp`, `moveDown`, `remove`. @tr Erişilebilir adlar: `item` (`(position) => text`, varsayılan "Item 2"), `moveUp`, `moveDown`, `remove`. */
   labels?: { item?: ((position: number) => string) | undefined; moveUp?: string | undefined; moveDown?: string | undefined; remove?: string | undefined } | undefined;
-  /** The move up / down buttons: `false` removes them. */
+  /** The move up / down buttons: `false` removes them. @tr Yukarı / aşağı taşıma düğmeleri: `false` kaldırır. */
   sortable?: boolean | undefined;
-  /** The remove button of a row: `false` removes it (clearing a row's text still removes it). */
+  /** The remove button of a row: `false` removes it (clearing a row's text still removes it). @tr Satırın kaldırma düğmesi: `false` kaldırır (satırın metnini silmek yine kaldırır). */
   removable?: boolean | undefined;
-  /** The "add an item" line under the list: `false` removes it. */
+  /** The "add an item" line under the list: `false` removes it. @tr Listenin altındaki "öğe ekle" satırı: `false` kaldırır. */
   addable?: boolean | undefined;
-  /** Content of the row buttons instead of the ↑ ↓ × icons (each a node, text or `() => node`). */
+  /** Content of the row buttons instead of the ↑ ↓ × icons (each a node, text or `() => node`). @tr Satır düğmelerinde ↑ ↓ × ikonları yerine içerik (her biri düğüm, metin ya da `() => node`). */
   icons?: { up?: unknown; down?: unknown; remove?: unknown } | undefined;
 }
 

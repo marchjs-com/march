@@ -7,14 +7,17 @@ import { colorAttr } from "../../../theme/colors.ts";
 import { choiceBox, choiceText, lookClass, type ChoiceLook } from "../../../forms/choice.ts";
 
 export interface CheckboxProps extends ControlProps<boolean>, ChoiceLook {
+  /** Text next to the box (or use children). @tr Kutunun yanındaki metin (ya da children kullanılır). */
   label?: unknown;
+  /** Label content, when `label` is not given. @tr `label` verilmediğinde etiket içeriği. */
   children?: unknown;
-  /** Smaller text under the label (in the card variant: the description). */
+  /** Smaller text under the label (in the card variant: the description). @tr Etiketin altındaki küçük metin (card görünümünde açıklama). */
   hint?: unknown;
+  /** Shows the mixed state (a dash) instead of the tick. @tr Tik yerine karışık durumu (çizgi) gösterir. */
   indeterminate?: boolean | undefined;
-  /** The click on the input, with its modifier keys (`e.shiftKey` for a range selection in a list or a grid). */
+  /** The click on the input, with its modifier keys (`e.shiftKey` for a range selection in a list or a grid). @tr Girdiye tıklama, değiştirici tuşlarıyla (liste ya da ızgarada aralık seçimi için `e.shiftKey`). */
   onClick?: ((e: MouseEvent) => void) | undefined;
-  /** Tab order of the input (`-1` inside a grid that moves focus with the arrow keys). */
+  /** Tab order of the input (`-1` inside a grid that moves focus with the arrow keys). @tr Girdinin sekme sırası (odağı ok tuşlarıyla taşıyan bir ızgarada `-1`). */
   tabIndex?: number | undefined;
 }
 

@@ -11,37 +11,41 @@ import { clamp } from "../../../core/util.ts";
 import { ownPart } from "../../../ui/parts.ts";
 
 export interface CodeInputProps extends ControlProps<string> {
-  /** Number of boxes, 3–12 (default 6). */
+  /** Number of boxes, 3–12 (default 6). @tr Kutu sayısı, 3–12 (varsayılan 6). */
   length?: number | undefined;
-  /** Characters allowed: "numeric" (default; numeric keypad, one-time-code autofill), "alpha" or "alphanumeric". */
+  /** Characters allowed: "numeric" (default; numeric keypad, one-time-code autofill), "alpha" or "alphanumeric". @tr İzin verilen karakterler: "numeric" (varsayılan; sayısal tuş takımı, tek kullanımlık kod otomatik doldurma), "alpha" ya da "alphanumeric". */
   pattern?: "numeric" | "alpha" | "alphanumeric" | undefined;
-  /** @deprecated use pattern: `false` = "alphanumeric". */
+  /** Digits only. @deprecated use pattern: `false` = "alphanumeric". @tr Yalnız rakam. */
   numeric?: boolean | undefined;
-  /** Force capitals (default true for letters). */
+  /** Force capitals (default true for letters). @tr Büyük harfe çevirir (harflerde varsayılan true). */
   uppercase?: boolean | undefined;
-  /** Visual groups, e.g. [3, 3] → "123 456" with a separator between the groups. */
+  /** Visual groups, e.g. [3, 3] → "123 456" with a separator between the groups. @tr Görsel gruplar, ör. [3, 3] → "123 456", gruplar arasında ayraç. */
   groups?: readonly number[] | undefined;
-  /** Hide the characters (PINs). */
+  /** Hide the characters (PINs). @tr Karakterleri gizler (PIN'ler). */
   mask?: boolean | (() => boolean) | undefined;
-  /** @deprecated alias of mask. */
+  /** Hides the characters. @deprecated alias of mask. @tr Karakterleri gizler. */
   masked?: boolean | (() => boolean) | undefined;
   /**
    * Box colors: "single" (the accent / `color`), "brand" (the four HADİ colors in turn — the HADİ theme's default), "palette"
    * (the theme's categorical colors) or a list of color tokens.
+   * @tr Kutu renkleri: "single" (vurgu rengi / `color`), "brand" (sırayla dört HADİ rengi — HADİ temasında varsayılan), "palette" (temanın kategorik renkleri) ya da renk token'ları listesi.
    */
   colors?: "single" | "brand" | "palette" | readonly ColorToken[] | undefined;
-  /** Digits font: "display" (the theme's display face — HADİ: Bricolage; the HADİ default), "mono" or "body". */
+  /** Digits font: "display" (the theme's display face — HADİ: Bricolage; the HADİ default), "mono" or "body". @tr Rakamların yazı tipi: "display" (temanın display yazı tipi — HADİ: Bricolage; HADİ varsayılanı), "mono" ya da "body". */
   font?: "display" | "mono" | "body" | undefined;
+  /** Box size: `sm`, `md` (default) or `lg`. @tr Kutu boyutu: `sm`, `md` (varsayılan) ya da `lg`. */
   size?: "sm" | "md" | "lg" | undefined;
-  /** "outline" (default), "filled" or "underline". */
+  /** "outline" (default), "filled" or "underline". @tr "outline" (varsayılan), "filled" ya da "underline". */
   variant?: "outline" | "filled" | "underline" | undefined;
-  /** Pop the character in (default true; off with prefers-reduced-motion). `false`: no motion; a function: your own (`(box) => animate(box, …)`). */
+  /** Pop the character in (default true; off with prefers-reduced-motion). `false`: no motion; a function: your own (`(box) => animate(box, …)`). @tr Karakteri zıplatarak gösterir (varsayılan true; prefers-reduced-motion ile kapalı). `false`: hareket yok; fonksiyon: kendi hareketiniz (`(box) => animate(box, …)`). */
   animate?: boolean | ((box: HTMLElement) => void) | undefined;
-  /** The mark between groups: `false` removes it, a node / text / `() => node` replaces the drawn dash. */
+  /** The mark between groups: `false` removes it, a node / text / `() => node` replaces the drawn dash. @tr Gruplar arasındaki işaret: `false` kaldırır, düğüm / metin / `() => node` çizilen çizginin yerine geçer. */
   separator?: unknown;
-  /** Accessible name of a box: `(position, length) => text` (default "Character 2 of 6"). */
+  /** Accessible name of a box: `(position, length) => text` (default "Character 2 of 6"). @tr Bir kutunun erişilebilir adı: `(position, length) => text` (varsayılan "Character 2 of 6"). */
   boxLabel?: ((position: number, length: number) => string) | undefined;
+  /** Called once with the code when every box is filled. @tr Tüm kutular dolunca kodla bir kez çağrılır. */
   onComplete?: ((code: string) => void) | undefined;
+  /** Focuses the first box on mount. @tr Açılışta ilk kutuya odaklanır. */
   autofocus?: boolean | undefined;
 }
 

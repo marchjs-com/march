@@ -20,26 +20,31 @@ export type RowAction = "up" | "down" | "remove";
 const ALL: readonly RowAction[] = ["up", "down", "remove"];
 
 export interface RowToolsProps {
-  /** Which tools, in this order (default: up, down, remove). */
+  /** Which tools, in this order (default: up, down, remove). @tr Hangi araçlar, bu sırayla (varsayılan: up, down, remove). */
   actions?: readonly RowAction[] | undefined;
+  /** Called when "Move up" is clicked. @tr "Move up" tıklanınca çağrılır. */
   onUp?: (() => void) | undefined;
+  /** Called when "Move down" is clicked. @tr "Move down" tıklanınca çağrılır. */
   onDown?: (() => void) | undefined;
+  /** Called when "Remove" is clicked. @tr "Remove" tıklanınca çağrılır. */
   onRemove?: (() => void) | undefined;
-  /** One handler for every tool (called besides onUp / onDown / onRemove). */
+  /** One handler for every tool (called besides onUp / onDown / onRemove). @tr Tüm araçlar için tek işleyici (onUp / onDown / onRemove'a ek olarak çağrılır). */
   onAction?: ((action: RowAction) => void) | undefined;
-  /** Position of the row: "up" is off on the first row. */
+  /** Position of the row: "up" is off on the first row. @tr Satırın sırası: ilk satırda "up" kapalıdır. */
   index?: MaybeFn<number | undefined>;
-  /** Rows in the list: "down" is off on the last row. */
+  /** Rows in the list: "down" is off on the last row. @tr Listedeki satır sayısı: son satırda "down" kapalıdır. */
   count?: MaybeFn<number | undefined>;
-  /** Switch all tools off, or some: `{ remove: () => list().length <= 1 }`. */
+  /** Switch all tools off, or some: `{ remove: () => list().length <= 1 }`. @tr Tüm araçları ya da bazılarını kapatır: `{ remove: () => list().length <= 1 }`. */
   disabled?: MaybeFn<boolean | undefined> | Partial<Record<RowAction, MaybeFn<boolean | undefined>>>;
-  /** Own names (default "Move up", "Move down", "Remove", group "Row tools"; translated). */
+  /** Own names (default "Move up", "Move down", "Remove", group "Row tools"; translated). @tr Kendi adlarınız (varsayılan "Move up", "Move down", "Remove", grup "Row tools"; çevrilir). */
   labels?: Partial<Record<RowAction | "group", MaybeFn<string | undefined>>> | undefined;
-  /** Own icons: an icon, text, a node or `() => node` each (a node is copied for every row). */
+  /** Own icons: an icon, text, a node or `() => node` each (a node is copied for every row). @tr Kendi ikonlarınız: her biri ikon, metin, düğüm ya da `() => node` (düğüm her satır için kopyalanır). */
   icons?: Partial<Record<RowAction, unknown>> | undefined;
+  /** Size of the tool buttons (IconButton sizes). @tr Araç düğmelerinin boyutu (IconButton boyutları). */
   size?: MaybeFn<IconButtonSize | undefined>;
-  /** The remove tool in the danger colour. */
+  /** The remove tool in the danger colour. @tr Kaldırma aracı tehlike renginde. */
   danger?: boolean | undefined;
+  /** Extra CSS classes on the tool group. @tr Araç grubuna eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 

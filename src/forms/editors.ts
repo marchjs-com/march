@@ -14,9 +14,11 @@ import { markdownNodes, type MarkdownOptions } from "../dom/markdown.ts";
 export { markdownNodes, isSafeLink, type MarkdownOptions } from "../dom/markdown.ts";
 
 export interface MarkdownProps extends MarkdownOptions {
+  /** Markdown text to render. @tr Çizilecek Markdown metni. */
   source?: string | null | undefined;
-  /** A string child (when no `source`). */
+  /** A string child (when no `source`). @tr Metin child (`source` yokken). */
   children?: unknown;
+  /** Extra CSS classes on the wrapper. @tr Sarmalayıcıya eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 

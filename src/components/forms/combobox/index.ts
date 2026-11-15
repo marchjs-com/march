@@ -14,31 +14,35 @@ import { Chip } from "../../actions/chip/index.ts";
 import { OptionList, type OptionItem } from "../option-list/index.ts";
 
 export interface ComboboxProps<T = unknown> extends ControlProps<T | null | T[]> {
-  /** Static options: [value] or [{ value, label, hint, disabled }]. */
+  /** Static options: [value] or [{ value, label, hint, disabled }]. @tr Sabit seçenekler: [value] ya da [{ value, label, hint, disabled }]. */
   options?: OptionsProp;
-  /** Async options for the typed text. */
+  /** Async options for the typed text. @tr Yazılan metne göre eşzamansız seçenekler. */
   search?: ((q: string) => Promise<readonly unknown[]> | readonly unknown[]) | undefined;
-  /** ms (250). */
+  /** ms (250). @tr Arama öncesi bekleme, ms (250). */
   debounce?: number | undefined;
-  /** Characters before searching (0 static / 1 async). */
+  /** Characters before searching (0 static / 1 async). @tr Aramadan önce gereken karakter sayısı (sabitte 0 / eşzamansızda 1). */
   minChars?: number | undefined;
+  /** Most options shown in the list (default 50). @tr Listede gösterilen en fazla seçenek (varsayılan 50). */
   limit?: number | undefined;
+  /** Placeholder of the text field. @tr Metin alanının yer tutucusu. */
   placeholder?: string | null | undefined;
+  /** Draws an option row: `(option) => node`. @tr Bir seçenek satırını çizer: `(option) => node`. */
   renderOption?: ((o: Option) => unknown) | undefined;
-  /** Label for a value that is not in the options. */
+  /** Label for a value that is not in the options. @tr Seçeneklerde olmayan bir değerin etiketi. */
   labelOf?: ((value: T) => string) | undefined;
-  /** Typed text becomes the value. */
+  /** Typed text becomes the value. @tr Yazılan metin değer olur. */
   allowCustom?: boolean | undefined;
-  /** Array value, chips. */
+  /** Array value, chips. @tr Değer dizi olur, seçilenler chip olarak görünür. */
   multiple?: boolean | undefined;
+  /** Called with the option when one is chosen. @tr Bir seçenek seçilince o seçenekle çağrılır. */
   onSelect?: ((o: Option) => void) | undefined;
-  /** Texts the list and the chips write themselves (defaults: "Searching…", "Type to search", "No results", "Search failed: …", "Remove …"). */
+  /** Texts the list and the chips write themselves (defaults: "Searching…", "Type to search", "No results", "Search failed: …", "Remove …"). @tr Liste ve chip'lerin kendi yazdığı metinler (varsayılanlar: "Searching…", "Type to search", "No results", "Search failed: …", "Remove …"). */
   labels?: {
     searching?: unknown; typeToSearch?: unknown; noResults?: unknown;
     searchFailed?: ((message: string) => unknown) | undefined;
     remove?: ((label: string) => string) | undefined;
   } | undefined;
-  /** The remove button of a chip (`multiple`): `false` removes it (Backspace still removes), a node / text / `() => node` replaces the "×". */
+  /** The remove button of a chip (`multiple`): `false` removes it (Backspace still removes), a node / text / `() => node` replaces the "×". @tr Chip'in kaldırma düğmesi (`multiple`): `false` kaldırır (Backspace yine siler), düğüm / metin / `() => node` "×" yerine geçer. */
   removeIcon?: unknown;
 }
 

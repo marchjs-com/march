@@ -22,23 +22,35 @@ export const setControlBuilder = (fn: ControlBuilder): void => { buildControl = 
 
 /** Props of <Field>. */
 export interface FieldProps<V = Values> {
-  /** A schema field of the enclosing (or `form`) form; its control is rendered. Without it, the children are wrapped. */
+  /** A schema field of the enclosing (or `form`) form; its control is rendered. Without it, the children are wrapped. @tr Çevreleyen (ya da `form`) formun şema alanı; onun denetimi çizilir. Verilmezse children sarmalanır. */
   name?: FieldName<V> | undefined;
+  /** The form controller (default: the surrounding Form). @tr Form denetleyicisi (varsayılan: çevreleyen Form). */
   form?: FormController<V> | null | undefined;
+  /** Id of the control (default: from the form or generated). @tr Denetimin id'si (varsayılan: formdan ya da üretilir). */
   id?: string | undefined;
+  /** Label text (default: the schema field's label). @tr Etiket metni (varsayılan: şema alanının etiketi). */
   label?: unknown;
+  /** Hint under the control (default: the schema field's help). @tr Denetimin altındaki ipucu (varsayılan: şema alanının yardım metni). */
   help?: unknown;
+  /** Error text (default: the form's error for the field). @tr Hata metni (varsayılan: formun bu alan için hatası). */
   error?: string | null | undefined;
+  /** Marks the field as required (default: from the schema). @tr Alanı zorunlu işaretler (varsayılan: şemadan). */
   required?: boolean | null | undefined;
+  /** Puts the label beside the control. @tr Etiketi denetimin yanına koyar. */
   inline?: boolean | undefined;
+  /** Hides the help and tightens the spacing. @tr Yardım metnini gizler, boşlukları daraltır. */
   compact?: boolean | undefined;
-  /** Label as a group label (div) instead of <label for>. */
+  /** Label as a group label (div) instead of <label for>. @tr Etiket <label for> yerine grup etiketi (div) olur. */
   group?: boolean | undefined;
+  /** Disables the control. @tr Denetimi devre dışı bırakır. */
   disabled?: boolean | undefined;
+  /** Makes the control read-only. @tr Denetimi yalnız okunur yapar. */
   readonly?: boolean | undefined;
+  /** Extra CSS classes on the field. @tr Alana eklenen CSS sınıfları. */
   class?: ClassProp;
-  /** Extra props for the rendered control. */
+  /** Extra props for the rendered control. @tr Çizilen denetime verilen ek özellikler. */
   controlProps?: Record<string, unknown> | undefined;
+  /** The control to wrap when there is no `name`. @tr `name` yokken sarmalanan denetim. */
   children?: unknown;
 }
 

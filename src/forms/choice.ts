@@ -17,14 +17,15 @@ export type ChoiceSize = "sm" | "md" | "lg";
 export type ChoiceShape = "square" | "rounded" | "circle";
 
 export interface ChoiceLook {
-  /** Look of the control (default "classic"). */
+  /** Look of the control (default "classic"). @tr Denetimin görünümü (varsayılan "classic"). */
   variant?: ChoiceVariant | undefined;
+  /** Size of the box, padding and text: `sm`, `md` (default) or `lg`. @tr Kutu, iç boşluk ve yazı boyutu: `sm`, `md` (varsayılan) ya da `lg`. */
   size?: ChoiceSize | undefined;
-  /** Box corners (checkboxes; radios are round). Default "rounded". */
+  /** Box corners (checkboxes; radios are round). Default "rounded". @tr Kutu köşeleri (onay kutuları; radyolar yuvarlaktır). Varsayılan "rounded". */
   shape?: ChoiceShape | undefined;
-  /** An icon (hadi-march/icons) shown instead of the drawn tick. */
+  /** An icon (hadi-march/icons) shown instead of the drawn tick. @tr Çizilen tik yerine gösterilen ikon (hadi-march/icons). */
   icon?: IconDef | undefined;
-  /** false: no animation. */
+  /** false: no animation. @tr false: animasyon yok. */
   animate?: boolean | undefined;
 }
 
@@ -75,7 +76,7 @@ export { itemColor };
 
 /** Look of a group of choices: every option takes it; `colors="brand"` gives each option the next HADİ color. */
 export interface ChoiceGroupLook extends ChoiceLook {
-  /** "brand" (orange, blue, green, purple in turn) or a list of color tokens, one per option in turn. */
+  /** "brand" (orange, blue, green, purple in turn) or a list of color tokens, one per option in turn. @tr "brand" (sırayla turuncu, mavi, yeşil, mor) ya da seçeneklere sırayla verilen renk token'ları listesi. */
   colors?: "brand" | readonly string[] | undefined;
 }
 

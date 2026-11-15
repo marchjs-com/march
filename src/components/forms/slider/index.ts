@@ -6,21 +6,25 @@ import { inputOf } from "../../../forms/affix.ts";
 import { colorAttr } from "../../../theme/colors.ts";
 
 export interface SliderProps extends ControlProps<number> {
+  /** Smallest value (default 0). @tr En küçük değer (varsayılan 0). */
   min?: number | undefined;
+  /** Largest value (default 100). @tr En büyük değer (varsayılan 100). */
   max?: number | undefined;
+  /** Step between values (default 1). @tr Değerler arasındaki adım (varsayılan 1). */
   step?: number | undefined;
-  /** Text of the value shown next to the slider. */
+  /** Text of the value shown next to the slider. @tr Kaydırıcının yanında gösterilen değerin metni. */
   format?: ((v: number) => unknown) | undefined;
-  /** The value shown next to the slider: `false` removes it. */
+  /** The value shown next to the slider: `false` removes it. @tr Kaydırıcının yanında gösterilen değer: `false` kaldırır. */
   showValue?: boolean | undefined;
   /**
    * Your own track under a drawn thumb, instead of the browser's: `true` (a ramp in the control's color), a class name
    * (the track is yours: a gradient from your CSS) or a node drawn as the track. Thumb fill: `--m-slider-thumb`.
+   * @tr Tarayıcınınki yerine çizilen başparmağın altında kendi izleriniz: `true` (denetimin renginde bir geçiş), bir sınıf adı (iz sizin: CSS'inizden bir gradyan) ya da iz olarak çizilen bir düğüm. Başparmak dolgusu: `--m-slider-thumb`.
    */
   track?: unknown;
-  /** Spoken value (`aria-valuetext`), e.g. `(v) => v + " degrees"`. */
+  /** Spoken value (`aria-valuetext`), e.g. `(v) => v + " degrees"`. @tr Seslendirilen değer (`aria-valuetext`), ör. `(v) => v + " degrees"`. */
   valueText?: ((v: number) => string) | undefined;
-  /** Called once when a change is finished (pointer released, key pressed), after `onChange`. */
+  /** Called once when a change is finished (pointer released, key pressed), after `onChange`. @tr Bir değişiklik bitince (işaretçi bırakılınca, tuşa basılınca) `onChange`'den sonra bir kez çağrılır. */
   onCommit?: ((v: number) => void) | undefined;
 }
 

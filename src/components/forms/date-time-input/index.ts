@@ -10,14 +10,17 @@ import { DatePicker, type DatePickerProps } from "../date-picker/index.ts";
 import { TimeInput } from "../time-input/index.ts";
 
 export interface DateTimeInputProps extends ControlProps<string | null> {
+  /** Earliest pickable date (ISO) for the date part. @tr Tarih kısmı için seçilebilecek en erken tarih (ISO). */
   min?: IsoDate | null | undefined;
+  /** Latest pickable date (ISO) for the date part. @tr Tarih kısmı için seçilebilecek en geç tarih (ISO). */
   max?: IsoDate | null | undefined;
+  /** First day of the week: 0 = Sunday … 6 = Saturday (default: from the locale). @tr Haftanın ilk günü: 0 = Pazar … 6 = Cumartesi (varsayılan: dile göre). */
   firstDay?: number | undefined;
-  /** Time used when only a date is picked ("00:00"). */
+  /** Time used when only a date is picked ("00:00"). @tr Yalnız tarih seçildiğinde kullanılan saat ("00:00"). */
   defaultTime?: string | undefined;
-  /** Accessible name of the time field (default "Time"). */
+  /** Accessible name of the time field (default "Time"). @tr Saat alanının erişilebilir adı (varsayılan "Time"). */
   timeLabel?: string | undefined;
-  /** Extra props for the DatePicker (`{ icon, labels, calendar, locale, placeholder }`). */
+  /** Extra props for the DatePicker (`{ icon, labels, calendar, locale, placeholder }`). @tr DatePicker'a ek özellikler (`{ icon, labels, calendar, locale, placeholder }`). */
   picker?: Partial<DatePickerProps> | undefined;
 }
 

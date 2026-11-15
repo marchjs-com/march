@@ -15,7 +15,7 @@ export function normalizePhone(raw: unknown, country?: string | null): string {
 }
 
 export interface PhoneInputProps extends ControlProps<string>, TextAttrProps, AffixProps {
-  /** Country calling code ("+44"), shown as a prefix and prepended to national numbers. */
+  /** Country calling code ("+44"), shown as a prefix and prepended to national numbers. @tr Ülke telefon kodu ("+44"); önek olarak gösterilir ve ulusal numaraların başına eklenir. */
   country?: string | undefined;
 }
 

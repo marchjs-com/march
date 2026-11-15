@@ -5,9 +5,11 @@ import { h } from "../../../dom/h.ts";
 import { model, ctl, cx, syncValue, type ControlProps } from "../../../forms/util.ts";
 
 export interface TimeInputProps extends ControlProps<string> {
+  /** Earliest allowed time ("HH:MM"). @tr İzin verilen en erken saat ("HH:MM"). */
   min?: string | null | undefined;
+  /** Latest allowed time ("HH:MM"). @tr İzin verilen en geç saat ("HH:MM"). */
   max?: string | null | undefined;
-  /** Seconds. */
+  /** Seconds. @tr Adım, saniye. */
   step?: number | null | undefined;
 }
 

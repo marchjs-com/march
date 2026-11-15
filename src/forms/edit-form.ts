@@ -38,29 +38,41 @@ export interface SaveContext<V> {
 
 /** Props of <EditForm>. */
 export interface EditFormProps<V = Values> extends FieldsLayout {
+  /** Field schema of the form. @tr Formun alan şeması. */
   schema: Schema<V>;
+  /** Loads the record; its result fills the form (also on Reload). @tr Kaydı yükler; sonucu formu doldurur (Reload'da da). */
   load: () => Promise<Partial<V> | null | undefined>;
+  /** Saves the values; gets `{ reason, changed }` as the second argument. @tr Değerleri kaydeder; ikinci bağımsız değişken olarak `{ reason, changed }` alır. */
   save: (values: V, ctx: SaveContext<V>) => unknown;
-  /** Ask for a reason before saving: a minimum length or prompt settings. */
+  /** Ask for a reason before saving: a minimum length or prompt settings. @tr Kaydetmeden önce gerekçe sorar: en az uzunluk ya da sorma ayarları. */
   reason?: number | ReasonOptions | false | null | undefined;
+  /** Heading above the form. @tr Formun üstündeki başlık. */
   title?: unknown;
+  /** Text under the heading. @tr Başlığın altındaki metin. */
   description?: unknown;
+  /** Titled groups of fields: `[{ title, description, fields, cols }]`. @tr Başlıklı alan grupları: `[{ title, description, fields, cols }]`. */
   sections?: readonly FormSection<V>[] | null | undefined;
+  /** Text of the submit button (default "Save"). @tr Gönder düğmesinin metni (varsayılan "Save"). */
   submitLabel?: string | undefined;
-  /** false = no toast. */
+  /** false = no toast. @tr false = bildirim yok. */
   successMessage?: string | false | undefined;
+  /** Called with save()'s result and the values after a successful save. @tr Başarılı kayıttan sonra save() sonucu ve değerlerle çağrılır. */
   onSaved?: ((result: unknown, values: V) => void) | undefined;
+  /** Shows the values without editing and hides the action bar. @tr Değerleri düzenlemeden gösterir, işlem çubuğunu gizler. */
   readonly?: boolean | null | undefined;
-  /** Extra buttons in the action bar. */
+  /** Extra buttons in the action bar. @tr İşlem çubuğuna eklenen düğmeler. */
   extra?: ((form: FormController<V>) => unknown) | undefined;
-  /** Reset the form from save()'s result instead of reloading. */
+  /** Reset the form from save()'s result instead of reloading. @tr Yeniden yüklemek yerine formu save() sonucuyla sıfırlar. */
   useResult?: boolean | undefined;
+  /** When fields are validated: "blur" (default), "change" or "submit". @tr Alanların ne zaman doğrulanacağı: "blur" (varsayılan), "change" ya da "submit". */
   validateOn?: ValidateOn | undefined;
+  /** Warns before leaving the page with unsaved changes. @tr Kaydedilmemiş değişiklik varken sayfadan çıkmadan önce uyarır. */
   confirmLeave?: boolean | undefined;
-  /** Reason prompt (default askReason). */
+  /** Reason prompt (default askReason). @tr Gerekçe penceresi (varsayılan askReason). */
   ask?: ((o: ReasonPrompt) => Promise<ReasonValue | null | undefined> | ReasonValue | null | undefined) | undefined;
-  /** Success notice (default toast). */
+  /** Success notice (default toast). @tr Başarı bildirimi (varsayılan toast). */
   notify?: ((message: string, opts: { kind: "success" }) => unknown) | undefined;
+  /** Extra CSS classes on the form section. @tr Form bölümüne eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 

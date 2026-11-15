@@ -9,8 +9,9 @@ import { choiceBox, choiceText, itemColor, groupClass, type ChoiceGroupLook } fr
 export type { ChoiceGroupLook };
 
 export interface CheckboxGroupProps<T = unknown> extends ControlProps<T[]>, ChoiceGroupLook {
-  /** [{ value, label, hint?, icon?, meta?, disabled? }] (icon, hint and meta — a price or badge — show in the card variant). */
+  /** [{ value, label, hint?, icon?, meta?, disabled? }] (icon, hint and meta — a price or badge — show in the card variant). @tr [{ value, label, hint?, icon?, meta?, disabled? }] (icon, hint ve meta — fiyat ya da rozet — card görünümünde görünür). */
   options?: OptionsProp;
+  /** Lays the options out in a row instead of a column. @tr Seçenekleri sütun yerine yan yana dizer. */
   inline?: boolean | undefined;
 }
 

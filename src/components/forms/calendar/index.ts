@@ -17,30 +17,39 @@ export { dayGridKey };
 export const clampIso = (iso: string, min: string | null | undefined, max: string | null | undefined) => (min && iso < min ? min : max && iso > max ? max : iso);
 
 export interface CalendarProps extends ControlProps<IsoDate | null> {
+  /** Earliest pickable date (ISO); days before it are disabled. @tr Seçilebilecek en erken tarih (ISO); öncesindeki günler devre dışı kalır. */
   min?: IsoDate | null | undefined;
+  /** Latest pickable date (ISO); days after it are disabled. @tr Seçilebilecek en geç tarih (ISO); sonrasındaki günler devre dışı kalır. */
   max?: IsoDate | null | undefined;
-  /** 0 = Sunday … 6 = Saturday (default: from the locale). */
+  /** 0 = Sunday … 6 = Saturday (default: from the locale). @tr Haftanın ilk günü: 0 = Pazar … 6 = Cumartesi (varsayılan: dile göre). */
   firstDay?: number | undefined;
+  /** Locale for month and weekday names (default: the app locale). @tr Ay ve gün adlarının dili (varsayılan: uygulamanın dili). */
   locale?: string | undefined;
-  /** Month shown when there is no value (default today). */
+  /** Month shown when there is no value (default today). @tr Değer yokken gösterilen ay (varsayılan: bugün). */
   initial?: IsoDate | undefined;
+  /** Returns `true` for a day that can't be picked. @tr Seçilemeyecek bir gün için `true` döndürür. */
   isDisabled?: ((iso: IsoDate) => boolean) | undefined;
+  /** Called with the ISO date when a day is picked. @tr Bir gün seçildiğinde ISO tarihle çağrılır. */
   onPick?: ((iso: IsoDate) => void) | undefined;
+  /** Called when Escape is pressed in the grid. @tr Izgarada Escape'e basılınca çağrılır. */
   onEscape?: (() => void) | undefined;
+  /** Start of a highlighted range (ISO). @tr Vurgulanan aralığın başlangıcı (ISO). */
   rangeFrom?: IsoDate | null | undefined;
+  /** End of a highlighted range (ISO). @tr Vurgulanan aralığın sonu (ISO). */
   rangeTo?: IsoDate | null | undefined;
+  /** Focuses the current day on mount. @tr Açılışta geçerli güne odaklanır. */
   autoFocus?: boolean | undefined;
-  /** Accessible names of the month buttons (default: "Previous month" / "Next month"). */
+  /** Accessible names of the month buttons (default: "Previous month" / "Next month"). @tr Ay düğmelerinin erişilebilir adları (varsayılan: "Previous month" / "Next month"). */
   labels?: { prevMonth?: string | undefined; nextMonth?: string | undefined } | undefined;
-  /** The month buttons: `false` removes both (PageUp / PageDown still change the month). */
+  /** The month buttons: `false` removes both (PageUp / PageDown still change the month). @tr Ay düğmeleri: `false` ikisini de kaldırır (PageUp / PageDown ayı yine değiştirir). */
   nav?: boolean | undefined;
-  /** Content of the previous-month button instead of the chevron (a node, text or `() => node`). */
+  /** Content of the previous-month button instead of the chevron (a node, text or `() => node`). @tr Önceki ay düğmesinde ok yerine gösterilen içerik (düğüm, metin ya da `() => node`). */
   prevIcon?: unknown;
-  /** Content of the next-month button instead of the chevron. */
+  /** Content of the next-month button instead of the chevron. @tr Sonraki ay düğmesinde ok yerine gösterilen içerik. */
   nextIcon?: unknown;
-  /** The row of weekday names: `false` removes it. */
+  /** The row of weekday names: `false` removes it. @tr Gün adları satırı: `false` kaldırır. */
   weekdays?: boolean | undefined;
-  /** Content of a day cell instead of the day number: `(iso, day) => node` (a dot under busy days, a price…). */
+  /** Content of a day cell instead of the day number: `(iso, day) => node` (a dot under busy days, a price…). @tr Gün numarası yerine hücre içeriği: `(iso, day) => node` (dolu günlerin altında nokta, fiyat…). */
   renderDay?: ((iso: IsoDate, day: number) => unknown) | undefined;
 }
 

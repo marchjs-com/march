@@ -5,12 +5,15 @@ import { h } from "../../../dom/h.ts";
 import { model, ctl, cx, type ControlProps } from "../../../forms/util.ts";
 
 export interface ToggleProps extends ControlProps<boolean | null> {
+  /** Text next to the switch (or use children). @tr Anahtarın yanındaki metin (ya da children kullanılır). */
   label?: unknown;
   /**
    * Three states: on, off and "not set" (null, the thumb in the middle): for a prop where unset differs from false
    * (a toggle button's `pressed`). A click goes not set → on → off → not set. Default false (two states).
+   * @tr Üç durum: açık, kapalı ve "ayarlanmamış" (null, başparmak ortada): ayarlanmamışın false'tan farklı olduğu bir özellik için (toggle düğmesinin `pressed`'i). Tıklama sırası: ayarlanmamış → açık → kapalı → ayarlanmamış. Varsayılan false (iki durum).
    */
   tristate?: boolean | undefined;
+  /** Label content, when `label` is not given. @tr `label` verilmediğinde etiket içeriği. */
   children?: unknown;
 }
 

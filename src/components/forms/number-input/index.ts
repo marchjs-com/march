@@ -10,16 +10,23 @@ import { affix, textAttrs, inputOf, type AffixProps, type TextAttrProps } from "
 const precise = <N extends number | null | undefined>(n: N): N => (n == null ? n : (Number(n.toPrecision(15)) as N));
 
 export interface NumberInputProps extends ControlProps<number | null>, TextAttrProps, AffixProps {
+  /** Smallest allowed value; the input clamps to it. @tr İzin verilen en küçük değer; girdi bu değere sınırlar. */
   min?: number | null | undefined;
+  /** Largest allowed value; the input clamps to it. @tr İzin verilen en büyük değer; girdi bu değere sınırlar. */
   max?: number | null | undefined;
-  /** ArrowUp / ArrowDown step (display units). */
+  /** ArrowUp / ArrowDown step (display units). @tr ArrowUp / ArrowDown adımı (gösterim biriminde). */
   step?: number | undefined;
+  /** Decimal places the value is rounded to. @tr Değerin yuvarlandığı ondalık basamak sayısı. */
   decimals?: number | undefined;
+  /** Decimal places always shown (padded with zeros). @tr Her zaman gösterilen ondalık basamak sayısı (sıfırla doldurulur). */
   minDecimals?: number | undefined;
+  /** Thousands separators while not editing (default false; MoneyInput: true). @tr Düzenlenmezken binlik ayırıcılar (varsayılan false; MoneyInput: true). */
   grouping?: boolean | undefined;
-  /** Display = value × scale. */
+  /** Display = value × scale. @tr Gösterilen = değer × scale. */
   scale?: number | undefined;
+  /** Locale for the number format (default: the app locale). @tr Sayı biçiminin dili (varsayılan: uygulamanın dili). */
   locale?: string | undefined;
+  /** Called with the input element. @tr Girdi öğesiyle çağrılır. */
   ref?: ((el: HTMLInputElement) => void) | undefined;
 }
 
@@ -101,7 +108,7 @@ export function currencyInfo(loc: string | undefined, currency: string): { symbo
 }
 
 export interface MoneyInputProps extends NumberInputProps {
-  /** ISO 4217 code (default "USD"). */
+  /** ISO 4217 code (default "USD"). @tr ISO 4217 kodu (varsayılan "USD"). */
   currency?: string | undefined;
 }
 
@@ -115,7 +122,7 @@ export function MoneyInput(props: MoneyInputProps): unknown {
 }
 
 export interface PercentInputProps extends NumberInputProps {
-  /** `false` stores 12.5 for 12.5 % (default: 0.125). */
+  /** `false` stores 12.5 for 12.5 % (default: 0.125). @tr `false` %12,5 için 12.5 saklar (varsayılan: 0.125). */
   fraction?: boolean | undefined;
 }
 

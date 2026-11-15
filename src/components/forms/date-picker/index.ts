@@ -43,16 +43,21 @@ function datePlaceholder(loc: string): string {
 }
 
 export interface DatePickerProps extends ControlProps<IsoDate | null> {
+  /** Earliest pickable date (ISO). @tr Seçilebilecek en erken tarih (ISO). */
   min?: IsoDate | null | undefined;
+  /** Latest pickable date (ISO). @tr Seçilebilecek en geç tarih (ISO). */
   max?: IsoDate | null | undefined;
+  /** First day of the week: 0 = Sunday … 6 = Saturday (default: from the locale). @tr Haftanın ilk günü: 0 = Pazar … 6 = Cumartesi (varsayılan: dile göre). */
   firstDay?: number | undefined;
+  /** Locale for the date format and the calendar (default: the app locale). @tr Tarih biçimi ve takvimin dili (varsayılan: uygulamanın dili). */
   locale?: string | undefined;
+  /** Placeholder of the text field (default: the locale's date pattern, e.g. `DD.MM.YYYY`). @tr Metin alanının yer tutucusu (varsayılan: dilin tarih kalıbı, ör. `DD.MM.YYYY`). */
   placeholder?: string | null | undefined;
-  /** The calendar button: `false` removes it (Alt+ArrowDown still opens the calendar), a node / text / `() => node` replaces the icon. */
+  /** The calendar button: `false` removes it (Alt+ArrowDown still opens the calendar), a node / text / `() => node` replaces the icon. @tr Takvim düğmesi: `false` kaldırır (Alt+ArrowDown takvimi yine açar), düğüm / metin / `() => node` ikonun yerine geçer. */
   icon?: unknown;
-  /** Accessible names: `choose` (the button and the popover, default "Choose date"), `prevMonth`, `nextMonth` (the calendar). */
+  /** Accessible names: `choose` (the button and the popover, default "Choose date"), `prevMonth`, `nextMonth` (the calendar). @tr Erişilebilir adlar: `choose` (düğme ve açılır pencere, varsayılan "Choose date"), `prevMonth`, `nextMonth` (takvim). */
   labels?: { choose?: string | undefined; prevMonth?: string | undefined; nextMonth?: string | undefined } | undefined;
-  /** Extra props for the Calendar in the popover (`{ renderDay, weekdays: false, prevIcon, nextIcon, isDisabled }`). */
+  /** Extra props for the Calendar in the popover (`{ renderDay, weekdays: false, prevIcon, nextIcon, isDisabled }`). @tr Açılır penceredeki Calendar'a ek özellikler (`{ renderDay, weekdays: false, prevIcon, nextIcon, isDisabled }`). */
   calendar?: Partial<CalendarProps> | undefined;
 }
 

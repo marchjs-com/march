@@ -12,21 +12,29 @@ import type { IconDef } from "../../../icons/svg.ts";
 import { isRtl } from "../../../core/util.ts";
 
 export interface RatingProps {
+  /** The rating, a value or an accessor (4.5 shows a half mark). @tr Puan, değer ya da erişimci (4.5 yarım işaret gösterir). */
   value?: MaybeFn<number | null | undefined>;
+  /** Writes the picked rating back (set by `bind:value`). @tr Seçilen puanı geri yazar (`bind:value` bunu verir). */
   setValue?: (v: number) => void;
+  /** Called with the picked rating. @tr Seçilen puanla çağrılır. */
   onChange?: (v: number) => void;
+  /** Number of marks (default 5). @tr İşaret sayısı (varsayılan 5). */
   max?: number;
+  /** Shows the rating without letting it change. @tr Puanı değiştirilemez şekilde gösterir. */
   readonly?: boolean;
+  /** Accessible name of the group (default "Rating"). @tr Grubun erişilebilir adı (varsayılan "Rating"). */
   label?: MaybeFn<string | undefined>;
+  /** Mark size: `sm`, `md` (default) or `lg`. @tr İşaret boyutu: `sm`, `md` (varsayılan) ya da `lg`. */
   size?: "sm" | "md" | "lg";
-  /** The empty mark instead of the star outline: an icon of hadi-march/icons, or `(n) => node` for your own drawing. */
+  /** The empty mark instead of the star outline: an icon of hadi-march/icons, or `(n) => node` for your own drawing. @tr Yıldız çerçevesi yerine boş işaret: hadi-march/icons'tan bir ikon ya da kendi çiziminiz için `(n) => node`. */
   icon?: IconDef | ((n: number) => unknown) | undefined;
-  /** The filled mark instead of the filled star (same forms as `icon`). */
+  /** The filled mark instead of the filled star (same forms as `icon`). @tr Dolu yıldız yerine dolu işaret (`icon` ile aynı biçimler). */
   iconOn?: IconDef | ((n: number) => unknown) | undefined;
-  /** Accessible name of a mark: `(n, max) => text` (default "3 of 5"). */
+  /** Accessible name of a mark: `(n, max) => text` (default "3 of 5"). @tr Bir işaretin erişilebilir adı: `(n, max) => text` (varsayılan "3 of 5"). */
   starLabel?: ((n: number, max: number) => string) | undefined;
-  /** `false`: no hover growth and no fade between empty and filled. */
+  /** `false`: no hover growth and no fade between empty and filled. @tr `false`: üzerine gelince büyüme ve boş ile dolu arasında geçiş yok. */
   animate?: boolean | undefined;
+  /** Extra CSS classes on the root element. @tr Kök öğeye eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 /** Star rating (radio group; ← → change): `<Rating bind:value={$stars} />`, `<Rating value={4.5} readonly />` */

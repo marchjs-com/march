@@ -39,27 +39,31 @@ export const ICON_GROUPS: readonly IconGroup[] = [
 export interface IconPickerPack { id: string; label: MaybeFn<string>; count?: number | undefined; load: () => Promise<Readonly<Record<string, IconDef>>> }
 
 export interface IconPickerProps {
-  /** The chosen icon's name (a signal, a value or an accessor); null: none. */
+  /** The chosen icon's name (a signal, a value or an accessor); null: none. @tr Seçilen ikonun adı (sinyal, değer ya da erişimci); null: yok. */
   value?: Signal<string | null> | MaybeFn<string | null | undefined>;
+  /** Called with the chosen icon's name (null for none). @tr Seçilen ikonun adıyla çağrılır (yoksa null). */
   onChange?: ((name: string | null) => void) | undefined;
-  /** The icons to choose from (default every built-in icon). */
+  /** The icons to choose from (default every built-in icon). @tr Seçilebilecek ikonlar (varsayılan: tüm yerleşik ikonlar). */
   icons?: Readonly<Record<string, IconDef>> | undefined;
-  /** More icon sets, chosen above the grid and loaded when first chosen (or when the value names one). */
+  /** More icon sets, chosen above the grid and loaded when first chosen (or when the value names one). @tr Izgaranın üstünden seçilen, ilk seçildiğinde (ya da değer onlardan birini adlandırınca) yüklenen ek ikon setleri. */
   packs?: readonly IconPickerPack[] | undefined;
-  /** The name of `icons` in the set list (default "March"). */
+  /** The name of `icons` in the set list (default "March"). @tr Set listesinde `icons`'un adı (varsayılan "March"). */
   setLabel?: MaybeFn<string | undefined>;
-  /** Icons drawn at once; scrolling to the end of the grid draws as many more (default 240). */
+  /** Icons drawn at once; scrolling to the end of the grid draws as many more (default 240). @tr Bir kerede çizilen ikon sayısı; ızgaranın sonuna kaydırınca bir o kadar daha çizilir (varsayılan 240). */
   pageSize?: number | undefined;
-  /** The filter chips (default ICON_GROUPS); false: none. */
+  /** The filter chips (default ICON_GROUPS); false: none. @tr Süzgeç chip'leri (varsayılan ICON_GROUPS); false: yok. */
   groups?: readonly IconGroup[] | false | undefined;
-  /** The panel right in the page instead of behind a button (a sidebar, a form section). */
+  /** The panel right in the page instead of behind a button (a sidebar, a form section). @tr Panel bir düğmenin arkası yerine doğrudan sayfada (kenar çubuğu, form bölümü). */
   inline?: boolean | undefined;
-  /** A "No icon" choice (default true). */
+  /** A "No icon" choice (default true). @tr "No icon" seçeneği (varsayılan true). */
   none?: boolean | undefined;
-  /** Accessible name of the button and the panel (default "Icon"). */
+  /** Accessible name of the button and the panel (default "Icon"). @tr Düğmenin ve panelin erişilebilir adı (varsayılan "Icon"). */
   label?: MaybeFn<string | undefined>;
+  /** Placeholder of the search field (default "Search icons"). @tr Arama alanının yer tutucusu (varsayılan "Search icons"). */
   placeholder?: MaybeFn<string | undefined>;
+  /** Size of the button: `sm` (default) or `md`. @tr Düğmenin boyutu: `sm` (varsayılan) ya da `md`. */
   size?: "sm" | "md" | undefined;
+  /** Extra CSS classes on the root element. @tr Kök öğeye eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 

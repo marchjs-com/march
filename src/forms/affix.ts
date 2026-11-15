@@ -4,7 +4,14 @@ import { h } from "../dom/h.ts";
 import { cx, type ClassProp } from "./util.ts";
 
 /** prefix / suffix text around a control. */
-export interface AffixProps { prefix?: unknown; suffix?: unknown; class?: ClassProp }
+export interface AffixProps {
+  /** Text or node shown before the input, inside its frame (e.g. "₺", "https://"). @tr Girdinin önünde, çerçevesinin içinde gösterilen metin ya da düğüm (ör. "₺", "https://"). */
+  prefix?: unknown;
+  /** Text or node shown after the input, inside its frame (e.g. "kg", "%"). @tr Girdinin arkasında, çerçevesinin içinde gösterilen metin ya da düğüm (ör. "kg", "%"). */
+  suffix?: unknown;
+  /** Extra CSS classes (on the wrapper when there is a prefix / suffix). @tr Ek CSS sınıfları (önek / sonek varken sarmalayıcıya). */
+  class?: ClassProp;
+}
 
 /** Wrap a control with prefix / suffix text when given. */
 export function affix(props: AffixProps, el: Node): unknown {
@@ -15,16 +22,25 @@ export function affix(props: AffixProps, el: Node): unknown {
 
 /** Text attributes shared by the text-like inputs. */
 export interface TextAttrProps {
+  /** Hint text shown while the input is empty. @tr Girdi boşken gösterilen yer tutucu metin. */
   placeholder?: string | null | undefined;
+  /** Makes the input read-only. @tr Girdiyi yalnız okunur yapar. */
   readonly?: boolean | null | undefined;
+  /** Browser autofill hint (`email`, `name`, `off`…). @tr Tarayıcının otomatik doldurma ipucu (`email`, `name`, `off`…). */
   autocomplete?: string | undefined;
+  /** Virtual keyboard to show (`numeric`, `email`, `tel`…). @tr Gösterilecek ekran klavyesi (`numeric`, `email`, `tel`…). */
   inputmode?: string | undefined;
+  /** Most characters allowed. @tr İzin verilen en fazla karakter sayısı. */
   maxLength?: number | undefined;
+  /** Same as `maxLength`. @tr `maxLength` ile aynı. */
   maxlength?: number | undefined;
+  /** Fewest characters required. @tr Gereken en az karakter sayısı. */
   minLength?: number | undefined;
+  /** Same as `minLength`. @tr `minLength` ile aynı. */
   minlength?: number | undefined;
+  /** Turns the browser's spell check on or off. @tr Tarayıcının yazım denetimini açar ya da kapatır. */
   spellcheck?: string | boolean | undefined;
-  /** Focus this field when it appears. */
+  /** Focus this field when it appears. @tr Alan göründüğünde ona odaklanır. */
   autofocus?: boolean | undefined;
 }
 

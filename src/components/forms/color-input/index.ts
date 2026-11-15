@@ -9,13 +9,13 @@ import { Swatch } from "../swatch/index.ts";
 import { TextInput, type TextInputProps } from "../text-input/index.ts";
 
 export interface ColorInputProps extends ControlProps<string> {
-  /** The native swatch picker: `false` leaves only the text field. */
+  /** The native swatch picker: `false` leaves only the text field. @tr Tarayıcının renk seçicisi: `false` yalnız metin alanını bırakır. */
   swatch?: boolean | undefined;
-  /** The #RRGGBB text field: `false` leaves only the swatch. */
+  /** The #RRGGBB text field: `false` leaves only the swatch. @tr #RRGGBB metin alanı: `false` yalnız renk kutusunu bırakır. */
   text?: boolean | undefined;
-  /** Accessible name of the swatch (default "Pick a color"). */
+  /** Accessible name of the swatch (default "Pick a color"). @tr Renk kutusunun erişilebilir adı (varsayılan "Pick a color"). */
   swatchLabel?: string | undefined;
-  /** Placeholder of the text field (default "#RRGGBB"). */
+  /** Placeholder of the text field (default "#RRGGBB"). @tr Metin alanının yer tutucusu (varsayılan "#RRGGBB"). */
   placeholder?: string | undefined;
 }
 

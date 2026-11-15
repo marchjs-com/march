@@ -26,20 +26,23 @@ export function rangePresets(today: IsoDate = todayIso()): RangePreset[] {
 }
 
 export interface DateRangePickerProps extends ControlProps<DateRange | null>, CommonProps {
-  /** Presets (like rangePresets()) or false for only the custom from / to pair. */
+  /** Presets (like rangePresets()) or false for only the custom from / to pair. @tr Hazır aralıklar (rangePresets() gibi) ya da yalnız özel başlangıç / bitiş çifti için false. */
   presets?: RangePreset[] | false | undefined;
-  /** "Today" for the built-in presets. */
+  /** "Today" for the built-in presets. @tr Hazır aralıklar için "bugün". */
   today?: IsoDate | undefined;
+  /** Earliest pickable date (ISO). @tr Seçilebilecek en erken tarih (ISO). */
   min?: IsoDate | null | undefined;
+  /** Latest pickable date (ISO). @tr Seçilebilecek en geç tarih (ISO). */
   max?: IsoDate | null | undefined;
+  /** First day of the week: 0 = Sunday … 6 = Saturday (default: from the locale). @tr Haftanın ilk günü: 0 = Pazar … 6 = Cumartesi (varsayılan: dile göre). */
   firstDay?: number | undefined;
-  /** Texts: `range` (name of the preset row, "Date range"), `custom` (the last option, "Custom"), `from` / `to` (names of the two date fields). */
+  /** Texts: `range` (name of the preset row, "Date range"), `custom` (the last option, "Custom"), `from` / `to` (names of the two date fields). @tr Metinler: `range` (hazır aralık satırının adı, "Date range"), `custom` (son seçenek, "Custom"), `from` / `to` (iki tarih alanının adları). */
   labels?: { range?: string | undefined; custom?: string | undefined; from?: string | undefined; to?: string | undefined } | undefined;
-  /** The "Custom" option after the presets: `false` leaves only the presets. */
+  /** The "Custom" option after the presets: `false` leaves only the presets. @tr Hazır aralıklardan sonraki "Custom" seçeneği: `false` yalnız hazır aralıkları bırakır. */
   custom?: boolean | undefined;
-  /** The mark between the two date fields: `false` removes it, a node / text / `() => node` replaces the "–". */
+  /** The mark between the two date fields: `false` removes it, a node / text / `() => node` replaces the "–". @tr İki tarih alanı arasındaki işaret: `false` kaldırır, düğüm / metin / `() => node` "–" yerine geçer. */
   separator?: unknown;
-  /** Extra props for both DatePickers (`{ icon, labels, calendar, locale, placeholder }`). */
+  /** Extra props for both DatePickers (`{ icon, labels, calendar, locale, placeholder }`). @tr İki DatePicker'a da ek özellikler (`{ icon, labels, calendar, locale, placeholder }`). */
   picker?: Partial<DatePickerProps> | undefined;
 }
 

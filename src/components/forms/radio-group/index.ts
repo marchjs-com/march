@@ -7,7 +7,9 @@ import { colorAttr } from "../../../theme/colors.ts";
 import { choiceBox, choiceText, itemColor, groupClass, type ChoiceGroupLook } from "../../../forms/choice.ts";
 
 export interface RadioGroupProps<T = unknown> extends ControlProps<T | null>, ChoiceGroupLook {
+  /** The choices: `[value]` or `[{ value, label, hint?, icon?, meta?, disabled? }]`. @tr Seçenekler: `[value]` ya da `[{ value, label, hint?, icon?, meta?, disabled? }]`. */
   options?: OptionsProp;
+  /** Lays the options out in a row instead of a column. @tr Seçenekleri sütun yerine yan yana dizer. */
   inline?: boolean | undefined;
 }
 

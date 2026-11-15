@@ -9,9 +9,9 @@ import { textAttrs, inputOf, type TextAttrProps } from "../../../forms/affix.ts"
 import { Button } from "../../actions/button/index.ts";
 
 export interface PasswordInputProps extends ControlProps<string>, TextAttrProps {
-  /** The show / hide button: `false` removes it; a function draws its content (`(shown) => <Icon of={shown ? eyeOff : eye} />`). */
+  /** The show / hide button: `false` removes it; a function draws its content (`(shown) => <Icon of={shown ? eyeOff : eye} />`). @tr Göster / gizle düğmesi: `false` kaldırır; fonksiyon içeriğini çizer (`(shown) => <Icon of={shown ? eyeOff : eye} />`). */
   toggle?: boolean | ((shown: boolean) => unknown) | undefined;
-  /** Texts: `show` / `hide` (the button text), `showPassword` / `hidePassword` (its accessible name). */
+  /** Texts: `show` / `hide` (the button text), `showPassword` / `hidePassword` (its accessible name). @tr Metinler: `show` / `hide` (düğme metni), `showPassword` / `hidePassword` (erişilebilir adı). */
   labels?: { show?: unknown; hide?: unknown; showPassword?: string | undefined; hidePassword?: string | undefined } | undefined;
 }
 

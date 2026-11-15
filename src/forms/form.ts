@@ -262,7 +262,12 @@ setControlBuilder(controlFor);
 
 // ------------------------------------------------------------------ Form
 /** Layout of auto-rendered fields. */
-export interface FieldsLayout { layout?: "stack" | "grid" | undefined; cols?: number | undefined }
+export interface FieldsLayout {
+  /** How fields are laid out: "stack" (default, one per row) or "grid". @tr Alanların dizilişi: "stack" (varsayılan, satır başına bir alan) ya da "grid". */
+  layout?: "stack" | "grid" | undefined;
+  /** Number of columns in the "grid" layout (default 2). @tr "grid" dizilişinde sütun sayısı (varsayılan 2). */
+  cols?: number | undefined;
+}
 
 /** Render the active schema fields (`names` or all), honouring `when`, `hidden` and layout. */
 export function renderFields<V>(form: FormController<V>, names?: readonly FieldName<V>[] | null, layout?: FieldsLayout): Element;
@@ -277,16 +282,21 @@ export function renderFields(form: FormController, names?: readonly string[] | n
 
 /** Props of <FormActions>. */
 export interface FormActionsProps<V = Values> {
+  /** The form controller (default: the surrounding Form). @tr Form denetleyicisi (varsayılan: çevreleyen Form). */
   form?: FormController<V> | null | undefined;
-  /** true = reset, or a function. */
+  /** true = reset, or a function. @tr true = sıfırla, ya da bir fonksiyon. */
   cancel?: boolean | ((form: FormController<V>) => unknown) | null | undefined;
+  /** Text of the cancel button (default "Cancel"). @tr İptal düğmesinin metni (varsayılan "Cancel"). */
   cancelLabel?: unknown;
+  /** Text of the submit button (default "Save"). @tr Gönder düğmesinin metni (varsayılan "Save"). */
   submitLabel?: unknown;
+  /** Text of the submit button while saving (default "Saving…"). @tr Kaydederken gönder düğmesinin metni (varsayılan "Saving…"). */
   busyLabel?: unknown;
-  /** Disable submit until something changed. */
+  /** Disable submit until something changed. @tr Bir şey değişene kadar gönder düğmesini devre dışı bırakır. */
   requireDirty?: boolean | undefined;
-  /** Extra buttons before cancel / submit. */
+  /** Extra buttons before cancel / submit. @tr İptal / gönder düğmelerinden önce ek düğmeler. */
   extra?: unknown;
+  /** Extra CSS classes on the action bar. @tr İşlem çubuğuna eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 
@@ -324,26 +334,41 @@ export interface FormSection<V> {
 
 /** Props of <Form>. */
 export interface FormProps<V = Values> extends FieldsLayout {
+  /** Field schema: a Schema or a schema spec. @tr Alan şeması: bir Schema ya da şema tanımı. */
   schema?: Schema<V> | SchemaSpec | undefined;
+  /** Initial values. @tr Başlangıç değerleri. */
   initial?: Initial<V>;
+  /** Called with the values when the valid form is submitted. @tr Geçerli form gönderilince değerlerle çağrılır. */
   onSubmit?: ((values: V, form: FormController<V>) => unknown) | undefined;
+  /** When fields are validated: "blur" (default), "change" or "submit". @tr Alanların ne zaman doğrulanacağı: "blur" (varsayılan), "change" ya da "submit". */
   validateOn?: ValidateOn | undefined;
+  /** Called with `(name, value, values)` when a field changes. @tr Bir alan değişince `(name, value, values)` ile çağrılır. */
   onChange?: FormOptions<V>["onChange"];
-  /** An existing useForm() controller. */
+  /** An existing useForm() controller. @tr Var olan bir useForm() denetleyicisi. */
   form?: FormController<V> | undefined;
+  /** Text of the submit button (default "Save"). @tr Gönder düğmesinin metni (varsayılan "Save"). */
   submitLabel?: unknown;
-  /** true = reset, or a function. */
+  /** true = reset, or a function. @tr true = sıfırla, ya da bir fonksiyon. */
   cancel?: boolean | ((form: FormController<V>) => unknown) | null | undefined;
+  /** Text of the cancel button (default "Cancel"). @tr İptal düğmesinin metni (varsayılan "Cancel"). */
   cancelLabel?: unknown;
+  /** Titled groups of fields: `[{ title, description, fields, cols }]`. @tr Başlıklı alan grupları: `[{ title, description, fields, cols }]`. */
   sections?: readonly FormSection<V>[] | null | undefined;
-  /** false hides the submit bar. */
+  /** false hides the submit bar. @tr false gönder çubuğunu gizler. */
   actions?: boolean | undefined;
+  /** Warns before leaving the page with unsaved changes. @tr Kaydedilmemiş değişiklik varken sayfadan çıkmadan önce uyarır. */
   confirmLeave?: boolean | undefined;
+  /** Disables submit until something changed. @tr Bir şey değişene kadar gönder düğmesini devre dışı bırakır. */
   requireDirty?: boolean | undefined;
+  /** Makes every field read-only and hides the submit bar. @tr Tüm alanları yalnız okunur yapar, gönder çubuğunu gizler. */
   readonly?: boolean | null | undefined;
+  /** Called once with the form controller. @tr Form denetleyicisiyle bir kez çağrılır. */
   onReady?: ((form: FormController<V>) => void) | undefined;
+  /** Extra buttons before cancel / submit. @tr İptal / gönder düğmelerinden önce ek düğmeler. */
   extraActions?: unknown;
+  /** Extra CSS classes on the form. @tr Forma eklenen CSS sınıfları. */
   class?: ClassProp;
+  /** Custom form body instead of the auto-rendered fields. @tr Otomatik çizilen alanlar yerine özel form içeriği. */
   children?: unknown;
 }
 
