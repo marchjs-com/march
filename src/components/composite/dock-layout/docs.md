@@ -29,7 +29,7 @@ Panels never move in the DOM: an iframe keeps running, an editor keeps its state
 | `api` | `(api: DockApi) => void` | — | `layout()`, `open`, `focus`, `collapse`, `close`, `toggleMaximize`, `focusMode` / `unfocus`, `preset`, `reset`, `expandAll`, `isOpen`, `load`, `layoutMenu()` |
 | `onChange` | `(layout) => void` | — | after every change |
 | `onClose` | `(panel) => boolean \| Promise` | — | a closable tab's close mark: remove the panel from `panels`; `false` keeps it |
-| `actions` | boolean / `("menu" \| "maximize" \| "collapse")[]` | `true` | the buttons of a group (keyboard, menus and `api` stay) |
+| `actions` | boolean / `("menu" \| "maximize" \| "collapse")[]` | `true` | the buttons of a group; without "collapse" the panel menu cannot collapse either (`api` still can) |
 | `narrow` | number | `560` | below this width: one tab group, no drag |
 | `motion` | boolean | `true` | the short slide when the layout changes |
 | `icons` | `{ menu, maximize, restore, collapse }` | — | own icons |
@@ -49,6 +49,9 @@ Panels never move in the DOM: an iframe keeps running, an editor keeps its state
 | Delete | close a closable tab |
 | Shift+F10 / Menu key | the panel menu: move, dock to an edge, join another group, collapse, fill, reset |
 | arrows on a splitter | resize (Shift: 4 steps); Enter / double click: equal sizes |
+
+A dragged splitter snaps to the line of another splitter of the same direction when it comes within 10 px: edges line
+up across columns and rows.
 
 ## Accessibility
 

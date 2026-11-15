@@ -4,7 +4,7 @@
 // for the way back. Groups fill the whole area, layouts come from presets, are saved and loaded (plain JSON).
 // Under `narrow` px it is one tab group. The tree logic is model.ts (no DOM).
 //
-// Built from TabList (the strip of Tabs, for every group's tabs: icon, title, badge, "changed" dot, close mark), IconButton (menu, maximize,
+// Built from TabList (the strip of Tabs, for every group's tabs; a narrowed title scrolls: OverflowText; icon, title, badge, "changed" dot, close mark), IconButton (menu, maximize,
 // collapse), Button (strip entries), ResizeHandle (every splitter: pointer, arrows, Shift, Enter / double click to
 // equalize), the shared menu panel (panel and layout menus) and dragGhost. Panels never move in the DOM: each panel's
 // content is built once and only gets a position and a size, so iframes and editors keep their state. A hidden panel
@@ -22,6 +22,7 @@ import { IconButton } from "../../actions/icon-button/index.ts";
 import { Button } from "../../actions/button/index.ts";
 import { menuPanel, type MenuItem } from "../../actions/menu/index.ts";
 import { ResizeHandle } from "../../layout/resize-handle/index.ts";
+import { OverflowText } from "../../typography/overflow-text/index.ts";
 import { dragGhost, type DragGhost } from "../../../behaviors/drag/ghost.ts";
 import { command } from "../../../managers/command/index.ts";
 import { more } from "../../../icons/glyphs/more.ts";
@@ -117,6 +118,8 @@ export interface DockLayoutProps {
 }
 
 const INSET = 8;
+/** A dragged splitter snaps to another splitter's line within this many px. */
+const SNAP = 10;
 const same = (a: unknown, b: unknown): boolean => JSON.stringify(a) === JSON.stringify(b);
 const coarse = (): boolean => typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches;
 const geoOpts = (): Partial<C.Metrics> => (coarse() ? { strip: 36, gap: 10 } : {});
@@ -124,7 +127,7 @@ function place(e: HTMLElement, r: Rect): void { const s = e.style; s.left = `${r
 const div = (cls: string, attrs: Record<string, unknown> = {}, ...kids: unknown[]): HTMLElement => h("div", { class: cls, ...attrs }, ...kids) as HTMLElement;
 const localStore: DockStorage = { get: (k) => load<unknown>(k, null), set: (k, v) => save(k, v) };
 
-interface PanelView { def: DockPanel; el: HTMLElement; stab: HTMLElement; shown: boolean; dispose: () => void }
+interface PanelView { def: DockPanel; el: HTMLElement; stab: HTMLElement; label: Node; shown: boolean; dispose: () => void }
 interface Frame { group: string; placed: boolean; el: HTMLElement; tabs: Signal<TabSpec[]>; active: Signal<string | null>; max: Signal<boolean>; canClose: Signal<boolean>; bar: HTMLElement | undefined; dispose: () => void }
 interface Sep { key: string; info: Signal<C.SplitterRect>; el: HTMLElement; dispose: () => void }
 
@@ -244,13 +247,13 @@ export function DockLayout(props: DockLayoutProps): Element {
     f.max.set(isMax);
     f.canClose.set(C.canCollapse(V, g.id));
   }
-  const tabSpec = (d: DockPanel): TabSpec => ({ id: d.id, label: () => val(d.title), icon: d.icon, badge: d.badge, dirty: d.dirty === undefined ? undefined : () => !!val(d.dirty), closable: d.closable ?? undefined });
+  const tabSpec = (d: DockPanel): TabSpec => ({ id: d.id, label: panels.get(d.id)?.label ?? (() => val(d.title)), icon: d.icon, badge: d.badge, dirty: d.dirty === undefined ? undefined : () => !!val(d.dirty), closable: d.closable ?? undefined });
   function makeFrame(id: string): Frame {
     return createRoot((dispose) => {
       const f = { group: id, placed: false, dispose, tabs: signal<TabSpec[]>([]), active: signal<string | null>(null), max: signal(false), canClose: signal(true), bar: undefined } as unknown as Frame;
       const gid = (): string => f.group;
       const menuBtn: HTMLElement = h(IconButton, {
-        icon: ownIcon(props.icons?.menu, more), label: () => props.labels?.menu ?? t`Panel menu`, size: "sm", class: "m-dock-hb", "aria-haspopup": "menu",
+        icon: ownIcon(props.icons?.menu, more), label: () => props.labels?.menu ?? t`Panel menu`, size: "sm", class: "m-dock-hb m-dock-hb-menu", "aria-haspopup": "menu",
         onClick: () => { const g = C.findNode(view() as DockTree, gid()) as C.TabsNode | null; if (g?.active) openMenu(menuBtn, panelMenu(g.active)); },
       }) as HTMLElement;
       const head = div("m-dock-head", {
@@ -331,18 +334,35 @@ export function DockLayout(props: DockLayoutProps): Element {
     createRoot((dispose) => {
       const info = signal(s0);
       const px = (): { pa: number; pb: number } => { const i = rects?.splits[info().split]; return { pa: i?.px[info().a] ?? 0, pb: i?.px[info().b] ?? 0 }; };
-      let start: DockTree | null = null, startR: Rects | null = null, from = 0;
+      let start: DockTree | null = null, startR: Rects | null = null, from = 0, dragging = false;
+      // while dragging, the splitter snaps to the line of another splitter of the same direction (a neighbouring
+      // column's or row's edge) when it comes within SNAP px: edges line up across the workspace
+      const snap = (v: number): number => {
+        const R = startR, s = info();
+        if (!dragging || !R) return v;
+        const mid = (r: Rect): number => (s.axis === "row" ? r.x + r.w / 2 : r.y + r.h / 2);
+        const own = R.splitters.find((x) => x.key === s.key);
+        if (!own) return v;
+        const at = mid(own.rect) + (v - from);
+        let best = SNAP + 1, to = at;
+        for (const o of R.splitters) {
+          if (o.key === s.key || o.axis !== s.axis) continue;
+          const d = Math.abs(mid(o.rect) - at);
+          if (d < best) { best = d; to = mid(o.rect); }
+        }
+        return best <= SNAP ? v + (to - at) : v;
+      };
       const el = h(ResizeHandle, {
         class: "m-dock-sep", edge: s0.axis === "row" ? "end" : "bottom", axis: s0.axis === "row" ? "inline" : "block", "data-axis": s0.axis, label: () => sepLabel(info()),
         value: () => px().pa, min: 0, max: 1e6,
         set: (v: number, done: boolean) => {
           if (!start) { start = L; startR = rects; from = px().pa; }
-          if (start && startR) { const n = C.resizeSplit(start, info().split, info().a, info().b, v - from, startR); if (n !== L) { L = n; L$.set(L); render(); } }
+          if (start && startR) { const n = C.resizeSplit(start, info().split, info().a, info().b, snap(v) - from, startR); if (n !== L) { L = n; L$.set(L); render(); } }
           if (done) { start = null; startR = null; persist(); }
         },
         reset: () => { if (L) commit(C.equalize(L, info().split), { anim: true }); },
-        onStart: () => { shield(true, info().axis === "row" ? "col-resize" : "row-resize"); },
-        onEnd: () => { shield(false); start = null; startR = null; persist(); },
+        onStart: () => { dragging = true; shield(true, info().axis === "row" ? "col-resize" : "row-resize"); },
+        onEnd: () => { dragging = false; shield(false); start = null; startR = null; persist(); },
       }) as HTMLElement;
       over.append(el);
       seps.set(s0.key, { key: s0.key, info, el, dispose });
@@ -426,6 +446,11 @@ export function DockLayout(props: DockLayoutProps): Element {
     if (!g) return [];
     if (narrow) return defs.map((d) => ({ label: titleOf(d.id), checked: g.active === d.id, onSelect: () => openPanel(d.id) }));
     const i = g.panels.indexOf(id), items: MenuItem[] = [];
+    // every tab of the group first: the ones that did not fit in the strip are reached here
+    if (g.panels.length > 1) {
+      for (const p of g.panels) { const d = panels.get(p)?.def; items.push({ label: titleOf(p), icon: d?.icon, checked: g.active === p, onSelect: () => { activate(p); queueMicrotask(() => focusTab(p)); } }); }
+      items.push("-");
+    }
     if (g.panels.length > 1) {
       items.push({ label: () => t`Move tab left`, disabled: i === 0, onSelect: () => moveWithFocus(C.moveTab(V, id, i - 1), id) });
       items.push({ label: () => t`Move tab right`, disabled: i === g.panels.length - 1, onSelect: () => moveWithFocus(C.moveTab(V, id, i + 1), id) });
@@ -435,7 +460,7 @@ export function DockLayout(props: DockLayoutProps): Element {
     for (const [z, label] of edge) items.push({ label, onSelect: () => L && moveWithFocus(C.movePanel(L, id, C.ROOT, z), id) });
     for (const o of C.groups(V.root)) if (o.id !== g.id) items.push({ label: () => t`Join as a tab: ${o.panels.map(titleOf).join(" · ")}`, onSelect: () => L && moveWithFocus(C.movePanel(L, id, o.id, "center"), id) });
     items.push("-");
-    items.push({ label: () => t`Collapse to a strip`, disabled: !C.canCollapse(V, g.id), onSelect: () => collapse(g.id) });
+    if (has("collapse")) items.push({ label: () => t`Collapse to a strip`, disabled: !C.canCollapse(V, g.id), onSelect: () => collapse(g.id) });
     items.push({ label: () => (V.max === g.id ? t`Back to its size` : t`Fill the whole area`), onSelect: () => toggleMax(g.id) });
     items.push({ label: () => t`Reset this panel`, onSelect: () => { const p = panels.get(id); if (p && L) commit(C.resetPanel(L, p.def, defs), { anim: true }); } });
     items.push({ label: () => t`Reset layout`, onSelect: () => commit(base0(), { anim: true }) });
@@ -498,7 +523,9 @@ export function DockLayout(props: DockLayoutProps): Element {
         onContextmenu: (c: MouseEvent) => { c.preventDefault(); openMenu(stab, panelMenu(def.id)); },
       }, h("span", { class: "m-dock-stl" }, () => val(def.title))) as HTMLElement;
       over.before(body);
-      panels.set(def.id, { def, el: body, stab, shown: false, dispose });
+      // the tab's title: when the tab is narrowed it scrolls while hovered or focused (the icon stays put)
+      const label = h(OverflowText, { class: "m-dock-tl", trigger: ["hover", "focus"], mode: "loop" }, () => val(def.title)) as Node;
+      panels.set(def.id, { def, el: body, stab, label, shown: false, dispose });
     }, owner);
   }
   function dropPanel(id: string): void {

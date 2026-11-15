@@ -14,11 +14,15 @@
 .m-dock-frame { position: absolute; box-sizing: border-box; display: flex; flex-direction: column; background: var(--m-surface); border: 1px solid var(--m-border); border-radius: var(--m-radius); overflow: hidden; }
 .m-dock-frame[hidden], .m-dock-strip[hidden], .m-dock-sep[hidden], .m-dock-preview[hidden], .m-dock-zones[hidden], .m-dock-insert[hidden] { display: none; }
 .m-dock-head { flex: 0 0 var(--m-dock-head); block-size: var(--m-dock-head); box-sizing: border-box; display: flex; align-items: center; gap: 1px; padding-inline-end: 3px; border-block-end: 1px solid var(--m-border); background: var(--m-dock-tint); user-select: none; -webkit-user-select: none; cursor: grab; touch-action: none; }
+/* tabs share the strip: each at its own width while they fit, all narrowed alike when they do not (a narrowed title
+   scrolls on hover / focus); the ones that still do not fit are
+   listed first in the group's ⋯ menu. The strip itself never scrolls. */
 .m-dock-tabs { flex: 1 1 auto; align-self: stretch; min-inline-size: 0; display: flex; align-items: stretch; overflow: hidden; }
-.m-dock-tab { flex: 0 1 auto; min-inline-size: 2.6rem; max-inline-size: 14rem; display: inline-flex; align-items: center; gap: var(--m-space-1); padding-inline: var(--m-space-3); border: 0; border-inline-end: 1px solid var(--m-border); background: transparent; color: var(--m-muted); font: 700 var(--m-text-xs) var(--m-font); white-space: nowrap; overflow: hidden; cursor: pointer; touch-action: none; }
+.m-dock-tab { flex: 1 1 0; min-inline-size: 4.25rem; max-inline-size: max-content; display: inline-flex; align-items: center; gap: var(--m-space-1); padding-inline: var(--m-space-3); border: 0; border-inline-end: 1px solid var(--m-border); background: transparent; color: var(--m-muted); font: 700 var(--m-text-xs) var(--m-font); white-space: nowrap; overflow: hidden; cursor: pointer; touch-action: none; }
 .m-dock-tab:hover { color: var(--m-text); }
 .m-dock-tab[aria-selected="true"] { color: var(--m-text); background: var(--m-surface); box-shadow: inset 0 2px 0 var(--m-primary); }
 .m-dock-tab .m-tab-icon, .m-dock-stab .m-icon { inline-size: 14px; block-size: 14px; flex: none; }
+.m-dock-tl { flex: 1 1 auto; min-inline-size: 0; }
 .m-dock-tab .m-tab-close { display: inline-grid; place-items: center; inline-size: 16px; block-size: 16px; border-radius: var(--m-radius-1); opacity: .6; }
 .m-dock-tab .m-tab-close:hover { opacity: 1; background: color-mix(in srgb, var(--m-primary) 16%, transparent); }
 .m-dock-tab .m-tab-close .m-icon { inline-size: 12px; block-size: 12px; }
@@ -59,9 +63,8 @@
 }
 /* touch: wider buttons */
 @media (pointer: coarse) { .m-dock-hb.m-icon-btn { inline-size: 34px; } }
-/* narrow: one tab group, scrolling tabs, no drag and no collapse */
+/* narrow: one tab group, no drag and no collapse; the ⋯ menu lists every panel */
 .m-dock.is-narrow .m-dock-head { cursor: default; touch-action: pan-x; }
-.m-dock.is-narrow .m-dock-tabs { overflow-x: auto; scrollbar-width: none; }
-.m-dock.is-narrow .m-dock-tab { flex: none; touch-action: manipulation; }
-.m-dock.is-narrow .m-dock-hb { display: none; }
+.m-dock.is-narrow .m-dock-tab { touch-action: manipulation; }
+.m-dock.is-narrow .m-dock-hb:not(.m-dock-hb-menu) { display: none; }
 .m-menu.m-dock-menu { min-inline-size: 15rem !important; inline-size: max-content; overflow-x: hidden; max-inline-size: min(24rem, 92vw); }
