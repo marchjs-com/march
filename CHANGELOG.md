@@ -4,6 +4,16 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
 
 ## 0.1.0 — unreleased
 
+### cdn.marchjs.com
+- `npm run build:cdn` (tools/build-cdn.js): every browser entry of the package as a minified ES module sharing its
+  chunks, in `cdn/dist/<version>/` and `latest/`: `march.js`, `ui.js`, `app-ui.js`, `icons/<pack>.js`…, `march.css`
+  (the tokens, the sx utilities and every component's styles), `importmap.json`, `files.json`.
+- `npm run deploy:cdn` (tools/cdn-deploy.js): publishes them as the static assets of a Cloudflare Worker
+  (`cdn/wrangler.jsonc`) at cdn.marchjs.com, keeping every version already out; a published version is never published
+  again changed. CORS open, a version cached for a year, `latest/` for five minutes. The Worker runs only for a
+  version's `march.js` and notes which site loaded which version (Analytics Engine); `npm run cdn:usage` lists them.
+- The playground's last-build output loads MarchJS from the CDN (an import map of the modules it uses, `march.css`).
+
 ### The name is MarchJS
 - The product is called **MarchJS** where it is shown: page titles, the showcase's trail, the READMEs, the console
   banner (`🧡 MarchJS v…`), the MadeWithMarch link ("Developed with MarchJS and 💗"), `<!-- Built with MarchJS -->`,

@@ -42,6 +42,19 @@ node node_modules/march/cli/march.js build --dev [--watch]   # fast build: one p
 node node_modules/march/cli/march.js check    # type-check, including March syntax
 ```
 
+Without a build: from **cdn.marchjs.com** (every module as a browser ES module, one stylesheet). A page made in the
+browser IDE (Playground → Console → "Son derlemeyi göster", or the Terminal's `output`) is exported this way.
+
+```html
+<link rel="stylesheet" href="https://cdn.marchjs.com/0.1.0/march.css" />
+<script type="importmap">
+  { "imports": { "march": "https://cdn.marchjs.com/0.1.0/march.js", "march/ui": "https://cdn.marchjs.com/0.1.0/ui.js" } }
+</script>
+```
+
+Every entry is there (`march/app-ui` → `app-ui.js`, `march/icons/lucide` → `icons/lucide.js`…), the whole map in
+`https://cdn.marchjs.com/0.1.0/importmap.json`; `latest/` follows the newest version (cached briefly; pin a version).
+
 Node runs `.ts`/`.tsx` sources directly: `node --import march/register --test` for component tests. March ships its
 TypeScript sources; node refuses to strip types under `node_modules`, so the CLI, the compiler and `march/register`
 strip or relocate March's own files themselves (node >= 22.18). Importing `march` from plain node needs `--import march/register`.
