@@ -1,5 +1,11 @@
 {
  "hadi-march": {
+  "extend": "Bileşenlere sarmalayıcı olmadan yeni özellik kazandırır: `extend([Button, Link], track)`, `extend(\"*\", testIds)`; hedef bir bileşen, liste, `\"*\"` ya da `{ test }`. Kaldıran bir fonksiyon döner.",
+  "intercept": "Adı verilen bileşenlerin aldığını ve verdiğini değiştirir: `props` (özellikler, canlı), `on` (onClick gibi geri çağrılar; `next` asıl olanı çağırır), `render` (çıktıyı sarar ya da tamamen değiştirir). Kaldıran bir fonksiyon döner.",
+  "defineExtension": "Yeniden kullanılır bir eklenti tanımlar (kaydetmez): eklediği özellikler (türleriyle), `setup`, `props` / `on` / `render` araya girenleri, `order`; `extend()` ya da `<Extensions use>` ile uygulanır.",
+  "withExtensions": "Eklentileri yalnız içeride çizilen bileşenlere uygular (şimdi ya da sonra): `withExtensions([track], () => …)`; genel olanlara ve dış kapsama eklenir.",
+  "Extensions": "`withExtensions` bileşen olarak: `<Extensions use={[track, smallButtons]}>…</Extensions>`.",
+  "extensions": "Araçlar için eklenti kaydı: `extensions.list()` (reaktif; kayıtlılar, hedefleri, kapsamları), `extensions.of(el)` (bir bileşene hangi eklentinin ne yaptığı), `extensions.propsOf(Comp)`.",
   "_enter": "Eşzamansız bileşenler için derleyici kancası: `await` sonrasında sahibi geri yükler (doğrudan kullanım için değil).",
   "_prop": "Derleyici yardımcısı (doğrudan kullanım için değil): şablon kopyasındaki bir öğeye tek bir JSX özelliğini h() gibi uygular (bağlı öznitelik, olay, ref, yönerge).",
   "_tpl": "Derleyici yardımcısı (doğrudan kullanım için değil): yerel öğe ağacını bir kez DOM çağrılarıyla kurar (HTML dizgesi yok), her kullanımda kopyalar; yalnız dinamik kısımlar bağlanır.",

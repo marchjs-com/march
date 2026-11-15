@@ -11,7 +11,9 @@ import { tmpdir } from "node:os";
 // 11.25 KB since the layer stack + named portal targets (dom/portal.ts) became core: one mechanism for every overlay.
 // 12.25 KB since template cloning (_tpl/_prop), selector() and the keyed list's fewest-moves reorder (LIS) became core:
 // the speed work that makes March as fast as hand-written DOM code. App entries stay under their own 15 KB budget.
-export const BUDGET = { core: 12.25 * 1024, minimal: 5 * 1024 };
+// 15 KB since extensions and interceptors (dom/extend.ts: extend, intercept, defineExtension, <Extensions>, the
+// pipeline and its tools) became core (+2.6 KB; docs/internal/size-watch.md). Apps that do not import them pay 0.
+export const BUDGET = { core: 15 * 1024, minimal: 5 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const ENTRIES = { core: "src/index.ts", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
 

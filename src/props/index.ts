@@ -3,18 +3,34 @@
 // a constant on a native element becomes a plain attribute at build time and only the CSS file is loaded.
 // New members are added with registerMProp(); the list is open.
 import { effect, computed, untrack, getOwner, runWithOwner, onCleanup, signal, reactive, isReactive, context, provide, useContext } from "../core/reactive.ts";
-import { registerNamespace, _partsHook } from "../dom/h.ts";
+import { registerNamespace } from "../dom/h.ts";
+import { _builtin } from "../dom/extend.ts";
 import "../css/props.css";
 
 /** Applies one common prop to one element; called again whenever a live value changes. */
 export type MProp = (el: Element, value: unknown) => void;
 const REG = new Map<string, MProp>();
+/** The `m:` keys a component may be given by hand (`h(Card, { "m:tip": "…" })`): applied to its root elements. */
+const KEYS = new Set<string>();
+let installed = false;
 
 /**
  * Add a common prop: `registerMProp("tone", (el, v) => …)` makes `m:tone` work on every element and component.
- * Register before the first render that uses it.
+ * Register before the first render that uses it. A built-in member of the extension pipeline (extend()): the
+ * compiler applies `m:` props itself, so it only runs for `h(Comp, { "m:tone": … })` written by hand.
  */
-export function registerMProp(name: string, apply: MProp): void { REG.set(name, apply); }
+export function registerMProp(name: string, apply: MProp): void {
+  REG.set(name, apply);
+  KEYS.add(`m:${name}`);
+  if (installed) return;
+  installed = true;
+  _builtin("m:", {
+    keys: KEYS,
+    // the component never sees them; they go to its root elements
+    raw: (_, raw) => { const o: Record<string, unknown> = {}; for (const k in raw) if (!KEYS.has(k)) o[k] = raw[k]; return o; },
+    out: (out, raw) => { const m: Record<string, unknown> = {}; for (const k in raw) if (KEYS.has(k)) m[k.slice(2)] = raw[k]; return mProps(out, m); },
+  });
+}
 
 /**
  * Apply common props by hand (the compiler writes this call for `m:` attributes): `mProps(h(Card, props), {
@@ -135,7 +151,7 @@ let hooked = false;
 export function withParts<T>(parts: PartsMap | (() => PartsMap | null | undefined), render: () => T): T {
   if (!hooked) {
     hooked = true;
-    _partsHook((c, raw) => {
+    _builtin("m:parts", { raw: (c, raw) => {
       const find = useContext(Parts), now = find && untrack(() => find(c as Comp));
       if (!now) return raw;
       const out = { ...raw };
@@ -146,7 +162,7 @@ export function withParts<T>(parts: PartsMap | (() => PartsMap | null | undefine
         out[key] = key === "children" || /^on[A-Z:]/.test(key) ? now[key] : reactive(value);
       }
       return out;
-    });
+    } });
   }
   const get = typeof parts === "function" ? parts : (): PartsMap => parts;
   const run = (): T => {

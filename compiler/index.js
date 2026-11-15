@@ -784,6 +784,11 @@ class Transformer {
           parts = a.dynamic ? `() => (${code})` : code;
           return [];
         }
+        // m:extend={false | ["name"]}: this instance takes no extension / only the named ones (read by the pipeline)
+        if (name === "extend") {
+          if (!isComp) throw fail(this.src, this.pos, "m:extend is for components (extensions apply to components)");
+          return [a];
+        }
         if (!/^[a-z][a-z0-9-]*$/.test(name)) throw fail(this.src, this.pos, `invalid common prop ${a.name}`);
         // a text constant on a native element: the attribute itself (m:theme still needs its stylesheet: runtime)
         if (!isComp && M_TEXT[name] && name !== "theme" && !a.dynamic && typeof a.literal === "string" && a.literal) return [{ name: M_TEXT[name], code: JSON.stringify(a.literal), dynamic: false, literal: a.literal }];
