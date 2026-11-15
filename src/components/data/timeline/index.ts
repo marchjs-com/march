@@ -13,13 +13,15 @@ const TONES: readonly StatusDotTone[] = ["primary", "info", "success", "warn", "
 /** A Timeline entry; `time` may be a Date, epoch ms, ISO string (formatted) or text. */
 export interface TimelineItem { time?: MaybeFn<unknown> | undefined; title?: MaybeFn<unknown> | undefined; body?: unknown; tone?: Tone | undefined; /** Dot colour as a theme token ("brand-orange" …); wins over `tone`. */ color?: ColorToken | undefined; icon?: unknown; /** Extra class on this item's `<li>` (a state the host styles). */ class?: string | undefined }
 export interface TimelineProps {
+  /** The entries: time, title, body, tone or colour, icon. @tr Girdiler: zaman, başlık, gövde, ton ya da renk, ikon. */
   items: MaybeFn<readonly TimelineItem[] | null | undefined>;
-  /** The dot of every item: true (default), false, or `(item, index) => node`. */
+  /** The dot of every item: true (default), false, or `(item, index) => node`. @tr Her ögenin noktası: true (varsayılan), false ya da `(item, index) => node`. */
   dot?: boolean | ((item: TimelineItem, index: number) => unknown) | undefined;
-  /** The line that connects the items (default true). */
+  /** The line that connects the items (default true). @tr Ögeleri birleştiren çizgi (varsayılan true). */
   line?: boolean | undefined;
-  /** Your own text for a time value (default: Date / epoch / ISO are formatted as date and time, text stays). */
+  /** Your own text for a time value (default: Date / epoch / ISO are formatted as date and time, text stays). @tr Bir zaman değeri için kendi metniniz (varsayılan: Date / epoch / ISO tarih ve saat olarak biçimlenir, metin olduğu gibi kalır). */
   formatTime?: ((value: unknown) => unknown) | undefined;
+  /** Extra CSS classes on the list. @tr Listeye eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 /** `<Timeline items={[{ time, title, body, tone, icon }]} />` — time may be a Date/epoch/ISO (formatted) or text. */

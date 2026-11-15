@@ -11,16 +11,21 @@ import { type ColorToken } from "../../../theme/colors.ts";
 
 export interface TreeNode { id: string; label: unknown; icon?: unknown; meta?: unknown; children?: readonly TreeNode[] | undefined }
 export interface TreeProps {
+  /** The tree's nodes; a node with `children` is a branch. @tr Ağacın düğümleri; `children` olan düğüm bir daldır. */
   nodes: readonly TreeNode[];
+  /** Id of the selected node. @tr Seçili düğümün kimliği. */
   selected?: MaybeFn<string | null | undefined>;
+  /** Called with the node the user selects (click or Enter). @tr Kullanıcının seçtiği düğümle çağrılır (tıklama ya da Enter). */
   onSelect?: (node: TreeNode) => void;
+  /** Ids of the branches open at start. @tr Başta açık olan dalların kimlikleri. */
   expanded?: readonly string[];
-  /** Accessible name (default "Tree"). */
+  /** Accessible name (default "Tree"). @tr Erişilebilir ad (varsayılan "Tree"). */
   label?: string;
-  /** The open / close arrow: true (default), false, or `(node, open) => node` (`open()` is live; yours does not turn by itself). */
+  /** The open / close arrow: true (default), false, or `(node, open) => node` (`open()` is live; yours does not turn by itself). @tr Aç / kapa oku: true (varsayılan), false ya da `(node, open) => node` (`open()` canlıdır; sizinki kendiliğinden dönmez). */
   chevron?: boolean | ((node: TreeNode, open: () => boolean) => unknown) | undefined;
-  /** What opens / closes a branch on click: "row" (default: the whole row, which also selects it) or "chevron" (only the arrow; a click on the row only selects). */
+  /** What opens / closes a branch on click: "row" (default: the whole row, which also selects it) or "chevron" (only the arrow; a click on the row only selects). @tr Tıklamada dalı ne açar / kapar: "row" (varsayılan: tüm satır, onu seçer de) ya da "chevron" (yalnız ok; satıra tıklamak yalnız seçer). */
   toggle?: "row" | "chevron" | undefined;
+  /** Extra CSS classes on the tree. @tr Ağaca eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 /** Expandable tree (role=tree; ↑ ↓ move, → opens then enters, ← closes then leaves, Enter selects): `<Tree nodes={files} onSelect={…} />` */

@@ -10,11 +10,13 @@ const PARTS = { label: "m-kv-label", value: "m-kv-value", hint: "m-kv-hint" };
 /** A KeyValue row. */
 export interface KeyValueItem { label: MaybeFn<unknown>; value: MaybeFn<unknown>; hint?: MaybeFn<unknown>; hidden?: MaybeFn<boolean> }
 export interface KeyValueProps {
-  /** Rows, or an object (keys become labels). */
+  /** Rows, or an object (keys become labels). @tr Satırlar ya da bir nesne (anahtarlar etiket olur). */
   items: MaybeFn<readonly KeyValueItem[] | Record<string, unknown> | null | undefined>;
+  /** Number of columns the rows flow into (2 to 4; default one). @tr Satırların dağıldığı sütun sayısı (2 ile 4 arası; varsayılan tek sütun). */
   columns?: number;
-  /** Shown for null / "" values (default "—"). */
+  /** Shown for null / "" values (default "—"). @tr null / "" değerler için gösterilir (varsayılan "—"). */
   empty?: unknown;
+  /** Extra CSS classes on the list. @tr Listeye eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 /** Definition list for detail views: `<KeyValue items={[{ label: "Email", value: user.email }]} columns={2} />` or an object. */

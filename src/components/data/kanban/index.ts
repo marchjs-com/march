@@ -24,18 +24,21 @@ export interface KanbanColumn<T> {
   items: readonly T[];
 }
 export interface KanbanProps<T> {
+  /** The columns, each with its id, title, dot colour and items. @tr Sütunlar; her biri kimliği, başlığı, nokta rengi ve ögeleriyle. */
   columns: MaybeFn<readonly KanbanColumn<T>[]>;
-  /** Card content for an item. */
+  /** Card content for an item. @tr Bir ögenin kart içeriği. */
   card: (item: T) => unknown;
+  /** Stable key of an item (keeps cards in place across updates). @tr Bir ögenin kalıcı anahtarı (güncellemelerde kartları yerinde tutar). */
   itemKey: (item: T) => string;
-  /** Called when a card is dropped on another column (drag and drop; keyboard: Alt+← / Alt+→ on a focused card). */
+  /** Called when a card is dropped on another column (drag and drop; keyboard: Alt+← / Alt+→ on a focused card). @tr Bir kart başka bir sütuna bırakılınca çağrılır (sürükle bırak; klavye: odaklı kartta Alt+← / Alt+→). */
   onMove?: (item: T, from: string, to: string) => void;
-  /** The dot before a column title: true (default), false, or `(column) => node`. */
+  /** The dot before a column title: true (default), false, or `(column) => node`. @tr Sütun başlığının önündeki nokta: true (varsayılan), false ya da `(column) => node`. */
   dot?: boolean | ((column: KanbanColumn<T>) => unknown) | undefined;
-  /** The card count of a column: true (default), false, or `(column) => node`. */
+  /** The card count of a column: true (default), false, or `(column) => node`. @tr Sütunun kart sayısı: true (varsayılan), false ya da `(column) => node`. */
   count?: boolean | ((column: KanbanColumn<T>) => unknown) | undefined;
-  /** Cards scale in when they appear (default true). */
+  /** Cards scale in when they appear (default true). @tr Kartlar belirirken büyüyerek gelir (varsayılan true). */
   animate?: boolean | undefined;
+  /** Extra CSS classes on the board. @tr Panoya eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 /** Board with columns and draggable cards. */

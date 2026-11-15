@@ -10,33 +10,35 @@ import { cx, val, rest, type ClassProp, type MaybeFn } from "../../../ui/util.ts
 import { type ColorToken } from "../../../theme/colors.ts";
 
 export interface StatTileProps {
-  /** The figure: text, a number or a node (`<Counter value={n} />`). */
+  /** The figure: text, a number or a node (`<Counter value={n} />`). @tr Rakam: metin, sayı ya da bir düğüm (`<Counter value={n} />`). */
   value?: MaybeFn<unknown>;
-  /** What it counts ("Followers"). */
+  /** What it counts ("Followers"). @tr Neyi saydığı ("Takipçi"). */
   label?: MaybeFn<unknown>;
-  /** A small line under them ("last 30 days"). */
+  /** A small line under them ("last 30 days"). @tr Altlarında küçük bir satır ("son 30 gün"). */
   hint?: MaybeFn<unknown>;
-  /** start · center (default) · end. */
+  /** start · center (default) · end. @tr start · center (varsayılan) · end. */
   align?: MaybeFn<"start" | "center" | "end" | undefined>;
-  /** sm · md (default) · lg · xl. */
+  /** sm · md (default) · lg · xl. @tr sm · md (varsayılan) · lg · xl. */
   size?: MaybeFn<"sm" | "md" | "lg" | "xl" | undefined>;
-  /** plain (default) · tile (soft background) · card (border and surface). */
+  /** plain (default) · tile (soft background) · card (border and surface). @tr plain (varsayılan) · tile (hafif arka plan) · card (kenarlık ve yüzey). */
   variant?: MaybeFn<"plain" | "tile" | "card" | undefined>;
-  /** Which line comes first: "value" (default) or "label". */
+  /** Which line comes first: "value" (default) or "label". @tr Hangi satır önce gelir: "value" (varsayılan) ya da "label". */
   order?: MaybeFn<"value" | "label" | undefined>;
-  /** Makes it a button. */
+  /** Makes it a button. @tr Onu bir düğme yapar. */
   onClick?: ((e: MouseEvent) => void) | undefined;
-  /** Makes it a link (the router's Link when the app has a router). */
+  /** Makes it a link (the router's Link when the app has a router). @tr Onu bir bağlantı yapar (uygulamada router varsa router'ın Link'i). */
   href?: MaybeFn<string | undefined>;
+  /** A button or link tile cannot be used: dimmed and not clickable. @tr Düğme ya da bağlantı olan karo kullanılamaz: soluklaşır, tıklanmaz. */
   disabled?: MaybeFn<boolean | undefined>;
-  /** Render `<dt>` (label) and `<dd>` (value, hint) for a `<dl>` parent; ignored for a button or a link. */
+  /** Render `<dt>` (label) and `<dd>` (value, hint) for a `<dl>` parent; ignored for a button or a link. @tr Bir `<dl>` ebeveyni için `<dt>` (etiket) ve `<dd>` (değer, ipucu) çizer; düğme ya da bağlantıda yok sayılır. */
   term?: boolean | undefined;
-  /** Where the hint goes: "tile" (default: its own line, last) or "value" (inside the value element: one `<dd>` per term). */
+  /** Where the hint goes: "tile" (default: its own line, last) or "value" (inside the value element: one `<dd>` per term). @tr İpucunun yeri: "tile" (varsayılan: kendi satırı, en sonda) ya da "value" (değer ögesinin içinde: terim başına tek `<dd>`). */
   hintIn?: "tile" | "value" | undefined;
-  /** "figure" (default): the value is a heavy number · "text": the value reads as body text that wraps (a details list). */
+  /** "figure" (default): the value is a heavy number · "text": the value reads as body text that wraps (a details list). @tr "figure" (varsayılan): değer kalın bir sayıdır · "text": değer alt satıra geçen gövde metni gibi okunur (ayrıntı listesi). */
   emphasis?: "figure" | "text" | undefined;
-  /** An extra class on a part, for a host that keeps its own class names (the KPI box of hadi-march/charts): `{ value, label, hint }`. */
+  /** An extra class on a part, for a host that keeps its own class names (the KPI box of hadi-march/charts): `{ value, label, hint }`. @tr Kendi sınıf adlarını koruyan bir ev sahibi için bir parçaya ek sınıf (hadi-march/charts'ın KPI kutusu): `{ value, label, hint }`. */
   partClass?: Partial<Record<"value" | "label" | "hint", string>> | undefined;
+  /** Extra CSS classes on the tile. @tr Karoya eklenen CSS sınıfları. */
   class?: ClassProp;
   /** Other attributes (`data-*`, `aria-*`, `title`, `id`) go to the root. */
   [attr: string]: unknown;

@@ -58,41 +58,49 @@ const LABELS: { [K in keyof TreeViewLabels]: () => TreeViewLabels[K] } = {
 };
 
 export interface TreeViewProps {
+  /** The tree's nodes; pass an accessor to own the data. @tr Ağacın düğümleri; verinin sahibi olmak için bir erişimci verin. */
   nodes: MaybeFn<readonly TreeViewNode[]>;
-  /** Children of a `lazy` node (called once per node; a rejection shows a retry row). */
+  /** Children of a `lazy` node (called once per node; a rejection shows a retry row). @tr `lazy` bir düğümün alt ögeleri (düğüm başına bir kez çağrılır; reddedilirse yeniden dene satırı gösterilir). */
   load?: ((node: TreeViewNode) => Promise<readonly TreeViewNode[]>) | undefined;
+  /** Selection mode: "none", "single" (default) or "multiple". @tr Seçim modu: "none", "single" (varsayılan) ya da "multiple". */
   selection?: MaybeFn<SelectionMode | undefined>;
-  /** Initially selected ids. */
+  /** Initially selected ids. @tr Başta seçili kimlikler. */
   selected?: readonly string[] | undefined;
+  /** Called with the selected ids and nodes when the selection changes. @tr Seçim değişince seçili kimlikler ve düğümlerle çağrılır. */
   onSelect?: ((ids: string[], nodes: TreeViewNode[]) => void) | undefined;
-  /** Initially open ids. */
+  /** Initially open ids. @tr Başta açık kimlikler. */
   expanded?: readonly string[] | undefined;
+  /** Called when a node opens or closes. @tr Bir düğüm açılınca ya da kapanınca çağrılır. */
   onExpand?: ((id: string, open: boolean) => void) | undefined;
-  /** Search text: shows the hits and the path to them, highlighted. */
+  /** Search text: shows the hits and the path to them, highlighted. @tr Arama metni: eşleşmeleri ve onlara giden yolu vurgulayarak gösterir. */
   search?: MaybeFn<string | null | undefined>;
-  /** Drag and drop to reorder / reparent (Alt+↑ / Alt+↓ moves among siblings from the keyboard). */
+  /** Drag and drop to reorder / reparent (Alt+↑ / Alt+↓ moves among siblings from the keyboard). @tr Sürükle bırakla yeniden sıralama / taşıma (klavyeden Alt+↑ / Alt+↓ kardeşler arasında taşır). */
   draggable?: MaybeFn<boolean | undefined>;
+  /** Decides whether the dragged ids may land at this target and position. @tr Sürüklenen kimliklerin bu hedefe ve konuma bırakılıp bırakılamayacağına karar verir. */
   canDrop?: ((ids: string[], target: TreeViewNode, position: DropPosition) => boolean) | undefined;
-  /** After a move; the tree already shows it (pass `nodes` as an accessor to own the data instead). */
+  /** After a move; the tree already shows it (pass `nodes` as an accessor to own the data instead). @tr Bir taşımadan sonra; ağaç bunu zaten gösterir (verinin sahibi olmak için `nodes`'u erişimci olarak verin). */
   onMove?: ((ids: string[], targetId: string, position: DropPosition) => void) | undefined;
-  /** Enter / double-click on a leaf. */
+  /** Enter / double-click on a leaf. @tr Bir yaprakta Enter / çift tıklama. */
   onActivate?: ((node: TreeViewNode) => void) | undefined;
-  /** Px height of the scroll area (default 360). */
+  /** Px height of the scroll area (default 360). @tr Kaydırma alanının yüksekliği, px (varsayılan 360). */
   height?: number | undefined;
+  /** Row height, px (default 32). @tr Satır yüksekliği, px (varsayılan 32). */
   rowHeight?: number | undefined;
-  /** Folder / file icons when a node has none (default true). */
+  /** Folder / file icons when a node has none (default true). @tr Düğümün ikonu yoksa klasör / dosya ikonları (varsayılan true). */
   icons?: MaybeFn<boolean | undefined>;
-  /** The open / close arrow: true (default), false (rows still open with a double click and the keyboard), or `(node, open) => node`. */
+  /** The open / close arrow: true (default), false (rows still open with a double click and the keyboard), or `(node, open) => node`. @tr Aç / kapa oku: true (varsayılan), false (satırlar yine çift tıklama ve klavyeyle açılır) ya da `(node, open) => node`. */
   chevron?: boolean | ((node: TreeViewNode, open: boolean) => unknown) | undefined;
-  /** The empty state: true (default: the text in `labels`), false, or your own node. */
+  /** The empty state: true (default: the text in `labels`), false, or your own node. @tr Boş durum: true (varsayılan: `labels`'taki metin), false ya da kendi düğümünüz. */
   empty?: unknown;
-  /** Content of the drag ghost: `(nodes) => node` (default: the first label and a count). */
+  /** Content of the drag ghost: `(nodes) => node` (default: the first label and a count). @tr Sürükleme hayaletinin içeriği: `(nodes) => node` (varsayılan: ilk etiket ve bir sayı). */
   ghost?: ((nodes: TreeViewNode[]) => unknown) | undefined;
-  /** Your own texts: `{ loading, retry, empty, noMatch }`. */
+  /** Your own texts: `{ loading, retry, empty, noMatch }`. @tr Kendi metinleriniz: `{ loading, retry, empty, noMatch }`. */
   labels?: Partial<TreeViewLabels> | undefined;
-  /** Opening, landing and ghost animations (default true). */
+  /** Opening, landing and ghost animations (default true). @tr Açılma, yerine konma ve hayalet animasyonları (varsayılan true). */
   animate?: boolean | undefined;
+  /** Accessible name of the tree (default "Tree"). @tr Ağacın erişilebilir adı (varsayılan "Tree"). */
   label?: MaybeFn<string | undefined>;
+  /** Extra CSS classes on the tree. @tr Ağaca eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 

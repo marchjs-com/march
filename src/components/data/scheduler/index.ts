@@ -73,49 +73,55 @@ const LABELS: { [K in keyof SchedulerLabels]: () => SchedulerLabels[K] } = {
 };
 
 export interface SchedulerProps {
+  /** The events: id, title, start, end and optional place and colour. @tr Etkinlikler: kimlik, başlık, başlangıç, bitiş; isteğe bağlı yer ve renk. */
   events: MaybeFn<readonly SchedulerEvent[]>;
+  /** The view: "month", "week" (default) or "day". @tr Görünüm: "month", "week" (varsayılan) ya da "day". */
   view?: MaybeFn<SchedulerView | undefined>;
+  /** Called when the user switches the view. @tr Kullanıcı görünümü değiştirince çağrılır. */
   onView?: ((view: SchedulerView) => void) | undefined;
-  /** The date in view (ISO). */
+  /** The date in view (ISO). @tr Görünümdeki tarih (ISO). */
   date?: MaybeFn<IsoDate | undefined>;
+  /** Called with the new date when the user moves to another period. @tr Kullanıcı başka bir döneme geçince yeni tarihle çağrılır. */
   onDate?: ((date: IsoDate) => void) | undefined;
-  /** After a drag (move / resize) or a keyboard move; the calendar already shows it. */
+  /** After a drag (move / resize) or a keyboard move; the calendar already shows it. @tr Bir sürüklemeden (taşıma / boyutlandırma) ya da klavyeyle taşımadan sonra; takvim bunu zaten gösterir. */
   onChange?: ((event: SchedulerEvent, next: SchedulerRange) => void) | undefined;
-  /** Drag on an empty slot (or click a free day in month view). */
+  /** Drag on an empty slot (or click a free day in month view). @tr Boş bir aralıkta sürükleme (ya da ay görünümünde boş bir güne tıklama). */
   onCreate?: ((range: SchedulerRange) => void) | undefined;
-  /** Click / Enter on an event. */
+  /** Click / Enter on an event. @tr Bir etkinliğe tıklama / Enter. */
   onSelect?: ((event: SchedulerEvent) => void) | undefined;
-  /** Snap in minutes (default 15). */
+  /** Snap in minutes (default 15). @tr Dakika cinsinden yaslama adımı (varsayılan 15). */
   step?: MaybeFn<number | undefined>;
-  /** Px per hour in week / day view (default 48). */
+  /** Px per hour in week / day view (default 48). @tr Hafta / gün görünümünde saat başına px (varsayılan 48). */
   hourHeight?: MaybeFn<number | undefined>;
-  /** Hour scrolled into view first (default 8). */
+  /** Hour scrolled into view first (default 8). @tr İlk görünür alana kaydırılan saat (varsayılan 8). */
   startHour?: number | undefined;
-  /** Show Saturday and Sunday in week view (default true). */
+  /** Show Saturday and Sunday in week view (default true). @tr Hafta görünümünde cumartesi ve pazarı gösterir (varsayılan true). */
   weekends?: MaybeFn<boolean | undefined>;
-  /** Drag, resize and create (default true). */
+  /** Drag, resize and create (default true). @tr Sürükleme, boyutlandırma ve oluşturma (varsayılan true). */
   editable?: MaybeFn<boolean | undefined>;
-  /** Px height of the calendar body (default 600). */
+  /** Px height of the calendar body (default 600). @tr Takvim gövdesinin yüksekliği, px (varsayılan 600). */
   height?: number | undefined;
-  /** Date locale (default: the app locale). Names, first day of week, 12 / 24 h and direction follow it. */
+  /** Date locale (default: the app locale). Names, first day of week, 12 / 24 h and direction follow it. @tr Tarih dili (varsayılan: uygulamanın dili). Adlar, haftanın ilk günü, 12 / 24 saat ve yön ona uyar. */
   locale?: MaybeFn<string | undefined>;
-  /** The bar above the calendar: period buttons, title and view switch (default true). */
+  /** The bar above the calendar: period buttons, title and view switch (default true). @tr Takvimin üstündeki çubuk: dönem düğmeleri, başlık ve görünüm seçici (varsayılan true). */
   toolbar?: boolean | undefined;
-  /** Views offered by the view switch (default all three); false or a single view hides the switch. */
+  /** Views offered by the view switch (default all three); false or a single view hides the switch. @tr Görünüm seçicinin sunduğu görünümler (varsayılan üçü de); false ya da tek görünüm seçiciyi gizler. */
   views?: readonly SchedulerView[] | false | undefined;
-  /** The "Today" button (default true). */
+  /** The "Today" button (default true). @tr "Bugün" düğmesi (varsayılan true). */
   todayButton?: boolean | undefined;
-  /** The line at the current time in week / day view (default true). */
+  /** The line at the current time in week / day view (default true). @tr Hafta / gün görünümünde şimdiki saatteki çizgi (varsayılan true). */
   nowLine?: boolean | undefined;
-  /** The hint under the calendar: true (default: the text in `labels`), false, or your own node. */
+  /** The hint under the calendar: true (default: the text in `labels`), false, or your own node. @tr Takvimin altındaki ipucu: true (varsayılan: `labels`'taki metin), false ya da kendi düğümünüz. */
   help?: unknown;
-  /** Content of an event: `(event, { view, time }) => node` (default: title, time and place). */
+  /** Content of an event: `(event, { view, time }) => node` (default: title, time and place). @tr Bir etkinliğin içeriği: `(event, { view, time }) => node` (varsayılan: başlık, saat ve yer). */
   renderEvent?: ((event: SchedulerEvent, info: { view: SchedulerView; time: string }) => unknown) | undefined;
-  /** Your own texts (see SchedulerLabels). */
+  /** Your own texts (see SchedulerLabels). @tr Kendi metinleriniz (bkz. SchedulerLabels). */
   labels?: Partial<SchedulerLabels> | undefined;
-  /** Slide, view-change and settle animations (default true). */
+  /** Slide, view-change and settle animations (default true). @tr Kayma, görünüm değişimi ve yerine oturma animasyonları (varsayılan true). */
   animate?: boolean | undefined;
+  /** Accessible name of the calendar (default "Calendar"). @tr Takvimin erişilebilir adı (varsayılan "Calendar"). */
   label?: MaybeFn<string | undefined>;
+  /** Extra CSS classes on the calendar. @tr Takvime eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 

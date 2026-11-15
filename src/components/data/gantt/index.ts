@@ -65,32 +65,39 @@ const LABELS: { [K in keyof GanttLabels]: () => GanttLabels[K] } = {
 };
 
 export interface GanttProps {
+  /** The tasks: id, name, start, end, progress, dependencies. @tr Görevler: kimlik, ad, başlangıç, bitiş, ilerleme, bağımlılıklar. */
   tasks: MaybeFn<readonly GanttTask[]>;
-  /** After a move, resize or progress change (and once per task pushed by `cascade`); the chart already shows it. */
+  /** After a move, resize or progress change (and once per task pushed by `cascade`); the chart already shows it. @tr Taşıma, boyutlandırma ya da ilerleme değişikliğinden sonra (ve `cascade`'in ittiği her görev için bir kez); grafik bunu zaten gösterir. */
   onChange?: ((task: GanttTask) => void) | undefined;
+  /** Called when a task is clicked or chosen with Enter. @tr Bir göreve tıklanınca ya da Enter ile seçilince çağrılır. */
   onSelect?: ((task: GanttTask) => void) | undefined;
+  /** Time scale: "day", "week" (default) or "month". @tr Zaman ölçeği: "day", "week" (varsayılan) ya da "month". */
   scale?: MaybeFn<GanttScale | undefined>;
-  /** Push successors later when a predecessor would overlap them (default true). */
+  /** Push successors later when a predecessor would overlap them (default true). @tr Bir öncül görev ardıllarıyla çakışacaksa ardılları ileri iter (varsayılan true). */
   cascade?: MaybeFn<boolean | undefined>;
+  /** Bars can be moved and resized with pointer and keys (default true). @tr Çubuklar işaretçi ve tuşlarla taşınıp boyutlandırılabilir (varsayılan true). */
   editable?: MaybeFn<boolean | undefined>;
-  /** Show the dependency arrows (default true). */
+  /** Show the dependency arrows (default true). @tr Bağımlılık oklarını gösterir (varsayılan true). */
   arrows?: MaybeFn<boolean | undefined>;
-  /** Px height of the chart (default 420). */
+  /** Px height of the chart (default 420). @tr Grafiğin yüksekliği, px (varsayılan 420). */
   height?: number | undefined;
+  /** Row height, px (default 36). @tr Satır yüksekliği, px (varsayılan 36). */
   rowHeight?: number | undefined;
-  /** The today line and its label (default true). */
+  /** The today line and its label (default true). @tr Bugün çizgisi ve etiketi (varsayılan true). */
   todayLine?: MaybeFn<boolean | undefined>;
-  /** The pinned column of task names (default true). */
+  /** The pinned column of task names (default true). @tr Görev adlarının sabit sütunu (varsayılan true). */
   names?: boolean | undefined;
-  /** The hint under the chart: true (default: the text in `labels`), false, or your own node. */
+  /** The hint under the chart: true (default: the text in `labels`), false, or your own node. @tr Grafiğin altındaki ipucu: true (varsayılan: `labels`'taki metin), false ya da kendi düğümünüz. */
   help?: unknown;
-  /** Content of a bar: `(task) => node` (default: the task name). */
+  /** Content of a bar: `(task) => node` (default: the task name). @tr Bir çubuğun içeriği: `(task) => node` (varsayılan: görev adı). */
   barLabel?: ((task: GanttTask) => unknown) | undefined;
-  /** Your own texts: `{ today, task, days, help, helpReadonly, done, after, moved, pushed }`. */
+  /** Your own texts: `{ today, task, days, help, helpReadonly, done, after, moved, pushed }`. @tr Kendi metinleriniz: `{ today, task, days, help, helpReadonly, done, after, moved, pushed }`. */
   labels?: Partial<GanttLabels> | undefined;
-  /** Arrow drawing, settle and scale-change animations (default true). */
+  /** Arrow drawing, settle and scale-change animations (default true). @tr Ok çizimi, yerine oturma ve ölçek değişimi animasyonları (varsayılan true). */
   animate?: boolean | undefined;
+  /** Accessible name of the chart (default "Project timeline"). @tr Grafiğin erişilebilir adı (varsayılan "Project timeline"). */
   label?: MaybeFn<string | undefined>;
+  /** Extra CSS classes on the chart. @tr Grafiğe eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 

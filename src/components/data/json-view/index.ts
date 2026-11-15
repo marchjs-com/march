@@ -45,17 +45,19 @@ function jsonNode(key: string | number | null, value: unknown, depth: number, o:
     () => open() && [h("ul", { class: "m-json-list", role: "group" }, kids()), h("span", { class: "m-json-punct" }, cb)]);
 }
 export interface JsonViewProps {
+  /** The value to show as a tree (any JSON-like value). @tr Ağaç olarak gösterilecek değer (JSON benzeri herhangi bir değer). */
   value: MaybeFn<unknown>;
-  /** Initially expanded depth (default 1). */
+  /** Initially expanded depth (default 1). @tr Başta açık olan derinlik (varsayılan 1). */
   open?: number;
-  /** Your own texts: `{ items, keys, circular }`. */
+  /** Your own texts: `{ items, keys, circular }`. @tr Kendi metinleriniz: `{ items, keys, circular }`. */
   labels?: Partial<JsonViewLabels> | undefined;
-  /** The open / close arrow: true (default), false, or `(open) => node` (`open()` is live). */
+  /** The open / close arrow: true (default), false, or `(open) => node` (`open()` is live). @tr Aç / kapa oku: true (varsayılan), false ya da `(open) => node` (`open()` canlıdır). */
   arrow?: boolean | ((open: () => boolean) => unknown) | undefined;
-  /** Accessible name of the tree. */
+  /** Accessible name of the tree. @tr Ağacın erişilebilir adı. */
   label?: MaybeFn<string | undefined>;
-  /** Your text for a value that is not JSON (a function, an element, a class instance): a string shows it as a leaf, null leaves it to JsonView. */
+  /** Your text for a value that is not JSON (a function, an element, a class instance): a string shows it as a leaf, null leaves it to JsonView. @tr JSON olmayan bir değer (fonksiyon, öge, sınıf örneği) için metniniz: string onu yaprak olarak gösterir, null JsonView'a bırakır. */
   describe?: ((value: unknown) => string | null | undefined) | undefined;
+  /** Extra CSS classes on the tree. @tr Ağaca eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 /** Collapsible read-only JSON tree: `<JsonView value={obj} open={1} />` (open = initially expanded depth). */

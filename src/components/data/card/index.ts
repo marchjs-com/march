@@ -6,17 +6,23 @@ import { type ActionsProp, actionsOf } from "../../../ui/display-base.ts";
 import { PanelHeader } from "../../layout/panel-header/index.ts";
 
 export interface CardProps {
+  /** Heading in the card's header. @tr Kartın başlığındaki başlık. */
   title?: unknown;
+  /** Smaller line under the title. @tr Başlığın altındaki küçük satır. */
   subtitle?: unknown;
+  /** Actions or nodes at the right of the header (action() objects become buttons). @tr Başlığın sağındaki eylemler ya da düğümler (action() nesneleri düğme olur). */
   actions?: ActionsProp;
+  /** Content of the footer strip under the body. @tr Gövdenin altındaki alt şeridin içeriği. */
   footer?: unknown;
-  /** Root tag (default "section"). */
+  /** Root tag (default "section"). @tr Kök etiketi (varsayılan "section"). */
   as?: string;
-  /** No body padding. */
+  /** No body padding. @tr Gövdede iç boşluk yok. */
   flush?: boolean;
-  /** No frame (background, border, radius, shadow): the card structure alone, for a list of posts or a bare layout. */
+  /** No frame (background, border, radius, shadow): the card structure alone, for a list of posts or a bare layout. @tr Çerçeve yok (arka plan, kenarlık, köşe yuvarlaklığı, gölge): yalnız kart yapısı; gönderi listesi ya da sade bir düzen için. */
   plain?: MaybeFn<boolean | undefined>;
+  /** Extra CSS classes on the card. @tr Karta eklenen CSS sınıfları. */
   class?: ClassProp;
+  /** The card body. @tr Kartın gövdesi. */
   children?: unknown;
   [attr: string]: unknown;
 }

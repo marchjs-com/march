@@ -121,40 +121,45 @@ const LABELS: { [K in keyof DataGridLabels]: () => DataGridLabels[K] } = {
 };
 
 export interface DataGridProps<R = Row> {
-  /** Rows (array, signal or getter). Ignored when `table` is given. */
+  /** Rows (array, signal or getter). Ignored when `table` is given. @tr Satırlar (dizi, sinyal ya da getter). `table` verilirse yok sayılır. */
   rows?: MaybeFn<readonly R[] | null | undefined>;
+  /** Column definitions: keys or objects (label, width, editable, aggregate…). @tr Sütun tanımları: anahtarlar ya da nesneler (label, width, editable, aggregate…). */
   columns?: readonly (DataGridColumn<R> | (keyof R & string))[] | undefined;
+  /** Row identity: a field name or `(row) => id` (default "id"). @tr Satır kimliği: bir alan adı ya da `(row) => id` (varsayılan "id"). */
   rowKey?: TableOptions<R>["rowKey"];
-  /** Use an existing createTable() state (server data, saved views, URL sync …). */
+  /** Use an existing createTable() state (server data, saved views, URL sync …). @tr Var olan bir createTable() durumunu kullanır (sunucu verisi, kayıtlı görünümler, URL eşitleme …). */
   table?: TableState<R> | undefined;
-  /** Px height of the scroll area (default 480). */
+  /** Px height of the scroll area (default 480). @tr Kaydırma alanının yüksekliği, px (varsayılan 480). */
   height?: number | undefined;
-  /** Row height in px (default 36). */
+  /** Row height in px (default 36). @tr Satır yüksekliği, px (varsayılan 36). */
   rowHeight?: MaybeFn<number | undefined>;
-  /** Column keys to group by (controlled when you also pass onGroupBy). */
+  /** Column keys to group by (controlled when you also pass onGroupBy). @tr Gruplanacak sütun anahtarları (onGroupBy da verilirse denetimli). */
   groupBy?: MaybeFn<readonly string[] | undefined>;
+  /** Called with the new grouping keys; makes `groupBy` controlled. @tr Yeni gruplama anahtarlarıyla çağrılır; `groupBy`'ı denetimli yapar. */
   onGroupBy?: ((keys: string[]) => void) | undefined;
-  /** Row checkboxes, Space / Shift+arrows / Ctrl+click selection. */
+  /** Row checkboxes, Space / Shift+arrows / Ctrl+click selection. @tr Satır onay kutuları; Space / Shift+oklar / Ctrl+tıklama ile seçim. */
   selectable?: boolean | undefined;
-  /** Save an edited cell (columns with `editable: true`). Throw to show the message. */
+  /** Save an edited cell (columns with `editable: true`). Throw to show the message. @tr Düzenlenen hücreyi kaydeder (`editable: true` sütunlar). İletiyi göstermek için hata fırlatın. */
   onEdit?: TableOptions<R>["onEdit"];
-  /** Totals row with each column's aggregate over all filtered rows (default: when a column has `aggregate`). */
+  /** Totals row with each column's aggregate over all filtered rows (default: when a column has `aggregate`). @tr Süzülen tüm satırlar üzerinden her sütunun toplamını gösteren toplam satırı (varsayılan: bir sütunda `aggregate` varsa). */
   footer?: boolean | undefined;
-  /** Toolbar with search, grouping, filters, CSV and the row count (default true); an object turns single tools off: `{ csv: false }`. */
+  /** Toolbar with search, grouping, filters, CSV and the row count (default true); an object turns single tools off: `{ csv: false }`. @tr Arama, gruplama, süzgeçler, CSV ve satır sayılı araç çubuğu (varsayılan true); bir nesne tek tek araçları kapatır: `{ csv: false }`. */
   toolbar?: boolean | Partial<Record<"search" | "groups" | "filters" | "csv" | "count", boolean>> | undefined;
-  /** The ⋮ menu of every column header (default true). */
+  /** The ⋮ menu of every column header (default true). @tr Her sütun başlığının ⋮ menüsü (varsayılan true). */
   columnMenu?: boolean | undefined;
-  /** The empty state: true (default: the text in `labels`), false, or your own node. */
+  /** The empty state: true (default: the text in `labels`), false, or your own node. @tr Boş durum: true (varsayılan: `labels`'taki metin), false ya da kendi düğümünüz. */
   empty?: unknown;
-  /** Your own texts (see DataGridLabels). */
+  /** Your own texts (see DataGridLabels). @tr Kendi metinleriniz (bkz. DataGridLabels). */
   labels?: Partial<DataGridLabels> | undefined;
-  /** Row entrance, column slide and save flash (default true). */
+  /** Row entrance, column slide and save flash (default true). @tr Satır girişi, sütun kayması ve kayıt parlaması (varsayılan true). */
   animate?: boolean | undefined;
-  /** CSV file name (without .csv). */
+  /** CSV file name (without .csv). @tr CSV dosya adı (.csv olmadan). */
   filename?: string | undefined;
-  /** Enter / double-click on a non-editable cell. */
+  /** Enter / double-click on a non-editable cell. @tr Düzenlenemeyen bir hücrede Enter / çift tıklama. */
   onActivate?: ((row: R, key: string) => void) | undefined;
+  /** Accessible name of the grid (default "Data grid"). @tr Izgaranın erişilebilir adı (varsayılan "Data grid"). */
   label?: MaybeFn<string | undefined>;
+  /** Extra CSS classes on the grid. @tr Izgaraya eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 

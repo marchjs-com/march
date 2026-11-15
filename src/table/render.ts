@@ -44,31 +44,55 @@ const each = <T>(props: ForProps<T>): unknown => h<ForProps<T>>(For, props);
 
 /** <Table> props: every createTable() option (or a ready `table`) plus rendering options. */
 export interface TableProps<R = DefaultRow> extends TableOptions<R> {
+  /** A ready createTable() state to render (instead of the options here). @tr Çizilecek hazır bir createTable() durumu (buradaki seçenekler yerine). */
   table?: TableState<R> | undefined;
+  /** Rows get checkboxes for selection. @tr Satırlara seçim için onay kutusu gelir. */
   selectable?: boolean | undefined;
+  /** Actions on the selected rows, shown in the selection bar. @tr Seçili satırlar üzerindeki eylemler; seçim çubuğunda gösterilir. */
   bulkActions?: readonly BulkAction<R>[] | undefined;
+  /** Actions on one row, at the end of each row. @tr Tek satır üzerindeki eylemler; her satırın sonunda. */
   rowActions?: readonly RowAction<R>[] | undefined;
-  /** Inline buttons instead of a kebab menu (default: up to 2 actions inline). */
+  /** Inline buttons instead of a kebab menu (default: up to 2 actions inline). @tr Üç nokta menüsü yerine satır içi düğmeler (varsayılan: en çok 2 eylem satır içinde). */
   rowActionsInline?: boolean | undefined;
+  /** Called when a row is clicked (not on its buttons or fields). @tr Bir satıra tıklanınca çağrılır (düğmelerine ya da alanlarına değil). */
   onRowClick?: ((row: R, e: Event) => void) | undefined;
+  /** Detail content of an expanded row; adds an expand toggle to each row. @tr Açılan satırın ayrıntı içeriği; her satıra bir aç/kapa düğmesi ekler. */
   expand?: ((row: R) => unknown) | undefined;
+  /** Shown when there are no rows. @tr Hiç satır yokken gösterilir. */
   empty?: unknown;
+  /** Table caption for screen readers. @tr Ekran okuyucular için tablo başlığı. */
   caption?: string | undefined;
+  /** Accessible name of the table. @tr Tablonun erişilebilir adı. */
   label?: string | undefined;
+  /** "auto" (default: cards below `cardBreakpoint`), "table" or "cards". @tr "auto" (varsayılan: `cardBreakpoint` altında kartlar), "table" ya da "cards". */
   layout?: "auto" | "table" | "cards" | undefined;
+  /** Width below which `layout: "auto"` shows cards, px (default 640). @tr `layout: "auto"`'nun kart gösterdiği genişlik sınırı, px (varsayılan 640). */
   cardBreakpoint?: number | undefined;
+  /** Height of the virtual scroll area, px (default 480). @tr Sanal kaydırma alanının yüksekliği, px (varsayılan 480). */
   height?: number | undefined;
+  /** Row height for virtual scrolling, px (default 40). @tr Sanal kaydırma için satır yüksekliği, px (varsayılan 40). */
   rowHeight?: number | undefined;
+  /** Virtual scrolling: extra rows rendered above and below (default 6). @tr Sanal kaydırma: üstte ve altta çizilen ek satırlar (varsayılan 6). */
   overscan?: number | undefined;
+  /** Placeholder rows while loading (default: page size, at most 5). @tr Yüklenirken gösterilen yer tutucu satırlar (varsayılan: sayfa boyu, en çok 5). */
   skeletonRows?: number | undefined;
+  /** Choices of the page size menu (default 10, 25, 50, 100). @tr Sayfa boyu menüsünün seçenekleri (varsayılan 10, 25, 50, 100). */
   pageSizes?: readonly number[] | undefined;
+  /** The toolbar with search, filters, columns and export (default true). @tr Arama, süzgeçler, sütunlar ve dışa aktarımlı araç çubuğu (varsayılan true). */
   toolbar?: boolean | undefined;
+  /** Your own content at the end of the toolbar. @tr Araç çubuğunun sonunda kendi içeriğiniz. */
   toolbarEnd?: unknown;
+  /** The export menu in the toolbar (default true). @tr Araç çubuğundaki dışa aktarım menüsü (varsayılan true). */
   exportable?: boolean | undefined;
+  /** Wait after typing before searching, ms (default 300 on the server, 120 in the browser). @tr Yazdıktan sonra aramadan önceki bekleme, ms (varsayılan sunucuda 300, tarayıcıda 120). */
   searchDelay?: number | undefined;
+  /** Extra class of a row (or card) for its data. @tr Verisine göre bir satırın (ya da kartın) ek sınıfı. */
   rowClass?: ((row: R) => unknown) | undefined;
+  /** Columns can be resized by dragging their edge (default true). @tr Sütunlar kenarı sürüklenerek boyutlandırılabilir (varsayılan true). */
   resizable?: boolean | undefined;
+  /** Columns can be reordered by dragging their header (default true). @tr Sütunlar başlığı sürüklenerek yeniden sıralanabilir (varsayılan true). */
   reorderable?: boolean | undefined;
+  /** Extra CSS classes on the table's root. @tr Tablonun köküne eklenen CSS sınıfları. */
   class?: unknown;
 }
 

@@ -12,34 +12,37 @@ import { measure } from "../../../motion/engine/clock.ts";
 import "./virtual-list.css";
 
 export interface VirtualListProps<T> {
+  /** The items to list. @tr Listelenecek ögeler. */
   items: MaybeFn<readonly T[]>;
-  /** Stable row key (default: the index). */
+  /** Stable row key (default: the index). @tr Kalıcı satır anahtarı (varsayılan: sıra numarası). */
   key?: ((item: T, index: number) => string | number) | undefined;
-  /** Draws a row; `item` is an accessor that follows updates of the same key. */
+  /** Draws a row; `item` is an accessor that follows updates of the same key. @tr Bir satırı çizer; `item`, aynı anahtarın güncellemelerini izleyen bir erişimcidir. */
   render: (item: () => T, index: number) => unknown;
-  /** Height guess (px) for rows not measured yet. Default 120. */
+  /** Height guess (px) for rows not measured yet. Default 120. @tr Henüz ölçülmemiş satırlar için yükseklik tahmini (px). Varsayılan 120. */
   estimate?: number | undefined;
-  /** Extra pixels kept rendered above and below the viewport. Default 600. */
+  /** Extra pixels kept rendered above and below the viewport. Default 600. @tr Görünür alanın üstünde ve altında çizili tutulan ek piksel. Varsayılan 600. */
   overscan?: number | undefined;
-  /** Space between rows (px). Default 0. */
+  /** Space between rows (px). Default 0. @tr Satırlar arası boşluk (px). Varsayılan 0. */
   gap?: number | undefined;
-  /** self: the list scrolls (give it a height) · parent: the nearest scrolling ancestor. Default self. */
+  /** self: the list scrolls (give it a height) · parent: the nearest scrolling ancestor. Default self. @tr self: liste kendisi kayar (ona yükseklik verin) · parent: en yakın kayan üst öge. Varsayılan self. */
   scroll?: "self" | "parent" | undefined;
-  /** Called once per item count when the viewport is within `endDistance` of the end (infinite scroll). */
+  /** Called once per item count when the viewport is within `endDistance` of the end (infinite scroll). @tr Görünür alan sona `endDistance` kadar yaklaşınca, öge sayısı başına bir kez çağrılır (sonsuz kaydırma). */
   onEndReached?: (() => void) | undefined;
-  /** Default 800 px. */
+  /** Distance from the end that calls `onEndReached`. Default 800 px. @tr `onEndReached`'i tetikleyen sona uzaklık. Varsayılan 800 px. */
   endDistance?: number | undefined;
-  /** Before the rows (inside the scroll area). */
+  /** Before the rows (inside the scroll area). @tr Satırlardan önce (kaydırma alanının içinde). */
   header?: unknown;
-  /** After the rows: a loader, "no more" … */
+  /** After the rows: a loader, "no more" … @tr Satırlardan sonra: bir yükleyici, "başka yok" … */
   footer?: unknown;
+  /** Accessible name of the list. @tr Listenin erişilebilir adı. */
   label?: MaybeFn<string | undefined>;
-  /** Role of the rows' container (default "list"). With another role ("listbox", "menu") the rows are yours: the row wrappers become presentational and what `render` returns carries the role, the state and `aria-posinset` / `aria-setsize`. */
+  /** Role of the rows' container (default "list"). With another role ("listbox", "menu") the rows are yours: the row wrappers become presentational and what `render` returns carries the role, the state and `aria-posinset` / `aria-setsize`. @tr Satır kabının rolü (varsayılan "list"). Başka bir rolde ("listbox", "menu") satırlar sizindir: satır sarmalayıcıları sunumsal olur, rolü, durumu ve `aria-posinset` / `aria-setsize`'ı `render`'ın döndürdüğü taşır. */
   role?: string | undefined;
-  /** Id of the rows' container (a field's `aria-controls`). */
+  /** Id of the rows' container (a field's `aria-controls`). @tr Satır kabının kimliği (bir alanın `aria-controls`'u). */
   id?: string | undefined;
-  /** Receives the list's handle once: `scrollToIndex(i)` brings a row into view (keyboard movement in a picker). */
+  /** Receives the list's handle once: `scrollToIndex(i)` brings a row into view (keyboard movement in a picker). @tr Listenin tutamacını bir kez alır: `scrollToIndex(i)` bir satırı görünür alana getirir (seçicide klavyeyle gezinme). */
   api?: ((api: VirtualListApi) => void) | undefined;
+  /** Extra CSS classes on the list. @tr Listeye eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 

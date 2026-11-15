@@ -10,34 +10,39 @@ import { StatusDot } from "../../feedback/status-dot/index.ts";
 export const countLabel = (n: number, max = 99): string => (n > max ? `${max}+` : String(n));
 
 export interface BadgeProps {
+  /** Colour tone: neutral (default; danger for a count), info, success, warn or danger. @tr Renk tonu: neutral (varsayılan; sayaçta danger), info, success, warn ya da danger. */
   tone?: MaybeFn<Tone | undefined>;
-  /** "soft" (default: a tinted fill) or "solid": the tone's full colour with the text on it (a count that must stand out). */
+  /** "soft" (default: a tinted fill) or "solid": the tone's full colour with the text on it (a count that must stand out). @tr "soft" (varsayılan: renkli hafif dolgu) ya da "solid": tonun tam rengi, metin üstünde (öne çıkması gereken sayaç). */
   variant?: "soft" | "solid" | undefined;
-  /** "md" (default) or "xs": the mini badge on the corner of an icon button, a tab, a rail item. */
+  /** "md" (default) or "xs": the mini badge on the corner of an icon button, a tab, a rail item. @tr "md" (varsayılan) ya da "xs": ikon düğmesinin, sekmenin, ray ögesinin köşesindeki mini rozet. */
   size?: "xs" | "md" | undefined;
-  /** Count badge: hidden at 0 unless `showZero`; above `max` shows "99+". */
+  /** Count badge: hidden at 0 unless `showZero`; above `max` shows "99+". @tr Sayaç rozeti: `showZero` yoksa 0'da gizlenir; `max` aşılınca "99+" gösterir. */
   count?: MaybeFn<number | null | undefined>;
+  /** Count badges: the largest number shown before "N+" (default 99). @tr Sayaç rozeti: "N+" yazmadan önce gösterilen en büyük sayı (varsayılan 99). */
   max?: number;
+  /** Count badges: stay visible at 0. @tr Sayaç rozeti: 0 olduğunda da görünür kalır. */
   showZero?: boolean;
-  /** Count badges: accessible label after the number ("3 unread"). */
+  /** Count badges: accessible label after the number ("3 unread"). @tr Sayaç rozeti: sayıdan sonra gelen erişilebilir etiket ("3 okunmamış"). */
   label?: MaybeFn<string>;
-  /** Dot before the text: `true` draws the built-in dot (a StatusDot), a node is your own mark. */
+  /** Dot before the text: `true` draws the built-in dot (a StatusDot), a node is your own mark. @tr Metnin önünde nokta: `true` hazır noktayı (bir StatusDot) çizer, bir düğüm kendi işaretinizdir. */
   dot?: boolean | Node | undefined;
-  /** Colour of the built-in dot (default: the text colour of the tone). */
+  /** Colour of the built-in dot (default: the text colour of the tone). @tr Hazır noktanın rengi (varsayılan: tonun metin rengi). */
   dotColor?: ColorToken | undefined;
-  /** The built-in dot pulses: `true` / "ring" (a breathing ring) or "blink"; it draws the dot by itself. */
+  /** The built-in dot pulses: `true` / "ring" (a breathing ring) or "blink"; it draws the dot by itself. @tr Hazır nokta atar: `true` / "ring" (nefes alan halka) ya da "blink"; noktayı kendisi çizer. */
   pulse?: boolean | "ring" | "blink" | undefined;
-  /** Count badges: your own text for the number (default `countLabel`: 120 → "99+"). */
+  /** Count badges: your own text for the number (default `countLabel`: 120 → "99+"). @tr Sayaç rozeti: sayı için kendi metniniz (varsayılan `countLabel`: 120 → "99+"). */
   format?: ((n: number, max: number) => unknown) | undefined;
-  /** A badge that can be pressed: it is drawn as a `<button>` (keyboard, focus ring, hover). */
+  /** A badge that can be pressed: it is drawn as a `<button>` (keyboard, focus ring, hover). @tr Basılabilen rozet: `<button>` olarak çizilir (klavye, odak halkası, üzerine gelme). */
   onClick?: ((e: MouseEvent) => void) | undefined;
-  /** Clickable badge: a toggle (`aria-pressed` and the pressed look). */
+  /** Clickable badge: a toggle (`aria-pressed` and the pressed look). @tr Tıklanabilir rozet: aç/kapa düğmesi (`aria-pressed` ve basılı görünüm). */
   pressed?: MaybeFn<boolean | null | undefined>;
-  /** Clickable badge: cannot be pressed. */
+  /** Clickable badge: cannot be pressed. @tr Tıklanabilir rozet: basılamaz. */
   disabled?: MaybeFn<boolean | null | undefined>;
-  /** Accessible name when the text alone does not say it (a clickable badge with a short code). */
+  /** Accessible name when the text alone does not say it (a clickable badge with a short code). @tr Metin tek başına anlatmadığında erişilebilir ad (kısa kodlu tıklanabilir rozet). */
   ariaLabel?: MaybeFn<string | undefined>;
+  /** Extra CSS classes on the badge. @tr Rozete eklenen CSS sınıfları. */
   class?: ClassProp;
+  /** The badge text or content (not used for count badges). @tr Rozetin metni ya da içeriği (sayaç rozetinde kullanılmaz). */
   children?: unknown;
 }
 /**

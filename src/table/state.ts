@@ -96,126 +96,226 @@ export type BulkAction<R> = TableAction<[rows: R[]]>;
 
 /** createTable() options. `R` is the row type (inferred from rows, source or schema). */
 export interface TableOptions<R = Row> {
+  /** Client mode: the rows to show (sorted, filtered and paged in the browser). @tr İstemci modu: gösterilecek satırlar (tarayıcıda sıralanır, süzülür, sayfalanır). */
   rows?: MaybeFn<readonly R[] | null | undefined> | undefined;
-  /** Server mode: one page for the (mapped) params. A plain array is a page without total. */
+  /** Server mode: one page for the (mapped) params. A plain array is a page without total. @tr Sunucu modu: (eşlenmiş) parametreler için bir sayfa. Düz bir dizi, toplamı olmayan bir sayfadır. */
   source?: ((params: TableParams, ctx: { signal: AbortSignal }) => Promise<TablePage<R> | R[]>) | undefined;
+  /** Column definitions: keys or objects (label, format, filter, width…); default: the schema's columns. @tr Sütun tanımları: anahtarlar ya da nesneler (label, format, filter, width…); varsayılan: şemanın sütunları. */
   columns?: MaybeFn<readonly ColumnInput<R>[] | null | undefined> | undefined;
+  /** A schema: gives the columns and validates inline edits. @tr Bir şema: sütunları verir ve satır içi düzenlemeleri doğrular. */
   schema?: Schema<R> | undefined;
+  /** Row identity: a field name or `(row) => id` (default "id"). @tr Satır kimliği: bir alan adı ya da `(row) => id` (varsayılan "id"). */
   rowKey?: (keyof R & string) | (string & {}) | ((row: R) => unknown) | undefined;
+  /** Rows per page (default 25). @tr Sayfa başına satır (varsayılan 25). */
   pageSize?: number | undefined;
+  /** true (default): numbered pages · "cursor": server pages by cursor · false: no paging. @tr true (varsayılan): numaralı sayfalar · "cursor": imleçle sunucu sayfaları · false: sayfalama yok. */
   paging?: boolean | "cursor" | undefined;
+  /** Rename, drop or transform the server params: `{ size: "limit", page: null }` or a function. @tr Sunucu parametrelerini yeniden adlandırır, çıkarır ya da dönüştürür: `{ size: "limit", page: null }` ya da bir fonksiyon. */
   paramNames?: ParamNames | undefined;
+  /** Initial sorting: a list of `{ key, dir }`. @tr Başlangıç sıralaması: `{ key, dir }` listesi. */
   sort?: MaybeFn<readonly SortSpec[] | null | undefined> | undefined;
+  /** Initial filter values by column key. @tr Sütun anahtarına göre başlangıç süzgeç değerleri. */
   filters?: MaybeFn<Record<string, unknown> | null | undefined> | undefined;
-  /** Initial search text; `false` hides the search box (<Table>). */
+  /** Initial search text; `false` hides the search box (<Table>). @tr Başlangıç arama metni; `false` arama kutusunu gizler (<Table>). */
   search?: MaybeFn<string | boolean | null | undefined> | undefined;
+  /** Saves views, the default view and the column layout in localStorage under this key. @tr Görünümleri, varsayılan görünümü ve sütun düzenini bu anahtarla localStorage'a kaydeder. */
   storageKey?: string | undefined;
+  /** Keeps sort, search, filters, page size and page in the URL query, prefixed with this key. @tr Sıralama, arama, süzgeçler, sayfa boyu ve sayfayı bu önekle URL sorgusunda tutar. */
   urlKey?: string | undefined;
+  /** Wait before the URL is updated, ms (default 250; 0: at once). @tr URL güncellenmeden önceki bekleme, ms (varsayılan 250; 0: hemen). */
   urlDelay?: number | undefined;
+  /** Client mode: render only the rows near the viewport; "auto" above `virtualThreshold` rows. @tr İstemci modu: yalnız görünür alana yakın satırları çizer; "auto" `virtualThreshold` satırın üstünde. */
   virtual?: boolean | "auto" | undefined;
+  /** Row count above which `virtual: "auto"` turns on (default 2000). @tr `virtual: "auto"`'nun devreye girdiği satır sayısı (varsayılan 2000). */
   virtualThreshold?: number | undefined;
+  /** Saves an inline edit; a thrown error keeps the editor open with its message. @tr Satır içi düzenlemeyi kaydeder; fırlatılan hata düzenleyiciyi iletisiyle açık tutar. */
   onEdit?: ((row: R, key: string, value: unknown) => unknown) | undefined;
+  /** Server mode: loads every matching row for export (default: the current page). @tr Sunucu modu: dışa aktarım için eşleşen tüm satırları yükler (varsayılan: geçerli sayfa). */
   exportAll?: ((params: TableQuery) => Promise<readonly R[]> | readonly R[]) | undefined;
+  /** Name of exported files, without extension (default "export"). @tr Dışa aktarılan dosyaların uzantısız adı (varsayılan "export"). */
   filename?: string | undefined;
+  /** Cache key of the server query and the table's id (default: storageKey, urlKey or a generated id). @tr Sunucu sorgusunun önbellek anahtarı ve tablonun kimliği (varsayılan: storageKey, urlKey ya da üretilen bir kimlik). */
   queryKey?: string | undefined;
+  /** Client mode: show the loading state (rows still coming). @tr İstemci modu: yükleniyor durumunu gösterir (satırlar henüz geliyor). */
   loading?: MaybeFn<boolean | null | undefined> | undefined;
+  /** Client mode: an error to show instead of the rows. @tr İstemci modu: satırlar yerine gösterilecek hata. */
   error?: MaybeFn<unknown> | undefined;
+  /** Server mode: how many times a failed request is retried. @tr Sunucu modu: başarısız isteğin kaç kez yeniden deneneceği. */
   retry?: number | undefined;
+  /** Server mode: reload when the window gets focus again (default false). @tr Sunucu modu: pencere yeniden odak alınca yeniden yükler (varsayılan false). */
   refetchOnFocus?: boolean | undefined;
 }
 
 /** Headless table state returned by createTable(). */
 export interface TableState<R = Row> {
+  /** The table's id (queryKey, storageKey, urlKey or generated). @tr Tablonun kimliği (queryKey, storageKey, urlKey ya da üretilmiş). */
   id: string;
+  /** "server" with a `source`, else "client". @tr `source` varsa "server", yoksa "client". */
   mode: "server" | "client";
+  /** Pages are fetched by cursor (`paging: "cursor"`). @tr Sayfalar imleçle getirilir (`paging: "cursor"`). */
   cursorMode: boolean;
+  /** Paging is on (`paging` is not false). @tr Sayfalama açık (`paging` false değil). */
   paged: boolean;
+  /** Returns a row's id (from `rowKey`). @tr Bir satırın kimliğini döndürür (`rowKey`'den). */
   idOf: (row: R) => unknown;
+  /** Reads a column's raw value from a row. @tr Bir satırdan sütunun ham değerini okur. */
   valueOf: typeof valueOf;
+  /** Display text of a cell (column `format`, option labels, Yes/No, lists). @tr Bir hücrenin görünen metni (sütun `format`'ı, seçenek etiketleri, Evet/Hayır, listeler). */
   format: (row: R, col: TableColumn<R> | Column<R> | string) => unknown;
   // columns
+  /** Every column, normalized, in definition order. @tr Tüm sütunlar, normalleştirilmiş, tanım sırasıyla. */
   allColumns: Accessor<TableColumn<R>[]>;
+  /** Every column in the user's order (hidden ones included). @tr Kullanıcının sırasıyla tüm sütunlar (gizliler dahil). */
   columns: Accessor<TableColumn<R>[]>;
+  /** The shown columns in order, pinned ones first and last. @tr Gösterilen sütunlar sırasıyla; sabitlenenler başta ve sonda. */
   visibleColumns: Accessor<VisibleColumns<R>>;
+  /** Finds a column by key. @tr Anahtarla bir sütun bulur. */
   column: (key: string) => TableColumn<R> | undefined;
+  /** Column layout: order, hidden, widths, pins. @tr Sütun düzeni: sıra, gizli, genişlikler, sabitlemeler. */
   colState: Signal<ColState>;
+  /** Whether a column is hidden. @tr Bir sütunun gizli olup olmadığı. */
   isHidden(key: string): boolean;
+  /** Hides or shows a column. @tr Bir sütunu gizler ya da gösterir. */
   setHidden(key: string, hide: boolean): void;
+  /** Flips a column between hidden and shown. @tr Bir sütunu gizli ile görünür arasında değiştirir. */
   toggleColumn(key: string): void;
-  /** Move among visible columns by `delta` positions (hidden columns are skipped). */
+  /** Move among visible columns by `delta` positions (hidden columns are skipped). @tr Görünür sütunlar arasında `delta` konum taşır (gizli sütunlar atlanır). */
   moveColumn(key: string, delta: number): void;
+  /** Moves a column before another one. @tr Bir sütunu başka bir sütunun önüne taşır. */
   moveColumnTo(key: string, beforeKey: string): void;
+  /** A column's set width, px (null: automatic). @tr Bir sütunun ayarlı genişliği, px (null: otomatik). */
   widthOf(key: string): number | null;
+  /** Which side a column is pinned to (null: not pinned). @tr Bir sütunun sabitlendiği taraf (null: sabitli değil). */
   pinOf(key: string): Pin | null;
+  /** Sets a column's width, px, within its min / max. @tr Bir sütunun genişliğini min / max içinde ayarlar, px. */
   setWidth(key: string, w: number): void;
+  /** Pins a column "left" or "right"; null unpins it. @tr Bir sütunu "left" ya da "right" sabitler; null sabitlemeyi kaldırır. */
   pin(key: string, side: string | null | undefined): void;
+  /** Restores the default column layout. @tr Varsayılan sütun düzenine döner. */
   resetColumns(): void;
+  /** Whether any shown column has a set width. @tr Görünür sütunlardan birinin ayarlı genişliği var mı. */
   hasWidths(): boolean;
   // data
+  /** Rows of the current page. @tr Geçerli sayfanın satırları. */
   rows: Accessor<readonly R[]>;
+  /** Every row that passes search and filters, sorted (server: the current page). @tr Aramayı ve süzgeçleri geçen tüm satırlar, sıralı (sunucu: geçerli sayfa). */
   filteredRows(): readonly R[];
+  /** Every row before search, filters and paging. @tr Arama, süzgeç ve sayfalamadan önceki tüm satırlar. */
   allRows: Accessor<readonly R[]>;
+  /** Count of matching rows (null when the server does not tell). @tr Eşleşen satır sayısı (sunucu bildirmezse null). */
   total: Accessor<number | null>;
+  /** Whether only the rows near the viewport are rendered. @tr Yalnız görünür alana yakın satırların çizilip çizilmediği. */
   isVirtual: Accessor<boolean>;
+  /** Data is loading. @tr Veri yükleniyor. */
   loading(): boolean;
+  /** Server data is reloading while the old rows stay. @tr Eski satırlar dururken sunucu verisi yeniden yükleniyor. */
   refreshing(): boolean;
+  /** The current error, or null. @tr Geçerli hata ya da null. */
   error(): unknown;
+  /** Reloads the server page. @tr Sunucu sayfasını yeniden yükler. */
   refetch(): Promise<void> | undefined;
+  /** Query params before `paramNames`: page, size, offset, cursor, sort, filters, search. @tr `paramNames`'ten önceki sorgu parametreleri: page, size, offset, cursor, sort, filters, search. */
   params: Accessor<TableQuery>;
+  /** The params as sent to `source` (after `paramNames`). @tr `source`'a gönderildiği hâliyle parametreler (`paramNames`'ten sonra). */
   serverParams: Accessor<Record<string, unknown>>;
+  /** What the body shows: "error", "loading", "rows" or "empty". @tr Gövdenin gösterdiği: "error", "loading", "rows" ya da "empty". */
   status: Accessor<"error" | "loading" | "rows" | "empty">;
   // sorting
+  /** The sort list. @tr Sıralama listesi. */
   sort: Signal<SortSpec[]>;
+  /** Replaces the sort list (back to page 1). @tr Sıralama listesini değiştirir (1. sayfaya döner). */
   setSort(list: readonly SortSpec[]): void;
+  /** Position of a column in the sort list (-1: not sorted). @tr Bir sütunun sıralama listesindeki yeri (-1: sıralı değil). */
   sortIndex(key: string): number;
+  /** Sort direction of a column, or null. @tr Bir sütunun sıralama yönü ya da null. */
   sortDir(key: string): SortDir | null;
+  /** Cycles a column asc → desc → off; `add` keeps the other sorts (multi-sort). @tr Bir sütunu asc → desc → kapalı döndürür; `add` diğer sıralamaları korur (çoklu sıralama). */
   toggleSort(key: string, add?: boolean): void;
   // filters & search
+  /** Filter values by column key. @tr Sütun anahtarına göre süzgeç değerleri. */
   filters: Signal<Record<string, unknown>>;
+  /** The search text. @tr Arama metni. */
   search: Signal<string>;
+  /** Sets a column's filter; an empty value removes it. @tr Bir sütunun süzgecini ayarlar; boş değer onu kaldırır. */
   setFilter(key: string, v: unknown): void;
+  /** Removes a column's filter. @tr Bir sütunun süzgecini kaldırır. */
   clearFilter(key: string): void;
+  /** Removes every filter and the search text. @tr Tüm süzgeçleri ve arama metnini kaldırır. */
   clearFilters(): void;
+  /** Sets the search text (back to page 1). @tr Arama metnini ayarlar (1. sayfaya döner). */
   setSearch(s: string | null | undefined): void;
+  /** The filters in use, with label and readable text (for chips). @tr Kullanılan süzgeçler, etiket ve okunur metinle (çipler için). */
   activeFilters(): ActiveFilter[];
+  /** Choices for a column's filter: its options, else the distinct values in the rows. @tr Bir sütun süzgecinin seçenekleri: kendi seçenekleri, yoksa satırlardaki farklı değerler. */
   filterOptions(key: string): FilterOption[];
   // paging
+  /** The current page, from 1. @tr Geçerli sayfa, 1'den başlar. */
   page: Accessor<number>;
+  /** Rows per page. @tr Sayfa başına satır. */
   size: Signal<number>;
+  /** Number of pages (null when the total is unknown). @tr Sayfa sayısı (toplam bilinmiyorsa null). */
   pageCount: Accessor<number | null>;
+  /** There is a next page. @tr Sonraki sayfa var. */
   hasNext: Accessor<boolean>;
+  /** There is a previous page. @tr Önceki sayfa var. */
   hasPrev: Accessor<boolean>;
+  /** Goes to a page. @tr Bir sayfaya gider. */
   setPage(n: number | string): void;
+  /** Changes rows per page (back to page 1). @tr Sayfa başına satırı değiştirir (1. sayfaya döner). */
   setSize(n: number | string): void;
+  /** Goes to the next page. @tr Sonraki sayfaya gider. */
   next(): void;
+  /** Goes to the previous page. @tr Önceki sayfaya gider. */
   prev(): void;
   // selection
+  /** Selected rows by id. @tr Kimliğe göre seçili satırlar. */
   selected: Signal<Map<unknown, R>>;
+  /** Every matching row is selected (not only the loaded ones). @tr Eşleşen tüm satırlar seçili (yalnız yüklenenler değil). */
   allMatching: Signal<boolean>;
+  /** Whether the row with this id is selected. @tr Bu kimlikteki satır seçili mi. */
   isSelected(rid: unknown): boolean;
+  /** The selected rows. @tr Seçili satırlar. */
   selectedRows(): R[];
+  /** Number of selected rows (server, all matching: the total). @tr Seçili satır sayısı (sunucu, tüm eşleşenler: toplam). */
   selectedCount(): number;
+  /** Selects or clears a row; `range` extends from the last one (Shift-click). @tr Bir satırı seçer ya da bırakır; `range` sonuncudan itibaren genişletir (Shift-tıklama). */
   toggle(row: R, opts?: { range?: boolean; on?: boolean | undefined }): void;
+  /** Selection on this page: "none", "all" or "some". @tr Bu sayfadaki seçim: "none", "all" ya da "some". */
   pageSelection(): "none" | "all" | "some";
+  /** Selects (or clears) every row of the page. @tr Sayfanın tüm satırlarını seçer (ya da bırakır). */
   selectPage(on?: boolean): void;
+  /** Selects every row that matches the search and filters. @tr Arama ve süzgeçlerle eşleşen tüm satırları seçer. */
   selectAllMatching(): void;
+  /** Clears the selection. @tr Seçimi temizler. */
   clearSelection(): void;
-  /** Run a bulk action with the selected rows; clears the selection when it ran successfully. Errors are swallowed (the action reports them). */
+  /** Run a bulk action with the selected rows; clears the selection when it ran successfully. Errors are swallowed (the action reports them). @tr Seçili satırlarla toplu bir eylem çalıştırır; başarıyla çalışınca seçimi temizler. Hatalar yutulur (eylem onları bildirir). */
   runBulk(a: BulkAction<R>): Promise<unknown>;
   // expansion
+  /** Whether the row with this id is expanded. @tr Bu kimlikteki satır açık mı. */
   isExpanded(rid: unknown): boolean;
+  /** Opens or closes a row's detail. @tr Bir satırın ayrıntısını açar ya da kapatır. */
   toggleExpand(row: R, open?: boolean): void;
   // inline edit
+  /** The cell being edited: row, key, draft, error, saving. @tr Düzenlenen hücre: satır, anahtar, taslak, hata, kaydediliyor. */
   editing: Signal<EditState<R> | null>;
+  /** Starts editing a cell. @tr Bir hücreyi düzenlemeye başlar. */
   startEdit(row: R, key: string): void;
+  /** Sets the draft value of the cell being edited. @tr Düzenlenen hücrenin taslak değerini ayarlar. */
   setDraft(v: unknown): void;
+  /** Drops the edit. @tr Düzenlemeyi bırakır. */
   cancelEdit(): void;
+  /** Validates and saves the draft with `onEdit`; true when it saved. @tr Taslağı doğrular ve `onEdit` ile kaydeder; kaydedince true. */
   commitEdit(): Promise<boolean>;
   // views
+  /** The saved views. @tr Kayıtlı görünümler. */
   views: Signal<SavedView[]>;
+  /** Name of the applied view, or null. @tr Uygulanan görünümün adı ya da null. */
   activeView: Signal<string | null>;
+  /** Name of the view applied at start, or null. @tr Başta uygulanan görünümün adı ya da null. */
   defaultView: Signal<string | null>;
+  /** The current sort, filters, search, page size and columns. @tr Geçerli sıralama, süzgeçler, arama, sayfa boyu ve sütunlar. */
   snapshot(): TableSnapshot;
+  /** Restores a snapshot (and marks the view `name` as active). @tr Bir anlık görüntüyü geri yükler (ve `name` görünümünü etkin işaretler). */
   applySnapshot(s: Partial<TableSnapshot>, name?: string | null): void;
   saveView(name: string | null | undefined): void;
   applyView(name: string): void;

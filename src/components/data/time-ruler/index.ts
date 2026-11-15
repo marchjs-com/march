@@ -37,36 +37,37 @@ export function timeTicks(duration: number, o: { step?: number | undefined; majo
 export const timePercent = (ms: number, duration: number): string => `${duration > 0 ? clamp((ms / duration) * 100, 0, 100) : 0}%`;
 
 export interface TimeRulerProps {
-  /** Time shown across the ruler, ms. */
+  /** Time shown across the ruler, ms. @tr Cetvel boyunca gösterilen süre, ms. */
   duration: MaybeFn<number>;
-  /** Playhead position, ms; null / undefined: no playhead. */
+  /** Playhead position, ms; null / undefined: no playhead. @tr Oynatma imlecinin konumu, ms; null / undefined: imleç yok. */
   value?: MaybeFn<number | null | undefined>;
-  /** Makes the ruler draggable and the playhead a slider: called with the time to jump to. */
+  /** Makes the ruler draggable and the playhead a slider: called with the time to jump to. @tr Cetveli sürüklenebilir, imleci kaydırıcı yapar: atlanacak zamanla çağrılır. */
   onSeek?: ((ms: number) => void) | undefined;
-  /** A drag or a key press starts (pause playback here). */
+  /** A drag or a key press starts (pause playback here). @tr Bir sürükleme ya da tuş basışı başlar (oynatmayı burada duraklatın). */
   onSeekStart?: (() => void) | undefined;
-  /** Minor tick distance, ms (default: picked for the duration). */
+  /** Minor tick distance, ms (default: picked for the duration). @tr Küçük çentik aralığı, ms (varsayılan: süreye göre seçilir). */
   step?: MaybeFn<number | undefined>;
-  /** Labelled tick distance, ms (default: picked for the duration). */
+  /** Labelled tick distance, ms (default: picked for the duration). @tr Etiketli çentik aralığı, ms (varsayılan: süreye göre seçilir). */
   major?: MaybeFn<number | undefined>;
-  /** Unlabelled ticks between the labels (default true). */
+  /** Unlabelled ticks between the labels (default true). @tr Etiketler arasındaki etiketsiz çentikler (varsayılan true). */
   minor?: boolean | undefined;
-  /** Own ticks instead of the computed ones. */
+  /** Own ticks instead of the computed ones. @tr Hesaplananlar yerine kendi çentikleriniz. */
   ticks?: ((duration: number) => readonly TimeTick[]) | undefined;
-  /** Label of a major tick (default "1.5s"). */
+  /** Label of a major tick (default "1.5s"). @tr Büyük çentiğin etiketi (varsayılan "1.5s"). */
   format?: ((ms: number) => unknown) | undefined;
-  /** Spoken value of the playhead (default "1.50 s"). */
+  /** Spoken value of the playhead (default "1.50 s"). @tr İmlecin sesli okunan değeri (varsayılan "1.50 s"). */
   valueText?: ((ms: number) => string) | undefined;
-  /** Round a dragged time (snap to frames, to a grid); the pointer event tells the modifier keys. */
+  /** Round a dragged time (snap to frames, to a grid); the pointer event tells the modifier keys. @tr Sürüklenen zamanı yuvarlar (karelere, bir ızgaraya); işaretçi olayı değiştirici tuşları bildirir. */
   snap?: ((ms: number, event: PointerEvent) => number) | undefined;
-  /** Time one arrow key moves the playhead, ms (default 100; Shift: ten times). */
+  /** Time one arrow key moves the playhead, ms (default 100; Shift: ten times). @tr Bir ok tuşunun imleci kaydırdığı süre, ms (varsayılan 100; Shift: on katı). */
   keyStep?: number | undefined;
-  /** The playhead: true (default, when `value` is given), false, or your own grip node. */
+  /** The playhead: true (default, when `value` is given), false, or your own grip node. @tr Oynatma imleci: true (varsayılan, `value` verildiğinde), false ya da kendi tutamaç düğümünüz. */
   head?: boolean | Node | undefined;
-  /** Extra class of the playhead (a host that styles or finds it by its own name). */
+  /** Extra class of the playhead (a host that styles or finds it by its own name). @tr İmlecin ek sınıfı (onu kendi adıyla biçimleyen ya da bulan ev sahibi için). */
   headClass?: string | undefined;
-  /** Own names: the ruler and the playhead. */
+  /** Own names: the ruler and the playhead. @tr Kendi adlarınız: cetvel ve oynatma imleci. */
   labels?: { ruler?: string | undefined; playhead?: string | undefined } | undefined;
+  /** Extra CSS classes on the ruler. @tr Cetvele eklenen CSS sınıfları. */
   class?: ClassProp;
 }
 
