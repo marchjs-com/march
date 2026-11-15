@@ -14,13 +14,15 @@ import { ThemeMenu } from "../theme-menu/index.ts";
 import { Joined } from "../../layout/joined/index.ts";
 import { Menu } from "../../actions/menu/index.ts";
 import { globe } from "../../../icons/glyphs/globe.ts";
-import { maximize } from "../../../icons/glyphs/maximize.ts";
-import { minimize } from "../../../icons/glyphs/minimize.ts";
+import { defineIcon } from "../../../icons/svg.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 
 messages("tr", tr);
-messages("tr", { "Full screen": "Tam ekran", "Exit full screen": "Tam ekrandan çık" });
+messages("tr", { "Full screen": "Tam ekran", "Exit full screen": "Tam ekrandan çık", "Default language": "Varsayılan Dil" });
+// full screen's own pair (screen corners opening out / closing in), unlike the panels' maximize arrows
+const enterFull = defineIcon("fullscreen", ["M3 8V5a2 2 0 0 1 2-2h3", "M16 3h3a2 2 0 0 1 2 2v3", "M21 16v3a2 2 0 0 1-2 2h-3", "M8 21H5a2 2 0 0 1-2-2v-3"]);
+const exitFull = defineIcon("fullscreen-exit", ["M8 3v3a2 2 0 0 1-2 2H3", "M21 8h-3a2 2 0 0 1-2-2V3", "M3 16h3a2 2 0 0 1 2 2v3", "M16 21v-3a2 2 0 0 1 2-2h3"]);
 
 /**
  * The tools of the preview toolbar to show: each is off unless named (a tool added later stays hidden until asked
@@ -71,7 +73,9 @@ export function AppPreview(props: AppPreviewProps): Element {
   // it) brings it back. Touch screens keep it in place (CSS: only where a fine pointer hovers)
   const barShown = signal(false);
   let barTimer: ReturnType<typeof setTimeout> | undefined;
-  const hideBarSoon = (ms = 1600): void => { clearTimeout(barTimer); barTimer = setTimeout(() => barShown.set(false), ms); };
+  // a menu opened from the bar keeps it (its button is expanded)
+  const menuOpen = (): boolean => !!root?.querySelector(".m-app-pv-bar [aria-expanded='true']");
+  const hideBarSoon = (ms = 1600): void => { clearTimeout(barTimer); barTimer = setTimeout(() => { if (menuOpen()) hideBarSoon(ms); else barShown.set(false); }, ms); };
   const onMove = (e: PointerEvent): void => {
     if (!full.peek() || !root) return;
     const top = root.getBoundingClientRect().top, over = (e.target as Element | null)?.closest?.(".m-app-pv-bar");
@@ -80,7 +84,8 @@ export function AppPreview(props: AppPreviewProps): Element {
   effect(() => { if (full()) { barShown.set(true); hideBarSoon(); } else { clearTimeout(barTimer); barShown.set(false); } });
   onCleanup(() => clearTimeout(barTimer));
   const follow = (): void => full.set(!!root && doc?.fullscreenElement === root);
-  const onKey = (e: KeyboardEvent): void => { if (e.key === "Escape" && cover.peek()) { cover.set(false); full.set(false); } };
+  // Esc leaves the cover, unless a menu, a list or a dialog is open (that one closes first)
+  const onKey = (e: KeyboardEvent): void => { if (e.key === "Escape" && cover.peek() && !e.defaultPrevented && !doc?.querySelector(".m-layer :is(.m-pop, [role=dialog], [role=menu], [role=listbox])")) { cover.set(false); full.set(false); } };
   doc?.addEventListener("fullscreenchange", follow);
   doc?.addEventListener("keydown", onKey);
   onCleanup(() => { doc?.removeEventListener("fullscreenchange", follow); doc?.removeEventListener("keydown", onKey); if (root && doc?.fullscreenElement === root) void doc.exitFullscreen?.(); });
@@ -97,7 +102,7 @@ export function AppPreview(props: AppPreviewProps): Element {
   };
   // the language tool: the chosen language's name on the button, every language in its menu
   const langs = (): readonly AppPreviewLanguage[] => val(props.languages) ?? [];
-  const langName = (): string => langs().find((x) => x.value === language())?.label ?? (language() || t`Default`);
+  const langName = (): string => langs().find((x) => x.value === language())?.label ?? (language() || t`Default language`);
   // each picker is built once (untracked): only turning it on or off draws it again
   const bar = (): unknown => (!anything() ? null : h("div", { class: "m-app-pv-bar", role: "toolbar", "aria-label": () => val(props.label) ?? t`Preview tools` },
     props.tools ?? null,
@@ -110,7 +115,7 @@ export function AppPreview(props: AppPreviewProps): Element {
     () => (on("theme") ? untrack(() => ThemeMenu({ current: true, page: true, size: "sm", view: "cards", modes: false, accents: false, headings: false, label: () => t`Preview theme`, placement: "bottom-end", value: theme, mode, onChange: (id: string) => theme.set(id) })) : null),
     () => (on("accent") ? untrack(() => AccentPicker({ label: () => t`Preview accent`, placement: "bottom-end", value: accent, theme: () => theme() || colorTheme(), mode: look, onChange: (c: ColorToken) => accent.set(c) })) : null),
     () => (on("mode") ? untrack(() => h(ThemeToggle, { value: mode, onChange: (m: ThemeMode) => mode.set(m) })) : null),
-    () => (on("fullscreen") ? untrack(() => h(IconButton, { size: "sm", variant: "ghost", class: "m-app-pv-full", icon: () => (full() ? minimize : maximize), pressed: full, label: () => (full() ? t`Exit full screen` : t`Full screen`), onClick: toggleFull })) : null)));
+    () => (on("fullscreen") ? untrack(() => h(IconButton, { size: "sm", variant: "ghost", class: "m-app-pv-full", icon: () => (full() ? exitFull : enterFull), pressed: full, label: () => (full() ? t`Exit full screen` : t`Full screen`), onClick: toggleFull })) : null)));
   // the stage is drawn in the chosen theme (its stylesheet loads when it is chosen) and mode; the accent on an inner box
   effect(() => { if (theme()) void loadTheme(theme()); });
   const stage = h("div", { class: "m-app-pv-stage", "data-m-theme": () => theme() || null, "data-theme": look },

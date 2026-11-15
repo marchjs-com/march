@@ -36,7 +36,7 @@
 @media (prefers-reduced-motion: reduce) { .m-app-pv.is-full > .m-app-pv-bar { transition: none; } }
 /* in full screen only the preview: the footer (the component's code) steps aside */
 .m-app-pv.is-full > .m-app-pv-foot { display: none; }
-.m-app-pv.is-cover { position: fixed; inset: 0; z-index: 2147483000; block-size: auto; background: var(--m-bg, var(--m-surface)); overflow: auto; }
+.m-app-pv.is-cover { position: fixed; inset: 0; z-index: calc(var(--m-z-dialog) - 1); block-size: auto; background: var(--m-bg, var(--m-surface)); overflow: auto; }
 .m-app-pv:fullscreen { inline-size: 100%; block-size: 100%; background: var(--m-bg, var(--m-surface)); overflow: auto; }
 .m-app-pv-foot { max-block-size: 40%; overflow: auto; }
 .m-app-pv-bar { display: flex; align-items: center; gap: var(--m-space-1); padding: 3px var(--m-space-2); }

@@ -64,7 +64,8 @@ export function openLayer(kind: LayerKind, node: Node, scope?: HTMLElement | nul
   const box = isBox ? (node as HTMLElement) : contents(h("div", { class: "m-portal" }) as HTMLElement, "auto");
   if (!isBox) box.appendChild(node);
   el.appendChild(box);
-  const entry: Layer = { el, kind, host: scope || document.body };
+  // in full screen only the full-screen element is drawn: a menu or a dialog opened then goes inside it
+  const entry: Layer = { el, kind, host: scope || (document.fullscreenElement as HTMLElement | null) || document.body };
   stack.push(entry);
   layerRoot(entry.host).appendChild(el);
   restack();
