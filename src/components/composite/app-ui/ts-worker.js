@@ -52,6 +52,147 @@ function start() {
 
 const flat = (parts) => (parts ?? []).map((x) => x.text).join("");
 
+// The JavaScript and DOM API's documentation in the page's language: a JSON dictionary beside the messages
+// (<lib>/<locale>/lib-docs.json, served by the app, not part of this code), read once, on the first description asked.
+// Keys: "Owner.member" (the interface or class that declares it: "Array.map", "Console.log", "ArrayConstructor.isArray"),
+// a global's name ("fetch") or "*.member" for a member of any owner ("*.addEventListener"). A value is the text, or
+// { "doc": text, "params": { "name": text } }.
+let docsLocale = "en", docs = null, docsFor = "";
+const SAME_AS = { ReadonlyArray: "Array", ConcatArray: "Array", ReadonlyMap: "Map", ReadonlySet: "Set", Int8Array: "Array", Uint8Array: "Array", Uint8ClampedArray: "Array", Int16Array: "Array", Uint16Array: "Array", Int32Array: "Array", Uint32Array: "Array", Float32Array: "Array", Float64Array: "Array" };
+function libDocs() {
+  if (docsLocale === "en") return null;
+  if (docsFor !== docsLocale) {
+    docsFor = docsLocale; docs = null;
+    try { const x = new XMLHttpRequest(); x.open("GET", `${libUrl}${docsLocale}/lib-docs.json`, false); x.send(); if (x.status === 200) docs = JSON.parse(x.responseText); } catch { docs = null; }
+  }
+  return docs;
+}
+/** The dictionary's entry of a symbol ({ doc, params }), or null. */
+function docOf(sym) {
+  const d = sym && libDocs();
+  if (!d) return null;
+  if (sym.flags & ts.SymbolFlags.Alias) { try { sym = LS.getProgram().getTypeChecker().getAliasedSymbol(sym); } catch { /* not an alias */ } }
+  const keys = [];
+  for (const decl of sym.declarations ?? []) {
+    const owner = decl.parent;
+    if (owner && (ts.isInterfaceDeclaration(owner) || ts.isClassDeclaration(owner)) && owner.name) {
+      keys.push(`${owner.name.text}.${sym.name}`);
+      // a read-only array, map or set has the same members as the writable one
+      const same = SAME_AS[owner.name.text];
+      if (same) keys.push(`${same}.${sym.name}`);
+    } else {
+      // a namespace's member: Intl.NumberFormat
+      let n = owner;
+      while (n && !ts.isModuleDeclaration(n) && !ts.isSourceFile(n)) n = n.parent;
+      if (n && ts.isModuleDeclaration(n) && n.name && ts.isIdentifier(n.name)) keys.push(`${n.name.text}.${sym.name}`);
+    }
+  }
+  // a global's own name only for a global (window.name is not the "name" of any other object)
+  if (!keys.length) keys.push(sym.name);
+  keys.push(`*.${sym.name}`);
+  for (const k of keys) { const v = Object.prototype.hasOwnProperty.call(d, k) ? d[k] : undefined; if (v) return typeof v === "string" ? { doc: v } : v; }
+  return null;
+}
+/** The symbol of the name at a place of a file. */
+function symbolAt(p, pos) {
+  const program = LS.getProgram(), sf = program?.getSourceFile(p);
+  if (!sf) return undefined;
+  const node = ts.getTouchingPropertyName(sf, pos);
+  try { return program.getTypeChecker().getSymbolAtLocation(node); } catch { return undefined; }
+}
+
+// The type a place of code expects (the variable's declared type after "=", the parameter in a call, the property in
+// an object, the function's return type…) and a test of whether a suggestion fits it. A type that takes anything
+// (any, unknown, one that both a number and a text fit) expects nothing in particular.
+function expectedType(sf, from, pos, checker) {
+  const word = from < pos ? ts.getTokenAtPosition(sf, from) : null;
+  if (word && ts.isIdentifier(word)) { const t = checker.getContextualType(word); if (t) return t; }
+  const prev = ts.findPrecedingToken(from, sf);
+  if (!prev) return undefined;
+  const at = prev.parent, K = ts.SyntaxKind;
+  try {
+    if (prev.kind === K.EqualsToken) {
+      if ((ts.isVariableDeclaration(at) || ts.isPropertyDeclaration(at) || ts.isParameter(at)) && at.type) return checker.getTypeFromTypeNode(at.type);
+      if (ts.isBinaryExpression(at)) return checker.getTypeAtLocation(at.left);
+    }
+    if ([K.EqualsEqualsEqualsToken, K.ExclamationEqualsEqualsToken, K.EqualsEqualsToken, K.ExclamationEqualsToken].includes(prev.kind) && ts.isBinaryExpression(at)) return checker.getTypeAtLocation(at.left);
+    if (prev.kind === K.ColonToken && ts.isPropertyAssignment(at)) {
+      const obj = checker.getContextualType(at.parent), name = at.name.getText(sf);
+      const prop = obj && checker.getPropertyOfType(obj, name);
+      return prop ? checker.getTypeOfSymbol(prop) : undefined;
+    }
+    if (prev.kind === K.ReturnKeyword) {
+      let fn = at;
+      while (fn && !ts.isFunctionLike(fn)) fn = fn.parent;
+      const sig = fn && checker.getSignatureFromDeclaration(fn);
+      return sig ? sig.getReturnType() : undefined;
+    }
+    if (prev.kind === K.CaseKeyword && ts.isCaseClause(at)) return checker.getTypeAtLocation(at.parent.parent.expression);
+    if (prev.kind === K.OpenParenToken || prev.kind === K.CommaToken) {
+      let call = at;
+      if (call && ts.isSyntaxList?.(call)) call = call.parent;
+      if (call && (ts.isCallExpression(call) || ts.isNewExpression(call))) {
+        const sig = checker.getResolvedSignature(call), args = call.arguments ?? [];
+        const i = args.filter((a) => a.end <= from).length, param = sig?.parameters[Math.min(i, (sig?.parameters.length ?? 1) - 1)];
+        if (param) return checker.getTypeOfSymbolAtLocation(param, call);
+      }
+    }
+  } catch { return undefined; }
+  return undefined;
+}
+// How well a suggestion fits the expected type: 3 a value of the type itself (true / false for a boolean, the words
+// of a string union, an enum member), 2 a name of the file that fits, 1 any other name that fits (a global, a
+// function whose call gives the type), 0 not at all. "any" fits nothing in particular; the name being declared is
+// not offered as its own value.
+function fitter(sf, from, pos) {
+  const checker = LS.getProgram().getTypeChecker();
+  const want = expectedType(sf, from, pos, checker);
+  if (!want || want.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) return () => 0;
+  const ok = (t) => { try { return !!t && !(t.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) && checker.isTypeAssignableTo(t, want); } catch { return false; } };
+  if (ok(checker.getNumberType()) && ok(checker.getStringType())) return () => 0;
+  const node = ts.getTokenAtPosition(sf, Math.max(0, from - 1));
+  const access = node && ts.isPropertyAccessExpression(node.parent) && node.kind === ts.SyntaxKind.DotToken ? node.parent : null;
+  const words = { true: checker.getTrueType(), false: checker.getFalseType(), null: checker.getNullType() };
+  const here = ts.getTokenAtPosition(sf, from);
+  const score = (e) => {
+    if (e.kind === "keyword") return e.name in words && ok(words[e.name]) ? (e.name === "null" ? 1 : 3) : 0;
+    if (e.kind === "string") return 3;
+    if (!/^(var|let|const|local var|parameter|property|getter|enum member|function|local function|method|class)$/.test(e.kind)) return 0;
+    let sym;
+    try { sym = access ? checker.getTypeAtLocation(access.expression).getProperty(e.name) : checker.resolveName(e.name, here, ts.SymbolFlags.Value, false); } catch { sym = undefined; }
+    if (!sym) return 0;
+    // the declaration the caret is in (const test: boolean = |) is not its own value
+    if ((sym.declarations ?? []).some((d) => d.getSourceFile() === sf && d.getStart(sf) <= from && (from <= d.end || !sf.text.slice(d.end, from).trim()))) return 0;
+    const own = (sym.declarations ?? []).some((d) => d.getSourceFile() === sf);
+    const t = checker.getTypeOfSymbol(sym);
+    if (ok(t)) return e.kind === "enum member" ? 3 : own ? 2 : 1;
+    // a function whose call gives the type (isValid() for a boolean)
+    const call = /function|method/.test(e.kind) ? t.getCallSignatures?.()[0] : undefined;
+    return call && ok(call.getReturnType()) ? (own ? 2 : 1) : 0;
+  };
+  // the type's own values written out: "primary" | "ghost", 1 | 2 (TypeScript offers them only inside quotes)
+  score.literals = (want.isUnion() ? want.types : [want])
+    .map((t) => (t.flags & ts.TypeFlags.StringLiteral ? JSON.stringify(t.value) : t.flags & ts.TypeFlags.NumberLiteral ? String(t.value) : ""))
+    .filter(Boolean).slice(0, 50);
+  return score;
+}
+/** What the caret is in: a comment, a string (or a template's text), the text between JSX tags, or code. */
+function whereAt(sf, pos) {
+  if (ts.isInComment(sf, pos)) return "comment";
+  const K = ts.SyntaxKind, text = sf.text;
+  for (const t of [ts.getTokenAtPosition(sf, pos), ts.findPrecedingToken(pos, sf)]) {
+    if (!t) continue;
+    const start = t.getStart(sf);
+    if (t.kind === K.JsxText && pos > t.pos && pos <= t.end) return "text";
+    const str = t.kind === K.StringLiteral || t.kind === K.NoSubstitutionTemplateLiteral || t.kind === K.TemplateHead || t.kind === K.TemplateMiddle || t.kind === K.TemplateTail;
+    if (!str || pos <= start) continue;
+    // inside, or at the end of a string not closed yet
+    const open = text[start], closed = t.end - start > 1 && (text[t.end - 1] === open || (open === "}" && text[t.end - 1] === "`") || text[t.end - 2] + text[t.end - 1] === "${");
+    if (pos < t.end || !closed) return "string";
+  }
+  return "code";
+}
+
 // the kinds a name of the file has (its own variables, functions, classes, parameters); a library's carry "declare"
 const LOCAL_KINDS = new Set(["var", "let", "const", "local var", "function", "local function", "class", "local class", "parameter", "interface", "type", "enum", "property"]);
 const handlers = {
@@ -76,20 +217,31 @@ const handlers = {
     return true;
   },
   update({ path, text }) { const p = norm(path), f = files.get(p); if (!f) files.set(p, { text, version: 1 }); else if (f.text !== text) { f.text = text; f.version++; } return true; },
+  // Suggestions for a place of code. Inside a comment or the text between JSX tags: none ("where" says why). Inside a
+  // string: only the words its type allows (variant="primary"). Rows that fit the type the place expects
+  // (const ok: boolean = → true, false) carry `priority` and come first.
   complete({ path, pos }) {
-    const r = LS.getCompletionsAtPosition(norm(path), pos, { includeCompletionsWithInsertText: true });
-    if (!r) return null;
-    const text = files.get(norm(path))?.text ?? "";
+    const p = norm(path), program = LS.getProgram(), sf = program?.getSourceFile(p);
+    const text = files.get(p)?.text ?? "";
+    const where = sf ? whereAt(sf, pos) : "code";
+    if (where === "comment" || where === "text") return { where, from: pos, to: pos, items: [] };
+    const r = LS.getCompletionsAtPosition(p, pos, { includeCompletionsWithInsertText: true });
     let from = pos;
-    while (from > 0 && /[\w$]/.test(text[from - 1])) from--;
+    if (where === "string") while (from > 0 && !`"'\``.includes(text[from - 1])) from--;
+    else while (from > 0 && /[\w$]/.test(text[from - 1])) from--;
+    if (!r) return { where, from, to: pos, items: [] };
     const word = text.slice(from, pos).toLowerCase();
-    const items = r.entries
-      .filter((e) => !word || e.name.toLowerCase().startsWith(word))
-      .sort((a, b) => (a.sortText < b.sortText ? -1 : a.sortText > b.sortText ? 1 : a.name.localeCompare(b.name)))
+    const fits = sf ? fitter(sf, from, pos) : () => 0;
+    const entries = r.entries.filter((e) => (where !== "string" || e.kind === "string") && (!word || e.name.toLowerCase().startsWith(word)));
+    // in code, the type's literal values first (const v: "a" | "b" = → "a", "b")
+    if (where === "code") for (const lit of fits.literals ?? []) if ((!word || lit.replace(/^"/, "").toLowerCase().startsWith(word)) && !entries.some((e) => e.name === lit)) entries.unshift({ name: lit, kind: "string", sortText: "0", insertText: lit });
+    const scored = entries.map((e) => ({ e, prio: where === "string" ? 3 : fits(e) }));
+    const items = scored
+      .sort((a, b) => b.prio - a.prio || (a.e.sortText < b.e.sortText ? -1 : a.e.sortText > b.e.sortText ? 1 : a.e.name.localeCompare(b.e.name)))
       .slice(0, 80)
       // the page translates the kind; `local`: a name of the file itself (not declared by a library, not imported, no keyword)
-      .map((e) => ({ label: e.name, hint: e.kind, insert: e.insertText ?? e.name, ...(LOCAL_KINDS.has(e.kind) && !/declare/.test(e.kindModifiers ?? "") && !e.source ? { local: true } : {}) }));
-    return { from, to: pos, items };
+      .map(({ e, prio }) => ({ label: e.name, hint: e.kind, insert: e.insertText ?? e.name, ...(prio ? { priority: prio } : {}), ...(LOCAL_KINDS.has(e.kind) && !/declare/.test(e.kindModifiers ?? "") && !e.source ? { local: true } : {}) }));
+    return { where, from, to: pos, items };
   },
   diagnostics({ path }) {
     const p = norm(path);
@@ -108,12 +260,15 @@ const handlers = {
   },
   hover({ path, pos }) {
     const q = LS.getQuickInfoAtPosition(norm(path), pos);
-    return q ? { kind: q.kind, text: flat(q.displayParts), doc: flat(q.documentation) } : null;
+    if (!q) return null;
+    const own = libDocs() ? docOf(symbolAt(norm(path), pos)) : null;
+    return { kind: q.kind, text: flat(q.displayParts), doc: own?.doc ?? flat(q.documentation) };
   },
   // the messages in the page's language: the typescript package's lib/<locale>/diagnosticMessages.generated.json
   // (tr, de, fr…; served beside the lib files); English needs none
   locale({ locale }) {
     const name = String(locale || "en").toLowerCase();
+    docsLocale = /^[a-z]{2}(-[a-z]{2})?$/.test(name) ? name : "en";
     if (name === "en" || !/^[a-z]{2}(-[a-z]{2})?$/.test(name)) { ts.setLocalizedDiagnosticMessages(undefined); for (const f of files.values()) f.version++; return false; }
     let text;
     try { const x = new XMLHttpRequest(); x.open("GET", `${libUrl}${name}/diagnosticMessages.generated.json`, false); x.send(); text = x.status === 200 ? x.responseText : undefined; } catch { text = undefined; }
@@ -143,18 +298,29 @@ const handlers = {
   // and its documentation
   details({ path, pos, name }) {
     const d = LS.getCompletionEntryDetails(norm(path), pos, name, {}, undefined, {}, undefined);
-    return d ? { kind: d.kind, signature: flat(d.displayParts), doc: flat(d.documentation) } : null;
+    if (!d) return null;
+    const own = libDocs() ? docOf(LS.getCompletionEntrySymbol(norm(path), pos, name, undefined)) : null;
+    return { kind: d.kind, signature: flat(d.displayParts), doc: own?.doc ?? flat(d.documentation) };
   },
   // inside a call's parentheses: its signatures, the one that fits, the argument the caret is at; each parameter with
   // its text and documentation
   signature({ path, pos }) {
-    const h = LS.getSignatureHelpItems(norm(path), pos, {});
+    const p0 = norm(path), h = LS.getSignatureHelpItems(p0, pos, {});
     if (!h) return null;
+    // the called name (before the "(" where the arguments start): its entry in the dictionary
+    let own = null;
+    if (libDocs()) {
+      const text = files.get(p0)?.text ?? "";
+      let i = h.applicableSpan.start - 1;
+      while (i > 0 && /[\s(]/.test(text[i])) i--;
+      if (text[i] === ">") i = text.lastIndexOf("<", i) - 1; // f<T>(…)
+      own = docOf(symbolAt(p0, Math.max(0, i)));
+    }
     return {
       active: h.selectedItemIndex, arg: h.argumentIndex, start: h.applicableSpan.start,
       items: h.items.map((it) => ({
-        prefix: flat(it.prefixDisplayParts), suffix: flat(it.suffixDisplayParts), separator: flat(it.separatorDisplayParts), doc: flat(it.documentation),
-        params: it.parameters.map((p) => ({ label: flat(p.displayParts), doc: flat(p.documentation) })),
+        prefix: flat(it.prefixDisplayParts), suffix: flat(it.suffixDisplayParts), separator: flat(it.separatorDisplayParts), doc: own?.doc ?? flat(it.documentation),
+        params: it.parameters.map((p) => ({ label: flat(p.displayParts), doc: own?.params?.[p.name] ?? flat(p.documentation) })),
       })),
     };
   },

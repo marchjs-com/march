@@ -38,7 +38,7 @@ const lineCol = (text: string, at: number): string => { const before = text.slic
 // the suggestion sources (chips under the list), in the order rows are ranked; the choice is kept across visits
 messages("tr", { "method": "metot", "function": "fonksiyon", "constructor": "yapıcı", "property": "özellik", "getter": "getter (okunur)", "setter": "setter (yazılır)",
   "variable": "değişken", "constant": "sabit", "parameter": "parametre", "Class": "sınıf", "interface": "arayüz", "type": "tür", "enum": "enum", "enum member": "enum üyesi",
-  "module": "modül", "keyword": "anahtar sözcük", "attribute": "öznitelik", "Saved": "Kaydedildi", "App": "Uygulama", "Methods": "Metotlar", "Properties": "Özellikler", "Classes": "Sınıflar", "Types": "Türler", "Modules": "Modüller", "Other": "Diğer" });
+  "module": "modül", "keyword": "anahtar sözcük", "attribute": "öznitelik", "Saved": "Kaydedildi", "App": "Uygulama", "Methods": "Metotlar", "Properties": "Özellikler", "Classes": "Sınıflar", "Types": "Türler", "Modules": "Modüller", "Other": "Diğer", "value": "değer" });
 
 // the file's own names (its variables, functions…) before March's, then TypeScript's and the JS / DOM API
 const SOURCES = [{ value: "file", label: "Dosya" }, { value: "march", label: "March" }, { value: "ts", label: "TS" }, { value: "js", label: "JS" }, { value: "all", label: "All" }];
@@ -66,7 +66,7 @@ const byKind = (items: readonly CodeSuggestion[]): CodeSuggestion[] => {
 const KIND_LABEL: Record<string, string> = {
   method: "method", function: "function", "local function": "function", constructor: "constructor", property: "property", getter: "getter", setter: "setter",
   var: "variable", "local var": "variable", let: "variable", const: "constant", parameter: "parameter", class: "Class", interface: "interface", type: "type",
-  alias: "type", enum: "enum", "enum member": "enum member", module: "module", keyword: "keyword", "JSX attribute": "attribute",
+  alias: "type", enum: "enum", "enum member": "enum member", module: "module", keyword: "keyword", "JSX attribute": "attribute", string: "value",
 };
 const kindLabel = (kind: string | undefined): string | undefined => (kind ? (KIND_LABEL[kind] ? t(KIND_LABEL[kind]!) : kind) : undefined);
 const sourceOf = (it: CodeSuggestion): string => (TS_KINDS.has(it.hint ?? "") || (it.hint === "keyword" && TS_WORDS.has(it.label)) ? "ts" : "js");
@@ -88,11 +88,22 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
           // March's rows first, then TypeScript's (JS and TS), one row per name; nothing on a blank (a space, a new
           // line, an empty text) unless asked with Ctrl + Space
           const complete = async (c: CodeCompleteContext): Promise<CodeCompletion | null> => {
-            if (!c.forced && /(^|\s)$/.test(c.before)) return null;
+            // after a space only where a value is expected (= ( , : return case ===…): then only the rows of the type
+            // the place expects (const ok: boolean = → true, false); elsewhere a blank asks nothing
+            const blank = !c.forced && /(^|\s)$/.test(c.before);
+            if (blank && !(ts && /(?:[=(,:?[]|\breturn|\bcase)\s*$/.test(c.before))) return null;
             const [own, fromTs] = await Promise.all([
-              Promise.resolve(ctx.service<LanguageService>("language")?.complete?.(file.path, c)).catch(() => null),
+              blank ? null : Promise.resolve(ctx.service<LanguageService>("language")?.complete?.(file.path, c)).catch(() => null),
               ts ? ts.complete(file.path, c).catch(() => null) : Promise.resolve(o.complete?.(file.path, c) ?? null),
             ]);
+            // a comment or the text between JSX tags is no code: nothing; a string: only its type's words (TypeScript's)
+            if (fromTs?.where === "comment" || fromTs?.where === "text") return null;
+            if (blank || fromTs?.where === "string") {
+              // with nothing typed only the closest fits (the type's own values, the file's names), never a list of globals
+              const items0 = fromTs?.items ?? [], top = Math.max(0, ...items0.map((it) => it.priority ?? 0));
+              const rows = items0.filter((it) => (it.priority ?? 0) > 0 && (fromTs?.where === "string" || (top >= 2 && it.priority === top))).map((it) => ({ ...it, source: it.source ?? sourceOf(it), hint: kindLabel(it.hint) ?? "" }));
+              return rows.length ? { from: fromTs!.from, to: fromTs!.to ?? c.caret, items: rows, all: true } : null;
+            }
             // after a dot only the value's members (TypeScript's): March's names are no member of anything
             const member = /\.[\w$]*$/.test(c.before);
             const march = member ? [] : (own?.items ?? []).map((it) => ({ ...it, source: it.source ?? "march" }));
@@ -123,6 +134,8 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
                 return q && (q.text || q.doc) ? { kind: kindLabel(q.kind), signature: q.text, doc: q.doc } : null;
               },
             } : {}),
+            // the undo history (500 steps) per file, kept in the browser session: it outlives a tab switch and a reload
+            history: { key: `code:${file.path}`, limit: 500 },
             get fontSize() { return fontSize(); },
             onFontSizeChange: (px: number | undefined) => { fontSize.set(px); try { if (px) localStorage.setItem(SIZE_KEY, String(px)); else localStorage.removeItem(SIZE_KEY); } catch { /* private mode */ } },
             onSave: () => (o.save ? o.save(file) : toast(t`Saved`, { kind: "success", timeout: 1200 })),
