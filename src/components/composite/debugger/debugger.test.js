@@ -162,3 +162,21 @@ test("Debugger: the timeline slider stays the same element while it is moved (th
   }
   dispose(); s.end();
 });
+
+test("Debugger layout: watch | scope and breakpoints | stack side by side, output alone with a copy button, the switches in the footer", async () => {
+  const s = createDebugSession({ evaluate });
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(Debugger, { session: s, outputLines: 3 }), el);
+  const pairs = [...el.querySelectorAll(".m-dbg-pair")].map((p) => [...p.querySelectorAll(".m-dbg-sec")].map((x) => x.className.split(" ").find((c) => c.startsWith("is-"))));
+  assert.deepEqual(pairs, [["is-watch", "is-scope"], ["is-breakpoints", "is-stack"]]);
+  assert.ok(el.querySelector(".m-dbg-sec.is-output") && !el.querySelector(".m-dbg-pair .is-output"), "output on a row of its own");
+  assert.ok(el.querySelector(".is-output .m-dbg-copy"), "the output's copy button");
+  assert.equal(el.querySelector(".m-dbg-out").style.getPropertyValue("--m-dbg-out-lines"), "3");
+  assert.ok(el.querySelector(".m-dbg-foot .m-dbg-options") && !el.querySelector(".m-dbg-body .m-dbg-options"), "the switches are the footer, outside the scrolling body");
+  dispose();
+  const el2 = document.createElement("div"); document.body.appendChild(el2);
+  const dispose2 = render(() => h(Debugger, { session: s, layout: ["watch", "scope"], sections: ["watch", "scope", "output"] }), el2);
+  assert.equal(el2.querySelector(".m-dbg-pair"), null, "a layout of single rows");
+  assert.equal(el2.querySelectorAll(".m-dbg-sec").length, 3, "a section the layout leaves out still gets a row");
+  dispose2();
+});

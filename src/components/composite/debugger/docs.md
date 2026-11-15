@@ -38,6 +38,8 @@ const session = createDebugSession({ persist: "my-ide.debug" });   // evaluate: 
 | `onStop` | Stop (Shift+F5); default `session.end()`. |
 | `onReveal` | `(file, line)`: a frame, a breakpoint or an output line was pressed. |
 | `sections` | Which sections, in which order: `watch`, `scope`, `stack`, `breakpoints`, `output` (reactive). |
+| `layout` | The rows: a section, or two side by side with a divider to drag: `[["watch", "scope"], ["breakpoints", "stack"], "output"]` (default). A section the layout leaves out gets a row of its own. |
+| `outputLines` | Lines of the output box (default 4): it does not grow, it scrolls with the newest line in view; its copy button copies every line. |
 | `open` | The sections open at first (default all). |
 | `timeline` | The recording's timeline (default true). |
 | `options` | The switches: pause on exceptions, stop on entry, breakpoints on (default true). |
@@ -53,5 +55,5 @@ the call stack is a list of buttons, the chosen frame marked `aria-current`. Eve
 
 ## Composed of
 
-IconButton (the controls), Slider (the timeline), Disclosure (the sections), JsonView (values), TextInput (watch,
+IconButton (the controls), Slider (the timeline), Disclosure (the sections), Splitter (two sections side by side), CopyButton (the output), JsonView (values), TextInput (watch,
 condition, log message), Checkbox (a breakpoint on / off), Toggle (the switches), Badge (counts), StatusDot (the state).

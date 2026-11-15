@@ -51,7 +51,7 @@ if (!session.breakpoints().length) session.setBreakpoint(FILE, 4)
 if (!session.watches().length) session.addWatch("sum * 2")
 const OWN = { title: "Böcek avı", resume: "Sürdür", over: "Atla", into: "Gir", out: "Çık", back: "Geri sar", stop: "Bitir", start: "Koş", restart: "Baştan koş", watch: "Gözlem", scope: "Değişkenler", stack: "Yığın", breakpoints: "Duraklar", output: "Günlük" }
 
-export default function DebuggerDemo(props: { values: { watch: boolean; scope: boolean; stack: boolean; breakpoints: boolean; output: boolean; timeline: boolean; options: boolean; depth: number; ownLabels: boolean; ownIcons: boolean } }) {
+export default function DebuggerDemo(props: { values: { watch: boolean; scope: boolean; stack: boolean; breakpoints: boolean; output: boolean; timeline: boolean; options: boolean; depth: number; side: boolean; outputLines: number; ownLabels: boolean; ownIcons: boolean } }) {
   const v = props.values
   const sections = (): DebuggerSection[] => [v.watch && "watch", v.scope && "scope", v.stack && "stack", v.breakpoints && "breakpoints", v.output && "output"].filter((k): k is DebuggerSection => !!k)
   return <div class="sc-dbg-demo">
@@ -60,7 +60,8 @@ export default function DebuggerDemo(props: { values: { watch: boolean; scope: b
       activeLine={() => session.litLine(FILE)} onGutter={(line: number) => session.toggleBreakpoint(FILE, line)} />
     {() => {
       const labels = v.ownLabels ? OWN : undefined, icons = v.ownIcons ? { start: sparkles, resume: star } : undefined, depth = v.depth
-      return <Debugger class="sc-dbg-panel" session={session} sections={sections} timeline={() => v.timeline} options={() => v.options} depth={depth}
+      const layout = v.side ? undefined : (["watch", "scope", "breakpoints", "stack", "output"] as DebuggerSection[]), outputLines = v.outputLines
+      return <Debugger class="sc-dbg-panel" session={session} sections={sections} timeline={() => v.timeline} options={() => v.options} depth={depth} layout={layout} outputLines={outputLines}
         labels={labels} icons={icons} onStart={() => { session.begin([META]); run() }} />
     }}
   </div>

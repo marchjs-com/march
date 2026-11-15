@@ -14,8 +14,14 @@
 .m-dbg-time > :first-child { flex: 1; min-inline-size: 0; }
 .m-dbg-count { color: var(--m-muted); font: var(--m-text-xs) var(--m-font-mono); white-space: nowrap; }
 .m-dbg-hint { margin: 0; color: var(--m-muted); font-size: var(--m-text-xs); }
-.m-dbg-body { flex: 1; min-block-size: 0; overflow: auto; }
-.m-dbg-sec { border-block-end: var(--m-border-w, 1px) solid var(--m-border); }
+/* the sections: rows with room between them; two side by side in a row share it by a divider (Splitter) */
+.m-dbg-body { flex: 1; min-block-size: 0; overflow: auto; display: grid; align-content: start; grid-auto-rows: max-content; gap: var(--m-space-2); padding: var(--m-space-2); }
+.m-dbg-sec { border: var(--m-border-w, 1px) solid var(--m-border); border-radius: var(--m-radius-2, 8px); background: var(--m-surface); min-inline-size: 0; }
+.m-splitter.m-dbg-pair { min-block-size: auto; border: 0; border-radius: 0; overflow: visible; background: none; }
+.m-dbg-pair > .m-split-pane { overflow: visible; min-block-size: auto; }
+.m-dbg-pair > .m-split-pane:first-child { padding-inline-end: var(--m-space-1); }
+.m-dbg-pair > .m-split-pane:last-child { padding-inline-start: var(--m-space-1); }
+.m-dbg-pair .m-dbg-sec { block-size: 100%; }
 .m-dbg-sec > .m-disclosure-summary { display: flex; align-items: center; gap: var(--m-space-2); padding: var(--m-space-1) var(--m-space-2); font-size: var(--m-text-xs); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--m-muted); }
 .m-dbg-sec > .m-disclosure-body { padding: 0 var(--m-space-2) var(--m-space-2); }
 .m-dbg-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
@@ -43,4 +49,11 @@ button.m-dbg-at:hover { color: var(--m-primary-text); text-decoration: underline
 .m-dbg-line.is-warn { color: var(--m-warn-text); border-color: var(--m-warn); }
 .m-dbg-line.is-error { color: var(--m-danger-text); border-color: var(--m-danger); }
 .m-dbg-line.is-logpoint { color: var(--m-info-text, var(--m-primary-text)); border-color: var(--m-info, var(--m-primary)); }
+/* the switches: the panel's footer, always in view under the sections */
+.m-dbg-foot { flex: none; border-block-start: var(--m-border-w, 1px) solid var(--m-border); background: var(--m-surface); }
 .m-dbg-options { display: flex; flex-wrap: wrap; gap: var(--m-space-2) var(--m-space-4); padding: var(--m-space-2); font-size: var(--m-text-xs); }
+/* the output: a fixed box of --m-dbg-out-lines lines (it scrolls, the newest line in view), copied by its button */
+.m-dbg-outbox { position: relative; }
+.m-dbg-out { --m-dbg-out-line: 1.5em; block-size: calc(var(--m-dbg-out-lines, 4) * var(--m-dbg-out-line) + 4px); overflow: auto; align-content: start; padding-inline-end: 2rem; border-radius: var(--m-radius-1); background: color-mix(in srgb, var(--m-text) 3%, transparent); }
+.m-dbg-out > li { min-block-size: var(--m-dbg-out-line); line-height: var(--m-dbg-out-line); }
+.m-dbg-copy { position: absolute; inset-block-start: 2px; inset-inline-end: 2px; }

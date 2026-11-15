@@ -27,6 +27,9 @@ import { Checkbox } from "../../forms/checkbox/index.ts";
 import { Toggle } from "../../forms/toggle/index.ts";
 import { Badge } from "../../data/badge/index.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
+import { Splitter } from "../../layout/splitter/index.ts";
+import { CopyButton } from "../../actions/copy-button/index.ts";
+import { stickToBottom } from "../../../ui/observe.ts";
 import { accessorKind, isUndeclared, text, type DebugSession, type StepView, type WatchValue } from "./session.ts";
 
 export { createDebugSession, accessorKind, isUndeclared } from "./session.ts";
@@ -41,7 +44,7 @@ messages("tr", {
   "Paused on debugger statement": "debugger deyiminde durdu", "Paused on exception": "Hatada durdu", "Paused": "Durdu", "Paused on entry": "Girişte durdu",
   "Recording": "Kayıt", "step": "adım", "Pause on exceptions": "Hatalarda dur", "Stop on entry": "Girişte dur", "Breakpoints on": "Kesme noktaları açık",
   "Remove all": "Tümünü kaldır", "No watches": "İzlenen ifade yok", "No breakpoints: click a line number in the editor (F9 at the caret)": "Kesme noktası yok: editörde satır numarasına tıkla (imleçte F9)",
-  "Nothing yet": "Henüz bir şey yok", "Not paused": "Durmadı", "not yet defined": "henüz tanımsız", "Timeline": "Zaman çizelgesi",
+  "Nothing yet": "Henüz bir şey yok", "Copy the output": "Çıktıyı kopyala", "Not paused": "Durmadı", "not yet defined": "henüz tanımsız", "Timeline": "Zaman çizelgesi",
   "Start a run, then set breakpoints or add debugger; to the code": "Çalıştırmayı başlat; kesme noktası koy ya da koda debugger; yaz",
 });
 
@@ -55,7 +58,7 @@ export interface DebuggerLabels {
   watch: string; scope: string; stack: string; breakpoints: string; output: string; local: string; closure: string; module: string;
   addWatch: string; remove: string; condition: string; log: string; idle: string; running: string; breakpoint: string; debugger: string;
   exception: string; paused: string; entry: string; step: string; pauseOnExceptions: string; stopOnEntry: string; breakpointsOn: string;
-  removeAll: string; noWatches: string; noBreakpoints: string; nothing: string; notPaused: string; undeclared: string; timeline: string; hint: string;
+  removeAll: string; noWatches: string; noBreakpoints: string; nothing: string; copyOutput: string; notPaused: string; undeclared: string; timeline: string; hint: string;
 }
 const LABELS: DebuggerLabels = {
   title: "Debugger", start: "Start debugging", restart: "Restart", resume: "Continue", over: "Step over", into: "Step into", out: "Step out",
@@ -64,7 +67,7 @@ const LABELS: DebuggerLabels = {
   idle: "Not debugging", running: "Running", breakpoint: "Paused on breakpoint", debugger: "Paused on debugger statement", exception: "Paused on exception",
   paused: "Paused", entry: "Paused on entry", step: "step", pauseOnExceptions: "Pause on exceptions", stopOnEntry: "Stop on entry",
   breakpointsOn: "Breakpoints on", removeAll: "Remove all", noWatches: "No watches", noBreakpoints: "No breakpoints: click a line number in the editor (F9 at the caret)",
-  nothing: "Nothing yet", notPaused: "Not paused", undeclared: "not yet defined", timeline: "Timeline", hint: "Start a run, then set breakpoints or add debugger; to the code",
+  nothing: "Nothing yet", copyOutput: "Copy the output", notPaused: "Not paused", undeclared: "not yet defined", timeline: "Timeline", hint: "Start a run, then set breakpoints or add debugger; to the code",
 };
 const KEYS: Partial<Record<DebuggerIcon, string>> = { resume: "F8", over: "F10", into: "F11", out: "Shift+F11", stop: "Shift+F5", start: "F5", restart: "Ctrl+Shift+F5" };
 
@@ -88,6 +91,13 @@ export interface DebuggerProps {
   onReveal?: ((file: string, line: number) => void) | undefined;
   /** The sections, in this order (default: watch, scope, stack, breakpoints, output). */
   sections?: MaybeFn<readonly DebuggerSection[] | undefined>;
+  /**
+   * How the sections stand: one per row, or two side by side in a row whose divider is dragged (default: watch | scope,
+   * breakpoints | stack, then output). A section of `sections` the layout does not name gets a row of its own.
+   */
+  layout?: readonly (DebuggerSection | readonly [DebuggerSection, DebuggerSection])[] | undefined;
+  /** Lines of the output shown at once (default 4; it scrolls, the newest line in view). */
+  outputLines?: number | undefined;
   /** The sections open at first (default: all). */
   open?: readonly DebuggerSection[] | undefined;
   /** The timeline of the recording, to go back and forth in time (default true). */
@@ -208,24 +218,46 @@ export function Debugger(props: DebuggerProps): Element {
     () => { const ids = bpIds(); return untrack(() => (ids ? h("ul", { class: "m-dbg-list" }, s.breakpoints().map((b) => bpRow(b.id))) : h("p", { class: "m-dbg-muted" }, L("noBreakpoints")))); },
     () => (s.breakpoints().length ? h("div", { class: "m-dbg-tools" }, h(IconButton, { icon: trash, label: () => L("removeAll"), size: "xs", variant: "ghost", onClick: () => s.clearBreakpoints() })) : null),
   ];
-  const output = (): unknown => () => {
-    const lines = s.output();
-    return lines.length ? h("ul", { class: "m-dbg-list m-dbg-out" }, lines.slice(-300).map((l) => h("li", { class: `m-dbg-line is-${l.level}` },
-      h("span", { class: "m-dbg-text" }, l.text),
-      l.file ? h("button", { type: "button", class: "m-dbg-at", onClick: () => props.onReveal?.(l.file!, l.line!) }, `${l.file}:${l.line}`) : null)))
-      : h("p", { class: "m-dbg-muted" }, L("nothing"));
+  // the output: a box of `outputLines` lines (it does not grow with every line), the newest in view, a copy button
+  const output = (): unknown => {
+    const list = h("ul", { class: "m-dbg-list m-dbg-out", style: { "--m-dbg-out-lines": String(props.outputLines ?? 4) } }, () => {
+      const lines = s.output();
+      return lines.length ? lines.slice(-300).map((l) => h("li", { class: `m-dbg-line is-${l.level}` },
+        h("span", { class: "m-dbg-text" }, l.text),
+        l.file ? h("button", { type: "button", class: "m-dbg-at", onClick: () => props.onReveal?.(l.file!, l.line!) }, `${l.file}:${l.line}`) : null))
+        : h("li", { class: "m-dbg-muted" }, L("nothing"));
+    }) as HTMLElement;
+    stickToBottom(list);
+    return h("div", { class: "m-dbg-outbox" }, list,
+      h(CopyButton, { iconOnly: true, class: "m-dbg-copy", label: () => L("copyOutput"), text: () => s.output().map((l) => (l.file ? `${l.text}  (${l.file}:${l.line})` : l.text)).join("\n") }));
   };
   const BODY: Record<DebuggerSection, () => unknown> = { watch, scope, stack, breakpoints, output };
   const COUNT: Partial<Record<DebuggerSection, () => number>> = { watch: () => s.watches().length, breakpoints: () => s.breakpoints().length, output: () => s.output().length };
   const opened = signal(new Set<DebuggerSection>(props.open ?? ["watch", "scope", "stack", "breakpoints", "output"]));
+  const section = (k: DebuggerSection): unknown => h(Disclosure, {
+    class: `m-dbg-sec is-${k}`, open: () => opened().has(k),
+    onToggle: (o: boolean) => { const next = new Set(opened.peek()); if (o) next.add(k); else next.delete(k); opened.set(next); },
+    title: [h("span", { class: "m-dbg-title" }, () => L(k)), COUNT[k] ? () => (COUNT[k]!() ? h(Badge, { size: "xs", tone: "neutral" }, String(COUNT[k]!())) : null) : null],
+    children: BODY[k](),
+  });
+  // a pair's divider is kept while the panel lives (its share by the pair)
+  const shares = new Map<string, number>();
+  const pair = (a: DebuggerSection, b: DebuggerSection): unknown => h(Splitter, {
+    class: "m-dbg-pair", start: section(a), end: section(b), min: 0.2, initial: shares.get(`${a}|${b}`) ?? 0.5, onChange: (v: number) => shares.set(`${a}|${b}`, v),
+  });
   const sections = (): unknown => {
     const list = val(props.sections) ?? ["watch", "scope", "stack", "breakpoints", "output"];
-    return untrack(() => list.map((k) => h(Disclosure, {
-      class: `m-dbg-sec is-${k}`, open: () => opened().has(k),
-      onToggle: (o: boolean) => { const next = new Set(opened.peek()); if (o) next.add(k); else next.delete(k); opened.set(next); },
-      title: [h("span", { class: "m-dbg-title" }, () => L(k)), COUNT[k] ? () => (COUNT[k]!() ? h(Badge, { size: "xs", tone: "neutral" }, String(COUNT[k]!())) : null) : null],
-      children: BODY[k](),
-    })));
+    const rows = props.layout ?? [["watch", "scope"], ["breakpoints", "stack"], "output"];
+    return untrack(() => {
+      const used = new Set<DebuggerSection>(), out: unknown[] = [];
+      for (const r of rows) {
+        const keys = (typeof r === "string" ? [r] : [...r]).filter((k) => list.includes(k) && !used.has(k));
+        keys.forEach((k) => used.add(k));
+        if (keys.length === 2) out.push(pair(keys[0]!, keys[1]!)); else if (keys.length === 1) out.push(section(keys[0]!));
+      }
+      for (const k of list) if (!used.has(k)) out.push(section(k));
+      return out;
+    });
   };
   const options = (): unknown => (val(props.options) === false ? null : h("div", { class: "m-dbg-options" },
     h(Toggle, { label: () => L("pauseOnExceptions"), get value() { return s.pauseOnExceptions(); }, onChange: (v: boolean | null) => s.pauseOnExceptions.set(!!v) }),
@@ -234,5 +266,6 @@ export function Debugger(props: DebuggerProps): Element {
 
   return h("section", { class: () => cx("m-dbg", `is-${s.state()}`, val(props.class)), "aria-label": () => L("title") },
     h("header", { class: "m-dbg-head" }, controls, status, timeline, () => (s.state() === "idle" && !s.breakpoints().length ? h("p", { class: "m-dbg-hint" }, L("hint")) : null)),
-    h("div", { class: "m-dbg-body" }, sections, options)) as Element;
+    h("div", { class: "m-dbg-body" }, sections),
+    () => (val(props.options) === false ? null : h("footer", { class: "m-dbg-foot" }, options()))) as Element;
 }
