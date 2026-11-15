@@ -14,3 +14,33 @@
 /* m:theme="night": a subtree in another colour theme takes that theme's text colour and font too (its tokens come from the
    theme's own [data-m-theme] rule; the inherited colour and font would still be the page's) */
 :where([data-m-theme]:not(:root)) { color: var(--m-text); font-family: var(--m-font); }
+
+/* m:text-color="brand-blue": the text colour of the element and everything in it, from the colour tokens (the
+   token's text tone, readable on the surface); "muted" the quiet text, "inherit" back to the parent's. It is the
+   developer's explicit choice, so it wins over a component's own text colour (m:color tints the fill and the accent). */
+[data-m-text-color="primary"] { --m-text-color: var(--m-primary-text); }
+[data-m-text-color="info"] { --m-text-color: var(--m-info-text); }
+[data-m-text-color="success"] { --m-text-color: var(--m-success-text); }
+[data-m-text-color="warn"] { --m-text-color: var(--m-warn-text); }
+[data-m-text-color="danger"] { --m-text-color: var(--m-danger-text); }
+[data-m-text-color="special"] { --m-text-color: var(--m-special-text); }
+[data-m-text-color="warning"] { --m-text-color: var(--m-warn-text); }
+[data-m-text-color="neutral"] { --m-text-color: var(--m-text); }
+[data-m-text-color="brand-orange"] { --m-text-color: var(--m-brand-orange-text, var(--m-cat-1-text)); }
+[data-m-text-color="brand-blue"] { --m-text-color: var(--m-brand-blue-text, var(--m-cat-2-text)); }
+[data-m-text-color="brand-green"] { --m-text-color: var(--m-brand-green-text, var(--m-cat-3-text)); }
+[data-m-text-color="brand-purple"] { --m-text-color: var(--m-brand-purple-text, var(--m-cat-4-text)); }
+[data-m-text-color="gold"] { --m-text-color: var(--m-brand-gold-text, var(--m-cat-6-text)); }
+[data-m-text-color="brand-gold"] { --m-text-color: var(--m-brand-gold-text, var(--m-cat-6-text)); }
+[data-m-text-color="brand-pink"] { --m-text-color: var(--m-brand-pink-text, var(--m-cat-5-text)); }
+[data-m-text-color="cat-1"] { --m-text-color: var(--m-cat-1-text); }
+[data-m-text-color="cat-2"] { --m-text-color: var(--m-cat-2-text); }
+[data-m-text-color="cat-3"] { --m-text-color: var(--m-cat-3-text); }
+[data-m-text-color="cat-4"] { --m-text-color: var(--m-cat-4-text); }
+[data-m-text-color="cat-5"] { --m-text-color: var(--m-cat-5-text); }
+[data-m-text-color="cat-6"] { --m-text-color: var(--m-cat-6-text); }
+[data-m-text-color="cat-7"] { --m-text-color: var(--m-cat-7-text); }
+[data-m-text-color="cat-8"] { --m-text-color: var(--m-cat-8-text); }
+[data-m-text-color="muted"] { --m-text-color: var(--m-muted); }
+/* the nearest m:text-color wins (the variable is inherited); every part inside takes it */
+[data-m-text-color], [data-m-text-color] * { color: var(--m-text-color) !important; }
