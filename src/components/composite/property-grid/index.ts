@@ -5,6 +5,7 @@
 // be reset one by one.
 import "./property-grid.css";
 import { signal, computed, untrack, onCleanup, getOwner, runWithOwner, reactive, type Signal } from "../../../core/reactive.ts";
+import { load as loadStored, save as store } from "../../../core/util.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -122,6 +123,10 @@ export interface PropertyGridProps {
    * is open; a press opens or closes it). Default true. @tr Birden çok grupta üstte bir araç satırı: bütün grupları
    * aç / kapat ve her grup için bir çip (açıkken seçili; basınca açar ya da kapatır). Varsayılan true. */
   groupTools?: boolean | undefined;
+  /** Keep which groups are closed in localStorage under "m.pg.<persist>" (they open as they were left). @tr Hangi grupların kapalı olduğunu localStorage'da "m.pg.<persist>" altında tutar (bırakıldıkları gibi açılır). */
+  persist?: string | undefined;
+  /** The groups open at first (the others closed) until the user opens or closes one; default: every group. @tr Başta açık gruplar (diğerleri kapalı), kullanıcı birini açıp kapatana kadar; varsayılan: hepsi. */
+  openGroups?: readonly string[] | undefined;
   labels?: {
     search?: string; general?: string; empty?: string; noMatch?: (query: string) => string;
     changed?: string; changedCount?: (n: number) => string; unsaved?: (n: number) => string; noChanges?: string;
@@ -228,20 +233,25 @@ export function PropertyGrid(props: PropertyGridProps): Element {
     return order.map((g) => ({ name: g, items: list().filter((p) => (p.group ?? "") === g) })).filter((x) => x.items.length);
   });
   // the groups closed by hand (a search opens them all while it lasts)
-  const closed = signal<ReadonlySet<string>>(new Set());
+  const keyOf = props.persist ? `m.pg.${props.persist}` : "";
+  // the user's own choice (kept with `persist`) wins; else `openGroups` closes the other groups at first
+  const stored = keyOf ? loadStored<string[] | null>(keyOf, null) : null;
+  const closed = signal<ReadonlySet<string>>(new Set(stored ?? (props.openGroups ? untrack(grouped).map((g) => g.name).filter((n) => !props.openGroups!.includes(n)) : [])));
+  /** Close or open groups by the user's hand: kept from now on. */
+  const choose = (next: ReadonlySet<string>): void => { closed.set(next); if (keyOf) store(keyOf, [...next]); };
   const setOpen = (name: string, open: boolean): void => {
     const now = closed.peek();
     if (open !== now.has(name)) return;
     const next = new Set(now);
     if (open) next.delete(name); else next.add(name);
-    closed.set(next);
+    choose(next);
   };
   const isOpen = (name: string): boolean => !!query() || !closed().has(name);
   const groupName = (g: { name: string }): string => g.name || (L().general ?? t`General`);
   const allOpen = (): boolean => grouped().every((g) => isOpen(g.name));
   const tools = (): unknown => (props.groupTools === false || grouped().length < 2 ? null : h("div", { class: "m-pg-tools", role: "group", "aria-label": () => L().sections ?? t`Sections` },
     h(IconButton, { class: "m-pg-all", icon: chevronsUpDown, size: "xs", variant: "ghost", label: () => (allOpen() ? L().closeAll ?? t`Close all` : L().openAll ?? t`Open all`),
-      onClick: () => closed.set(allOpen() ? new Set(grouped().map((g) => g.name)) : new Set()) }),
+      onClick: () => choose(allOpen() ? new Set(grouped().map((g) => g.name)) : new Set()) }),
     () => grouped().map((g) => untrack(() => h(Chip, { size: "sm", selected: () => isOpen(g.name), onClick: () => setOpen(g.name, !isOpen(g.name)) }, groupName(g))))));
   const body = (): unknown => grouped().map((g) => untrack(() => {
     const items = g.items.map((p) => { const el = rowOf(p); return () => (matches().has(p.key) ? el : null); });

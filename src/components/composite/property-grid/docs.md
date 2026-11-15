@@ -27,6 +27,8 @@ one. The footer counts the changes and offers Revert and Save.
 | `groups` | string[] | order of appearance | group order |
 | `search` | boolean | `true` | the search field (label, key, group, keywords, description; Turkish-aware folding) |
 | `groupTools` | boolean | `true` | with more than one group, a row of tools at the top: open / close every group and a chip per group (lit while it is open; a press opens or closes it); a search opens them all while it lasts |
+| `persist` | string | — | keep which groups are closed in localStorage under `m.pg.<persist>`; they open as they were left |
+| `openGroups` | `string[]` | every group | the groups open at first (the others closed) until the user opens or closes one |
 | `layout` | `auto` `stacked` | `auto` | label beside the editor (stacked in narrow panels) or always above |
 | `api` | `(api) => void` | — | `changes()`, `save()`, `revert()`, `markSaved()`, `focus(key)` |
 | `label` | string / accessor | `Properties` | accessible name, DirtyState and undo label |

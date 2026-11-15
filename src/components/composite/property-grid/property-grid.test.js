@@ -180,3 +180,29 @@ test("PropertyGrid group tools: a chip per group (lit while open) toggles it; op
   assert.equal(host2.querySelector(".m-pg-tools"), null);
   d2();
 });
+
+test("PropertyGrid persist: the closed groups are kept and come back", async () => {
+  const tick = () => new Promise((r) => setTimeout(r, 0));
+  const properties = [{ key: "a", label: "A", group: "One" }, { key: "b", label: "B", group: "Two" }];
+  const mountIt = () => { const host = document.createElement("div"); document.body.appendChild(host); return [host, render(() => h(PropertyGrid, { properties, value: {}, search: false, persist: "t1" }), host)]; };
+  const [h1, d1] = mountIt();
+  h1.querySelectorAll(".m-pg-tools .m-chip2 button")[1].click(); await tick();
+  d1();
+  const [h2, d2] = mountIt();
+  assert.deepEqual([...h2.querySelectorAll("details.m-pg-group")].map((d) => d.hasAttribute("open")), [true, false], "Two comes back closed");
+  d2();
+});
+
+test("PropertyGrid openGroups: only those open at first; the user's choice (persist) wins afterwards", async () => {
+  const tick = () => new Promise((r) => setTimeout(r, 0));
+  const properties = [{ key: "a", label: "A", group: "March" }, { key: "b", label: "B", group: "HTML" }, { key: "c", label: "C", group: "sx" }];
+  const mountIt = () => { const host = document.createElement("div"); document.body.appendChild(host); return [host, render(() => h(PropertyGrid, { properties, value: {}, search: false, persist: "t2", openGroups: ["March"] }), host)]; };
+  const open = (host) => [...host.querySelectorAll("details.m-pg-group")].map((d) => d.hasAttribute("open"));
+  const [h1, d1] = mountIt();
+  assert.deepEqual(open(h1), [true, false, false]);
+  h1.querySelectorAll(".m-pg-tools .m-chip2 button")[2].click(); await tick();
+  d1();
+  const [h2, d2] = mountIt();
+  assert.deepEqual(open(h2), [true, false, true], "sx stays open as the user left it");
+  d2();
+});
