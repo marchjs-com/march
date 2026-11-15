@@ -18,6 +18,7 @@ export const parts: Record<string, () => Promise<unknown>> = {
   Chevron: () => import("./actions/chevron/index.ts").then((m) => (m as Record<string, unknown>)["Chevron"]),
   Chip: () => import("./actions/chip/index.ts").then((m) => (m as Record<string, unknown>)["Chip"]),
   ClampText: () => import("./typography/clamp-text/index.ts").then((m) => (m as Record<string, unknown>)["ClampText"]),
+  CodeEditor: () => import("./composite/code-editor/index.ts").then((m) => (m as Record<string, unknown>)["CodeEditor"]),
   CodeView: () => import("./typography/code-view/index.ts").then((m) => (m as Record<string, unknown>)["CodeView"]),
   ColorInput: () => import("./forms/color-input/index.ts").then((m) => (m as Record<string, unknown>)["ColorInput"]),
   ColorPicker: () => import("./composite/color-picker/index.ts").then((m) => (m as Record<string, unknown>)["ColorPicker"]),

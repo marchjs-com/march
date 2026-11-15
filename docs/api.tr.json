@@ -139,6 +139,8 @@
   "TYPES": "Alan türleri ve temel davranışları. `fieldType(name, def)` ile genişletilir."
  },
  "hadi-march/ui": {
+  "codeEditorPlugin": "march-app-ui eklentisi: kod dosyalarını (.ts, .tsx, .js, .css, .json…) March'ın CodeEditor'ında açar; öneriler bir dil servisi eklentisinden gelebilir.",
+  "definePlugin": "march-app-ui eklentisi tanımlar: kimlik, önce gereken eklentiler ve activate(ctx); dosya türü, panel, komut ve servis ekler, hepsi eklentiyle birlikte kalkar.",
   "AppUI": "march-app-ui, March IDE'nin çekirdeği ve IDE kabuğunun tabanı: üst çubuk (başlık, araçlar, Yerleşim menüsü), yan yuva, DockLayout çalışma alanı ve alt yuva.",
   "col": "Hazır düzende üst üste duran çocuklar: `col([ağırlık, çocuk], …)`.",
   "row": "Hazır düzende yan yana duran çocuklar: `row([ağırlık, çocuk], …)`.",

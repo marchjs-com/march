@@ -4,6 +4,7 @@
 // a foot line says what the owner thinks of the code. It does not run or compile anything: the owner reads `value`.
 // Built from EditorFrame (border, focus ring, foot bar), Popover + OptionList (the suggestions; the keys stay in the
 // text), CopyButton, Kbd and StatusDot.
+import "../../typography/code-view/code-view.css"; // the token colours (.m-tok-*)
 import "./code-editor.css";
 import { signal, computed, effect, untrack, batch } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";

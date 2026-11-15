@@ -8,3 +8,11 @@
 .m-app-body { position: relative; flex: 1 1 auto; min-block-size: 0; min-inline-size: 0; }
 .m-app-body > .m-dock { position: absolute; inset: 0; min-block-size: 0; }
 .m-menu.m-app-menu { min-inline-size: 15rem !important; inline-size: max-content; overflow-x: hidden; max-inline-size: min(22rem, 92vw); }
+/* a file panel: the editor (or the plain text) fills it */
+.m-app-file { block-size: 100%; display: grid; min-block-size: 0; }
+.m-app-file > * { min-block-size: 0; }
+.m-app-plain { margin: 0; padding: var(--m-space-3); overflow: auto; font: var(--m-text-sm)/1.55 var(--m-font-mono); white-space: pre; }
+.m-editor-frame.m-app-code { block-size: 100%; border: 0; border-radius: 0; box-shadow: none; }
+/* the code fills the panel and scrolls; the frame's footer stays at the bottom */
+.m-app-code .m-ced-area { flex: 1 1 auto; min-block-size: 0; overflow: auto; align-content: start; }
+.m-app-code .m-ced-input { min-block-size: 100%; }

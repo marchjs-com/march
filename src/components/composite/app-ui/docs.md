@@ -25,7 +25,33 @@ Every DockLayout prop (`panels`, `presets`, `preset`, `persist`, `storage`, `api
 | `bar` | boolean | `true` | the top bar; without it open the menu yourself (`api.layoutMenu()` gives its items) |
 | `layoutLabel` | string / `false` | "Layout" | name (tooltip) of the Layout menu button, an icon button; `false`: no button |
 | `layoutIcon` | icon | columns | own icon of the Layout menu button |
+| `plugins` | `AppPlugin[]` | — | file types, panels, commands and services (below) |
+| `kit` | `(kit) => void` | — | the running plugin kit: add or remove plugins later |
 | `class` | class value | — | on the root (`m-app`) |
+
+## Plugins and files
+
+A panel can show a **file** instead of `content`: `{ id, title, file: { path, text: () => string, set?(text) } }`. The
+file type that opens its path draws it (a plugin may come later: the panel is drawn again then); without one it is plain
+text. `codeEditorPlugin()` opens code files (.ts, .tsx, .js, .jsx, .css, .html, .json, .sh) in a CodeEditor; a
+language service plugin can give its suggestions (the `language` service: `complete(path, ctx)`).
+
+```tsx
+const myPlugin = definePlugin({
+  id: "my.tools", requires: ["march.code"],
+  activate(ctx) {
+    ctx.command({ id: "my.run", title: "Run", shortcut: "mod+enter", run: () => run() });
+    ctx.fileType({ id: "md", match: /\.md$/, mount: (file) => <Markdown text={file.text} /> });
+    ctx.panel({ id: "my.log", title: "Log", content: () => <Log /> });
+    ctx.provide("runner", { run });
+  },
+})
+<AppUI panels={panels} plugins={[codeEditorPlugin(), myPlugin]} />
+```
+
+A plugin's context: `fileType`, `panel`, `command` (the command manager: the palette finds it), `provide` / `service`,
+`on` / `emit` (events between plugins) and `onDispose`; each returns a remover, and everything a plugin added goes away
+with it. `requires` starts it after the plugins it needs; removing one removes the plugins that need it first.
 
 ## Accessibility
 
@@ -33,4 +59,4 @@ The Layout menu is a Menu (a menu button, arrow keys among the entries, Escape c
 
 ## Composed of
 
-DockLayout (the workspace) and Menu (the Layout menu).
+DockLayout (the workspace), Menu (the Layout menu) and CodeEditor (the code editor plugin).

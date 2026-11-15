@@ -186,7 +186,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| AppUI | experimental | march-app-ui, the core of March IDE: a top bar (title, your tools, the Layout menu with presets, saved layouts and the panel list) over a DockLayout. | [DockLayout](#docklayout), [Menu](#menu) |
+| AppUI | experimental | march-app-ui, the core of March IDE: a top bar (title, your tools, the Layout menu with presets, saved layouts and the panel list) over a DockLayout; plugins add file types (the code editor opens code files), panels, commands and services. | [DockLayout](#docklayout), [Menu](#menu), [CodeEditor](#codeeditor) |
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | [Badge](#badge), [OverflowText](#overflowtext), [ListRow](#listrow), [Drawer](#drawer) |
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | [Menu](#menu), [Textarea](#textarea), [ReactionPicker](#reactionpicker), [IconButton](#iconbutton), [StatusDot](#statusdot), [ReplyQuote](#replyquote) |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [ReactionPicker](#reactionpicker), [Avatar](#avatar), [Button](#button), [Picture](#picture) |
@@ -315,7 +315,7 @@ Full page: src/components/layout/app-shell/docs.md
 
 march-app-ui, the core of March IDE and the base of an IDE shell: a top bar (a title, your tools and the **Layout** menu), a side slot (an ActivityBar), the [DockLayout](#docklayout) workspace and a status slot (a StatusBar). The Layout menu lists the presets, the saved layouts ("Save this layout"), every panel (checked when it is open; choosing one opens or collapses it), "Open all panels" and "Reset to default". Colours come from the page's theme and accent. Activity bars, status bars and editors are built on top of it.
 
-Composed of: [DockLayout](#docklayout), [Menu](#menu)
+Composed of: [DockLayout](#docklayout), [Menu](#menu), [CodeEditor](#codeeditor)
 
 ```tsx
 <AppUI title="march-app-ui" panels={panels} presets={{

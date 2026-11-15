@@ -27,3 +27,33 @@ test("AppUI: top bar with title, tools and the Layout menu; side and status slot
   assert.ok(items.some((x) => x !== "-" && typeof x.label === "string" && x.label === "Default"), "the presets are in the layout menu");
   dispose();
 });
+
+test("plugins: file types open file panels (the highest priority wins), requires order, everything goes with the plugin", async () => {
+  const { definePlugin, createAppKit } = await import("./kit.ts");
+  const order = [];
+  const a = definePlugin({ id: "a", activate(ctx) { order.push("a"); ctx.fileType({ id: "txt", match: /\.txt$/, mount: () => h("i", { class: "low" }) }); ctx.provide("svc", { n: 1 }); } });
+  const b = definePlugin({ id: "b", requires: ["a"], activate(ctx) { order.push("b"); ctx.fileType({ id: "txt2", match: /\.txt$/, priority: 2, mount: (f) => h("b", { class: "high" }, f.text()) }); return () => order.push("b-off"); } });
+  const kit = createAppKit([b, a]);
+  assert.deepEqual(order, ["a", "b"], "b waits for a");
+  assert.equal(kit.typeOf("x.txt").id, "txt2");
+  assert.equal(kit.service("svc").n, 1);
+  kit.remove("a");
+  assert.deepEqual(order, ["a", "b", "b-off"], "b goes first: it needs a");
+  assert.equal(kit.typeOf("x.txt"), null);
+  assert.equal(kit.service("svc"), undefined);
+  assert.throws(() => definePlugin({ id: "bad id", activate() {} }));
+});
+
+test("AppUI: a panel with a file is drawn by the code editor plugin; without a type it is plain text", async () => {
+  const { codeEditorPlugin } = await import("./index.ts");
+  const { signal } = await import("../../../index.ts");
+  const text = signal("const a = 1");
+  const panels = [
+    { id: "code", title: "a.tsx", file: { path: "a.tsx", text, set: (v) => text.set(v) } },
+    { id: "note", title: "a.txt", file: { path: "a.txt", text: () => "plain" } },
+  ];
+  const { el, dispose } = mount(() => h(AppUI, { panels, plugins: [codeEditorPlugin()], commands: false }));
+  assert.ok(el.querySelector(".m-app-code"), "the code editor opens the .tsx file");
+  assert.equal(el.querySelector(".m-app-plain").textContent, "plain");
+  dispose();
+});
