@@ -239,7 +239,7 @@ export function generate(root = ROOT) {
   // every component prop declared in March's sources: an English JSDoc and its `@tr` Turkish (the playground's
   // Properties and the API page show them), one row per declaration
   const undocProps = [...new Map(recs.flatMap((r) => (r.props ?? []).filter((p) => p.src.startsWith("src/") && (!p.doc || !p.tr))
-    .map((p) => [p.src, `${p.src} ${r.name}.${p.name}${p.doc ? "" : " (English)"}${p.tr ? "" : " (@tr)"}`]))).values()];
+    .map((p) => [`${p.src} ${p.name}`, `${p.src} ${r.name}.${p.name}${p.doc ? "" : " (English)"}${p.tr ? "" : " (@tr)"}`]))).values()];
   return { files, recs, missingMd: missingMd.filter((m) => !MD_PENDING.has(m.split(" › ")[0])), mdDone, undocMembers, undocProps };
 }
 

@@ -24,6 +24,10 @@ test("every public class member has a JSDoc summary", () => {
   assert.deepEqual(open(g.undocMembers), [], "write a /** one-line summary */ on these members");
 });
 
+test("every component prop has an English JSDoc and a Turkish `@tr` text", () => {
+  assert.deepEqual(g.undocProps, [], "write /** English. @tr Türkçe. */ above these props");
+});
+
 test("every export of a finished subpath has its long-form doc (docs/api/<subpath>/<name>.md)", () => {
   assert.deepEqual(g.missingMd, [], "write docs/api/<subpath>/<name>.md (subpaths still being written: MD_PENDING in tools/api-docs.js)");
   assert.deepEqual(g.mdDone, [], "these subpaths have every doc now: remove them from MD_PENDING");
