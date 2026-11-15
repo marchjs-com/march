@@ -17,6 +17,7 @@ and a circular reference is marked instead of looping.
 | `labels` | `{ items?, keys?, circular? }` | "items", "keys", "[circular]" | your own texts |
 | `arrow` | boolean / `(open) => node` | `true` | the open / close arrow, off, or your own (`open()` is live) |
 | `label` | string / accessor | — | accessible name of the tree |
+| `describe` | `(value) => string \| null` | — | your text for a value that is not JSON (a function, an element, a signal): shown as a leaf; null leaves it to JsonView. Pass a function value as `() => fn` (a function `value` is read as an accessor) |
 | `class` | class | — | extra class on the root |
 
 ```tsx

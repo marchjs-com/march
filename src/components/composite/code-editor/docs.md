@@ -47,6 +47,10 @@ typed and on Ctrl + Space (names already written are left out); the values of a 
 | `m:color` | color token | accent | Common prop (hadi-march/props): the colour token of the component and everything in it. |
 | `onBlur` | `(e) => void` | — | focus left the field (tidy the code here) |
 | `inputRef` | `(textarea) => void` | — | the text field |
+| `lineNumbers` | boolean / accessor | `false` | a gutter with each line's number (a wrapped line keeps one) |
+| `lineMarks` | `{ line, kind?, title? }[]` / accessor | — | marks beside the numbers: `breakpoint` (red dot), `conditional` (amber), `log` (diamond), `off` (hollow); any other kind is a class `is-<kind>` to style |
+| `activeLine` | number / `{ line, kind? }` / accessor | — | a line lit across the editor (a debugger's paused line; kinds `current`, `exception`, `frame`), scrolled into view |
+| `onGutter` | `(line, e) => void` | — | a press on the gutter, or F9 at the caret's line (toggle a breakpoint) |
 | `id`, `name`, `class` | | | |
 
 A suggestion: `{ label, hint?, insert?, back?, again?, source?, head? }`: `insert` replaces the word being written (default: the

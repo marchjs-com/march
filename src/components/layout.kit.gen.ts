@@ -6,6 +6,7 @@ export * from "./layout/device-preview/index.ts";
 export * from "./layout/disclosure/index.ts";
 export * from "./layout/exploded-view/index.ts";
 export * from "./layout/grid/index.ts";
+export * from "./layout/joined/index.ts";
 export * from "./layout/layout/index.ts";
 export * from "./layout/overlay-scope/index.ts";
 export * from "./layout/panel-header/index.ts";

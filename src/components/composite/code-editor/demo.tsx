@@ -20,7 +20,7 @@ const PROPS = [
   { name: "title", hint: "ipucu yazısı", value: '=""' },
 ]
 
-export default function CodeEditorDemo(props: { values: { complete: boolean; multiline: boolean; message: boolean; hint: boolean; copy: boolean; flash: boolean; color: string; state: string } }) {
+export default function CodeEditorDemo(props: { values: { lineNumbers: boolean; complete: boolean; multiline: boolean; message: boolean; hint: boolean; copy: boolean; flash: boolean; color: string; state: string } }) {
   let $code = `<Button variant="ghost" size="lg">Kaydet</Button>`
   let $marks: CodeMark[] = []
   // what the code says, read with two small patterns (the editor itself never runs the code)
@@ -32,6 +32,8 @@ export default function CodeEditorDemo(props: { values: { complete: boolean; mul
   const text = () => />([^<]*)</.exec($code)?.[1] ?? "Kaydet"
   const bad = () => variant().bad || size().bad
   const note = () => bad() || "Kod okundu: düğme ona uydu."
+  // lineNumbers: a click on a number marks the line (a breakpoint's dot), again: unmarks it
+  let $pins = new Set<number>()
   const change = (next: string): void => {
     // the part that changed lights up once
     const old = $code
@@ -51,7 +53,9 @@ export default function CodeEditorDemo(props: { values: { complete: boolean; mul
         complete={v.complete ? jsxCompleter({ tag: "Button", props: PROPS }) : undefined}
         hint={v.hint ? undefined : false}
         message={v.message ? note : false} status={() => (bad() ? "error" : "ok")}
-        marks={() => $marks} label="Button kodu" />
+        marks={() => $marks} label="Button kodu"
+        lineNumbers={v.lineNumbers} lineMarks={() => [...$pins].map((line) => ({ line, kind: "breakpoint", title: `${line}. satır işaretli` }))}
+        onGutter={(line: number) => { const next = new Set($pins); if (next.has(line)) next.delete(line); else next.add(line); $pins = next }} />
     }}
     <div class="sc-row">
       <Button variant={() => variant().value as "primary"} size={() => size().value as "md"} disabled={() => /\sdisabled\b/.test($code)}>{text}</Button>

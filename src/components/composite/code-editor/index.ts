@@ -63,6 +63,13 @@ export interface CodeCompleteContext {
 }
 /** A marked range of the text: "flash" lights up once, "error" and "warning" stay underlined (red, amber). */
 export interface CodeMark { from: number; to: number; kind?: "flash" | "error" | "warning"; /** Shown as the mark's tooltip (the problem). */ title?: string }
+/**
+ * A mark in the gutter beside a line's number (1-based): its `kind` becomes a class (`is-<kind>`). Drawn ones:
+ * "breakpoint" (a red dot), "conditional" (amber), "log" (a diamond), "off" (a hollow dot); any other kind is yours to style.
+ */
+export interface CodeLineMark { line: number; kind?: string; /** The mark's tooltip. */ title?: string }
+/** The lit line (a debugger's paused line): its number and kind (class `is-<kind>`, default "current"). */
+export interface CodeActiveLine { line: number; kind?: string }
 
 export interface CodeEditorProps extends ControlProps<string> {
   /** Colours: js / ts / jsx / tsx (default "tsx"), css, html, json, sh; "" for none. */
@@ -107,6 +114,14 @@ export interface CodeEditorProps extends ControlProps<string> {
   onBlur?: ((e: FocusEvent) => void) | undefined;
   /** The textarea (to focus it, to read the selection). */
   inputRef?: ((el: HTMLTextAreaElement) => void) | undefined;
+  /** Line numbers in a gutter at the start of each line (wrapped lines keep one number). */
+  lineNumbers?: MaybeFn<boolean | undefined>;
+  /** Marks in the gutter, by line (breakpoints…); shown with `lineNumbers`. */
+  lineMarks?: MaybeFn<readonly CodeLineMark[] | undefined>;
+  /** A line lit across the editor (a debugger's paused line): a number or `{ line, kind }`; scrolled into view when it changes. */
+  activeLine?: MaybeFn<CodeActiveLine | number | null | undefined>;
+  /** A press on the gutter at a line, or F9 at the caret's line (toggle a breakpoint…). */
+  onGutter?: ((line: number, e: MouseEvent | KeyboardEvent) => void) | undefined;
   class?: ClassProp;
 }
 
@@ -127,10 +142,27 @@ export function CodeEditor(props: CodeEditorProps): Element {
 
   // ---- the coloured copy under the (transparent) text field: same text, same wrapping
   const seen = new Set<string>();
+  const gutter = (): boolean => !!val(props.lineNumbers);
+  const lit = (): CodeActiveLine | null => { const a = val(props.activeLine); return a == null ? null : typeof a === "number" ? { line: a } : a; };
   const paint = (): unknown => {
     const src = get(), list = [...marks()].filter((m) => m.to > m.from).sort((a, b) => a.from - b.from);
     const out: unknown[] = [], now = new Set<string>();
     let at = 0;
+    // the gutter: a number (and its mark) at each line's start, the lit line's bar behind it; the tokens are cut there
+    const starts: number[] = [];
+    const lineMark = new Map<number, CodeLineMark>();
+    const active = gutter() ? lit() : null;
+    if (gutter()) {
+      starts.push(0);
+      for (let i = src.indexOf("\n"); i >= 0; i = src.indexOf("\n", i + 1)) starts.push(i + 1);
+      for (const m of val(props.lineMarks) ?? []) lineMark.set(m.line, m);
+    }
+    let next = 0;
+    const lineNode = (n: number): unknown => {
+      const m = lineMark.get(n);
+      return [active?.line === n ? h("span", { class: `m-ced-lit is-${active.kind ?? "current"}`, "aria-hidden": "true" }) : null,
+        h("span", { class: cx("m-ced-ln", m && `is-${m.kind ?? "breakpoint"}`), "data-line": n, title: m?.title ?? null })];
+    };
     const g = ghost();
     let ghostDone = !g;
     const ghostNode = (): unknown => h("span", { class: "m-ced-ghost-at" }, h("span", { class: "m-ced-ghost" }, g?.rest ?? ""));
@@ -148,16 +180,19 @@ export function CodeEditor(props: CodeEditorProps): Element {
       let from = at;
       const end = at + text.length;
       while (from < end) {
+        while (next < starts.length && starts[next]! <= from) { out.push(lineNode(next + 1)); next++; }
         if (!ghostDone && g!.at === from) { out.push(ghostNode()); ghostDone = true; }
         const m = list.find((x) => x.from < end && x.to > from) ?? null;
         let stop = m ? (m.from > from ? m.from : Math.min(m.to, end)) : end;
         if (!ghostDone && g!.at > from && g!.at < stop) stop = g!.at;
+        if (next < starts.length && starts[next]! > from && starts[next]! < stop) stop = starts[next]!;
         push(kind, text.slice(from - at, stop - at), m && m.from <= from ? m : null);
         from = stop;
       }
       at = end;
     }
     seen.clear(); for (const k of now) seen.add(k);
+    while (next < starts.length) { out.push(lineNode(next + 1)); next++; } // an empty last line
     if (!ghostDone) out.push(ghostNode());
     out.push("​"); // the last (empty) line keeps its height
     return out;
@@ -252,6 +287,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
       if (!(e.ctrlKey || e.metaKey) && e.key.length > 1) ghost.set(null); // the caret moves: the ghost goes
     }
     if ((e.ctrlKey || e.metaKey) && e.code === "Space") { e.preventDefault(); ask(true); return; }
+    if (e.key === "F9" && props.onGutter) { e.preventDefault(); props.onGutter(input.value.slice(0, input.selectionStart ?? 0).split("\n").length, e); return; }
     const d = done.peek();
     if (d) {
       // the arrows and Enter belong to the suggestion list (OptionList listens on this field); Tab picks too
@@ -291,14 +327,30 @@ export function CodeEditor(props: CodeEditorProps): Element {
     })),
     () => (done() && !shown().length ? h("span", { class: "m-ced-none" }, t`No suggestions here`) : null));
 
+  // the gutter's press area, over the text field's start: the line under the pointer (its number's place)
+  const lineAt = (y: number): number => {
+    let n = 1;
+    for (const el of code.querySelectorAll<HTMLElement>(".m-ced-ln")) { if (el.getBoundingClientRect().top <= y + 1) n = Number(el.dataset["line"]); else break; }
+    return n;
+  };
+  let hover: Element | null = null;
+  const unhover = (): void => { hover?.classList.remove("is-hover"); hover = null; };
+  const hit = h("span", {
+    class: "m-ced-gutter", "aria-hidden": "true",
+    onPointerdown: (e: PointerEvent) => { if (e.button !== 0) return; e.preventDefault(); props.onGutter?.(lineAt(e.clientY), e); },
+    onPointermove: (e: PointerEvent) => { const el = code.querySelector(`.m-ced-ln[data-line="${lineAt(e.clientY)}"]`); if (el !== hover) { unhover(); hover = el; el?.classList.add("is-hover"); } },
+    onPointerleave: unhover,
+  });
+  // the lit line comes into view when it moves
+  effect(() => { const a = gutter() ? lit() : null; if (a) queueMicrotask(() => code.querySelector?.(".m-ced-lit")?.scrollIntoView?.({ block: "nearest" })); });
   const status = (): "ok" | "error" | false => { const s = val(props.status); return s === undefined ? "ok" : s; };
   const hint = props.hint === false ? null : props.hint ?? (props.complete ? h("span", { class: "m-ced-hint" }, h(Kbd, {}, "Ctrl"), h(Kbd, {}, "Space"), () => t`suggestions`) : null);
   const foot = props.message === false ? undefined : h("span", { class: () => cx("m-ced-msg", status() === "error" && "is-error"), id: `${id}-msg`, role: "status", "aria-live": "polite" },
     () => (status() === false ? null : h(StatusDot, { tone: untrack(status) === "error" ? "warn" : "success", size: "sm" })),
     h("span", { class: "m-ced-msg-text" }, () => val(props.message)));
   return h(EditorFrame, {
-    class: () => cx("m-ced", val(props.class)), disabled: () => !!props.disabled, readonly: () => !!props.readonly,
+    class: () => cx("m-ced", gutter() && "is-gutter", val(props.class)), disabled: () => !!props.disabled, readonly: () => !!props.readonly,
     foot, showFoot: props.message !== false,
     footProps: { class: "m-ced-foot", divider: true, actions: [hint, props.copy !== false && h(CopyButton, { text: get, ...(props.copyLabel != null ? { label: props.copyLabel } : {}) })] },
-    children: [h("div", { class: "m-ced-area" }, pre, input), list] }) as Element;
+    children: [h("div", { class: "m-ced-area" }, pre, input, () => (gutter() ? hit : null)), list] }) as Element;
 }

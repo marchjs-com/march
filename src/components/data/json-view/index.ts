@@ -16,10 +16,13 @@ export interface JsonViewLabels {
   circular: string;
 }
 type Arrow = boolean | ((open: () => boolean) => unknown) | undefined;
-interface NodeOptions { openDepth: number; labels: Partial<JsonViewLabels> | undefined; arrow: Arrow }
+interface NodeOptions { openDepth: number; labels: Partial<JsonViewLabels> | undefined; arrow: Arrow; describe: ((value: unknown) => string | null | undefined) | undefined }
 
 function jsonNode(key: string | number | null, value: unknown, depth: number, o: NodeOptions, seen: Set<object>): Element {
   const keyEl = key != null && [h("span", { class: "m-json-key" }, typeof key === "number" ? String(key) : JSON.stringify(key)), h("span", { class: "m-json-punct" }, ": ")];
+  // a value the owner names itself (a function, an element, a signal): its text, as a leaf
+  const own = o.describe?.(value);
+  if (own != null) return h("li", { class: "m-json-row" }, keyEl, h("span", { class: "m-json-own" }, own));
   if (value === null || typeof value !== "object") {
     const type = value === null ? "null" : typeof value;
     const text = type === "string" ? JSON.stringify(value) : type === "undefined" ? "undefined" : type === "bigint" ? `${value as bigint}n` : String(value);
@@ -51,10 +54,12 @@ export interface JsonViewProps {
   arrow?: boolean | ((open: () => boolean) => unknown) | undefined;
   /** Accessible name of the tree. */
   label?: MaybeFn<string | undefined>;
+  /** Your text for a value that is not JSON (a function, an element, a class instance): a string shows it as a leaf, null leaves it to JsonView. */
+  describe?: ((value: unknown) => string | null | undefined) | undefined;
   class?: ClassProp;
 }
 /** Collapsible read-only JSON tree: `<JsonView value={obj} open={1} />` (open = initially expanded depth). */
 export function JsonView(props: JsonViewProps): Element {
   return h("div", { class: () => cx("m-json", val(props.class)) },
-    h("ul", { class: "m-json-list m-json-root", role: "tree", "aria-label": () => val(props.label) ?? null }, () => { const v = val(props.value); return untrack(() => jsonNode(null, v, 0, { openDepth: props.open ?? 1, labels: props.labels, arrow: props.arrow }, new Set())); }));
+    h("ul", { class: "m-json-list m-json-root", role: "tree", "aria-label": () => val(props.label) ?? null }, () => { const v = val(props.value); return untrack(() => jsonNode(null, v, 0, { openDepth: props.open ?? 1, labels: props.labels, arrow: props.arrow, describe: props.describe }, new Set())); }));
 }

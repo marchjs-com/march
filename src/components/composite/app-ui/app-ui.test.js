@@ -111,3 +111,46 @@ test("marchLanguagePlugin: after import every export, picking writes the whole i
   assert.deepEqual(c.items.map((x) => x.label), ["signal"], "elsewhere: the imported names");
   kit.dispose();
 });
+
+test("instrument.js: one-line calls, every line keeps its number; steps, scopes, functions and debugger; statements", async () => {
+  const { readFileSync } = await import("node:fs");
+  const vm = await import("node:vm");
+  const ts = (await import("typescript")).default;
+  const box = { self: {} };
+  vm.runInNewContext(readFileSync(new URL("./instrument.js", import.meta.url), "utf8"), box);
+  const src = 'import { signal } from "hadi-march"\nconst items = signal([1])\nfunction add(x: number) {\n  let z = x + 1\n  if (z > 2) debugger\n  return z\n}\nexport const C = () => <p on:click={() => items.set([2])}>{add(1)}</p>\n';
+  const r = JSON.parse(JSON.stringify(box.self.marchInstrument(ts, "a.tsx", src, 0))); // out of the vm context
+  assert.equal(r.code.split("\n").length, src.split("\n").length, "no new lines");
+  assert.ok(!/\bdebugger\b/.test(r.code), "the debugger statement is our step now");
+  const out = ts.transpileModule(r.code, { fileName: "a.tsx", reportDiagnostics: true, compilerOptions: { jsx: ts.JsxEmit.Preserve, target: ts.ScriptTarget.ES2022 } });
+  assert.deepEqual(out.diagnostics.map((d) => d.messageText), [], "still valid code");
+  assert.deepEqual(r.meta.module, ["items", "add", "C"], "imports are left out");
+  assert.deepEqual(r.meta.fns.map((f) => f[0]), ["add", "C", "on:click handler"]);
+  const debug = r.meta.steps.find((s) => s[3] === "debugger");
+  assert.equal(debug[0], 5);
+  assert.deepEqual(debug[4], ["z", "x"], "the local names at that line");
+});
+
+test("debuggerPlugin: the debugger and gutter services, the panel; prepare instruments and starts the session", async () => {
+  const { debuggerPlugin } = await import("./index.ts");
+  const { createAppKit, definePlugin } = await import("./kit.ts");
+  let ran = 0;
+  const fakeTs = definePlugin({ id: "march.typescript", activate(ctx) { ctx.provide("typescript", { instrument: async (files) => ({ files: Object.fromEntries(Object.entries(files).map(([p, t]) => [p, `/*i*/${t}`])), metas: [{ file: "a.tsx", module: [], fns: [], steps: [] }] }) }); } });
+  const kit = createAppKit([fakeTs, debuggerPlugin({ run: () => ran++, keys: false })]);
+  const dbg = kit.service("debugger"), gutter = kit.service("gutter");
+  assert.ok(kit.panels().some((p) => p.id === "debug"), "the panel");
+  gutter.click("a.tsx", 3);
+  assert.deepEqual(gutter.marks("a.tsx").map((m) => [m.line, m.kind]), [[3, "breakpoint"]]);
+  dbg.session.updateBreakpoint(dbg.session.breakpoints()[0].id, { condition: "x > 1" });
+  assert.equal(gutter.marks("a.tsx")[0].kind, "conditional");
+  dbg.start();
+  assert.equal(ran, 1);
+  assert.ok(dbg.active());
+  const files = await dbg.prepare({ "a.tsx": "x", "style.css": "a{}" });
+  assert.deepEqual(files, { "a.tsx": "/*i*/x", "style.css": "a{}" }, "only scripts are instrumented");
+  assert.equal(dbg.session.state(), "running");
+  dbg.stop();
+  assert.equal(dbg.session.state(), "idle");
+  assert.equal(ran, 2, "built again without the calls");
+  kit.dispose();
+});

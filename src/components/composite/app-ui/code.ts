@@ -8,6 +8,7 @@ import { h } from "../../../dom/h.ts";
 import { CodeEditor, type CodeCompleteContext, type CodeCompletion, type CodeMark, type CodeSuggestion } from "../code-editor/index.ts";
 import { definePlugin, type AppPlugin, type AppFile } from "./kit.ts";
 import type { TypeScriptService, CodeProblem } from "./ts.ts";
+import type { GutterService } from "./debug.ts";
 
 /** What a language service plugin provides (service "language"). */
 export interface LanguageService {
@@ -48,6 +49,8 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
         id: "code", title: "Code", match: o.match ?? CODE,
         mount: (file: AppFile) => {
           const ts = SCRIPT.test(file.path) ? ctx.service<TypeScriptService>("typescript") : undefined;
+          // a script's gutter (line numbers, breakpoints, the paused line) when a plugin draws one (debuggerPlugin)
+          const gutter = SCRIPT.test(file.path) ? ctx.service<GutterService>("gutter") : undefined;
           const tracked = ts?.track(file);
           const problems = computed((): readonly CodeProblem[] => tracked?.problems() ?? []);
           const errors = (): number => problems().filter((p) => p.error).length;
@@ -68,6 +71,7 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
           return h(CodeEditor, {
             class: "m-app-code", get value() { return file.text(); }, onChange: (text: string) => file.set?.(text), readonly: !file.set,
             lang: codeLang(file.path), label: file.path, multiline: true, complete, suggest: "ghost",
+            ...(gutter ? { lineNumbers: true, lineMarks: () => gutter.marks(file.path), activeLine: () => gutter.active(file.path), onGutter: (line: number) => gutter.click(file.path, line) } : {}),
             sources: SOURCES, get source() { return source(); }, onSourceChange: (v: string) => { source.set(v); try { localStorage.setItem(SOURCE_KEY, v); } catch { /* private mode */ } },
             marks: (): CodeMark[] => problems().map((p) => ({ from: p.from, to: Math.max(p.to, p.from + 1), kind: p.error ? "error" : "warning", title: p.message })),
             // under the code: how many errors and warnings, and the first one with its line

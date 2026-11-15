@@ -7,6 +7,7 @@ export * from "./chat-thread/index.ts";
 export * from "./code-editor/index.ts";
 export * from "./color-picker/index.ts";
 export * from "./command-palette/index.ts";
+export * from "./debugger/index.ts";
 export * from "./dock-layout/index.ts";
 export * from "./editor-frame/index.ts";
 export * from "./feed/index.ts";

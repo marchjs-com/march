@@ -6,6 +6,7 @@
 import { signal, effect, onCleanup, type Signal } from "../../../core/reactive.ts";
 import type { CodeCompleteContext, CodeCompletion } from "../code-editor/index.ts";
 import { definePlugin, type AppPlugin, type AppFile } from "./kit.ts";
+import type { DebugMeta } from "../debugger/session.ts";
 
 /** A problem of a file: its range, text and whether it is an error (else a warning or a suggestion). */
 export interface CodeProblem { from: number; to: number; message: string; code: number; error: boolean }
@@ -18,6 +19,8 @@ export interface TypeScriptService {
   hover(path: string, pos: number): Promise<{ text: string; doc: string } | null>;
   /** The TypeScript version once it runs. */
   version: () => string;
+  /** The files with the debugger's calls written in (instrument.js; debuggerPlugin): their code and what each call is. */
+  instrument(files: Record<string, string>): Promise<{ files: Record<string, string>; metas: DebugMeta[] }>;
 }
 export interface TypeScriptPluginOptions {
   /** URL of ts-worker.js (hadi-march's src/components/composite/app-ui/ts-worker.js, served by the app). */
@@ -82,6 +85,10 @@ export function typeScriptPlugin(o: TypeScriptPluginOptions): AppPlugin {
           if (!(await ready)) return null;
           await send(path, c.value);
           return call<CodeCompletion | null>("complete", { path, pos: c.caret });
+        },
+        async instrument(files) {
+          if (!(await ready)) throw new Error("TypeScript did not start");
+          return call("instrument", { files });
         },
         async hover(path, pos) {
           if (!(await ready)) return null;

@@ -25,3 +25,23 @@
 .m-ced-sources { display: flex; flex-wrap: wrap; align-items: center; gap: var(--m-space-1); padding: var(--m-space-1) var(--m-space-2); border-block-start: var(--m-border-w, 1px) solid var(--m-border); font-family: var(--m-font); }
 .m-ced-none { color: var(--m-muted); font-size: var(--m-text-xs); }
 .m-ced-list { min-inline-size: 14rem; max-inline-size: min(26rem, 90vw); font-family: var(--m-font-mono); }
+/* lineNumbers: a gutter at the start; each line's number (and its mark) sits at its line's start, the lit line's bar
+   lies behind the text; the press area over the gutter takes the clicks (the text field keeps the rest) */
+.m-ced.is-gutter { --m-ced-gutter: 3.4em; }
+.m-ced.is-gutter :is(.m-ced-paint, .m-ced-input) { padding-inline-start: calc(var(--m-ced-gutter) + var(--m-space-3)); }
+.m-ced.is-gutter .m-ced-paint { position: relative; z-index: 0; }
+.m-ced.is-gutter .m-ced-area::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: var(--m-ced-gutter); border-inline-end: var(--m-border-w, 1px) solid var(--m-border); background: color-mix(in srgb, var(--m-text) 3%, transparent); pointer-events: none; }
+.m-ced-ln { position: absolute; inset-inline-start: 0; inline-size: var(--m-ced-gutter); padding-inline-end: .7em; box-sizing: border-box; text-align: end; color: var(--m-muted); opacity: .7; font-size: .85em; line-height: calc(1.7em / .85); }
+.m-ced-ln::before { content: attr(data-line); }
+.m-ced-ln::after { content: ""; position: absolute; inset-inline-start: .45em; inset-block-start: 50%; inline-size: .8em; block-size: .8em; translate: 0 -50%; border-radius: 50%; opacity: 0; transition: opacity var(--m-dur-fast) var(--m-ease); }
+.m-ced-ln.is-hover::after { opacity: .35; background: var(--m-danger); }
+.m-ced-ln:is(.is-breakpoint, .is-conditional, .is-log, .is-off) { opacity: 1; color: var(--m-text); }
+.m-ced-ln:is(.is-breakpoint, .is-conditional, .is-log, .is-off)::after { opacity: 1; }
+.m-ced-ln.is-breakpoint::after { background: var(--m-danger); box-shadow: 0 0 0 2px color-mix(in srgb, var(--m-danger) 25%, transparent); }
+.m-ced-ln.is-conditional::after { background: var(--m-warn); box-shadow: 0 0 0 2px color-mix(in srgb, var(--m-warn) 25%, transparent); }
+.m-ced-ln.is-log::after { background: var(--m-info, var(--m-primary)); border-radius: 2px; rotate: 45deg; translate: 0 -50%; scale: .85; }
+.m-ced-ln.is-off::after { background: none; border: 2px solid var(--m-muted); box-sizing: border-box; }
+.m-ced-lit { position: absolute; z-index: -1; inset-inline: 0; block-size: 1lh; background: color-mix(in srgb, var(--m-warn) 22%, transparent); box-shadow: inset 3px 0 0 var(--m-warn); }
+.m-ced-lit.is-exception { background: color-mix(in srgb, var(--m-danger) 20%, transparent); box-shadow: inset 3px 0 0 var(--m-danger); }
+.m-ced-lit.is-frame { background: color-mix(in srgb, var(--m-success) 16%, transparent); box-shadow: inset 3px 0 0 var(--m-success); }
+.m-ced-gutter { position: absolute; z-index: 1; inset-block: 0; inset-inline-start: 0; inline-size: var(--m-ced-gutter); cursor: pointer; }

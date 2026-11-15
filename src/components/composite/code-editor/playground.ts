@@ -1,10 +1,11 @@
 import { definePlayground } from "../../meta.ts";
 
-interface Values { complete: boolean; multiline: boolean; message: boolean; hint: boolean; copy: boolean; flash: boolean; color: string; state: string }
+interface Values { lineNumbers: boolean; complete: boolean; multiline: boolean; message: boolean; hint: boolean; copy: boolean; flash: boolean; color: string; state: string }
 
 export default definePlayground<Values>({
   options: [
     { key: "complete", label: "Öneri listesi", default: true },
+    { key: "lineNumbers", label: "Satır numaraları (tıkla: işaret)", default: false },
     { key: "message", label: "Alt satır (durum)", default: true },
     { key: "hint", label: "Kısayol ipucu", default: true, visibleWhen: (v) => v.complete && v.message },
     { key: "copy", label: "Kopyala düğmesi", default: true, visibleWhen: (v) => v.message },

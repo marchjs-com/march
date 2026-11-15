@@ -91,10 +91,33 @@ underlined in the code editor (red, amber) and counted under it with the first o
 demand from `lib`). Under a CSP with Trusted Types the worker starts through the `march-worker` policy (same-origin `.js`
 only): the CSP must list `trusted-types march-worker`.
 
+## Debugger
+
+`debuggerPlugin({ run, reveal, evaluate, untrack, persist })` (after HADİ Studio Kit's debugger, rewritten on March) adds
+the "Debugger" panel (the Debugger component), a gutter to every script file's editor (line numbers; click one or press
+F9 for a breakpoint; the paused line is lit) and the commands F5 (start), Shift+F5 (stop), F8 (continue), F10 (step
+over), F11 (step into), Shift+F11 (step out). The host builds and runs the code: while `kit.service("debugger").active()`
+it passes its files through `prepare(files)` — the TypeScript plugin's worker loads `instrument.js` (serve it beside
+`ts-worker.js`) and writes one-line calls into each script (before every statement, around every function; `debugger;`
+becomes a stop; no line moves) and the session starts for them — then runs what comes back; `run` asks it to build
+again (start, restart, stop). The code is not halted (a page cannot freeze itself and stay usable): every step is
+recorded with the names in scope and the call stack, and the debugger stops on the recording — Continue, the steps and
+Step back move through it, and when it has no further stop it waits for the code to reach one. Conditions, logpoint
+messages, watches and the host's terminal evaluate with `evaluate(expr, scope)` (the playground: its preview runtime's
+module evaluator, no eval); `untrack` is the untrack of the March that runs the code, so reading a value never
+subscribes to it.
+
+```tsx
+const debug = debuggerPlugin({ persist: "ide.debug", run: () => build(), reveal: (file) => openTab(file), evaluate: (e, scope) => preview.evaluate(e, scope) })
+<AppUI plugins={[typeScriptPlugin({ worker, typescript, lib }), debug, codeEditorPlugin()]} … />
+// in build(): if (dbg.active()) files = await dbg.prepare(files)
+```
+
 ## Accessibility
 
 The Layout menu is a Menu (a menu button, arrow keys among the entries, Escape closes); the workspace is a DockLayout.
 
 ## Composed of
 
-DockLayout (the workspace), Menu (the Layout menu), CodeEditor (the code editor plugin) and ThemeMenu (the preview's theme).
+DockLayout (the workspace), Menu (the Layout menu), CodeEditor (the code editor plugin), ThemeMenu (the preview's theme)
+and Debugger (the debugger plugin).

@@ -1,0 +1,18 @@
+import { definePlayground } from "../../meta.ts";
+
+interface Values { watch: boolean; scope: boolean; stack: boolean; breakpoints: boolean; output: boolean; timeline: boolean; options: boolean; depth: number; ownLabels: boolean; ownIcons: boolean }
+
+export default definePlayground<Values>({
+  options: [
+    { key: "watch", label: "İzlenenler bölümü", default: true },
+    { key: "scope", label: "Kapsam bölümü", default: true },
+    { key: "stack", label: "Çağrı yığını bölümü", default: true },
+    { key: "breakpoints", label: "Kesme noktaları bölümü", default: true },
+    { key: "output", label: "Çıktı bölümü", default: true },
+    { key: "timeline", label: "Zaman çizelgesi", default: true },
+    { key: "options", label: "Anahtarlar (hatada dur…)", default: true },
+    { key: "depth", label: "Değerlerin açık derinliği", default: 0, options: [{ value: 0, label: "kapalı" }, { value: 1, label: "1" }, { value: 2, label: "2" }] },
+    { key: "ownLabels", label: "Kendi metinlerim", default: false },
+    { key: "ownIcons", label: "Kendi ikonlarım", default: false },
+  ],
+});

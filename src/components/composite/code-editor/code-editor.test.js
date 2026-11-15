@@ -165,3 +165,22 @@ test("CodeEditor: suggest=\"ghost\" writes the likeliest row faintly (same case 
   assert.ok(document.querySelector(".m-ced-list"), "Ctrl + Space opens the list");
   dispose();
 });
+
+test("CodeEditor: lineNumbers draw a number per line with its mark, the active line is lit, F9 and the gutter call onGutter", async () => {
+  const marks = signal([{ line: 2, kind: "conditional", title: "if: x" }]), lit = signal(null), pressed = [];
+  const [el, dispose] = mount(() => h(CodeEditor, { value: "a\nb\nc", lineNumbers: true, lineMarks: marks, activeLine: lit, onGutter: (line) => pressed.push(line) }));
+  const lines = [...el.querySelectorAll(".m-ced-ln")];
+  assert.deepEqual(lines.map((x) => x.getAttribute("data-line")), ["1", "2", "3"]);
+  assert.ok(lines[1].classList.contains("is-conditional"));
+  assert.equal(lines[1].getAttribute("title"), "if: x");
+  assert.equal(el.querySelector(".m-ced-lit"), null);
+  lit.set({ line: 3, kind: "exception" });
+  assert.ok(el.querySelector(".m-ced-lit.is-exception"));
+  assert.equal(el.querySelector(".m-ced-paint").textContent.replace(/​/g, ""), "a\nb\nc", "the text is unchanged");
+  const input = caretOf(el.querySelector(".m-ced-input"));
+  input.selectionStart = 2;
+  input.dispatchEvent(new KeyboardEvent("keydown", { key: "F9", bubbles: true }));
+  assert.deepEqual(pressed, [2], "F9: the caret's line");
+  assert.ok(el.querySelector(".m-ced.is-gutter .m-ced-gutter"), "the gutter's press area");
+  dispose();
+});

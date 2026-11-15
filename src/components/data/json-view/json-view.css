@@ -7,3 +7,4 @@
 .m-json-key { color: var(--m-primary-text); } .m-json-string { color: var(--m-success-text); } .m-json-number, .m-json-bigint { color: var(--m-info-text); }
 .m-json-boolean { color: var(--m-warn-text); } .m-json-null, .m-json-undefined, .m-json-more, .m-json-punct { color: var(--m-muted); }
 .m-json-arrow.m-chevron { inline-size: auto; min-inline-size: 1em; block-size: auto; }
+.m-json-own { color: var(--m-brand-purple-text, var(--m-muted)); font-style: italic; }

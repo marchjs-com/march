@@ -3,7 +3,7 @@
 // `libUrl` (synchronous requests are allowed in a worker). The page sends the project's files; the worker answers
 // suggestions, errors and hover text. Nothing here touches the page.
 /* global ts */
-let LS = null, libUrl = "";
+let LS = null, libUrl = "", policy = null;
 const files = new Map(); // path → { text, version }
 const libs = new Map();
 // what March code needs to be read without March's own types: any import of hadi-march is `any`, JSX is open
@@ -58,7 +58,7 @@ const handlers = {
     // under the page's Trusted Types (CSP trusted-types march-worker) importScripts takes only a policy's URL: same
     // origin, .js
     const tt = self.trustedTypes;
-    const policy = tt ? tt.createPolicy("march-worker", { createScriptURL: (u) => { const x = new URL(u, self.location.href); if (x.origin !== self.location.origin || !/\.js$/.test(x.pathname)) throw new Error(`not a script of this site: ${u}`); return x.href; } }) : null;
+    policy = tt ? tt.createPolicy("march-worker", { createScriptURL: (u) => { const x = new URL(u, self.location.href); if (x.origin !== self.location.origin || !/\.js$/.test(x.pathname)) throw new Error(`not a script of this site: ${u}`); return x.href; } }) : null;
     importScripts(policy ? policy.createScriptURL(tsUrl) : tsUrl);
     start();
     return { version: ts.version };
@@ -92,6 +92,16 @@ const handlers = {
     const p = norm(path);
     const all = [...LS.getSyntacticDiagnostics(p), ...LS.getSemanticDiagnostics(p)];
     return all.map((d) => ({ from: d.start ?? 0, to: (d.start ?? 0) + (d.length ?? 0), message: ts.flattenDiagnosticMessageText(d.messageText, "\n"), code: d.code, error: d.category === ts.DiagnosticCategory.Error }));
+  },
+  // the debugger: the files with its calls written in (instrument.js, beside this worker, loaded on the first call)
+  instrument({ files: list }) {
+    if (!self.marchInstrument) { const u = new URL("instrument.js", self.location.href).href; importScripts(policy ? policy.createScriptURL(u) : u); }
+    const out = {}, metas = [];
+    for (const [path, text] of Object.entries(list)) {
+      const r = self.marchInstrument(ts, path, text, metas.length);
+      out[path] = r.code; metas.push(r.meta);
+    }
+    return { files: out, metas };
   },
   hover({ path, pos }) {
     const q = LS.getQuickInfoAtPosition(norm(path), pos);

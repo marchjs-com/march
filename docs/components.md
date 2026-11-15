@@ -14,6 +14,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Disclosure | stable | A collapsible section on native details / summary: keyboard and screen reader support built in, animated open and close. | [Chevron](#chevron) |
 | ExplodedView | experimental | Takes its content apart like an exploded drawing and puts it back: the same elements tilt and rise as plates with name tags (chosen parts), or one element opens into its shadow, surface, content and focus ring. | — |
 | Grid | stable | Responsive grid that never overflows: fixed or automatic columns, fill or balance the last row, equal row heights; pure CSS. | — |
+| Joined | experimental | Parts drawn as one piece: whatever goes in loses its own border, corners, margin and shadow; one frame and radius for the whole, lines between, vertical or horizontal. | — |
 | Layout | stable | The frame all pages of an app share: content plus the page corner (BottomRightControls) with its back-to-top button; Page builds on it. | [Button](#button), [Badge](#badge), [Progress](#progress), [ScrollToTop](#scrolltotop) |
 | OverlayScope | stable | A box that keeps the layers opened inside it (drawers, dialogs, menus, toasts) inside it: previews, device frames, panels, demos. | — |
 | PanelHeader | experimental | The bar on top of (or under) a panel: lead, icon, title, subtitle, count, actions and a close button; sizes, divider, sticky, muted tone; usable as a drag handle. | [IconButton](#iconbutton) |
@@ -65,7 +66,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | DateRangePicker | stable | Date range { from, to } with presets (Segmented) and a custom pair of DatePickers. | [Segmented](#segmented), [DatePicker](#datepicker) |
 | DateTimeInput | stable | A DatePicker and a TimeInput editing one ISO timestamp in local time. | [DatePicker](#datepicker), [TimeInput](#timeinput) |
 | FileUpload | stable | Drop zone or click; accept / size checks, image and audio previews, upload progress and cancel. | [Progress](#progress), [ListRow](#listrow), [IconButton](#iconbutton), [Button](#button), [Badge](#badge) |
-| IconPicker | experimental | Choose an icon: a button with the chosen icon and its name opens a panel with a search, filter chips and a grid of every icon. | Dropdown, [SearchBox](#searchbox), [Chip](#chip), [IconButton](#iconbutton), [Empty](#empty) |
+| IconPicker | experimental | Choose an icon: a button with the chosen icon and its name opens a panel with a search, filter chips and a grid of every icon; more icon sets (packs) load when chosen, the grid a page at a time. | Dropdown, [SearchBox](#searchbox), [Chip](#chip), [IconButton](#iconbutton), [Select](#select), [Spinner](#spinner), [Empty](#empty) |
 | KeyValueEditor | stable | Edit key → value rows as an object; order kept, duplicate keys flagged, numbers on request. | [TextInput](#textinput), [RowTools](#rowtools), [Button](#button) |
 | ListEditor | stable | Edit a list of strings: add, edit, reorder, remove; pasted lines become items. | [TextInput](#textinput), [RowTools](#rowtools), [Button](#button) |
 | MultiSelect | stable | Several values as removable chips: a Combobox with multiple (static options or async search). | [Combobox](#combobox) |
@@ -187,14 +188,15 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| AppUI | experimental | march-app-ui, the core of March IDE: a top bar (title, your tools, the Layout menu with presets, saved layouts and the panel list) over a DockLayout; plugins add file types (the code editor opens code files), panels, commands and services. | [DockLayout](#docklayout), [Menu](#menu), [CodeEditor](#codeeditor), [ThemeMenu](#thememenu) |
+| AppUI | experimental | march-app-ui, the core of March IDE: a top bar (title, your tools, the Layout menu with presets, saved layouts and the panel list) over a DockLayout; plugins add file types (the code editor opens code files), panels, commands and services. | [DockLayout](#docklayout), [Menu](#menu), [CodeEditor](#codeeditor), [ThemeMenu](#thememenu), [Joined](#joined), [Debugger](#debugger) |
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | [Badge](#badge), [OverflowText](#overflowtext), [ListRow](#listrow), [Drawer](#drawer) |
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | [Menu](#menu), [Textarea](#textarea), [ReactionPicker](#reactionpicker), [IconButton](#iconbutton), [StatusDot](#statusdot), [ReplyQuote](#replyquote) |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [ReactionPicker](#reactionpicker), [Avatar](#avatar), [Button](#button), [Picture](#picture) |
-| CodeEditor | experimental | A small code field: coloured as it is typed, a suggestion list at the caret (prop names and values of a JSX tag, or your own), marked ranges that flash or underline, a foot line with a status and a copy button. | [EditorFrame](#editorframe), [Popover](#popover), [OptionList](#optionlist), [CopyButton](#copybutton), [Kbd](#kbd), [StatusDot](#statusdot) |
+| CodeEditor | experimental | A small code field: coloured as it is typed, a suggestion list at the caret (prop names and values of a JSX tag, or your own), marked ranges that flash or underline, a foot line with a status and a copy button. | [EditorFrame](#editorframe), [Popover](#popover), [OptionList](#optionlist), [CopyButton](#copybutton), [Kbd](#kbd), [StatusDot](#statusdot), [Chip](#chip) |
 | ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | [IconButton](#iconbutton), [Segmented](#segmented), [Badge](#badge), [SectionLabel](#sectionlabel), [Slider](#slider), [Swatch](#swatch), [TextInput](#textinput) |
 | CommandPalette | stable | Ctrl/⌘+K search over commands, pages and actions with typo-tolerant ranking and an optional intent hook; the dialog loads on first open. | [Dialog](#dialog), [SearchBox](#searchbox), [ListRow](#listrow), [SectionLabel](#sectionlabel), [Empty](#empty), [Kbd](#kbd), [OverflowText](#overflowtext) |
 | ConsentBanner | stable | Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content. | [Button](#button), [Card](#card), [Dialog](#dialog), [Toggle](#toggle), [Stack](#stack), [Empty](#empty) |
+| Debugger | experimental | Debugger panel over a recording of instrumented code: Continue, Step over / into / out, Step back and a timeline (time travel); breakpoints with conditions and logpoints, debugger; statements, pause on exceptions; watches, scopes (local / closure / module) and the call stack at every stop. | [IconButton](#iconbutton), [Slider](#slider), [Disclosure](#disclosure), [JsonView](#jsonview), [TextInput](#textinput), [Checkbox](#checkbox), [Toggle](#toggle), [Badge](#badge), [StatusDot](#statusdot) |
 | DockLayout | experimental | IDE workspace (the dock of march-app-ui): tab groups in rows and columns; drag tabs to a side, centre, between tabs or the outer edge; closing collapses a group to a strip and keeps its size; maximize, presets, saved layouts, focus mode, narrow mode. | [Tabs](#tabs), [IconButton](#iconbutton), [Button](#button), [ResizeHandle](#resizehandle), [Menu](#menu), [OverflowText](#overflowtext) |
 | EditorFrame | experimental | The frame of an editor: border and focus ring around a head bar (toolbar, search, tabs), the editing area and a foot bar (counts, hints); each bar optional, colour and states yours. | [PanelHeader](#panelheader) |
 | Feed | experimental | Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, "N new posts" pill, end mark. | [PullToRefresh](#pulltorefresh), [VirtualList](#virtuallist), [PostCard](#postcard), [Skeleton](#skeleton), [Button](#button), [Empty](#empty), [StatusDot](#statusdot) |
@@ -316,7 +318,7 @@ Full page: src/components/layout/app-shell/docs.md
 
 march-app-ui, the core of March IDE and the base of an IDE shell: a top bar (a title, your tools and the **Layout** menu), a side slot (an ActivityBar), the [DockLayout](#docklayout) workspace and a status slot (a StatusBar). The Layout menu lists the presets, the saved layouts ("Save this layout"), every panel (checked when it is open; choosing one opens or collapses it), "Open all panels" and "Reset to default". Colours come from the page's theme and accent. Activity bars, status bars and editors are built on top of it.
 
-Composed of: [DockLayout](#docklayout), [Menu](#menu), [CodeEditor](#codeeditor), [ThemeMenu](#thememenu)
+Composed of: [DockLayout](#docklayout), [Menu](#menu), [CodeEditor](#codeeditor), [ThemeMenu](#thememenu), [Joined](#joined), [Debugger](#debugger)
 
 ```tsx
 <AppUI title="march-app-ui" panels={panels} presets={{
@@ -652,22 +654,12 @@ Full page: src/components/typography/clamp-text/docs.md
 
 ## CodeEditor
 
-A small code field for one snippet: the text is coloured while it is typed (the CodeView colours; unfinished code too), a suggestion list opens at the caret, ranges can be marked (a flash for "this just changed", an underline for "this is wrong") and a foot line says what the owner thinks of the code. It does **not** run or compile anything: the owner reads `value` and decides what it means (the showcase reads a component's props from it).
 
-Composed of: [EditorFrame](#editorframe), [Popover](#popover), [OptionList](#optionlist), [CopyButton](#copybutton), [Kbd](#kbd), [StatusDot](#statusdot)
+
+Composed of: [EditorFrame](#editorframe), [Popover](#popover), [OptionList](#optionlist), [CopyButton](#copybutton), [Kbd](#kbd), [StatusDot](#statusdot), [Chip](#chip)
 
 ```tsx
-import { CodeEditor, jsxCompleter } from "hadi-march/ui";
 
-<CodeEditor bind:value={$code} lang="tsx" message={$note} status={$bad ? "error" : "ok"}
-  complete={jsxCompleter({ tag: "Button", props: [
-    { name: "variant", hint: "look", values: ["primary", "secondary", "ghost"] },   // variant="…": values inside the quotes
-    { name: "icon", hint: "icon", value: "={plus}" },                              // written as icon={plus}
-    { name: "disabled" },                                                          // a bare prop
-  ] })}
-  marks={[{ from: 8, to: 23, kind: "flash" }]} />
-<CodeEditor value={$css} onChange={save} lang="css" complete={(ctx) => ({ from: ctx.caret, items: [{ label: "color" }] })} />
-<CodeEditor bind:value={$one} multiline={false} message={false} copy={false} />   // one bare line
 ```
 
 Full page: src/components/composite/code-editor/docs.md
@@ -902,6 +894,25 @@ Composed of: [DatePicker](#datepicker), [TimeInput](#timeinput)
 ```
 
 Full page: src/components/forms/date-time-input/docs.md
+
+## Debugger
+
+A debugger panel for code that runs in the page: the playground's preview, a plugin, a demo. The code is instrumented (march-app-ui's `instrument.js` writes one-line calls into it; line numbers stay) and runs at its own speed; every step is recorded with the names in scope and the call stack, and the debugger stops on the recording.
+
+Composed of: [IconButton](#iconbutton), [Slider](#slider), [Disclosure](#disclosure), [JsonView](#jsonview), [TextInput](#textinput), [Checkbox](#checkbox), [Toggle](#toggle), [Badge](#badge), [StatusDot](#statusdot)
+
+```tsx
+import { Debugger, CodeEditor, createDebugSession } from "hadi-march/ui";
+
+const session = createDebugSession({ persist: "my-ide.debug" });   // evaluate: your evaluator (default: a blob: module)
+<CodeEditor lineNumbers bind:value={$code}
+  lineMarks={() => session.breakpoints().map((b) => ({ line: b.line, kind: b.condition ? "conditional" : "breakpoint" }))}
+  activeLine={() => session.litLine("app.ts")} onGutter={(line) => session.toggleBreakpoint("app.ts", line)} />
+<Debugger session={session} onStart={async () => { const r = await ts.instrument(files); session.begin(r.metas); run(r.files) }}
+  onReveal={(file, line) => openAt(file, line)} />
+```
+
+Full page: src/components/composite/debugger/docs.md
 
 ## DevicePreview
 
@@ -1302,7 +1313,7 @@ Full page: src/components/actions/icon-button/docs.md
 
 Choose an icon. A button shows the chosen icon and its name; it opens a panel with a search (by name), filter chips (arrows, files, media, messages, people, layout, filled) and a grid of every built-in icon. The value is the icon's export name (`"plus"`); `ICONS[name]` (hadi-march/icons/catalog) gives the icon itself.
 
-Composed of: Dropdown, [SearchBox](#searchbox), [Chip](#chip), [IconButton](#iconbutton), [Empty](#empty)
+Composed of: Dropdown, [SearchBox](#searchbox), [Chip](#chip), [IconButton](#iconbutton), [Select](#select), [Spinner](#spinner), [Empty](#empty)
 
 ```tsx
 let $icon = "plus"
@@ -1336,6 +1347,22 @@ const blob = await cropper.toBlob("image/webp", 0.9, 512)
 
 Full page: src/components/composite/image-cropper/docs.md
 
+## Joined
+
+Parts drawn as one piece. Whatever goes in (cards, a code view, an input and a button, a preview and its code) loses its own border, corners, margin and shadow; the whole has one frame and one radius, with a line between the parts. One under the other (`vertical`, the default) or side by side (`horizontal`).
+
+```tsx
+<Joined>
+  <Card title="Önizleme">…</Card>
+  <CodeView code={code} lang="tsx" />
+</Joined>
+<Joined direction="horizontal" radius="full">
+  <TextInput placeholder="Ara…" /><Button variant="primary">Ara</Button>
+</Joined>
+```
+
+Full page: src/components/layout/joined/docs.md
+
 ## JsonEditor
 
 JSON in two views. **Text**: the source with live parse errors (line and column), Format and Tab indentation. **Tree**: a TreeEditor with type badges, inline editing and undo, loaded the first time the view is opened (a form that only needs the text view stays small). A `schema` (JSON Schema subset) and `validate` check both views: the text view lists the first problem with its path, the tree marks every invalid row.
@@ -1351,12 +1378,12 @@ Full page: src/components/composite/json-editor/docs.md
 
 ## JsonView
 
-A collapsible, read-only JSON tree for API responses, settings and logs. Keys, strings, numbers, booleans and null have their own theme colours; a closed object or array shows how many keys or items it holds. Dates print as ISO strings and a circular reference is marked instead of looping.
+
 
 Composed of: [Chevron](#chevron)
 
 ```tsx
-<JsonView value={response} open={1} />
+
 ```
 
 Full page: src/components/data/json-view/docs.md

@@ -3,4 +3,6 @@ import * as d0 from "./composite/code-editor/demo.tsx";
 import * as p0 from "./composite/code-editor/playground.ts";
 import * as d1 from "./composite/color-picker/demo.tsx";
 import * as p1 from "./composite/color-picker/playground.ts";
-export { d0, p0, d1, p1 };
+import * as d2 from "./composite/debugger/demo.tsx";
+import * as p2 from "./composite/debugger/playground.ts";
+export { d0, p0, d1, p1, d2, p2 };
