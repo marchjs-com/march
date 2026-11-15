@@ -24,7 +24,7 @@ export function Counter(props: { start?: number }) {
   "seats": 48
 }`,
   sh: `# install and start the dev server
-npm i github:tlghn/hadimarch
+npm i github:marchjs/march
 npx march dev --port 5173`,
 }
 
