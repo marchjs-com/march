@@ -4,7 +4,7 @@
 // registered with the DirtyState manager (leave warning, saveAll). Rows show what differs from the saved values and can
 // be reset one by one.
 import "./property-grid.css";
-import { signal, computed, untrack, onCleanup, type Signal } from "../../../core/reactive.ts";
+import { signal, computed, untrack, onCleanup, getOwner, runWithOwner, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -192,7 +192,10 @@ export function PropertyGrid(props: PropertyGridProps): Element {
   };
   // rows are built once and kept; search and `hidden` only show / hide them
   const rows = new Map<string, Element>();
-  const rowOf = (p: PropertySpec): Element => { let r = rows.get(p.key); if (!r) rows.set(p.key, (r = row(p))); return r; };
+  // built under the grid itself, not under the section that first shows them: a section drawn again (a row shown or
+  // hidden, a group opened) would otherwise take the kept rows' labels, marks and editors with it
+  const owner = getOwner();
+  const rowOf = (p: PropertySpec): Element => { let r = rows.get(p.key); if (!r) rows.set(p.key, (r = runWithOwner(owner, () => row(p)))); return r; };
   // equal sets are the same value: a value change that hides or shows nothing must not touch the rows (a slider
   // being dragged stays the same node, keeps focus and pointer capture)
   const matches = computed(() => {

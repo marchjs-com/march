@@ -140,3 +140,21 @@ test("PropertyGrid: history buttons, reset buttons, change marks and the footer 
   assert.equal(own.el.querySelector(".m-pg-empty").textContent, "Nothing for qqqq");
   own.dispose();
 });
+
+test("PropertyGrid: a kept row stays whole when the body is drawn again (a new properties list, a row shown or hidden)", async () => {
+  const v = signal({ on: false, name: "a", extra: 1 });
+  const make = () => [
+    { key: "on", label: "On", type: "switch", group: "G" },
+    { key: "name", label: "Name", group: "G" },
+    { key: "extra", label: "Extra", type: "number", group: "G", hidden: (x) => !x.on },
+  ];
+  const list = signal(make());
+  const { el, dispose } = mount(() => h(PropertyGrid, { properties: list, value: v, search: false, dirty: false, history: false }));
+  const label = (k) => el.querySelector(`[data-key="${k}"] .m-pg-name`)?.textContent;
+  assert.equal(label("name"), "Name");
+  for (const on of [true, false, true]) { v.set({ ...v(), on }); list.set(make()); await tick(); }
+  assert.equal(label("name"), "Name", "the label is still there");
+  assert.equal(label("on"), "On");
+  assert.equal(label("extra"), "Extra");
+  dispose();
+});
