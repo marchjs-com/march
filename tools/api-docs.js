@@ -145,7 +145,10 @@ export function collect(root = ROOT) {
             const pt = checker.getTypeOfSymbolAtLocation(sigs[sigs.length - 1].getParameters()[0], at);
             rec.props = checker.getPropertiesOfType(pt).slice(0, 80).map((m) => {
               const d = m.valueDeclaration ?? m.declarations?.[0];
-              return { name: m.getName(), type: d && "type" in d && d.type ? flat(d.type.getText()) : str(checker.getTypeOfSymbolAtLocation(m, at), at), optional: !!(m.flags & ts.SymbolFlags.Optional), doc: docText(m.getDocumentationComment(checker)) };
+              // the Turkish text: the prop's `@tr …` JSDoc tag (one source, next to the English)
+              const trTag = m.getJsDocTags(checker).find((t) => t.name === "tr");
+              const src = d ? `${relative(root, d.getSourceFile().fileName).split("\\").join("/")}:${d.getSourceFile().getLineAndCharacterOfPosition(d.getStart()).line + 1}` : "";
+              return { name: m.getName(), type: d && "type" in d && d.type ? flat(d.type.getText()) : str(checker.getTypeOfSymbolAtLocation(m, at), at), optional: !!(m.flags & ts.SymbolFlags.Optional), doc: docText(m.getDocumentationComment(checker)), tr: trTag ? docText(trTag.text) : "", src };
             });
           }
         } else {
@@ -206,7 +209,7 @@ export function generate(root = ROOT) {
   for (const r of recs) {
     const m = meta.get(r.name);
     const md = existsSync(join(root, mdPath(r.subpath, r.name))) ? readFileSync(join(root, mdPath(r.subpath, r.name)), "utf8") : "";
-    const doc = { ...r, tr: tr[r.subpath]?.[r.name] ?? "", md,
+    const doc = { ...r, tr: tr[r.subpath]?.[r.name] ?? "", md, ...(r.props ? { props: r.props.map(({ src, ...p }) => (p.tr ? p : (({ tr, ...q }) => q)(p))) } : {}),
       status: r.deprecated ? "deprecated" : r.experimental ? "experimental" : m?.status || "stable", since: r.since || m?.since || "0.1.0",
       demo: m?.showcase || showcasePages.get(r.name) || "" };
     delete doc.file;
@@ -233,7 +236,11 @@ export function generate(root = ROOT) {
   const missingMd = recs.filter((r) => !existsSync(join(root, mdPath(r.subpath, r.name)))).map((r) => `${r.subpath} › ${r.name}`);
   const undocMembers = recs.flatMap((r) => (r.members ?? []).filter((m) => !m.summary).map((m) => `${r.subpath} › ${r.name}.${m.name}`));
   const mdDone = [...MD_PENDING].filter((sub) => recs.some((r) => r.subpath === sub) && recs.filter((r) => r.subpath === sub).every((r) => existsSync(join(root, mdPath(r.subpath, r.name)))));
-  return { files, recs, missingMd: missingMd.filter((m) => !MD_PENDING.has(m.split(" › ")[0])), mdDone, undocMembers };
+  // every component prop declared in March's sources: an English JSDoc and its `@tr` Turkish (the playground's
+  // Properties and the API page show them), one row per declaration
+  const undocProps = [...new Map(recs.flatMap((r) => (r.props ?? []).filter((p) => p.src.startsWith("src/") && (!p.doc || !p.tr))
+    .map((p) => [p.src, `${p.src} ${r.name}.${p.name}${p.doc ? "" : " (English)"}${p.tr ? "" : " (@tr)"}`]))).values()];
+  return { files, recs, missingMd: missingMd.filter((m) => !MD_PENDING.has(m.split(" › ")[0])), mdDone, undocMembers, undocProps };
 }
 
 /** The index keeps a short summary (the docs file has the full one). */

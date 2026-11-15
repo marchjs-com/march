@@ -16,6 +16,7 @@ import { model, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { tokenize, type Token } from "../../../ui/highlight.ts";
 import { scanBrackets, bracketAt, wordAt, occurrences, findAll, pairAction, pairAround, tagToClose, fitPaste, applyEdits, PAIRS } from "./assist.ts";
 import { findBar, type FindState, type FindMode } from "./find.ts";
+import { createHistory } from "./history.ts";
 import { TextInput } from "../../forms/text-input/index.ts";
 import { virtualAnchor } from "../../../ui/popover.ts";
 import { Popover } from "../../overlays/popover/index.ts";
@@ -70,6 +71,11 @@ export interface CodeSuggestion {
   group?: string;
   /** Its definition, shown under the list while the row is picked out (else `describe` is asked). */
   doc?: CodeDoc;
+  /**
+   * Rows with a higher priority come first, before the source and the fit (a row of the type the place expects: true
+   * and false after `const ok: boolean =`). With nothing typed yet, rows with a priority open the list by themselves.
+   */
+  priority?: number;
 }
 /** A row's definition, shown under the list for the row picked out: its kind, its signature, what it does. */
 export interface CodeDoc { kind?: string | undefined; signature?: string | undefined; doc?: string | undefined }
@@ -87,7 +93,13 @@ export interface CodeSignature {
 /** A chip under the suggestion list: rows whose `source` is `value` ("all": every row). */
 export interface CodeSource { value: string; label: string }
 /** What `complete` returns: the rows and the range of the text they replace. */
-export interface CodeCompletion { from: number; to?: number; items: readonly CodeSuggestion[]; /** Every row, whatever source chip is chosen (and no chips): a member list. */ all?: boolean }
+export interface CodeCompletion {
+  from: number; to?: number; items: readonly CodeSuggestion[];
+  /** Every row, whatever source chip is chosen (and no chips): a member list. */
+  all?: boolean;
+  /** Where the caret is, as a language service sees it: in code, a string, a comment or the text between tags. */
+  where?: "code" | "string" | "comment" | "text";
+}
 /** Where the caret is when suggestions are asked for. */
 export interface CodeCompleteContext {
   value: string;
@@ -112,7 +124,7 @@ export interface CodeActiveLine { line: number; kind?: string }
 export interface CodeShortcut { keys: string; label: MaybeFn<string>; group?: MaybeFn<string | undefined> }
 /** The editor's own keys (each can be turned off with `keys={{ comment: false }}`). */
 export type CodeCommand = "indent" | "outdent" | "newline" | "comment" | "moveUp" | "moveDown" | "copyUp" | "copyDown" | "deleteLine" | "suggest" | "save" | "release"
-  | "find" | "replace" | "goToLine" | "definition" | "rename" | "format" | "zoom";
+  | "find" | "replace" | "goToLine" | "definition" | "rename" | "format" | "zoom" | "undo";
 /** A range of the text. */
 export interface CodeRange { from: number; to: number }
 /** An edit of the text: [from, to) becomes `text` (places in the text before any edit). */
@@ -233,6 +245,12 @@ export interface CodeEditorProps extends ControlProps<string> {
   rename?: ((ctx: { value: string; at: number }) => Maybe<CodeRename>) | undefined;
   /** Shift + Alt + F: the edits that format the text (one undo step). */
   format?: ((value: string) => Maybe<readonly CodeEdit[]>) | undefined;
+  /**
+   * The undo history (Ctrl+Z, Ctrl+Y / Ctrl+Shift+Z): `limit` steps (default 500; a typed word is one step). With a
+   * `key` it is kept in the browser session (sessionStorage) for that key, so it survives the editor being drawn again
+   * and a reload while the text is the same. `false`: the browser's own undo.
+   */
+  history?: false | { key?: string | undefined; limit?: number | undefined } | undefined;
   /** The pointer rests on a word: what it is (its type, signature, documentation), shown over it. */
   hover?: ((ctx: { value: string; at: number }) => Maybe<CodeDoc>) | undefined;
   class?: ClassProp;
@@ -415,12 +433,15 @@ export function CodeEditor(props: CodeEditorProps): Element {
    * (same-case start, any-case start, holding it) and length. Rows under headings keep their groups' order.
    */
   const rank = (items: readonly CodeSuggestion[], typed: string): CodeSuggestion[] => {
-    if (!typed) return [...items];
+    const prio = (it: CodeSuggestion): number => it.priority ?? 0;
+    if (!typed) return [...items].sort((a, b) => prio(b) - prio(a));
     const lw = typed.toLowerCase();
     const fit = (it: CodeSuggestion): number => (it.label.startsWith(typed) ? 0 : it.label.toLowerCase().startsWith(lw) ? 1 : it.label.toLowerCase().includes(lw) ? 2 : 3);
     const kept = items.filter((it) => fit(it) < 3);
-    const by = (a: CodeSuggestion, b: CodeSuggestion): number => sourceRank(a) - sourceRank(b) || fit(a) - fit(b) || a.label.length - b.label.length || a.label.localeCompare(b.label);
-    const best = kept.filter((it) => fit(it) === 0).sort((a, b) => a.label.length - b.label.length || sourceRank(a) - sourceRank(b))[0];
+    const by = (a: CodeSuggestion, b: CodeSuggestion): number => prio(b) - prio(a) || sourceRank(a) - sourceRank(b) || fit(a) - fit(b) || a.label.length - b.label.length || a.label.localeCompare(b.label);
+    // the best row: the shortest same-case start, among the rows of the highest priority
+    const top = Math.max(0, ...kept.map(prio));
+    const best = kept.filter((it) => fit(it) === 0 && prio(it) === top).sort((a, b) => a.label.length - b.label.length || sourceRank(a) - sourceRank(b))[0];
     const groups = [...new Set(kept.map((it) => it.group ?? ""))];
     return groups.flatMap((g) => {
       const rows = kept.filter((it) => (it.group ?? "") === g).sort(by);
@@ -444,7 +465,8 @@ export function CodeEditor(props: CodeEditorProps): Element {
       // the ghost (the best row's rest at the caret) and, below, the list: both while typing
       ghost.set(ghosting && !forced && c ? likeliest({ ...c, items }, caret) : null);
       const min = props.listAfter ?? 3;
-      const open = !ghosting || sticky || (min > 0 && word.length >= min);
+      // rows the place's type expects open the list even before a letter is typed (const ok: boolean = → true, false)
+      const open = !ghosting || sticky || (min > 0 && word.length >= min) || (!word && items.some((it) => (it.priority ?? 0) > 0));
       batch(() => { active.set(0); done.set(open && c && items.length ? { from: c.from, to: c.to ?? caret, items, ...(c.all ? { all: true } : {}) } : null); });
       if (!done.peek()) sticky = false;
     };
@@ -520,8 +542,11 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const on = (c: CodeCommand): boolean => props.keys !== false && (props.keys?.[c] ?? true) && (c !== "save" || !!props.onSave);
   const unit = (): string => " ".repeat(props.tabSize ?? 2);
   let editing = false;
+  /** The selection before the change being made (the undo step's "before"). */
+  let selBefore: readonly [number, number] | null = null;
   /** Replace [from, to) with `text`, then select [a, b] (offsets in the new text). */
   const replace = (from: number, to: number, text: string, a: number, b = a): void => {
+    selBefore ??= [input.selectionStart ?? 0, input.selectionEnd ?? input.selectionStart ?? 0];
     editing = true;
     // the find bar's field keeps the focus (Replace, Replace all)
     const back = globalThis.document.activeElement as HTMLElement | null;
@@ -867,6 +892,11 @@ export function CodeEditor(props: CodeEditorProps): Element {
     if (mod && !e.shiftKey && !e.altKey && e.key.toLowerCase() === "s" && on("save")) { e.preventDefault(); props.onSave!(input.value); return; }
     hideHover();
     const k = e.key.toLowerCase(), multi0 = props.multiline !== false;
+    if (mod && !e.altKey && hist && on("undo") && (k === "z" || e.code === "KeyZ" || k === "y" || e.code === "KeyY")) {
+      e.preventDefault();
+      history((k === "z" || e.code === "KeyZ") && !e.shiftKey);
+      return;
+    }
     if (mod && !e.altKey && !e.shiftKey && (k === "f" || e.code === "KeyF") && on("find")) { e.preventDefault(); close(); openFind("find"); return; }
     if (mod && !e.altKey && (k === "h" || e.code === "KeyH") && on("replace") && !ro()) { e.preventDefault(); close(); openFind("replace"); return; }
     if (mod && !e.altKey && !e.shiftKey && (k === "g" || e.code === "KeyG") && on("goToLine") && multi0) { e.preventDefault(); close(); openFind("line"); return; }
@@ -923,7 +953,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
       ["rename", "F2", () => t`Rename symbol`, !!props.rename && !ro()], ["format", "Shift+Alt+F", () => t`Format document`, !!props.format && !ro()],
       ["zoom", "Ctrl+= / Ctrl+- / Ctrl+0", () => t`Bigger / smaller / default text`],
       ["save", "Ctrl+S", () => t`Save`], ["", "F9", () => t`Toggle a breakpoint`, !!props.onGutter],
-      ["", "Ctrl+Z / Ctrl+Y", () => t`Undo / redo`], ["release", "Esc, Tab", () => t`Leave the editor`],
+      ["undo", "Ctrl+Z / Ctrl+Y", () => t`Undo / redo`], ["release", "Esc, Tab", () => t`Leave the editor`],
     ];
     return rows.filter(([c, , , ok]) => ok !== false && (!c || on(c))).map(([, keys, label]) => ({ keys, label, group: () => t`Editor` }));
   };
@@ -947,12 +977,48 @@ export function CodeEditor(props: CodeEditorProps): Element {
       if (sig.peek()) askSignature();
     },
     onPaste,
+    // the selection before a typed change; the browser's own undo (its menu, a gesture) goes to the editor's
+    onBeforeinput: (e: InputEvent) => {
+      if (hist && (e.inputType === "historyUndo" || e.inputType === "historyRedo")) { e.preventDefault(); history(e.inputType === "historyUndo"); return; }
+      selBefore ??= [input.selectionStart ?? 0, input.selectionEnd ?? input.selectionStart ?? 0];
+    },
     onPointermove: onPointerMove,
     onPointerleave: () => { clearTimeout(hoverTimer); hideTimer = setTimeout(() => hoverDoc.set(null), 250); },
     onFocus: () => { focused.set(true); readSel(); globalThis.document.addEventListener("selectionchange", onSelChange); },
     onBlur: (e: FocusEvent) => { close(); ghost.set(null); closeSignature(); focused.set(false); globalThis.document.removeEventListener("selectionchange", onSelChange); props.onBlur?.(e); },
   }) as HTMLTextAreaElement;
   syncValue(input, get);
+
+  // ---- undo: every change of the value is a step (typing, the editor's commands, a value set from outside); the
+  // editor's own history, so it outlives the text field (and, with a key, the page)
+  const hist = props.history === false ? null : createHistory({ limit: props.history?.limit, key: props.history?.key });
+  const keep = (): void => { if (hist && props.history && props.history.key) { clearTimeout(saveTimer); saveTimer = setTimeout(() => hist.save(known), 400); } };
+  let known = untrack(get), applying = false, saveTimer: ReturnType<typeof setTimeout> | undefined;
+  hist?.load(known);
+  effect(() => {
+    const v = get();
+    untrack(() => {
+      if (v === known) return;
+      if (hist && !applying) {
+        const after = globalThis.document?.activeElement === input ? [input.selectionStart ?? 0, input.selectionEnd ?? input.selectionStart ?? 0] as const : null;
+        hist.record(known, v, selBefore ?? sel.peek(), after);
+      }
+      known = v; selBefore = null;
+      keep();
+    });
+  });
+  const history = (back: boolean): void => {
+    if (!hist || ro()) return;
+    const r = back ? hist.undo(input.value) : hist.redo(input.value);
+    if (!r) return;
+    close(); ghost.set(null);
+    known = r.value; applying = true;
+    input.value = r.value; set(r.value);
+    applying = false;
+    input.setSelectionRange(r.sel[0], r.sel[1]); readSel(); reveal(r.sel[0]);
+    keep();
+  };
+  onCleanup(() => { if (hist && props.history && props.history.key) { clearTimeout(saveTimer); hist.save(known); } });
   props.inputRef?.(input);
 
   const anchor = virtualAnchor(caretRect, () => input);

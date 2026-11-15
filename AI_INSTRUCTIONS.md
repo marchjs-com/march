@@ -350,6 +350,11 @@ Single choices with few values never use a drop-down: `<ChoicePicker bind:value=
 tiles), 10+ → Combobox. An option panel shows an option only while it has an effect (`visibleWhen`) and sits beside
 the stage (below it on a phone), so options appearing or going never move the stage (showcase: `Playground`).
 
+Every prop of a component's props interface carries one JSDoc with its English text and its Turkish in a `@tr` tag:
+`/** Full width of its container. @tr Kapsayıcısının tam genişliği. */ block?: boolean;` (technical names and values
+stay as written). The API reference and the playground's Properties (in the page's language) read them;
+`test/api-docs.test.js` lists the props without one.
+
 ## 14c. Widget points (hadi-march/widget, re-exported by ui)
 
 A widget point is a named place other code fills: `widgetPoint<Input>(id, { defaults })`, `point.provide({ id, slot,

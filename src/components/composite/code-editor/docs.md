@@ -75,9 +75,15 @@ typed and on Ctrl + Space (names already written are left out); the values of a 
 | `rename` | `({ value, at }) => { from, to, locations } \| { error } \| Promise` | — | F2: a small field under the name asks the new one; Enter writes it at every place (one undo step) |
 | `format` | `(value) => { from, to, text }[] \| Promise` | — | Shift + Alt + F: the edits are applied at once (one undo step) |
 | `hover` | `({ value, at }) => CodeDoc \| Promise` | — | the pointer rests on a word: its kind, signature and documentation over it |
+| `history` | `false` / `{ key?, limit? }` | `{ limit: 500 }` | the editor's own undo (Ctrl+Z, Ctrl+Y / Ctrl+Shift+Z): a typed word or a run of Backspaces is one step, every command and every value set from outside is one; with `key` it is kept in the browser session (sessionStorage) and taken back when the editor is drawn again with the same text (a tab switch, a reload); `false`: the browser's own undo |
 | `id`, `name`, `class` | | | |
 
-A suggestion: `{ label, hint?, insert?, back?, again?, source?, head? }`: `insert` replaces the word being written (default: the
+A suggestion's `priority` puts it before the others (a row of the type the place expects: `true` and `false` after
+`const ok: boolean =`); rows with a priority open the list even before a letter is typed. A completion's `where`
+(`code`, `string`, `comment`, `text`) is what a language service saw at the caret (the March IDE's code plugin offers
+nothing in a comment or the text between JSX tags, and in a string only the words its type allows).
+
+A suggestion: `{ label, hint?, insert?, back?, again?, source?, head?, priority? }`: `insert` replaces the word being written (default: the
 label), `back` moves the caret back into what was inserted (`variant=""` → inside the quotes), `again` asks for
 suggestions right after the pick (the values of the prop just written), `source` is what the `sources` chips filter
 by, `head` a line written at the top of the text with the pick when it is not there yet (the row's import).

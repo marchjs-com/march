@@ -410,3 +410,24 @@ test("CodeEditor: F12 selects the definition, F2 renames every place, Shift+Alt+
   assert.equal(sizes[1], undefined, "Ctrl+0: the default size");
   dispose();
 });
+
+test("CodeEditor undo: Ctrl+Z undoes the editor's own steps (a command, typed text), Ctrl+Y redoes; history={false} leaves it to the browser", async () => {
+  const code = signal("a");
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, lang: "ts" }));
+  const input = caretOf(el.querySelector("textarea"));
+  input.setSelectionRange(1, 1);
+  key(input, "(");
+  assert.equal(code(), "a()");
+  code.set("a() // set from outside");
+  await tick();
+  assert.ok(key(input, "z", { ctrlKey: true, code: "KeyZ" }).defaultPrevented);
+  assert.equal(code(), "a()");
+  key(input, "z", { ctrlKey: true, code: "KeyZ" });
+  assert.equal(code(), "a");
+  key(input, "y", { ctrlKey: true, code: "KeyY" });
+  assert.equal(code(), "a()");
+  dispose();
+  const [el2, dispose2] = mount(() => h(CodeEditor, { value: code, history: false }));
+  assert.ok(!key(caretOf(el2.querySelector("textarea")), "z", { ctrlKey: true, code: "KeyZ" }).defaultPrevented);
+  dispose2();
+});
