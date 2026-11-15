@@ -143,15 +143,35 @@
 .m-text-lg{font-size:var(--m-text-lg)!important}
 .m-text-xl{font-size:var(--m-text-xl)!important}
 .m-text-2xl{font-size:var(--m-text-2xl)!important}
-.m-text-muted{color:var(--m-muted)!important}
-.m-text-danger{color:var(--m-danger)!important}
-.m-text-success{color:var(--m-success)!important}
-.m-text-warn{color:var(--m-warn)!important}
 .m-text-left{text-align:start!important}
 .m-text-center{text-align:center!important}
 .m-text-right{text-align:end!important}
 .m-text-mono{font-family:var(--m-font-mono)!important}
 .m-text-bold{font-weight:700!important}
+.m-color-muted{color:var(--m-muted)!important}
+.m-color-primary{color:var(--m-primary-text)!important}
+.m-color-info{color:var(--m-info-text)!important}
+.m-color-success{color:var(--m-success-text)!important}
+.m-color-warn{color:var(--m-warn-text)!important}
+.m-color-danger{color:var(--m-danger-text)!important}
+.m-color-special{color:var(--m-special-text)!important}
+.m-color-warning{color:var(--m-warn-text)!important}
+.m-color-neutral{color:var(--m-text)!important}
+.m-color-brand-orange{color:var(--m-brand-orange-text, var(--m-cat-1-text))!important}
+.m-color-brand-blue{color:var(--m-brand-blue-text, var(--m-cat-2-text))!important}
+.m-color-brand-green{color:var(--m-brand-green-text, var(--m-cat-3-text))!important}
+.m-color-brand-purple{color:var(--m-brand-purple-text, var(--m-cat-4-text))!important}
+.m-color-brand-gold{color:var(--m-brand-gold-text, var(--m-cat-6-text))!important}
+.m-color-brand-pink{color:var(--m-brand-pink-text, var(--m-cat-5-text))!important}
+.m-color-gold{color:var(--m-brand-gold-text, var(--m-cat-6-text))!important}
+.m-color-cat-1{color:var(--m-cat-1-text)!important}
+.m-color-cat-2{color:var(--m-cat-2-text)!important}
+.m-color-cat-3{color:var(--m-cat-3-text)!important}
+.m-color-cat-4{color:var(--m-cat-4-text)!important}
+.m-color-cat-5{color:var(--m-cat-5-text)!important}
+.m-color-cat-6{color:var(--m-cat-6-text)!important}
+.m-color-cat-7{color:var(--m-cat-7-text)!important}
+.m-color-cat-8{color:var(--m-cat-8-text)!important}
 .m-flex-row{display:flex!important;flex-direction:row!important;align-items:center!important}
 .m-flex-col{display:flex!important;flex-direction:column!important}
 .m-flex-wrap{display:flex!important;flex-wrap:wrap!important}

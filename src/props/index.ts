@@ -22,8 +22,6 @@ let installed = false;
 export interface CommonProps {
   /** The colour token of the element and everything in it (`data-m-color`; the components read `--m-accent`). @tr Öğenin ve içindeki her şeyin renk belirteci (`data-m-color`; bileşenler `--m-accent`'i okur). */
   "m:color"?: string | (() => string | null | undefined) | null;
-  /** The text colour of the element and everything in it, from the colour tokens (`brand-blue`, `danger`…, `muted`); \`m:color\` tints the fill and the accent. @tr Öğenin ve içindeki her şeyin yazı rengi, renk belirteçlerinden (`brand-blue`, `danger`…, `muted`); `m:color` dolguyu ve vurguyu boyar. */
-  "m:text-color"?: string | (() => string | null | undefined) | null;
   /** The writing direction of the subtree: `ltr`, `rtl` or `auto`. @tr Alt ağacın yazı yönü: `ltr`, `rtl` ya da `auto`. */
   "m:dir"?: "ltr" | "rtl" | "auto" | (() => "ltr" | "rtl" | "auto" | null | undefined) | null;
   /** The language of the subtree (`lang`, e.g. `ar`): reading, hyphenation and fonts follow it. @tr Alt ağacın dili (`lang`, ör. `ar`): okuma, heceleme ve yazı tipleri buna uyar. */
@@ -97,8 +95,6 @@ registerMProp("no-select", (el, v) => {
 const attr = (name: string): MProp => (el, v) => { if (v == null || v === false) el.removeAttribute(name); else el.setAttribute(name, String(v)); };
 // m:color="brand-blue": the colour token of the element and everything in it (the components read --m-accent)
 registerMProp("color", attr("data-m-color"));
-// m:text-color="brand-blue": the text colour of the element and everything in it (m:color tints the fill and the accent)
-registerMProp("text-color", attr("data-m-text-color"));
 // sx on a component (the compiler sends it here): its classes on the component's root elements, beside their own class
 registerMProp("sx", (el, v) => _prop(el, el.localName, "sx", typeof v === "string" ? v : v && typeof v === "object" ? sxClasses(v as Sx) : ""));
 // m:dir="rtl" / m:lang="ar": writing direction and language of a subtree

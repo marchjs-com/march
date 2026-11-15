@@ -186,7 +186,8 @@ Built-in pipes: `date`, `time`, `datetime`, `relative`, `number`, `money(currenc
 
 ## sx
 Token utilities: `p px py pt pb m mx my mt mb gap` (0–8), `cols span` (1–12), `radius` (0–4), `shadow` (0–3),
-`w` (auto, full, sm, md, lg, xl), `text` (xs…2xl, muted, danger, success, warn, left, center, right, mono, bold),
+`w` (auto, full, sm, md, lg, xl), `text` (xs…2xl, left, center, right, mono, bold), `color` (the colour tokens: primary, danger, brand-blue, cat-1…, and
+muted: the text colour),
 `flex` (row, col, wrap, center, between, end, grow), `grid` (auto, fit), `hide` (sm, md, lg), `display` (block, inline,
 inline-block, flex, inline-flex, grid, none). Classes live in `css/sx.css`.
 

@@ -29,7 +29,7 @@
    top (or the keyboard inside it) brings it back. Touch screens keep it in place. */
 @media (hover: hover) and (pointer: fine) {
   .m-app-pv.is-full { position: relative; }
-  .m-app-pv.is-full > .m-app-pv-bar { position: absolute; z-index: 2; inset-block-start: var(--m-space-2); inset-inline: var(--m-space-3); border-radius: var(--m-radius-3, 12px); background: var(--m-surface); box-shadow: var(--m-shadow-3, 0 8px 24px rgb(0 0 0 / .18)); transform: translateY(calc(-100% - var(--m-space-3))); opacity: 0; transition: transform .28s var(--m-ease-out, ease-out), opacity .2s; }
+  .m-app-pv.is-full > .m-app-pv-bar { position: absolute; z-index: 2; inset-block-start: var(--m-space-2); inset-inline: var(--m-space-3); border-radius: var(--m-radius-3, 12px); background: var(--m-surface); box-shadow: var(--m-shadow-3); transform: translateY(calc(-100% - var(--m-space-3))); opacity: 0; transition: transform var(--m-dur) var(--m-ease-out), opacity var(--m-dur-fast) var(--m-ease-out); }
   .m-app-pv.is-full.is-bar-shown > .m-app-pv-bar, .m-app-pv.is-full > .m-app-pv-bar:has(:focus-visible) { transform: none; opacity: 1; }
   .m-app-pv.is-cover > .m-app-pv-bar { position: fixed; }
 }

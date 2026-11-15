@@ -15,7 +15,8 @@ import { tmpdir } from "node:os";
 // pipeline, partial targets inside / partOf and its tools) became core (+3.4 KB; docs/internal/size-watch.md). Apps that do not import them pay 0.
 // 15.8 KB since sx works on components (the sx common prop and _sxClass shared with elements) and its scales are
 // exported (SX); m:text-color lives in hadi-march/props (docs/internal/size-watch.md).
-export const BUDGET = { core: 15.8 * 1024, minimal: 5 * 1024 };
+// 15.9 KB since sx has a colour key (the 24 colour words of sx color: the text colour, which replaced m:text-color).
+export const BUDGET = { core: 15.9 * 1024, minimal: 5 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const ENTRIES = { core: "src/index.ts", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
 

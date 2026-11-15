@@ -89,17 +89,13 @@ test("runtime m:reveal: hidden at once until it comes into view (once per elemen
   assert.equal(off.style.getPropertyValue("opacity"), "");
 });
 
-test("runtime m:text-color: the text colour token on the element (data-m-text-color), every colour token has its rule", async () => {
-  const el = document.createElement("div");
-  P.mProps(el, { "text-color": "brand-blue" });
-  assert.equal(el.getAttribute("data-m-text-color"), "brand-blue");
-  P.mProps(el, { "text-color": null });
-  assert.equal(el.hasAttribute("data-m-text-color"), false);
+test("sx color: a colour token's text tone (and muted); the colours left sx text", async () => {
   const { readFileSync } = await import("node:fs");
-  const css = readFileSync(new URL("../src/css/props.css", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../src/css/sx.css", import.meta.url), "utf8");
   const { COLOR_TOKENS } = await import("../src/theme/colors.ts");
-  for (const t of [...COLOR_TOKENS, "muted"]) assert.ok(css.includes(`[data-m-text-color="${t}"] { --m-text-color:`), t);
-  assert.match(c('const a = <Card m:text-color="danger" />'), /"text-color": "danger"/);
+  for (const t of [...COLOR_TOKENS, "muted"]) assert.ok(new RegExp(`\\.m-color-${t}\\{color:var\\(--m-`).test(css), t);
+  assert.ok(!css.includes(".m-text-danger"), "text has no colours now");
+  assert.match(c('const a = <Card sx={{ color: "danger" }} />'), /"sx": "m-color-danger"/);
 });
 
 test("sx on a component: the compiler sends it to mProps; its classes go on the root beside the root's own class", () => {

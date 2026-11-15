@@ -6,7 +6,9 @@ export const SX = {
   p: [0, 8], px: [0, 8], py: [0, 8], pt: [0, 8], pb: [0, 8],
   m: [0, 8], mx: [0, 8], my: [0, 8], mt: [0, 8], mb: [0, 8],
   gap: [0, 8], cols: [1, 12], span: [1, 12], radius: [0, 4], shadow: [0, 3], w: ["auto", "full", "sm", "md", "lg", "xl"],
-  text: ["xs", "sm", "md", "lg", "xl", "2xl", "muted", "danger", "success", "warn", "left", "center", "right", "mono", "bold"],
+  text: ["xs", "sm", "md", "lg", "xl", "2xl", "left", "center", "right", "mono", "bold"],
+  // the text colour: the colour tokens (theme/colors.ts) and muted
+  color: ["muted", "primary", "info", "success", "warn", "danger", "special", "warning", "neutral", "brand-orange", "brand-blue", "brand-green", "brand-purple", "brand-gold", "brand-pink", "gold", "cat-1", "cat-2", "cat-3", "cat-4", "cat-5", "cat-6", "cat-7", "cat-8"],
   flex: ["row", "col", "wrap", "center", "between", "end", "grow"], grid: ["auto", "fit"], hide: ["sm", "md", "lg"],
   display: ["block", "inline", "inline-block", "flex", "inline-flex", "grid", "none"],
 } as const satisfies Record<string, readonly [number, number] | readonly string[]>;

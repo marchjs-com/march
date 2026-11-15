@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Generates src/css/sx.css (utility classes for every `sx` token) from src/core/sx.ts. Run after changing SX.
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { SX } from "../src/core/sx.ts";
 
 const space = (n) => `var(--m-space-${n})`;
@@ -19,8 +19,12 @@ for (const n of range(SX.shadow)) add(`shadow-${n}`, n ? `box-shadow:var(--m-sha
 const W = { auto: "width:auto", full: "width:100%", sm: "max-width:24rem;width:100%", md: "max-width:40rem;width:100%", lg: "max-width:64rem;width:100%", xl: "max-width:80rem;width:100%" };
 for (const v of SX.w) add(`w-${v}`, W[v]);
 const TEXT = { xs: "font-size:var(--m-text-xs)", sm: "font-size:var(--m-text-sm)", md: "font-size:var(--m-text-md)", lg: "font-size:var(--m-text-lg)", xl: "font-size:var(--m-text-xl)", "2xl": "font-size:var(--m-text-2xl)",
-  muted: "color:var(--m-muted)", danger: "color:var(--m-danger)", success: "color:var(--m-success)", warn: "color:var(--m-warn)", left: "text-align:start", center: "text-align:center", right: "text-align:end", mono: "font-family:var(--m-font-mono)", bold: "font-weight:700" };
+  left: "text-align:start", center: "text-align:center", right: "text-align:end", mono: "font-family:var(--m-font-mono)", bold: "font-weight:700" };
 for (const v of SX.text) add(`text-${v}`, TEXT[v]);
+// color: a colour token's text tone (the same one data-m-color sets as --m-accent-text, read from css/colors.css)
+const COLORS_CSS = readFileSync(new URL("../src/css/colors.css", import.meta.url), "utf8");
+const tone = (t) => /--m-accent-text: ([^;]+);/.exec(new RegExp(`\\[data-m-color="${t}"\\][^}]*`).exec(COLORS_CSS)?.[0] ?? "")?.[1];
+for (const v of SX.color) add(`color-${v}`, `color:${v === "muted" ? "var(--m-muted)" : tone(v)}`);
 const FLEX = { row: "display:flex;flex-direction:row;align-items:center", col: "display:flex;flex-direction:column", wrap: "display:flex;flex-wrap:wrap", center: "display:flex;align-items:center;justify-content:center", between: "display:flex;align-items:center;justify-content:space-between", end: "display:flex;justify-content:flex-end", grow: "flex:1 1 auto;min-width:0" };
 for (const v of SX.flex) add(`flex-${v}`, FLEX[v]);
 for (const v of SX.display) add(`display-${v}`, `display:${v}`);
