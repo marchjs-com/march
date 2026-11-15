@@ -4,7 +4,7 @@
 // services: a panel that shows a `file` is drawn by the file type that opens its path (codeEditorPlugin: code files in
 // a code editor), else as plain text. Colours come from the page's theme and accent.
 import "./app-ui.css";
-import { computed, untrack, onCleanup } from "../../../core/reactive.ts";
+import { computed, untrack, onCleanup, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -34,8 +34,12 @@ export interface AppUIProps extends Omit<DockLayoutProps, "panels"> {
   panels: MaybeFn<readonly AppPanel[]>;
   /** Plugins: file types (code editor…), panels, commands, services. */
   plugins?: readonly AppPlugin[] | undefined;
-  /** Text at the start of the top bar. */
-  title?: MaybeFn<string | undefined>;
+  /** Text at the start of the top bar; empty or null: none. */
+  title?: MaybeFn<string | null | undefined>;
+  /** A short note beside the title, quiet and smaller, written as a code comment ("// …"; the "//" is added). */
+  description?: MaybeFn<string | null | undefined>;
+  /** What starts the description (default "//"); "" for none. */
+  descriptionMark?: string | undefined;
   /** Your items in the top bar, before the Layout menu. */
   tools?: unknown;
   /** Beside the workspace, at the start (an ActivityBar). */
@@ -46,6 +50,8 @@ export interface AppUIProps extends Omit<DockLayoutProps, "panels"> {
   bar?: MaybeFn<boolean | undefined>;
   /** Name (tooltip) of the Layout menu button, an icon button (default "Layout"); false: no button. */
   layoutLabel?: MaybeFn<string | undefined> | false;
+  /** The Layout menu button at the end of the top bar (default true; live); false hides it (as `layoutLabel={false}`). */
+  layoutMenu?: MaybeFn<boolean | undefined>;
   /** Own icon of the Layout menu button. */
   layoutIcon?: unknown;
   /** The plugin kit once it runs (add or remove plugins later). */
@@ -65,7 +71,8 @@ function fileView(kit: AppKit, file: AppFile): () => unknown {
 /** `<AppUI title="My IDE" panels={panels} presets={PRESETS} plugins={[codeEditorPlugin()]} persist="ide" />` */
 export function AppUI(props: AppUIProps): Element {
   let dock: DockApi | undefined;
-  const { title, tools, side, status, bar, layoutLabel, layoutIcon, class: cls, api, plugins, kit: onKit, panels, ...rest } = props;
+  // title and description are read from props when drawn (live: a getter prop follows its value)
+  const { title: _title, description: _description, layoutMenu: _layoutMenu, descriptionMark, tools, side, status, bar, layoutLabel, layoutIcon, class: cls, api, plugins, kit: onKit, panels, ...rest } = props;
   const kit = createAppKit(plugins ?? []);
   onCleanup(() => kit.dispose());
   onKit?.(kit);
@@ -88,9 +95,10 @@ export function AppUI(props: AppUIProps): Element {
   });
   return h("div", { class: () => cx("m-app", val(cls)) },
     () => (val(bar) === false ? null : h("div", { class: "m-app-bar" },
-      () => (val(title) ? h("span", { class: "m-app-title" }, () => val(title)) : null),
-      h("span", { class: "m-app-fill" }), tools ?? null, menu)),
+      () => (val(props.title) ? h("span", { class: "m-app-title" }, () => val(props.title)) : null),
+      () => { const d = val(props.description); return d ? h("span", { class: "m-app-desc" }, (descriptionMark ?? "//") ? h("span", { class: "m-app-desc-mark", "aria-hidden": "true" }, `${descriptionMark ?? "//"} `) : null, d) : null; },
+      h("span", { class: "m-app-fill" }), tools ?? null, () => (val(props.layoutMenu) === false ? null : menu))),
     h("div", { class: "m-app-main" }, side ?? null,
-      h("div", { class: "m-app-body" }, h(DockLayout, { ...rest, panels: all, api: (a: DockApi) => { dock = a; api?.(a); } }))),
+      h("div", { class: "m-app-body" }, h(DockLayout, { ...rest, actions: reactive(() => val(props.actions)), panels: all, api: (a: DockApi) => { dock = a; api?.(a); } }))),
     status ?? null) as Element;
 }

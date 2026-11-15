@@ -105,7 +105,7 @@ export interface DockLayoutProps {
   /** A closable tab's close mark: remove the panel from `panels` here; return false to keep it. */
   onClose?: ((panel: string) => boolean | void | Promise<boolean | void>) | undefined;
   /** The buttons of a group: true (default), false, or the ones to keep. Keyboard and `api` stay. */
-  actions?: boolean | readonly DockAction[] | undefined;
+  actions?: MaybeFn<boolean | readonly DockAction[] | undefined>;
   /** Below this width (px) the workspace is one tab group, no drag (default 560). */
   narrow?: number | undefined;
   /** The short slide when the layout changes (default true; none with reduced motion). */
@@ -143,8 +143,8 @@ export function DockLayout(props: DockLayoutProps): Element {
   const store = props.persist ? (props.storage ?? localStore) : null;
   const key = (k: string): string => `${props.persist}:${k}`;
   const NARROW = props.narrow ?? 560;
-  const acts = props.actions ?? true;
-  const has = (a: DockAction): boolean => acts === true || (Array.isArray(acts) && acts.includes(a));
+  // the group buttons are read when drawn (a getter prop: they follow the value)
+  const has = (a: DockAction): boolean => { const acts = val(props.actions) ?? true; return acts === true || (Array.isArray(acts) && acts.includes(a)); };
   const L$ = signal<DockTree | null>(null);
   let L: DockTree | null = null, phone: DockTree | null = null, rects: Rects | null = null, narrow = false, dragged = false;
   let saveT: ReturnType<typeof setTimeout> | undefined, animT: ReturnType<typeof setTimeout> | undefined, focusSaved: DockTree | null = null, started = false;
@@ -278,15 +278,15 @@ export function DockLayout(props: DockLayoutProps): Element {
           onContextmenu: (c: MouseEvent) => { if (narrow) return; c.preventDefault(); openMenu(c.currentTarget as HTMLElement, panelMenu(x.id)); },
         }),
       }),
-      has("menu") ? menuBtn : null,
-      has("maximize") ? h(IconButton, {
+      () => (has("menu") ? menuBtn : null),
+      () => (has("maximize") ? untrack(() => h(IconButton, {
         icon: () => (f.max() ? ownIcon(props.icons?.restore, restoreIcon) : ownIcon(props.icons?.maximize, maxIcon)), size: "sm", class: "m-dock-hb", pressed: f.max,
         label: () => (f.max() ? props.labels?.restore ?? t`Back to its size` : props.labels?.maximize ?? t`Fill the whole area`), onClick: () => toggleMax(gid()),
-      }) : null,
-      has("collapse") ? h(IconButton, {
+      })) : null),
+      () => (has("collapse") ? untrack(() => h(IconButton, {
         icon: ownIcon(props.icons?.collapse, minus), size: "sm", class: "m-dock-hb", disabled: () => !f.canClose(),
         label: () => props.labels?.collapse ?? t`Collapse to a strip`, onClick: () => collapse(gid()),
-      }) : null);
+      })) : null));
       f.el = div("m-dock-frame", {}, head);
       under.append(f.el);
       frames.set(id, f);

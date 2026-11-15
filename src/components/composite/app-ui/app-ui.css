@@ -2,6 +2,9 @@
 .m-app { display: flex; flex-direction: column; min-block-size: 0; block-size: 100%; background: var(--m-bg); color: var(--m-text); }
 .m-app-bar { flex: none; display: flex; align-items: center; gap: var(--m-space-2); padding-block: var(--m-space-2) 0; padding-inline: var(--m-space-3); }
 .m-app-title { font: 800 var(--m-text-sm) var(--m-font-display); color: var(--m-text); }
+/* the note beside the title: a code comment, quiet, smaller, on the title's middle line */
+.m-app-desc { align-self: center; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--m-text-xs) var(--m-font-mono); color: var(--m-muted); }
+.m-app-desc-mark { opacity: .7; }
 .m-app-fill { flex: 1; }
 .m-app-main { flex: 1 1 auto; min-block-size: 0; display: flex; }
 .m-app-main > :not(.m-app-body) { flex: none; }
@@ -14,6 +17,7 @@
 .m-app-plain { margin: 0; padding: var(--m-space-3); overflow: auto; font: var(--m-text-sm)/1.55 var(--m-font-mono); white-space: pre; }
 .m-editor-frame.m-app-code { block-size: 100%; border: 0; border-radius: 0; box-shadow: none; }
 /* the code fills the panel and scrolls; the frame's footer stays at the bottom */
+.m-app-code .m-ced-body { flex: 1 1 auto; min-block-size: 0; }
 .m-app-code .m-ced-area { flex: 1 1 auto; min-block-size: 0; overflow: auto; align-content: start; }
 .m-app-code .m-ced-input { min-block-size: 100%; }
 /* AppPreview: the toolbar (your tools at the start, the preview's look at the end) over the stage */

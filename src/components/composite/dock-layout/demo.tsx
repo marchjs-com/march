@@ -17,7 +17,7 @@ const PRESETS: Record<string, Record<string, Preset>> = {
   columns: { columns: { title: "Üç sütun", tree: () => row([0.33, tabs("files")], [0.34, tabs(["editor", "notes"])], [0.33, tabs(["console", "props"])]) } },
   single: { single: { title: "Tek grup", tree: () => tabs(["editor", "files", "console", "props", "notes"]) } },
 }
-const ACTIONS: Record<string, boolean | DockAction[]> = { all: true, max: ["maximize"], none: false }
+const ACTIONS: Record<string, boolean | DockAction[]> = { all: true, nomenu: ["maximize", "collapse"], max: ["maximize"], none: false }
 
 const pane = (title: string, lines: string[]) => <div class="sc-dock-pane"><strong>{title}</strong>{lines.map((l) => <p class="m-muted">{l}</p>)}</div>
 

@@ -18,11 +18,14 @@ Every DockLayout prop (`panels`, `presets`, `preset`, `persist`, `storage`, `api
 
 | Prop | Type | Default | |
 |---|---|---|---|
-| `title` | string | — | text at the start of the top bar |
+| `title` | string / `null` | — | text at the start of the top bar; empty or `null`: none |
+| `description` | string / `null` | — | a short note beside the title, quiet, smaller, written as a code comment (`// …`) |
+| `descriptionMark` | string | `"//"` | what starts the description; `""` for none |
 | `tools` | node | — | your items in the top bar, before the Layout menu |
 | `side` | node | — | beside the workspace at the start (an ActivityBar) |
 | `status` | node | — | under the workspace (a StatusBar) |
 | `bar` | boolean | `true` | the top bar; without it open the menu yourself (`api.layoutMenu()` gives its items) |
+| `layoutMenu` | boolean | `true` | the Layout menu button at the end of the top bar; `false` hides it (live) |
 | `layoutLabel` | string / `false` | "Layout" | name (tooltip) of the Layout menu button, an icon button; `false`: no button |
 | `layoutIcon` | icon | columns | own icon of the Layout menu button |
 | `plugins` | `AppPlugin[]` | — | file types, panels, commands and services (below) |
