@@ -89,6 +89,7 @@
   "outletRoute": "Adlandırılmış bir outlet'in gösterdiği (reaktif): hedefi veya null.",
   "params": "Geçerli eşleşmenin rota parametreleri (reaktif).",
   "path": "Geçerli yol (reaktif).",
+  "hash": "Adresin #kısmı, \"#\" ile (yoksa \"\"; reaktif). Hash modunda rotanın kendisi bu değildir.",
   "prefetch": "Bir rotanın ihtiyaç duyduğu her parçayı derleme manifestosuyla getirir (çalıştırmaz): tek tur <link rel=\"modulepreload\">. Manifesto yoksa (geliştirme sunucusu, testler) preload()'a döner. Kullanıcı veri tasarrufundaysa atlanır.",
   "prefetchLinks": "Ekrandakilerin bağladığı rotaları en düşük öncelikle (<link rel=\"prefetch\">) önceden getirir, en çok `max` rota; ilk sayfadan sonra boştayken çağrılır.",
   "preload": "Bir rotanın sayfasını (ve düzenlerini) önceden yükler, örn. üzerine gelince.",

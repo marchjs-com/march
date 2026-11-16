@@ -75,3 +75,17 @@ test("shownDigits catches a typed count and lets live values through", () => {
   assert.deepEqual(shownDigits('href: "/managers-a11y" label="/ 7 tema"'), ["/ 7 tema"]);
   assert.deepEqual(shownDigits('`${n} bileşen · 7 tema`'), ["${n} bileşen · 7 tema"]);
 });
+
+test("home timeline (home/toc.tsx): every section head is listed once, in page order, with its own English address", () => {
+  const home = join(ROOT, "examples/showcase/src/home");
+  const read = (f) => readFileSync(join(home, f), "utf8");
+  const toc = read("toc.tsx");
+  const items = [...toc.matchAll(/I\("([^"]+)", "([^"]+)"/g)].map((m) => ({ head: m[1], slug: m[2] }));
+  // the heads in page order: sections.tsx mounts the files, each file mounts its sections in its default export
+  const files = ["features.tsx", "more/ai.tsx", "more/ui.tsx", "more/design.tsx", "more/live.tsx", "more3/visual.tsx", "more2/data.tsx",
+    "more2/motion.tsx", "more2/app.tsx", "more2/dev.tsx", "more3/tools.tsx", "more/people.tsx", "sections.tsx"];
+  const heads = new Set(files.flatMap((f) => [...read(f).matchAll(/<Head id="([^"]+)"/g)].map((m) => m[1])));
+  assert.deepEqual(new Set(items.map((i) => i.head)), heads, "the timeline lists exactly the page's section heads");
+  assert.equal(new Set(items.map((i) => i.slug)).size, items.length, "addresses are unique");
+  for (const i of items) assert.match(i.slug, /^[a-z][a-z0-9-]*$/, `${i.slug}: a short English address`);
+});

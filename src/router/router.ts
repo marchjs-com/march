@@ -124,6 +124,8 @@ export function setNavigationWrapper(fn: typeof navWrapper): void { navWrapper =
 
 /** Current path (reactive). */
 export const path = (): string => S.path();
+/** The address's #part, with the "#" ("" without one; reactive). In hash mode the route itself is not it. */
+export const hash = (): string => S.hash();
 /** Route params of the current match (reactive). */
 export const params = (): Record<string, string> => S.match()?.params ?? {};
 /** Query string as an object (reactive). Repeated keys become arrays. */
