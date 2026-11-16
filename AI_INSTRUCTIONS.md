@@ -766,6 +766,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | Steps, Button |
 | Steps | stable | Progress through stages: done, current and upcoming steps with titles and descriptions; clickable when onSelect is given; horizontal or vertical. | CheckMark |
 | Tabs | stable | Tabbed panels: roving focus (← → Home End, mirrored in RTL), icons, badges, closable and changed tabs, an actions slot, a line or pill look, the active tab optionally kept in the URL. | Badge, StatusDot |
+| ThreadNav | experimental | An app's navigation as a thread: sections are beads that magnify like a dock, a bead opens a capsule of categories, a category's pages hang on a second thread, a drop marks where you are. | SearchBox |
 
 ### Media — `march/media`
 

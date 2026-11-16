@@ -11,6 +11,7 @@ import { Portal } from "../../../dom/portal.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, isRtl, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { nextFrame } from "../../../motion/engine/clock.ts";
+import { dockLens } from "../../../ui/dock-lens.ts";
 import { reducedMotion } from "../../../motion/env.ts";
 import tr from "./tr.ts";
 
@@ -179,65 +180,10 @@ export function SectionTimeline(props: SectionTimelineProps): unknown {
     }
   };
 
-  // ── the magnifier: each item gets --k (0 far … 1 under the pointer) and --m-stl-shift (how far it moves to make room).
-  // Nothing changes a size: the items move, the dots and names scale, so a frame lays nothing out. Distances are taken
-  // from where the dots stand unmoved, so the list does not chase its own growth; drawn once per frame, only changed
-  // values are written; coming and going it swells and settles by one strength.
-  let list: HTMLElement | undefined, base: number[] = [], lens: number | null = null, at = 0, power = 0, drawing = false;
-  let drawnK: string[] = [], drawnS: string[] = [];
-  const rest = (): number[] => {
-    if (!list) return [];
-    const r = list.getBoundingClientRect(), n = list.children.length, v = untrack(vertical);
-    const len = v ? r.height : r.width, step = len / Math.max(1, n), mid = (v ? r.top : r.left) + len / 2;
-    const rtl = !v && isRtl(list);
-    return Array.from({ length: n }, (_, i) => mid + (rtl ? -1 : 1) * (i - (n - 1) / 2) * step);
-  };
-  const draw = (): void => {
-    if (!list || !alive) { drawing = false; return; }
-    const want = lens == null ? 0 : 1, reach = val(props.reach) ?? 130, grow = val(props.grow) ?? 28;
-    power += (want - power) * (reducedMotion() ? 1 : 0.3);
-    if (Math.abs(want - power) < 0.01) power = want;
-    const els = list.children, ks: number[] = [];
-    let total = 0;
-    for (let i = 0; i < els.length; i++) {
-      const d = Math.abs(at - (base[i] ?? 0));
-      const k = d >= reach ? 0 : (power * (1 + Math.cos((d / reach) * Math.PI))) / 2;
-      ks.push(k); total += k * grow;
-    }
-    let before = 0;
-    for (let i = 0; i < els.length; i++) {
-      const k = ks[i] as number, el = els[i] as HTMLElement;
-      const kv = k < 0.005 ? "0" : k.toFixed(2), sv = `${Math.round(before + (k * grow) / 2 - total / 2)}px`;
-      before += k * grow;
-      if (drawnK[i] !== kv) { drawnK[i] = kv; el.style.setProperty("--k", kv); }
-      if (drawnS[i] !== sv) { drawnS[i] = sv; el.style.setProperty("--m-stl-shift", sv); }
-    }
-    list.classList.toggle("is-lens", power > 0);
-    if (power === want) { drawing = false; if (!power) base = []; return; }
-    nextFrame(draw);
-  };
-  const lensAt = (p: number | null): void => {
-    lens = p;
-    if (p != null) at = p;
-    if (!drawing) { drawing = true; nextFrame(draw); }
-  };
-  const enter = (): void => { if (!base.length) base = rest(); };
-  // the intro: the lens runs over the dots once, start to end, then lets go; a pointer on the rail ends it
-  let introRun = false;
-  const intro = (): void => {
-    if (!props.intro || reducedMotion() || !list || !on()) return;
-    const pos = rest(), first = pos[0], last = pos[pos.length - 1];
-    if (first == null || last == null || first === last) return;
-    base = pos; introRun = true;
-    const start = performance.now(), ms = Math.min(2400, 600 + pos.length * 40);
-    const step = (): void => {
-      if (!introRun || !alive) return;
-      const p = Math.min(1, (performance.now() - start) / ms), e = p < 0.5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2;
-      lensAt(first + (last - first) * e);
-      if (p < 1) nextFrame(step); else { introRun = false; lensAt(null); }
-    };
-    lensAt(first); nextFrame(step);
-  };
+  // ── the magnifier (march/ui dock-lens): the dots move apart and swell near the pointer or the focused dot
+  let list: HTMLElement | undefined;
+  const lens = dockLens({ list: () => list, vertical, reach: () => val(props.reach), grow: () => val(props.grow), shiftVar: "--m-stl-shift" });
+  const intro = (): void => { if (props.intro && on()) lens.sweep(); };
   const on = (): boolean => val(props.magnify) !== false;
 
   const markOf = (i: number): HTMLElement | null => (list?.children[i]?.firstElementChild as HTMLElement | null) ?? null;
@@ -261,6 +207,7 @@ export function SectionTimeline(props: SectionTimelineProps): unknown {
 
   onCleanup(() => {
     alive = false;
+    lens.dispose();
     listening?.removeEventListener("scroll", spy);
     win.removeEventListener?.("resize", spy);
   });
@@ -270,19 +217,17 @@ export function SectionTimeline(props: SectionTimelineProps): unknown {
     "aria-label": () => props.labels?.group ?? t`Sections`,
   }, h("div", { class: "m-stl-rail" }, h("ol", {
     class: "m-stl-list", ref: (el: HTMLElement) => { list = el; },
-    onPointerEnter: () => { introRun = false; if (on()) enter(); },
-    onPointerMove: (e: PointerEvent) => { if (!on()) return; enter(); lensAt(untrack(vertical) ? e.clientY : e.clientX); },
-    onPointerLeave: () => lensAt(null),
+    onPointerEnter: () => { if (on()) lens.enter(); },
+    onPointerMove: (e: PointerEvent) => { if (!on()) return; lens.enter(); lens.at(untrack(vertical) ? e.clientY : e.clientX); },
+    onPointerLeave: () => lens.at(null),
     onFocusin: (e: FocusEvent) => {
       const li = (e.target as Element).closest("li");
-      if (!li || !list || !on()) return;
-      enter(); lensAt(base[[...list.children].indexOf(li)] ?? null);
+      if (li && list && on()) lens.atItem([...list.children].indexOf(li));
     },
-    onFocusout: () => lensAt(null),
+    onFocusout: () => lens.at(null),
     onKeyDown,
   }, () => {
     const list = items();
-    drawnK = list.map(() => ""); drawnS = list.map(() => "");
     return untrack(() => list.map((it, i) => {
       const cur = (): boolean => active() === i;
       const tag = it.slug ? "a" : "button";

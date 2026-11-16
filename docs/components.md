@@ -150,6 +150,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | [Steps](#steps), [Button](#button) |
 | Steps | stable | Progress through stages: done, current and upcoming steps with titles and descriptions; clickable when onSelect is given; horizontal or vertical. | [CheckMark](#checkmark) |
 | Tabs | stable | Tabbed panels: roving focus (← → Home End, mirrored in RTL), icons, badges, closable and changed tabs, an actions slot, a line or pill look, the active tab optionally kept in the URL. | [Badge](#badge), [StatusDot](#statusdot) |
+| ThreadNav | experimental | An app's navigation as a thread: sections are beads that magnify like a dock, a bead opens a capsule of categories, a category's pages hang on a second thread, a drop marks where you are. | [SearchBox](#searchbox) |
 
 ### Media — `march/media`
 
@@ -2683,6 +2684,19 @@ Composed of: Dropdown, ThemeSwatch, [OverflowText](#overflowtext), [SectionLabel
 ```
 
 Full page: src/components/composite/theme-menu/docs.md
+
+## ThreadNav
+
+An app's navigation drawn as a thread at the side of the screen. The sections are beads on the thread; near the pointer it magnifies like a dock and the thread bends toward the pointer. A bead opens a capsule beside it: a search and the section's categories, plain text with a count. The open category's pages hang from it on a second thread. A drop marks where you are and flows to a new place in the colour of its section. While the capsule is closed, a small capsule shows the path (section › category › page) with the same beads; a bead there opens the capsule at that level.
+
+Composed of: [SearchBox](#searchbox)
+
+```tsx
+<ThreadNav items={sections} value={$page} onNavigate={(it) => go(it.href)} fixed />
+<ThreadNav items={sections} value={$page} onNavigate={(it) => $page = it.id} search={false} crumbs={false} />
+```
+
+Full page: src/components/navigation/thread-nav/docs.md
 
 ## TimeInput
 

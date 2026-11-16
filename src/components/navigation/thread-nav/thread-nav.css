@@ -1,0 +1,85 @@
+/* ThreadNav: the navigation as a thread. The rail: a hair-thin thread (an SVG path that bends toward the pointer), the
+   sections as beads on it (dock lens: --k and --m-thn-shift on each item), a drop on the bead of where you are. The
+   capsule: beside the rail, the section's categories as plain text and a count; the open category's pages on a second
+   thread with its own drop. The drop takes its section's colour (data-m-color) and stretches as it flows. Tokens:
+   --m-thn-step (room per bead), --m-thn-rail (the rail's width). */
+.m-thn { --m-thn-step: 2.25rem; --m-thn-rail: 3rem; position: relative; display: flex; align-items: stretch; block-size: 100%; }
+.m-thn.is-fixed { position: fixed; inset-block: 0; inset-inline-start: 0; z-index: var(--m-z-sticky); block-size: auto; }
+
+/* ── the rail */
+.m-thn-rail { position: relative; inline-size: var(--m-thn-rail); flex: none; display: flex; align-items: center; justify-content: center; }
+.m-thn-thread { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; overflow: visible; pointer-events: none; }
+.m-thn-thread path { fill: none; stroke: color-mix(in srgb, var(--m-accent, var(--m-primary)) 55%, var(--m-border)); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.m-thn-list { position: relative; z-index: 1; display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.m-thn-item { --k: 0; --m-thn-shift: 0px; display: flex; justify-content: center; align-items: center; block-size: var(--m-thn-step); translate: 0 var(--m-thn-shift); }
+.m-thn-bead { position: relative; display: grid; place-items: center; inline-size: var(--m-thn-rail); block-size: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
+.m-thn-bead:focus-visible { outline: none; }
+/* the bead: a circle scaled with the lens; its stroke does not scale, the ring stays 1px */
+.m-thn-dot { inline-size: 1.25rem; block-size: 1.25rem; overflow: visible; scale: calc(.4 + var(--k) * .6); }
+.m-thn-dot circle { fill: var(--m-surface); stroke: color-mix(in srgb, var(--m-accent, var(--m-primary)) 45%, var(--m-border)); stroke-width: 1px; vector-effect: non-scaling-stroke; transition: fill var(--m-dur-fast), stroke var(--m-dur-fast); }
+.m-thn-item.is-open .m-thn-dot circle { fill: var(--m-accent-soft-2, var(--m-surface)); }
+.m-thn-bead:focus-visible .m-thn-dot { scale: 1; }
+.m-thn-bead:focus-visible .m-thn-dot circle { stroke: var(--m-accent, var(--m-primary)); }
+/* the name beside a bead: only while magnified, larger the nearer the pointer */
+.m-thn-label { position: absolute; inset-inline-start: calc(100% - .5rem); inset-block-start: 50%; translate: 0 -50%; white-space: nowrap;
+  padding: .1875rem .625rem; border-radius: var(--m-radius-full); font-size: .875rem; font-weight: var(--m-weight-medium);
+  color: var(--m-text); background: var(--m-surface-raised, var(--m-surface)); box-shadow: 0 0 0 1px var(--m-border), var(--m-shadow-1);
+  transform-origin: 0 50%; scale: calc(.75 + var(--k) * .25); opacity: var(--k); pointer-events: none; }
+.m-thn-list:not(.is-lens) .m-thn-label { opacity: 0; }
+.m-thn-bead:hover .m-thn-label { color: var(--m-accent, var(--m-primary)); }
+.m-thn.is-open .m-thn-label { opacity: 0; }
+
+/* the drop: on the bead of where you are, in its section's colour; moving it stretches along the thread */
+.m-thn-drop, .m-thn-subdrop { position: absolute; z-index: 2; inset-block-start: 0; inline-size: .75rem; block-size: .75rem; border-radius: var(--m-radius-full);
+  background: var(--m-accent, var(--m-primary)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--m-accent, var(--m-primary)) 22%, transparent);
+  translate: 0 calc(var(--m-thn-drop-y, 0px) + var(--m-thn-drop-shift, 0px) - 50%); opacity: 0; pointer-events: none;
+  transition: translate var(--m-dur-slow) var(--m-ease-spring), scale var(--m-dur-fast) var(--m-ease-out), background var(--m-dur-slow), opacity var(--m-dur-fast); }
+.m-thn-drop { inset-inline-start: calc(50% - .375rem); }
+.m-thn-drop.is-on, .m-thn-subdrop.is-on { opacity: 1; }
+.m-thn-drop.is-flowing, .m-thn-subdrop.is-flowing { scale: .7 1.9; }
+
+/* ── the capsule */
+.m-thn-panel { position: absolute; z-index: 3; inset-inline-start: calc(var(--m-thn-rail) + .25rem); inset-block: var(--m-space-3);
+  inline-size: min(19rem, calc(100vw - var(--m-thn-rail) - 2rem)); display: flex; flex-direction: column; gap: var(--m-space-2);
+  padding: var(--m-space-4); border-radius: var(--m-radius-4); background: var(--m-surface-raised, var(--m-surface));
+  box-shadow: 0 0 0 1px var(--m-border), var(--m-shadow-3); overflow: hidden; }
+.m-thn-head { display: grid; grid-template-columns: 1fr auto; column-gap: var(--m-space-2); align-items: start; }
+.m-thn-title { font-family: var(--m-font-display); font-weight: var(--m-display-weight, var(--m-weight-bold)); font-size: var(--m-text-xl); line-height: 1.2; }
+.m-thn-sub-title { grid-column: 1; font-size: var(--m-text-sm); color: var(--m-muted); }
+.m-thn-close { grid-column: 2; grid-row: 1; inline-size: 1.75rem; block-size: 1.75rem; border: 0; border-radius: var(--m-radius-full); background: none; color: var(--m-muted); font-size: 1.25rem; line-height: 1; cursor: pointer; }
+.m-thn-close:hover { background: var(--m-bg-subtle); color: var(--m-text); }
+.m-thn-cats { flex: 1; min-block-size: 0; margin: 0; padding: 0 0 var(--m-space-2); list-style: none; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.m-thn-row { display: flex; align-items: center; gap: var(--m-space-2); inline-size: 100%; box-sizing: border-box; padding: .375rem .5rem; border: 0; border-radius: var(--m-radius-2);
+  background: none; color: var(--m-text); font: inherit; text-align: start; text-decoration: none; cursor: pointer; }
+.m-thn-row:hover { background: var(--m-bg-subtle); }
+.m-thn-row:focus-visible { outline: 2px solid var(--m-accent, var(--m-primary)); outline-offset: -2px; }
+.m-thn-text { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-thn-cat-link { font-weight: var(--m-weight-medium); }
+.m-thn-cat.is-here > .m-thn-cat-link, .m-thn-cat.is-open > .m-thn-cat-link { color: var(--m-accent, var(--m-primary)); }
+.m-thn-count { font-size: var(--m-text-xs); color: var(--m-muted); font-variant-numeric: tabular-nums; }
+/* the pages' thread: hangs from its category, its knots the pages, its own drop at the page you are on */
+.m-thn-sub { position: relative; margin-inline-start: .875rem; }
+.m-thn-sub::before { content: ""; position: absolute; inset-block: .25rem; inset-inline-start: .3125rem; inline-size: 1px; background: color-mix(in srgb, var(--m-accent, var(--m-primary)) 45%, var(--m-border)); }
+.m-thn-subdrop { inset-inline-start: 0; inline-size: .6875rem; block-size: .6875rem; }
+.m-thn-pages { margin: 0; padding: 0; list-style: none; }
+.m-thn-page-link { padding-inline-start: 0; font-size: var(--m-text-sm); color: var(--m-text-2, var(--m-text)); }
+.m-thn-knot { position: relative; flex: none; inline-size: .6875rem; block-size: .6875rem; display: grid; place-items: center; }
+.m-thn-knot::after { content: ""; inline-size: .3125rem; block-size: .3125rem; border-radius: var(--m-radius-full); background: var(--m-surface); box-shadow: 0 0 0 1px color-mix(in srgb, var(--m-muted) 70%, transparent); }
+.m-thn-page.is-on > .m-thn-page-link { color: var(--m-accent, var(--m-primary)); font-weight: var(--m-weight-medium); }
+.m-thn-empty { padding: var(--m-space-3) .5rem; font-size: var(--m-text-sm); color: var(--m-muted); }
+/* one line about the row under the pointer or the focus: descriptions never crowd the list */
+.m-thn-hint { margin: 0; min-block-size: 1.4em; font-size: var(--m-text-xs); color: var(--m-muted); opacity: 0; transition: opacity var(--m-dur-fast); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-thn-hint.is-on { opacity: 1; }
+
+/* ── the path while closed */
+.m-thn-crumbs { position: absolute; z-index: 2; inset-block-start: var(--m-space-3); inset-inline-start: calc(var(--m-thn-rail) + .25rem); }
+.m-thn-crumbs ol { display: flex; align-items: center; gap: .25rem; margin: 0; padding: .1875rem .375rem; list-style: none; border-radius: var(--m-radius-full);
+  background: color-mix(in srgb, var(--m-surface-raised, var(--m-surface)) 92%, transparent); box-shadow: 0 0 0 1px var(--m-border); }
+.m-thn-crumb button { display: inline-flex; align-items: center; gap: .25rem; padding: .125rem .375rem; border: 0; border-radius: var(--m-radius-full); background: none;
+  font: inherit; font-size: var(--m-text-xs); color: var(--m-muted); cursor: pointer; white-space: nowrap; }
+.m-thn-crumb button:hover { color: var(--m-text); background: var(--m-bg-subtle); }
+.m-thn-crumb.is-here button { color: var(--m-accent, var(--m-primary)); font-weight: var(--m-weight-medium); }
+.m-thn-crumb .m-thn-knot::after { background: color-mix(in srgb, var(--m-accent, var(--m-primary)) 45%, var(--m-surface)); box-shadow: none; }
+.m-thn-crumb.is-here .m-thn-knot::after { background: var(--m-accent, var(--m-primary)); }
+
+@media (prefers-reduced-motion: reduce) { .m-thn-drop, .m-thn-subdrop, .m-thn-dot circle, .m-thn-hint { transition: none; } .m-thn-drop.is-flowing, .m-thn-subdrop.is-flowing { scale: 1; } }

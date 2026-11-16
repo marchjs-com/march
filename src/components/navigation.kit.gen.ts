@@ -9,3 +9,4 @@ export * from "./navigation/section-timeline/index.ts";
 export * from "./navigation/stepper/index.ts";
 export * from "./navigation/steps/index.ts";
 export * from "./navigation/tabs/index.ts";
+export * from "./navigation/thread-nav/index.ts";

@@ -21,7 +21,7 @@ export default function SectionTimelineDemo(props: { values: { orientation: stri
       const items: SectionTimelineItem[] = names.map((n, i) => ({ label: n, target: () => box?.querySelector(`[data-sec="${i}"]`) ?? null }))
       const row = v.orientation === "horizontal"
       return <div class={row ? "sc-col" : "sc-row"}>
-        <div class="sc-stl-box" ref={(el: HTMLElement) => { box = el }} tabindex="0" aria-label="Bölümler">
+        <div class="sc-stl-box" ref={(el: Element) => { box = el as HTMLElement }} tabindex="0" aria-label="Bölümler">
           {names.map((n, i) => <section class="sc-stl-sec" data-sec={String(i)}><h3>{`${i + 1}. ${n}`}</h3><p>Bu bölüm kaydırıldıkça okuma çizgisini geçer; zaman çizelgesi onu renklendirir.</p></section>)}
         </div>
         <SectionTimeline items={items} root={() => box} orientation={v.orientation as "vertical"} magnify={v.magnify} intro={v.intro} wave={v.wave || false} reach={v.reach} grow={v.grow}

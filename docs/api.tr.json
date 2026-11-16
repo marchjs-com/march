@@ -172,6 +172,8 @@
   "PeriodNav": "Takvim dönemi için önceki · bugün · sonraki grubu; `title` verilirse dönemin adı okların arasında durur: `<PeriodNav title={$month} onPrev={back} onNext={on} onToday={now} />`",
   "PageDots": "Sayfa başına bir nokta, etkin olan uzun ve renkli; `onChange` ile düğme olur: `<PageDots count={5} bind:value={$page} />`",
   "SectionTimeline": "Uzun bir sayfanın her bölümü için bir nokta, dikey ya da yatay; okunan renkli, basınca oraya kayar, imleç yakınında Dock gibi büyür, istenirse adres okunan bölümü izler: `<SectionTimeline items={sections} hash fixed intro />`",
+  "ThreadNav": "Gezinme bir iplik: bölümler Dock gibi büyüyen boncuklar, boncuk kategori kapsülünü açar, sayfalar ikinci iplikte, damla bulunduğun yerde: `<ThreadNav items={sections} value={$page} fixed />`",
+  "threadPath": "Bölümden verilen id'ye giden yol (bölüm, kategori, sayfa); yoksa boş dizi.",
   "Picture": "Resim nesnesini (`{ src, alt, width, height, srcset, sizes }`) tembel yüklenen bir `<img>` olarak çizer, hazır düğümü olduğu gibi döndürür: `<Picture source={project.cover} />`",
   "RowTools": "Düzenlenebilir listede satır araçları (yukarı, aşağı, sil); uçlarda kapanır: `<RowTools index={i} count={n} onUp={…} onDown={…} onRemove={…} />`",
   "UndoRedo": "Düzenleyicinin geri al / yinele düğme çifti; ipucunda adımın adı ve kısayol yazar: `<UndoRedo history={stack} />`",

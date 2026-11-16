@@ -11,3 +11,4 @@ export * from "./section-timeline/index.ts";
 export * from "./stepper/index.ts";
 export * from "./steps/index.ts";
 export * from "./tabs/index.ts";
+export * from "./thread-nav/index.ts";

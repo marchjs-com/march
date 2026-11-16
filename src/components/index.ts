@@ -135,6 +135,7 @@ export * from "./composite/terminal/index.ts";
 export * from "./forms/text-input/index.ts";
 export * from "./forms/textarea/index.ts";
 export * from "./composite/theme-menu/index.ts";
+export * from "./navigation/thread-nav/index.ts";
 export * from "./forms/time-input/index.ts";
 export * from "./data/time-ruler/index.ts";
 export * from "./data/timeline/index.ts";

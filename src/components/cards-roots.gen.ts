@@ -175,6 +175,7 @@ export const roots: Record<string, string> = {
   "Textarea": "m-textarea-grow",
   "ThemeEditor": "m-te",
   "ThemeMenu": "m-theme-menu",
+  "ThreadNav": "m-thn",
   "TimeInput": "m-time",
   "TimeRuler": "m-time-ruler",
   "Timeline": "m-timeline",
