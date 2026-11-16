@@ -45,6 +45,14 @@ node node_modules/march/cli/march.js check    # type-check, including March synt
 Without a build: from **cdn.marchjs.com** (every module as a browser ES module, one stylesheet). A page made in the
 browser IDE (Playground → Console → "Son derlemeyi göster", or the Terminal's `output`) is exported this way.
 
+The newest version, one line:
+
+```html
+<script type="module" src="https://cdn.marchjs.com/latest/march.js"></script>
+```
+
+A pinned version, with an import map:
+
 ```html
 <link rel="stylesheet" href="https://cdn.marchjs.com/0.1.0/march.css" />
 <script type="importmap">
