@@ -86,6 +86,7 @@ Missing values (`null`, `""`, `NaN`) break the line into segments.
 | `stacked` | `false` | Stack series in one bar (negative values stack downwards). |
 | `horizontal` (or `orientation="horizontal"`) | `false` | Categories on the y axis. |
 | `yMin`, `yMax` | data | Value domain. |
+| `animate` | off | On a data change the bars glide to their new size (`true`: a spring, or an easing name such as `"spring-wobbly"`); the axes take the new scale at once. Off with reduced motion. |
 
 Categories should be unique (bars are keyed by `category|series`).
 

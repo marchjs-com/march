@@ -1,7 +1,9 @@
 // BarChart: categories × series, grouped (default) or `stacked`, vertical (default) or `horizontal`.
 // Bars are a keyed list ("category|series"); each rect binds x/y/width/height through computeds, so a data change only
 // writes the attributes of bars whose geometry changed.
-import { signal, computed, read, untrack } from "../core/reactive.ts";
+import { signal, computed, read, untrack, effect, onCleanup } from "../core/reactive.ts";
+import { animateValue } from "../motion/engine/value.ts";
+import { reducedMotion } from "../motion/env.ts";
 import { h } from "../dom/h.ts";
 import { scaleLinear, scaleBand, niceTicks } from "./scale.ts";
 import { rowsOf, accessor, formatter, num, seriesOf, seriesClass, colorStyle, useSize, attr, textWidth, navIndex, sameBox, each,
@@ -42,8 +44,25 @@ export interface BarChartProps<D = unknown> extends ChartBaseProps {
   tooltip?: TooltipProp<ChartPoint<D>>;
   /** Called with the point on click, or Enter / Space on the focused one. @tr Tıklanınca ya da odaktaki öğede Enter / Space'e basılınca noktayla çağrılır. */
   onSelect?: ((p: ChartPoint<D>) => void) | undefined;
+  /** When the data changes the bars glide to their new size, the axes take the new scale at once: `true` (a spring) or an easing name ("spring-wobbly", "out"…); default off. @tr Veri değişince çubuklar yeni boylarına kayar, eksenler yeni ölçeğe hemen geçer: `true` (yay) ya da bir easing adı ("spring-wobbly", "out"…); varsayılan kapalı. */
+  animate?: Opt<boolean | string>;
 }
 interface Bar { key: string; index: number; si: number; x: number; y: number; width: number; height: number }
+
+/** The geometry a bar is drawn with: its place at once, or (animate) a glide from where it is drawn now. */
+function glide(target: () => Bar, how: () => boolean | string | null | undefined): () => Bar {
+  const shown = signal(untrack(target));
+  let run: { cancel(): void } | null = null;
+  effect(() => {
+    const to = target(), mode = untrack(how), from = untrack(shown);
+    run?.cancel(); run = null;
+    if (!mode || reducedMotion() || (from.x === to.x && from.y === to.y && from.width === to.width && from.height === to.height)) { shown.set(to); return; }
+    const mix = (a: number, b: number, t: number): number => a + (b - a) * t;
+    run = untrack(() => animateValue(0, 1, { easing: mode === true ? "spring" : mode, onUpdate: (t: number) => shown.set({ ...to, x: mix(from.x, to.x, t), y: mix(from.y, to.y, t), width: Math.max(0, mix(from.width, to.width, t)), height: Math.max(0, mix(from.height, to.height, t)) }) }));
+  });
+  onCleanup(() => run?.cancel());
+  return shown;
+}
 
 
 /** Bar chart. See docs/charts.md for props. */
@@ -152,12 +171,12 @@ export function BarChart<D>(props: BarChartProps<D>): Element {
       h("rect", { class: "m-chart-band", visibility: () => (active() >= 0 ? "visible" : "hidden"),
         ...(hz ? { x: 0, width: () => box().w, y: () => f1(band().center(Math.max(0, active())) - band().step / 2), height: () => f1(band().step) }
           : { y: 0, height: () => box().h, x: () => f1(band().center(Math.max(0, active())) - band().step / 2), width: () => f1(band().step) }) }),
-      each<Bar>({ each: bars, key: (b) => b.key, children: (b) => h("rect", {
+      each<Bar>({ each: bars, key: (b) => b.key, children: (b) => { const g = glide(b, () => read(props.animate)); return h("rect", {
         class: () => `m-chart-bar ${seriesClass(b().si)}`, "class:m-chart-active": () => active() === b().index,
         style: () => colorStyle(props.colors, b().si),
-        x: attr(() => f1(b().x)), y: attr(() => f1(b().y)), width: attr(() => f1(b().width)), height: attr(() => f1(b().height)),
+        x: attr(() => f1(g().x)), y: attr(() => f1(g().y)), width: attr(() => f1(g().width)), height: attr(() => f1(g().height)),
         onPointerEnter: () => show(b().index), onPointerMove: () => { if (active.peek() !== b().index) show(b().index); }, onClick: () => select(b().index),
-      }) })),
+      }); } })),
   ];
 
   return Frame<D>(props, {

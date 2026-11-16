@@ -269,3 +269,18 @@ test("empty state and CSP: no style attribute anywhere", () => {
   const colored = el.querySelectorAll(".m-chart")[1].querySelector("g.m-chart-series");
   assert.equal(colored.style.getPropertyValue("--m-c"), "#123456", "colors override via CSSOM custom property");
 });
+
+test("BarChart animate: the first draw is in place; a data change glides the bars (the axes take the new scale at once), off: in place", async () => {
+  const bars = (el) => all(el).filter((n) => n.getAttribute?.("class")?.includes("m-chart-bar")).map((n) => Number(n.getAttribute("height")));
+  const data = signal([{ c: "a", v: 10 }, { c: "b", v: 20 }]);
+  const on = mount(() => h(C.BarChart, { data, x: "c", y: "v", width: 400, height: 200, animate: true })).el;
+  const off = mount(() => h(C.BarChart, { data, x: "c", y: "v", width: 400, height: 200 })).el;
+  const before = bars(on);
+  assert.deepEqual(before, bars(off), "the first draw is the same");
+  data.set([{ c: "a", v: 20 }, { c: "b", v: 10 }]);
+  const target = bars(off);
+  assert.notDeepEqual(target, before);
+  assert.notDeepEqual(bars(on), target, "with animate the bars are still on their way");
+  await new Promise((r) => setTimeout(r, 1500));
+  bars(on).forEach((v, i) => assert.ok(Math.abs(v - target[i]) < 0.6, `bar ${i} arrived`));
+});
