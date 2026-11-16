@@ -40,3 +40,8 @@ test("CountRoll: own formatter, roll off", () => {
   assert.equal(b.textContent, "8");
   m.dispose();
 });
+
+test("formatCount / CountRoll format: Intl options give one decimal in compact (32,8 B instead of 33 B)", () => {
+  assert.match(formatCount(32800, { format: { notation: "compact", maximumFractionDigits: 1 } }, "en"), /^32\.8K$/);
+  assert.match(formatCount(32800, { format: { notation: "compact", maximumFractionDigits: 1 } }, "tr"), /^32,8\sB$/);
+});

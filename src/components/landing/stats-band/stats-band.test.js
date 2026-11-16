@@ -29,3 +29,14 @@ test("StatsBand: own colour, plain numbers, no entrance", () => {
   assert.ok(dl.classList.contains("is-revealed") && !dl.classList.contains("is-pending"));
   dispose();
 });
+
+test("StatsBand: a value may be an accessor (a new value is counted to) and duration sets each figure's count", async () => {
+  const { signal } = await import("../../../index.ts");
+  const shown = signal(false);
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(StatsBand, { items: [{ value: () => (shown() ? 1200 : 0), label: "events" }], mode: "none", reveal: false, duration: 3000 }), el);
+  assert.equal(el.querySelector(".m-stats-plain").textContent, "0");
+  shown.set(true);
+  assert.match(el.querySelector(".m-stats-plain").textContent, /^1.?200$/);
+  dispose();
+});

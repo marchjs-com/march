@@ -14,7 +14,7 @@ The text is compact in the active locale (`1,2 B`, `12K`); `format="full"` group
 | Prop | Type | Default | |
 |---|---|---|---|
 | `value` | number / accessor | — | |
-| `format` | `compact` `full` | `compact` | below 1000 both are the plain number |
+| `format` | `compact` `full` / `{ format?, decimals? }` | `compact` | below 1000 both are the plain number; an object is Intl formatting (`{ format: { notation: "compact", maximumFractionDigits: 1 } }`: 32,8 B) |
 | `hideZero` | boolean | false | nothing at 0 (a count next to an icon) |
 | `duration` | ms | 320 | roll time |
 | `formatter` | `(n) => string` | — | your own visible text (wins over `format`) |

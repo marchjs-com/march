@@ -10,7 +10,8 @@ import { Reveal, type RevealOptions } from "../reveal/index.ts";
 import { StatTile } from "../../data/stat-tile/index.ts";
 
 export interface StatItem {
-  value: number;
+  /** The figure, or an accessor: a new value is counted to (from 0, the first time). */
+  value: number | (() => number);
   label: unknown;
   note?: unknown;
   format?: Intl.NumberFormatOptions | undefined;
@@ -25,6 +26,10 @@ export interface StatsBandProps {
   variant?: "plain" | "divided" | "cards" | undefined;
   /** Counter style (default count); "none" writes the number without counting. @tr Sayaç biçimi (varsayılan count); "none" sayıyı saymadan yazar. */
   mode?: "count" | "roll" | "none" | undefined;
+  /** How long each figure counts, ms (default: the Counter's, 1600 for count). @tr Her rakamın sayma süresi, ms (varsayılan: Counter'ınki, count için 1600). */
+  duration?: number | undefined;
+  /** Easing of the count (a motion easing name, e.g. "in-out"; default: the Counter's, "expo"). @tr Sayımın yumuşatması (bir hareket easing adı, ör. "in-out"; varsayılan: Counter'ınki, "expo"). */
+  easing?: string | undefined;
   /** Entrance of the items: Reveal options, or false for none (default: up, one after another). @tr Öğelerin girişi: Reveal seçenekleri ya da hiç giriş olmaması için false (varsayılan: up, art arda). */
   reveal?: RevealOptions | false | undefined;
   /** Extra CSS class on the list. @tr Listeye eklenen ek CSS sınıfı. */
@@ -39,7 +44,7 @@ export function StatsBand(props: StatsBandProps): Element {
     props.items.map((s) => h(StatTile, {
       term: true, size: "xl", variant: props.variant === "cards" ? "card" : "plain", class: "m-stats-item", label: s.label, hint: s.note ?? undefined,
       value: mode === "none"
-        ? h("span", { class: "m-stats-plain" }, s.prefix ?? null, () => formatCount(s.value, s, locale()), s.suffix ?? null)
-        : h(Counter, { value: s.value, format: s.format, decimals: s.decimals, prefix: s.prefix, suffix: s.suffix, mode }),
+        ? h("span", { class: "m-stats-plain" }, s.prefix ?? null, () => formatCount(val(s.value), s, locale()), s.suffix ?? null)
+        : h(Counter, { value: s.value, format: s.format, decimals: s.decimals, prefix: s.prefix, suffix: s.suffix, mode, duration: props.duration, easing: props.easing }),
     }))) as Element;
 }

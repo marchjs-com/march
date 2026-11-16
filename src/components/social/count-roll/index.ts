@@ -7,15 +7,15 @@ import { h } from "../../../dom/h.ts";
 import { locale } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { still } from "../../../motion/engine/parts.ts";
-import { formatCount } from "../../../ui/format.ts";
+import { formatCount, type CountFormat } from "../../../ui/format.ts";
 import { drawDigits, rollDigits } from "../../../motion/digits.ts";
 import "./count-roll.css";
 
 export interface CountRollProps {
   /** The number shown; digits roll when it changes. @tr Gösterilen sayı; değişince rakamlar yuvarlanır. */
   value: MaybeFn<number | null | undefined>;
-  /** compact: 1,2 B · full: 1.234 (grouped). Default compact. @tr compact: 1,2 B · full: 1.234 (gruplu). Varsayılan compact. */
-  format?: MaybeFn<"compact" | "full" | undefined>;
+  /** compact: 1,2 B · full: 1.234 (grouped) · Intl options: `{ format: { notation: "compact", maximumFractionDigits: 1 } }` (32,8 B). Default compact. @tr compact: 1,2 B · full: 1.234 (gruplu) · Intl seçenekleri: `{ format: { notation: "compact", maximumFractionDigits: 1 } }` (32,8 B). Varsayılan compact. */
+  format?: MaybeFn<"compact" | "full" | CountFormat | undefined>;
   /** Hide at 0 (an empty count next to an icon). @tr 0 iken gizlenir (bir ikonun yanındaki boş sayaç). */
   hideZero?: MaybeFn<boolean | undefined>;
   /** Roll duration (ms). Default 320. @tr Yuvarlanma süresi (ms). Varsayılan 320. */

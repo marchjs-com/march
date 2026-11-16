@@ -2,6 +2,7 @@
 // burst of particles in the four HADİ colors (motion engine: global speed, pause and reduced motion apply; with
 // reduced motion only the fill changes). heartBurst() / heartPop() (motion/burst.ts, re-exported here) are the same
 // effects for any element (a double-tap on a photo, a comment, a story).
+import type { CountFormat } from "../../../ui/format.ts";
 import { live } from "../../../forms/util.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
@@ -36,8 +37,8 @@ export interface LikeButtonProps {
   pop?: MaybeFn<boolean | undefined>;
   /** Shape of the burst: `{ count, radius, ring }` (`ring: false` drops the ring). @tr Patlamanın biçimi: `{ count, radius, ring }` (`ring: false` halkayı kaldırır). */
   burstOptions?: BurstOptions | undefined;
-  /** Text of the count: compact (1,2 B, default) or full (1.234). @tr Sayının metni: compact (1,2 B, varsayılan) ya da full (1.234). */
-  countFormat?: MaybeFn<"compact" | "full" | undefined>;
+  /** Text of the count: compact (1,2 B, default), full (1.234) or Intl options (`{ format: { notation: "compact", maximumFractionDigits: 1 } }`: 32,8 B). @tr Sayının metni: compact (1,2 B, varsayılan), full (1.234) ya da Intl seçenekleri (`{ format: { notation: "compact", maximumFractionDigits: 1 } }`: 32,8 B). */
+  countFormat?: MaybeFn<"compact" | "full" | CountFormat | undefined>;
   /** Extra class on the button. @tr Düğmeye eklenen sınıf. */
   class?: ClassProp;
 }

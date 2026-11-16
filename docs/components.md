@@ -2097,7 +2097,7 @@ Full page: src/components/forms/radio-group/docs.md
 
 ## Rating
 
-Stars to give or show a score. Editable it is a radio group: click or use the arrow keys (mirrored in right-to-left layouts), Home / End; hovering previews the score in a lighter tone. Read-only it can show half stars (`4.5`).
+Stars to give or show a score. Editable it is a radio group: click or use the arrow keys (mirrored in right-to-left layouts), Home / End; hovering previews the score in a lighter tone. Read-only it can show part of a star: a fraction fills that part of the mark (`4.5`: half, `4.3`: under a third), so a value glided from 0 fills the stars smoothly.
 
 ```tsx
 <Rating bind:value={$stars} />

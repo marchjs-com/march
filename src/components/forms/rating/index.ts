@@ -12,7 +12,7 @@ import type { IconDef } from "../../../icons/svg.ts";
 import { isRtl } from "../../../core/util.ts";
 
 export interface RatingProps {
-  /** The rating, a value or an accessor (4.5 shows a half mark). @tr Puan, değer ya da erişimci (4.5 yarım işaret gösterir). */
+  /** The rating, a value or an accessor; a fraction fills that part of a mark (4.5: half of the fifth, 4.3: under a third), so a value glided from 0 fills the stars smoothly. @tr Puan, değer ya da erişimci; kesirli kısım bir işaretin o kadarını doldurur (4.5: beşincinin yarısı, 4.3: üçte birinden azı), böylece 0'dan kaydırılan bir değer yıldızları akıcı doldurur. */
   value?: MaybeFn<number | null | undefined>;
   /** Writes the picked rating back (set by `bind:value`). @tr Seçilen puanı geri yazar (`bind:value` bunu verir). */
   setValue?: (v: number) => void;
@@ -49,6 +49,8 @@ export function Rating(props: RatingProps): Element {
     const filled = (): boolean => shown() >= n - 0.25;
     return h("button", {
       type: "button", role: "radio", class: () => cx("m-rating-star", filled() && "is-on", !filled() && shown() > n - 1 && "is-half"),
+      // the filled part of a partly filled mark (rating.css clips the filled star to it)
+      style: () => { const part = shown() - (n - 1); return { "--m-rating-part": !filled() && part > 0 ? part.toFixed(3) : null }; },
       "aria-checked": () => String(Math.round(Number(val(props.value) ?? 0)) === n), "aria-label": () => props.starLabel?.(n, max) ?? t`${n} of ${max}`,
       tabindex: () => (Math.max(1, Math.round(Number(val(props.value) ?? 0))) === n ? "0" : "-1"), disabled: () => !!props.readonly,
       onClick: () => set(n), onMouseenter: () => !props.readonly && hover.set(n),

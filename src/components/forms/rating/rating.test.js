@@ -45,3 +45,17 @@ test("Rating: the marks, their names and the motion are yours", () => {
   assert.ok(!c.className.includes("is-still"));
   assert.equal(c.querySelector(".m-rating-star").getAttribute("aria-label"), "1 of 2");
 });
+
+test("Rating: a fraction fills that part of the mark (--m-rating-part); whole values set none", async () => {
+  const { signal } = await import("../../../index.ts");
+  const v = signal(3.3);
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(Rating, { value: v, readonly: true }), el);
+  const stars = el.querySelectorAll(".m-rating-star");
+  assert.ok(stars[3].classList.contains("is-half"));
+  assert.equal(stars[3].style.getPropertyValue("--m-rating-part"), "0.300");
+  v.set(4);
+  assert.ok(stars[3].classList.contains("is-on"));
+  assert.equal(stars[3].style.getPropertyValue("--m-rating-part"), "");
+  dispose();
+});

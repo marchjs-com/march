@@ -23,7 +23,7 @@ global speed, "pause all" and reduced motion apply (reduced motion keeps only th
 | `icon` | node / `(liked) => node` | heart | your own icon (a March glyph fills with the color while liked) |
 | `pop` | boolean | true | the pop of the icon on toggle |
 | `burstOptions` | `{ count, radius, ring }` | — | shape of the burst |
-| `countFormat` | `compact` `full` | `compact` | text of the count |
+| `countFormat` | `compact` `full` / `{ format?, decimals? }` | `compact` | text of the count; an object is Intl formatting (`{ format: { notation: "compact", maximumFractionDigits: 1 } }`: 32,8 B) |
 | `class` | string | — | on the button (`m-like`; parts: `m-like-hit`, `m-like-heart`, `m-like-count`) |
 
 ```tsx

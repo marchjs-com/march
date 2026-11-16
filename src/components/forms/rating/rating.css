@@ -8,8 +8,9 @@
 .m-rating-star > span { grid-area: 1 / 1; display: inline-flex; width: 100%; height: 100%; }
 .m-rating-on { color: var(--m-accent, var(--m-primary)); opacity: 0; transition: opacity var(--m-dur) var(--m-ease); }
 .m-rating-star.is-on .m-rating-on { opacity: 1; }
-.m-rating-star.is-half .m-rating-on { opacity: 1; clip-path: inset(0 50% 0 0); }
-.m-rating-star.is-half:dir(rtl) .m-rating-on { clip-path: inset(0 0 0 50%); }
+/* a partly filled mark: the filled star clipped to the fraction (--m-rating-part, set by the component; half by default) */
+.m-rating-star.is-half .m-rating-on { opacity: 1; clip-path: inset(0 calc((1 - var(--m-rating-part, .5)) * 100%) 0 0); }
+.m-rating-star.is-half:dir(rtl) .m-rating-on { clip-path: inset(0 0 0 calc((1 - var(--m-rating-part, .5)) * 100%)); }
 /* hover preview: a lighter tone of the color until the click */
 .m-rating.is-hovering .m-rating-on { color: color-mix(in srgb, var(--m-accent, var(--m-primary)) 55%, var(--m-surface)); }
 .m-rating:not(.is-readonly) .m-rating-star:hover { transform: scale(1.15); }
