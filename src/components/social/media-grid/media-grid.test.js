@@ -55,3 +55,13 @@ test("MediaGrid: own names, +N off / own, video mark off / own, skeleton off / o
   assert.equal(b.querySelector(".m-mgrid-skel"), null);
   m.dispose();
 });
+
+test("MediaGrid: a video tile shows its poster, or without one the video itself (never the video file as an image)", () => {
+  const host = document.createElement("div"); document.body.append(host);
+  render(() => h(MediaGrid, { items: [{ src: "v.webm", kind: "video", poster: "p.jpg", alt: "a" }, { src: "w.webm", kind: "video", alt: "b" }] }), host);
+  const [a, b] = host.querySelectorAll(".m-mgrid-tile");
+  assert.match(a.querySelector("img").getAttribute("src"), /p\.jpg$/);
+  assert.equal(a.querySelector("video"), null);
+  assert.equal(b.querySelector("img"), null);
+  assert.match(b.querySelector("video.m-mgrid-video").getAttribute("src"), /w\.webm$/);
+});

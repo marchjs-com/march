@@ -321,3 +321,15 @@ test("intercept props: a prop the instance is given stays live, so an intercepto
   assert.match(btn.className, /m-btn-ghost/, "and goes back");
   dispose(); off();
 });
+
+test("intercept props: a ref (and a use: action) reaches the element as it is, so a Dropdown under an interceptor still knows its button", async () => {
+  const { Button } = await import("../src/ui/index.ts");
+  const off = M.intercept(Button, { name: "any", props: () => ({ size: "sm" }) });
+  const el = document.createElement("div"); document.body.appendChild(el);
+  let got = null, used = null;
+  const dispose = M.render(() => M.h(Button, { ref: (x) => { got = x; }, "use:mark": (x) => { used = x; } }, "A"), el);
+  const btn = el.querySelector("button");
+  assert.equal(got, btn, "the ref got the button");
+  assert.equal(used, btn, "the use: action ran on it");
+  dispose(); off();
+});

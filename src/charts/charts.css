@@ -124,6 +124,9 @@
 .m-heat-2 { fill: var(--m-heat-2); }
 .m-heat-3 { fill: var(--m-heat-3); }
 .m-heat-4 { fill: var(--m-heat-4); }
+/* animate: cells fade to their new level (Heatmap sets the easing and its length) */
+.m-heat-anim .m-heat-cell { transition: fill var(--m-heat-dur, 450ms) var(--m-heat-ease, ease-out); }
+@media (prefers-reduced-motion: reduce) { .m-heat-anim .m-heat-cell { transition: none; } }
 
 /* sparkline */
 .m-sparkline { display: inline-block; vertical-align: middle; overflow: visible; }

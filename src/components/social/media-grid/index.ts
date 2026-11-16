@@ -17,6 +17,8 @@ export interface MediaItem {
   /** Text alternative (required for images that carry meaning). */
   alt?: string | undefined;
   kind?: "image" | "video" | undefined;
+  /** A video's cover image on its tile; without it the tile shows the video's first frame. @tr Video karesinde kapak resmi; verilmezse karede videonun ilk karesi görünür. */
+  poster?: string | undefined;
   /** Natural size: the single-photo layout keeps its shape. */
   width?: number | undefined;
   height?: number | undefined;
@@ -72,7 +74,9 @@ export function MediaGrid(props: MediaGridProps): Element {
       onClick: (e: MouseEvent) => tap(i, el, e.detail === 0),
     },
     () => (loaded() || sk === false ? null : typeof sk === "function" ? h("span", { class: "m-mgrid-skel m-mgrid-skel-own" }, sk()) : h(Skeleton, { block: true, class: "m-mgrid-skel" })),
-    h(Picture, { src: it.src, alt: "", fit: "cover", draggable: "false", onLoad: () => loaded.set(true), onError: () => loaded.set(true) }),
+    it.kind === "video" && !it.poster
+      ? h("video", { class: "m-mgrid-video", src: it.src, muted: true, playsinline: true, preload: "metadata", "aria-hidden": "true", onLoadeddata: () => loaded.set(true), onError: () => loaded.set(true) })
+      : h(Picture, { src: it.kind === "video" ? it.poster : it.src, alt: "", fit: "cover", draggable: "false", onLoad: () => loaded.set(true), onError: () => loaded.set(true) }),
     it.kind === "video" && mark !== false ? h(CornerMark, { class: "m-mgrid-kind", icon: typeof mark === "function" ? mark(it) : videoIcon }) : null,
     more > 0 && own !== false ? h("span", { class: "m-mgrid-more", "aria-hidden": "true" }, typeof own === "function" ? own(more) : `+${more}`) : null);
   };

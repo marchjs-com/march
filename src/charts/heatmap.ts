@@ -8,6 +8,7 @@ import { rowsOf, accessor, formatter, num, useSize, attr, textWidth, each,
   type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps, type Getter, type TooltipProp, f1 } from "./util.ts";
 import { Frame, tooltipState, showTip, tipBody, thin } from "./parts.ts";
 import { clamp } from "../core/util.ts";
+import { ease, cssOf } from "../motion/engine/ease.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -50,6 +51,8 @@ export interface HeatmapProps<D = unknown> extends ChartBaseProps {
   tooltip?: TooltipProp<HeatPoint>;
   /** Called with the point on click, or Enter / Space on the focused one. @tr Tıklanınca ya da odaktaki öğede Enter / Space'e basılınca noktayla çağrılır. */
   onSelect?: ((p: HeatPoint) => void) | undefined;
+  /** When the values change the cells fade to their new colors: `true` (a spring) or an easing name ("out", "spring-wobbly"…); default off. @tr Değerler değişince hücreler yeni renklerine geçer: `true` (yay) ya da bir easing adı ("out", "spring-wobbly"…); varsayılan kapalı. */
+  animate?: Opt<boolean | string>;
 }
 interface Label { key: string; label: unknown }
 interface HeatGrid { xs: Label[]; ys: Label[]; cells: HeatCell[] }
@@ -139,7 +142,10 @@ export function Heatmap<D>(props: HeatmapProps<D>): Element {
       each<PosLabel>({ each: xLabels, key: (t) => t.key, children: (t) => h("text", { x: attr(() => t().pos), y: 14, "text-anchor": "middle" }, attr(() => t().label)) })),
     h("g", { class: "m-chart-axis m-chart-axis-y", "aria-hidden": "true" },
       each<PosLabel>({ each: yLabels, key: (t) => t.key, children: (t) => h("text", { x: () => f1(ml() - 6), y: attr(() => t().pos), dy: "0.32em", "text-anchor": "end" }, attr(() => t().label)) })),
-    h("g", { class: "m-chart-plot", transform: attr(() => `translate(${f1(box().x)},${box().y})`), onPointerLeave: hide },
+    h("g", { class: "m-chart-plot", transform: attr(() => `translate(${f1(box().x)},${box().y})`), onPointerLeave: hide,
+      // animate: the color change runs as a CSS transition (the easing's own curve and length; springs as linear())
+      "class:m-heat-anim": () => !!read(props.animate),
+      style: () => { const m = read(props.animate); if (!m) return null; const e = ease(m === true ? "spring" : m); return { "--m-heat-ease": cssOf(e) ?? "ease-out", "--m-heat-dur": `${Math.round(e.duration ?? 450)}ms` }; } },
       each<HeatCell>({ each: () => grid().cells, key: (c) => c.key, children: (c, i) => h("rect", {
         class: attr(() => `m-heat-cell m-heat-${heatLevel(c().value, max(), levels())}`), "class:m-chart-active": () => active() === i(),
         x: attr(() => f1(c().xi * cell())), y: attr(() => f1(c().yi * cell())), width: attr(() => f1(Math.max(1, cell() - gap()))), height: attr(() => f1(Math.max(1, cell() - gap()))), rx: 2,

@@ -165,7 +165,7 @@ export function ColorPicker(props: ColorPickerProps): unknown {
   const text = h(TextInput, {
     id: props.id, name: props.name, class: "m-cp-text", spellcheck: "false", autocomplete: "off",
     "aria-label": live(() => c["aria-label"]() ?? L().value ?? t`Color value`),
-    value: live(() => draft() ?? out({ ...hsva() })), readonly: live(() => !!props.readonly), disabled: live(() => !!props.disabled), required: live(() => !!props.required),
+    value: live(() => draft() ?? (fmt(), out({ ...hsva() }))), readonly: live(() => !!props.readonly), disabled: live(() => !!props.disabled), required: live(() => !!props.required),
     invalid: live(() => (bad() ? true : props.invalid)),
     onChange: (v: string) => { draft.set(v); const p = C.parse(v); if (p) { last = v; hsva.set(C.rgbToHsv(p, hsva.peek().h)); set(out()); } },
     onBlur: (e: FocusEvent) => { if (draft.peek() != null) { draft.set(null); remember(); } props.onBlur?.(e); },

@@ -80,3 +80,12 @@ test("ColorPicker: preview, format switcher and text field can be turned off; ow
   assert.equal(host2.querySelector(".m-cp-formats"), null);
   on(); host2.remove();
 });
+
+test("ColorPicker: the format switcher changes the text even when the value is not written back (or already the same)", () => {
+  const host = document.createElement("div"); document.body.append(host);
+  render(() => h(ColorPicker, { value: "#a3338c", onChange: () => {} }), host);
+  const input = host.querySelector(".m-cp-text input") ?? host.querySelector("input.m-cp-text") ?? host.querySelector("input[type=text]");
+  assert.match(input.value, /^#a3338c$/i);
+  [...host.querySelectorAll(".m-cp-formats button, .m-cp-formats [role=radio]")].find((b) => b.textContent === "HSL").click();
+  assert.match(input.value, /^hsl\(/);
+});

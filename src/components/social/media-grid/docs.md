@@ -13,7 +13,7 @@ waits 230 ms, so a double tap (like) never also opens the photo.
 
 | Prop | Type | Default | |
 |---|---|---|---|
-| `items` | `MediaItem[]` | — | `{ src, alt, kind: "image" \| "video", width, height }` |
+| `items` | `MediaItem[]` | — | `{ src, alt, kind: "image" \| "video", poster, width, height }`: a video tile shows its `poster` (else the first frame) |
 | `max` | 2–4 | 4 | tiles before "+N" |
 | `shape` | `auto` `square` `portrait` | `auto` | auto keeps a single photo's shape |
 | `gap` | `none` `thin` `gap` | `thin` | |
@@ -24,7 +24,7 @@ waits 230 ms, so a double tap (like) never also opens the photo.
 | `skeleton` | boolean / `() => node` | `true` | the loading placeholder: off, or your own |
 | `videoMark` | boolean / `(item) => node` | `true` | the mark on a video tile |
 | `more` | boolean / `(rest) => node` | `true` | "+N" on the last tile: off, or your own content |
-| `class` | string | — | on the root (`m-mgrid`; parts: `m-mgrid-tile`, `m-mgrid-kind`, `m-mgrid-more`, `m-mgrid-skel`) |
+| `class` | string | — | on the root (`m-mgrid`; parts: `m-mgrid-tile`, `m-mgrid-video`, `m-mgrid-kind`, `m-mgrid-more`, `m-mgrid-skel`) |
 
 ```tsx
 <MediaGrid items={post.media} label="Trip photos" tileLabel={(i, n, it) => `${it.alt}, ${i + 1}/${n}`}

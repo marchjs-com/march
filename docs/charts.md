@@ -102,6 +102,7 @@ Categories should be unique (bars are keyed by `category|series`).
 | `x` | `"label"` | Slice label. |
 | `y` | `"value"` | Slice value (negative values count as 0). |
 | `donut` | `false` | `true` (inner radius 60 %) or a ratio `0..0.95`. |
+| `animate` | off | On a data change the slices turn to their new angles and a new slice opens from its edge (`true`: a spring, or an easing name such as `"spring-wobbly"`). Off with reduced motion. |
 | `center` | formatted total | Text in the donut hole. |
 | `padAngle` | `0.01` | Gap between slices (radians). |
 
@@ -143,6 +144,7 @@ Classes: `m-stat-up|down|flat` and `m-stat-good|bad|neutral`. The arrow is `aria
 | `xDomain`, `yDomain` | data order | Order (and completeness) of columns / rows. |
 | `xFormat`, `yFormat` | `String` | Axis labels. |
 | `levels` | 5 | Color levels `m-heat-0..4` (0 = empty or ≤ 0). |
+| `animate` | off | On a value change the cells fade to their new color (`true`: a spring, or an easing name such as `"out"`); a CSS transition. Off with reduced motion. |
 | `max` | data max | Value of the top level. |
 | `cell` | fits the width (≤ 32) | Fixed cell size in px. |
 | `calendar` | — | `true` or `{ weeks: 12 }`: `x` is a date; columns are weeks, rows Monday…Sunday. |

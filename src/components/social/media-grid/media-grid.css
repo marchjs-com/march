@@ -14,11 +14,12 @@
 .m-mgrid-tile { position: relative; display: block; min-width: 0; min-height: 0; padding: 0; margin: 0; border: 0; overflow: hidden; background: var(--m-surface-2);
   cursor: zoom-in; -webkit-tap-highlight-color: transparent; }
 .m-mgrid-gap-gap .m-mgrid-tile { border-radius: var(--m-radius-2); }
-.m-mgrid-tile img { position: absolute; inset: 0; max-width: none; opacity: 0; transform: scale(1.02);
+.m-mgrid-tile img, .m-mgrid-video { position: absolute; inset: 0; max-width: none; opacity: 0; transform: scale(1.02);
   transition: opacity var(--m-dur-slow) var(--m-ease), transform var(--m-dur-slow) var(--m-ease-out); }
-.m-mgrid-tile.is-loaded img { opacity: 1; transform: none; }
-.m-mgrid-tile:hover img { transform: scale(1.025); }
-.m-mgrid-tile:active img { transform: scale(.985); }
+.m-mgrid-video { inline-size: 100%; block-size: 100%; object-fit: cover; }
+.m-mgrid-tile.is-loaded img, .m-mgrid-tile.is-loaded .m-mgrid-video { opacity: 1; transform: none; }
+.m-mgrid-tile:hover img, .m-mgrid-tile:hover .m-mgrid-video { transform: scale(1.025); }
+.m-mgrid-tile:active img, .m-mgrid-tile:active .m-mgrid-video { transform: scale(.985); }
 .m-mgrid-tile:focus-visible { outline: 3px solid var(--m-accent, var(--m-primary)); outline-offset: -3px; z-index: 1; }
 .m-mgrid-skel { position: absolute; inset: 0; height: 100%; border-radius: 0; }
 .m-mgrid-skel-own { display: grid; place-items: center; }

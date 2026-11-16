@@ -339,14 +339,14 @@ class Ctx implements ExtensionContext {
   constructor(c: AnyComp, i: ComponentInfo, n: string, p: () => Props) { this.component = c; this.info = i; this.name = n; this.p = p; }
   get props(): Props { return this.p(); }
 }
-const ON = /^on[A-Z:]/;
+const RAW = /^(children$|ref$|on[A-Z:]|bind:|use:)/;
 function fail(e: Entry, c: AnyComp, err: unknown): void {
   console.error(`[march] extension "${e.ext.name}" failed on <${infoOf(c).name}>${DEV.enabled ? " (skipped)" : ""}:`, err);
 }
 /** A live view over props: compiler thunks read as their value (tracked), the rest as they are. */
 function view(src: () => Props): Props {
   return new Proxy({}, {
-    get: (_, k) => { const v = src()[k as string]; return typeof k === "string" && isReactive(v) && !ON.test(k) && k !== "children" ? v() : v; },
+    get: (_, k) => { const v = src()[k as string]; return typeof k === "string" && isReactive(v) && !RAW.test(k) ? v() : v; },
     has: (_, k) => k in src(),
     ownKeys: () => Reflect.ownKeys(src()),
     getOwnPropertyDescriptor: (_, k) => (k in src() ? { enumerable: true, configurable: true, value: (src() as Record<string | symbol, unknown>)[k] } : undefined),
@@ -367,7 +367,7 @@ function rootsOf(v: unknown, into: Element[] = []): Element[] {
   else if (v && (v as Node).nodeType === 11) for (const x of (v as DocumentFragment).children) into.push(x);
   return into;
 }
-const snap = (p: Props): Props => { const o: Props = {}; for (const k of Object.keys(p)) if (k !== "children") { const v = p[k]; o[k] = isReactive(v) && !ON.test(k) ? untrack(v) : v; } return o; };
+const snap = (p: Props): Props => { const o: Props = {}; for (const k of Object.keys(p)) { const v = p[k]; o[k] = isReactive(v) && !RAW.test(k) ? untrack(v) : v; } return o; };
 
 function pipeline(Comp: Component<Props>, raw0: Props): [Component<Props>, Props] {
   if (!tracking) return runPipeline(Comp, raw0);
@@ -429,9 +429,9 @@ function runPipeline(Comp: Component<Props>, raw0: Props, path?: readonly AnyCom
     const first = untrack(mapped);
     const next: Props = { ...before };
     // every prop stays live through the interceptor: what it returns wins, else the instance's own value; so a prop it
-    // returns only later (`on() ? { variant } : null`) still reaches the component. Listeners and children are read once.
+    // returns only later (`on() ? { variant } : null`) still reaches the component. Listeners, refs, use: and children are read once.
     for (const k of new Set([...Object.keys(before), ...Object.keys(first)])) {
-      if (k === "children" || ON.test(k) || k.startsWith("bind:")) { if (k in first) next[k] = first[k]; continue; }
+      if (/^(children$|ref$|on[A-Z:]|bind:|use:)/.test(k)) { if (k in first) next[k] = first[k]; continue; }
       const own = before[k];
       next[k] = reactive(() => { const m = mapped(); const v = k in m ? m[k] : own; return isReactive(v) ? v() : v; });
     }

@@ -1,12 +1,10 @@
 // BarChart: categories × series, grouped (default) or `stacked`, vertical (default) or `horizontal`.
 // Bars are a keyed list ("category|series"); each rect binds x/y/width/height through computeds, so a data change only
 // writes the attributes of bars whose geometry changed.
-import { signal, computed, read, untrack, effect, onCleanup } from "../core/reactive.ts";
-import { animateValue } from "../motion/engine/value.ts";
-import { reducedMotion } from "../motion/env.ts";
+import { signal, computed, read, untrack } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { scaleLinear, scaleBand, niceTicks } from "./scale.ts";
-import { rowsOf, accessor, formatter, num, seriesOf, seriesClass, colorStyle, useSize, attr, textWidth, navIndex, sameBox, each,
+import { rowsOf, accessor, formatter, num, seriesOf, seriesClass, colorStyle, useSize, attr, textWidth, navIndex, sameBox, each, tween, type AnimateProp,
   type MaybeReactive, type DataProp, type Field, type SeriesSpec, type SeriesLabels, type FormatSpec, type ChartBaseProps, type ChartPoint, type TooltipProp, type Box, f1 } from "./util.ts";
 import { Frame, Axis, Grid, tooltipState, showTip, tipBody, thin, type Tick } from "./parts.ts";
 import { clamp } from "../core/util.ts";
@@ -50,20 +48,10 @@ export interface BarChartProps<D = unknown> extends ChartBaseProps {
 interface Bar { key: string; index: number; si: number; x: number; y: number; width: number; height: number }
 
 /** The geometry a bar is drawn with: its place at once, or (animate) a glide from where it is drawn now. */
-function glide(target: () => Bar, how: () => boolean | string | null | undefined): () => Bar {
-  const shown = signal(untrack(target));
-  let run: { cancel(): void } | null = null;
-  effect(() => {
-    const to = target(), mode = untrack(how), from = untrack(shown);
-    run?.cancel(); run = null;
-    if (!mode || reducedMotion() || (from.x === to.x && from.y === to.y && from.width === to.width && from.height === to.height)) { shown.set(to); return; }
-    const mix = (a: number, b: number, t: number): number => a + (b - a) * t;
-    run = untrack(() => animateValue(0, 1, { easing: mode === true ? "spring" : mode, onUpdate: (t: number) => shown.set({ ...to, x: mix(from.x, to.x, t), y: mix(from.y, to.y, t), width: Math.max(0, mix(from.width, to.width, t)), height: Math.max(0, mix(from.height, to.height, t)) }) }));
-  });
-  onCleanup(() => run?.cancel());
-  return shown;
+function glide(target: () => Bar, how: () => AnimateProp): () => Bar {
+  const g = tween(target, ["x", "y", "width", "height"], how);
+  return () => { const b = g(); return b.width < 0 || b.height < 0 ? { ...b, width: Math.max(0, b.width), height: Math.max(0, b.height) } : b; };
 }
-
 
 /** Bar chart. See docs/charts.md for props. */
 export function BarChart<D>(props: BarChartProps<D>): Element {

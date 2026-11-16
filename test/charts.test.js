@@ -284,3 +284,29 @@ test("BarChart animate: the first draw is in place; a data change glides the bar
   await new Promise((r) => setTimeout(r, 1500));
   bars(on).forEach((v, i) => assert.ok(Math.abs(v - target[i]) < 0.6, `bar ${i} arrived`));
 });
+
+test("PieChart animate: slices open from their edge, then turn to new angles on a data change; off: in place", async () => {
+  const paths = (el) => all(el).filter((n) => n.getAttribute?.("class")?.includes("m-chart-slice")).map((n) => n.getAttribute("d"));
+  const data = signal([{ label: "a", value: 1 }, { label: "b", value: 3 }]);
+  const on = mount(() => h(C.PieChart, { data, width: 200, height: 200, animate: "out" })).el;
+  const off = mount(() => h(C.PieChart, { data, width: 200, height: 200 })).el;
+  assert.notDeepEqual(paths(on), paths(off), "with animate the slices are still opening");
+  await new Promise((r) => setTimeout(r, 1200));
+  assert.deepEqual(paths(on), paths(off), "the slices arrived");
+  data.set([{ label: "a", value: 3 }, { label: "b", value: 1 }]);
+  assert.notDeepEqual(paths(on), paths(off), "a data change turns the slices");
+  await new Promise((r) => setTimeout(r, 1200));
+  assert.deepEqual(paths(on), paths(off), "and they arrive");
+});
+
+test("Heatmap animate: the cells carry a fill transition with the easing's curve and length; off: none", () => {
+  const data = [{ x: 1, y: 1, value: 2 }, { x: 2, y: 1, value: 4 }];
+  const plot = (el) => el.querySelector(".m-chart-plot");
+  const on = plot(mount(() => h(C.Heatmap, { data, width: 300, animate: "out" })).el);
+  const off = plot(mount(() => h(C.Heatmap, { data, width: 300 })).el);
+  assert.ok(on.classList.contains("m-heat-anim"));
+  assert.ok(on.style.getPropertyValue("--m-heat-ease"), "the easing is set");
+  assert.match(on.style.getPropertyValue("--m-heat-dur"), /^\d+ms$/);
+  assert.ok(!off.classList.contains("m-heat-anim"));
+  assert.equal(off.getAttribute("style"), null);
+});

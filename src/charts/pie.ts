@@ -2,7 +2,7 @@
 import { signal, computed, read } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { applyPipe } from "../core/pipes.ts";
-import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, useSize, attr, navIndex, each,
+import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, useSize, attr, navIndex, each, tween,
   type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps, type TooltipProp } from "./util.ts";
 import { Frame, tooltipState, showTip, tipBody } from "./parts.ts";
 import { clamp } from "../core/util.ts";
@@ -34,6 +34,8 @@ export interface PieChartProps<D = unknown> extends ChartBaseProps {
   tooltip?: TooltipProp<PiePoint<D>>;
   /** Called with the point on click, or Enter / Space on the focused one. @tr Tıklanınca ya da odaktaki öğede Enter / Space'e basılınca noktayla çağrılır. */
   onSelect?: ((p: PiePoint<D>) => void) | undefined;
+  /** When the data changes the slices turn to their new angles (a new one opens from its edge): `true` (a spring) or an easing name ("spring-wobbly", "out"…); default off. @tr Veri değişince dilimler yeni açılarına döner (yeni dilim kenarından açılır): `true` (yay) ya da bir easing adı ("spring-wobbly", "out"…); varsayılan kapalı. */
+  animate?: Opt<boolean | string>;
 }
 /** One slice of `pieLayout`. */
 export interface PieSlice { start: number; end: number; value: number; share: number }
@@ -117,12 +119,12 @@ export function PieChart<D>(props: PieChartProps<D>): Element {
 
   const body = [
     h("g", { class: "m-chart-plot", onPointerLeave: hide },
-      each<Slice<D>>({ each: slices, key: (s) => s.key, children: (s) => h("path", {
+      each<Slice<D>>({ each: slices, key: (s) => s.key, children: (s) => { const a = tween(s, ["start", "end"], () => read(props.animate), (to) => ({ ...to, end: to.start })); return h("path", {
         class: () => `m-chart-slice ${seriesClass(s().index)}`, "class:m-chart-active": () => activeKey() === s().key,
-        style: () => colorStyle(props.colors, s().index), d: attr(() => s().d),
+        style: () => colorStyle(props.colors, s().index), d: attr(() => { const t = a(), g = geo(); return t.start === s().start && t.end === s().end ? s().d : arcPath(g.cx, g.cy, g.r, g.r0, t.start, Math.max(t.start, t.end)); }),
         onPointerEnter: () => show(slices().findIndex((x) => x.key === s().key)),
         onClick: () => select(slices().findIndex((x) => x.key === s().key)),
-      }) })),
+      }); } })),
     () => (geo().r0 > 0 ? h("text", { class: "m-chart-center", x: () => geo().cx, y: () => geo().cy, "text-anchor": "middle", "dominant-baseline": "middle" },
       () => { const c = read(props.center); return c ?? fmt()(total()); }) : null),
   ];
