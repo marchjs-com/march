@@ -1,5 +1,5 @@
-// ThemeEditor colors tab (its own chunk): every color token of the edited mode, a ColorPicker and tone scale for the
-// selected one, a dark mode made from the light one and the WCAG contrast audit with fixes.
+// ThemeEditor colors tab (its own chunk): every color token of the edited mode; a press on one opens its ColorPicker and
+// tone scale in a popover beside it; a dark mode made from the light one and the WCAG contrast audit with fixes.
 import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { live } from "../../../forms/util.ts";
@@ -14,6 +14,7 @@ import { Swatch } from "../../forms/swatch/index.ts";
 import { Stack } from "../../layout/stack/index.ts";
 import { SectionLabel } from "../../typography/section-label/index.ts";
 import { ColorPicker } from "../color-picker/index.ts";
+import { PopoverPanel } from "../../overlays/popover/index.ts";
 import * as M from "./model.ts";
 import type { ThemeEditorContext } from "./types.ts";
 
@@ -43,6 +44,14 @@ export function ColorsPanel({ ctx }: { ctx: ThemeEditorContext }): Element {
   const { draft, mode, change } = ctx;
   const ro = ctx.readonly;
   const selected = signal<M.ColorKey>("primary");
+  // the token whose editor is open (the popover hangs on it); a press on the open one closes it
+  const at = signal<HTMLElement | null>(null);
+  const edit = (k: M.ColorKey, el: HTMLElement): void => {
+    const was = at.peek();
+    selected.set(k);
+    at.set(null);
+    if (was !== el) queueMicrotask(() => at.set(el));
+  };
   const colorNow = (): string => M.colorOf(draft()[mode()], selected());
   const setColor = (k: M.ColorKey, v: string, merge = true): void => {
     const m = untrack(mode);
@@ -63,7 +72,8 @@ export function ColorsPanel({ ctx }: { ctx: ThemeEditorContext }): Element {
   // a token: a selectable ListRow (sample, name, hex)
   const tokenButton = (k: M.ColorKey): Element => h(ListRow, {
     class: "m-te-token", size: "sm", overflow: "ellipsis", selected: () => selected() === k,
-    "aria-label": () => `${keyLabel(k)}: ${M.colorOf(draft()[mode()], k)}`, onClick: () => selected.set(k),
+    "aria-label": () => `${keyLabel(k)}: ${M.colorOf(draft()[mode()], k)}`, "aria-haspopup": "dialog", "aria-expanded": () => String(!!at() && selected() === k),
+    onClick: (e: MouseEvent) => edit(k, e.currentTarget as HTMLElement),
     lead: chip(() => M.colorOf(draft()[mode()], k)), title: () => keyLabel(k), sub: h("code", { class: "m-te-token-hex" }, () => M.hex(M.colorOf(draft()[mode()], k))),
   }) as Element;
   const checkRow = (c: M.ContrastCheck): Element => {
@@ -83,7 +93,10 @@ export function ColorsPanel({ ctx }: { ctx: ThemeEditorContext }): Element {
       h(Button, { size: "sm", variant: "ghost", disabled: ro, onClick: () => { change(t`Dark from light`, (d) => ({ ...d, dark: M.deriveDark(d.light) })); mode.set("dark"); } }, t`Make dark from light`)),
     h("div", { class: "m-te-colors-grid" },
       h("div", { class: "m-te-groups" }, GROUPS.map(([label, keys]) => h("fieldset", { class: "m-te-group" }, h(SectionLabel, { as: "legend", size: "md", label }), h("div", { class: "m-te-tokens" }, keys.map(tokenButton))))),
-      h("div", { class: "m-te-edit" },
+      h(PopoverPanel, {
+        anchor: () => at() ?? undefined, open: () => !!at(), onOpenChange: (on: boolean) => { if (!on) at.set(null); },
+        placement: "bottom-start", panelClass: "m-te-pop", label: () => keyLabel(selected()),
+        children: () => h("div", { class: "m-te-edit" },
         h("div", { class: "m-te-edit-head" }, chip(colorNow, "lg"),
           h("span", {}, h("strong", {}, () => keyLabel(selected())), h("code", {}, () => `--m-${selected() === "solid" ? "primary-solid" : selected() === "onSolid" ? "on-primary" : selected() === "raised" ? "surface-raised" : selected()}`))),
         h(ColorPicker, { alpha: false, recent: 6, readonly: live(() => ro()), value: live(() => colorNow()), onChange: (v: string) => setColor(untrack(selected), v) }),
@@ -92,7 +105,7 @@ export function ColorsPanel({ ctx }: { ctx: ThemeEditorContext }): Element {
             h(Swatch, {
               class: "m-te-tone", color: s.color, shape: "square", checker: false, selected: () => M.hex(colorNow()) === s.color, label: t`Tone ${s.step}: ${s.color}`, disabled: ro,
               onClick: () => setColor(untrack(selected), s.color, false),
-            }), h("span", { class: "m-te-tone-step", "aria-hidden": "true" }, String(s.step))))))),
+            }), h("span", { class: "m-te-tone-step", "aria-hidden": "true" }, String(s.step)))))) })),
     h(Card, {
       class: "m-te-audit", title: t`Contrast (WCAG)`,
       actions: [

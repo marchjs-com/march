@@ -30,9 +30,6 @@
 /* colors */
 .m-te-colors { display: flex; flex-direction: column; gap: var(--m-space-4); }
 .m-te-colors-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--m-space-4); }
-@container (min-width: 44rem) { .m-te-colors-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 17.5rem); } }
-@container (min-width: 60rem) { .m-te-colors-grid { grid-template-columns: minmax(0, 1fr); } }
-@container (min-width: 84rem) { .m-te-colors-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 17.5rem); } }
 .m-te-groups { display: flex; flex-direction: column; gap: var(--m-space-3); min-width: 0; }
 .m-te-group { margin: 0; padding: 0; border: 0; min-width: 0; }
 .m-te-group .m-section-label { min-block-size: 0; margin-block-end: var(--m-space-2); }
@@ -48,6 +45,8 @@
 .m-te-chip.m-sample-lg { border-radius: var(--m-radius-2); }
 .m-te-chip .m-sample-fill { transition: background var(--m-dur) var(--m-ease); }
 .m-te-edit { display: flex; flex-direction: column; gap: var(--m-space-3); min-width: 0; }
+/* the editor of a token: a popover beside it, as wide as the ColorPicker */
+.m-te-pop .m-te-edit { inline-size: min(19rem, calc(100vw - 2rem)); }
 .m-te-edit-head { display: flex; align-items: center; gap: var(--m-space-3); }
 .m-te-edit-head > span:last-child { display: flex; flex-direction: column; min-width: 0; }
 .m-te-edit-head code { font: var(--m-text-xs)/1.4 var(--m-font-mono); color: var(--m-muted); }

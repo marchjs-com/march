@@ -82,9 +82,14 @@ test("ThemeEditor: tokens, color edit, undo / redo, audit fix, scoped preview va
   const tokens = el.querySelectorAll(".m-te-token");
   assert.equal(tokens.length, 4 + 3 + 3 + 4 + 4 + 8);
   assert.equal(tokens[0].getAttribute("aria-pressed"), "true");
-  assert.ok(el.querySelector(".m-cp"), "the selected token has a ColorPicker");
+  assert.equal(el.querySelector(".m-cp"), null, "no picker in the page until a token is pressed");
+  tokens[0].click();
+  await new Promise((r) => setTimeout(r, 10));
+  const pop = document.querySelector(".m-te-pop");
+  assert.ok(pop?.querySelector(".m-cp"), "a press opens the token's ColorPicker in a popover");
+  assert.equal(tokens[0].getAttribute("aria-expanded"), "true");
   // a tone sets the color as one undo step
-  el.querySelectorAll(".m-te-tone")[7].click();
+  pop.querySelectorAll(".m-te-tone")[7].click();
   assert.equal(v().light.primary, M.toneScale("#F2801F")[7].color);
   const iconBtn = (l) => [...el.querySelectorAll(".m-icon-btn")].find((b) => b.getAttribute("aria-label").startsWith(l));
   const undo = iconBtn("Undo");
@@ -162,8 +167,9 @@ test("ThemeEditor: the section tabs switch; rows are Fields; undo keys and the n
   assert.ok(picker, "the body font is a FontPicker button");
   assert.match(picker.textContent, /Figtree/);
   el.querySelectorAll(".m-te-panel .m-tab")[0].click();
-  await wait(".m-te-tone");
-  el.querySelectorAll(".m-te-tone")[2].click();
+  (await wait(".m-te-token")).click();
+  await new Promise((r) => setTimeout(r, 10));
+  document.querySelectorAll(".m-te-pop .m-te-tone")[2].click();
   const undo = el.querySelector(".m-te-undo");
   assert.equal(undo.disabled, false);
   el.querySelector(".m-te").dispatchEvent(new KeyboardEvent("keydown", { key: "z", ctrlKey: true, bubbles: true }));
