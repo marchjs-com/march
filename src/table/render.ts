@@ -15,6 +15,7 @@ import { createTable, type TableOptions, type TableState, type TableAction, type
 import type { Row as DefaultRow, TableColumn } from "./filters.ts";
 import { createVirtual, type Virtual } from "./virtual.ts";
 import { clamp, uid, isRtl } from "../core/util.ts";
+import { nextFrame } from "../motion/engine/clock.ts";
 import { lazy } from "../dom/lazy.ts";
 import { live } from "../forms/util.ts";
 import { draggable } from "../behaviors/drag/index.ts";
@@ -98,6 +99,8 @@ export interface TableProps<R = DefaultRow> extends TableOptions<R> {
 
 interface Ctx<R> {
   id: string;
+  /** The table's root, once made (bulk changes mark it). */
+  root?: HTMLElement;
   table: TableState<R>;
   props: TableProps<R>;
   selectable: boolean;
@@ -147,7 +150,7 @@ export function Table<R = DefaultRow>(props: TableProps<R>): Element {
     colCount: () => table.visibleColumns().length + lead + trail,
   };
 
-  const root = h("div", {
+  const root: HTMLElement = h("div", {
     class: () => ["m-table", layout() === "cards" ? "m-table--cards" : "m-table--grid", table.refreshing() && "is-refreshing", table.hasWidths() && "m-table--fixed", props.class],
     id: ctx.id,
     "aria-busy": () => (table.loading() || table.refreshing() ? "true" : null),
@@ -157,6 +160,7 @@ export function Table<R = DefaultRow>(props: TableProps<R>): Element {
   ctx.selectable ? BulkBar(ctx) : null,
   () => { const l = layout(), v = table.isVirtual(); return untrack(() => (l === "cards" ? Cards(ctx) : Grid(ctx, v))); },
   table.paged ? Footer(ctx) : null);
+  ctx.root = root;
   return root;
 }
 
@@ -254,9 +258,9 @@ function BulkBar<R>(ctx: Ctx<R>): () => unknown {
   return () => (show() ? untrack(() => h("div", { class: "m-table-bulk", role: "region", "aria-label": t`Bulk actions` },
     h(LiveStatus, { class: "m-table-bulk-count", text: () => (table.allMatching() && table.mode === "server" ? t`All ${table.total() ?? ""} selected` : t`${table.selectedCount()} selected`) }),
     () => (!table.allMatching() && table.pageSelection() === "all" && (table.total() ?? 0) > table.selectedCount()
-      ? untrack(() => h(Button, { variant: "link", class: "m-table-selectall", onClick: table.selectAllMatching }, t`Select all ${table.total()} matching`)) : null),
+      ? untrack(() => h(Button, { variant: "link", class: "m-table-selectall", onClick: soon(ctx, table.selectAllMatching) }, t`Select all ${table.total()} matching`)) : null),
     actions.map((a) => h<ActionButtonProps<[R[]]>>(ActionButton, { action: a, args: (): [R[]] => [table.selectedRows()], run: () => table.runBulk(a), class: "m-table-action" })),
-    h(Button, { variant: "link", onClick: table.clearSelection }, t`Clear selection`))) : null);
+    h(Button, { variant: "link", onClick: soon(ctx, table.clearSelection) }, t`Clear selection`))) : null);
 }
 
 // ------------------------------------------------------------------ grid
@@ -332,7 +336,7 @@ function HeaderRow<R>(ctx: Ctx<R>): Element {
     const box = h(Checkbox, {
       class: "m-table-check", "aria-label": t`Select all rows on this page`,
       value: live(() => table.pageSelection() === "all"), indeterminate: live(() => table.pageSelection() === "some"),
-      onClick: () => table.selectPage(untrack(table.pageSelection) !== "all"),
+      onClick: soon(ctx, () => table.selectPage(untrack(table.pageSelection) !== "all")),
     });
     lead.push(h("th", { class: "m-table-lead m-table-select", scope: "col", "data-cell": "", tabindex: "0" }, box));
   }
@@ -556,6 +560,28 @@ function Card<R>(ctx: Ctx<R>, item: Accessor<R>): Element {
   ] : null);
 }
 
+/** A bulk change of the selection (the page, every matching row, none): the press is drawn first, the rows change a
+ * frame later with their transitions off, so ten thousand rows do not hold the click. */
+const soon = <R>(ctx: Ctx<R>, fn: () => void) => (): void => {
+  const el = ctx.root;
+  el?.classList.add("is-bulk");
+  nextFrame(() => setTimeout(() => { fn(); nextFrame(() => setTimeout(() => el?.classList.remove("is-bulk"), 0)); }, 0));
+};
+/** Run `fn` (a page or a page size), then scroll so `el` stays where it was on screen: the table may grow or shrink by
+ * thousands of pixels, the reader keeps the control they pressed under the pointer. */
+function keepInPlace(el: Element, fn: () => void): void {
+  const before = el.getBoundingClientRect().top;
+  fn();
+  // the rows are drawn on the next frame: measured and scrolled there, before it is painted
+  nextFrame(() => {
+    const d = el.getBoundingClientRect().top - before;
+    if (Math.abs(d) < 1) return;
+    let box: Element | null = el.parentElement;
+    while (box && !(/(auto|scroll)/.test(getComputedStyle(box).overflowY) && box.scrollHeight > box.clientHeight)) box = box.parentElement;
+    (box ?? el.ownerDocument.scrollingElement ?? globalThis).scrollBy({ top: d, behavior: "instant" });
+  }, "read");
+}
+
 // ------------------------------------------------------------------ footer
 function Footer<R>(ctx: Ctx<R>): Element {
   const { table, props } = ctx;
@@ -568,13 +594,15 @@ function Footer<R>(ctx: Ctx<R>): Element {
     const from = (table.page() - 1) * table.size() + 1, to = Math.min(n, from + table.rows().length - 1);
     return t`${from}–${to} of ${n}`;
   };
-  return h("div", { class: "m-table-footer" },
+  let foot!: Element;
+  const keep = (fn: () => void) => (): void => keepInPlace(foot, fn);
+  return foot = h("div", { class: "m-table-footer" },
     h(LiveStatus, { class: "m-table-range", text: range }),
     // rows per page, Previous / Next and "Page 2 of 7"; in cursor mode (or with an unknown total) only the two buttons
     () => (table.isVirtual() ? null : untrack(() => h(Pagination, {
       variant: "simple", class: "m-table-pager", info: false,
       page: () => table.page(), pages: () => (table.cursorMode ? null : table.pageCount()),
-      hasPrev: () => table.hasPrev(), hasNext: () => table.hasNext(), onPrev: table.prev, onNext: table.next,
-      size: () => table.size(), sizes, onSize: (n: number) => table.setSize(n),
+      hasPrev: () => table.hasPrev(), hasNext: () => table.hasNext(), onPrev: keep(table.prev), onNext: keep(table.next),
+      size: () => table.size(), sizes, onSize: (n: number) => keepInPlace(foot, () => table.setSize(n)),
     }))));
 }

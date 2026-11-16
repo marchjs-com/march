@@ -108,3 +108,5 @@ thead .m-table-pin-start, thead .m-table-pin-end { z-index: 3; }
 .m-table-card-field dd { margin: 0; overflow-wrap: break-word; text-align: start !important; }
 .m-table-card-more { align-self: flex-start; }
 .m-table-card-expansion { padding-top: var(--m-space-2); border-top: var(--m-border-w, 1px) solid var(--m-border); }
+/* a bulk change of the selection: every row changes at once, without its transitions (Table marks it is-bulk) */
+.m-table.is-bulk *, .m-table.is-bulk *::before, .m-table.is-bulk *::after { transition: none; animation: none; }

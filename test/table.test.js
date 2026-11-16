@@ -178,6 +178,8 @@ test("URL sync: state is written to the query string and restored (shareable lin
 });
 
 test("selection: row checkbox, shift range, select page / all matching, bulk action clears", async () => {
+  // the page / all-matching / clear presses apply a frame later (the press is drawn first)
+  const frame = () => new Promise((r) => setTimeout(r, 60));
   const removed = [];
   const del = act("Delete", async (rows) => { removed.push(...ids(rows)); });
   const rows = Array.from({ length: 12 }, (_, i) => ({ id: i + 1, name: `n${i + 1}` }));
@@ -190,8 +192,10 @@ test("selection: row checkbox, shift range, select page / all matching, bulk act
   assert.equal(el.querySelector(".m-table-bulk-count").textContent, "4 selected");
   assert.equal(el.querySelectorAll("tr[aria-selected=true]").length, 4);
   click(el.querySelector("thead .m-table-check input"));
+  await frame();
   assert.equal(tb.selectedCount(), 5);
   click(el.querySelector(".m-table-selectall"));
+  await frame();
   assert.equal(tb.selectedCount(), 12);
   click([...el.querySelectorAll(".m-table-bulk button")].find((b) => b.textContent === "Delete"));
   await tick(); await tick();
