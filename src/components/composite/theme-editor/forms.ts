@@ -1,11 +1,12 @@
 // ThemeEditor typography and shape tabs (their own chunk), and the labelled slider rows the motion tab shares.
-import { computed, effect } from "../../../core/reactive.ts";
+import { effect } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { live } from "../../../forms/util.ts";
 import { t } from "../../../core/i18n.ts";
 import { cx, uid, setStyle } from "../../../core/util.ts";
-import { Segmented, Slider, Select } from "../../../forms/inputs.ts";
+import { Segmented, Slider } from "../../../forms/inputs.ts";
 import { Field } from "../../../forms/field.ts";
+import { FontPicker, type FontChoice } from "../font-picker/index.ts";
 import * as M from "./model.ts";
 import type { ThemeEditorContext } from "./types.ts";
 
@@ -29,26 +30,20 @@ export function num<K extends "type" | "shape" | "style" | "motion">(ctx: ThemeE
 }
 
 // ------------------------------------------------------------------ typography
-const FONTS: readonly { value: string; label: string }[] = [
-  { value: `"Figtree Variable", "Figtree"`, label: "Figtree" }, { value: `"Bricolage Grotesque Variable", "Bricolage Grotesque"`, label: "Bricolage Grotesque" },
-  { value: `"InterVariable", "Inter"`, label: "Inter" }, { value: `"Inter"`, label: "Inter (static)" }, { value: "system-ui", label: "System UI" },
-  { value: `Georgia, "Times New Roman", serif`, label: "Serif (Georgia)" }, { value: `"Trebuchet MS", "Segoe UI", sans-serif`, label: "Humanist" },
-];
-const MONOS: readonly { value: string; label: string }[] = [
-  { value: M.DEFAULT_TYPE.mono, label: "System mono" }, { value: `"JetBrains Mono", ui-monospace, monospace`, label: "JetBrains Mono" },
-  { value: `"Fira Code", ui-monospace, monospace`, label: "Fira Code" }, { value: `"Courier New", monospace`, label: "Courier New" },
-];
 const RATIOS: readonly [number, string][] = [[1.067, "Minor second"], [1.125, "Major second"], [1.2, "Minor third"], [1.25, "Major third"], [1.333, "Perfect fourth"], [1.414, "Augmented fourth"], [1.5, "Perfect fifth"]];
 const ratioName = (r: number): string => { const n = RATIOS.find(([x]) => Math.abs(x - r) < 0.004); return n ? `${r.toFixed(3)} · ${t(n[1])}` : r.toFixed(3); };
 
-function fontRow(ctx: ThemeEditorContext, key: "body" | "display" | "mono", label: () => string, list: readonly { value: string; label: string }[]): Element {
-  // the current stack is offered even when it is not in the list (imported or preset fonts)
-  const options = computed(() => { const cur = ctx.draft().type[key]; return list.some((f) => f.value === cur) ? list : [{ value: cur, label: cur.split(",")[0]!.replace(/"/g, "") }, ...list]; });
-  return row(label, (_labelId, id) => h(Select, {
-    id, options, readonly: live(() => ctx.readonly()),
-    value: live(() => ctx.draft().type[key]),
-    onChange: (v: string | null) => { if (v) ctx.change(label(), (d) => ({ ...d, type: { ...d.type, [key]: v } })); },
-  }), undefined, true);
+/** The family a font stack starts with ("Figtree Variable", "Figtree", system-ui → Figtree). */
+const familyOf = (stack: string): string => (stack.split(",")[0] ?? "").trim().replace(/^["']|["']$/g, "").replace(/ Variable$/, "");
+
+/** A font of the draft, picked with the FontPicker (the device's fonts and the web catalog, each name in its own type);
+ * the pick loads the font and writes its CSS stack into the draft. The code font opens on the monospace ones. */
+function fontRow(ctx: ThemeEditorContext, key: "body" | "display" | "mono", label: () => string): Element {
+  return row(label, (labelId) => h(FontPicker, {
+    "aria-labelledby": labelId, category: key === "mono" ? "monospace" : undefined, readonly: live(() => ctx.readonly()),
+    value: live(() => familyOf(ctx.draft().type[key])),
+    onPick: (f: FontChoice) => ctx.change(label(), (d) => ({ ...d, type: { ...d.type, [key]: key === "mono" ? `${f.stack}, ui-monospace, monospace` : f.stack } })),
+  }));
 }
 
 /** Font families, scale ratio, base size, line heights and weights, with the type ramp they make. */
@@ -65,7 +60,7 @@ export function TypePanel({ ctx }: Ctx): Element {
   effect(() => { const ty = ctx.draft().type; setStyle(ramp, { "--m-te-body": ty.body, "--m-te-display": ty.display, "--m-te-dw": String(ty.displayWeight), "--m-te-lh": String(ty.leading), "--m-te-lht": String(ty.leadingTight) }); });
   return h("div", { class: "m-te-split" },
     h("div", { class: "m-te-form" },
-      fontRow(ctx, "body", () => t`Body font`, FONTS), fontRow(ctx, "display", () => t`Heading font`, FONTS), fontRow(ctx, "mono", () => t`Code font`, MONOS),
+      fontRow(ctx, "body", () => t`Body font`), fontRow(ctx, "display", () => t`Heading font`), fontRow(ctx, "mono", () => t`Code font`),
       num(ctx, "type", "base", () => t`Base size`, { min: 12, max: 18, step: 1, format: px }),
       num(ctx, "type", "ratio", () => t`Scale ratio`, { min: 1.067, max: 1.5, step: 0.001, format: ratioName }),
       num(ctx, "type", "leading", () => t`Line height`, { min: 1.2, max: 1.9, step: 0.05, format: (v) => v.toFixed(2) }),

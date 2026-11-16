@@ -157,8 +157,10 @@ test("ThemeEditor: the section tabs switch; rows are Fields; undo keys and the n
   const field = await wait(".m-te-field");
   assert.ok(field, "the typography tab opens");
   assert.equal(el.querySelectorAll(".m-te-panel .m-tab")[1].getAttribute("aria-selected"), "true");
-  const select = field.querySelector("select");
-  assert.equal(field.querySelector("label").getAttribute("for"), select.id, "a native control is named by its label");
+  // the font rows are FontPickers: a button named by the row's label, showing the family of the draft's stack
+  const picker = field.querySelector("button");
+  assert.ok(picker, "the body font is a FontPicker button");
+  assert.match(picker.textContent, /Figtree/);
   el.querySelectorAll(".m-te-panel .m-tab")[0].click();
   await wait(".m-te-tone");
   el.querySelectorAll(".m-te-tone")[2].click();

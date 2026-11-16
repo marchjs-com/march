@@ -37,6 +37,7 @@ export const parts: Record<string, () => Promise<unknown>> = {
   EditorFrame: () => import("./composite/editor-frame/index.ts").then((m) => (m as Record<string, unknown>)["EditorFrame"]),
   Empty: () => import("./feedback/empty/index.ts").then((m) => (m as Record<string, unknown>)["Empty"]),
   FollowButton: () => import("./social/follow-button/index.ts").then((m) => (m as Record<string, unknown>)["FollowButton"]),
+  FontPicker: () => import("./composite/font-picker/index.ts").then((m) => (m as Record<string, unknown>)["FontPicker"]),
   FormatToolbar: () => import("./composite/format-toolbar/index.ts").then((m) => (m as Record<string, unknown>)["FormatToolbar"]),
   Grid: () => import("./layout/grid/index.ts").then((m) => (m as Record<string, unknown>)["Grid"]),
   IconButton: () => import("./actions/icon-button/index.ts").then((m) => (m as Record<string, unknown>)["IconButton"]),

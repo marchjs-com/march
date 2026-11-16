@@ -3,7 +3,7 @@
 Make a whole theme and watch it live. Start from a built-in theme (HADİ, Classic Cream, Night Blue, Neon, Indigo,
 Minimal, High Contrast) or from scratch with one accent color; edit every color token for light and dark with a full
 ColorPicker (accent, surfaces, text, border, status, HADİ brand colors, the categorical palette), pick tones from an
-automatic tone scale, and fix contrast with the WCAG audit. Type (font families, scale ratio, line heights, weights),
+automatic tone scale, and fix contrast with the WCAG audit. Type (font families picked with the FontPicker: the device's fonts and a web font catalog, each name in its own type; scale ratio, line heights, weights),
 shape (radius scale, spacing, density, shadows, border width) and motion (durations, three easing curves) are tokens
 too. The preview is a small app screen of real components scoped to the editor (`data-m-theme` + the draft's
 variables) in light or dark, LTR or RTL, with or without motion; "Apply to the app" switches the whole app to it. Out
