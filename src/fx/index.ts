@@ -12,10 +12,6 @@ import { listen } from "../core/util.ts";
 type Props = Record<string, unknown>;
 const num = (v: unknown, d: number): number => (typeof v === "number" && Number.isFinite(v) ? v : d);
 const str = (v: unknown, d: string): string => (typeof v === "string" ? v : d);
-const cssVar = (name: string, d: string): string => {
-  const v = globalThis.getComputedStyle?.(globalThis.document.documentElement).getPropertyValue(name).trim();
-  return v || d;
-};
 
 interface P { x: number; y: number; vx: number; vy: number; r: number }
 
@@ -48,7 +44,15 @@ export function Particles(props: Props): HTMLCanvasElement {
     color = resolveColor(str(props["color"], "var(--m-primary)"));
     draw();
   };
-  const resolveColor = (c: string): string => { const m = /^var\((--[\w-]+)\)$/.exec(c); return m?.[1] ? cssVar(m[1], "#7c97ff") : c; };
+  // a CSS colour, var() with fallbacks included (var(--m-accent, var(--m-primary))), resolved where the canvas is (its
+  // theme and accent): the canvas cannot read var() itself (it kept its last colour, black)
+  const resolveColor = (c: string): string => {
+    if (!c.includes("var(")) return c;
+    canvas.style.color = c;
+    const v = globalThis.getComputedStyle?.(canvas).color;
+    canvas.style.color = "";
+    return v || "#7c97ff";
+  };
   const draw = (): void => {
     if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
