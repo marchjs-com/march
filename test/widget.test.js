@@ -99,3 +99,14 @@ test("tokenize: untrusted text stays text; unknown languages stay plain", () => 
   assert.deepEqual(U.tokenize("x-1", "ts").map((t) => t[0]), ["", "punct", "num"]);
   assert.deepEqual(U.tokenLines("/* a\nb */ x", "js").map((l) => l.map((t) => t[0])), [["com"], ["com", ""]]);
 });
+
+test("tokenize: a template literal's ${…} is code (coloured as code; nested templates and strings with braces inside)", async () => {
+  const { tokenize } = await import("../src/ui/highlight.ts");
+  const kinds = (s) => tokenize(s, "ts").filter(([k]) => k);
+  const t = kinds("`hsl(${Math.random() * 360} 70% ${x ? `a${y}` : \"}\"})`");
+  assert.deepEqual(t.slice(0, 7), [["str", "`hsl("], ["punct", "${"], ["type", "Math"], ["punct", "."], ["fn", "random"], ["punct", "()"], ["punct", "*"]]);
+  assert.ok(t.some(([k, x]) => k === "num" && x === "360"), "a number inside is a number");
+  assert.ok(t.some(([k, x]) => k === "str" && x === "\"}\""), "a brace inside a string does not close the expression");
+  assert.deepEqual(t.at(-1), ["str", ")`"]);
+  assert.deepEqual(kinds("`plain`"), [["str", "`plain`"]]);
+});

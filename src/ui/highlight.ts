@@ -35,9 +35,33 @@ export function tokenize(src: string, lang = ""): Token[] {
     if (last && last[0] === kind) last[1] += text; else out.push([kind, text]);
   };
   let inTag = false;
+  // a template literal: its text is a string, each ${…} inside is code (coloured as such, nested templates too)
+  const template = (s: number): number => {
+    let j = s + 1, from = s;
+    while (j < src.length && src[j] !== "`") {
+      if (src[j] === "\\") { j += 2; continue; }
+      if (src[j] !== "$" || src[j + 1] !== "{") { j++; continue; }
+      push("str", src.slice(from, j)); push("punct", "${");
+      let depth = 1, k = j + 2;
+      while (k < src.length) {
+        const ch = src[k]!;
+        if (ch === "\"" || ch === "'" || ch === "`") { k += at(STRING, src, k)?.length ?? 1; continue; }
+        if (ch === "{") depth++;
+        else if (ch === "}" && !--depth) break;
+        k++;
+      }
+      for (const [kind, text] of tokenize(src.slice(j + 2, k), lang)) push(kind, text);
+      if (k < src.length) push("punct", "}");
+      j = from = k + 1;
+    }
+    const end = Math.min(src.length, j + 1);
+    push("str", src.slice(from, end));
+    return end;
+  };
   for (let i = 0; i < src.length;) {
     let m: string | null;
     if ((m = at(SPACE, src, i))) { push("", m); i += m.length; continue; }
+    if (js && src[i] === "`") { i = template(i); continue; }
     if ((m = (sh ? at(HASH_COMMENT, src, i) : null) ?? (js || css || (tags && !inTag && lang !== "html") ? at(COMMENT, src, i) : null))) { push("com", m); i += m.length; continue; }
     if (tags && !inTag && src.startsWith("<!--", i)) { const e = src.indexOf("-->", i); const end = e < 0 ? src.length : e + 3; push("com", src.slice(i, end)); i = end; continue; }
     if ((m = at(STRING, src, i)) && (!tags || inTag || js)) {
