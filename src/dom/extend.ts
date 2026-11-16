@@ -79,6 +79,8 @@ export interface ExtensionDef<P extends Props = Props> {
   /**
    * The new props (an object of specs: they are added to the component and kept out of its own props), or a props
    * interceptor `(p, ctx) => changes`: what it returns is merged over the props; it re-runs when what it reads changes.
+   * A prop it returns only later (`on() ? { variant: "primary" } : null`) must be given on the instance or returned on
+   * its first run: a component takes its props' names when it is made.
    */
   props?: { [K in keyof P]-?: ExtensionPropSpec<P[K]> } | ((p: Props & P, ctx: ExtensionContext<Props & P>) => Props | null | undefined | void);
   /** Wrap callbacks: `{ onClick: (next, e, p) => … }`; `next(...args)` calls the original (not calling it stops it). */
@@ -425,12 +427,13 @@ function runPipeline(Comp: Component<Props>, raw0: Props, path?: readonly AnyCom
       catch (err) { if (ok) { ok = false; fail(e, c, err); } return prev ?? {}; }
     });
     const first = untrack(mapped);
-    const keys = Object.keys(first);
-    if (!keys.length) continue;
     const next: Props = { ...before };
-    for (const k of keys) {
-      // listeners and children are read once by a component; everything else stays live
-      next[k] = k === "children" || ON.test(k) ? first[k] : reactive(() => { const v = mapped()[k]; return isReactive(v) ? v() : v; });
+    // every prop stays live through the interceptor: what it returns wins, else the instance's own value; so a prop it
+    // returns only later (`on() ? { variant } : null`) still reaches the component. Listeners and children are read once.
+    for (const k of new Set([...Object.keys(before), ...Object.keys(first)])) {
+      if (k === "children" || ON.test(k) || k.startsWith("bind:")) { if (k in first) next[k] = first[k]; continue; }
+      const own = before[k];
+      next[k] = reactive(() => { const m = mapped(); const v = k in m ? m[k] : own; return isReactive(v) ? v() : v; });
     }
     cur = next;
     const s = step(e, "props");

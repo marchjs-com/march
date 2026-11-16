@@ -306,3 +306,18 @@ test("partial targets: partOf(Button, Spinner) reaches Button's own Spinner; ins
   assert.throws(() => intercept(inside(PButton, "*"), { name: "x", render: (n) => n() }), /only adds props/);
   assert.throws(() => inside(PButton), /two steps/);
 });
+
+test("intercept props: a prop the instance is given stays live, so an interceptor that returns it only later (it read a signal that was off) still changes it", async () => {
+  const { Button } = await import("../src/ui/index.ts");
+  const on = M.signal(false);
+  const off = M.intercept(Button, { name: "later", props: (p) => (on() && String(p.class ?? "").includes("t") ? { variant: "primary" } : null) });
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = M.render(() => M.h(Button, { class: "t", variant: "ghost" }, "A"), el);
+  const btn = el.querySelector("button");
+  assert.match(btn.className, /m-btn-ghost/);
+  on.set(true);
+  assert.match(btn.className, /m-btn-primary/, "the later return reaches the component");
+  on.set(false);
+  assert.match(btn.className, /m-btn-ghost/, "and goes back");
+  dispose(); off();
+});

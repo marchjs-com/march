@@ -39,7 +39,7 @@
 :where(.m-spotlight) { position: relative; }
 .m-spotlight::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .35s var(--m-ease, ease);
   background: radial-gradient(21rem circle at var(--m-spot-x, -999px) var(--m-spot-y, -999px), color-mix(in srgb, var(--m-spot-color, var(--m-accent, var(--m-primary))) var(--m-spot-glow, 13%), transparent), transparent 70%); }
-.m-spotlight::before { content: ""; position: absolute; inset: calc(var(--m-border-w, 1px) * -1); z-index: 1; padding: 1.5px; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .35s var(--m-ease, ease);
+.m-spotlight::before { content: ""; position: absolute; inset: 0; z-index: 1; padding: 1.5px; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .35s var(--m-ease, ease);
   background: radial-gradient(16rem circle at var(--m-spot-x, -999px) var(--m-spot-y, -999px), var(--m-spot-color, var(--m-accent, var(--m-primary))), transparent 70%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
 .m-spotlight.is-lit::after, .m-spotlight.is-lit::before { opacity: 1; }
