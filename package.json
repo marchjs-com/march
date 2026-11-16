@@ -141,8 +141,6 @@
     "typecheck": "tsc -p tsconfig.json",
     "build:lib": "node tools/build-lib.js",
     "build:cdn": "node tools/build-cdn.js",
-    "deploy:cdn": "node tools/cdn-deploy.js",
-    "cdn:usage": "node tools/cdn-usage.js",
     "build:showcase": "node examples/showcase/build.mjs",
     "build:showcase:release": "node examples/showcase/build.mjs --release",
     "audit:controls": "node tools/control-audit.mjs",

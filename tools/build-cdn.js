@@ -5,7 +5,7 @@
 //   <entry>.css      the stylesheets of one entry (when it has any)
 //   css/…            the stylesheets the package exports as files (tokens.css, themes/…)
 //   importmap.json   { imports: { "march": ".../march.js", "march/ui": ".../ui.js", … } } with absolute URLs
-//   files.json       every file of the version (cdn-deploy.js uses it to keep older versions)
+//   files.json       every file of the version (a deploy uses it to keep the older versions)
 // and the same files again in cdn/dist/latest/. Usage: node tools/build-cdn.js [--base https://cdn.marchjs.com]
 import { readFileSync, writeFileSync, rmSync, cpSync, readdirSync, statSync, existsSync, renameSync } from "node:fs";
 import { join, relative } from "node:path";

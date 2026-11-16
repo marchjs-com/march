@@ -2,5 +2,13 @@ node_modules/
 dist/
 *.log
 .DS_Store
-# the internal notes: a private repository of their own, checked out here
+# private: not part of this repository (a private one, .private.git, tracks them in this same folder)
+.private.git/
 docs/internal/
+.claude/
+CLAUDE.md
+cdn/
+tools/cdn-deploy.js
+tools/cdn-usage.js
+# generated: the March type check's working copy
+examples/showcase/.march/
