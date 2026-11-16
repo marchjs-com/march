@@ -112,6 +112,7 @@ export * from "./forms/row-tools/index.ts";
 export * from "./actions/scroll-to-top/index.ts";
 export * from "./forms/search-box/index.ts";
 export * from "./typography/section-label/index.ts";
+export * from "./navigation/section-timeline/index.ts";
 export * from "./forms/segmented/index.ts";
 export * from "./forms/select/index.ts";
 export * from "./feedback/skeleton/index.ts";

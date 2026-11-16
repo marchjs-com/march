@@ -146,6 +146,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | PageDots | experimental | One dot per page, the current one longer and coloured: buttons with arrow keys when it has onChange, a position sign otherwise; own names, colour, size and dot content. | — |
 | Pagination | stable | Numbered pages with ellipses and Previous / Next (the current page marked for screen readers), or a simple Previous / Next pager that also works without a page count. | [Button](#button), [IconButton](#iconbutton), [Select](#select) |
 | PeriodNav | experimental | Previous · today · next for a calendar period, with the period's name between the arrows on request; arrows swap in right-to-left, own texts, icons, today button and colour. | [ButtonGroup](#buttongroup), [IconButton](#iconbutton), [Button](#button) |
+| SectionTimeline | experimental | A dot per section of a long page, vertical or horizontal: the one being read in colour, a press scrolls there; magnifies like a dock near the pointer; can write the section into the address. | — |
 | Stepper | experimental | Steps with motion: a liquid highlight stretches from step to step, panels morph (blur + slide by direction, RTL mirrored) while the frame's height follows; Back / Next. | [Steps](#steps), [Button](#button) |
 | Steps | stable | Progress through stages: done, current and upcoming steps with titles and descriptions; clickable when onSelect is given; horizontal or vertical. | [CheckMark](#checkmark) |
 | Tabs | stable | Tabbed panels: roving focus (← → Home End, mirrored in RTL), icons, badges, closable and changed tabs, an actions slot, a line or pill look, the active tab optionally kept in the URL. | [Badge](#badge), [StatusDot](#statusdot) |
@@ -2317,6 +2318,18 @@ The small heading of a group inside a panel: a menu, a palette, a sidebar, a pro
 ```
 
 Full page: src/components/typography/section-label/docs.md
+
+## SectionTimeline
+
+A dot per section of a long page, in a column or a row. The section being read is in full colour, the ones behind it light, the ones ahead without colour; a press on a dot scrolls to its section. Near the pointer (or the focused dot) it magnifies like a dock: the dots move apart and swell, their names open beside them, larger the nearer they are. With `hash` the address follows the section being read, and a shared `#name` opens at that section.
+
+```tsx
+<SectionTimeline items={sections} hash fixed intro />
+<SectionTimeline items={steps} orientation="horizontal" root={() => box} />
+<SectionTimeline items={sections} magnify={false} onChange={(i) => $read = i} />
+```
+
+Full page: src/components/navigation/section-timeline/docs.md
 
 ## Segmented
 

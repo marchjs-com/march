@@ -1,0 +1,67 @@
+/* SectionTimeline: a dot per section, vertical or horizontal. Only the section being read in full colour, the ones
+   behind it light, the ones ahead without colour. Near the pointer it magnifies like a dock: each item gets --k (0…1)
+   and --m-stl-shift (index.ts); the items move and the dots and names scale, nothing changes a size, so a frame of it
+   lays nothing out. When the section being read changes, the dots between take their colour one after another
+   (--m-stl-delay, set by index.ts). Tokens: --m-stl-step (room per dot), --m-stl-c (colour; m:color), --m-stl-past. */
+.m-stl {
+  --m-stl-c: var(--m-color, var(--m-accent, var(--m-primary)));
+  --m-stl-past: color-mix(in srgb, var(--m-stl-c) 38%, var(--m-surface));
+  --m-stl-step: .875rem;
+  display: flex; pointer-events: none;
+}
+.m-stl-rail { position: relative; pointer-events: auto; }
+.m-stl-list { position: relative; display: flex; margin: 0; padding: 0; list-style: none; }
+.m-stl-item { --k: 0; --m-stl-shift: 0px; --m-stl-delay: calc(var(--m-dur) * 0); --m-stl-s: calc(.25 + var(--k) * .4167); display: flex; align-items: center; justify-content: center; flex: none; }
+.m-stl-item.is-on { --m-stl-s: calc(.4167 + var(--k) * .25); }
+.m-stl-mark { position: relative; flex: none; display: flex; align-items: center; justify-content: center; inline-size: 1.5rem; block-size: 1.5rem;
+  padding: 0; border: 0; background: none; color: inherit; font: inherit; text-decoration: none; cursor: pointer; border-radius: var(--m-radius-full); }
+.m-stl-mark:focus-visible { outline: none; }
+/* the dot: a circle scaled from 6px to 16px (10px to 16px for the section being read); its stroke does not scale, so the
+   ring is 1px at every size */
+.m-stl-dot { position: relative; z-index: 1; inline-size: 1.5rem; block-size: 1.5rem; overflow: visible; scale: var(--m-stl-s); }
+.m-stl-dot circle { fill: var(--m-surface); stroke: color-mix(in srgb, var(--m-muted) 70%, transparent); stroke-width: 1px; vector-effect: non-scaling-stroke;
+  transition: fill var(--m-dur) var(--m-stl-delay), stroke var(--m-dur) var(--m-stl-delay); }
+.m-stl-dot .m-stl-halo { stroke: transparent; stroke-width: 9px; }
+.m-stl-item.is-past .m-stl-dot circle { fill: var(--m-stl-past); stroke: var(--m-stl-past); }
+.m-stl-item.is-on .m-stl-dot circle { fill: var(--m-stl-c); stroke: var(--m-stl-c); }
+.m-stl-item.is-on .m-stl-dot .m-stl-halo, .m-stl-mark:focus-visible .m-stl-halo { stroke: color-mix(in srgb, var(--m-stl-c) 22%, transparent); }
+/* the names: shown only while magnified, larger and clearer the nearer the pointer */
+.m-stl-label { position: absolute; white-space: nowrap; box-sizing: border-box; display: flex; align-items: center;
+  border-radius: var(--m-radius-full); line-height: 1.3; font-size: .9375rem; font-weight: var(--m-weight-medium, 500);
+  color: var(--m-text); background: color-mix(in srgb, var(--m-surface-raised, var(--m-surface)) 94%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--m-border) 70%, transparent), var(--m-shadow-1);
+  opacity: var(--k); pointer-events: none; }
+.m-stl-list:not(.is-lens) .m-stl-label { opacity: 0; }
+.m-stl-mark:hover .m-stl-label { color: var(--m-stl-c); }
+.m-stl-item.is-on .m-stl-label { font-weight: var(--m-weight-bold, 700); }
+
+/* vertical: a column; each name a capsule that wraps its dot (the dot in its end), scaled about the dot's centre */
+.m-stl-vertical .m-stl-list { flex-direction: column; }
+.m-stl-vertical .m-stl-item { block-size: var(--m-stl-step); justify-content: flex-end; translate: 0 var(--m-stl-shift); }
+.m-stl-vertical .m-stl-mark { block-size: 100%; justify-content: flex-end; }
+.m-stl-vertical .m-stl-label { --m-stl-pad: .25rem; inset-inline-end: calc(-1 * var(--m-stl-pad)); inset-block-start: 50%;
+  min-block-size: calc(1.5rem + var(--m-stl-pad) * 2); padding-block: .125rem; padding-inline: .75rem calc(1.5rem + var(--m-stl-pad) * 2);
+  translate: 0 -50%; transform-origin: calc(100% - var(--m-stl-pad) - .75rem) 50%; scale: calc(.72 + var(--k) * .28); }
+[dir="rtl"] .m-stl-vertical .m-stl-label, .m-stl-vertical:dir(rtl) .m-stl-label { transform-origin: calc(var(--m-stl-pad) + .75rem) 50%; }
+/* while magnified each mark reaches over its name and the gaps the moved dots leave: the pointer stays on the rail */
+.m-stl-vertical .m-stl-list.is-lens .m-stl-mark { inline-size: 16rem; }
+.m-stl-vertical .m-stl-list.is-lens .m-stl-mark::before { content: ""; position: absolute; inset-inline: 0; inset-block-start: 50%; block-size: 2.75rem; translate: 0 -50%; }
+
+/* horizontal: a row; the name of the dot under the pointer above it (only the nearest: the names would overlap) */
+.m-stl-horizontal .m-stl-list { flex-direction: row; }
+.m-stl-horizontal .m-stl-item { inline-size: var(--m-stl-step); translate: var(--m-stl-shift) 0; }
+.m-stl-horizontal .m-stl-mark { inline-size: 100%; }
+.m-stl-horizontal .m-stl-label { inset-block-end: calc(100% + .25rem); inset-inline-start: 50%; padding: .1875rem .625rem;
+  translate: -50% 0; transform-origin: 50% 100%; scale: calc(.8 + var(--k) * .2); opacity: clamp(0, calc((var(--k) - .7) * 3.4), 1); }
+.m-stl-horizontal .m-stl-list.is-lens .m-stl-mark { block-size: 4.5rem; align-items: flex-end; padding-block-end: 0; }
+.m-stl-horizontal .m-stl-list.is-lens .m-stl-mark::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 50%; inline-size: 2.75rem; translate: -50% 0; }
+.m-stl-horizontal .m-stl-list.is-lens .m-stl-dot { margin-block-end: 0; }
+
+/* fixed at the edge of the screen: a box of its own, closed to the page (contain: strict) so the magnifier lays out
+   and paints only inside it; the box lets the pointer through, only the rail takes it */
+.m-stl.is-fixed { position: fixed; z-index: var(--m-z-sticky, 20); contain: strict; box-sizing: border-box; }
+.m-stl-vertical.is-fixed { inset-inline-end: 0; inset-block: 0; inline-size: 19rem; padding-inline-end: var(--m-space-4, 1rem);
+  flex-direction: column; justify-content: center; align-items: flex-end; --m-stl-step: min(1.5vh, .9375rem); }
+.m-stl-horizontal.is-fixed { inset-inline: 0; inset-block-end: 0; block-size: 8rem; padding-block-end: var(--m-space-4, 1rem);
+  justify-content: center; align-items: flex-end; --m-stl-step: min(1.5vw, .9375rem); }
+@media (prefers-reduced-motion: reduce) { .m-stl-dot circle { transition: none; } }

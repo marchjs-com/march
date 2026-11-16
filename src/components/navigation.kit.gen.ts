@@ -5,6 +5,7 @@ export * from "./navigation/page-dots/index.ts";
 export * from "./navigation/pagination/index.ts";
 export * from "./navigation/period-nav/index.ts";
 export * from "./feedback/pull-to-refresh/index.ts";
+export * from "./navigation/section-timeline/index.ts";
 export * from "./navigation/stepper/index.ts";
 export * from "./navigation/steps/index.ts";
 export * from "./navigation/tabs/index.ts";

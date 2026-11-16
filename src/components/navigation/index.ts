@@ -7,6 +7,7 @@ export * from "./nav-menu/index.ts";
 export * from "./page-dots/index.ts";
 export * from "./pagination/index.ts";
 export * from "./period-nav/index.ts";
+export * from "./section-timeline/index.ts";
 export * from "./stepper/index.ts";
 export * from "./steps/index.ts";
 export * from "./tabs/index.ts";

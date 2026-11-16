@@ -146,6 +146,7 @@ export const roots: Record<string, string> = {
   "SearchBox": "m-search",
   "SectionHead": "m-section-head",
   "SectionLabel": "m-section-label",
+  "SectionTimeline": "m-stl",
   "Segmented": "m-segmented",
   "Select": "m-select-field",
   "SiteFooter": "m-sfoot",
