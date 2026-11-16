@@ -26,10 +26,15 @@ function published() {
   return roots.map((r) => join(ROOT, r)).filter(existsSync).flatMap((p) => (statSync(p).isDirectory() ? walk(p) : [p])).filter((f) => TEXT.test(f) && !iconData.test(f));
 }
 
+// a name a showcase demo uses on purpose (the home page's chat card: its people), allowed in that file only
+const DEMO_NAMES = new Map([["tolgahan", /examples[\\/]showcase[\\/]src[\\/]home[\\/]bench\.tsx$/]]);
+
 test("published files use product language only", () => {
   const hits = [];
   for (const f of published()) {
-    readFileSync(f, "utf8").split("\n").forEach((line, i) => { for (const re of FORBIDDEN) if (re.test(line)) hits.push(`${relative(ROOT, f)}:${i + 1}: ${line.trim().slice(0, 100)}`); });
+    readFileSync(f, "utf8").split("\n").forEach((line, i) => {
+      for (const re of FORBIDDEN) if (re.test(line) && !DEMO_NAMES.get(re.source)?.test(f)) hits.push(`${relative(ROOT, f)}:${i + 1}: ${line.trim().slice(0, 100)}`);
+    });
   }
   assert.deepEqual(hits, []);
 });
