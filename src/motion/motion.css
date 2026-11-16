@@ -43,6 +43,8 @@
   background: radial-gradient(16rem circle at var(--m-spot-x, -999px) var(--m-spot-y, -999px), var(--m-spot-color, var(--m-accent, var(--m-primary))), transparent 70%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
 .m-spotlight.is-lit::after, .m-spotlight.is-lit::before { opacity: 1; }
+/* a card that scrolls its own content: the light stays on the part in view (spotlight() sets how far it scrolled) */
+.m-spotlight::after, .m-spotlight::before { translate: var(--m-spot-sx, 0px) var(--m-spot-sy, 0px); }
 @media (hover: none) { .m-spotlight::after, .m-spotlight::before { display: none; } }
 
 /* Scroll-driven reveal without JS where supported: class="m-scroll-reveal" */

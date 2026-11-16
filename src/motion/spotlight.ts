@@ -34,9 +34,12 @@ export function spotlight(root: Document | Element, o: SpotlightOptions): () => 
     if (!point) { out(); return; }
     const { x, y } = point, list = cards();
     // read every box first, then write (no layout between the writes)
-    const boxes = list.map((c) => c.getBoundingClientRect());
+    const boxes = list.map((c) => c.getBoundingClientRect()), scrolled = list.map((c) => [c.scrollLeft, c.scrollTop] as const);
     list.forEach((c, i) => {
-      const r = boxes[i]!;
+      const r = boxes[i]!, [sl, st] = scrolled[i]!;
+      // a card that scrolls its own content: the light layer would scroll away with it; it is moved back by as much
+      c.style.setProperty("--m-spot-sx", sl ? `${sl}px` : "");
+      c.style.setProperty("--m-spot-sy", st ? `${st}px` : "");
       // distance from the pointer to the card's box (0 inside it)
       const dx = Math.max(r.left - x, 0, x - r.right), dy = Math.max(r.top - y, 0, y - r.bottom);
       const near = r.width > 0 && dx * dx + dy * dy < reach * reach;
