@@ -1,6 +1,6 @@
 // Open-source product language: the showcase, the docs and every file that ships in the package speak about March,
 // never about the people or the internal process behind it (no names, no "the founder asked", no session or branch
-// talk, no roadmap chatter). Internal planning lives in docs/internal/ (not packaged, not published).
+// talk, no roadmap chatter). Internal planning lives in docs/internal/ (a private repository checked out there: not in this repository, not packaged, not published).
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
