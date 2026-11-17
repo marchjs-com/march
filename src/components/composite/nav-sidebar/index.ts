@@ -4,7 +4,7 @@
 // Remembers open categories and recent visits (localStorage); icon rail mode; drawer with a menu button on small screens.
 import "./nav-sidebar.css";
 import "../../navigation/nav-menu/nav-menu.css";
-import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { path, navigate, type Href } from "../../../router/router.ts";
@@ -32,6 +32,7 @@ import { PanelHeader } from "../../layout/panel-header/index.ts";
 import { ResizeHandle } from "../../layout/resize-handle/index.ts";
 import { SectionLabel } from "../../typography/section-label/index.ts";
 import { navDrawer } from "../../navigation/nav-menu/drawer.ts";
+import { PopoverPanel } from "../../overlays/popover/index.ts";
 
 /** One NavSidebar entry. `href` navigates (router Link); `onSelect` runs instead. */
 export interface NavSidebarItem {
@@ -140,6 +141,14 @@ export interface NavSidebarProps {
     menu?: MaybeFn<string>; expandSidebar?: MaybeFn<string>; collapseSidebar?: MaybeFn<string>; resize?: MaybeFn<string>;
     showUnder?: (label: string) => string; hideUnder?: (label: string) => string;
   } | undefined;
+  /** Wide screens: the menu floats as a card off the screen edge (a gap round it, rounded corners, a shadow; as tall as its content, at most the room between the gaps, then it scrolls) instead of filling the side (`--m-sb-gap`, `--m-sb-gap-top`, `--m-sb-radius`). @tr Geniş ekranlar: menü kenarı doldurmak yerine ekran kenarından ayrık bir kart olarak yüzer (çevresinde boşluk, yuvarlak köşeler, gölge; içeriği kadar uzun, en çok boşluklar arası kadar, sonra kayar; `--m-sb-gap`, `--m-sb-gap-top`, `--m-sb-radius`). */
+  floating?: MaybeFn<boolean>;
+  /** Frosted glass: the menu is see-through, what is behind shows blurred and a little richer, with a hairline glass edge and a light lip on top (`--m-glass-tint`, `--m-glass-blur`). @tr Buzlu cam: menü saydamdır, arkası bulanık ve biraz daha canlı görünür; ince bir cam kenarı ve üstte açık bir ışık çizgisi vardır (`--m-glass-tint`, `--m-glass-blur`). */
+  glass?: MaybeFn<boolean>;
+  /** The pages under an item: "inline" (default: they open under it, in the list) or "flyout" (wide screens: they float in a panel beside the item while the pointer is over it, or the item's arrow / → opens it; the list never moves). @tr Bir öğenin altındaki sayfalar: "inline" (varsayılan: listede altında açılır) ya da "flyout" (geniş ekranlar: imleç öğenin üzerindeyken ya da öğenin oku / → ile yanında yüzen bir panelde açılır; liste hiç kaymaz). */
+  subMenus?: "inline" | "flyout";
+  /** With `subMenus: "flyout"`: the current page's branch is pinned in the list: the pages under the current page and under each item above it open in the list (the list grows and moves what is below it), the other items still fly out (default false). @tr `subMenus: "flyout"` ile: geçerli sayfanın dalı listeye iğnelenir: geçerli sayfanın ve üstündeki her öğenin alt sayfaları listede açılır (liste büyür, altındakini kaydırır), öbür öğeler yine yanda yüzer (varsayılan false). */
+  pinCurrent?: MaybeFn<boolean>;
   /** Extra classes on the wrapper (`m-sb-wrap`). @tr Sarmalayıcıya (`m-sb-wrap`) eklenen ek sınıflar. */
   class?: ClassProp;
 }
@@ -228,7 +237,62 @@ export function NavSidebar(props: NavSidebarProps): Element {
     const a = active();
     return a === id || (!!a && under(id, a));
   };
+  // flyout sub-menus: the item whose pages float beside it now (one at a time), and whether flyouts are in use here
+  // (wide screens, not the icon rail; on a phone the pages open in the list as usual)
+  // (a chain: the item open at each depth, so a floating page with pages of its own opens them beside it in turn)
+  const fly = signal<string[]>([]);
+  const flyAt = (depth: number): string | undefined => fly()[depth];
+  const flyMode = (): boolean => props.subMenus === "flyout" && !rail() && !globalThis.matchMedia?.("(max-width: 900px)").matches;
+  let flyTimer: ReturnType<typeof setTimeout> | undefined;
+  /** pinCurrent: the current page's branch (it and the items above it) opens in the list instead of flying out. */
+  const pinned = (id: string): boolean => { if (!val(props.pinCurrent)) return false; const a = active(); return a === id || (!!a && under(id, a)); };
+  // a page chosen with pinCurrent opens its branch again, even if it was closed by hand before
+  effect(() => {
+    if (!val(props.pinCurrent)) return;
+    const a = active();
+    if (!a) return;
+    untrack(() => {
+      const s = open.peek(), shut = [...s].filter((k) => k[0] === "<" && (k.slice(1) === a || under(k.slice(1), a)));
+      if (shut.length) open.set(new Set([...s].filter((k) => !shut.includes(k))));
+    });
+  });
+  const flyShow = (id: string, depth: number): void => {
+    clearTimeout(flyTimer);
+    if (!flyMode() || untrack(() => pinned(id))) { if (fly.peek().length > depth) fly.set(fly.peek().slice(0, depth)); return; }
+    const chain = fly.peek();
+    if (chain[depth] !== id || chain.length !== depth + 1) fly.set([...chain.slice(0, depth), id]);
+  };
+  // a moment after the pointer leaves: keep the open items it is still over (an item or its floating pages), close the rest
+  const flyHide = (depth: number): void => {
+    clearTimeout(flyTimer);
+    flyTimer = setTimeout(() => {
+      const chain = fly.peek(), keep: string[] = [];
+      try {
+        for (const id of chain) {
+          if (!globalThis.document?.querySelector(`.m-sb-fly[data-fly="${CSS.escape(id)}"]:hover, .m-sb-li[data-fly-li="${CSS.escape(id)}"]:hover`)) break;
+          keep.push(id);
+        }
+      } catch { keep.push(...chain.slice(0, depth)); }
+      if (keep.length !== chain.length) fly.set(keep);
+    }, 160);
+  };
+  // a press anywhere but on the menu or one of its floating panels closes them all; choosing a page in one closes them
+  // after the choice has gone through
+  if (props.subMenus === "flyout") {
+    const away = (e: Event): void => {
+      const t = e.target as Element | null;
+      if (fly.peek().length && !t?.closest?.(".m-sb-fly") && !navEl?.contains(t)) fly.set([]);
+    };
+    const chosen = (e: Event): void => {
+      const t = e.target as Element | null;
+      if (fly.peek().length && t?.closest?.(".m-sb-fly .m-sb-row")) setTimeout(() => fly.set([]), 0);
+    };
+    globalThis.document?.addEventListener("pointerdown", away, true);
+    globalThis.document?.addEventListener("click", chosen, true);
+    onCleanup(() => { globalThis.document?.removeEventListener("pointerdown", away, true); globalThis.document?.removeEventListener("click", chosen, true); });
+  }
   const toggleKids = (id: string): void => {
+    if (flyMode() && !pinned(id)) { fly.set(fly.peek()[0] === id ? [] : [id]); return; }
     const to = !kidsOpen(id);
     open.update((s) => { const n = new Set(s); n.delete(`>${id}`); n.delete(`<${id}`); n.add(`${to ? ">" : "<"}${id}`); return n; });
     persist();
@@ -301,7 +365,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
     const look = { class: "m-sb-badge", tone, variant: tone === "primary" ? "solid" as const : undefined };
     return typeof b === "number" ? h(Badge, { ...look, count: b }) : h(Badge, look, b);
   };
-  const row = (x: NavSidebarItem, where: string, sub?: () => string): Element => {
+  const row = (x: NavSidebarItem, where: string, sub?: () => string, depth = 0): Element => {
     const kids = where === "group" || where === "main" || where === "child" ? kidsOf().get(x.id) : undefined;
     const count = lgItems && kids?.length && where !== "child" && props.groupCounts !== false ? h("span", { class: "m-sb-count" }, String(kids.length)) : undefined;
     const el = h(ListRow, {
@@ -316,8 +380,20 @@ export function NavSidebar(props: NavSidebarProps): Element {
     });
     if (!kids?.length) return h("li", { class: "m-sb-li" }, el);
     const kid = uid("m-sbk");
-    return h("li", { class: () => cx("m-sb-li", "is-parent", kidsOpen(x.id) && "is-kids-open") },
-      el,
+    // flyout: the pages float beside the item while the pointer is over it (or over the panel); the list stays put
+    let liEl: HTMLElement | undefined;
+    const flyout = props.subMenus === "flyout" ? PopoverPanel({
+      // (a computed: the panel hears only when it opens or closes, not each time the chain changes deeper down, which
+      // would draw its pages again under the pointer)
+      anchor: () => liEl, open: computed(() => flyAt(depth) === x.id), onOpenChange: (o) => { if (!o && fly.peek()[depth] === x.id) fly.set(fly.peek().slice(0, depth)); },
+      // (a press outside is handled once for the whole chain below: a panel must not close when a deeper one is pressed)
+      placement: "right-start", autoFocus: false, closeOnOutside: false, role: null, motion: "fade", flush: true, panelClass: cx("m-sb-fly", untrack(() => val(props.glass)) && "is-glass", lgItems && "is-lg-items"), label: () => text(x.label),
+      panelProps: { "data-fly": x.id, onPointerenter: () => flyShow(x.id, depth), onPointerleave: () => flyHide(depth), onKeydown: (e: KeyboardEvent) => onKey(e) },
+      children: () => h("ul", { class: "m-sb-list m-sb-sublist m-sb-fly-list" }, kids.map((k) => row(k, "child", undefined, depth + 1))),
+    }) : null;
+    return h("li", { class: () => cx("m-sb-li", "is-parent", kidsOpen(x.id) && "is-kids-open", pinned(x.id) && "is-pinned", flyAt(depth) === x.id && "is-flying"), ref: (n: HTMLElement) => { liEl = n; }, "data-fly-li": x.id,
+      onPointerenter: props.subMenus === "flyout" ? () => flyShow(x.id, depth) : undefined, onPointerleave: props.subMenus === "flyout" ? () => flyHide(depth) : undefined },
+      el, flyout,
       h(IconButton, { class: "m-sb-kids-btn", size: "xs", icon: h(Chevron, {}), title: false, tabindex: "-1", "aria-expanded": () => String(kidsOpen(x.id)), "aria-controls": kid,
         label: () => (kidsOpen(x.id) ? props.labels?.hideUnder?.(text(x.label)) ?? t`Hide pages under ${text(x.label)}` : props.labels?.showUnder?.(text(x.label)) ?? t`Show pages under ${text(x.label)}`), onClick: () => toggleKids(x.id) }),
       h("div", { class: "m-sb-kids", id: kid, inert: () => !kidsOpen(x.id) },
@@ -373,17 +449,38 @@ export function NavSidebar(props: NavSidebarProps): Element {
     if (e.defaultPrevented) return; // handled once (nested handlers / delegation)
     const target = e.target as HTMLElement;
     if (!target.classList.contains("m-sb-row")) return;
-    const list = rows(), i = list.indexOf(target);
+    // (in a floating panel the arrows move among its own pages)
+    const panel = target.closest<HTMLElement>(".m-sb-fly");
+    const list = panel ? [...panel.querySelectorAll<HTMLElement>(".m-sb-row")] : rows(), i = list.indexOf(target);
     // ↑ on the first row goes back to the search box; ↑ ↓ Home End otherwise move among the rows
     if (e.key === "ArrowUp" && i === 0) { e.preventDefault(); searchEl?.focus(); return; }
     if (roving(e, list, { wrap: false })) return;
     // nested items: → opens a parent's children, ← closes them, or goes from a child back to its parent
     if ((e.key === "ArrowRight" || e.key === "ArrowLeft") && target.closest(".is-parent, .m-sb-sublist")) {
       const li = target.parentElement, id = target.dataset["id"] ?? "";
-      if (li?.classList.contains("is-parent") && target.dataset["where"] !== "child") {
+      if (li?.classList.contains("is-parent") && (target.dataset["where"] !== "child" || (flyMode() && e.key === "ArrowRight"))) {
+        if (e.key === "ArrowRight" && flyMode()) {
+          // flyout: → opens the floating pages and goes to the first of them
+          // (from a floating page: its own pages open one level further)
+          e.preventDefault();
+          const inPanel = target.closest<HTMLElement>(".m-sb-fly"), depth = inPanel ? fly.peek().indexOf(inPanel.dataset["fly"] ?? "") + 1 : 0;
+          fly.set([...fly.peek().slice(0, depth), id]);
+          setTimeout(() => document.querySelector<HTMLElement>(`.m-sb-fly[data-fly="${CSS.escape(id)}"] .m-sb-row`)?.focus(), 30);
+          return;
+        }
         if (e.key === "ArrowRight") { e.preventDefault(); if (!kidsOpen(id)) toggleKids(id); else list[i + 1]?.focus(); return; }
         if (kidsOpen(id)) { e.preventDefault(); toggleKids(id); return; }
       } else if (e.key === "ArrowLeft") {
+        // from a floating page: ← closes the flyout and goes back to its item
+        // from a floating page: ← closes its panel and goes back to the item it hangs from
+        const inPanel = target.closest<HTMLElement>(".m-sb-fly");
+        if (inPanel) {
+          e.preventDefault();
+          const back = inPanel.dataset["fly"] ?? "", chain = fly.peek(), at = chain.indexOf(back);
+          fly.set(at >= 0 ? chain.slice(0, at) : []);
+          document.querySelector<HTMLElement>(`.m-sb-row[data-id="${CSS.escape(back)}"]`)?.focus();
+          return;
+        }
         const up = target.closest(".is-parent")?.querySelector<HTMLElement>(":scope > .m-sb-row");
         if (up) { e.preventDefault(); up.focus(); return; }
       }
@@ -427,7 +524,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
   });
   const title = props.title; // read once: a node prop is built when it is read
   const railLabel = (): string => (rail() ? L("expandSidebar", t`Expand sidebar`) : L("collapseSidebar", t`Collapse sidebar`));
-  return h("div", { class: () => cx("m-nav-wrap", "m-sb-wrap", drawer() && "is-open", rail() && "is-rail", props.resizable && "is-resizable", props.nestedSubs && "is-nested-subs", lgItems && "is-lg-items", val(props.class)), ref: (x: HTMLElement) => { wrapEl = x; const w = cssWidth(); if (w) x.style.setProperty("--m-sb-w", w); } },
+  return h("div", { class: () => cx("m-nav-wrap", "m-sb-wrap", drawer() && "is-open", rail() && "is-rail", props.resizable && "is-resizable", props.nestedSubs && "is-nested-subs", lgItems && "is-lg-items", val(props.floating) && "is-floating", val(props.glass) && "is-glass", props.subMenus === "flyout" && "is-flyout-subs", val(props.class)), ref: (x: HTMLElement) => { wrapEl = x; const w = cssWidth(); if (w) x.style.setProperty("--m-sb-w", w); } },
     props.menuButton === false ? null : sheet.burger,
     sheet.place(h("nav", { class: "m-nav m-sb", id: navId, ref: (x: HTMLElement) => { navEl = x; }, "aria-label": () => val(props.label) ?? t`Main`, onKeydown: onKey },
       h("div", { class: "m-sb-head" },

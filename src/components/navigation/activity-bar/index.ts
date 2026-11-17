@@ -28,6 +28,8 @@ export interface ActivityItem {
   shortcut?: string;
   /** A plain action instead of a view (it is not selected). */
   onSelect?: () => unknown;
+  /** Items under this one (`subItems`): `{ id, label, short, icon }`. */
+  children?: readonly ActivityItem[];
 }
 export interface ActivityBarProps {
   /** The views: `{ id, label, short, icon, badge, position, shortcut, onSelect }` (an array or an accessor). @tr Görünümler: `{ id, label, short, icon, badge, position, shortcut, onSelect }` (dizi ya da erişimci). */
@@ -52,6 +54,14 @@ export interface ActivityBarProps {
   tooltips?: boolean | undefined;
   /** The name under each icon (an item's `short`, else its `label`): a wider bar, as a section rail or a phone tab bar (default false). @tr Her ikonun altında ad (öğenin `short`'u, yoksa `label`'ı): bölüm rayı ya da telefon sekme çubuğu gibi daha geniş bir çubuk (varsayılan false). */
   showLabels?: boolean | undefined;
+  /** Frosted glass: the bar is see-through, what is behind shows blurred and a little richer, with a hairline glass edge and a light lip on top (`--m-glass-tint`, `--m-glass-blur`). @tr Buzlu cam: çubuk saydamdır, arkası bulanık ve biraz daha canlı görünür; ince bir cam kenarı ve üstte açık bir ışık çizgisi vardır (`--m-glass-tint`, `--m-glass-blur`). */
+  glass?: MaybeFn<boolean>;
+  /** The selected item's `children` fly out of it and line up right under it, one after another; choosing another item takes them away and brings its own (a section rail that shows the pages of the section you are in). @tr Seçili öğenin `children`'ı ondan uçarak çıkar ve hemen altına sırayla dizilir; başka bir öğe seçilince onlar kalkar, onunkiler gelir (bulunduğun bölümün sayfalarını gösteren bir bölüm rayı). */
+  subItems?: boolean | undefined;
+  /** The id of the child that is current (marked among the children). @tr Geçerli alt öğenin id'si (alt öğeler arasında işaretlenir). */
+  subValue?: MaybeFn<string | null | undefined>;
+  /** Called when a child is chosen (default: `onChange` with the child's id). @tr Bir alt öğe seçilince çağrılır (varsayılan: alt öğenin id'siyle `onChange`). */
+  onSubSelect?: ((child: ActivityItem, parent: ActivityItem) => void) | undefined;
   /** Extra class on the bar. @tr Çubuğa eklenen sınıf. */
   class?: ClassProp;
 }
@@ -91,6 +101,19 @@ export function ActivityBar(props: ActivityBarProps): Element {
     });
   }
 
+  // subItems: the selected item's children, right under it. Each flies out of the item (from its place, one after
+  // another) as it comes; they go when another item is chosen
+  const subs = (id: string): unknown => {
+    if (current() !== id) return null;
+    const parent = byId(id), kids = parent?.children;
+    if (!parent || !kids?.length) return null;
+    return untrack(() => h("div", { class: "m-ab-sub", role: "group", "aria-label": () => val(parent.label) },
+      kids.map((k, i) => h("button", {
+        type: "button", class: () => cx("m-ab-sub-btn", val(props.subValue) === k.id && "is-current"), "data-sub": k.id, "aria-label": () => val(k.label),
+        "aria-current": () => (val(props.subValue) === k.id ? "page" : null), ref: (el: HTMLElement) => el.style.setProperty("--m-ab-i", String(i)),
+        onClick: () => (props.onSubSelect ? props.onSubSelect(k, parent) : props.onChange(k.id)),
+      }, icon(k.icon, "m-ab-icon"), props.showLabels && h("span", { class: "m-ab-text" }, () => val(k.short) ?? val(k.label))))));
+  };
   const tabs = computed((): TabSpec[] => ordered().map((it) => ({
     id: it.id,
     label: [icon(it.icon, "m-ab-icon"), props.showLabels && h("span", { class: "m-ab-text" }, () => val(it.short) ?? val(it.label)), it.badge !== undefined && h("span", { class: "m-ab-badge" }, h(Badge, { count: () => val(it.badge), tone: "primary", size: "xs" }))],
@@ -100,9 +123,12 @@ export function ActivityBar(props: ActivityBarProps): Element {
   return h(TabList, {
     tabs, value: selected, onSelect: (id: string) => choose(byId(id)), orientation: reactive(() => (horizontal() ? "horizontal" : "vertical")) as never,
     activation: "manual", variant: "none", controls: props.controls, tabId: (id: string) => `${base}-${id}`,
-    class: () => cx("m-ab", horizontal() ? "m-ab-h" : "m-ab-v", props.showLabels && "m-ab-labeled", val(props.class)), label: () => val(props.label) ?? t`Views`,
+    class: () => cx("m-ab", horizontal() ? "m-ab-h" : "m-ab-v", props.showLabels && "m-ab-labeled", val(props.glass) && "is-glass", val(props.class)), label: () => val(props.label) ?? t`Views`,
     tabProps: (tab: TabSpec) => { const it = byId(tab.id)!; return { class: cx("m-ab-btn", it.position === "end" && "m-ab-end"), "data-view": it.id, "aria-label": () => name(it), "aria-keyshortcuts": it.shortcut ?? null }; },
-    wrap: (btn: Element, tab: TabSpec) => (props.tooltips === false ? btn : h(Tooltip, { text: () => name(byId(tab.id)!), placement: reactive(() => (horizontal() ? "top" : "bottom-start")) as never, children: btn })),
+    wrap: (btn: Element, tab: TabSpec) => {
+      const shown = props.tooltips === false ? btn : h(Tooltip, { text: () => name(byId(tab.id)!), placement: reactive(() => (horizontal() ? "top" : "bottom-start")) as never, children: btn });
+      return props.subItems ? [shown, () => subs(tab.id)] : shown;
+    },
     children: ind,
   }) as Element;
 }

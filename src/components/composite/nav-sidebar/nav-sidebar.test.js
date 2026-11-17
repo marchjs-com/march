@@ -294,3 +294,82 @@ test("NavSidebar: groupHeads={false} is a two-level menu; expand / collapse all 
   assert.deepEqual(open(), [false, false], "a closed choice is kept");
   m.dispose();
 });
+
+test("NavSidebar floating: the wrapper carries is-floating, following a reactive value", () => {
+  const on = signal(true);
+  const m = mount(() => h(U.NavSidebar, { items: ITEMS, floating: on, storageKey: "t.float", palette: false, hotkey: false }));
+  const wrap = m.el.querySelector(".m-sb-wrap");
+  assert.ok(wrap.classList.contains("is-floating"));
+  on.set(false);
+  assert.ok(!wrap.classList.contains("is-floating"));
+  m.dispose();
+});
+
+test("NavSidebar glass: the wrapper carries is-glass", () => {
+  const m = mount(() => h(U.NavSidebar, { items: ITEMS, glass: true, storageKey: "t.glass", palette: false, hotkey: false }));
+  assert.ok(m.el.querySelector(".m-sb-wrap").classList.contains("is-glass"));
+  m.dispose();
+});
+
+test("NavSidebar subMenus flyout: an item's pages float beside it while the pointer is over it; the list keeps them closed", async () => {
+  const items = [
+    { id: "inv", label: "Faturalar", href: "/inv", group: "Satış" },
+    { id: "inv-late", label: "Gecikenler", href: "/inv/late", group: "Satış", parent: "inv" },
+    { id: "inv-draft", label: "Taslaklar", href: "/inv/draft", group: "Satış", parent: "inv" },
+  ];
+  const m = mount(() => h(U.NavSidebar, { items, subMenus: "flyout", nestedSubs: true, defaultOpen: "all", storageKey: "t.fly", palette: false, hotkey: false }));
+  assert.ok(m.el.querySelector(".m-sb-wrap").classList.contains("is-flyout-subs"));
+  const li = m.el.querySelector(".m-sb-li.is-parent");
+  assert.ok(li, "the item with pages");
+  li.dispatchEvent(new Event("pointerenter"));
+  await tick(20);
+  const panel = document.querySelector(".m-sb-fly");
+  assert.ok(panel, "the pages float in a panel");
+  assert.deepEqual([...panel.querySelectorAll(".m-sb-row")].map((r) => r.textContent.trim()), ["Gecikenler", "Taslaklar"]);
+  li.dispatchEvent(new Event("pointerleave"));
+  await tick(220);
+  assert.equal(document.querySelector(".m-sb-fly"), null, "gone a moment after the pointer leaves");
+  m.dispose();
+});
+
+test("NavSidebar subMenus flyout: a floating page with pages of its own opens them beside it; the first panel stays", async () => {
+  const items = [
+    { id: "apps", label: "Uygulamalar", href: "/apps", group: "Yapılar" },
+    { id: "landing", label: "Açılış sayfaları", href: "/apps/landing", group: "Yapılar", parent: "apps" },
+    { id: "landing-a", label: "Mağaza", href: "/apps/landing/a", group: "Yapılar", parent: "landing" },
+  ];
+  const m = mount(() => h(U.NavSidebar, { items, subMenus: "flyout", nestedSubs: true, defaultOpen: "all", storageKey: "t.fly2", palette: false, hotkey: false }));
+  m.el.querySelector('.m-sb-li[data-fly-li="apps"]').dispatchEvent(new Event("pointerenter"));
+  await tick(20);
+  const inner = document.querySelector('.m-sb-fly[data-fly="apps"] .m-sb-li[data-fly-li="landing"]');
+  assert.ok(inner, "the floating page with pages of its own");
+  inner.dispatchEvent(new Event("pointerenter"));
+  await tick(20);
+  assert.ok(document.querySelector('.m-sb-fly[data-fly="apps"]'), "the first panel stays open");
+  const second = document.querySelector('.m-sb-fly[data-fly="landing"]');
+  assert.ok(second, "its pages float beside it");
+  assert.deepEqual([...second.querySelectorAll(".m-sb-row")].map((r) => r.textContent.trim()), ["Mağaza"]);
+  m.dispose();
+});
+
+test("NavSidebar pinCurrent: the current page's branch opens in the list; the other items still fly out", async () => {
+  const items = [
+    { id: "apps", label: "Uygulamalar", href: "/apps", group: "Yapılar" },
+    { id: "landing", label: "Açılış sayfaları", href: "/apps/landing", group: "Yapılar", parent: "apps" },
+    { id: "inv", label: "Faturalar", href: "/inv", group: "Yapılar" },
+    { id: "inv-late", label: "Gecikenler", href: "/inv/late", group: "Yapılar", parent: "inv" },
+  ];
+  R.navigate("/apps/landing"); await tick();
+  const m = mount(() => h(U.NavSidebar, { items, subMenus: "flyout", pinCurrent: true, nestedSubs: true, defaultOpen: "all", storageKey: "t.pin", palette: false, hotkey: false }));
+  const apps = m.el.querySelector('.m-sb-li[data-fly-li="apps"]'), inv = m.el.querySelector('.m-sb-li[data-fly-li="inv"]');
+  assert.ok(apps.classList.contains("is-pinned") && apps.classList.contains("is-kids-open"), "the current page's parent is pinned open");
+  assert.ok(!inv.classList.contains("is-pinned"));
+  apps.dispatchEvent(new Event("pointerenter"));
+  await tick(20);
+  assert.equal(document.querySelector('.m-sb-fly[data-fly="apps"]'), null, "a pinned item does not fly out");
+  inv.dispatchEvent(new Event("pointerenter"));
+  await tick(20);
+  assert.ok(document.querySelector('.m-sb-fly[data-fly="inv"]'), "another item still flies out");
+  m.dispose();
+  R.navigate("/"); await tick();
+});

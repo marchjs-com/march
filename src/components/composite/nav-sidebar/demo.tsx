@@ -25,7 +25,7 @@ const ITEMS = [
 
 const SECTIONS: Record<string, string[] | undefined> = { all: undefined, sales: ["Satış"], admin: ["Yönetim", "Analiz"] }
 
-export default function NavSidebarDemo(props: { values: { groupOrder: string; defaultOpen: string; collapsible: boolean; recent: number; search: boolean; headings: boolean; expandAll: boolean; groupCounts: boolean; groupHeads: boolean; ownLabels: boolean; section: string; itemSize: string; subOverflow: string } }) {
+export default function NavSidebarDemo(props: { values: { groupOrder: string; defaultOpen: string; collapsible: boolean; recent: number; search: boolean; headings: boolean; expandAll: boolean; groupCounts: boolean; groupHeads: boolean; ownLabels: boolean; floating: boolean; glass: boolean; subMenus: string; pinCurrent: boolean; section: string; itemSize: string; subOverflow: string } }) {
   // read here: JSX attributes become getters, so the sidebar is drawn again only for values read in this function
   return <div class="sc-sb-frame">{() => { const { groupOrder, defaultOpen, collapsible, recent } = { groupOrder: props.values.groupOrder, defaultOpen: props.values.defaultOpen, collapsible: props.values.collapsible, recent: props.values.recent }
     const parts = { search: props.values.search, headings: props.values.headings, expandAll: props.values.expandAll, groupCounts: props.values.groupCounts, groupHeads: props.values.groupHeads }
@@ -37,5 +37,5 @@ export default function NavSidebarDemo(props: { values: { groupOrder: string; de
     if (!Array.isArray(visits) || !visits.length) save(storageKey, { ...seen, recent: ITEMS.map((x) => x.id) })
     return <NavSidebar title="HADİ" items={ITEMS} storageKey={storageKey}
       groupOrder={groupOrder === "alpha" ? "alpha" : "none"} defaultOpen={defaultOpen as "all"}
-      collapsible={collapsible} recent={recent} {...parts} labels={labels} itemSize={itemSize} subOverflow={subOverflow} visibleGroups={() => SECTIONS[props.values.section]} hotkey={false} palette={false} label="Playground kenar çubuğu" /> }}</div>
+      collapsible={collapsible} recent={recent} {...parts} labels={labels} itemSize={itemSize} subOverflow={subOverflow} floating={props.values.floating} glass={props.values.glass} subMenus={props.values.subMenus as "inline"} pinCurrent={() => props.values.pinCurrent} visibleGroups={() => SECTIONS[props.values.section]} hotkey={false} palette={false} label="Playground kenar çubuğu" /> }}</div>
 }

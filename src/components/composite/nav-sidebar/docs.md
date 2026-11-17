@@ -24,6 +24,10 @@ featured items at the top, a collapsible icon rail and a resizable width, all re
 | `defaultOpen` | `"active"` `"all"` `"none"` | `"active"` | categories open on the first visit |
 | `hotkey` | `"focus"` `"palette"` `false` | `"focus"` | Ctrl+K focuses the search, or belongs to a CommandPalette |
 | `collapsible` | boolean | `false` | icon rail button (state persists) |
+| `floating` | boolean / accessor | `false` | wide screens: a card off the screen edge, as tall as its content (at most the room between the gaps, then it scrolls) (gap `--m-sb-gap`, a larger top gap `--m-sb-gap-top` under a floating header, corners `--m-sb-radius`, a shadow) |
+| `glass` | boolean / accessor | `false` | frosted glass: see-through, the backdrop blurred, a hairline glass edge (`--m-glass-tint`, `--m-glass-blur`) |
+| `subMenus` | `"inline"` / `"flyout"` | `"inline"` | the pages under an item: in the list under it, or (wide screens) floating in a panel beside it while the pointer is over it (its arrow or → opens it too; ← goes back); the list never moves |
+| `pinCurrent` | boolean / accessor | `false` | with `subMenus: "flyout"`: the current page's branch is pinned in the list (its pages and those of the items above it open in the list, which grows); the other items still fly out |
 | `resizable`, `minWidth`, `maxWidth`, `collapseBelow` | boolean, px | `false`, 200, 480 | drag grip; narrower than `collapseBelow` switches to the rail |
 | `storageKey`, `persist` | string, boolean | `"m.sidebar"` | where open categories, recents and width are kept |
 | `placeholder`, `label` | string | `t` texts | search placeholder, landmark name |

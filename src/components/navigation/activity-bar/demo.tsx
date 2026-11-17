@@ -7,6 +7,9 @@ import { gitBranch } from "../../../icons/glyphs/gitBranch.ts";
 import { bug } from "../../../icons/glyphs/bug.ts";
 import { settings } from "../../../icons/glyphs/settings.ts";
 import { user } from "../../../icons/glyphs/user.ts";
+import { fileText } from "../../../icons/glyphs/fileText.ts";
+import { clock } from "../../../icons/glyphs/clock.ts";
+import { star } from "../../../icons/glyphs/star.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 
 export const code = `<ActivityBar value={$view} onChange={(v) => $view = v} controls="side-view" items={[
@@ -17,22 +20,25 @@ export const code = `<ActivityBar value={$view} onChange={(v) => $view = v} cont
 ]} />
 <ActivityBar items={views} value={$view} onChange={(v) => $view = v} m:color="brand-purple" motion="fade" tooltips={false} />
 <ActivityBar items={views} value={$view} onChange={(v) => $view = v} indicator={false} />
-<ActivityBar items={views} value={$view} onChange={(v) => $view = v} showLabels tooltips={false} />   // adlar ikonun altında`
+<ActivityBar items={views} value={$view} onChange={(v) => $view = v} showLabels tooltips={false} />   // adlar ikonun altında
+<ActivityBar items={sections} value={$section} onChange={pick} subItems subValue={$page} onSubSelect={(c) => go(c.id)} />   // seçilenin alt öğeleri altında`
 
 const TITLES: Record<string, string> = { files: "Dosyalar", search: "Ara", git: "Kaynak denetimi", debug: "Hata ayıkla" }
 // the indicator's motion shows only while the view changes: the stage says which one is on
 const MOTIONS: Record<string, string> = { glide: "Çizgi etkin simgeye kayarak gider", fade: "Çizgi etkin simgede yerinde belirir", none: "Çizgi hareketsiz yer değiştirir", off: "Çizgi yok" }
 
-export default function ActivityBarDemo(props: { values: { orientation: string; badges: boolean; indicator: string; color: string; tooltips: boolean; showLabels: boolean } }) {
-  const view = signal<string | null>("files")
+export default function ActivityBarDemo(props: { values: { orientation: string; badges: boolean; indicator: string; color: string; tooltips: boolean; showLabels: boolean; glass: boolean; subItems: boolean } }) {
+  const view = signal<string | null>("files"), sub = signal<string | null>("open")
   return <div class={() => (props.values.orientation === "horizontal" ? "sc-ab-stage is-h" : "sc-ab-stage")}>
     {() => {
       // the indicator, its motion, the tooltips and the color are read once: the bar is drawn again when one changes
       const ind = props.values.indicator, showLabels = props.values.showLabels, tooltips = props.values.tooltips && !showLabels, color = (props.values.color || undefined) as ColorToken
       return <ActivityBar value={view} onChange={(v: string | null) => view.set(v)} controls="sc-ab-view"
-      indicator={ind !== "off"} motion={ind === "off" ? undefined : ind as "glide"} tooltips={tooltips} showLabels={showLabels} m:color={color}
+      indicator={ind !== "off"} motion={ind === "off" ? undefined : ind as "glide"} tooltips={tooltips} showLabels={showLabels} glass={props.values.glass} subItems={props.values.subItems} subValue={() => sub()} onSubSelect={(c: { id: string }) => sub.set(c.id)} m:color={color}
       orientation={() => props.values.orientation as "vertical"} label="Görünümler" items={[
-        { id: "files", label: "Dosyalar", icon: files, shortcut: "mod+shift+e" },
+        { id: "files", label: "Dosyalar", icon: files, shortcut: "mod+shift+e", children: [
+          { id: "open", label: "Açık dosyalar", short: "Açık", icon: fileText }, { id: "recent", label: "Son kullanılanlar", short: "Son", icon: clock }, { id: "starred", label: "Yıldızlılar", short: "Yıldız", icon: star },
+        ] },
         { id: "search", label: "Ara", icon: search, badge: () => (props.values.badges ? 12 : 0) },
         { id: "git", label: "Kaynak denetimi", short: "Kaynak", icon: gitBranch, badge: () => (props.values.badges ? 3 : 0) },
         { id: "debug", label: "Hata ayıkla", short: "Ayıkla", icon: bug },

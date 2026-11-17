@@ -7,7 +7,7 @@ import { on, cx } from "./util.ts";
 import { clamp } from "../core/util.ts";
 import { dismiss } from "../behaviors/dismiss/index.ts";
 
-export type Placement = "bottom-start" | "bottom-end" | "top-start" | "top-end" | "top" | "bottom";
+export type Placement = "bottom-start" | "bottom-end" | "top-start" | "top-end" | "top" | "bottom" | "right-start";
 /** Fixed position as a style object. */
 export interface PlacedStyle { top: string; left: string; "min-width"?: string | null }
 
@@ -25,6 +25,12 @@ export function place(anchor: Element, panel: Element | null | undefined, placem
   const vw = scope?.width ?? (de?.clientWidth || globalThis.innerWidth || 1024), vh = scope?.height ?? (de?.clientHeight || globalThis.innerHeight || 768);
   const r = anchor.getBoundingClientRect();
   const a = { top: r.top - oy, bottom: r.bottom - oy, left: r.left - ox, right: r.right - ox, width: r.width };
+  // beside the anchor, its top level with the anchor's (a sub-menu): on the left when there is no room on the right
+  if (placement === "right-start") {
+    let x = a.right + gap;
+    if (x + p.width > vw - 8) x = a.left - gap - p.width;
+    return { top: `${Math.round(clamp(vh - p.height - 8, 8, a.top))}px`, left: `${Math.round(clamp(vw - p.width - 8, 8, x))}px`, "min-width": null };
+  }
   const parts = placement.split("-");
   let side = parts[0];
   const align = parts[1] ?? "center";

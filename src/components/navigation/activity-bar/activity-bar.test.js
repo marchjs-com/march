@@ -96,3 +96,33 @@ test("ActivityBar: showLabels writes the name under each icon (short, else label
   assert.ok(!plain.classList.contains("m-ab-labeled"));
   m.dispose();
 });
+
+test("ActivityBar glass: the bar carries is-glass, following a reactive value", () => {
+  const on = signal(true);
+  const m = mount(() => h(ActivityBar, { items: [{ id: "a", label: "A", icon: "" }], glass: on }));
+  const bar = m.el.querySelector(".m-ab");
+  assert.ok(bar.classList.contains("is-glass"));
+  on.set(false);
+  assert.ok(!bar.classList.contains("is-glass"));
+  m.dispose();
+});
+
+test("ActivityBar subItems: the selected item's children under it; another item brings its own; a child calls onSubSelect", async () => {
+  const view = signal("a"), picked = [];
+  const items = [
+    { id: "a", label: "A", icon: "", children: [{ id: "a1", label: "A1", icon: "" }, { id: "a2", label: "A2", icon: "" }] },
+    { id: "b", label: "B", icon: "", children: [{ id: "b1", label: "B1", icon: "" }] },
+    { id: "c", label: "C", icon: "" },
+  ];
+  const m = mount(() => h(ActivityBar, { items, value: view, onChange: (v) => view.set(v), subItems: true, subValue: () => "a2", onSubSelect: (c, p) => picked.push(`${p.id}/${c.id}`) }));
+  const subs = () => [...m.el.querySelectorAll(".m-ab-sub-btn")].map((b) => b.dataset.sub);
+  assert.deepEqual(subs(), ["a1", "a2"]);
+  assert.equal(m.el.querySelector('[data-sub="a2"]').getAttribute("aria-current"), "page");
+  view.set("b"); await tick();
+  assert.deepEqual(subs(), ["b1"], "another item takes the old ones away and brings its own");
+  m.el.querySelector('[data-sub="b1"]').click();
+  assert.deepEqual(picked, ["b/b1"]);
+  view.set("c"); await tick();
+  assert.deepEqual(subs(), [], "no children, nothing under it");
+  m.dispose();
+});

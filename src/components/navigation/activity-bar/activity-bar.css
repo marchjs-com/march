@@ -27,3 +27,39 @@
 .m-ab-labeled.m-ab-h .m-ab-text { font-size: .65625rem; letter-spacing: -.01em; }
 .m-ab-labeled .m-ab-icon .m-svg { width: 1.25rem; height: 1.25rem; }
 .m-ab-labeled.m-ab-v .m-ab-ind { width: 3px; border-radius: 3px; }
+/* glass: see-through, the backdrop blurred and a little richer; a hairline glass edge and a light lip on top. Its
+   lights are mixed from the theme's own surface (white on a light page, a lighter tone of it on a dark one) */
+.m-ab.is-glass { background: color-mix(in srgb, var(--m-surface) var(--m-glass-tint, 28%), transparent);
+  -webkit-backdrop-filter: blur(var(--m-glass-blur, 18px)) saturate(170%); backdrop-filter: blur(var(--m-glass-blur, 18px)) saturate(170%);
+  border-color: var(--m-glass-edge-c, color-mix(in srgb, color-mix(in srgb, var(--m-surface), var(--m-text) 14%) 65%, transparent)); box-shadow: var(--m-shadow-3), inset 0 1px 0 var(--m-glass-lip-c, color-mix(in srgb, color-mix(in srgb, var(--m-surface), white 25%) 60%, transparent)); }
+/* glass, domed: a soft light over the top part, and a band of light sweeping across once each time the pointer comes in
+   (it slides over while hovered, and back the same way when the pointer leaves) */
+.m-ab.is-glass::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(140% 55% at 50% 0%, color-mix(in srgb, color-mix(in srgb, var(--m-surface), white 35%) var(--m-glass-gloss, 55%), transparent), transparent 70%),
+    linear-gradient(to top, color-mix(in srgb, black var(--m-glass-shade, 7%), transparent), transparent 35%); }
+.m-ab.is-glass::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(115deg, transparent 40%, color-mix(in srgb, color-mix(in srgb, var(--m-surface), white 55%) var(--m-glass-shine, 55%), transparent) 50%, transparent 60%) no-repeat;
+  background-size: 300% 100%; background-position: 100% 0; transition: background-position calc(var(--m-dur-slow) * 3) var(--m-ease-out); }
+.m-ab.is-glass:hover::after { background-position: 0 0; }
+@media (prefers-reduced-motion: reduce) { .m-ab.is-glass::after { display: none; } }
+/* on glass the hover highlight is glass too: a lighter pane with its own hairline edge and lip */
+.m-ab.is-glass .m-ab-btn { transition: color var(--m-dur) var(--m-ease), background-color var(--m-dur) var(--m-ease), box-shadow var(--m-dur) var(--m-ease), scale var(--m-dur) var(--m-ease); }
+.m-ab.is-glass .m-ab-btn:hover { background: color-mix(in srgb, color-mix(in srgb, var(--m-surface), white 30%) 50%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, color-mix(in srgb, var(--m-surface), var(--m-text) 14%) 55%, transparent), inset 0 1px 0 color-mix(in srgb, color-mix(in srgb, var(--m-surface), white 35%) 70%, transparent), 0 .125rem .5rem color-mix(in srgb, black 6%, transparent); }
+/* subItems: the selected item's children under it, a little smaller; each flies out of the item into its place, one
+   after another (from where the item is: higher the further down it goes) */
+.m-ab-sub { display: flex; flex-direction: column; align-items: center; gap: .125rem; inline-size: 100%; padding-block: .125rem .375rem; }
+.m-ab-h .m-ab-sub { flex-direction: row; inline-size: auto; padding: 0 .375rem; }
+.m-ab-sub-btn { position: relative; display: grid; place-items: center; inline-size: 2.5rem; block-size: 2.25rem; padding: 0; border: 0; border-radius: var(--m-radius-2); background: none; color: var(--m-muted); cursor: pointer;
+  opacity: 1; translate: 0 0; scale: 1;
+  transition: opacity var(--m-dur-slow) var(--m-ease-out), translate var(--m-dur-slow) var(--m-ease-spring), scale var(--m-dur-slow) var(--m-ease-spring), color var(--m-dur) var(--m-ease), background-color var(--m-dur) var(--m-ease);
+  transition-delay: calc(var(--m-ab-i, 0) * var(--m-dur-fast) / 3), calc(var(--m-ab-i, 0) * var(--m-dur-fast) / 3), calc(var(--m-ab-i, 0) * var(--m-dur-fast) / 3), calc(var(--m-dur) * 0), calc(var(--m-dur) * 0); }
+@starting-style { .m-ab-sub-btn { opacity: 0; scale: .6; translate: 0 calc(-1 * (var(--m-ab-i, 0) + 1) * 2.375rem); } }
+.m-ab-h .m-ab-sub-btn { translate: 0 0; }
+.m-ab-sub-btn:hover { color: var(--m-text); background: color-mix(in srgb, var(--m-text) 6%, transparent); }
+.m-ab-sub-btn.is-current { color: var(--m-accent-text, var(--m-primary-text)); background: color-mix(in srgb, var(--m-accent, var(--m-primary)) 10%, transparent); }
+.m-ab-sub-btn:focus-visible { outline: 2px solid var(--m-accent, var(--m-primary)); outline-offset: 1px; }
+.m-ab-sub-btn .m-ab-icon { inline-size: 1rem; block-size: 1rem; }
+.m-ab-labeled .m-ab-sub-btn { inline-size: calc(100% - .5rem); block-size: auto; min-block-size: 2.5rem; padding: .3125rem .25rem; gap: .125rem; }
+.m-ab-labeled .m-ab-sub-btn .m-ab-text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-size: .5625rem; line-height: 1.15; text-align: center; overflow-wrap: anywhere; }
+.m-ab.is-glass .m-ab-sub-btn:hover { background: color-mix(in srgb, color-mix(in srgb, var(--m-surface), white 30%) 50%, transparent); }
+@media (prefers-reduced-motion: reduce) { .m-ab-sub-btn { transition: none; } }

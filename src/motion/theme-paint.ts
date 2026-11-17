@@ -566,6 +566,13 @@ function walk(s: Node, d: Node, w: number, h: number, twins: Twins, later: (() =
   }
   if (s.scrollTop || s.scrollLeft) { const t = s.scrollTop, l = s.scrollLeft; later.push(() => { d.scrollTop = t; d.scrollLeft = l; }); }
   copyValue(s, d);
+  // a sticky element sticks to the page's scroller; in the copy (which does not scroll: it is moved up by the scroll)
+  // it would ride up with the content, so it is put back where it stands on the page
+  const view = s.ownerDocument.defaultView;
+  if (s instanceof HTMLElement && typeof view?.getComputedStyle === "function" && view.getComputedStyle(s).position === "sticky") {
+    const r = s.getBoundingClientRect();
+    later.push(() => { const c = (d as HTMLElement).getBoundingClientRect(), dx = r.left - c.left, dy = r.top - c.top; if (dx || dy) (d as HTMLElement).style.setProperty("translate", `${px(dx)} ${px(dy)}`); });
+  }
   const a = s.childNodes, b = [...d.childNodes];
   for (let i = 0; i < a.length && i < b.length; i++) walk(a[i]!, b[i]!, w, h, twins, later);
 }

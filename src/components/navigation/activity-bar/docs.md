@@ -27,6 +27,8 @@ bottom bar on phones), and mirrored in RTL.
 | `indicator` | boolean | `true` | the line that marks the active view |
 | `motion` | `glide` `fade` `none` | `glide` | how the indicator moves to a new view |
 | `tooltips` | boolean | `true` | name tooltips on hover and focus (the accessible name stays either way) |
+| `glass` | boolean / accessor | `false` | frosted glass: see-through, the backdrop blurred, a hairline glass edge (`--m-glass-tint`, `--m-glass-blur`) |
+| `subItems`, `subValue`, `onSubSelect` | boolean, id, `(child, parent) => void` | `false` | the selected item's `children` fly out of it and line up under it (another item takes them away and brings its own); `subValue` marks the current one; a child calls `onSubSelect` (default `onChange(child.id)`) |
 | `showLabels` | boolean | `false` | the name under each icon (an item's `short`, else its `label`): a wider bar, for a section rail or a phone tab bar |
 | `m:color` | ColorToken | theme primary | Common prop (march/props): the colour token of the component and everything in it. |
 | `class` | ClassProp | — | extra class on the bar |

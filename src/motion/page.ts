@@ -191,11 +191,13 @@ export function pageTransitions(o: PageTransitionOptions = {}): () => void {
       void Promise.resolve(vt.ready).then(() => {
         animate(pseudo(root, `::view-transition-old(${scope})`), transitionFrames(t.type, "out", nav.dir, rtl, t.distance), timing);
         animate(pseudo(root, `::view-transition-new(${scope})`), transitionFrames(t.type, "in", nav.dir, rtl, t.distance), timing);
-        // the browser's own morph of shared elements: same duration, the global speed
+        // the browser's own morph of shared elements: same duration, the global speed. An animation the page's own CSS
+        // gives a named part (`::view-transition-old(x) { animation: … }`) keeps its timing
         for (const a of doc.getAnimations?.() ?? []) {
           const fx = a.effect as (KeyframeEffect & { pseudoElement?: string | null }) | null;
           const pe = fx?.pseudoElement ?? "";
-          if (ours.has(a) || !pe.startsWith("::view-transition") || /\((root|m-page)\)/.test(pe)) continue;
+          const css = (a as Animation & { animationName?: string }).animationName;
+          if (ours.has(a) || !pe.startsWith("::view-transition") || /\((root|m-page)\)/.test(pe) || (css && !css.startsWith("-ua-"))) continue;
           try { fx!.updateTiming({ duration: t.duration }); a.updatePlaybackRate(rateScale()); } catch { /* already finished */ }
         }
       }, () => undefined);

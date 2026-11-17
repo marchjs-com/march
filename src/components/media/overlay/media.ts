@@ -83,5 +83,6 @@ export function mountCanvas(root: HTMLElement, draw: DrawFn, animate: boolean): 
     const io = new IO((es) => { visible = es.some((e) => e.isIntersecting); if (visible) run(); }, { threshold: 0 });
     io.observe(root);
   }
-  resize();
+  // the first size comes from the observer, after the browser's own layout: measuring here would force a layout while
+  // the page is still being built (a stall when a page with a canvas opens)
 }

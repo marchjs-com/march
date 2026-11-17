@@ -29,6 +29,10 @@ html.m-sb-resizing .m-nav { transition: none; }
 /* rows: ListRow with the sidebar's measures */
 .m-sb-row.m-listrow { gap: .625rem; min-block-size: 2.25rem; padding: .375rem .5rem; border-radius: var(--m-radius); color: var(--m-text-2); }
 .m-sb-row.m-listrow:hover { color: var(--m-text); }
+/* hover: the row's highlight fades in, and fades out a little slower once the pointer leaves */
+.m-sb-row.m-listrow.is-action { transition: background-color var(--m-dur-slow) var(--m-ease-out), color var(--m-dur) var(--m-ease-out); }
+.m-sb-row.m-listrow.is-action:hover { transition-duration: var(--m-dur), var(--m-dur-fast); }
+@media (prefers-reduced-motion: reduce) { .m-sb-row.m-listrow.is-action { transition: none; } }
 .m-sb-row .m-listrow-lead { inline-size: 1.125rem; transition: color var(--m-dur) var(--m-ease); }
 .m-sb-row .m-listrow-lead .m-svg { width: 1.0625rem; height: 1.0625rem; }
 .m-sb-row .m-listrow-text { line-height: 1.25; }
@@ -109,9 +113,55 @@ html.m-sb-resizing .m-nav { transition: none; }
 /* the pages under a roomy row are text only (the row above carries the icon) */
 .is-lg-items .m-sb-sublist .m-listrow-lead { display: none; }
 .is-lg-items .m-sb-sublist .m-sb-row.m-listrow { padding-inline-start: .625rem; }
+/* roomy rows: the pages under an item get room to breathe too */
+.is-lg-items .m-sb-sublist .m-sb-row.m-listrow { min-block-size: 2.375rem; padding-block: .375rem; }
+.is-lg-items .m-sb-sublist { display: grid; gap: .125rem; }
 /* a bottom sheet (sheetSide="bottom"): the menu fills it */
 .m-drawer.m-sb-sheet.m-sb-sheet-bottom { --m-sheet-size: min(78dvh, 40rem); }
 .m-sb-sheet-bottom .m-nav.m-sb { block-size: 100%; }
 /* groupHeads={false}: one list of top-level rows, no category rows */
 /* (clipped like a category's list, with room at the start for the active row's bar) */
 :is(.m-sb-wrap, .m-sb-sheet) .m-sb-gitems.m-sb-flat { margin-inline-start: -.5rem; padding-inline-start: .5rem; }
+/* floating (wide screens): a card off the screen edge with a gap round it */
+@media (min-width: 901px) {
+  /* as tall as its content, at most the room between the gaps; more content scrolls inside */
+  .m-sb-wrap.is-floating .m-nav.m-sb { align-self: flex-start; height: auto; max-height: calc(100% - var(--m-sb-gap-top, var(--m-sb-gap, var(--m-space-3))) - var(--m-sb-gap, var(--m-space-3))); margin: var(--m-sb-gap, var(--m-space-3)); margin-block-start: var(--m-sb-gap-top, var(--m-sb-gap, var(--m-space-3))); overflow: hidden;
+    border: var(--m-border-w, 1px) solid var(--m-border-subtle); border-radius: var(--m-sb-radius, var(--m-radius-4)); box-shadow: var(--m-shadow-3); }
+  .m-sb-wrap.is-floating .m-sb-scroll { min-height: 0; }
+}
+
+/* glass: see-through, the backdrop blurred and a little richer; a hairline glass edge and a light lip on top. Its
+   lights are mixed from the theme's own surface (white on a light page, a lighter tone of it on a dark one) */
+.m-sb-wrap.is-glass .m-nav.m-sb { background: color-mix(in srgb, var(--m-surface) var(--m-glass-tint, 28%), transparent);
+  -webkit-backdrop-filter: blur(var(--m-glass-blur, 18px)) saturate(170%); backdrop-filter: blur(var(--m-glass-blur, 18px)) saturate(170%);
+  border-color: var(--m-glass-edge-c, color-mix(in srgb, color-mix(in srgb, var(--m-surface), var(--m-text) 14%) 65%, transparent)); box-shadow: var(--m-shadow-3), inset 0 1px 0 var(--m-glass-lip-c, color-mix(in srgb, color-mix(in srgb, var(--m-surface), white 25%) 60%, transparent)); }
+.m-sb-wrap.is-glass :is(.m-sb-head, .m-sb-section.m-section-label) { background: transparent; }
+/* flyout sub-menus (wide screens): the pages under an item float in a panel beside it; in the list they stay closed */
+@media (min-width: 901px) {
+  .m-sb-wrap.is-flyout-subs:not(.is-rail) .m-sb-kids { display: none; }
+  .m-sb-wrap.is-flyout-subs:not(.is-rail) .m-sb-kids-btn .m-chevron { --m-chevron-open: 0; }
+  /* pinCurrent: the current page's branch opens in the list */
+  .m-sb-wrap.is-flyout-subs:not(.is-rail) .m-sb-li.is-pinned > .m-sb-kids { display: grid; }
+  .m-sb-wrap.is-flyout-subs:not(.is-rail) .m-sb-li.is-pinned > .m-sb-kids-btn .m-chevron { --m-chevron-open: 1; }
+  .m-sb-wrap.is-flyout-subs:not(.is-rail) .m-sb-li.is-pinned:not(.is-kids-open) > .m-sb-kids-btn .m-chevron { --m-chevron-open: 0; }
+  .m-sb-wrap.is-flyout-subs .m-sb-li.is-flying > .m-sb-row.m-listrow { background: var(--m-surface-2); color: var(--m-text); }
+}
+.m-sb-fly.m-popover-panel { min-inline-size: 14rem; max-block-size: min(70vh, 32rem); overflow: auto; padding: var(--m-space-2); }
+.m-sb-fly .m-sb-fly-list { gap: 1px; }
+/* glass, domed: a soft light over the top part, and a band of light sweeping across once each time the pointer comes in
+   (it slides over while hovered, and back the same way when the pointer leaves) */
+.m-sb-wrap.is-glass .m-nav.m-sb::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(140% 55% at 50% 0%, color-mix(in srgb, color-mix(in srgb, var(--m-surface), white 35%) var(--m-glass-gloss, 55%), transparent), transparent 70%),
+    linear-gradient(to top, color-mix(in srgb, black var(--m-glass-shade, 7%), transparent), transparent 35%); }
+.m-sb-wrap.is-glass .m-nav.m-sb::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(115deg, transparent 40%, color-mix(in srgb, color-mix(in srgb, var(--m-surface), white 55%) var(--m-glass-shine, 55%), transparent) 50%, transparent 60%) no-repeat;
+  background-size: 300% 100%; background-position: 100% 0; transition: background-position calc(var(--m-dur-slow) * 3) var(--m-ease-out); }
+.m-sb-wrap.is-glass .m-nav.m-sb:hover::after { background-position: 0 0; }
+@media (prefers-reduced-motion: reduce) { .m-sb-wrap.is-glass .m-nav.m-sb::after { display: none; } }
+/* a glass menu's floating pages are glass too */
+.m-sb-fly.m-popover-panel.is-glass { background: color-mix(in srgb, var(--m-surface) var(--m-glass-tint, 28%), transparent);
+  -webkit-backdrop-filter: blur(var(--m-glass-blur, 18px)) saturate(170%); backdrop-filter: blur(var(--m-glass-blur, 18px)) saturate(170%);
+  border-color: var(--m-glass-edge-c, color-mix(in srgb, color-mix(in srgb, var(--m-surface), var(--m-text) 14%) 65%, transparent)); box-shadow: var(--m-shadow-3), inset 0 1px 0 var(--m-glass-lip-c, color-mix(in srgb, color-mix(in srgb, var(--m-surface), white 25%) 60%, transparent)); }
+/* on glass the hover highlight is glass too: a lighter pane with its own hairline edge and lip (it fades in and out) */
+:is(.m-sb-wrap.is-glass, .m-sb-fly.is-glass) .m-sb-row.m-listrow.is-action { transition: background-color var(--m-dur-slow) var(--m-ease-out), box-shadow var(--m-dur-slow) var(--m-ease-out), color var(--m-dur) var(--m-ease-out); }
+:is(.m-sb-wrap.is-glass, .m-sb-fly.is-glass) .m-sb-row.m-listrow.is-action:hover { background: color-mix(in srgb, color-mix(in srgb, var(--m-surface), white 30%) 50%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, color-mix(in srgb, var(--m-surface), var(--m-text) 14%) 55%, transparent), inset 0 1px 0 color-mix(in srgb, color-mix(in srgb, var(--m-surface), white 35%) 70%, transparent), 0 .125rem .5rem color-mix(in srgb, black 6%, transparent); transition-duration: var(--m-dur), var(--m-dur), var(--m-dur-fast); }
