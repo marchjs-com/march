@@ -32,7 +32,6 @@ messages("tr", {
   "Choose a longer passphrase: 10+ characters, letters and digits (a short sentence is best).": "Daha uzun bir parola seç: 10+ karakter, harf ve rakam (en iyisi kısa bir cümle).",
   "Code": "Kod", "Create the vault": "Kasayı oluştur", "Current passphrase": "Şimdiki parola", "Delete everything": "Hepsini sil", "Delete the vault?": "Kasa silinsin mi?",
   "Encrypted with your passphrase (AES-256, PBKDF2 600 000 rounds); only ciphertext is stored, in this browser.": "Parolanla şifrelenir (AES-256, PBKDF2 600 000 tur); bu tarayıcıda yalnız şifreli hâli durur.",
-  "Enter your passphrase to use the AI with your own keys.": "AI'ı kendi anahtarlarınla kullanmak için parolanı gir.",
   "Enter your passphrase to use your AI keys.": "AI anahtarlarını kullanmak için parolanı gir.",
   "Every key in it is deleted; there is no way back. Then you make a new vault.": "İçindeki bütün anahtarlar silinir, geri dönüşü yok. Sonra yeni bir kasa oluşturursun.",
   "Forgot the passphrase?": "Parolanı mı unuttun?", "Get a key": "Anahtar al",
@@ -55,7 +54,7 @@ messages("tr", {
   "Too short": "Çok kısa", "Weak": "Zayıf", "Fair": "İdare eder", "Good": "İyi", "Strong": "Güçlü",
   "Explain": "Açıkla", "Fix": "Düzelt", "Write tests": "Test yaz", "Improve": "İyileştir",
   "Lock the vault": "Kasayı kilitle", "AI: explain the file": "AI: dosyayı açıkla", "AI: fix the file": "AI: dosyayı düzelt", "AI: write tests": "AI: test yaz",
-  "AI: ask about the selection": "AI: seçimi sor",
+  "AI: ask about the selection": "AI: seçimi sor", "cached": "önbellekten", "Open AI keys": "AI anahtarlarını aç", "Open the vault in AI keys; the chat is ready here as soon as it is open.": "Kasayı AI anahtarları sekmesinde aç; açılınca sohbet burada hazır olur.",
 });
 
 /** What the vault plugin provides (service "vault"): the vault and the AI keys in it. */
@@ -96,8 +95,8 @@ export interface AiPluginOptions {
   apply?: ((file: string, code: string) => void) | undefined;
   /** Opens a panel by id (the host's dock): the AI panel for a command, the keys panel for "Add a key". */
   open?: ((id: string) => void) | undefined;
-  /** The instructions the model gets first (the framework, the house rules). */
-  system?: string | undefined;
+  /** The instructions the model gets first (the framework, the house rules): a text, or a function that loads it (once, on the first send). */
+  system?: string | (() => string | Promise<string>) | undefined;
   /** The panel (id "ai"). */
   panel?: { id?: string; title?: string; place?: DockPanel["place"] } | undefined;
   /** The keys panel's id (default "ai-keys"). */

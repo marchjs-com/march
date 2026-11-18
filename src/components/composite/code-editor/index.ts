@@ -1531,7 +1531,9 @@ export function CodeEditor(props: CodeEditorProps): Element {
   // the hover's and the note's popover (over the word), the rename field (under the name)
   const tipAnchor = virtualAnchor(() => { const x = hoverDoc() ?? null, n = note(); return x ? wordRect(x.from, x.to) : n ? rectAt(n.at) : null; }, () => input);
   const tipPop = h(Popover, {
-    anchor: () => tipAnchor, open: () => !!(hoverDoc() || note()), onOpenChange: (o: boolean) => { if (!o) { hideHover(); note.set(null); } }, role: null, flush: true, autoFocus: false, placement: "top-start", panelClass: "m-ced-tip-panel",
+    anchor: () => tipAnchor, open: () => !!(hoverDoc() || note()), onOpenChange: (o: boolean) => { if (!o) { hideHover(); note.set(null); } }, role: null, flush: true, autoFocus: false, panelClass: "m-ced-tip-panel",
+    // over the word; under it while the find bar is open (over it, it would cover the bar)
+    get placement() { return barOpen.peek() ? "bottom-start" : "top-start"; },
     children: () => [() => { const d = hoverDoc()?.doc ?? note()?.doc; return d ? h("div", { onPointerenter: () => clearTimeout(hideTimer), onPointerleave: () => { hideTimer = setTimeout(() => hoverDoc.set(null), 250); } }, docView(d, "is-tip")) : null; }],
   });
   const renameAnchor = virtualAnchor(() => { const r = renaming(); return r ? rectAt(r.from) : null; }, () => input);

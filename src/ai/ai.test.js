@@ -12,20 +12,20 @@ const serve = (res) => { globalThis.fetch = async (url, init) => { last = { url,
 
 test("anthropic: browser header, system, stream, usage", async () => {
   serve(sse([
-    { type: "message_start", message: { model: "claude-sonnet-5-5", usage: { input_tokens: 12 } } },
+    { type: "message_start", message: { model: "claude-sonnet-5-5", usage: { input_tokens: 2, cache_read_input_tokens: 10 } } },
     { type: "content_block_delta", delta: { type: "text_delta", text: "Mer" } },
     { type: "content_block_delta", delta: { type: "text_delta", text: "haba" } },
     { type: "message_delta", delta: { stop_reason: "end_turn" }, usage: { output_tokens: 3 } },
   ]));
   const parts = [];
   const r = await chat({ provider: "anthropic", key: "sk-ant-X", model: "claude-sonnet-5-5", system: "sys", messages: [{ role: "user", content: "hi" }], onText: (d) => parts.push(d) });
-  assert.deepEqual(r, { text: "Merhaba", usage: { input: 12, output: 3 }, model: "claude-sonnet-5-5", stop: "end_turn" });
+  assert.deepEqual(r, { text: "Merhaba", usage: { input: 12, output: 3, cached: 10 }, model: "claude-sonnet-5-5", stop: "end_turn" });
   assert.deepEqual(parts, ["Mer", "haba"]);
   assert.equal(last.url, "https://api.anthropic.com/v1/messages");
   assert.equal(last.init.headers["x-api-key"], "sk-ant-X");
   assert.equal(last.init.headers["anthropic-dangerous-direct-browser-access"], "true");
   assert.equal(last.init.credentials, "omit");
-  assert.equal(last.body.system, "sys");
+  assert.deepEqual(last.body.system, [{ type: "text", text: "sys", cache_control: { type: "ephemeral" } }], "the system text is marked for the prompt cache");
 });
 
 test("openai-compatible: system message, bearer, usage chunk, [DONE]", async () => {

@@ -52,7 +52,8 @@ export const provider = (id: string): AiProvider => {
 };
 
 export interface ChatMessage { role: "user" | "assistant"; content: string }
-export interface Usage { input: number; output: number }
+/** Tokens: `input` all that was read (with the cached part), `cached` the part read from the provider's cache (cheaper). */
+export interface Usage { input: number; output: number; cached?: number }
 export interface ChatRequest {
   provider: string;
   key: string;
@@ -62,6 +63,9 @@ export interface ChatRequest {
   /** The longest answer in tokens. Default 4096. */
   maxTokens?: number;
   temperature?: number;
+  /** Mark the system text for the provider's prompt cache (Anthropic: cache_control; the others cache a repeated
+   *  prefix by themselves). Default true: a long, unchanging system text then costs about a tenth after the first send. */
+  cache?: boolean;
   /** Stops the request (a Stop button). */
   signal?: AbortSignal;
   /** Each piece of the answer as it arrives, and the answer so far. */
@@ -131,9 +135,14 @@ export async function chat(r: ChatRequest): Promise<ChatResult> {
   const init = (body: unknown): RequestInit => ({ method: "POST", headers: headers(p, r.key), body: JSON.stringify(body), ...(r.signal ? { signal: r.signal } : {}) });
   try {
     if (p.kind === "anthropic") {
-      const res = await send(`${p.base}/messages`, init({ model: r.model, max_tokens: max, stream: true, ...(r.system ? { system: r.system } : {}), ...(r.temperature !== undefined ? { temperature: r.temperature } : {}), messages: r.messages }), p);
+      const res = await send(`${p.base}/messages`, init({ model: r.model, max_tokens: max, stream: true, ...(r.system ? { system: r.cache === false ? r.system : [{ type: "text", text: r.system, cache_control: { type: "ephemeral" } }] } : {}), ...(r.temperature !== undefined ? { temperature: r.temperature } : {}), messages: r.messages }), p);
       for await (const e of sseEvents(res) as AsyncGenerator<J>) {
-        if (e.type === "message_start") { usage.input = e.message?.usage?.input_tokens ?? 0; model = e.message?.model ?? model; }
+        if (e.type === "message_start") {
+          const u = e.message?.usage ?? {}, cached = u.cache_read_input_tokens ?? 0;
+          usage.input = (u.input_tokens ?? 0) + cached + (u.cache_creation_input_tokens ?? 0);
+          if (cached) usage.cached = cached;
+          model = e.message?.model ?? model;
+        }
         else if (e.type === "content_block_delta" && e.delta?.type === "text_delta") add(e.delta.text);
         else if (e.type === "message_delta") { usage.output = e.usage?.output_tokens ?? usage.output; stop = e.delta?.stop_reason ?? stop; }
         else if (e.type === "error") throw new AiError("server", `${p.name}: ${e.error?.message ?? "hata"}`);
@@ -148,7 +157,10 @@ export async function chat(r: ChatRequest): Promise<ChatResult> {
         const c = e.candidates?.[0];
         for (const part of c?.content?.parts ?? []) if (!part.thought) add(part.text ?? "");
         if (c?.finishReason) stop = c.finishReason;
-        if (e.usageMetadata) { usage.input = e.usageMetadata.promptTokenCount ?? usage.input; usage.output = (e.usageMetadata.candidatesTokenCount ?? 0) + (e.usageMetadata.thoughtsTokenCount ?? 0); }
+        if (e.usageMetadata) {
+          usage.input = e.usageMetadata.promptTokenCount ?? usage.input; usage.output = (e.usageMetadata.candidatesTokenCount ?? 0) + (e.usageMetadata.thoughtsTokenCount ?? 0);
+          if (e.usageMetadata.cachedContentTokenCount) usage.cached = e.usageMetadata.cachedContentTokenCount;
+        }
         if (e.modelVersion) model = e.modelVersion;
       }
     } else {
@@ -161,7 +173,11 @@ export async function chat(r: ChatRequest): Promise<ChatResult> {
         add(c?.delta?.content ?? "");
         if (c?.finish_reason) stop = c.finish_reason;
         const u = e.usage ?? c?.usage;
-        if (u) { usage.input = u.prompt_tokens ?? usage.input; usage.output = u.completion_tokens ?? usage.output; }
+        if (u) {
+          usage.input = u.prompt_tokens ?? usage.input; usage.output = u.completion_tokens ?? usage.output;
+          const cached = u.prompt_tokens_details?.cached_tokens ?? u.prompt_cache_hit_tokens;
+          if (cached) usage.cached = cached;
+        }
         if (e.model) model = e.model;
       }
     }

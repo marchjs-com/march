@@ -241,8 +241,8 @@ export interface AiChatProps {
   apply?: ((file: string, code: string) => void) | undefined;
   /** Opens the AI keys panel. */
   openKeys?: (() => void) | undefined;
-  /** The instructions the model gets first. */
-  system?: string | undefined;
+  /** The instructions the model gets first: a text, or a function that gives it (loaded once, on the first send). */
+  system?: string | (() => string | Promise<string>) | undefined;
   /** A signal the plugin sets to send a message from a command ("explain", "fix"…). */
   ask?: (() => { text: string; label?: string; n: number } | null) | undefined;
   /** Bumped when the keys change (the provider list is read again). */
@@ -298,6 +298,9 @@ export function AiChatPanel(props: AiChatProps) {
     if (c.error) parts.push(`Last run error:\n${c.error}`);
     return parts.join("\n\n");
   };
+  // the instructions: read once (a long guide is fetched on the first send, then kept)
+  let sys: Promise<string> | null = null;
+  const systemText = (): Promise<string> => (sys ??= Promise.resolve(typeof props.system === "function" ? props.system() : props.system ?? "").catch(() => { sys = null; return ""; }));
   const sendNow = async (text: string, label?: string): Promise<void> => {
     const cur = untrack(current);
     if (!cur || !text.trim() || untrack(busy)) return;
@@ -316,7 +319,8 @@ export function AiChatPanel(props: AiChatProps) {
     const put = (m: Partial<Msg>): void => { const all = [...untrack(msgs)]; all[at] = { ...all[at]!, ...m }; msgs.set(all); };
     queueMicrotask(scroll);
     try {
-      const r = await chat({ provider: cur.id, key, model: cur.model, system: `${props.system ? `${props.system}\n` : ""}The user's interface language: ${untrack(locale)}; answer in it unless the user writes in another one.`, messages: [...history, { role: "user", content: user.content }], signal: stop.signal,
+      const base = await systemText();
+      const r = await chat({ provider: cur.id, key, model: cur.model, system: `${base ? `${base}\n\n` : ""}The user's interface language: ${untrack(locale)}; answer in it unless the user writes in another one.`, messages: [...history, { role: "user", content: user.content }], signal: stop.signal,
         onText: (_, all) => { put({ content: all }); scroll(); } });
       put({ content: r.text, usage: r.usage, model: r.model, done: true });
     } catch (e) {
@@ -344,7 +348,14 @@ export function AiChatPanel(props: AiChatProps) {
   return (
     <div class="m-ai">
       <If when={() => props.vault.state() !== "unlocked"}>
-        <VaultGate vault={props.vault} intro={t("Enter your passphrase to use the AI with your own keys.")} />
+        <div class="m-ai-empty">
+          <div class="m-vault-mark" aria-hidden="true">{glyph(lock)}</div>
+          <h3 class="m-vault-title">{() => (props.vault.state() === "new" ? t("Bring your own AI") : t("The vault is locked"))}</h3>
+          <p class="m-vault-note">{() => (props.vault.state() === "new"
+            ? t("Add an API key (Claude, ChatGPT, Gemini, DeepSeek, Kimi, Mistral, Groq or OpenRouter); requests go straight from this browser to the provider and are billed to your account.")
+            : t("Open the vault in AI keys; the chat is ready here as soon as it is open."))}</p>
+          <Button variant="primary" icon={keyIcon} onClick={() => props.openKeys?.()}>{() => (props.vault.state() === "new" ? t("Add a key") : t("Open AI keys"))}</Button>
+        </div>
         <Else>
           <If when={() => !current()}>
             <div class="m-ai-empty">
@@ -389,7 +400,7 @@ export function AiChatPanel(props: AiChatProps) {
                         )}</For>
                         <If when={() => m().done === false && !m().content}><p class="m-ai-wait" aria-label={t("Thinking")}><i /><i /><i /></p></If>
                         <If when={() => m().error}><p class="m-ai-err" role="alert">{() => m().error}</p></If>
-                        <If when={() => m().usage}><p class="m-ai-meta">{() => `${m().model ?? ""} · ↑${k(m().usage!.input)} ↓${k(m().usage!.output)}`}</p></If>
+                        <If when={() => m().usage}><p class="m-ai-meta">{() => `${m().model ?? ""} · ↑${k(m().usage!.input)}${m().usage!.cached ? ` (${k(m().usage!.cached!)} ${t("cached")})` : ""} ↓${k(m().usage!.output)}`}</p></If>
                       </Else>
                     </If>
                   </div>
