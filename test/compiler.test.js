@@ -242,3 +242,13 @@ test("compiler: a component's type arguments (<List<User> …>, <Pick<{ a: () =>
   assert.match(out, /h\(Pick, \{open:/);
   assert.doesNotMatch(out, /List</);
 });
+
+test("compiler: sourceMarks writes where each element is (data-m-src=\"file:line\"); a component gets it through m:src; flow and plain builds get none", () => {
+  const src = `export const A = () => <div class="x">\n  <span>hi</span>\n  <If when={1}><Card /></If>\n</div>`;
+  const out = compile(src, { filename: "A.tsx", sourceMarks: true }).code;
+  assert.match(out, /\["data-m-src","A\.tsx:1"\]/);
+  assert.match(out, /\["data-m-src","A\.tsx:2"\]/);
+  assert.match(out, /\{"src": "A\.tsx:3"\}/, "the Card's usage line");
+  assert.doesNotMatch(out, /If, \{[^}]*src/, "no mark on If");
+  assert.doesNotMatch(compile(src, { filename: "A.tsx" }).code, /data-m-src|"src"/);
+});

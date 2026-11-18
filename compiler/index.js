@@ -9,6 +9,8 @@
 import { isIdStart, isIdPart, exprAllowed, identKind, skipString, skipComment, skipRegex, syntax, jsxText, lineCol } from "./lexer.js";
 import { importTs } from "./load-ts.js";
 import { isIconProp, iconByName } from "./icon-names.js";
+// control flow draws no element of its own: no source mark (opts.sourceMarks) on it
+const FLOW_TAGS = new Set(["If", "Else", "For", "Switch", "Match", "Await", "Try", "Show", "Portal", "Dynamic", "Fragment", "Index"]);
 
 // sx is shared with the runtime; importTs also works when March is installed under node_modules
 const { sx: resolveSx } = await importTs(new URL("../src/core/sx.ts", import.meta.url));
@@ -839,8 +841,17 @@ class Transformer {
   }
 
   element(tag, isComp, attrs, kids, start) {
-    void start;
     const props = [];
+    // opts.sourceMarks (a tool's build: MarchIDE): every element says where it is written, `data-m-src="App.tsx:12"`
+    // (its file and line), so a press on it in the preview finds the line
+    // (a component: `m:src`, the tool's common prop, puts it on the component's root elements)
+    if (this.opts.sourceMarks && start != null && !FLOW_TAGS.has(tag) && !attrs.some((a) => a.name === "data-m-src" || a.name === "m:src")) {
+      if (this.lineAt === undefined) { this.lineAt = []; for (let i = this.src.indexOf("\n"); i >= 0; i = this.src.indexOf("\n", i + 1)) this.lineAt.push(i); }
+      let lo = 0, hi = this.lineAt.length;
+      while (lo < hi) { const m = (lo + hi) >> 1; if (this.lineAt[m] < start) lo = m + 1; else hi = m; }
+      const v = `${this.opts.filename ?? ""}:${lo + 1}`;
+      attrs = [...attrs, { name: isComp ? "m:src" : "data-m-src", code: JSON.stringify(v), dynamic: false, literal: v }];
+    }
     // an icon written by name in an icon prop (`icon="lucide:heart"`, `icon="chevron-down"`): an import of that icon,
     // as if it were written by hand (only the icons used are bundled; a wrong pack name fails as a missing export)
     if (isComp && !this.opts.typecheck && attrs.some((a) => typeof a.literal === "string" && isIconProp(a.name ?? ""))) {
