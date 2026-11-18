@@ -235,3 +235,10 @@ test("texts: text written around {expressions} is one text, each expression a nu
   assert.deepEqual([...r.texts].sort(), ["dünya", "Gönder ({0})", "Merhaba", "{0} / {1} öğe seçili"].sort(),
     "an element between them ends a text; no letters around an expression (`, {name}!`, `{count}`): no text");
 });
+
+test("compiler: a component's type arguments (<List<User> …>, <Pick<{ a: () => void }> …>) are erased like other types", () => {
+  const out = c(`export const A = () => <div><List<string> items={[]} /><Pick<{ from: number; f: () => void }> open={() => true}>x</Pick></div>`);
+  assert.match(out, /h\(List, \{items:/);
+  assert.match(out, /h\(Pick, \{open:/);
+  assert.doesNotMatch(out, /List</);
+});

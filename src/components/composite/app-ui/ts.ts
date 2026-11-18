@@ -4,13 +4,19 @@
 // the worker's URL comes from the "march-worker" policy (same origin, .js only): the CSP must list
 // `trusted-types march-worker`.
 import { signal, effect, onCleanup, type Signal } from "../../../core/reactive.ts";
-import type { CodeCompleteContext, CodeCompletion, CodeDoc, CodeSignature, CodeRange, CodeRename, CodeEdit } from "../code-editor/index.ts";
+import type { CodeCompleteContext, CodeCompletion, CodeDoc, CodeSignature, CodeRange, CodeRename, CodeEdit, CodeFix } from "../code-editor/index.ts";
 import { locale } from "../../../core/i18n.ts";
 import { definePlugin, type AppPlugin, type AppFile } from "./kit.ts";
 import type { DebugMeta } from "../debugger/session.ts";
 
 /** A problem of a file: its range, text and whether it is an error (else a warning or a suggestion). */
 export interface CodeProblem { from: number; to: number; message: string; code: number; error: boolean }
+/** A place a name is used: whether it is written there (`write`) or declared (`definition`). */
+export interface CodeReference { from: number; to: number; write: boolean; definition: boolean }
+/** A named thing of a file (Ctrl+Shift+O). */
+export interface CodeSymbol { name: string; kind: string; depth: number; from: number; to: number }
+/** An inlay hint: a text shown at a place (`left` / `right`: a space before / after it). */
+export interface CodeInlay { at: number; text: string; kind?: string; left?: boolean; right?: boolean }
 /** What the TypeScript plugin provides (service "typescript"). */
 export interface TypeScriptService {
   complete(path: string, ctx: CodeCompleteContext): Promise<CodeCompletion | null>;
@@ -28,6 +34,18 @@ export interface TypeScriptService {
   details(path: string, value: string, pos: number, name: string): Promise<CodeDoc | null>;
   /** Inside a call's parentheses: its signatures and the argument at the caret. */
   signature(path: string, value: string, pos: number): Promise<CodeSignature | null>;
+  /** Ctrl+.: the fixes for the problems (their codes) in a range, each with its title and edits. */
+  fixes(path: string, value: string, from: number, to: number, codes: readonly number[]): Promise<CodeFix[]>;
+  /** The edits that sort the imports and remove the unused ones. */
+  organize(path: string, value: string): Promise<CodeEdit[] | null>;
+  /** Shift+F12: every place of the file the name at a place is used. */
+  references(path: string, value: string, pos: number): Promise<CodeReference[]>;
+  /** Ctrl+Shift+O: the file's named things (functions, components, variables…), nested by `depth`. */
+  symbols(path: string, value: string): Promise<CodeSymbol[]>;
+  /** The spans that fold (blocks, JSX elements, imports, comments). */
+  outline(path: string, value: string): Promise<CodeRange[]>;
+  /** Inlay hints in a range: a literal argument's parameter name, an inferred type. */
+  inlay(path: string, value: string, from: number, to: number): Promise<CodeInlay[]>;
   /** The TypeScript version once it runs. */
   version: () => string;
   /** The files with the debugger's calls written in (instrument.js; debuggerPlugin): their code and what each call is. */
@@ -166,6 +184,48 @@ export function typeScriptPlugin(o: TypeScriptPluginOptions): AppPlugin {
           if (v.inserts.length) return null;
           await send(path, v.text);
           return call<CodeEdit[]>("format", { path, tabSize });
+        },
+        // the answers below are about the file (its view's places mapped back; places inside what the host inserted go)
+        async fixes(path, value, from, to, codes) {
+          if (!(await ready)) return [];
+          const v = viewOf(path, value);
+          await send(path, v.text);
+          const list = await call<CodeFix[]>("fixes", { path, from: toView(v.inserts, from), to: toView(v.inserts, to), codes });
+          return v.inserts.length ? list.map((f) => ({ ...f, edits: f.edits.map((e) => ({ ...e, ...range(v.inserts, e) })) })) : list;
+        },
+        async organize(path, value) {
+          if (!(await ready)) return null;
+          const v = viewOf(path, value);
+          if (v.inserts.length) return null; // the host's view is not the file (as format)
+          await send(path, v.text);
+          return call<CodeEdit[]>("organize", { path });
+        },
+        async references(path, value, pos) {
+          if (!(await ready)) return [];
+          const v = viewOf(path, value);
+          await send(path, v.text);
+          const list = await call<CodeReference[]>("references", { path, pos: toView(v.inserts, pos) });
+          return list.map((r) => ({ ...r, ...range(v.inserts, r) })).filter((r) => r.to > r.from);
+        },
+        async symbols(path, value) {
+          if (!(await ready)) return [];
+          const v = viewOf(path, value);
+          await send(path, v.text);
+          const list = await call<CodeSymbol[]>("symbols", { path });
+          return list.map((s) => ({ ...s, ...range(v.inserts, s) }));
+        },
+        async outline(path, value) {
+          if (!(await ready)) return [];
+          const v = viewOf(path, value);
+          await send(path, v.text);
+          return (await call<CodeRange[]>("outline", { path })).map((r) => range(v.inserts, r));
+        },
+        async inlay(path, value, from, to) {
+          if (!(await ready)) return [];
+          const v = viewOf(path, value);
+          await send(path, v.text);
+          const list = await call<CodeInlay[]>("inlay", { path, from: toView(v.inserts, from), to: toView(v.inserts, to) });
+          return list.map((h) => ({ ...h, at: toFile(v.inserts, h.at) }));
         },
         track(file) {
           const problems: Signal<readonly CodeProblem[]> = signal([]);

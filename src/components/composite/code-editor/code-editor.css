@@ -84,14 +84,14 @@
 .m-ced-ln.is-log::after { background: var(--m-info, var(--m-primary)); border-radius: 2px; rotate: 45deg; translate: 0 -50%; scale: .85; }
 .m-ced-ln.is-off::after { background: none; border: 2px solid var(--m-muted); box-sizing: border-box; }
 /* a line with a problem: its number in the problem's colour and an icon where a breakpoint would be */
-.m-ced-ln:is(.has-error, .has-warning) { opacity: 1; }
-.m-ced-ln.has-error { color: var(--m-danger-text, var(--m-danger)); }
-.m-ced-ln.has-warning { color: var(--m-warn-text, var(--m-warn)); }
+.m-ced-ln:is(.is-error, .is-warning) { opacity: 1; }
+.m-ced-ln.is-error { color: var(--m-danger-text, var(--m-danger)); }
+.m-ced-ln.is-warning { color: var(--m-warn-text, var(--m-warn)); }
 .m-ced-prob { position: absolute; inset-inline-start: .3em; inset-block-start: 50%; translate: 0 -50%; display: inline-flex; inline-size: 1.05em; block-size: 1.05em; pointer-events: none; }
 .m-ced-prob > svg { inline-size: 100%; block-size: 100%; }
-.m-ced-ln.has-error .m-ced-prob { color: var(--m-danger); }
-.m-ced-ln.has-warning .m-ced-prob { color: var(--m-warn); }
-.m-ced-ln:is(.has-error, .has-warning).is-hover::after { opacity: 0; }
+.m-ced-ln.is-error .m-ced-prob { color: var(--m-danger); }
+.m-ced-ln.is-warning .m-ced-prob { color: var(--m-warn); }
+.m-ced-ln:is(.is-error, .is-warning).is-hover::after { opacity: 0; }
 .m-ced-lit { position: absolute; z-index: -1; inset-inline: 0; block-size: 1lh; background: color-mix(in srgb, var(--m-warn) 22%, transparent); box-shadow: inset 3px 0 0 var(--m-warn); }
 .m-ced-lit.is-exception { background: color-mix(in srgb, var(--m-danger) 20%, transparent); box-shadow: inset 3px 0 0 var(--m-danger); }
 .m-ced-lit.is-frame { background: color-mix(in srgb, var(--m-success) 16%, transparent); box-shadow: inset 3px 0 0 var(--m-success); }
@@ -142,3 +142,23 @@
 .m-ced-rename { display: grid; gap: 3px; padding: 4px; }
 .m-ced-rename .m-input.m-ced-rename-field { inline-size: 14rem; block-size: 28px; font-family: var(--m-font-mono); font-size: var(--m-text-sm); }
 .m-ced-rename-hint { color: var(--m-muted); font-size: var(--m-text-2xs, 11px); padding-inline: 2px; }
+/* more carets (Ctrl+D, Alt+click, Ctrl+Alt+Up/Down): the others' bars and selections */
+.m-ced-xcaret { display: inline-block; inline-size: 0; block-size: 1lh; vertical-align: top; box-shadow: -1px 0 0 1px var(--m-editor-caret, var(--m-text)); }
+.m-ced-xsel { border-radius: 2px; background: color-mix(in srgb, var(--m-editor-accent, var(--m-primary)) 28%, transparent); }
+/* quick fixes (Ctrl+.): a heading over the list */
+.m-ced-fixes-head { padding: var(--m-space-1) var(--m-space-3); color: var(--m-muted); font-family: var(--m-font); font-size: var(--m-text-xs); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+/* references (Shift+F12): marked while listed */
+.m-ced-ref { border-radius: 2px; background: color-mix(in srgb, var(--m-info, var(--m-primary)) 22%, transparent); }
+.m-ced-ref.is-write { background: color-mix(in srgb, var(--m-warn) 26%, transparent); }
+.m-ced-refs .m-option-hint, .m-ced-refs [class*="hint"] { font-variant-numeric: tabular-nums; }
+/* sticky scroll: the lines that open the blocks around the top line, over the text while it scrolls */
+.m-ced-sticky { position: absolute; z-index: 4; inset-inline: 0; inset-block-start: var(--m-ced-sticky-top, 0); display: grid; background: var(--m-surface); border-block-end: var(--m-border-w, 1px) solid var(--m-border); box-shadow: 0 4px 10px -8px color-mix(in srgb, var(--m-text) 40%, transparent); font: var(--m-ced-size, var(--m-text-sm)) / var(--m-ced-lh, 1.7) var(--m-font-mono); }
+.m-ced-sticky-line { display: grid; grid-template-columns: var(--m-ced-gutter, 3.4em) minmax(0, 1fr); align-items: baseline; cursor: pointer; white-space: pre; overflow: hidden; }
+.m-ced-sticky-line:hover { background: color-mix(in srgb, var(--m-text) 5%, transparent); }
+.m-ced-sticky-n { padding-inline-end: .7em; color: var(--m-muted); font-size: .85em; text-align: end; }
+.m-ced-sticky-text { padding-inline-start: var(--m-space-3); overflow: hidden; text-overflow: ellipsis; }
+/* inlay hints: at the end of their line, faint, taking no room (the text and the caret do not move) */
+.m-ced-inlay { display: inline-block; inline-size: 0; overflow: visible; white-space: nowrap; vertical-align: top; pointer-events: none; }
+.m-ced-inlay > span { margin-inline-start: 1.2ch; padding: 0 .45ch; border-radius: 3px; background: color-mix(in srgb, var(--m-text) 6%, transparent); color: var(--m-muted); font-size: .85em; font-style: italic; }
+/* a string that names a colour: a line of that colour under it */
+.m-ced-color { text-decoration: underline 3px var(--m-ced-swatch); text-underline-offset: 3px; text-decoration-skip-ink: none; }

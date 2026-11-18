@@ -18,12 +18,13 @@ export { definePlugin } from "./kit.ts";
 export type { AppPlugin, AppFile, FileType, PluginContext, AppKit } from "./kit.ts";
 export { codeEditorPlugin } from "./code.ts";
 export type { LanguageService, CodeEditorPluginOptions } from "./code.ts";
+export { MARCH_SNIPPETS, snippetRows, type CodeSnippet } from "./snippets.ts";
 export { marchLanguagePlugin } from "./march-lang.ts";
 export { AppPreview } from "./preview.ts";
 export { typeScriptPlugin } from "./ts.ts";
 export { debuggerPlugin } from "./debug.ts";
 export type { DebuggerService, GutterService, DebuggerPluginOptions } from "./debug.ts";
-export type { TypeScriptService, TypeScriptPluginOptions, CodeProblem } from "./ts.ts";
+export type { TypeScriptService, TypeScriptPluginOptions, CodeProblem, CodeReference, CodeSymbol, CodeInlay } from "./ts.ts";
 export type { AppPreviewProps, AppPreviewToolbar } from "./preview.ts";
 export type { MarchCatalog, MarchExport, MarchLanguageOptions } from "./march-lang.ts";
 

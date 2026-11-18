@@ -67,3 +67,17 @@ test("headEdit: a name joins the module's import line; a new module gets its own
   const b = `import {} from "x"`, f = headEdit(b, `import { y } from "x"`);
   assert.equal(b.slice(0, f.at) + f.text + b.slice(f.at), `import { y } from "x"`);
 });
+
+test("tagPair: an opening tag's name and its closing tag's, past nested and self-closing tags and code with < >", async () => {
+  const { tagPair } = await import("./assist.ts");
+  const v = `<Row a={x > 1}><Button /><Row>in</Row>{a < b ? <i/> : null}</Row>`;
+  const at = v.indexOf("Row") + 1;
+  const r = tagPair(v, at);
+  assert.deepEqual(r.self, [1, 4]);
+  assert.equal(v.slice(...r.pair), "Row");
+  assert.equal(r.pair[0], v.lastIndexOf("</Row>") + 2, "the outer closing tag, not the inner one");
+  const back = tagPair(v, v.lastIndexOf("</Row>") + 3);
+  assert.deepEqual(back.pair, [1, 4], "from the closing tag back to its opening");
+  assert.equal(tagPair(v, v.indexOf("Button") + 1), null, "a self-closing tag has no pair");
+  assert.equal(tagPair(v, 0), null, "outside a name");
+});

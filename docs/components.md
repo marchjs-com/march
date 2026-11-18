@@ -690,12 +690,13 @@ Full page: src/components/forms/code-input/docs.md
 
 ## CodeView
 
-
+A read-only code block: line numbers, syntax colours for js / ts / jsx / tsx, css, html, json and sh (other languages stay plain), a wrap toggle and a copy button. Text is inserted as text nodes, never as HTML. Every showcase Code tab draws it through the `code-view` widget point.
 
 Composed of: [CopyButton](#copybutton), [Button](#button), [IconButton](#iconbutton), [PanelHeader](#panelheader)
 
 ```tsx
-
+<CodeView code={source} lang="tsx" copy />
+<CodeView code={css} lang="css" lineNumbers={false} wrap />
 ```
 
 Full page: src/components/typography/code-view/docs.md
@@ -908,12 +909,19 @@ Full page: src/components/forms/date-time-input/docs.md
 
 ## Debugger
 
-
+A debugger panel for code that runs in the page: the playground's preview, a plugin, a demo. The code is instrumented (march-app-ui's `instrument.js` writes one-line calls into it; line numbers stay) and runs at its own speed; every step is recorded with the names in scope and the call stack, and the debugger stops on the recording.
 
 Composed of: [IconButton](#iconbutton), [Slider](#slider), [Disclosure](#disclosure), [JsonView](#jsonview), [TextInput](#textinput), [Checkbox](#checkbox), [Toggle](#toggle), [Badge](#badge), [StatusDot](#statusdot), [Splitter](#splitter), [CopyButton](#copybutton)
 
 ```tsx
+import { Debugger, CodeEditor, createDebugSession } from "march/ui";
 
+const session = createDebugSession({ persist: "my-ide.debug" });   // evaluate: your evaluator (default: a blob: module)
+<CodeEditor lineNumbers bind:value={$code}
+  lineMarks={() => session.breakpoints().map((b) => ({ line: b.line, kind: b.condition ? "conditional" : "breakpoint" }))}
+  activeLine={() => session.litLine("app.ts")} onGutter={(line) => session.toggleBreakpoint("app.ts", line)} />
+<Debugger session={session} onStart={async () => { const r = await ts.instrument(files); session.begin(r.metas); run(r.files) }}
+  onReveal={(file, line) => openAt(file, line)} />
 ```
 
 Full page: src/components/composite/debugger/docs.md
@@ -962,12 +970,17 @@ Full page: src/components/layout/disclosure/docs.md
 
 ## DockLayout
 
-
+An IDE workspace, the dock of march-app-ui (after HADİ Studio Kit): tab groups in rows and columns. Drag a tab to a **side** of a group (a new split), onto its **centre** or **between two tabs** (a tab there), or to the **outer edge** of the whole layout. Closing never deletes: the group **collapses to a strip** (vertical in a row, horizontal in a column) and gets its size back when opened. Groups fill the whole area, layouts come from presets and are saved as plain JSON. Panels never move in the DOM: an iframe keeps running, an editor keeps its state.
 
 Composed of: [Tabs](#tabs), [IconButton](#iconbutton), [Button](#button), [ResizeHandle](#resizehandle), [Menu](#menu), [OverflowText](#overflowtext)
 
 ```tsx
-
+<DockLayout panels={[
+  { id: "files", title: "Files", icon: folder, min: [150, 120], content: () => <FileTree /> },
+  { id: "editor", title: "main.ts", icon: fileText, content: () => <Editor />, dirty: () => $dirty },
+  { id: "console", title: "Console", icon: terminal, content: () => <Console /> },
+]} presets={{ main: { title: "Main", tree: () => row([.26, tabs("files")], [.74, col([.68, tabs("editor")], [.32, tabs("console")])]) } }}
+   persist="ide.layout" api={(a) => dock = a} />
 ```
 
 Full page: src/components/composite/dock-layout/docs.md
@@ -1310,12 +1323,14 @@ Full page: src/components/actions/icon-button/docs.md
 
 ## IconPicker
 
-
+Choose an icon. A button shows the chosen icon and its name; it opens a panel with a search (by name), filter chips (arrows, files, media, messages, people, layout, filled) and a grid of every built-in icon. The value is the icon's export name (`"plus"`); `ICONS[name]` (march/icons/catalog) gives the icon itself.
 
 Composed of: Dropdown, [SearchBox](#searchbox), [Chip](#chip), [IconButton](#iconbutton), [Spinner](#spinner), [Empty](#empty)
 
 ```tsx
-
+let $icon = "plus"
+<IconPicker value={$icon} onChange={(n) => $icon = n} />
+<IconPicker inline groups={false} value={$icon} onChange={(n) => $icon = n} />
 ```
 
 Full page: src/components/forms/icon-picker/docs.md
@@ -1375,12 +1390,12 @@ Full page: src/components/composite/json-editor/docs.md
 
 ## JsonView
 
-
+A collapsible, read-only JSON tree for API responses, settings and logs. Keys, strings, numbers, booleans and null have their own theme colours; a closed object or array shows how many keys or items it holds. Dates print as ISO strings and a circular reference is marked instead of looping.
 
 Composed of: [Chevron](#chevron)
 
 ```tsx
-
+<JsonView value={response} open={1} />
 ```
 
 Full page: src/components/data/json-view/docs.md
@@ -1696,12 +1711,15 @@ Full page: src/components/navigation/nav-menu/docs.md
 
 ## NavSidebar
 
-
+The app's side menu: categories that open and close, a typo-tolerant search over every item, recent visits and featured items at the top, a collapsible icon rail and a resizable width, all remembered per user. Items are links (router `Link`), so the current page is marked and the menu follows navigation.
 
 Composed of: [ListRow](#listrow), [SearchBox](#searchbox), [PanelHeader](#panelheader), [SectionLabel](#sectionlabel), [IconButton](#iconbutton), [Button](#button), [Badge](#badge), [Chevron](#chevron), [Empty](#empty), [ResizeHandle](#resizehandle), [Drawer](#drawer)
 
 ```tsx
-
+<NavSidebar title="HADİ" items={[
+  { id: "/orders", label: "Orders", href: "/orders", group: "Sales", icon: cart, badge: () => $open },
+  { id: "/users", label: "Users", href: "/users", group: "Admin", can: "users.read" },
+]} collapsible resizable groupOrder={["Sales", "Admin"]} />
 ```
 
 Full page: src/components/composite/nav-sidebar/docs.md
@@ -2601,12 +2619,29 @@ Full page: src/components/navigation/tabs/docs.md
 
 ## Terminal
 
-
+An extensible command line in the page — for a playground, a dev console, an admin panel or a product demo.
 
 Composed of: [JsonView](#jsonview), [Window](#window), [Progress](#progress), [Spinner](#spinner)
 
 ```tsx
+import { Terminal, defineTerminalCommands, ansi } from "march/components/composite/terminal";
 
+<Terminal prompt="hadi$ " welcome="[info] help yaz" persist="demo" scheme="auto" cursor="block" commands={{
+  echo: (a, io) => io.print(a.rest.join(" ")),
+  deploy: {
+    desc: "Yayınla",
+    args: [{ name: "env", required: true, choices: ["staging", "prod"] }],
+    options: { force: { alias: "f", desc: "Onay sorma" } },
+    run: async (a, io) => {
+      const p = io.progress(`${a.args.env} yükleniyor`)
+      for (let i = 1; i <= 10; i++) { if (io.signal.aborted) return; await wait(120); p.set(i / 10) }
+      p.done(); io.success("Yayında")
+    },
+  },
+  user: { desc: "Kullanıcılar", sub: { list: (_a, io) => io.table(users), add: { args: [{ name: "name", required: true }], run: … } } },
+}} ref={(t) => t.exec("help")} />
+
+defineTerminalCommands({ ping: (_a, io) => io.print(ansi.green("pong")) })   // every terminal on the page
 ```
 
 Full page: src/components/composite/terminal/docs.md

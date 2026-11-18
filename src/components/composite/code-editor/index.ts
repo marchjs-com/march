@@ -14,13 +14,14 @@ import { uid } from "../../../core/util.ts";
 import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { model, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { tokenize, type Token } from "../../../ui/highlight.ts";
-import { scanBrackets, bracketAt, wordAt, occurrences, findAll, pairAction, pairAround, tagToClose, fitPaste, applyEdits, PAIRS, headEdit } from "./assist.ts";
+import { scanBrackets, bracketAt, wordAt, occurrences, findAll, pairAction, pairAround, tagToClose, fitPaste, applyEdits, PAIRS, headEdit, tagPair } from "./assist.ts";
 import { findBar, type FindState, type FindMode } from "./find.ts";
 import { createHistory } from "./history.ts";
 import { TextInput } from "../../forms/text-input/index.ts";
 import { virtualAnchor } from "../../../ui/popover.ts";
 import { Popover } from "../../overlays/popover/index.ts";
 import { animate } from "../../../motion/animate.ts";
+import { measure } from "../../../motion/engine/clock.ts";
 import { EditorFrame } from "../editor-frame/index.ts";
 import { OptionList } from "../../forms/option-list/index.ts";
 import { CopyButton } from "../../actions/copy-button/index.ts";
@@ -37,7 +38,7 @@ import { withColor } from "../../../theme/colors.ts";
 export { jsxCompleter, type JsxProp } from "./jsx.ts";
 
 messages("tr", {
-  "Code": "Kod", "Suggestions": "Öneriler", "suggestions": "öneriler", "Copy": "Kopyala", "Suggestion source": "Önerilerin kaynağı", "Suggestion group": "Öneri grubu", "No suggestions here": "Bu kaynakta öneri yok",
+  "Code": "Kod", "Suggestions": "Öneriler", "suggestions": "öneriler", "Copy": "Kopyala", "Suggestion source": "Önerilerin kaynağı", "Suggestion group": "Öneri grubu", "No suggestions here": "Bu kaynakta öneri yok", "Quick fixes": "Hızlı düzeltmeler", "Quick fix": "Hızlı düzeltme", "No quick fixes here": "Burada hızlı düzeltme yok", "No references here": "Burada kullanım yok", "References": "Kullanımlar", "{n} references": "{n} kullanım", "written": "yazılıyor", "Find all references": "Tüm kullanımlar",
   "Keyboard shortcuts": "Klavye kısayolları", "Editor": "Editör", "Indent (or take the suggestion)": "Girinti (ya da öneriyi al)", "Outdent": "Girintiyi azalt",
   "New line, keeping the indent": "Yeni satır, girinti korunur", "Comment / uncomment lines": "Satırları yorum yap / aç", "Move lines up": "Satırları yukarı taşı",
   "Move lines down": "Satırları aşağı taşı", "Copy lines up": "Satırları yukarı kopyala", "Copy lines down": "Satırları aşağı kopyala", "Delete lines": "Satırları sil",
@@ -138,6 +139,8 @@ export type CodeCommand = "indent" | "outdent" | "newline" | "comment" | "moveUp
 export interface CodeRange { from: number; to: number }
 /** An edit of the text: [from, to) becomes `text` (places in the text before any edit). */
 export interface CodeEdit { from: number; to: number; text: string }
+/** A quick fix (Ctrl+.): what it does and its edits. */
+export interface CodeFix { title: string; edits: readonly CodeEdit[] }
 /** What `rename` answers: the name's range at the caret and every place it is written (or why it cannot be renamed). */
 export type CodeRename = { from: number; to: number; locations: readonly CodeRange[] } | { error: string };
 type Maybe<T> = T | null | undefined | Promise<T | null | undefined>;
@@ -256,6 +259,22 @@ export interface CodeEditorProps extends ControlProps<string> {
    * @tr Parantezler ve tırnaklar kendini kapatır: `(` imleç arada `()` yazar, seçim sarılır, kapatanı yazmak üstünden geçer, boş çift arasında Backspace ikisini de siler, `<div` sonrası `>` `</div>` yazar. Varsayılan true.
    */
   autoClose?: MaybeFn<boolean | undefined>;
+  /** Renaming a tag renames its pair too (`<Row>` → `<Stack>` changes `</Row>`). Default true. @tr Bir etiketin adını değiştirmek eşini de değiştirir (`<Row>` → `<Stack>`, `</Row>`'u da değiştirir). Varsayılan true. */
+  linkedTags?: MaybeFn<boolean | undefined>;
+  /** More carets: Ctrl+D (the next place of the selected word), Alt+click, Ctrl+Alt+Up/Down; what is typed goes to each. Default true. @tr Birden çok imleç: Ctrl+D (seçili kelimenin sonraki yeri), Alt+tık, Ctrl+Alt+Yukarı/Aşağı; yazılan her birine gider. Varsayılan true. */
+  multiCursor?: MaybeFn<boolean | undefined>;
+  /** With line numbers, while scrolled: the lines that open the blocks the top line is in (a function, a `return (`), kept on top; a press goes there. Default true. @tr Satır numaralarıyla, kaydırılınca: üstteki satırın içinde olduğu blokları açan satırlar (bir işlev, bir `return (`) üstte kalır; basınca oraya gider. Varsayılan true. */
+  stickyScroll?: MaybeFn<boolean | undefined>;
+  /**
+   * Inlay hints (a parameter's name, an inferred type): shown faintly at the end of their line, so the text does not
+   * move. @tr Satır içi ipuçları (bir parametrenin adı, çıkarılan bir tür): satırlarının sonunda soluk gösterilir, metin kaymaz.
+   */
+  inlays?: MaybeFn<readonly { at: number; text: string }[] | undefined>;
+  /**
+   * The colour a string names (`"#e5484d"`, `"brand-orange"`): a line of that colour under it. Default: CSS colours
+   * (#hex, rgb(), hsl(), oklch()); `false`: none. @tr Bir metnin adlandırdığı renk (`"#e5484d"`, `"brand-orange"`): altında o renkte bir çizgi. Varsayılan: CSS renkleri (#hex, rgb(), hsl(), oklch()); `false`: yok.
+   */
+  colorOf?: ((text: string) => string | null | undefined) | false | undefined;
   /** Pasted lines move to the indent of the line they land on (their inner indent kept). Default true. @tr Yapıştırılan satırlar düştükleri satırın girintisine taşınır (iç girintileri korunur). Varsayılan true. */
   pasteIndent?: MaybeFn<boolean | undefined>;
   /** Text size in px; Ctrl + = / Ctrl + - / Ctrl + 0 change it (`onFontSizeChange` keeps it). Default: the theme's small text. @tr px cinsinden yazı boyutu; Ctrl + = / Ctrl + - / Ctrl + 0 değiştirir (`onFontSizeChange` tutar). Varsayılan: temanın küçük metni. */
@@ -270,6 +289,16 @@ export interface CodeEditorProps extends ControlProps<string> {
   rename?: ((ctx: { value: string; at: number }) => Maybe<CodeRename>) | undefined;
   /** Shift + Alt + F: the edits that format the text (one undo step). @tr Shift + Alt + F: metni biçimlendiren düzenlemeler (tek geri alma adımı). */
   format?: ((value: string) => Maybe<readonly CodeEdit[]>) | undefined;
+  /**
+   * Ctrl+. (or a press on a problem's icon in the gutter): the fixes for the problems of a range (the caret's line), in
+   * a list; the one picked is applied (one undo step). @tr Ctrl+. (ya da oluktaki sorun ikonuna basmak): bir aralığın (imlecin satırı) sorunları için düzeltmeler, bir listede; seçilen uygulanır (tek geri alma adımı).
+   */
+  fixes?: ((ctx: { value: string; from: number; to: number }) => Maybe<readonly CodeFix[]>) | undefined;
+  /**
+   * Shift+F12: every place the name at the caret is used (`write`: written there), marked in the text and listed with
+   * its line; a row takes the caret there. @tr Shift+F12: imleçteki adın kullanıldığı her yer (`write`: orada yazılıyor), metinde işaretli ve satırıyla listede; bir satır imleci oraya götürür.
+   */
+  references?: ((ctx: { value: string; at: number }) => Maybe<readonly { from: number; to: number; write?: boolean }[]>) | undefined;
   /**
    * The undo history (Ctrl+Z, Ctrl+Y / Ctrl+Shift+Z): `limit` steps (default 500; a typed word is one step). With a
    * `key` it is kept in the browser session (sessionStorage) for that key, so it survives the editor being drawn again
@@ -289,6 +318,11 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const id = uid("m-ced");
   const ro = (): boolean => !!(props.readonly || props.disabled);
   const done = signal<{ from: number; to: number; items: readonly CodeSuggestion[]; all?: boolean } | null>(null);
+  // the carets besides the text field's own (more carets: Ctrl+D, Alt+click, Ctrl+Alt+Up/Down)
+  const extra = signal<readonly (readonly [number, number])[]>([]);
+  // the references being listed (Shift+F12)
+  const refs = signal<{ at: number; items: readonly { from: number; to: number; write?: boolean }[] } | null>(null);
+  const refActive = signal(0);
   const active = signal(0);
   const marks = (): readonly CodeMark[] => val(props.marks) ?? [];
   // suggest="ghost": the rest of the likeliest row, shown faintly at the caret (`at`); Tab writes it
@@ -333,6 +367,14 @@ export function CodeEditor(props: CodeEditorProps): Element {
   };
   const gutter = (): boolean => !!val(props.lineNumbers);
   const lit = (): CodeActiveLine | null => { const a = val(props.activeLine); return a == null ? null : typeof a === "number" ? { line: a } : a; };
+  // a string that names a colour: its CSS colour (the owner's names first, then CSS's own forms)
+  const CSS_COLOR = /^(#[0-9a-f]{3,8}|(?:rgb|rgba|hsl|hsla|oklch|oklab|lab|lch|color)\([^()]*\))$/i;
+  const colorAt = (token: string): string | null => {
+    if (props.colorOf === false) return null;
+    const inner = token.replace(/^["'`]|["'`]$/g, "").trim();
+    if (!inner || inner.length > 40) return null;
+    return props.colorOf?.(inner) ?? (CSS_COLOR.test(inner) ? inner : null);
+  };
   const paint = (): unknown => {
     const src = get(), list = [...marks()].filter((m) => m.to > m.from).sort((a, b) => a.from - b.from);
     const out: unknown[] = [], now = new Set<string>();
@@ -360,14 +402,15 @@ export function CodeEditor(props: CodeEditorProps): Element {
     const lineNode = (n: number): unknown => {
       const m = lineMark.get(n), p = probs.get(n);
       return [active?.line === n ? h("span", { class: `m-ced-lit is-${active.kind ?? "current"}`, "aria-hidden": "true" }) : null,
-        h("span", { class: cx("m-ced-ln", m && `is-${m.kind ?? "breakpoint"}`, p && (p.error ? "has-error" : "has-warning")), "data-line": n, title: m?.title ?? (p ? p.titles.join("\n") : null) },
+        h("span", { class: cx("m-ced-ln", m && `is-${m.kind ?? "breakpoint"}`, p && (p.error ? "is-error" : "is-warning")), "data-line": n, title: m?.title ?? (p ? p.titles.join("\n") : null) },
           p && !m ? h("span", { class: "m-ced-prob", "aria-hidden": "true" }, glyph(p.error ? xCircle : alertTriangle)) : null)];
     };
     const g = ghost();
     let ghostDone = !g;
     const ghostNode = (): unknown => h("span", { class: "m-ced-ghost-at" }, h("span", { class: "m-ced-ghost" }, g?.rest ?? ""));
     const push = (kind: string, text: string, mark: CodeMark | null): void => {
-      const node = kind ? h("span", { class: `m-tok-${kind}` }, text) : text;
+      const col = kind === "str" ? colorAt(text) : null;
+      const node = col ? h("span", { class: `m-tok-${kind} m-ced-color`, style: { "--m-ced-swatch": col } }, text) : kind ? h("span", { class: `m-tok-${kind}` }, text) : text;
       if (!mark) { out.push(node); return; }
       const key = `${mark.kind ?? "flash"}:${mark.from}:${mark.to}:${src.slice(mark.from, mark.to)}`;
       const flash = (mark.kind ?? "flash") === "flash";
@@ -432,6 +475,18 @@ export function CodeEditor(props: CodeEditorProps): Element {
       }
     }
     if (on && flag(props.occurrences)) for (const [x, y] of occurrences(src, a, b)) ranges.push([x, y, "m-ced-occ"]);
+    // the references being listed (Shift+F12): written places stronger
+    for (const r of refs()?.items ?? []) ranges.push([r.from, r.to, r.write ? "m-ced-ref is-write" : "m-ced-ref"]);
+    // inlay hints: each line's at its end (the text does not move)
+    const hints = new Map<number, string[]>();
+    for (const x of val(props.inlays) ?? []) {
+      if (x.at < 0 || x.at > src.length) continue;
+      const e = src.indexOf("\n", x.at), end = e < 0 ? src.length : e;
+      hints.set(end, [...(hints.get(end) ?? []), x.text.replace(/^:\s*/, "").trim()]);
+    }
+    // the other carets: a selection's range, a collapsed one's bar (a point below)
+    const bars = new Set<number>();
+    for (const [x, y] of extra()) if (y > x) ranges.push([x, y, "m-ced-xsel"]); else bars.add(Math.min(x, src.length));
     const cur = current();
     matches().forEach(([x, y], i) => ranges.push([x, y, i === cur ? "m-ced-found is-current" : "m-ced-found"]));
     if (on && a === b && flag(props.matchBrackets)) { const m = bracketAt(brackets(), src, a); if (m) ranges.push([m[0], m[0] + 1, "m-ced-bm"], [m[1], m[1] + 1, "m-ced-bm"]); }
@@ -441,6 +496,8 @@ export function CodeEditor(props: CodeEditorProps): Element {
     for (const r of ranges) { cuts.add(r[0]); cuts.add(r[1]); }
     if (lineStart >= 0) cuts.add(lineStart);
     if (rvAt >= 0) cuts.add(rvAt);
+    for (const x of bars) cuts.add(x);
+    for (const x of hints.keys()) cuts.add(x);
     const pts = [...cuts].sort((x, y) => x - y);
     ranges.sort((x, y) => x[0] - y[0]);
     const out: unknown[] = [];
@@ -449,6 +506,8 @@ export function CodeEditor(props: CodeEditorProps): Element {
       const x = pts[i]!, y = pts[i + 1];
       if (x === lineStart) out.push(h("span", { class: "m-ced-cur", "aria-hidden": "true" }));
       if (x === rvAt) out.push(h("span", { class: "m-ced-at" }));
+      if (bars.has(x)) out.push(h("span", { class: "m-ced-xcaret", "aria-hidden": "true" }));
+      if (hints.has(x)) out.push(h("span", { class: "m-ced-inlay", "aria-hidden": "true" }, h("span", {}, hints.get(x)!.join(" · "))));
       if (y === undefined) break;
       while (ri < ranges.length && ranges[ri]![0] <= x) act.push(ranges[ri++]!);
       act = act.filter((r) => r[1] > x);
@@ -601,6 +660,71 @@ export function CodeEditor(props: CodeEditorProps): Element {
   let editing = false;
   /** The selection before the change being made (the undo step's "before"). */
   let selBefore: readonly [number, number] | null = null;
+  let altFrom: [number, number] | null = null;
+  const multiOn = (): boolean => val(props.multiCursor) !== false && props.multiline !== false && !ro();
+  // a tag name being edited (linkedTags): the text before the edit and where its pair is
+  let linked: { value: string; self: [number, number]; pair: [number, number] } | null = null;
+  const LINKED_LANG = /^(tsx|jsx|html?|xml|vue|svelte)$/;
+  // ---- more carets: Ctrl+D (the next place of the selected word), Alt+click, Ctrl+Alt+Up/Down (the line above / below);
+  // typing, Backspace, Delete, Enter and a paste happen at each, as one step; Escape, a click or an arrow drops them
+  const dropMulti = (): void => { if (extra.peek().length) extra.set([]); };
+  const primary = (): [number, number] => [input.selectionStart ?? 0, input.selectionEnd ?? input.selectionStart ?? 0];
+  /** Every caret (the text field's selection among them), merged where they overlap, in the text's order. */
+  const carets = (): [number, number][] => {
+    const all = [primary(), ...extra.peek().map((r) => [r[0], r[1]] as [number, number])].sort((x, y) => x[0] - y[0] || x[1] - y[1]);
+    const out: [number, number][] = [];
+    for (const r of all) { const last = out[out.length - 1]; if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]); else out.push(r); }
+    return out;
+  };
+  /** Writes `texts[i]` over each caret's selection (or, collapsed, `del` characters before (-1) or after (1) it taken):
+   * one step in the history; the carets stand after what was written. */
+  const editEach = (texts: (i: number) => string, del: -1 | 0 | 1 = 0): void => {
+    const v = input.value, list = carets().map(([a, b]) => (a === b && del < 0 ? [Math.max(0, a - 1), b] : a === b && del > 0 ? [a, Math.min(v.length, b + 1)] : [a, b]) as [number, number]);
+    const from = list[0]![0], to = list[list.length - 1]![1];
+    let out = "", at = from, shift = 0;
+    const after: number[] = [];
+    list.forEach(([a, b], i) => { const text = texts(i); out += v.slice(at, a) + text; at = b; after.push(a + shift + text.length); shift += text.length - (b - a); });
+    out += v.slice(at, to);
+    replace(from, to, out, after[after.length - 1]!);
+    extra.set(after.slice(0, -1).map((x) => [x, x] as const));
+  };
+  /** Ctrl+D: the word at the caret, then each next place of the selected text (after the last caret, around the end). */
+  const selectNext = (): void => {
+    const [a, b] = primary(), v = input.value;
+    if (a === b) { const w = wordAt(v, a); if (w) { input.setSelectionRange(w[0], w[1]); readSel(); } return; }
+    const word = v.slice(a, b), taken = carets(), last = Math.max(...taken.map((r) => r[1]));
+    const places: number[] = [];
+    for (let i = v.indexOf(word); i >= 0; i = v.indexOf(word, i + 1)) if (!taken.some((r) => r[0] === i)) places.push(i);
+    const i = places.find((x) => x >= last) ?? places[0];
+    if (i === undefined) return;
+    extra.set([...extra.peek(), [a, b]]);
+    input.setSelectionRange(i, i + word.length); readSel(); reveal(i);
+  };
+  /** Ctrl+Alt+Up/Down: a caret on the line above / below the farthest one, at the same column. */
+  const addLine = (dir: -1 | 1): void => {
+    const v = input.value, all = carets(), edge = dir > 0 ? all[all.length - 1]![1] : all[0]![0];
+    const ls = v.lastIndexOf("\n", edge - 1) + 1, col = edge - ls;
+    if (dir > 0 ? v.indexOf("\n", edge) < 0 : ls === 0) return;
+    const ns = dir > 0 ? v.indexOf("\n", edge) + 1 : v.lastIndexOf("\n", ls - 2) + 1;
+    const ne = v.indexOf("\n", ns), at = Math.min(ns + col, ne < 0 ? v.length : ne);
+    extra.set([...extra.peek(), [at, at]]);
+  };
+  /** After an edit inside a tag's name: its pair gets the same name (one more step in the history). */
+  const followTag = (): void => {
+    const l = linked;
+    linked = null;
+    if (!l) return;
+    const v = input.value, delta = v.length - l.value.length;
+    let end = l.self[0];
+    while (end < v.length && /[\w$.:-]/.test(v[end]!)) end++;
+    const name = v.slice(l.self[0], end), oldName = l.value.slice(l.self[0], l.self[1]);
+    const pair: [number, number] = l.pair[0] > l.self[0] ? [l.pair[0] + delta, l.pair[1] + delta] : [l.pair[0], l.pair[1]];
+    if (name === oldName || !name || v.slice(pair[0], pair[1]) !== l.value.slice(l.pair[0], l.pair[1])) return;
+    const at = input.selectionStart ?? 0, shift = pair[0] < at ? name.length - (pair[1] - pair[0]) : 0;
+    input.setRangeText(name, pair[0], pair[1], "preserve");
+    input.setSelectionRange(at + shift, at + shift);
+    set(input.value);
+  };
   /** Replace [from, to) with `text`, then select [a, b] (offsets in the new text). */
   const replace = (from: number, to: number, text: string, a: number, b = a): void => {
     selBefore ??= [input.selectionStart ?? 0, input.selectionEnd ?? input.selectionStart ?? 0];
@@ -740,8 +864,16 @@ export function CodeEditor(props: CodeEditorProps): Element {
     return true;
   };
   const onPaste = (e: ClipboardEvent): void => {
-    if (ro() || !flag(props.pasteIndent) || props.multiline === false) return;
+    if (ro()) return;
     const text = e.clipboardData?.getData("text/plain") ?? "";
+    // more carets: the pasted text at each (a line each when it has as many lines as there are carets)
+    if (extra.peek().length) {
+      e.preventDefault();
+      const lines = text.replace(/\r\n?/g, "\n").split("\n"), n = carets().length;
+      editEach((i) => (lines.length === n ? lines[i]! : text));
+      return;
+    }
+    if (!flag(props.pasteIndent) || props.multiline === false) return;
     if (!text.includes("\n")) return;
     const v = input.value, s = input.selectionStart ?? 0, end = input.selectionEnd ?? s;
     const lineStart = v.lastIndexOf("\n", s - 1) + 1, head = v.slice(lineStart, s), atIndent = /^[ \t]*$/.test(head);
@@ -888,6 +1020,56 @@ export function CodeEditor(props: CodeEditorProps): Element {
     replace(from, to, r.value.slice(from, r.value.length - tail), r.caret);
   };
 
+  // ---- quick fixes (Ctrl+.): the caret's line's fixes in a list under it
+  const fixList = signal<{ at: number; items: readonly CodeFix[] } | null>(null);
+  const fixActive = signal(0);
+  const lineRange = (at: number): [number, number] => {
+    const v = input.value, a = v.lastIndexOf("\n", Math.max(0, at - 1)) + 1, e = v.indexOf("\n", at);
+    return [a, e < 0 ? v.length : e];
+  };
+  const openFixes = async (at: number): Promise<void> => {
+    if (!props.fixes || ro()) return;
+    const value = input.value, [from, to] = lineRange(at);
+    close(); closeSignature();
+    const items = await settle(props.fixes({ value, from, to }));
+    if (input.value !== value) return;
+    if (!items?.length) { notice(t`No quick fixes here`, at); return; }
+    batch(() => { fixActive.set(0); fixList.set({ at, items }); });
+  };
+  const applyFix = (i: number): void => {
+    const f = fixList.peek()?.items[i];
+    fixList.set(null);
+    if (!f || !f.edits.length) return;
+    const value = input.value, at = input.selectionStart ?? 0;
+    const from = Math.min(...f.edits.map((x) => x.from)), to = Math.max(...f.edits.map((x) => x.to));
+    const r = applyEdits(value, f.edits, at), tail = value.length - to;
+    replace(from, to, r.value.slice(from, r.value.length - tail), r.caret);
+    input.focus({ preventScroll: true });
+  };
+
+  // ---- references (Shift+F12): marked in the text, listed under the word
+  const openRefs = async (at: number): Promise<void> => {
+    if (!props.references) return;
+    const value = input.value;
+    close(); closeSignature(); fixList.set(null);
+    const items = await settle(props.references({ value, at }));
+    if (input.value !== value) return;
+    if (!items?.length) { notice(t`No references here`, at); return; }
+    const w = wordAt(value, at);
+    batch(() => { refActive.set(0); refs.set({ at: w ? w[0] : at, items: [...items].sort((x, y) => x.from - y.from) }); });
+  };
+  const goRef = (i: number): void => {
+    const r = refs.peek()?.items[i];
+    refs.set(null);
+    if (!r) return;
+    input.focus({ preventScroll: true }); input.setSelectionRange(r.from, r.to); readSel(); reveal(r.from);
+  };
+  /** A place's line: its number and its text (trimmed), for a row of a list. */
+  const lineOf = (v: string, at: number): { n: number; text: string } => {
+    const a = v.lastIndexOf("\n", at - 1) + 1, e = v.indexOf("\n", at);
+    return { n: v.slice(0, a).split("\n").length, text: v.slice(a, e < 0 ? v.length : e).trim() };
+  };
+
   // ---- text size (Ctrl + = / - / 0)
   const size = signal<number | undefined>(untrack(() => val(props.fontSize)));
   effect(() => { const v = val(props.fontSize); untrack(() => { if (v !== size.peek()) size.set(v); }); });
@@ -968,12 +1150,32 @@ export function CodeEditor(props: CodeEditorProps): Element {
     if (mod && !e.altKey && (k === "h" || e.code === "KeyH") && on("replace") && !ro()) { e.preventDefault(); close(); openFind("replace"); return; }
     if (mod && !e.altKey && !e.shiftKey && (k === "g" || e.code === "KeyG") && on("goToLine") && multi0) { e.preventDefault(); close(); openFind("line"); return; }
     if (e.key === "F3" && fs.text.peek() && on("find")) { e.preventDefault(); if (!finding()) fs.mode.set("find"); nextMatch(e.shiftKey); return; }
-    if (e.key === "F12" && props.definition && on("definition")) { e.preventDefault(); close(); void goDefinition(input.selectionStart ?? 0); return; }
+    if (e.key === "F12" && !e.shiftKey && props.definition && on("definition")) { e.preventDefault(); close(); void goDefinition(input.selectionStart ?? 0); return; }
     if (e.key === "F2" && props.rename && on("rename")) { e.preventDefault(); close(); void startRename(); return; }
     if (e.shiftKey && e.altKey && !mod && e.code === "KeyF" && props.format && on("format")) { e.preventDefault(); close(); void formatAll(); return; }
     if (mod && !e.altKey && on("zoom")) {
       const z = e.key === "=" || e.key === "+" || e.code === "NumpadAdd" ? 1 : e.key === "-" || e.code === "NumpadSubtract" ? -1 : e.key === "0" || e.code === "Numpad0" ? 0 : null;
       if (z !== null) { e.preventDefault(); zoom(z); return; }
+    }
+    if (fixList.peek()) {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter") return; // the fix list's keys
+      if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); fixList.set(null); return; }
+      fixList.set(null);
+    }
+    if (mod && !e.altKey && e.key === "." && props.fixes) { e.preventDefault(); void openFixes(input.selectionStart ?? 0); return; }
+    if (refs.peek()) {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter") return; // the list's keys
+      if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); refs.set(null); return; }
+      refs.set(null);
+    }
+    if (e.key === "F12" && e.shiftKey && props.references) { e.preventDefault(); void openRefs(input.selectionStart ?? 0); return; }
+    // more carets
+    if (mod && !e.altKey && !e.shiftKey && (e.key.toLowerCase() === "d" || e.code === "KeyD") && multiOn()) { e.preventDefault(); close(); selectNext(); return; }
+    if (mod && e.altKey && (e.key === "ArrowDown" || e.key === "ArrowUp") && multiOn()) { e.preventDefault(); close(); addLine(e.key === "ArrowDown" ? 1 : -1); return; }
+    if (extra.peek().length) {
+      if (e.key === "Escape" && !done.peek()) { e.preventDefault(); e.stopPropagation(); dropMulti(); return; }
+      if (/^(Arrow|Home|End|Page)/.test(e.key) && !done.peek()) dropMulti();
+      if (e.key === "Tab" && !done.peek() && !ghost.peek()) { e.preventDefault(); editEach(() => " ".repeat(props.tabSize ?? 2)); return; }
     }
     const d = done.peek();
     if (d) {
@@ -1016,7 +1218,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
       ["copyUp", "Shift+Alt+↑", () => t`Copy lines up`, multi], ["copyDown", "Shift+Alt+↓", () => t`Copy lines down`, multi],
       ["deleteLine", "Ctrl+Shift+K", () => t`Delete lines`, multi], ["suggest", "Ctrl+Space", () => t`Suggestions list`, !!props.complete],
       ["find", "Ctrl+F", () => t`Find`], ["replace", "Ctrl+H", () => t`Find / replace`, !ro()], ["find", "F3 / Shift+F3", () => t`Next / previous match`],
-      ["goToLine", "Ctrl+G", () => t`Go to line`, multi], ["definition", "F12 / Ctrl+Click", () => t`Go to definition`, !!props.definition],
+      ["goToLine", "Ctrl+G", () => t`Go to line`, multi], ["", "Ctrl+.", () => t`Quick fix`, !!props.fixes], ["", "Shift+F12", () => t`Find all references`, !!props.references], ["definition", "F12 / Ctrl+Click", () => t`Go to definition`, !!props.definition],
       ["rename", "F2", () => t`Rename symbol`, !!props.rename && !ro()], ["format", "Shift+Alt+F", () => t`Format document`, !!props.format && !ro()],
       ["zoom", "Ctrl+= / Ctrl+- / Ctrl+0", () => t`Bigger / smaller / default text`],
       ["save", "Ctrl+S", () => t`Save`], ["", "F9", () => t`Toggle a breakpoint`, !!props.onGutter],
@@ -1032,13 +1234,18 @@ export function CodeEditor(props: CodeEditorProps): Element {
     onInput: (e: Event) => {
       if (editing) return;
       ghost.set(null); set(input.value); readSel();
+      if (linked) followTag();
       const ie = e as InputEvent, typed = ie.inputType === "insertText" ? ie.data ?? "" : "";
       ask(false, typed);
       // the signature: opened by ( and , ; followed while it is open (the argument moves, ")" ends the call)
       if (/[(,]$/.test(typed) || sig.peek()) askSignature();
     },
     onKeyUp: (e: KeyboardEvent) => { readSel(); if (sig.peek() && /^(Arrow|Home|End|Page)/.test(e.key)) askSignature(); },
+    onMousedown: (e: MouseEvent) => { altFrom = e.altKey && multiOn() ? primary() : null; },
     onClick: (e: MouseEvent) => {
+      // Alt+click: one more caret (the one before stays); a plain click: one caret again
+      if (altFrom) { const keep = altFrom; altFrom = null; extra.set([...extra.peek(), keep]); }
+      else dropMulti();
       close(); ghost.set(null); readSel();
       if ((e.ctrlKey || e.metaKey) && props.definition && on("definition")) { void goDefinition(input.selectionStart ?? 0); return; }
       if (sig.peek()) askSignature();
@@ -1047,7 +1254,24 @@ export function CodeEditor(props: CodeEditorProps): Element {
     // the selection before a typed change; the browser's own undo (its menu, a gesture) goes to the editor's
     onBeforeinput: (e: InputEvent) => {
       if (hist && (e.inputType === "historyUndo" || e.inputType === "historyRedo")) { e.preventDefault(); history(e.inputType === "historyUndo"); return; }
+      // more carets: the change happens at each of them
+      if (extra.peek().length && !ro()) {
+        const kind = e.inputType;
+        if (kind === "insertText" || kind === "insertLineBreak" || kind === "deleteContentBackward" || kind === "deleteContentForward") {
+          e.preventDefault();
+          const text = kind === "insertText" ? e.data ?? "" : kind === "insertLineBreak" ? "\n" : "";
+          editEach(() => text, kind === "deleteContentBackward" ? -1 : kind === "deleteContentForward" ? 1 : 0);
+          return;
+        }
+      }
       selBefore ??= [input.selectionStart ?? 0, input.selectionEnd ?? input.selectionStart ?? 0];
+      // typing in a tag's name: remember its pair (followTag renames it after the change)
+      const a = input.selectionStart ?? 0, b = input.selectionEnd ?? a;
+      linked = null;
+      if (val(props.linkedTags) !== false && LINKED_LANG.test(props.lang ?? "tsx") && /^(insertText|deleteContent)/.test(e.inputType)) {
+        const p = tagPair(input.value, a);
+        if (p && b <= p.self[1] && (e.inputType !== "deleteContentBackward" || a > p.self[0] || b > a) && (e.inputType !== "insertText" || /^[\w$.:-]+$/.test(e.data ?? ""))) linked = { value: input.value, ...p };
+      }
     },
     onPointermove: onPointerMove,
     onPointerleave: () => { clearTimeout(hoverTimer); hideTimer = setTimeout(() => hoverDoc.set(null), 250); },
@@ -1127,6 +1351,24 @@ export function CodeEditor(props: CodeEditorProps): Element {
     anchor: () => sigAnchor, open: () => !!sig(), onOpenChange: (o: boolean) => { if (!o) closeSignature(); }, role: null, flush: true, autoFocus: false, placement: "top-start", panelClass: "m-ced-sig-panel",
     children: () => [sigView],
   });
+  const refAnchor = virtualAnchor(() => { const r = refs(); return r ? rectAt(r.at) : null; }, () => input);
+  const refPop = h(Popover, {
+    anchor: () => refAnchor, open: () => !!refs(), onOpenChange: (o: boolean) => { if (!o) refs.set(null); }, role: null, flush: true, autoFocus: false, placement: "bottom-start", panelClass: "m-ced-list m-ced-refs",
+    children: () => [h("div", { class: "m-ced-fixes-head" }, () => t("{n} references", { n: refs()?.items.length ?? 0 })), h(OptionList<number>, {
+      id: `${id}-refs`, keysFrom: input, active: refActive, inline: true, check: false, size: "sm", label: () => t`References`, empty: false,
+      options: () => { const v = get(); return (refs()?.items ?? []).map((r, i) => { const l = lineOf(v, r.from); return { value: i, label: l.text || " ", hint: `${r.write ? `${t`written`} · ` : ""}${l.n}` }; }); },
+      onPick: (i: number) => goRef(i),
+    })],
+  });
+  const fixAnchor = virtualAnchor(() => { const f = fixList(); return f ? rectAt(f.at) : null; }, () => input);
+  const fixPop = h(Popover, {
+    anchor: () => fixAnchor, open: () => !!fixList(), onOpenChange: (o: boolean) => { if (!o) fixList.set(null); }, role: null, flush: true, autoFocus: false, placement: "bottom-start", panelClass: "m-ced-list m-ced-fixes",
+    children: () => [h("div", { class: "m-ced-fixes-head" }, t`Quick fixes`), h(OptionList<number>, {
+      id: `${id}-fixes`, keysFrom: input, active: fixActive, inline: true, check: false, size: "sm", label: () => t`Quick fixes`, empty: false,
+      options: () => (fixList()?.items ?? []).map((f, i) => ({ value: i, label: f.title })),
+      onPick: (i: number) => applyFix(i),
+    })],
+  });
   const list = h(Popover, {
     anchor: () => anchor, open: () => open(), onOpenChange: (o: boolean) => { if (!o) close(); }, role: null, flush: true, autoFocus: false, placement: "bottom-start", panelClass: "m-ced-list",
     children: (_close: unknown) => [() => (groupsOf().length > 1 ? groupBar() : null), h(OptionList<number>, {
@@ -1160,7 +1402,14 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const unhover = (): void => { hover?.classList.remove("is-hover"); hover = null; };
   const hit = h("span", {
     class: "m-ced-gutter", "aria-hidden": "true",
-    onPointerdown: (e: PointerEvent) => { if (e.button !== 0) return; e.preventDefault(); props.onGutter?.(lineAt(e.clientY), e); },
+    onPointerdown: (e: PointerEvent) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      // a line with a problem: its quick fixes; else the owner's (a breakpoint)
+      const n = lineAt(e.clientY), el = code.querySelector(`.m-ced-ln[data-line="${n}"]`);
+      if (props.fixes && el?.matches(".is-error, .is-warning")) { const v = input.value.split("\n"); let at = 0; for (let i = 0; i < n - 1; i++) at += v[i]!.length + 1; input.setSelectionRange(at, at); readSel(); void openFixes(at); return; }
+      props.onGutter?.(n, e);
+    },
     onPointermove: (e: PointerEvent) => { const el = code.querySelector(`.m-ced-ln[data-line="${lineAt(e.clientY)}"]`); if (el !== hover) { unhover(); hover = el; el?.classList.add("is-hover"); } },
     onPointerleave: unhover,
   });
@@ -1224,6 +1473,42 @@ export function CodeEditor(props: CodeEditorProps): Element {
       const end = input.value.length; input.setSelectionRange(end, end); readSel();
     },
   }, deco, pre, input, () => (gutter() ? hit : null)) as HTMLElement;
+  // ---- sticky scroll: the lines that open the blocks around the first line on screen (up to 3, innermost last)
+  const stuck = signal<readonly { at: number; n: number; text: string }[]>([]);
+  let stickyQueued = false;
+  const updateSticky = (): void => {
+    stickyQueued = false;
+    if (!gutter() || val(props.stickyScroll) === false || area.scrollTop < 4) { if (stuck.peek().length) stuck.set([]); return; }
+    const top = area.scrollTop;
+    let first = 1;
+    for (const el of code.querySelectorAll<HTMLElement>(".m-ced-ln")) { if (el.offsetTop + 2 >= top) { first = Number(el.dataset["line"]); break; } }
+    const v = get(), lines = v.split("\n");
+    let topAt = 0;
+    for (let i = 0; i < first - 1 && i < lines.length; i++) topAt += lines[i]!.length + 1;
+    const lineAtPos = (pos: number): number => v.slice(0, pos).split("\n").length;
+    const seen = new Set<number>(), out: { at: number; n: number; text: string }[] = [];
+    const opens = [...brackets().mate].filter(([o, c]) => o < c && o < topAt && c >= topAt && "{([".includes(v[o] ?? "")).sort((x, y) => x[0] - y[0]);
+    for (const [o] of opens) {
+      const n = lineAtPos(o);
+      if (n >= first || seen.has(n)) continue;
+      seen.add(n);
+      const ls = v.lastIndexOf("\n", o - 1) + 1, le = v.indexOf("\n", o);
+      const text = v.slice(ls, le < 0 ? v.length : le);
+      if (!text.trim()) continue;
+      out.push({ at: ls, n, text: text.length > 160 ? `${text.slice(0, 159)}…` : text });
+    }
+    const keep = out.slice(-3);
+    const cur = stuck.peek();
+    if (keep.length !== cur.length || keep.some((x, i) => x.n !== cur[i]?.n || x.text !== cur[i]?.text)) stuck.set(keep);
+  };
+  const queueSticky = (): void => { if (stickyQueued) return; stickyQueued = true; measure(updateSticky); };
+  area.addEventListener("scroll", queueSticky, { passive: true });
+  effect(() => { get(); untrack(queueSticky); });
+  const stickyBar = (): unknown => (stuck().length ? h("div", { class: "m-ced-sticky", "aria-hidden": "true" },
+    stuck().map((s) => h("div", { class: "m-ced-sticky-line", onPointerdown: (e: PointerEvent) => {
+      e.preventDefault(); input.focus({ preventScroll: true }); input.setSelectionRange(s.at, s.at); readSel();
+      const el = code.querySelector<HTMLElement>(`.m-ced-ln[data-line="${s.n}"]`); if (el) area.scrollTop = Math.max(0, el.offsetTop - 4);
+    } }, h("span", { class: "m-ced-sticky-n" }, String(s.n)), h("span", { class: "m-ced-sticky-text" }, s.text)))) : null);
   // the text size and line height (Ctrl + = / - / 0)
   effect(() => {
     const px = size(), lh = val(props.lineHeight);
@@ -1235,5 +1520,5 @@ export function CodeEditor(props: CodeEditorProps): Element {
     class: () => cx("m-ced", gutter() && "is-gutter", val(props.palette) !== "theme" && "is-ide", val(props.class)), disabled: () => !!props.disabled, readonly: () => !!props.readonly,
     foot, showFoot: props.message !== false,
     footProps: { class: "m-ced-foot", divider: true, actions: [hint, keysButton, props.copy !== false && h(CopyButton, { text: get, iconOnly: true, class: "m-ced-copy", ...(props.copyLabel != null ? { label: props.copyLabel } : {}) })] },
-    children: [h("div", { class: "m-ced-body" }, barNode, area), list, sigPop, tipPop, renamePop] }) as Element;
+    children: [h("div", { class: "m-ced-body" }, barNode, stickyBar, area), list, fixPop, refPop, sigPop, tipPop, renamePop] }) as Element;
 }

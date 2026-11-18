@@ -156,6 +156,8 @@
   "typeScriptPlugin": "TypeScript dil servisi eklentisi: bir worker içinde çalışır; bütün JavaScript / TypeScript / DOM API tamamlaması, hata ve uyarıların yerleri. CSP Trusted Types ile çalışıyorsa trusted-types march-worker gerekir.",
   "AppPreview": "IDE kabuğunun önizleme paneli: araç çubuğunda önizlemenin kendi teması, vurgu rengi ve açık / koyu kipi (yalnız önizleme etkilenir), ortada gösterilen içerik; araç çubuğu ve her seçici kapatılabilir.",
   "marchLanguagePlugin": "March kodu için öneriler: import sonrası march bileşenleri ve işlevleri (seçince içe aktarma satırı tamamlanır), from sonrası alt yollar, JSX içinde bileşenler.",
+  "snippetRows": "Yazılan kelimeyle başlayan kalıpların öneri satırları: satırın girintisiyle yazılır, imleç kalıbın `$0` yerine konur.",
+  "MARCH_SNIPPETS": "March'ın kod kalıpları (comp, acomp, gcomp, sig, computed, eff, forj, ifj, tryj, query, onclick, imp): kısa bir kelime, bütün bir parça yazar.",
   "codeEditorPlugin": "march-app-ui eklentisi: kod dosyalarını (.ts, .tsx, .js, .css, .json…) March'ın CodeEditor'ında açar; öneriler bir dil servisi eklentisinden gelebilir.",
   "debuggerPlugin": "march-app-ui hata ayıklayıcı eklentisi: Debugger paneli, kod editöründe satır numarası oluğu (tıkla ya da F9: kesme noktası; duraklatılmış satır vurgulanır) ve F5 / F8 / F10 / F11 komutları; derlemede kod enstrümante edilir, kayıt üstünde durulur.",
   "Debugger": "Hata ayıklayıcı paneli: Devam, üstünden / içine / dışına adım, geri adım ve zaman çizelgesi; koşullu kesme noktaları, logpoint, debugger; ve hatada durma; izlenen ifadeler, kapsam (yerel / kapanış / modül) ve çağrı yığını.",

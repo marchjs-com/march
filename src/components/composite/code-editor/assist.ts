@@ -167,3 +167,58 @@ export function headEdit(value: string, head: string | undefined): { at: number;
   }
   return { at: 0, text: `${head}\n` };
 }
+
+/** A JSX / HTML tag of a text: where its name is, whether it closes (`</x>`) or closes itself (`<x />`). */
+interface TagTok { start: number; end: number; closing: boolean; self: boolean }
+/** The tags of a text in order, skipping quotes, braces' contents and comments inside a tag (`{a > b}`). */
+function tags(value: string): TagTok[] {
+  const out: TagTok[] = [];
+  const re = /<(\/?)([A-Za-z][\w$.:-]*)?/g;
+  for (let m = re.exec(value); m; m = re.exec(value)) {
+    const closing = m[1] === "/", start = m.index + 1 + m[1]!.length, end = start + (m[2]?.length ?? 0);
+    // `a < b` in code is no tag: a tag name follows `<` right away (or `<>` / `</>`, a fragment)
+    if (!m[2] && value[end] !== ">") continue;
+    if (m[2] && /[\w$)\]]/.test(value[m.index - 1] ?? "") && !closing) continue;
+    let i = end, depth = 0, q = "";
+    for (; i < value.length; i++) {
+      const c = value[i]!;
+      if (q) { if (c === q) q = ""; continue; }
+      if (c === "\"" || c === "'" || c === "`") { q = c; continue; }
+      if (c === "{") depth++;
+      else if (c === "}") depth--;
+      else if (depth <= 0 && (c === ">" || c === "<")) break;
+    }
+    out.push({ start, end, closing, self: !closing && value[i] === ">" && value[i - 1] === "/" });
+    re.lastIndex = Math.max(re.lastIndex, end);
+  }
+  return out;
+}
+/**
+ * The tag whose name holds `at` (`<Ro|w>` or `</Ro|w>`) and the name of the tag it pairs with: their ranges. Null when
+ * `at` is in no tag name, the tag closes itself, or it has no pair (the text is unbalanced there).
+ */
+export function tagPair(value: string, at: number): { self: [number, number]; pair: [number, number] } | null {
+  const list = tags(value);
+  const i = list.findIndex((t) => at >= t.start && at <= t.end && !t.self);
+  if (i < 0) return null;
+  const me = list[i]!;
+  let depth = 0;
+  if (!me.closing) {
+    for (let j = i + 1; j < list.length; j++) {
+      const t = list[j]!;
+      if (t.self) continue;
+      if (!t.closing) depth++;
+      else if (depth === 0) return { self: [me.start, me.end], pair: [t.start, t.end] };
+      else depth--;
+    }
+  } else {
+    for (let j = i - 1; j >= 0; j--) {
+      const t = list[j]!;
+      if (t.self) continue;
+      if (t.closing) depth++;
+      else if (depth === 0) return { self: [me.start, me.end], pair: [t.start, t.end] };
+      else depth--;
+    }
+  }
+  return null;
+}

@@ -297,6 +297,59 @@ const handlers = {
     const settings = { ...ts.getDefaultFormatCodeSettings("\n"), indentSize: tabSize ?? 2, tabSize: tabSize ?? 2, convertTabsToSpaces: true };
     return LS.getFormattingEditsForDocument(norm(path), settings).map((e) => ({ from: e.span.start, to: e.span.start + e.span.length, text: e.newText }));
   },
+  // Ctrl+.: the fixes TypeScript has for the problems in a range (add a missing name, fix a spelling, remove what is
+  // unused…), each with its title and its edits in this file (fixes that change other files are left out)
+  fixes({ path, from, to, codes }) {
+    const p = norm(path), settings = { ...ts.getDefaultFormatCodeSettings("\n"), indentSize: 2, tabSize: 2, convertTabsToSpaces: true };
+    const out = [], seen = new Set();
+    for (const code of [...new Set(codes)]) {
+      let list = [];
+      try { list = LS.getCodeFixesAtPosition(p, from, Math.max(to, from), [code], settings, { quotePreference: "double" }); } catch { list = []; }
+      for (const f of list) {
+        if (f.changes.some((c) => c.fileName !== p) || seen.has(f.description)) continue;
+        seen.add(f.description);
+        out.push({ title: f.description, edits: f.changes.flatMap((c) => c.textChanges.map((e) => ({ from: e.span.start, to: e.span.start + e.span.length, text: e.newText }))) });
+      }
+    }
+    return out;
+  },
+  // organize imports: sorted, the unused ones removed, as edits
+  organize({ path }) {
+    const p = norm(path), settings = { ...ts.getDefaultFormatCodeSettings("\n"), indentSize: 2, tabSize: 2, convertTabsToSpaces: true };
+    return LS.organizeImports({ type: "file", fileName: p }, settings, { quotePreference: "double" })
+      .filter((c) => c.fileName === p).flatMap((c) => c.textChanges.map((e) => ({ from: e.span.start, to: e.span.start + e.span.length, text: e.newText })));
+  },
+  // Shift+F12: every place of the file the name at a place is used, with whether it is written there
+  references({ path, pos }) {
+    const p = norm(path);
+    return (LS.getReferencesAtPosition(p, pos) ?? []).filter((r) => r.fileName === p)
+      .map((r) => ({ from: r.textSpan.start, to: r.textSpan.start + r.textSpan.length, write: !!r.isWriteAccess, definition: !!r.isDefinition }));
+  },
+  // Ctrl+Shift+O: the file's named things (functions, components, variables, classes, their members), nested
+  symbols({ path }) {
+    const p = norm(path), out = [];
+    const walk = (n, depth) => {
+      for (const c of n.childItems ?? []) {
+        if (c.text && c.text !== "<function>" && c.kind !== "alias") out.push({ name: c.text, kind: c.kind, depth, from: c.nameSpan?.start ?? c.spans[0].start, to: c.spans[0].start + c.spans[0].length });
+        if (depth < 3) walk(c, depth + 1);
+      }
+    };
+    walk(LS.getNavigationTree(p), 0);
+    return out.sort((a, b) => a.from - b.from);
+  },
+  // folding: the spans that fold (blocks, JSX elements, imports, comments), by their start and end
+  outline({ path }) {
+    return LS.getOutliningSpans(norm(path)).map((s) => ({ from: s.textSpan.start, to: s.textSpan.start + s.textSpan.length, kind: s.kind }));
+  },
+  // inlay hints: a literal's parameter name, a variable's and a parameter's inferred type, in a range
+  inlay({ path, from, to }) {
+    const prefs = { includeInlayParameterNameHints: "literals", includeInlayParameterNameHintsWhenArgumentMatchesName: false, includeInlayVariableTypeHints: true,
+      includeInlayVariableTypeHintsWhenTypeMatchesName: false, includeInlayFunctionParameterTypeHints: true, includeInlayFunctionLikeReturnTypeHints: false, includeInlayPropertyDeclarationTypeHints: false };
+    let list = [];
+    try { list = LS.provideInlayHints(norm(path), { start: from, length: Math.max(0, to - from) }, prefs); } catch { list = []; }
+    return list.map((h) => ({ at: h.position, text: typeof h.text === "string" ? h.text : (h.displayParts ?? []).map((d) => d.text).join(""), kind: h.kind, left: !!h.whitespaceBefore, right: !!h.whitespaceAfter }))
+      .filter((h) => h.text && h.text.length <= 40 && !/\bany\b/.test(h.text));
+  },
   // a suggestion's definition (the row shown in the list): its kind, its signature ("(method) Console.table(…): void")
   // and its documentation
   details({ path, pos, name }) {

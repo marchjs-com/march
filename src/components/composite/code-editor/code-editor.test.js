@@ -10,9 +10,10 @@ const tick = () => new Promise((r) => setTimeout(r, 0));
 /** The test DOM has no selection API on text fields: a caret, setSelectionRange and setRangeText are enough here. */
 const caretOf = (input) => {
   if (input.setRangeText) return input;
-  let at = input.value.length;
-  Object.defineProperty(input, "selectionStart", { get: () => at, set: (v) => { at = v; }, configurable: true });
-  input.setSelectionRange = (a) => { at = a; };
+  let at = input.value.length, end = at;
+  Object.defineProperty(input, "selectionStart", { get: () => at, set: (v) => { at = v; end = Math.max(end, v); }, configurable: true });
+  Object.defineProperty(input, "selectionEnd", { get: () => Math.max(end, at), set: (v) => { end = v; }, configurable: true });
+  input.setSelectionRange = (a, b = a) => { at = a; end = b; };
   input.setRangeText = (text, from, to) => { input.value = input.value.slice(0, from) + text + input.value.slice(to); };
   return input;
 };
@@ -231,9 +232,9 @@ test("CodeEditor: a line with an error / warning mark gets an icon in the gutter
   const marks = [{ from: 2, to: 4, kind: "error", title: "nope" }, { from: 5, to: 6, kind: "warning", title: "hmm" }];
   const [el, dispose] = mount(() => h(CodeEditor, { value: code, lineNumbers: true, marks, message: "1 hata", onMessage: () => opened.push(1), goTo: go }));
   const ln = (n) => el.querySelector(`.m-ced-ln[data-line="${n}"]`);
-  assert.ok(ln(2).classList.contains("has-error") && ln(2).querySelector(".m-ced-prob svg"), "line 2: the error icon");
+  assert.ok(ln(2).classList.contains("is-error") && ln(2).querySelector(".m-ced-prob svg"), "line 2: the error icon");
   assert.equal(ln(2).getAttribute("title"), "nope");
-  assert.ok(ln(3).classList.contains("has-warning"));
+  assert.ok(ln(3).classList.contains("is-warning"));
   assert.equal(ln(1).querySelector(".m-ced-prob"), null);
   el.querySelector("button.m-ced-msg-text").click();
   assert.deepEqual(opened, [1]);
@@ -241,6 +242,46 @@ test("CodeEditor: a line with an error / warning mark gets an icon in the gutter
   go.set({ from: 5, to: 7 });
   await tick(); await tick();
   assert.equal(input.selectionStart, 5, "the caret at the problem");
+  dispose();
+});
+
+test("CodeEditor: typing in a tag's name renames its pair (<Row> → <Stack> changes </Row>); linkedTags={false} does not", async () => {
+  for (const on of [true, false]) {
+    const start = "<Row><Button /></Row>";
+    const code = signal(start);
+    const [el, dispose] = mount(() => h(CodeEditor, { value: code, lang: "tsx", linkedTags: on }));
+    const input = caretOf(el.querySelector("textarea"));
+    input.setSelectionRange(4, 4);
+    const before = new Event("beforeinput", { bubbles: true, cancelable: true }); before.inputType = "insertText"; before.data = "s";
+    input.dispatchEvent(before);
+    type(input, "<Rows><Button /></Row>", 5, "s");
+    await tick();
+    assert.equal(code(), on ? "<Rows><Button /></Rows>" : "<Rows><Button /></Row>");
+    dispose();
+  }
+});
+
+test("CodeEditor: more carets: Ctrl+D picks the word then its next place; typing and Backspace happen at each, as one change; Escape drops them", async () => {
+  const code = signal("let a = foo; foo(); foo");
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, lang: "ts" }));
+  const input = caretOf(el.querySelector("textarea"));
+  input.setSelectionRange(9, 9);
+  key(input, "d", { ctrlKey: true, code: "KeyD" });
+  assert.deepEqual([input.selectionStart, input.selectionEnd], [8, 11], "the word at the caret");
+  key(input, "d", { ctrlKey: true, code: "KeyD" });
+  assert.deepEqual([input.selectionStart, input.selectionEnd], [13, 16], "its next place");
+  await tick();
+  assert.equal(el.querySelectorAll(".m-ced-xsel").length, 1, "the first one stays, drawn as a selection");
+  const typed = new Event("beforeinput", { bubbles: true, cancelable: true }); typed.inputType = "insertText"; typed.data = "x";
+  input.dispatchEvent(typed);
+  assert.ok(typed.defaultPrevented);
+  assert.equal(code(), "let a = x; x(); foo", "both places written over");
+  const back = new Event("beforeinput", { bubbles: true, cancelable: true }); back.inputType = "deleteContentBackward";
+  input.dispatchEvent(back);
+  assert.equal(code(), "let a = ; (); foo");
+  key(input, "Escape");
+  await tick();
+  assert.equal(el.querySelectorAll(".m-ced-xcaret, .m-ced-xsel").length, 0, "one caret again");
   dispose();
 });
 

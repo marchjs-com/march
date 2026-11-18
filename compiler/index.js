@@ -563,6 +563,17 @@ class Transformer {
     this.pos += tag.length;
     const isComp = /^[A-Z_$]/.test(tag) || tag.includes(".");
     if (isComp) this.used.add(tag.split(".")[0]);
+    // a component's type arguments (`<List<User> items={…}>`, TSX): types only, erased like the rest
+    if (isComp && src[this.pos] === "<") {
+      let depth = 0, i = this.pos;
+      for (; i < src.length; i++) {
+        const ch = src[i];
+        if (ch === "<") depth++;
+        else if (ch === ">" && src[i - 1] !== "=") { depth--; if (depth === 0) break; }
+      }
+      if (depth !== 0) throw fail(src, this.pos, `unterminated type arguments for <${tag}>`);
+      this.pos = i + 1;
+    }
     const attrs = [];
     for (;;) {
       this.skipWs();

@@ -7,7 +7,14 @@ import { computed, signal, effect, untrack, onCleanup } from "../../../core/reac
 import { h } from "../../../dom/h.ts";
 import { CodeEditor, type CodeCompleteContext, type CodeCompletion, type CodeMark, type CodeSuggestion, type CodeDoc } from "../code-editor/index.ts";
 import { definePlugin, type AppPlugin, type AppFile } from "./kit.ts";
-import type { TypeScriptService, CodeProblem } from "./ts.ts";
+import type { TypeScriptService, CodeProblem, CodeInlay } from "./ts.ts";
+import { COLOR_TOKENS } from "../../../theme/colors.ts";
+import { snippetRows, MARCH_SNIPPETS, type CodeSnippet } from "./snippets.ts";
+import { applyEdits } from "../code-editor/assist.ts";
+
+const JSX_OR_SCRIPT = /\.(m?[jt]sx?)$/i;
+
+const TOKEN_COLORS = new Set<string>(COLOR_TOKENS);
 import type { GutterService } from "./debug.ts";
 import { hotkeys } from "../../../managers/hotkey/index.ts";
 import { t, messages } from "../../../core/i18n.ts";
@@ -30,6 +37,14 @@ export interface CodeEditorPluginOptions {
   problems?: ((path: string, list: readonly CodeProblem[], text: string) => void) | undefined;
   /** Pressing the problem count under a file's code (e.g. open a Problems panel). */
   openProblems?: ((path: string) => void) | undefined;
+  /** Ctrl+S formats the file first (TypeScript's formatter, 2 spaces). Default false. */
+  formatOnSave?: boolean | undefined;
+  /** Ctrl+S sorts the imports and removes the unused ones first. Default false. */
+  organizeOnSave?: boolean | undefined;
+  /** The snippets offered while typing (default: March's: comp, sig, eff, forj…; `[]`: none). */
+  snippets?: readonly CodeSnippet[] | undefined;
+  /** Inlay hints (a literal argument's parameter name, an inferred type) at the ends of lines; `false`: none. */
+  inlays?: boolean | undefined;
   /** Where to put a file's caret (reactive; a new object each time): a problem picked from a list. */
   goTo?: ((path: string) => { from: number; to?: number } | null | undefined) | undefined;
 }
@@ -93,6 +108,29 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
           const tracked = ts?.track(file);
           const problems = computed((): readonly CodeProblem[] => tracked?.problems() ?? []);
           const errors = (): number => problems().filter((p) => p.error).length;
+          // Ctrl+S with formatOnSave / organizeOnSave: the imports sorted (unused ones out) and the file formatted first,
+          // as one change of the text (Ctrl+Z takes it back)
+          const tidy = async (): Promise<void> => {
+            if (!ts || !file.set || (!o.formatOnSave && !o.organizeOnSave)) return;
+            let text = file.text();
+            const start = text;
+            try {
+              if (o.organizeOnSave) { const e = await ts.organize(file.path, text); if (e?.length) text = applyEdits(text, e, 0).value; }
+              if (o.formatOnSave) { const e = await ts.format(file.path, text, 2); if (e?.length) text = applyEdits(text, e, 0).value; }
+            } catch { return; }
+            if (text !== start && file.text() === start) file.set(text);
+          };
+          // inlay hints: asked a moment after typing stops, for the whole file
+          const inlays = signal<readonly CodeInlay[]>([]);
+          if (ts && o.inlays !== false) {
+            let timer: ReturnType<typeof setTimeout> | undefined, n = 0;
+            effect(() => {
+              const text = file.text();
+              clearTimeout(timer);
+              timer = setTimeout(() => { const k = ++n; void ts.inlay(file.path, text, 0, text.length).then((list) => { if (k === n) inlays.set(list); }, () => undefined); }, 700);
+            });
+            onCleanup(() => clearTimeout(timer));
+          }
           // the owner hears about the file's problems (a Problems panel), and that they are gone when the editor closes
           if (o.problems) {
             effect(() => { const list = problems(); o.problems!(file.path, list, untrack(file.text)); });
@@ -127,7 +165,11 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
             const march = member ? [] : (own?.items ?? []).map((it) => ({ ...it, source: it.source ?? "march" }));
             const names = new Set(march.map((it) => it.label));
             const rest = (fromTs?.items ?? []).filter((it) => !names.has(it.label)).map((it) => ({ ...it, source: it.source ?? ((it as { local?: boolean }).local ? "file" : sourceOf(it)) }));
-            const all = [...march, ...rest];
+            // snippets: a short word that writes a whole piece (comp, sig, eff, forj…), with the line's indent
+            const typedWord = /[\w$]*$/.exec(c.before)?.[0] ?? "";
+            const pad = /^[ \t]*/.exec(c.before.slice(c.before.lastIndexOf("\n") + 1))?.[0] ?? "";
+            const snips = member || !JSX_OR_SCRIPT.test(file.path) ? [] : snippetRows(typedWord, pad, o.snippets ?? MARCH_SNIPPETS).filter((x) => !names.has(x.label));
+            const all = [...march, ...snips, ...rest];
             // after a dot: the members, by kind, whatever source chip is chosen
             // TypeScript's rows say their kind in the list's language (metot, getter…); March's keep theirs
             const items = (member ? byKind(all) : all).map((it) => (it.source === "march" ? it : { ...it, hint: kindLabel(it.hint) ?? "" }));
@@ -147,6 +189,14 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
               definition: (at: { value: string; at: number }) => ts.definition(file.path, at.value, at.at).catch(() => null),
               rename: (at: { value: string; at: number }) => ts.rename(file.path, at.value, at.at).catch(() => null),
               format: (value: string) => ts.format(file.path, value, 2).catch(() => null),
+              references: (at: { value: string; at: number }) => ts.references(file.path, at.value, at.at).catch(() => []),
+              // Ctrl+.: TypeScript's fixes for the problems on the line (by their codes)
+              fixes: async (at: { value: string; from: number; to: number }) => {
+                const here = problems().filter((p) => p.from <= at.to && p.to >= at.from);
+                if (!here.length) return [];
+                const from = Math.min(...here.map((p) => p.from)), to = Math.max(...here.map((p) => p.to));
+                return ts.fixes(file.path, at.value, from, to, here.map((p) => p.code)).catch(() => []);
+              },
             } : {}),
             // the pointer's rest: the language service first (a March component's prop: its type and what it does;
             // TypeScript sees March's imports as any), then TypeScript
@@ -161,12 +211,15 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
             history: { key: `code:${file.path}`, limit: 500 },
             get fontSize() { return fontSize(); },
             onFontSizeChange: (px: number | undefined) => { fontSize.set(px); try { if (px) localStorage.setItem(SIZE_KEY, String(px)); else localStorage.removeItem(SIZE_KEY); } catch { /* private mode */ } },
-            onSave: () => (o.save ? o.save(file) : toast(t`Saved`, { kind: "success", timeout: 1200 })),
+            onSave: () => { void tidy().then(() => (o.save ? o.save(file) : toast(t`Saved`, { kind: "success", timeout: 1200 }))); },
             ...(gutter ? { lineNumbers: true, lineMarks: () => gutter.marks(file.path), activeLine: () => gutter.active(file.path), onGutter: (line: number) => gutter.click(file.path, line) } : {}),
             sources: SOURCES, get source() { return source(); }, onSourceChange: (v: string) => { source.set(v); try { localStorage.setItem(SOURCE_KEY, v); } catch { /* private mode */ } },
             marks: (): CodeMark[] => problems().map((p) => ({ from: p.from, to: Math.max(p.to, p.from + 1), kind: p.error ? "error" : "warning", title: p.message })),
             // under the code: how many errors and warnings, and the first one with its line
             ...(o.goTo ? { goTo: () => o.goTo!(file.path) } : {}),
+            inlays: () => inlays(),
+            // a colour token's name ("brand-orange", "danger") is the theme's colour; CSS colours as the editor knows them
+            colorOf: (text: string) => (TOKEN_COLORS.has(text) ? `var(--m-${text})` : null),
             ...(ts ? {
               status: () => (errors() ? "error" : "ok"),
               ...(o.openProblems ? { onMessage: () => o.openProblems!(file.path) } : {}),
