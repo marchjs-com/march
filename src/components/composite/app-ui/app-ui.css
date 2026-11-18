@@ -66,6 +66,12 @@
 .m-vault-meter[data-level="3"] > i:nth-child(-n+3) { background: var(--m-success); }
 .m-vault-meter[data-level="4"] > i { background: var(--m-success); }
 .m-vault-meter > span { min-inline-size: 5rem; text-align: end; }
+.m-vault-rules { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-size: var(--m-text-xs); color: var(--m-muted); }
+.m-vault-rules li, .m-vault-match { display: flex; align-items: center; gap: .35rem; }
+.m-vault-rules svg, .m-vault-match svg { flex: none; inline-size: .85rem; block-size: .85rem; color: var(--m-danger); }
+.m-vault-rules .is-ok, .m-vault-match.is-ok { color: var(--m-text); }
+.m-vault-rules .is-ok svg, .m-vault-match.is-ok svg { color: var(--m-success); }
+.m-vault-match { margin: 0; font-size: var(--m-text-xs); color: var(--m-danger-text, var(--m-danger)); }
 .m-vault-hint { margin: 0; padding: var(--m-space-1) var(--m-space-2); border-radius: var(--m-radius-1); background: var(--m-bg-subtle); font-size: var(--m-text-sm); overflow-wrap: anywhere; }
 .m-vault-count { margin: 0; color: var(--m-muted); font: var(--m-text-xs) var(--m-font-mono); font-variant-numeric: tabular-nums; }
 .m-vault-count.is-busy { color: var(--m-primary); }

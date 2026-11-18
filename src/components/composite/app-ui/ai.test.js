@@ -7,7 +7,7 @@ import { installDom } from "../../../testing/dom.ts";
 installDom();
 const { createAppKit } = await import("./kit.ts");
 const { vaultPlugin, aiPlugin } = await import("./ai.ts");
-const { passStrength, answerParts, inline } = await import("./ai-panels.tsx");
+const { passStrength, passRules, answerParts, inline } = await import("./ai-panels.tsx");
 const { _resetVaults } = await import("../../../vault/index.ts");
 
 test("vaultPlugin + aiPlugin: services, panels, ai waits for the vault", () => {
@@ -35,4 +35,11 @@ test("passStrength, answerParts, inline", () => {
   assert.equal(nodes.length, 5);
   assert.equal(nodes[1].tagName, "STRONG");
   assert.equal(nodes[3].tagName, "CODE");
+});
+
+test("passRules: 10+ characters, and two kinds or 16+ (the button waits for both)", () => {
+  assert.deepEqual(passRules("short1"), { long: false, varied: true });
+  assert.deepEqual(passRules("denemekasasi"), { long: true, varied: false }, "one kind, under 16");
+  assert.deepEqual(passRules("denemekasasi7"), { long: true, varied: true });
+  assert.deepEqual(passRules("bir uzun cumle yazdim"), { long: true, varied: true }, "16+ is enough");
 });

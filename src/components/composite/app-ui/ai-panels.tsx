@@ -37,6 +37,11 @@ export function passStrength(p: string): number {
   return Math.min(4, (p.length >= 16 ? 2 : 1) + (kinds >= 3 ? 2 : kinds >= 2 ? 1 : 0));
 }
 const STRENGTH = ["Too short", "Weak", "Fair", "Good", "Strong"];
+/** What a new passphrase needs (the vault takes it when both hold): 10+ characters; 16+, or two kinds (letters, digits, capitals, signs). */
+export function passRules(p: string): { long: boolean; varied: boolean } {
+  const kinds = [/[a-zçğıöşü]/, /[A-ZÇĞİÖŞÜ]/, /\d/, /[^\wçğıöşüÇĞİÖŞÜ\s]/].filter((r) => r.test(p)).length;
+  return { long: p.length >= 10, varied: p.length >= 16 || kinds >= 2 };
+}
 /** A failure in the user's words. */
 export function errText(e: unknown): string {
   if (e instanceof VaultError) {
@@ -57,10 +62,12 @@ export function errText(e: unknown): string {
 function VaultGate(props: { vault: Vault; intro?: unknown }) {
   const pass = signal(""), again = signal(""), hint = signal(""), busy = signal(false), error = signal(""), confirmReset = signal(false);
   const strength = computed(() => passStrength(pass()));
+  const rules = computed(() => passRules(pass()));
+  const same = computed(() => !!again() && again() === pass());
+  const canCreate = computed(() => rules().long && rules().varied && same() && !busy());
   const create = async (): Promise<void> => {
     error.set("");
-    if (strength() < 2) { error.set(t("Choose a longer passphrase: 10+ characters, letters and digits (a short sentence is best).")); return; }
-    if (pass() !== again()) { error.set(t("The passphrases do not match.")); return; }
+    if (!untrack(canCreate)) return;
     busy.set(true);
     try { await props.vault.create(pass(), { hint: hint() }); pass.set(""); again.set(""); hint.set(""); } catch (e) { error.set(errText(e)); } finally { busy.set(false); }
   };
@@ -94,14 +101,22 @@ function VaultGate(props: { vault: Vault; intro?: unknown }) {
           <PasswordInput value={pass} autocomplete="new-password" placeholder={t("e.g. a short sentence only you know")} />
         </label>
         <div class="m-vault-meter" data-level={() => strength()} aria-live="polite"><i /><i /><i /><i /><span>{() => (pass() ? t(STRENGTH[strength()]!) : "")}</span></div>
+        <ul class="m-vault-rules" aria-label={t("The passphrase needs")}>
+          <li class:is-ok={rules().long}>{() => glyph(rules().long ? check : xIcon)} {t("At least 10 characters")}</li>
+          <li class:is-ok={rules().varied}>{() => glyph(rules().varied ? check : xIcon)} {t("Two kinds of characters (letters and digits, capitals or signs), or 16+ characters")}</li>
+        </ul>
         <label class="m-vault-field" onKeyDown={enter(() => void create())}><span>{t("Again")}</span>
-          <PasswordInput value={again} autocomplete="new-password" />
+          <PasswordInput value={again} autocomplete="new-password" invalid={!!again() && !same()} />
         </label>
+        <If when={() => again()}>
+          <p class="m-vault-match" class:is-ok={same()} role="status">{() => glyph(same() ? check : xIcon)} {() => (same() ? t("The passphrases match") : t("The passphrases do not match."))}</p>
+        </If>
         <label class="m-vault-field" onKeyDown={enter(() => void create())}><span>{t("Hint (optional)")}</span>
           <TextInput value={hint} placeholder={t("Something that reminds you, never the passphrase")} />
         </label>
         <p class="m-vault-note">{t("Unlocking needs no button: it opens the moment the passphrase is typed in full (the vault keeps its length; the hint is shown above it, unencrypted).")}</p>
-        <Button variant="primary" icon={shieldCheck} loading={() => busy()} onClick={() => void create()}>{t("Create the vault")}</Button>
+        <Button variant="primary" icon={shieldCheck} loading={() => busy()} disabled={() => !canCreate()} onClick={() => void create()}>{t("Create the vault")}</Button>
+        <If when={() => error()}><p class="m-vault-error" role="alert">{() => error()}</p></If>
         <Else>
           <h3 class="m-vault-title">{t("The vault is locked")}</h3>
           <p class="m-vault-note">{props.intro ?? t("Enter your passphrase to use your AI keys.")}</p>
@@ -118,6 +133,7 @@ function VaultGate(props: { vault: Vault; intro?: unknown }) {
               {() => (wait() > 0 ? t`Wait ${wait()} s` : busy() ? t("Checking…") : `${typed()} / ${need()}`)}
             </p>
           </If>
+          <If when={() => error()}><p class="m-vault-error" role="alert">{() => error()}</p></If>
           <If when={() => !confirmReset()}>
             <button type="button" class="m-vault-link" onClick={() => confirmReset.set(true)}>{t("Forgot the passphrase?")}</button>
             <Else>
@@ -127,7 +143,6 @@ function VaultGate(props: { vault: Vault; intro?: unknown }) {
           </If>
         </Else>
       </If>
-      <If when={() => error()}><p class="m-vault-error" role="alert">{() => error()}</p></If>
     </div>
   );
 }
