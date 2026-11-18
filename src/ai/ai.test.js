@@ -3,7 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-const { chat, listModels, AiError, keyLooksLike, maskKey, PROVIDERS, aiKeys } = await import("./index.ts");
+const { chat, listModels, AiError, keyLooksLike, maskKey, PROVIDERS, aiKeys, endpointOf, allProviders } = await import("./index.ts");
 const { createVault, _resetVaults } = await import("../vault/index.ts");
 
 const sse = (events) => new Response(events.map((e) => `data: ${typeof e === "string" ? e : JSON.stringify(e)}\n\n`).join(""), { headers: { "content-type": "text/event-stream" } });
@@ -69,7 +69,9 @@ test("models: chat models only; key hints and masks", async () => {
   assert.equal(keyLooksLike("sk-ant-abc"), "anthropic");
   assert.equal(keyLooksLike("sk-or-v1-x"), "openrouter");
   assert.equal(keyLooksLike("sk-plain"), null);
-  assert.equal(maskKey("sk-ant-api03-abcdefghijkl1234"), "sk-ant-…1234");
+  assert.equal(maskKey("sk-ant-api03-abcdefghijkl1234"), "sk-ant-••••1234");
+  assert.equal(maskKey("my-secret-key"), "my-••••", "a short key: only its kind");
+  assert.equal(maskKey("abcdefgh"), "ab••••");
   assert.equal(PROVIDERS.length, 18);
 });
 
@@ -116,4 +118,27 @@ test("meta: OpenAI-compatible at api.meta.ai, bearer key", async () => {
   assert.equal(r.text, "Hi");
   assert.equal(last.url, "https://api.meta.ai/v1/chat/completions");
   assert.equal(last.init.headers.authorization, "Bearer mk-1");
+});
+
+test("custom providers: https (or http on localhost) only; kept in the vault, known to chat; removed with their keys", async () => {
+  assert.equal(endpointOf("http://api.example.com/v1"), null, "plain http to another machine: refused");
+  assert.equal(endpointOf("https://user:pw@api.example.com/v1"), null, "no credentials in the address");
+  assert.deepEqual(endpointOf("https://api.example.com/v1/"), { base: "https://api.example.com/v1", origin: "https://api.example.com", local: false });
+  assert.equal(endpointOf("http://localhost:8080/v1").local, true);
+  _resetVaults();
+  const v = createVault({ name: "ai-c", memory: true, iterations: 1000, autoLock: 0 });
+  await v.create("a long passphrase");
+  const k = aiKeys(v);
+  await assert.rejects(k.addProvider({ name: "x", kind: "openai", base: "http://evil.example" }), (e) => e.code === "bad");
+  const c = await k.addProvider({ name: "My API", kind: "openai", base: "https://api.example.com/v1" });
+  assert.ok(allProviders().some((p) => p.id === c.id));
+  await k.add(c.id, "key-1");
+  serve(sse([{ choices: [{ delta: { content: "hi" }, finish_reason: "stop" }] }, "[DONE]"]));
+  const r = await chat({ provider: c.id, key: await k.get(c.id), model: "m", messages: [{ role: "user", content: "x" }] });
+  assert.equal(r.text, "hi");
+  assert.equal(last.url, "https://api.example.com/v1/chat/completions");
+  await k.removeProvider(c.id);
+  assert.deepEqual(await k.list(c.id), []);
+  assert.ok(!allProviders().some((p) => p.id === c.id));
+  assert.equal(((await k.settings()).custom ?? []).length, 0);
 });

@@ -10,7 +10,7 @@ import { key as keyIcon } from "../../../icons/glyphs/key.ts";
 import { sparkles } from "../../../icons/glyphs/sparkles.ts";
 import { lock } from "../../../icons/glyphs/lock.ts";
 import { createVault, type Vault, type VaultOptions } from "../../../vault/index.ts";
-import { aiKeys, chat, type AiKeys, type ChatRequest, type ChatResult } from "../../../ai/index.ts";
+import { aiKeys, chat, provider, type AiKeys, type ChatRequest, type ChatResult } from "../../../ai/index.ts";
 import { definePlugin, type AppPlugin } from "./kit.ts";
 import type { DockPanel } from "../dock-layout/index.ts";
 import type { AiContext, AiChatProps } from "./ai-panels.tsx";
@@ -54,7 +54,12 @@ messages("tr", {
   "Too short": "Çok kısa", "Weak": "Zayıf", "Fair": "İdare eder", "Good": "İyi", "Strong": "Güçlü",
   "Explain": "Açıkla", "Fix": "Düzelt", "Write tests": "Test yaz", "Improve": "İyileştir",
   "Lock the vault": "Kasayı kilitle", "AI: explain the file": "AI: dosyayı açıkla", "AI: fix the file": "AI: dosyayı düzelt", "AI: write tests": "AI: test yaz",
-  "AI: ask about the selection": "AI: seçimi sor", "cached": "önbellekten", "The passphrase needs": "Parolanın gerekenleri", "At least 10 characters": "En az 10 karakter",
+  "AI: ask about the selection": "AI: seçimi sor", "cached": "önbellekten", "Another provider…": "Başka sağlayıcı…", "Provider name": "Sağlayıcının adı", "API format": "API biçimi", "OpenAI-compatible (most)": "OpenAI uyumlu (çoğu)",
+  "Endpoint (base URL)": "Uç nokta (temel adres)", "On this computer: {0} (no key needed)": "Bu bilgisayarda: {0} (anahtar gerekmez)",
+  "Requests go to {0}; the page must allow it (CSP connect-src).": "İstekler {0} adresine gider; sayfanın buna izin vermesi gerekir (CSP connect-src).",
+  "The address the API's paths start from: OpenAI-compatible ones end in /v1 (…/chat/completions, …/models).": "API yollarının başladığı adres: OpenAI uyumlularda /v1 ile biter (…/chat/completions, …/models).",
+  "Give the provider a name and an https address (http only on localhost).": "Sağlayıcıya bir ad ve https adresi ver (http yalnız localhost'ta).",
+  "Remove the provider": "Sağlayıcıyı sil", "Remove it and its keys?": "Kendisi ve anahtarları silinsin mi?", "The passphrase needs": "Parolanın gerekenleri", "At least 10 characters": "En az 10 karakter",
   "Two kinds of characters (letters and digits, capitals or signs), or 16+ characters": "İki tür karakter (harf ve rakam, büyük harf ya da simge) ya da 16+ karakter", "The passphrases match": "Parolalar aynı", "Hint (optional)": "İpucu (isteğe bağlı)", "Hint": "İpucu", "Something that reminds you, never the passphrase": "Sana hatırlatan bir şey; asla parolanın kendisi değil",
   "Unlocking needs no button: it opens the moment the passphrase is typed in full (the vault keeps its length; the hint is shown above it, unencrypted).": "Açmak için düğmeye gerek yok: parola tam yazıldığı anda açılır (kasa uzunluğunu tutar; ipucu üstünde şifresiz görünür).",
   "Checking…": "Denetleniyor…", "The hint gives the passphrase away: write something that only reminds you of it.": "İpucu parolayı ele veriyor: yalnız sana hatırlatan bir şey yaz.", "All ({0})": "Tümü ({0})", "Provider": "Sağlayıcı", "Add": "Ekle", "Choose a provider first.": "Önce bir sağlayıcı seç.",
@@ -96,6 +101,10 @@ export interface AiService {
   chat(r: Omit<ChatRequest, "provider" | "key" | "model"> & { provider?: string; model?: string }): Promise<ChatResult>;
   /** Opens the AI panel and sends a message there (`label`: what the chat shows for it). */
   ask(text: string, label?: string): void;
+  /** What a request would use now: the provider and model; "locked" (open the vault first) or "none" (no key yet). */
+  current(): Promise<{ id: string; name: string; model: string } | "locked" | "none">;
+  /** Opens the AI keys panel. */
+  openKeys(): void;
 }
 export interface AiPluginOptions {
   /** The editor's state: the open file, its code, the selection, the problems, the last run error. */
@@ -129,6 +138,15 @@ export function aiPlugin(o: AiPluginOptions = {}): AppPlugin {
           return chat({ ...r, provider: id, key, model: r.model ?? s.models[id] ?? "" });
         },
         ask(text, label) { o.open?.(panelId); asked.set({ text, ...(label ? { label } : {}), n: ++n }); },
+        async current() {
+          if (v.vault.state() !== "unlocked") return "locked";
+          const s = await v.keys.settings(), have = await v.keys.configured();
+          const id = s.provider && have.includes(s.provider) ? s.provider : have[0];
+          if (!id) return "none";
+          const p = provider(id);
+          return { id, name: p.name, model: s.models[id] ?? p.models[0] ?? "" };
+        },
+        openKeys() { o.open?.(o.keysPanel ?? "ai-keys"); },
       };
       ctx.provide("ai", svc);
       ctx.panel({ id: panelId, title: o.panel?.title ?? t("AI"), icon: sparkles, ...(o.panel?.place ? { place: o.panel.place } : {}),

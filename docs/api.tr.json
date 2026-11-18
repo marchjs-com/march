@@ -1359,6 +1359,10 @@
   "aiKeys": "Bir kasadaki AI anahtarları ve seçimler (varsayılan sağlayıcı, sağlayıcı başına model, onay).",
   "keyLooksLike": "Yapıştırılan anahtar başka bir sağlayıcınınkine benziyorsa o sağlayıcı.",
   "maskKey": "Anahtarı güvenle gösterir: başı ve son dört karakteri.",
-  "sseEvents": "Bir server-sent events yanıtının veri satırları (her olay ayrıştırılmış JSON)."
+  "sseEvents": "Bir server-sent events yanıtının veri satırları (her olay ayrıştırılmış JSON).",
+  "allProviders": "Yerleşik sağlayıcılar ve şu an bilinen, kullanıcının eklediği sağlayıcılar.",
+  "customProvider": "Kullanıcının eklediği bir sağlayıcı kaydından (ad, temel adres, biçim) sağlayıcı tanımı.",
+  "endpointOf": "Bir anahtarın gidebileceği adres mi: https ya da bu bilgisayarda (localhost) http; değilse null.",
+  "registerProvider": "Kullanıcının bir sağlayıcısını tanıtır (aiKeys kasadakileri kendisi tanıtır); null unutturur."
  }
 }

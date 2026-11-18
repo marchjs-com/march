@@ -28,7 +28,7 @@ import { shieldCheck } from "../../../icons/glyphs/shieldCheck.ts";
 import { refresh } from "../../../icons/glyphs/refresh.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { VaultError, passLength, type Vault } from "../../../vault/index.ts";
-import { PROVIDERS, AiError, chat, listModels, keyLooksLike, maskKey, provider as providerOf, type AiKey, type AiKeys, type AiProvider, type AiSettings, type ChatMessage, type Usage } from "../../../ai/index.ts";
+import { PROVIDERS, AiError, chat, listModels, keyLooksLike, maskKey, provider as providerOf, customProvider, registerProvider, endpointOf, type AiKind, type AiKey, type AiKeys, type AiProvider, type AiSettings, type ChatMessage, type Usage } from "../../../ai/index.ts";
 
 /** How strong a passphrase looks: 0 (weak) … 4 (strong), by length and kinds of characters. */
 export function passStrength(p: string): number {
@@ -166,6 +166,8 @@ export function AiKeysPanel(props: { vault: Vault; keys: AiKeys; onChange?: () =
   const states = signal<Record<string, KeyState>>({}), models = signal<Record<string, readonly string[]>>({});
   const confirmDel = signal<string | null>(null), changing = signal(false);
   const oldPass = signal(""), newPass = signal(""), newHint = signal(""), passMsg = signal("");
+  // a provider of the user's own: a name, its base URL, the format it speaks
+  const NEW = "__new", cName = signal(""), cBase = signal(""), cKind = signal<AiKind>("openai"), confirmDrop = signal<string | null>(null);
   const load = async (): Promise<void> => {
     if (props.vault.state() !== "unlocked") return;
     const [l, s] = await Promise.all([props.keys.list(), props.keys.settings()]);
@@ -175,12 +177,16 @@ export function AiKeysPanel(props: { vault: Vault; keys: AiKeys; onChange?: () =
   const changed = (): void => { void load(); props.onChange?.(); };
   const setState = (id: string, st: KeyState | null): void => { const all = { ...untrack(states) }; if (st) all[id] = st; else delete all[id]; states.set(all); };
   const count = (p: string): number => list().filter((k) => k.provider === p).length;
+  // the built-in providers and the user's own (from the vault's settings)
+  const provs = computed((): AiProvider[] => [...PROVIDERS, ...(settings().custom ?? []).flatMap((c) => { try { return [customProvider(c)]; } catch { return []; } })]);
+  const pv = (id: string | null): AiProvider | null => (id && id !== NEW ? provs().find((p) => p.id === id) ?? null : null);
   const filterOptions = computed(() => [
     { value: "all", label: t`All (${list().length})` },
-    ...PROVIDERS.map((p) => { const n = count(p.id); return { value: p.id, label: n ? `${p.name} (${n})` : p.name }; }),
+    ...provs().map((p) => { const n = count(p.id); return { value: p.id, label: n ? `${p.name} (${n})` : p.name }; }),
+    { value: NEW, label: t("Another provider…") },
   ]);
   // the groups shown: with "All", the providers that have a key; else the picked one (also with no key)
-  const groups = computed((): AiProvider[] => (filter() === "all" ? PROVIDERS.filter((p) => count(p.id)) : [providerOf(filter())]));
+  const groups = computed((): AiProvider[] => { const f = filter(); if (f === "all") return provs().filter((p) => count(p.id)); const one = pv(f); return one ? [one] : []; });
   const modelsOf = (p: string): readonly string[] => models()[p] ?? providerOf(p).models;
   const remember = async (p: string, found: readonly string[]): Promise<void> => {
     if (found.length) models.set({ ...untrack(models), [p]: found });
@@ -190,14 +196,39 @@ export function AiKeysPanel(props: { vault: Vault; keys: AiKeys; onChange?: () =
       if (m) settings.set(await props.keys.saveSettings({ models: { ...s.models, [p]: m } }));
     }
   };
-  const startAdd = (): void => {
+  const startAdd = (forNew = false): void => {
     adding.set(true); draftKey.set(""); draftLabel.set(""); addState.set(null);
-    addFor.set(untrack(filter) === "all" ? null : untrack(filter));
+    if (forNew) { cName.set(""); cBase.set(""); cKind.set("openai"); }
+    addFor.set(forNew ? NEW : untrack(filter) === "all" ? null : untrack(filter));
   };
+  /** The new provider's endpoint as typed: null while it is not an https address (or http on localhost). */
+  const newEnd = computed(() => (cBase().trim() ? endpointOf(cBase()) : null));
   const save = async (): Promise<void> => {
-    const p = untrack(addFor), key = untrack(draftKey).trim();
+    let p = untrack(addFor);
+    const key = untrack(draftKey).trim();
     if (!p) { addState.set({ state: "error", msg: t("Choose a provider first.") }); return; }
-    const local = !!providerOf(p).local;
+    // a new provider: checked under a temporary id first, kept only when it answers
+    if (p === NEW) {
+      const e = untrack(newEnd), name = untrack(cName).trim();
+      if (!name || !e) { addState.set({ state: "error", msg: t("Give the provider a name and an https address (http only on localhost).") }); return; }
+      if (!key && !e.local) return;
+      addState.set({ state: "checking", msg: "" });
+      const tmp = "c-checking";
+      try {
+        registerProvider(tmp, { id: tmp, name, kind: untrack(cKind), base: e.base });
+        const found = await listModels(tmp, key);
+        const c = await props.keys.addProvider({ name, kind: untrack(cKind), base: e.base });
+        const k = await props.keys.add(c.id, key, untrack(draftLabel));
+        await load();
+        await remember(c.id, found);
+        adding.set(false); addState.set(null); filter.set(c.id);
+        setState(k.id, { state: "ok", msg: t`${found.length} models` });
+        changed();
+      } catch (err) { addState.set({ state: "error", msg: errText(err) }); }
+      finally { registerProvider(tmp, null); }
+      return;
+    }
+    const local = !!pv(p)?.local;
     if (!key && !local) return;
     addState.set({ state: "checking", msg: "" });
     try {
@@ -217,6 +248,7 @@ export function AiKeysPanel(props: { vault: Vault; keys: AiKeys; onChange?: () =
     catch (e) { setState(k.id, { state: "error", msg: errText(e) }); }
   };
   const remove = async (k: AiKey): Promise<void> => { confirmDel.set(null); await props.keys.remove(k.id); setState(k.id, null); changed(); };
+  const dropProvider = async (id: string): Promise<void> => { confirmDrop.set(null); await props.keys.removeProvider(id); if (untrack(filter) === id) filter.set("all"); changed(); };
   const activate = async (k: AiKey): Promise<void> => { await props.keys.activate(k.id); changed(); };
   const setDefault = async (p: string): Promise<void> => { settings.set(await props.keys.saveSettings({ provider: p })); props.onChange?.(); };
   const setModel = async (p: string, m: string): Promise<void> => { const s = untrack(settings); settings.set(await props.keys.saveSettings({ models: { ...s.models, [p]: m } })); props.onChange?.(); };
@@ -229,15 +261,15 @@ export function AiKeysPanel(props: { vault: Vault; keys: AiKeys; onChange?: () =
   };
   const hint = (): string => {
     const k = draftKey(), like = k.length > 6 ? keyLooksLike(k) : null, p = addFor();
-    return like && p && like !== p ? t`This looks like a ${providerOf(like).name} key.` : "";
+    return like && p && p !== NEW && like !== p ? t`This looks like a ${providerOf(like).name} key.` : "";
   };
   const nameOf = (k: AiKey): string => k.label || t`Key ${list().filter((x) => x.provider === k.provider).indexOf(k) + 1}`;
   return (
     <div class="m-ai-keys">
       <If when={() => props.vault.state() === "unlocked"}>
         <div class="m-ai-keys-bar">
-          <Select class="m-ai-keys-filter" aria-label={t("Provider")} placeholder={false} options={filterOptions()} value={filter()} onChange={(v) => { filter.set(String(v ?? "all")); if (adding()) startAdd(); }} />
-          <Button size="sm" variant="primary" icon={plus} onClick={startAdd}>{t("Add")}</Button>
+          <Select class="m-ai-keys-filter" aria-label={t("Provider")} placeholder={false} options={filterOptions()} value={filter()} onChange={(v) => { if (v === NEW) { filter.set("all"); startAdd(true); return; } filter.set(String(v ?? "all")); if (adding()) startAdd(); }} />
+          <Button size="sm" variant="primary" icon={plus} onClick={() => startAdd()}>{t("Add")}</Button>
           <span class="m-app-fill" />
           <Button size="sm" variant="ghost" onClick={() => changing.set(!changing())}>{t("Change passphrase")}</Button>
           <IconButton icon={lock} label={t("Lock")} onClick={() => props.vault.lock()} />
@@ -255,21 +287,35 @@ export function AiKeysPanel(props: { vault: Vault; keys: AiKeys; onChange?: () =
           <form class="m-ai-add" onSubmit={(e: Event) => { e.preventDefault(); void save(); }}>
             <div class="m-ai-add-row">
               <If when={() => filter() === "all"}>
-                <Select class="m-ai-add-provider" aria-label={t("Provider")} placeholder={t("Choose a provider")} options={PROVIDERS.map((p) => ({ value: p.id, label: p.name }))} value={addFor()} onChange={(v) => addFor.set(v ? String(v) : null)} />
+                <Select class="m-ai-add-provider" aria-label={t("Provider")} placeholder={t("Choose a provider")} options={[...provs().map((p) => ({ value: p.id, label: p.name })), { value: NEW, label: t("Another provider…") }]} value={addFor()} onChange={(v) => addFor.set(v ? String(v) : null)} />
               </If>
               <TextInput class="m-ai-add-label" value={draftLabel} placeholder={t("Name (optional): work, personal…")} aria-label={t("Name")} />
             </div>
+            <If when={() => addFor() === NEW}>
+              <div class="m-ai-add-row">
+                <TextInput class="m-ai-add-provider" value={cName} placeholder={t("Provider name")} aria-label={t("Provider name")} />
+                <Select class="m-ai-add-provider" aria-label={t("API format")} placeholder={false} value={cKind()} onChange={(v) => cKind.set((v ?? "openai") as AiKind)}
+                  options={[{ value: "openai", label: t("OpenAI-compatible (most)") }, { value: "anthropic", label: "Anthropic Messages" }, { value: "gemini", label: "Gemini" }]} />
+              </div>
+              <div class="m-ai-add-row">
+                <TextInput class="m-ai-add-key" value={cBase} placeholder="https://api.example.com/v1" aria-label={t("Endpoint (base URL)")} invalid={!!cBase().trim() && !newEnd()} />
+              </div>
+              <p class="m-ai-key-msg">{() => (newEnd()
+                ? newEnd()!.local ? t`On this computer: ${newEnd()!.origin} (no key needed)` : t`Requests go to ${newEnd()!.origin}; the page must allow it (CSP connect-src).`
+                : t("The address the API's paths start from: OpenAI-compatible ones end in /v1 (…/chat/completions, …/models)."))}</p>
+            </If>
             <div class="m-ai-add-row">
               <PasswordInput class="m-ai-add-key" value={draftKey} autocomplete="off" aria-label={t("API key")}
-                placeholder={addFor() && providerOf(addFor()!).local ? t("No key needed (optional)") : addFor() && providerOf(addFor()!).keyPrefix ? `${providerOf(addFor()!).keyPrefix}…` : t("API key")} />
+                placeholder={pv(addFor())?.local || (addFor() === NEW && newEnd()?.local) ? t("No key needed (optional)") : pv(addFor())?.keyPrefix ? `${pv(addFor())!.keyPrefix}…` : t("API key")} />
               <Button size="sm" variant="primary" type="submit" loading={() => addState()?.state === "checking"}
-                disabled={() => !addFor() || (!draftKey().trim() && !providerOf(addFor()!).local)}>{() => (addFor() && providerOf(addFor()!).local ? t("Connect") : t("Check and save"))}</Button>
+                disabled={() => { const a = addFor(); if (!a) return true; if (a === NEW) return !cName().trim() || !newEnd() || (!draftKey().trim() && !newEnd()!.local); return !draftKey().trim() && !pv(a)?.local; }}>
+                {() => (pv(addFor())?.local || (addFor() === NEW && newEnd()?.local) ? t("Connect") : t("Check and save"))}</Button>
               <Button size="sm" variant="ghost" onClick={() => adding.set(false)}>{t("Cancel")}</Button>
             </div>
-            <If when={() => addFor()}>
+            <If when={() => pv(addFor())?.keyUrl}>
               <p class="m-ai-key-msg">
-                <a class="m-ai-key-get" href={providerOf(addFor()!).keyUrl} target="_blank" rel="noopener noreferrer">{() => (providerOf(addFor()!).local ? t("Download") : t("Get a key"))} {glyph(externalLink)}</a>
-                {() => (providerOf(addFor()!).hint ? ` · ${t(providerOf(addFor()!).hint!)}` : "")}
+                <a class="m-ai-key-get" href={pv(addFor())!.keyUrl} target="_blank" rel="noopener noreferrer">{() => (pv(addFor())?.local ? t("Download") : t("Get a key"))} {glyph(externalLink)}</a>
+                {() => (pv(addFor())?.hint ? ` · ${t(pv(addFor())!.hint!)}` : "")}
               </p>
             </If>
             <If when={() => hint()}><p class="m-ai-key-msg is-warn">{() => hint()}</p></If>
@@ -279,7 +325,7 @@ export function AiKeysPanel(props: { vault: Vault; keys: AiKeys; onChange?: () =
         <If when={() => groups().length} fallback={() => (
           <div class="m-ai-keys-empty">
             <p class="m-vault-note">{t("No keys yet. Add one: requests go from this browser straight to the provider and are billed to your account.")}</p>
-            <Button variant="primary" icon={plus} onClick={startAdd}>{t("Add a key")}</Button>
+            <Button variant="primary" icon={plus} onClick={() => startAdd()}>{t("Add a key")}</Button>
           </div>
         )}>
           <div class="m-ai-groups">
@@ -296,7 +342,18 @@ export function AiKeysPanel(props: { vault: Vault; keys: AiKeys; onChange?: () =
                       <Select class="m-ai-key-model" aria-label={t("Model")} placeholder={false} options={modelsOf(p)} value={settings().models[p] ?? modelsOf(p)[0] ?? null} onChange={(m) => { if (m) void setModel(p, String(m)); }} />
                       <If when={() => settings().provider !== p}><Button size="sm" variant="ghost" icon={check} onClick={() => void setDefault(p)}>{t("Make default")}</Button></If>
                     </If>
-                    <a class="m-ai-key-get" href={gp().keyUrl} target="_blank" rel="noopener noreferrer">{gp().local ? t("Download") : t("Get a key")} {glyph(externalLink)}</a>
+                    <If when={() => gp().keyUrl} fallback={() => (
+                      // a provider of the user's own: its address, and a way to remove it (with its keys)
+                      <span class="m-ai-key-mask" title={gp().base}>{gp().origin}</span>
+                    )}>
+                      <a class="m-ai-key-get" href={gp().keyUrl} target="_blank" rel="noopener noreferrer">{gp().local ? t("Download") : t("Get a key")} {glyph(externalLink)}</a>
+                    </If>
+                    <If when={() => p.startsWith("c-")}>
+                      <If when={() => confirmDrop() === p} fallback={() => <IconButton icon={trash} label={t("Remove the provider")} onClick={() => confirmDrop.set(p)} />}>
+                        <Button size="sm" variant="danger" onClick={() => void dropProvider(p)}>{t("Remove it and its keys?")}</Button>
+                        <IconButton icon={xIcon} label={t("Cancel")} onClick={() => confirmDrop.set(null)} />
+                      </If>
+                    </If>
                   </header>
                   <If when={() => keysOf().length} fallback={() => <p class="m-ai-key-msg">{gp().hint ? t(gp().hint!) : t("No key for this provider yet.")}</p>}>
                     <ul class="m-ai-key-list">

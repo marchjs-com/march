@@ -63,9 +63,31 @@ export const PROVIDERS: AiProvider[] = [
   { id: "lmstudio", name: "LM Studio (local)", kind: "openai", base: "http://localhost:1234/v1", origin: "http://localhost:1234", keyUrl: "https://lmstudio.ai", models: [], local: true,
     hint: "In LM Studio: Developer › start the server and turn on CORS." },
 ];
-/** A provider by id ("anthropic", "openai"…); throws for an unknown one. */
+/** A provider the user adds: a name, the API's base URL and the format it speaks (most speak OpenAI's). */
+export interface CustomProvider { id: string; name: string; kind: AiKind; base: string }
+const custom = new Map<string, AiProvider>();
+/** An https URL, or an http one on this computer (localhost): where a key may go. Null when it is not one. */
+export function endpointOf(base: string): { base: string; origin: string; local: boolean } | null {
+  let u: URL;
+  try { u = new URL(base.trim()); } catch { return null; }
+  const local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(u.hostname);
+  if (u.protocol !== "https:" && !(u.protocol === "http:" && local)) return null;
+  if (u.username || u.password || u.search || u.hash) return null;
+  return { base: u.href.replace(/\/+$/, ""), origin: u.origin, local };
+}
+/** The provider a custom entry describes. */
+export function customProvider(c: CustomProvider): AiProvider {
+  const e = endpointOf(c.base);
+  if (!e) throw new AiError("bad", `march/ai: "${c.base}" is not an https address (or http on localhost)`);
+  return { id: c.id, name: c.name, kind: c.kind, base: e.base, origin: e.origin, keyUrl: "", models: [], local: e.local, chatModel: (m) => !notChat.test(m) };
+}
+/** Makes a custom provider known (aiKeys does it for the ones in its vault); `null` forgets it. */
+export function registerProvider(id: string, c: CustomProvider | null): void { if (c) custom.set(id, customProvider(c)); else custom.delete(id); }
+/** The built-in providers and the custom ones known now. */
+export const allProviders = (): AiProvider[] => [...PROVIDERS, ...custom.values()];
+/** A provider by id ("anthropic", "openai", a custom one…); throws for an unknown one. */
 export const provider = (id: string): AiProvider => {
-  const p = PROVIDERS.find((x) => x.id === id);
+  const p = PROVIDERS.find((x) => x.id === id) ?? custom.get(id);
   if (!p) throw new AiError("bad", `march/ai: no provider "${id}"`);
   return p;
 };
@@ -232,8 +254,16 @@ export function keyLooksLike(key: string): string | null {
   for (const id of ["anthropic", "openrouter", "groq", "gemini", "xai", "perplexity", "fireworks", "cerebras"]) if (k.startsWith(provider(id).keyPrefix!)) return id;
   return null;
 }
-/** A key shown safely: its start and its last four characters. */
-export const maskKey = (key: string): string => (key.length <= 12 ? "•".repeat(key.length) : `${key.slice(0, Math.min(7, key.indexOf("-", 3) + 1 || 4))}…${key.slice(-4)}`);
+/**
+ * A key shown safely: its kind (the provider's prefix, "sk-ant-", at most a quarter of it) and, for a long key, its
+ * last four characters; a short key shows next to nothing.
+ */
+export function maskKey(key: string): string {
+  const known = PROVIDERS.map((p) => p.keyPrefix ?? "").filter((x) => x && key.startsWith(x)).sort((a, b) => b.length - a.length)[0];
+  const n = key.length, cut = key.slice(2).search(/[-_]/), prefix = known ? known.length : cut >= 0 ? cut + 3 : 0;
+  const head = Math.min(prefix || 3, 7, Math.floor(n / 4)), tail = n >= 24 ? 4 : 0;
+  return `${key.slice(0, head)}${"•".repeat(4)}${tail ? key.slice(-tail) : ""}`;
+}
 
 export interface AiSettings {
   provider?: string;
@@ -241,6 +271,8 @@ export interface AiSettings {
   consent: Record<string, boolean>;
   /** The key used for each provider (its id; the first key when not set). */
   active: Record<string, string>;
+  /** The providers the user added (an endpoint and its format). */
+  custom?: CustomProvider[];
 }
 /** A saved key: its provider, the user's own name for it, the key, when it was added. */
 export interface AiKey { id: string; provider: string; label: string; key: string; added: number }
@@ -260,8 +292,12 @@ export interface AiKeys {
   configured(): Promise<string[]>;
   settings(): Promise<AiSettings>;
   saveSettings(s: Partial<AiSettings>): Promise<AiSettings>;
+  /** Adds a provider of the user's own (its base URL must be https, or http on localhost); returns it. */
+  addProvider(c: Omit<CustomProvider, "id">): Promise<CustomProvider>;
+  /** Removes a provider the user added, with its keys. */
+  removeProvider(id: string): Promise<void>;
 }
-const order = (p: string): number => { const i = PROVIDERS.findIndex((x) => x.id === p); return i < 0 ? PROVIDERS.length : i; };
+const order = (p: string): number => { const all = allProviders(), i = all.findIndex((x) => x.id === p); return i < 0 ? all.length : i; };
 const rid = (): string => Array.from(globalThis.crypto.getRandomValues(new Uint8Array(6)), (b) => b.toString(16).padStart(2, "0")).join("");
 /**
  * The AI keys kept in a vault ("ai:key:<provider>:<id>"), and the choices (default provider, model and active key per
@@ -292,7 +328,7 @@ export function aiKeys(vault: Vault): AiKeys {
       return out.sort((a, b) => order(a.provider) - order(b.provider) || a.added - b.added);
     },
     async add(p, key, label = "") {
-      provider(p);
+      await self.settings(); provider(p);
       await ready();
       const id = `${p}:${rid()}`, k: AiKey = { id, provider: p, label: label.trim(), key: key.trim(), added: Date.now() };
       await vault.set(`ai:key:${id}`, { key: k.key, label: k.label, added: k.added } satisfies Stored);
@@ -317,8 +353,30 @@ export function aiKeys(vault: Vault): AiKeys {
       return (list.find((k) => k.id === s.active[p]) ?? list[0])?.key;
     },
     configured: async () => [...new Set((await self.list()).map((k) => k.provider))],
-    settings: async () => ({ models: {}, consent: {}, active: {}, ...(await vault.get<Partial<AiSettings>>("ai:settings")) }) as AiSettings,
+    async settings() {
+      const s = { models: {}, consent: {}, active: {}, ...(await vault.get<Partial<AiSettings>>("ai:settings")) } as AiSettings;
+      // the user's own providers are known from here on (chat, models, the panels)
+      for (const c of s.custom ?? []) { try { registerProvider(c.id, c); } catch { /* an address no longer allowed: left out */ } }
+      return s;
+    },
     async saveSettings(s) { const next = { ...(await self.settings()), ...s }; await vault.set("ai:settings", next); return next; },
+    async addProvider(c) {
+      const name = c.name.trim(), e = endpointOf(c.base);
+      if (!name) throw new AiError("bad", "march/ai: the provider needs a name");
+      if (!e) throw new AiError("bad", `march/ai: "${c.base}" is not an https address (or http on localhost)`);
+      const s = await self.settings(), entry: CustomProvider = { id: `c-${rid()}`, name, kind: c.kind, base: e.base };
+      registerProvider(entry.id, entry);
+      await self.saveSettings({ custom: [...(s.custom ?? []), entry] });
+      return entry;
+    },
+    async removeProvider(id) {
+      for (const k of await self.list(id)) await vault.remove(`ai:key:${k.id}`);
+      const s = await self.settings(), active = { ...s.active }, models = { ...s.models };
+      delete active[id]; delete models[id];
+      const rest = (s.custom ?? []).filter((c) => c.id !== id);
+      await vault.set("ai:settings", { ...s, active, models, custom: rest, provider: s.provider === id ? (await self.configured()).find((p) => p !== id) : s.provider });
+      registerProvider(id, null);
+    },
   };
   return self;
 }
