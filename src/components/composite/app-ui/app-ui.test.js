@@ -67,6 +67,8 @@ test("AppUI: typing in a file's editor keeps the editor (and its focus): the tex
   const area = el.querySelector(".m-ced-input");
   text.set("let a = 12");
   assert.equal(el.querySelector(".m-ced-input"), area, "the same text field");
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(area.value, "let a = 12", "a text set from outside shows in the editor");
   dispose();
 });
 

@@ -100,7 +100,9 @@ function createComponent(Comp: Component<Props>, raw: Props, children: unknown[]
   if (hook) [Comp, raw] = hook(Comp, raw);
   const props: Props = {};
   for (const key of Object.keys(raw)) {
-    const v = raw[key];
+    // a getter prop (`h(C, { get value() { … } })`) stays a getter: the component reads it live
+    const d = Object.getOwnPropertyDescriptor(raw, key)!, v = d.value;
+    if (d.get) { Object.defineProperty(props, key, d); continue; }
     if (key.startsWith("bind:")) {
       const name = key.slice(5);
       const s = v as Signal<unknown> | undefined;

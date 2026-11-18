@@ -20,7 +20,9 @@ import { tmpdir } from "node:os";
 // function* / async function* component pays (minimal unchanged; docs/internal/size-watch.md).
 // 16.5 KB since a component's own error goes up through a render extension (dom/extend.ts: it is no longer reported as the
 // extension's and swallowed; measured 16.46 KB)
-export const BUDGET = { core: 16.5 * 1024, minimal: 5 * 1024 };
+// minimal 5.05 KB since a getter prop stays a getter (h(C, { get value() { … } }): the component reads it live; before, it
+// was read once and a plugin's editor or a debugger toggle never followed its value; +~40 bytes, measured 5.02 KB)
+export const BUDGET = { core: 16.5 * 1024, minimal: 5.05 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const ENTRIES = { core: "src/index.ts", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
 
