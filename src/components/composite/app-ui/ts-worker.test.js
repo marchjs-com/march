@@ -66,3 +66,12 @@ test("ts-worker: with the page in Turkish the JS / DOM descriptions come from li
   call("locale", { locale: "en" });
   assert.doesNotMatch(call("hover", { path: "a.tsx", pos: at("console.lo¦g('x')") }).doc, /Konsola/);
 });
+
+test("ts-worker: a statement after a JSX expression with no semicolon still gets suggestions (console…), the file text kept", () => {
+  const text = "const Row = () => <div>{1}</div>\n\nconso\nexport function A() {}\n";
+  const r = call("complete", { path: "a.tsx", pos: at(text.replace("conso\n", "conso¦\n")) });
+  assert.ok(r.items.some((i) => i.label === "console"), "console is offered");
+  assert.equal(r.from, text.indexOf("conso"));
+  const r2 = call("complete", { path: "a.tsx", pos: text.indexOf("conso") + 5 });
+  assert.ok(r2.items.some((i) => i.label === "console"), "asked again: same answer (the text was put back)");
+});

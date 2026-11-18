@@ -228,10 +228,18 @@ const handlers = {
     const text = files.get(p)?.text ?? "";
     const where = sf ? whereAt(sf, pos) : "code";
     if (where === "comment" || where === "text") return { where, from: pos, to: pos, items: [] };
-    const r = LS.getCompletionsAtPosition(p, pos, { includeCompletionsWithInsertText: true });
+    let r = LS.getCompletionsAtPosition(p, pos, { includeCompletionsWithInsertText: true });
     let from = pos;
     if (where === "string") while (from > 0 && !`"'\``.includes(text[from - 1])) from--;
     else while (from > 0 && /[\w$]/.test(text[from - 1])) from--;
+    // TypeScript gives nothing at the start of a statement that follows a JSX expression with no semicolon
+    // (`<div />` then `conso` on the next line: it reads the place as JSX text). A ";" before the word ends that
+    // statement: asked again on that text, then the file's own text is put back
+    const f = files.get(p), lineStart = text.lastIndexOf("\n", from - 1) + 1;
+    if ((!r || !r.entries.length) && where === "code" && f && /^\s*$/.test(text.slice(lineStart, from))) {
+      f.text = `${text.slice(0, lineStart)};${text.slice(lineStart)}`; f.version++;
+      try { r = LS.getCompletionsAtPosition(p, pos + 1, { includeCompletionsWithInsertText: true }); } finally { f.text = text; f.version++; }
+    }
     if (!r) return { where, from, to: pos, items: [] };
     const word = text.slice(from, pos).toLowerCase();
     const fits = sf ? fitter(sf, from, pos) : () => 0;

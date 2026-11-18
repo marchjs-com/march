@@ -705,20 +705,21 @@ export function CodeEditor(props: CodeEditorProps): Element {
     const walker = globalThis.document.createTreeWalker?.(code, 4 /* text */);
     if (!walker) return null;
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
-      const len = n.nodeValue?.length ?? 0;
-      if (left <= len) {
+      const v = n.nodeValue ?? "", len = v.length;
+      // a place at a node's end that follows a line break is the next line's start: it belongs to the next node
+      if (left < len || (left === len && !v.endsWith("\n"))) {
         const r = globalThis.document.createRange();
         r.setStart(n, left); r.setEnd(n, left);
         const own = r.getClientRects?.()[0] ?? r.getBoundingClientRect?.() ?? null;
         if (own && own.height) return own;
-        // a collapsed place a browser gives no box (the end of a token before a line break): the character beside it
-        // tells where it is (its right edge, or the next one's left edge), one pixel wide
-        const side = left > 0 ? [left - 1, left] : len > 0 ? [0, 1] : null;
+        // a collapsed place a browser gives no box: the character beside it on the same line tells where it is (the
+        // one before: its right edge; else the one after: its left edge), one pixel wide
+        const side = left > 0 && v[left - 1] !== "\n" ? [left - 1, left, 1] : left < len && v[left] !== "\n" ? [left, left + 1, 0] : null;
         if (!side) return own;
         r.setStart(n, side[0]!); r.setEnd(n, side[1]!);
         const c = r.getClientRects?.()[0] ?? r.getBoundingClientRect?.();
         if (!c || !c.height || typeof DOMRect === "undefined") return own;
-        return new DOMRect(left > 0 ? c.right : c.left, c.top, 1, c.height);
+        return new DOMRect(side[2] ? c.right : c.left, c.top, 1, c.height);
       }
       left -= len;
     }
