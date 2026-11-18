@@ -21,12 +21,12 @@ export { codeEditorPlugin } from "./code.ts";
 export type { LanguageService, CodeEditorPluginOptions } from "./code.ts";
 export { MARCH_SNIPPETS, snippetRows, type CodeSnippet } from "./snippets.ts";
 export { marchLanguagePlugin } from "./march-lang.ts";
-export { AppPreview } from "./preview.ts";
+export { AppPreview, PREVIEW_DEVICES } from "./preview.ts";
 export { typeScriptPlugin } from "./ts.ts";
 export { debuggerPlugin } from "./debug.ts";
 export type { DebuggerService, GutterService, DebuggerPluginOptions } from "./debug.ts";
 export type { TypeScriptService, TypeScriptPluginOptions, CodeProblem, CodeReference, CodeSymbol, CodeInlay } from "./ts.ts";
-export type { AppPreviewProps, AppPreviewToolbar } from "./preview.ts";
+export type { AppPreviewProps, AppPreviewToolbar, AppPreviewDevice } from "./preview.ts";
 export type { MarchCatalog, MarchExport, MarchLanguageOptions } from "./march-lang.ts";
 
 /** A panel of an AppUI: a DockPanel, or one that shows a file (drawn by the file type that opens its path). */

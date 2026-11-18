@@ -45,3 +45,6 @@
 .m-app-pv-lang-icon .m-svg { inline-size: 1rem; block-size: 1rem; }
 .m-app-pv-stage { min-block-size: 0; overflow: auto; display: grid; background: var(--m-bg); color: var(--m-text); font-family: var(--m-font); }
 .m-app-pv-accent { display: grid; place-items: center; min-block-size: 100%; padding: var(--m-space-4); box-sizing: border-box; }
+/* a device size: the content in a frame of that size, centred on the stage (which scrolls when it is larger) */
+.m-app-pv-stage.is-device { place-items: start center; padding: var(--m-space-4); background: color-mix(in srgb, var(--m-text) 5%, var(--m-bg)); }
+.m-app-pv-stage.is-device > .m-app-pv-accent { inline-size: var(--m-pv-w); block-size: var(--m-pv-h); min-block-size: 0; max-inline-size: none; overflow: auto; border: var(--m-border-w, 1px) solid var(--m-border); border-radius: 18px; background: var(--m-bg); box-shadow: 0 8px 30px color-mix(in srgb, var(--m-text) 14%, transparent); container-type: inline-size; }

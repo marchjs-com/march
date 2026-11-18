@@ -156,6 +156,7 @@
   "typeScriptPlugin": "TypeScript dil servisi eklentisi: bir worker içinde çalışır; bütün JavaScript / TypeScript / DOM API tamamlaması, hata ve uyarıların yerleri. CSP Trusted Types ile çalışıyorsa trusted-types march-worker gerekir.",
   "AppPreview": "IDE kabuğunun önizleme paneli: araç çubuğunda önizlemenin kendi teması, vurgu rengi ve açık / koyu kipi (yalnız önizleme etkilenir), ortada gösterilen içerik; araç çubuğu ve her seçici kapatılabilir.",
   "marchLanguagePlugin": "March kodu için öneriler: import sonrası march bileşenleri ve işlevleri (seçince içe aktarma satırı tamamlanır), from sonrası alt yollar, JSX içinde bileşenler.",
+  "PREVIEW_DEVICES": "AppPreview'in cihaz aracının varsayılan boyutları: telefon, tablet, dizüstü.",
   "snippetRows": "Yazılan kelimeyle başlayan kalıpların öneri satırları: satırın girintisiyle yazılır, imleç kalıbın `$0` yerine konur.",
   "MARCH_SNIPPETS": "March'ın kod kalıpları (comp, acomp, gcomp, sig, computed, eff, forj, ifj, tryj, query, onclick, imp): kısa bir kelime, bütün bir parça yazar.",
   "codeEditorPlugin": "march-app-ui eklentisi: kod dosyalarını (.ts, .tsx, .js, .css, .json…) March'ın CodeEditor'ında açar; öneriler bir dil servisi eklentisinden gelebilir.",
