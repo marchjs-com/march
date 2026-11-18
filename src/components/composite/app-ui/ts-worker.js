@@ -17,7 +17,7 @@ declare namespace JSX { interface IntrinsicElements { [name: string]: any } inte
 `;
 const OPTIONS = () => ({
   target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler,
-  jsx: ts.JsxEmit.Preserve, strict: true, noEmit: true, skipLibCheck: true, allowJs: true, checkJs: false,
+  jsx: ts.JsxEmit.Preserve, strict: true, noEmit: true, skipLibCheck: true, allowJs: true, checkJs: false, allowImportingTsExtensions: true,
   lib: ["lib.es2022.d.ts", "lib.dom.d.ts"], types: [],
 });
 const norm = (p) => (p.startsWith("/") ? p : `/${p}`);

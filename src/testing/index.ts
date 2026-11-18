@@ -41,7 +41,11 @@ function response(status: number, body: unknown): MockResponse {
   return { ok: status >= 200 && status < 300, status, headers: new Headers({ "content-type": "application/json" }), json: async () => body, text: async () => JSON.stringify(body) };
 }
 
-export interface RenderTestOptions { mock?: Record<string, MockRoute>; container?: Element }
+export interface RenderTestOptions {
+  mock?: Record<string, MockRoute>; container?: Element;
+  /** Where the screen looks for text and elements (default the whole body: dialogs and toasts are portaled there). */
+  root?: Element;
+}
 type Target = string | Element;
 /** Screen driver returned by `renderTest()`. */
 export interface TestScreen {
@@ -78,7 +82,7 @@ export function renderTest(fn: () => unknown, opts: RenderTestOptions = {}): Tes
   const container = opts.container ?? doc.body.appendChild(doc.createElement("div"));
   const fetchMock = opts.mock ? mockFetch(opts.mock) : null;
   const dispose = render(fn, container);
-  const root = (): HTMLElement => doc.body; // dialogs/toasts are portaled to body
+  const root = (): HTMLElement => (opts.root as HTMLElement | undefined) ?? doc.body; // dialogs/toasts are portaled to body
 
   const all = (sel: string): Element[] => Array.from(root().querySelectorAll(sel));
   const byText = (text: string, sel = "*"): Element[] => {
