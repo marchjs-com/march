@@ -34,14 +34,9 @@ export const PACKS = {
 
 export const LICENSES = new Set(["MIT", "ISC", "Apache-2.0", "CC0-1.0", "CC-BY-4.0", "OFL-1.1"]);
 
-const RESERVED = new Set("break case catch class const continue debugger default delete do else enum export extends false finally for function if import in instanceof let new null return super switch this throw true try typeof var void while with yield await static implements interface package private protected public arguments eval undefined".split(" "));
-
-/** File name → export name: "arrow-left" → arrowLeft, "1st" → i1st, "delete" → deleteIcon. */
-export function exportName(file) {
-  let id = file.replace(/[^A-Za-z0-9]+(.)?/g, (_m, c) => (c ? c.toUpperCase() : "")).replace(/^[A-Z]/, (c) => c.toLowerCase());
-  if (!id || /^\d/.test(id)) id = `i${id}`;
-  return RESERVED.has(id) ? `${id}Icon` : id;
-}
+// "arrow-left" → arrowLeft, "1st" → i1st, "delete" → deleteIcon: the compiler reads icon names with the same rule
+export { exportName } from "../compiler/icon-names.js";
+import { exportName } from "../compiler/icon-names.js";
 
 /** Words of icons that point along the reading direction (they mirror in right-to-left text). */
 const DIR = new Set(["undo", "redo", "reply", "forward", "backward", "back", "next", "previous", "prev", "login", "logout", "send", "indent", "outdent", "rewind"]);

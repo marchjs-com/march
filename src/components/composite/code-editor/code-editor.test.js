@@ -214,6 +214,18 @@ test("CodeEditor: Tab on the ghost of a row with again opens the next list; rows
   dispose();
 });
 
+test("CodeEditor: a word written whole whose row writes more (icon → icon=\"\") is the ghost, not a longer name (iconEnd)", async () => {
+  const code = signal("");
+  const items = [{ label: "iconEnd", insert: 'iconEnd=""', back: 1 }, { label: "icon", insert: 'icon=""', back: 1 }];
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, suggest: "ghost", listAfter: 0, complete: (c) => ({ from: c.caret - (/\w*$/.exec(c.before)?.[0].length ?? 0), items }) }));
+  const input = caretOf(el.querySelector("textarea"));
+  type(input, "icon", 4, "n"); await tick();
+  assert.equal(el.querySelector(".m-ced-ghost")?.textContent, '=""');
+  key(input, "Tab");
+  assert.equal(code(), 'icon=""');
+  dispose();
+});
+
 test("CodeEditor: lineNumbers draw a number per line with its mark, the active line is lit, F9 and the gutter call onGutter", async () => {
   const marks = signal([{ line: 2, kind: "conditional", title: "if: x" }]), lit = signal(null), pressed = [];
   const [el, dispose] = mount(() => h(CodeEditor, { value: "a\nb\nc", lineNumbers: true, lineMarks: marks, activeLine: lit, onGutter: (line) => pressed.push(line) }));

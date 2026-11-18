@@ -55,3 +55,11 @@ test("iconRows: the file's icons, March's, every pack's (a taken name renamed), 
   assert.equal(all.filter((r) => r.group === "Material Symbols").length, PACK_ROWS);
   assert.equal(all.at(-1).label, "defineIcon");
 });
+
+test("iconNameRows: March's names bare, packs' as pack:name; \"lucide:\" narrows to Lucide", async () => {
+  const { iconNameRows } = await import("../examples/showcase/src/playground/prop-helpers.ts");
+  const sets = [{ id: "march", label: "March", names: ["heart", "home"] }, { id: "lucide", label: "Lucide", names: ["heart", "heart-crack", "house"] }, { id: "tabler", label: "Tabler Icons", names: ["heart"] }];
+  assert.deepEqual(iconNameRows("icon", "hea", sets).map((r) => r.label), ["heart", "lucide:heart", "lucide:heart-crack", "tabler:heart"]);
+  assert.deepEqual(iconNameRows("icon", "lucide:h", sets).map((r) => r.label), ["lucide:heart", "lucide:heart-crack", "lucide:house"]);
+  assert.deepEqual(iconNameRows("icon", "march:ho", sets).map((r) => r.label), ["home"]);
+});

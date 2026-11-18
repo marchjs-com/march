@@ -8,6 +8,7 @@
 // It is a careful scanner, not a full parser: write normal, semicolon-or-newline separated JavaScript.
 import { isIdStart, isIdPart, exprAllowed, identKind, skipString, skipComment, skipRegex, syntax, jsxText, lineCol } from "./lexer.js";
 import { importTs } from "./load-ts.js";
+import { isIconProp, iconByName } from "./icon-names.js";
 
 // sx is shared with the runtime; importTs also works when March is installed under node_modules
 const { sx: resolveSx } = await importTs(new URL("../src/core/sx.ts", import.meta.url));
@@ -153,6 +154,13 @@ class Transformer {
 
   helper(k) { this.helpers.add(k); return H[k]; }
 
+  /** Where icons written by name come from: opts.icons, else the runtime package's icons ("march/icons", or
+   * "hadi-march/icons" when the runtime is that package); a runtime given as a path or URL means march's. */
+  iconBase() {
+    const rt = this.opts.runtime ?? "march";
+    return this.opts.icons ?? (/^(@[\w-]+\/)?[\w-]+$/.test(rt) ? `${rt}/icons` : "march/icons");
+  }
+
   imports(code = "") {
     const rt = this.opts.runtime ?? "march";
     const lines = [];
@@ -173,6 +181,10 @@ class Transformer {
       if (spec.endsWith("#default")) { for (const n of names) lines.push(`import ${n} from ${JSON.stringify(spec.slice(0, -8))};`); continue; }
       lines.push(`import { ${names.sort().join(", ")} } from ${JSON.stringify(spec)};`);
     }
+    // icons written by name (element()): one import line per module
+    const iconsBy = new Map();
+    for (const [local, ic] of this.iconImports ?? []) { if (!iconsBy.has(ic.from)) iconsBy.set(ic.from, []); iconsBy.get(ic.from).push(`${ic.name} as ${local}`); }
+    for (const [from, names] of iconsBy) lines.push(`import { ${names.join(", ")} } from ${JSON.stringify(from)};`);
     const mp = this.opts.props ?? "march/props";
     // m:parts names components: each must be in scope (declared here or auto-imported)
     for (const [name, at] of this.partNames ?? []) {
@@ -761,6 +773,17 @@ class Transformer {
   element(tag, isComp, attrs, kids, start) {
     void start;
     const props = [];
+    // an icon written by name in an icon prop (`icon="lucide:heart"`, `icon="chevron-down"`): an import of that icon,
+    // as if it were written by hand (only the icons used are bundled; a wrong pack name fails as a missing export)
+    if (isComp && !this.opts.typecheck && attrs.some((a) => typeof a.literal === "string" && isIconProp(a.name ?? ""))) {
+      attrs = attrs.map((a) => {
+        const ic = typeof a.literal === "string" && isIconProp(a.name ?? "") ? iconByName(a.literal, this.iconBase()) : null;
+        if (!ic) return a;
+        const local = `_mi_${ic.from.split("/").slice(2).join("_").replace(/[^\w]/g, "_") || "march"}_${ic.name}`;
+        (this.iconImports ??= new Map()).set(local, ic);
+        return { name: a.name, code: local, dynamic: false };
+      });
+    }
     let elseKids = null;
     if (isComp && tag === "If") {
       const i = kids.findIndex((k) => this.elseCodes?.has(k.code));

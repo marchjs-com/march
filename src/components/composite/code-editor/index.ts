@@ -512,7 +512,9 @@ export function CodeEditor(props: CodeEditorProps): Element {
     const typed = input.value.slice(c.from, caret);
     if (!typed) return null;
     // matched by the name; the ghost shows what Tab writes after the typed letters (the name's rest when the row writes more, an import)
-    const item = c.items.find((it) => it.label.startsWith(typed) && it.label !== typed) ?? c.items.find((it) => it.label.toLowerCase().startsWith(typed.toLowerCase()) && it.label.length > typed.length);
+    // the word written whole (`icon`) whose row writes more (`icon=""`) wins over a longer name (`iconEnd`)
+    const item = c.items.find((it) => it.label === typed && (it.insert ?? it.label) !== typed)
+      ?? c.items.find((it) => it.label.startsWith(typed) && it.label !== typed) ?? c.items.find((it) => it.label.toLowerCase().startsWith(typed.toLowerCase()) && it.label.length > typed.length);
     if (!item) return null;
     const text = item.insert ?? item.label;
     return { from: c.from, at: caret, rest: (text.toLowerCase().startsWith(typed.toLowerCase()) ? text : item.label).slice(typed.length), item };

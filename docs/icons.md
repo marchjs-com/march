@@ -56,6 +56,23 @@ March set does not mirror by itself: components that use its arrows flip them wh
 
 ### Icons by name
 
+In an icon prop of a component, a name written as text is compiled to an import of that one icon, so it costs what
+importing the icon by hand costs (only the icons used are bundled, they draw on the first frame, a wrong pack name is a
+build error):
+
+```tsx
+<Button icon="lucide:heart">Like</Button>       // → import { heart } from "march/icons/lucide"
+<Button icon="chevron-down" />                  // no prefix: the March set → import { chevronDown } from "march/icons"
+<Chip removeIcon="tabler:x" />                  // any icon prop: icon, iconEnd, spinner, …Icon
+<Button icon="★" />                             // not an icon name: stays the text it is
+```
+
+The names are the set's file names (`arrow-left`, `lucide:a-arrow-down`); the compiler turns them into the exports
+(`compiler/icon-names.js`, the rule above plus the few names two files share). Only a literal is compiled; a name chosen
+at run time (`icon={$name}`) goes through `icon()` below.
+
+For a name chosen at run time, register the packs and use `icon()`:
+
 ```tsx
 import { registerIconPack, icon, loadIcon, Icon } from "march/icons/packs";
 import lucide from "march/icons/lucide/pack";
