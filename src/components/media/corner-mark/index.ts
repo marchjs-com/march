@@ -7,13 +7,14 @@ import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts
 import { type ColorToken } from "../../../theme/colors.ts";
 
 import type { Corner } from "../../layout/bottom-right-controls/index.ts";
+import type { IconProp } from "../../../icons/types.ts";
 // one definition of the corner names (shared with the corner controls), re-exported under the same name
 export type { Corner } from "../../layout/bottom-right-controls/index.ts";
 export interface CornerMarkProps {
   /** Which corner (logical: "end" is the right side in left-to-right text). Default "top-end". @tr Hangi köşe (mantıksal: soldan sağa metinde "end" sağ taraftır). Varsayılan "top-end". */
   corner?: MaybeFn<Corner | undefined>;
   /** The icon (an icon, text or a node); children work too. @tr İkon (bir ikon, metin ya da düğüm); children da olur. */
-  icon?: unknown;
+  icon?: IconProp;
   /** Size: sm, md (default) or lg. @tr Boyut: sm, md (varsayılan) ya da lg. */
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;
   /** "scrim" (default: dark glass, for photos), "surface" (card colour with a shadow) or "solid" (filled with the colour). @tr "scrim" (varsayılan: fotoğraflar için koyu cam), "surface" (gölgeli kart rengi) ya da "solid" (renkle dolu). */

@@ -24,13 +24,14 @@ import { SearchBox } from "../../forms/search-box/index.ts";
 import { Empty } from "../../feedback/empty/index.ts";
 import { SectionLabel } from "../../typography/section-label/index.ts";
 import { navDrawer } from "./drawer.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 /** A NavMenu entry. */
 export interface NavItem {
   id: string;
   title: MaybeFn<string>;
   href: Href;
-  icon?: unknown;
+  icon?: IconProp;
   group?: string;
   badge?: MaybeFn<number | null | undefined>;
   keywords?: string;

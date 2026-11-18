@@ -20,6 +20,7 @@ import { FollowButton, type FollowState } from "../../social/follow-button/index
 import { CountRoll } from "../../social/count-roll/index.ts";
 import "./profile-header.css";
 import { withColor } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export interface ProfileUser {
   name: string;
@@ -70,11 +71,11 @@ export interface ProfileHeaderProps {
   /** The stats row: true (default: all three), false, or the ones to show in order (`["followers", "following"]`). @tr İstatistik satırı: true (varsayılan: üçü de), false ya da sırasıyla gösterilecekler (`["followers", "following"]`). */
   stats?: MaybeFn<boolean | readonly ("posts" | "followers" | "following")[] | undefined>;
   /** Own icons (an icon of march/icons, text or a node); `false` hides the verified mark or the Message icon. @tr Kendi ikonların (march/icons ikonu, metin ya da düğüm); `false` onay işaretini ya da Message ikonunu gizler. */
-  verifiedIcon?: unknown;
+  verifiedIcon?: IconProp;
   /** Own icon of the Message button (icon, text or node); `false` hides it. @tr Message düğmesinin kendi ikonu (ikon, metin ya da düğüm); `false` gizler. */
-  messageIcon?: unknown;
+  messageIcon?: IconProp;
   /** Own icon of the ⋯ menu button (icon, text or node). @tr ⋯ menü düğmesinin kendi ikonu (ikon, metin ya da düğüm). */
-  menuIcon?: unknown;
+  menuIcon?: IconProp;
   /** Color of the Message button (default: a neutral surface). @tr Message düğmesinin rengi (varsayılan: nötr bir yüzey). */
   messageColor?: ColorToken | undefined;
   /** Extra classes on the section. @tr Bölüme (section) eklenen ek sınıflar. */

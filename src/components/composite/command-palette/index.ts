@@ -15,6 +15,7 @@ import { OverflowText } from "../../typography/overflow-text/index.ts";
 import { Kbd } from "../../typography/kbd/index.ts";
 import { isOpen } from "./state.ts";
 import type { Command } from "../../../ui/registry.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export { registerCommands, registerPages } from "../../../ui/registry.ts";
 export type { Command, CommandEntry, PageEntry } from "../../../ui/registry.ts";
@@ -26,7 +27,7 @@ export interface PaletteEntry {
   group: string;
   sub?: string | undefined;
   keywords?: string | undefined;
-  icon?: unknown;
+  icon?: IconProp;
   shortcut?: string | undefined;
   href?: string | undefined;
   run: () => unknown;
@@ -92,7 +93,7 @@ export interface CommandPaletteProps {
   /** Own content for "no results" (default: the `labels.empty` text). @tr "Sonuç yok" için kendi içeriğin (varsayılan: `labels.empty` metni). */
   empty?: unknown;
   /** Icon of the Ask row (default: sparkles); false: none. @tr Ask satırının ikonu (varsayılan: sparkles); false: yok. */
-  askIcon?: unknown;
+  askIcon?: IconProp;
   /** Extra class on the dialog. @tr Pencereye eklenen sınıf. */
   class?: ClassProp;
 }
@@ -118,7 +119,7 @@ export interface PaletteButtonProps {
   /** The shortcut shown in the hint (default "mod+k"). @tr İpucunda gösterilen kısayol (varsayılan "mod+k"). */
   shortcut?: string;
   /** The search icon: default, false (none), or your own (an icon of march/icons, text or a node). @tr Arama ikonu: varsayılan, false (yok) ya da kendi ikonun (march/icons ikonu, metin ya da düğüm). */
-  icon?: unknown;
+  icon?: IconProp;
   /** The shortcut hint (Ctrl+K / ⌘K) at the end. Default true. @tr Sondaki kısayol ipucu (Ctrl+K / ⌘K). Varsayılan true. */
   kbd?: boolean | undefined;
   /** Extra classes on the button. @tr Düğmeye eklenen sınıflar. */

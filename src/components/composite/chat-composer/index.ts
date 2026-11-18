@@ -26,6 +26,7 @@ import { animate } from "../../../motion/animate.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
 import "./chat-composer.css";
 import { withColor } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 /** The texts ChatComposer writes itself; every one is optional (default: the built-in text). */
 export interface ChatComposerLabels {
@@ -57,13 +58,13 @@ export interface ChatComposerProps {
   /** Own texts (names of the field and the buttons, the reply line, the recording status). Defaults: the built-in texts. @tr Kendi metinlerin (alanın ve düğmelerin adları, yanıt satırı, kayıt durumu). Varsayılan: yerleşik metinler. */
   labels?: MaybeFn<ChatComposerLabels | undefined>;
   /** Own icons (an icon of march/icons, an emoji / short text, or a node). Defaults: plus, smile, send arrow, microphone. @tr Kendi ikonların (march/icons ikonu, emoji / kısa metin ya da düğüm). Varsayılan: artı, gülen yüz, gönder oku, mikrofon. */
-  attachIcon?: unknown;
+  attachIcon?: IconProp;
   /** Own icon of the emoji button (default: a smile). @tr Emoji düğmesinin kendi ikonu (varsayılan: gülen yüz). */
-  emojiIcon?: unknown;
+  emojiIcon?: IconProp;
   /** Own icon of the send button (default: an arrow). @tr Gönder düğmesinin kendi ikonu (varsayılan: ok). */
-  sendIcon?: unknown;
+  sendIcon?: IconProp;
   /** Own icon of the microphone button (default: a microphone). @tr Mikrofon düğmesinin kendi ikonu (varsayılan: mikrofon). */
-  micIcon?: unknown;
+  micIcon?: IconProp;
   /** Color of the round button while it sends (default: Aktivite blue) and while it is the microphone (default: Heyecan orange). @tr Yuvarlak düğmenin gönderirken rengi (varsayılan: Aktivite mavisi) ve mikrofonken rengi (varsayılan: Heyecan turuncusu). */
   sendColor?: ColorToken | undefined;
   /** Color of the round button while it is the microphone (default: Heyecan orange). @tr Yuvarlak düğme mikrofonken rengi (varsayılan: Heyecan turuncusu). */

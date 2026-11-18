@@ -17,6 +17,7 @@ import { type ColorToken } from "../../../theme/colors.ts";
 import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
 import { isRtl } from "../../../core/util.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 /** A tab: `content` is a node or a function rendering the panel (called when the tab becomes active). */
 export interface TabSpec {
@@ -31,7 +32,7 @@ export interface TabSpec {
   /** The tab is left out of the list. @tr Sekme listeden çıkarılır. */
   hidden?: MaybeFn<boolean | undefined>;
   /** An icon before the label (an icon definition, a short text or a node). @tr Etiketten önce bir ikon (ikon tanımı, kısa metin ya da düğüm). */
-  icon?: unknown;
+  icon?: IconProp;
   /** Tooltip of the tab (e.g. why it is disabled). @tr Sekmenin ipucu (örneğin neden devre dışı olduğu). */
   title?: MaybeFn<string | null | undefined>;
   /** A close mark on the tab; the Delete key closes too. Both call `onClose(id)`. @tr Sekmede kapatma işareti; Delete tuşu da kapatır. İkisi de `onClose(id)` çağırır. */
@@ -66,7 +67,7 @@ export interface TabListLook {
   /** Called by the close mark of a `closable` tab and by the Delete key. @tr `closable` bir sekmenin kapatma işareti ve Delete tuşu tarafından çağrılır. */
   onClose?: ((id: string) => void) | undefined;
   /** Your own close mark (an icon or a short text). @tr Kendi kapatma işaretin (bir ikon ya da kısa metin). */
-  closeIcon?: unknown;
+  closeIcon?: IconProp;
   /** Texts: tooltip of the close mark, accessible name of the "changed" dot. @tr Metinler: kapatma işaretinin ipucu, "değişti" noktasının erişilebilir adı. */
   labels?: { close?: MaybeFn<string | undefined>; dirty?: MaybeFn<string | undefined> } | undefined;
   /** Extra attributes and events of a tab's button (`onPointerdown` for dragging, `onContextmenu`, `class`, `aria-*` …). @tr Bir sekme düğmesinin ek öznitelikleri ve olayları (sürükleme için `onPointerdown`, `onContextmenu`, `class`, `aria-*` …). */

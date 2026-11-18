@@ -188,7 +188,9 @@ Overlays never take input; put content after them. `front` only for foreground e
   the entry is over budget, move the listed modules behind `import()`/`lazy()`.
 - Import named exports (`import { Card } from "march/ui"`), never `import * as` from a March module. Use
   `march/icons/catalog` for icon galleries. In an icon prop a name is enough: `<Button icon="lucide:heart">`,
-  `icon="chevron-down"` (March's); the compiler makes it an import of that icon (same cost as importing it).
+  `icon="chevron-down"` (March's); the compiler makes it an import of that icon (same cost as importing it). The same
+  in an object's icon key (`{ icon: "lucide:heart" }`) and in `icon("lucide:heart")` (march/icons/packs, any other
+  prop). Type your own icon props as `IconType` (march/icons).
 - Leave `<Link>` prefetch on (default hover). Do not prefetch everything by hand.
 - Credit is optional and never required (the licence stays MIT): `<MadeWithMarch />` (`variant` text / badge / small, link constant `MARCH_URL`) or `credit: true` in `march.config.js` (adds `<!-- Built with MarchJS -->` to the built `index.html` and prints the one-line console banner in production too, from a separate tiny `credit.js`; off by default). `march dev` prints the banner once per page; `banner: false` turns it off. Production never prints it otherwise and the app bundle never contains it (size effect 0). The link comes from one constant, `MARCH_URL` in `src/brand.js`. Add it to a footer when the user wants it; never add it unasked.
 - Set `budget` in `march.config.js` for production apps (`{ entry, route, part, routes: { "/x": bytes }, parts: { "src/x.ts": { limit, why } }, fail: true }`); `parts` gives one lazy part (by its import source) its own limit with a written reason, e.g. a third-party library loaded on demand. Turn on `sw: true` when offline use matters.

@@ -32,6 +32,7 @@ import { minus } from "../../../icons/glyphs/minus.ts";
 import * as C from "./model.ts";
 import type { DockTree, Preset, PanelDef, Rects, Rect, Zone, Hit, TreeSpec } from "./model.ts";
 import tr from "./tr.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 messages("tr", tr);
 // preset helpers and types here; every tree operation is exported from march/app-ui
@@ -41,7 +42,7 @@ export type { DockTree, LayoutNode, TabsNode, SplitNode, Preset, PanelDef, Panel
 /** A panel of the workspace. `content` runs once; the panel keeps it while it moves, collapses or hides. */
 export interface DockPanel extends PanelDef {
   title: MaybeFn<string>;
-  icon?: unknown;
+  icon?: IconProp;
   content: () => unknown;
   /** A close mark on the tab (the panel leaves through `onClose`). */
   closable?: MaybeFn<boolean | undefined>;

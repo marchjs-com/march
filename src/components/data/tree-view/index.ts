@@ -24,11 +24,12 @@ import { folder } from "../../../icons/glyphs/folder.ts";
 import { fileText } from "../../../icons/glyphs/fileText.ts";
 import { alertCircle } from "../../../icons/glyphs/alertCircle.ts";
 import { type ColorToken, withColor } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export interface TreeViewNode {
   id: string;
   label: string;
-  icon?: unknown;
+  icon?: IconProp;
   /** Trailing text (size, count …). */
   meta?: unknown;
   /** Child nodes; `null` / missing = a leaf unless `lazy`. */

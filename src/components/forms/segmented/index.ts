@@ -8,6 +8,7 @@ import { observeSize } from "../../../ui/observe.ts";
 import { slidingIndicator } from "../../../motion/engine/parts.ts";
 import { model, ctl, cx, normOptions, same, labelledBy, useField, type ControlProps, type OptionsProp } from "../../../forms/util.ts";
 import { colorAttr } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 /** An option of Segmented (a bare value works too). */
 export interface SegmentedOption {
@@ -15,7 +16,7 @@ export interface SegmentedOption {
   /** Text of the segment (default: the value). `""` with an `icon`: an icon-only segment named by `title`. */
   label?: string | undefined;
   /** An icon before the text (an icon definition, a short text or a node). */
-  icon?: unknown;
+  icon?: IconProp;
   /** Tooltip (e.g. why the option is disabled); the accessible name of an icon-only segment. */
   title?: string | undefined;
   disabled?: boolean | undefined;

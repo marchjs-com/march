@@ -154,6 +154,19 @@ class Transformer {
 
   helper(k) { this.helpers.add(k); return H[k]; }
 
+  /** The local name of an icon written by name (`{ from, name }` of iconByName); its import is written once. */
+  iconLocal(ic) {
+    const local = `_mi_${ic.from.split("/").slice(2).join("_").replace(/[^\w]/g, "_") || "march"}_${ic.name}`;
+    (this.iconImports ??= new Map()).set(local, ic);
+    return local;
+  }
+  /** The name `icon` of march/icons/packs has in this file (`import { icon } from …`, or `icon as ic`), if imported. */
+  packsIconName() {
+    if (this._packsIcon !== undefined) return this._packsIcon;
+    const m = /import\s*\{([^}]*)\}\s*from\s*["'](?:hadi-)?march\/icons\/packs["']/.exec(this.src);
+    const spec = m?.[1].split(",").map((x) => x.trim()).find((x) => /^icon(\s+as\s+[\w$]+)?$/.test(x));
+    return (this._packsIcon = spec ? spec.split(/\s+as\s+/).pop().trim() : null);
+  }
   /** Where icons written by name come from: opts.icons, else the runtime package's icons ("march/icons", or
    * "hadi-march/icons" when the runtime is that package); a runtime given as a path or URL means march's. */
   iconBase() {
@@ -213,7 +226,17 @@ class Transformer {
       const i = this.pos, c = src[i];
       if (c === " " || c === "\t" || c === "\n" || c === "\r") { out.push(c); this.pos++; continue; }
       if (c === "/" && (src[i + 1] === "/" || src[i + 1] === "*")) { const e = skipComment(src, i); out.push(src.slice(i, e)); this.pos = e; continue; }
-      if (c === '"' || c === "'") { const e = skipString(src, i); out.push(src.slice(i, e)); this.pos = e; prev = { t: "str" }; continue; }
+      if (c === '"' || c === "'") {
+        const e = skipString(src, i);
+        // an object's icon key written with a name (`{ icon: "lucide:heart" }`, `closeIcon: "x"`): that icon's import
+        if (!this.opts.typecheck && prev.t === "punct" && prev.v === ":") {
+          const key = /[{,]\s*(?:([A-Za-z_$][\w$]*)|"([A-Za-z_$][\w$]*)"|'([A-Za-z_$][\w$]*)')\s*:\s*$/.exec(src.slice(Math.max(0, i - 120), i));
+          const text = src.slice(i + 1, e - 1);
+          const ic = key && isIconProp(key[1] ?? key[2] ?? key[3]) && !text.includes("\\") ? iconByName(text, this.iconBase()) : null;
+          if (ic) { out.push(this.iconLocal(ic)); this.pos = e; prev = { t: "id" }; continue; }
+        }
+        out.push(src.slice(i, e)); this.pos = e; prev = { t: "str" }; continue;
+      }
       if (c === "`") { out.push(this.template(prev, out)); prev = { t: "tpl" }; continue; }
       if (c === "/" && exprAllowed(prev)) { const e = skipRegex(src, i); out.push(src.slice(i, e)); this.pos = e; prev = { t: "str" }; continue; }
       // `<T,>(x: T) => …` / `<T extends U>(…) =>` in .tsx is a generic arrow function, not JSX
@@ -237,6 +260,12 @@ class Transformer {
           if (word === "await" && prev.v === "for" && this.asyncFrames > 0) { out.push(word); forAwait = stack.length; prev = { t: "kw", v: word }; continue; }
           if (word === "await" && this.asyncFrames > 0) { out.push(this.awaitExpr()); prev = { t: "id" }; continue; }
           if (this.signals.has(word)) { out.push(this.signalRef(word, prev, stack[stack.length - 1]?.ch)); prev = { t: "id" }; continue; }
+          // icon("lucide:heart") (march/icons/packs) with a written name: that icon's import, no pack to register
+          if (!this.opts.typecheck && word === this.packsIconName() && prev.v !== "function") {
+            const call = /^\s*\(\s*(["'])([^"'\\\n]+)\1\s*\)/.exec(src.slice(j, j + 200));
+            const ic = call ? iconByName(call[2], this.iconBase()) : null;
+            if (ic) { out.push(this.iconLocal(ic)); this.pos = j + call[0].length; prev = { t: "id" }; continue; }
+          }
           if (!this.isObjectKey(prev)) this.used.add(word);
         }
         out.push(word);
@@ -818,9 +847,7 @@ class Transformer {
       attrs = attrs.map((a) => {
         const ic = typeof a.literal === "string" && isIconProp(a.name ?? "") ? iconByName(a.literal, this.iconBase()) : null;
         if (!ic) return a;
-        const local = `_mi_${ic.from.split("/").slice(2).join("_").replace(/[^\w]/g, "_") || "march"}_${ic.name}`;
-        (this.iconImports ??= new Map()).set(local, ic);
-        return { name: a.name, code: local, dynamic: false };
+        return { name: a.name, code: this.iconLocal(ic), dynamic: false };
       });
     }
     let elseKids = null;

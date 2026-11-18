@@ -9,6 +9,7 @@ import { colorAttr } from "../../../theme/colors.ts";
 import { utcDate as utc, isIso, todayIso, addMonths, firstDayOf, monthGrid, weekdayNames, dateFormat as dtf, type IsoDate } from "../../../core/date.ts";
 import { dayGridKey } from "../../../ui/date-grid.ts";
 import { PeriodNav } from "../../navigation/period-nav/index.ts";
+import type { IconProp } from "../../../icons/types.ts";
 export type { IsoDate };
 // the keys of a day grid live in a module of their own (ui/date-grid.ts); the name stays exported from here
 export { dayGridKey };
@@ -44,9 +45,9 @@ export interface CalendarProps extends ControlProps<IsoDate | null> {
   /** The month buttons: `false` removes both (PageUp / PageDown still change the month). @tr Ay düğmeleri: `false` ikisini de kaldırır (PageUp / PageDown ayı yine değiştirir). */
   nav?: boolean | undefined;
   /** Content of the previous-month button instead of the chevron (a node, text or `() => node`). @tr Önceki ay düğmesinde ok yerine gösterilen içerik (düğüm, metin ya da `() => node`). */
-  prevIcon?: unknown;
+  prevIcon?: IconProp;
   /** Content of the next-month button instead of the chevron. @tr Sonraki ay düğmesinde ok yerine gösterilen içerik. */
-  nextIcon?: unknown;
+  nextIcon?: IconProp;
   /** The row of weekday names: `false` removes it. @tr Gün adları satırı: `false` kaldırır. */
   weekdays?: boolean | undefined;
   /** Content of a day cell instead of the day number: `(iso, day) => node` (a dot under busy days, a price…). @tr Gün numarası yerine hücre içeriği: `(iso, day) => node` (dolu günlerin altında nokta, fiyat…). */

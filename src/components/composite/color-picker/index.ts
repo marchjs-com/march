@@ -19,6 +19,7 @@ import { SectionLabel } from "../../typography/section-label/index.ts";
 import { pipette } from "../../../icons/glyphs/pipette.ts";
 import * as C from "./color.ts";
 import tr from "./tr.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 messages("tr", tr);
 
@@ -53,7 +54,7 @@ export interface ColorPickerProps extends ControlProps<string> {
   /** The text field with the value (default true). @tr Değeri gösteren metin alanı (varsayılan true). */
   input?: boolean | undefined;
   /** Own eyedropper icon (an icon of march/icons, text or a node). @tr Kendi damlalık ikonun (march/icons ikonu, metin ya da düğüm). */
-  eyedropperIcon?: unknown;
+  eyedropperIcon?: IconProp;
   /** Own texts: names of the sliders, the buttons and the default palettes. @tr Kendi metinlerin: kaydırıcıların, düğmelerin ve varsayılan paletlerin adları. */
   labels?: ColorPickerLabels | undefined;
   /** Extra classes on the root. @tr Köke eklenen sınıflar. */

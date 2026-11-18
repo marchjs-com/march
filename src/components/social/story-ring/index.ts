@@ -11,6 +11,7 @@ import { animate } from "../../../motion/animate.ts";
 import { withColor } from "../../../theme/colors.ts";
 import { CornerMark } from "../../media/corner-mark/index.ts";
 import "./story-ring.css";
+import type { IconProp } from "../../../icons/types.ts";
 
 export type StoryRingState = "new" | "seen" | "close" | "none";
 
@@ -34,7 +35,7 @@ export interface StoryRingProps {
   /** Your own accessible name. Default: "HADİ, new story" / "HADİ, story seen" / the name. @tr Kendi erişilebilir adınız. Varsayılan: "HADİ, yeni hikâye" / "HADİ, hikâye görüldü" / ad. */
   ariaLabel?: MaybeFn<string | undefined>;
   /** Your own content for the + badge. @tr + rozeti için kendi içeriğiniz. */
-  addIcon?: unknown;
+  addIcon?: IconProp;
   /** Your own node instead of the Avatar (a logo, an image). @tr Avatar yerine kendi düğümünüz (bir logo, bir resim). */
   avatar?: unknown;
   /** Extra class on the root. @tr Köke eklenen sınıf. */

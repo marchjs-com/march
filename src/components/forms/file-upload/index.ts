@@ -18,6 +18,7 @@ import { ListRow } from "../../data/list-row/index.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
 
 import { dropzone, accepts } from "../../../behaviors/dropzone/index.ts";
+import type { IconProp } from "../../../icons/types.ts";
 // the accept check lives with the dropzone behavior; forms keeps exporting it
 export { accepts };
 
@@ -48,7 +49,7 @@ export interface FileUploadProps<R = unknown> extends ControlProps<unknown> {
   /** Image thumbnails and audio players of the chosen files: `false` shows only names. @tr Seçilen dosyaların resim küçük görselleri ve ses oynatıcıları: `false` yalnız adları gösterir. */
   preview?: boolean | undefined;
   /** Content of the remove button of a file instead of the "×" (a node, text or `() => node`). @tr Bir dosyanın kaldırma düğmesinde "×" yerine içerik (düğüm, metin ya da `() => node`). */
-  removeIcon?: unknown;
+  removeIcon?: IconProp;
   /** Every other text the control writes; each default is the built-in (translated) text. @tr Denetimin yazdığı diğer tüm metinler; her varsayılan yerleşik (çevrilmiş) metindir. */
   labels?: {
     /** "max 5 MB" in the hint. */

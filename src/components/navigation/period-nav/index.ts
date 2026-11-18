@@ -13,6 +13,7 @@ import { ButtonGroup } from "../../actions/button-group/index.ts";
 import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { withColor } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 /** Texts of a PeriodNav (each a string or an accessor). */
 export interface PeriodNavLabels {
@@ -38,9 +39,9 @@ export interface PeriodNavProps {
   /** Texts and accessible names: `{ group, previous, today, next }`, each a string or an accessor (defaults are translated). @tr Metinler ve erişilebilir adlar: `{ group, previous, today, next }`, her biri metin ya da erişimci (varsayılanlar çevrilir). */
   labels?: PeriodNavLabels | undefined;
   /** Content of the previous / next button instead of the chevron: an icon, a text, a node or `() => node` (drawn as given: no swap in right-to-left). @tr Ok yerine önceki / sonraki düğmesinin içeriği: ikon, metin, düğüm ya da `() => node` (verildiği gibi çizilir: sağdan sola yazıda yer değiştirmez). */
-  prevIcon?: unknown;
+  prevIcon?: IconProp;
   /** Content of the next button instead of the chevron: an icon, a text, a node or `() => node` (no swap in right-to-left). @tr Ok yerine sonraki düğmesinin içeriği: ikon, metin, düğüm ya da `() => node` (sağdan sola yazıda yer değiştirmez). */
-  nextIcon?: unknown;
+  nextIcon?: IconProp;
   /** `false`: no arrows (the title and the today button stay; keys of the host still move the period). @tr `false`: ok yok (başlık ve bugün düğmesi kalır; ana bileşenin tuşları dönemi yine değiştirir). */
   arrows?: boolean | undefined;
   /** The previous / next button is off (the first / last period). @tr Önceki / sonraki düğmesi kapalı (ilk / son dönem). */

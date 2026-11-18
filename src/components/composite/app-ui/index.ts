@@ -13,6 +13,7 @@ import { ownIcon } from "../../../ui/parts.ts";
 import { columns } from "../../../icons/glyphs/columns.ts";
 import { DockLayout, type DockLayoutProps, type DockApi, type DockPanel } from "../dock-layout/index.ts";
 import { createAppKit, type AppKit, type AppPlugin, type AppFile } from "./kit.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export { definePlugin } from "./kit.ts";
 export type { AppPlugin, AppFile, FileType, PluginContext, AppKit } from "./kit.ts";
@@ -55,7 +56,7 @@ export interface AppUIProps extends Omit<DockLayoutProps, "panels"> {
   /** The Layout menu button at the end of the top bar (default true; live); false hides it (as `layoutLabel={false}`). @tr Üst çubuğun sonundaki Layout menüsü düğmesi (varsayılan true; canlı); false gizler (`layoutLabel={false}` gibi). */
   layoutMenu?: MaybeFn<boolean | undefined>;
   /** Own icon of the Layout menu button. @tr Layout menüsü düğmesinin kendi ikonu. */
-  layoutIcon?: unknown;
+  layoutIcon?: IconProp;
   /** The plugin kit once it runs (add or remove plugins later). @tr Eklenti kiti çalışmaya başlayınca çağrılır (sonradan eklenti ekle ya da kaldır). */
   kit?: ((kit: AppKit) => void) | undefined;
   /** Extra classes on the root. @tr Köke eklenen sınıflar. */

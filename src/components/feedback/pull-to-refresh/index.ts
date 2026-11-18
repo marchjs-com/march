@@ -13,6 +13,7 @@ import { animate } from "../../../motion/animate.ts";
 import { setStyle } from "../../../motion/env.ts";
 import { swipeable, rubberBand } from "../../../behaviors/swipe/index.ts";
 import "./pull-to-refresh.css";
+import type { IconProp } from "../../../icons/types.ts";
 
 export type PullPhase = "idle" | "pull" | "ready" | "refreshing";
 
@@ -30,7 +31,7 @@ export interface PullToRefreshProps {
   /** The round indicator: true (default), false, or `(phase) => content` drawn inside it (re-run on every phase). @tr Yuvarlak gösterge: true (varsayılan), false ya da içinde çizilen `(phase) => içerik` (her evrede yeniden çalışır). */
   indicator?: boolean | ((phase: PullPhase) => unknown) | undefined;
   /** Glyph or node that turns inside the indicator (default: the refresh glyph). @tr Göstergenin içinde dönen glif ya da düğüm (varsayılan: yenile glifi). */
-  icon?: unknown;
+  icon?: IconProp;
   /** Settle (spring back) duration in ms; false or 0 snaps. Default 260. @tr Yerine oturma (yay gibi geri dönme) süresi, ms; false ya da 0 hemen oturur. Varsayılan 260. */
   settle?: number | false | undefined;
   /** The keyboard "Refresh" button that appears on focus (default true). @tr Odaklanınca beliren klavye "Refresh" düğmesi (varsayılan true). */

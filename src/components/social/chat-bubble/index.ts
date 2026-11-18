@@ -21,6 +21,7 @@ import { ReplyQuote } from "../reply-quote/index.ts";
 import "./chat-bubble.css";
 import { isRtl } from "../../../core/util.ts";
 import { swipeable } from "../../../behaviors/swipe/index.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export type MessageStatus = "sending" | "sent" | "delivered" | "read" | "failed";
 export interface Reaction { emoji: string; count: number; mine?: boolean | undefined }
@@ -67,9 +68,9 @@ export interface ChatBubbleProps {
   /** The React / Reply buttons shown on hover and focus. Default true. @tr Üzerine gelince ve odakta görünen Tepki / Yanıtla düğmeleri. Varsayılan true. */
   tools?: boolean | undefined;
   /** Your own icon for the React button. @tr Tepki düğmesi için kendi ikonunuz. */
-  reactIcon?: unknown;
+  reactIcon?: IconProp;
   /** Your own icon for the Reply button. @tr Yanıtla düğmesi için kendi ikonunuz. */
-  replyIcon?: unknown;
+  replyIcon?: IconProp;
   /** Extra content (an image, a voice note) above the text. @tr Metnin üstünde ek içerik (bir resim, bir sesli not). */
   children?: unknown;
   /** Extra class on the bubble. @tr Balona eklenen sınıf. */

@@ -11,6 +11,7 @@ import { ownPart } from "../../../ui/parts.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { Popover } from "../../overlays/popover/index.ts";
 import { calendar as calendarIcon } from "../../../icons/glyphs/calendar.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 const NUMERIC: Intl.DateTimeFormatOptions = { year: "numeric", month: "2-digit", day: "2-digit" };
 
@@ -54,7 +55,7 @@ export interface DatePickerProps extends ControlProps<IsoDate | null> {
   /** Placeholder of the text field (default: the locale's date pattern, e.g. `DD.MM.YYYY`). @tr Metin alanının yer tutucusu (varsayılan: dilin tarih kalıbı, ör. `DD.MM.YYYY`). */
   placeholder?: string | null | undefined;
   /** The calendar button: `false` removes it (Alt+ArrowDown still opens the calendar), a node / text / `() => node` replaces the icon. @tr Takvim düğmesi: `false` kaldırır (Alt+ArrowDown takvimi yine açar), düğüm / metin / `() => node` ikonun yerine geçer. */
-  icon?: unknown;
+  icon?: IconProp;
   /** Accessible names: `choose` (the button and the popover, default "Choose date"), `prevMonth`, `nextMonth` (the calendar). @tr Erişilebilir adlar: `choose` (düğme ve açılır pencere, varsayılan "Choose date"), `prevMonth`, `nextMonth` (takvim). */
   labels?: { choose?: string | undefined; prevMonth?: string | undefined; nextMonth?: string | undefined } | undefined;
   /** Extra props for the Calendar in the popover (`{ renderDay, weekdays: false, prevIcon, nextIcon, isDisabled }`). @tr Açılır penceredeki Calendar'a ek özellikler (`{ renderDay, weekdays: false, prevIcon, nextIcon, isDisabled }`). */

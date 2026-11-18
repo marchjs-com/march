@@ -14,6 +14,7 @@ import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
 import { nextFrame } from "../../../motion/engine/index.ts";
 import { isRtl } from "../../../core/util.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export interface StepperProps {
   /** The steps: `{ title, description?, icon? }` (the Steps items). @tr Adımlar: `{ title, description?, icon? }` (Steps öğeleri). */
@@ -41,7 +42,7 @@ export interface StepperProps {
   /** Texts: the Back and Next buttons and the panel's accessible name (`step(i, n)`, i is 0-based). @tr Metinler: Back ve Next düğmeleri ve panelin erişilebilir adı (`step(i, n)`, i 0'dan başlar). */
   labels?: { back?: MaybeFn<string | undefined>; next?: MaybeFn<string | undefined>; step?: ((i: number, n: number) => string) | undefined } | undefined;
   /** Passed to Steps: the mark of a done step (icon, string, or false to keep the number). @tr Steps'e geçer: tamamlanan adımın işareti (ikon, metin ya da numarayı korumak için false). */
-  doneIcon?: unknown;
+  doneIcon?: IconProp;
   /** Passed to Steps: your own dot content. @tr Steps'e geçer: kendi nokta içeriğin. */
   renderDot?: ((i: number, state: "done" | "current" | "todo", step: StepItem) => unknown) | undefined;
   /** Passed to Steps: the line between the steps (default true). @tr Steps'e geçer: adımlar arasındaki çizgi (varsayılan true). */

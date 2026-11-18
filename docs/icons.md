@@ -68,8 +68,26 @@ build error):
 ```
 
 The names are the set's file names (`arrow-left`, `lucide:a-arrow-down`); the compiler turns them into the exports
-(`compiler/icon-names.js`, the rule above plus the few names two files share). Only a literal is compiled; a name chosen
-at run time (`icon={$name}`) goes through `icon()` below.
+(`compiler/icon-names.js`, the rule above plus the few names two files share). A name is compiled only where an icon is
+expected, so ordinary text never changes (`let a = "lucide:icon"` stays a text):
+
+- a component's icon prop: `icon`, `iconEnd`, `spinner`, `…Icon` (`<Chip removeIcon="x" />`);
+- an object's key of the same names: `const items = [{ label: "Like", icon: "lucide:heart" }]` (menus, tabs, lists);
+- `icon("lucide:heart")` of `march/icons/packs` with a written name (for a prop of any other name:
+  `<Card picture={icon("lucide:heart")} />`).
+
+A name chosen at run time (`icon={$name}`, `icon(name)`) goes through `icon()` below.
+
+**`IconType`** (march/icons): the type of an icon prop of your own: an imported icon, a March name (`"chevron-down"`,
+completed and checked by TypeScript) or `"<pack>:<name>"`. MarchIDE's editor offers every set's names in the quotes of
+any prop typed `IconType`, whatever its name. March's own icon props are `IconProp` (an IconType, a node, a function
+that draws one, or a short text).
+
+```tsx
+import type { IconType } from "march/icons";
+interface CardProps { title: string; icon?: IconType }
+<Card title="Saved" icon="lucide:bookmark" />
+```
 
 For a name chosen at run time, register the packs and use `icon()`:
 

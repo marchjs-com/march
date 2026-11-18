@@ -6,10 +6,11 @@ import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { isIconDef } from "../../../icons/svg.ts";
 import { IconTile } from "../../data/icon-tile/index.ts";
 import { type ActionsProp, actionsOf } from "../../../ui/display-base.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export interface EmptyProps {
   /** A node, glyph or emoji shown in a raised tile. @tr Yükseltilmiş bir karoda gösterilen düğüm, glif ya da emoji. */
-  icon?: unknown;
+  icon?: IconProp;
   /** "md" (default) or "sm": the compact empty state of a panel, a list or a popup. @tr "md" (varsayılan) ya da "sm": bir panelin, listenin ya da açılır pencerenin sıkışık boş durumu. */
   size?: "sm" | "md" | undefined;
   /** The title; `false` leaves it out (default "Nothing here yet", translated). @tr Başlık; `false` onu çıkarır (varsayılan "Nothing here yet", çevrilir). */

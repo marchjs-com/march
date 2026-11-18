@@ -33,6 +33,7 @@ import { ResizeHandle } from "../../layout/resize-handle/index.ts";
 import { SectionLabel } from "../../typography/section-label/index.ts";
 import { navDrawer } from "../../navigation/nav-menu/drawer.ts";
 import { PopoverPanel } from "../../overlays/popover/index.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 /** One NavSidebar entry. `href` navigates (router Link); `onSelect` runs instead. */
 export interface NavSidebarItem {
@@ -40,7 +41,7 @@ export interface NavSidebarItem {
   label: MaybeFn<string>;
   /** Second line (a status, a category name…). */
   sub?: MaybeFn<string | null | undefined>;
-  icon?: unknown;
+  icon?: IconProp;
   href?: Href;
   onSelect?: () => void;
   /** Count (hidden at 0) or short text. */

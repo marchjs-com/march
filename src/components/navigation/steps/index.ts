@@ -4,6 +4,7 @@ import { h } from "../../../dom/h.ts";
 import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { CheckMark } from "../../feedback/check-mark/index.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export interface StepItem { title: unknown; description?: unknown; icon?: unknown }
 export interface StepsProps {
@@ -16,7 +17,7 @@ export interface StepsProps {
   /** Steps as a vertical list (default false). @tr Adımlar dikey bir liste (varsayılan false). */
   vertical?: boolean;
   /** Mark of a done step: the check (default), your own icon (an IconDef or a short string), or false to keep the number / step icon. @tr Tamamlanan adımın işareti: onay (varsayılan), kendi ikonun (IconDef ya da kısa metin) ya da numarayı / adım ikonunu korumak için false. */
-  doneIcon?: unknown;
+  doneIcon?: IconProp;
   /** Your own dot content: `(i, state, step) => node` (replaces the number, the step icon and the check). @tr Kendi nokta içeriğin: `(i, state, step) => node` (numaranın, adım ikonunun ve onay işaretinin yerine geçer). */
   renderDot?: ((i: number, state: "done" | "current" | "todo", step: StepItem) => unknown) | undefined;
   /** The line between the steps (default true). @tr Adımlar arasındaki çizgi (varsayılan true). */

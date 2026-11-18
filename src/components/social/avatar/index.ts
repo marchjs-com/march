@@ -8,6 +8,7 @@ import { t, locale } from "../../../core/i18n.ts";
 import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { hashString } from "../../../ui/format.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 /** Initials for a name ("Ada Lovelace" → "AL"), locale aware upper casing. */
 export function initials(name: unknown): string {
@@ -29,7 +30,7 @@ export interface AvatarProps {
   /** Ready text instead of the initials ("+3", "?"). @tr Baş harfler yerine hazır metin ("+3", "?"). */
   text?: MaybeFn<string | null | undefined>;
   /** An icon (or node) instead of the initials when there is no image. @tr Resim yokken baş harfler yerine bir ikon (ya da düğüm). */
-  icon?: unknown;
+  icon?: IconProp;
   /** A fixed theme colour instead of the colour taken from the name. @tr Addan alınan renk yerine sabit bir tema rengi. */
   color?: MaybeFn<ColorToken | undefined>;
   /** "circle" (default) or "square" (rounded). @tr "circle" (varsayılan) ya da "square" (yuvarlatılmış köşeli). */

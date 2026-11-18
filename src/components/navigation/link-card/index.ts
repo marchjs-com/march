@@ -10,6 +10,7 @@ import { arrowUpRight } from "../../../icons/glyphs/arrowUpRight.ts";
 import { OverflowText } from "../../typography/overflow-text/index.ts";
 import { IconTile, type IconTone } from "../../data/icon-tile/index.ts";
 import { withColor } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export interface LinkCardProps {
   /** The whole card links here (router `Link`: prefetch, active state). @tr Kartın tamamı bu bağlantıdır (router `Link`: önceden yükleme, etkin durum). */
@@ -19,7 +20,7 @@ export interface LinkCardProps {
   /** Description text or node under the title. @tr Başlığın altındaki açıklama metni ya da düğümü. */
   description?: MaybeFn<unknown>;
   /** Icon drawn in an IconTile. @tr IconTile içinde çizilen ikon. */
-  icon?: unknown;
+  icon?: IconProp;
   /** IconTile tone of the icon tile (default primary). @tr İkon kutusunun IconTile tonu (varsayılan primary). */
   tone?: MaybeFn<IconTone | undefined>;
   /** Theme colour token of the icon tile (wins over `tone`). @tr İkon kutusunun tema renk belirteci (`tone`'a baskın gelir). */

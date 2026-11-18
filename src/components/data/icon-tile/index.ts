@@ -5,11 +5,12 @@ import "./icon-tile.css";
 import { h } from "../../../dom/h.ts";
 import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export type IconTone = "primary" | "neutral" | "success" | "warn" | "danger" | "info" | "violet" | "pink" | "teal";
 export interface IconTileProps {
   /** The icon drawn in the tile. @tr Karonun içinde çizilen ikon. */
-  icon?: unknown;
+  icon?: IconProp;
   /** Tint: primary (default), neutral, success, warn, danger, info, violet, pink or teal. @tr Renk tonu: primary (varsayılan), neutral, success, warn, danger, info, violet, pink ya da teal. */
   tone?: MaybeFn<IconTone | undefined>;
   /** Tile size: sm, md (default) or lg. @tr Karo boyutu: sm, md (varsayılan) ya da lg. */

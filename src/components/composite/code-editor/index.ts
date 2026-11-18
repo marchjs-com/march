@@ -10,7 +10,7 @@ import "./code-editor.css";
 import { signal, computed, effect, untrack, batch, onCleanup, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
-import { uid } from "../../../core/util.ts";
+import { uid, clamp } from "../../../core/util.ts";
 import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { model, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { tokenize, type Token } from "../../../ui/highlight.ts";
@@ -693,7 +693,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     if (r) {
       const vh = globalThis.document?.documentElement?.clientHeight || globalThis.innerHeight || 768;
       const below = vh - r.bottom - 16, above = r.top - 16, room = below >= 180 ? below : Math.max(below, above);
-      globalThis.document?.documentElement?.style.setProperty("--m-ced-room", `${Math.round(Math.max(120, Math.min(room - 110, 420)))}px`);
+      globalThis.document?.documentElement?.style.setProperty("--m-ced-room", `${Math.round(clamp(room - 110, 120, 420))}px`);
     }
     return r;
   };

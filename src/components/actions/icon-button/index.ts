@@ -4,6 +4,7 @@ import { h } from "../../../dom/h.ts";
 import { val, cx, rest, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { buttonSizeClass, buttonLink, pressedAttr, type ButtonHref, type ButtonSize } from "../button/index.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export type IconButtonSize = "xs" | ButtonSize;
 /** `danger`: red icon. `solid`: filled with the accent (`color`, default the theme's primary). `raised`: surface, border and shadow (floating buttons). */
@@ -12,7 +13,7 @@ export type IconButtonVariant = "danger" | "solid" | "raised";
 /** Props of <IconButton>. `label` (or aria-label) is required. */
 export interface IconButtonProps {
   /** The icon (an icon or a node). @tr İkon (ikon ya da düğüm). */
-  icon?: unknown;
+  icon?: IconProp;
   /** Accessible name and tooltip (required, or `aria-label`). @tr Erişilebilir ad ve ipucu (zorunlu, ya da `aria-label`). */
   label?: MaybeFn<string>;
   /** The name when no `label` is given (no tooltip then). @tr `label` verilmediğinde ad (o zaman ipucu çıkmaz). */

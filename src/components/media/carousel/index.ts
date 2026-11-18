@@ -12,6 +12,7 @@ import { PageDots } from "../../navigation/page-dots/index.ts";
 import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { withColor } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export interface CarouselProps {
   /** Accessible name of the carousel (default "Carousel", translated). @tr Atlıkarıncanın erişilebilir adı (varsayılan "Carousel", çevrilir). */
@@ -27,9 +28,9 @@ export interface CarouselProps {
   /** The previous / next buttons (default true). @tr Önceki / sonraki düğmeleri (varsayılan true). */
   arrows?: boolean | undefined;
   /** Glyph or node of the previous button (default: a chevron). @tr Önceki düğmesinin glifi ya da düğümü (varsayılan: bir ok). */
-  prevIcon?: unknown;
+  prevIcon?: IconProp;
   /** Glyph or node of the next button (default: a chevron). @tr Sonraki düğmesinin glifi ya da düğümü (varsayılan: bir ok). */
-  nextIcon?: unknown;
+  nextIcon?: IconProp;
   /** The dots: true (default), false, or `(index, active) => content` drawn inside each dot button. @tr Noktalar: true (varsayılan), false ya da her nokta düğmesinin içine çizilen `(index, active) => content`. */
   dots?: boolean | ((index: number, active: () => boolean) => unknown) | undefined;
   /** Buttons and dots scroll smoothly (default true); false jumps. @tr Düğmeler ve noktalar yumuşak kaydırır (varsayılan true); false ile atlar. */

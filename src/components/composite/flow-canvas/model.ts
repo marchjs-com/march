@@ -11,6 +11,7 @@ import { signal, batch, untrack, type Signal, type Accessor } from "../../../cor
 import { t } from "../../../core/i18n.ts";
 import type { MaybeFn } from "../../../core/util.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 // the UndoManager loads on the first change: the component barrel stays free of side effects
 const undoManager = () => import("../../../managers/undo/index.ts");
 
@@ -49,7 +50,7 @@ export interface FlowNodeType {
   type: string;
   label: MaybeFn<string>;
   description?: MaybeFn<string>;
-  icon?: unknown;
+  icon?: IconProp;
   /** Header accent (theme token). */
   color?: ColorToken;
   /** Palette section. */

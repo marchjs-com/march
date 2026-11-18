@@ -20,13 +20,14 @@ import { animate } from "../../../motion/animate.ts";
 import { still, motionPreset } from "../../../motion/engine/parts.ts";
 import { more } from "../../../icons/glyphs/more.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 messages("tr", { "More": "Daha fazla", "More actions": "Diğer eylemler" });
 
 export interface ToolbarItem {
   id: string;
   label?: MaybeFn<string>;
-  icon?: unknown;
+  icon?: IconProp;
   onSelect?: () => unknown;
   /** A command id (Command manager): label, icon, shortcut, disabled and run come from it unless given here. */
   command?: string;
@@ -55,7 +56,7 @@ export interface OverflowToolbarProps {
   /** Accessible name of the More button and its menu (default: "More actions", translated). @tr More düğmesinin ve menüsünün erişilebilir adı (varsayılan: "More actions", çevrilir). */
   moreLabel?: MaybeFn<string | undefined>;
   /** Icon of the More button (default: three dots): your own node / icon. @tr More düğmesinin ikonu (varsayılan: üç nokta): kendi düğümün / ikonun. */
-  moreIcon?: unknown;
+  moreIcon?: IconProp;
   /** Tooltips of icon-only buttons (default true); false: none (the buttons keep their accessible names). @tr Yalnız ikonlu düğmelerin ipuçları (varsayılan true); false: yok (düğmeler erişilebilir adlarını korur). */
   tooltips?: boolean | undefined;
   /** How an item comes back from the More menu: "pop" (default), "fade", "none" / false, or `(el) => …` (your own animation). @tr Bir öğe More menüsünden nasıl geri gelir: "pop" (varsayılan), "fade", "none" / false ya da `(el) => …` (kendi animasyonun). */

@@ -12,6 +12,7 @@ import { ownPart } from "../../../ui/parts.ts";
 import { errorText } from "../../../ui/format.ts";
 import { Chip } from "../../actions/chip/index.ts";
 import { OptionList, type OptionItem } from "../option-list/index.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export interface ComboboxProps<T = unknown> extends ControlProps<T | null | T[]> {
   /** Static options: [value] or [{ value, label, hint, disabled }]. @tr Sabit seçenekler: [value] ya da [{ value, label, hint, disabled }]. */
@@ -43,7 +44,7 @@ export interface ComboboxProps<T = unknown> extends ControlProps<T | null | T[]>
     remove?: ((label: string) => string) | undefined;
   } | undefined;
   /** The remove button of a chip (`multiple`): `false` removes it (Backspace still removes), a node / text / `() => node` replaces the "×". @tr Chip'in kaldırma düğmesi (`multiple`): `false` kaldırır (Backspace yine siler), düğüm / metin / `() => node` "×" yerine geçer. */
-  removeIcon?: unknown;
+  removeIcon?: IconProp;
 }
 
 /**

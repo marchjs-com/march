@@ -13,13 +13,14 @@ import { Menu, type MenuItemSpec } from "../../../ui/menu.ts";
 import type { Href } from "../../../router/router.ts";
 import { overflowFit } from "../../../ui/fit.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 messages("tr", { "Path": "Yol", "Hidden path parts": "Gizli yol parçaları", "{0}: go to": "{0}: şuraya git" });
 
 export interface Crumb {
   id: string;
   label: MaybeFn<string>;
-  icon?: unknown;
+  icon?: IconProp;
   href?: Href;
   onSelect?: () => unknown;
   /** Items beside this one: the crumb opens a menu of them. */
@@ -29,7 +30,7 @@ export interface Crumb {
 export interface CrumbSibling {
   id: string;
   label: string;
-  icon?: unknown;
+  icon?: IconProp;
   /** A second, quieter line under the label. */
   sub?: string | undefined;
   href?: Href | undefined;

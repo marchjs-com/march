@@ -7,12 +7,13 @@ import { cx, val, rest, type ClassProp, type MaybeFn } from "../../../ui/util.ts
 import { ownIcon } from "../../../ui/parts.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import { badgeCheck } from "../../../icons/glyphs/badgeCheck.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export interface VerifiedMarkProps {
   /** Accessible name (default "Verified"); `false`: decorative (the text beside it says it). @tr Erişilebilir ad (varsayılan "Doğrulanmış"); `false`: süs amaçlı (yanındaki metin zaten söyler). */
   label?: MaybeFn<string | false | undefined>;
   /** Own icon (an icon of march/icons, text or a node). @tr Kendi ikonunuz (march/icons'tan bir ikon, metin ya da düğüm). */
-  icon?: unknown;
+  icon?: IconProp;
   /** sm (beside body text, default) · md (beside a heading) · lg. @tr sm (gövde metninin yanında, varsayılan) · md (başlığın yanında) · lg. */
   size?: MaybeFn<"sm" | "md" | "lg" | undefined>;
   /** Extra class on the mark. @tr İşarete eklenen sınıf. */

@@ -17,13 +17,14 @@ import { Kbd } from "../../typography/kbd/index.ts";
 import { Divider } from "../../layout/stack/index.ts";
 import { PlainListRow } from "../../data/list-row/core.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 // ------------------------------------------------------------------ menus
 /** A plain menu entry. `onSelect` receives the menu's `args`. */
 export interface MenuItemSpec {
   label: MaybeFn<string>;
   onSelect?(...args: unknown[]): unknown;
-  icon?: unknown;
+  icon?: IconProp;
   href?: Href;
   danger?: boolean;
   disabled?: MaybeFn<boolean>;
@@ -81,7 +82,7 @@ export interface PopoverButtonProps {
   /** Trigger text and accessible name. @tr Tetikleyici metni ve erişilebilir ad. */
   label?: MaybeFn<string>;
   /** Icon-only trigger. @tr Yalnız ikonlu tetikleyici. */
-  icon?: unknown;
+  icon?: IconProp;
   /** Custom trigger content. @tr Tetikleyicinin kendi içeriği. */
   trigger?: unknown;
   /** The trigger's look (see Button); default secondary. @tr Tetikleyicinin görünümü (bkz. Button); varsayılan secondary. */

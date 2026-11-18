@@ -23,6 +23,7 @@ import { maximize } from "../../../icons/glyphs/maximize.ts";
 import { copy } from "../../../icons/glyphs/copy.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import tr from "./tr.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 messages("tr", tr);
 
@@ -43,7 +44,7 @@ export interface WindowProps {
   /** Title text in the bar (live); also names the window. @tr Çubuktaki başlık metni (canlı); pencerenin adı da olur. */
   title?: MaybeFn<string> | undefined;
   /** An icon node before the title. @tr Başlıktan önce bir ikon düğümü. */
-  icon?: unknown;
+  icon?: IconProp;
   /** Look of the frame (default "hadi"). @tr Çerçevenin görünümü (varsayılan "hadi"). */
   chrome?: MaybeFn<WindowChrome | undefined> | undefined;
   /** Start place and size in px (default: 32 × 20 rem, centered). @tr Px cinsinden başlangıç yeri ve boyutu (varsayılan: 32 × 20 rem, ortada). */

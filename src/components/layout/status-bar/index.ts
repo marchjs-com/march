@@ -14,6 +14,7 @@ import { animate } from "../../../motion/animate.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 import { PlainListRow } from "../../data/list-row/core.ts";
 import { more } from "../../../icons/glyphs/more.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 messages("tr", { "Status bar": "Durum çubuğu", "More status": "Diğer durum bilgileri" });
 
@@ -21,7 +22,7 @@ export type StatusTone = "neutral" | "info" | "success" | "warn" | "danger" | "b
 export interface StatusItem {
   id: string;
   text?: MaybeFn<string>;
-  icon?: unknown;
+  icon?: IconProp;
   /** Which end of the bar (default "start"; "end" follows the writing direction). */
   side?: "start" | "end";
   tone?: MaybeFn<StatusTone | undefined>;
@@ -44,7 +45,7 @@ export interface StatusBarProps {
   /** Accessible name of the "…" menu (default "More status"). @tr "…" menüsünün erişilebilir adı (varsayılan "Diğer durumlar"). */
   moreLabel?: MaybeFn<string | undefined>;
   /** Icon of the "…" menu button. @tr "…" menü düğmesinin ikonu. */
-  moreIcon?: unknown;
+  moreIcon?: IconProp;
   /** false: no "…" menu; every item stays in the bar (default true). @tr false: "…" menüsü yok; her öğe çubukta kalır (varsayılan true). */
   overflow?: boolean;
   /** The tone dot of items without an icon: true (default), false, or `(tone, item) => node` (tone is live). @tr İkonsuz öğelerin ton noktası: true (varsayılan), false ya da `(tone, item) => node` (tone canlıdır). */

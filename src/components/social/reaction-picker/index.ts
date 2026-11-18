@@ -12,6 +12,7 @@ import { IconButton } from "../../actions/icon-button/index.ts";
 import { moveCursor } from "../../../behaviors/list-nav/index.ts";
 import "./reaction-picker.css";
 import { isRtl } from "../../../core/util.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 /** Default quick-reaction row: the six emoji shown under a message. */
 export const QUICK_REACTIONS: readonly string[] = ["❤️", "😂", "😮", "😢", "🙏", "👍"];
@@ -38,7 +39,7 @@ export interface ReactionPickerProps {
   /** Accessible name of the "+" button. Default "More emoji". @tr "+" düğmesinin erişilebilir adı. Varsayılan "Daha fazla emoji". */
   moreLabel?: MaybeFn<string | undefined>;
   /** Your own content for the "+" button. @tr "+" düğmesi için kendi içeriğiniz. */
-  moreIcon?: unknown;
+  moreIcon?: IconProp;
   /** Extra class on the root. @tr Köke eklenen sınıf. */
   class?: ClassProp;
 }

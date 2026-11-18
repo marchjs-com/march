@@ -15,11 +15,12 @@ import { overlayScopeFor } from "../../layout/overlay-scope/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import { Badge } from "../../data/badge/index.ts";
 import { ListRow } from "../../data/list-row/index.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export interface BottomNavAction {
   id: string;
   label: MaybeFn<string>;
-  icon?: unknown;
+  icon?: IconProp;
   /** A second line (sheet look) and the tooltip (fan look). */
   desc?: MaybeFn<string | undefined>;
   /** Color of the action's icon disc. Default: the four HADİ colors in turn. */

@@ -9,6 +9,7 @@ import { cx, val, rest, type ClassProp, type MaybeFn } from "../../../ui/util.ts
 import { ownIcon } from "../../../ui/parts.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 /** Where a Chevron points while closed. */
 export type ChevronDirection = "end" | "start" | "down" | "up";
@@ -23,7 +24,7 @@ export interface ChevronProps {
   /** The turn: "smooth" (default), "spring", or `false` (jumps). @tr Dönüş: "smooth" (varsayılan), "spring" ya da `false` (sıçrar). */
   motion?: MaybeFn<"smooth" | "spring" | false | undefined>;
   /** Own icon drawn pointing to the inline end (an icon of march/icons, text or a node); it turns the same way. @tr Satır sonuna bakacak şekilde çizilen kendi ikonun (march/icons ikonu, metin ya da düğüm); aynı şekilde döner. */
-  icon?: unknown;
+  icon?: IconProp;
   /** Keeps the box but draws nothing (a tree leaf lines up with its siblings). @tr Kutuyu korur ama hiçbir şey çizmez (ağaç yaprağı kardeşleriyle hizalanır). */
   leaf?: MaybeFn<boolean | undefined>;
   /** Extra classes on the arrow. @tr Oka eklenen sınıflar. */

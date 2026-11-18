@@ -20,6 +20,7 @@ import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
 import { motionPreset } from "../../../motion/engine/parts.ts";
 import { addBottomRightControl } from "../../layout/bottom-right-controls/index.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export interface ScrollToTopProps {
   /** Scrolled distance (px) after which the button shows. Default 320. @tr Düğmenin göründüğü kaydırma mesafesi (px). Varsayılan 320. */
@@ -35,7 +36,7 @@ export interface ScrollToTopProps {
   /** Accessible name and tooltip (default: "Back to top", translated). @tr Erişilebilir ad ve ipucu (varsayılan: "Back to top", çevrilir). */
   label?: MaybeFn<string | undefined>;
   /** The icon (default: an up arrow): your own node / icon. @tr İkon (varsayılan: yukarı ok): kendi düğümün / ikonun. */
-  icon?: unknown;
+  icon?: IconProp;
   /** How the button appears and leaves: "pop" (default), "fade", "slide", "none" / false, or `(el, shown) => …` (your own animation). @tr Düğme nasıl belirir ve gider: "pop" (varsayılan), "fade", "slide", "none" / false ya da `(el, shown) => …` (kendi animasyonun). */
   motion?: "pop" | "fade" | "slide" | "none" | false | ((el: HTMLElement, shown: boolean) => unknown) | undefined;
   /** Scroll back smoothly (default true); false jumps at once. @tr Yukarı yumuşakça kayar (varsayılan true); false hemen sıçrar. */

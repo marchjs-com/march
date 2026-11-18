@@ -11,6 +11,7 @@ import { Button } from "../button/index.ts";
 import { IconButton } from "../icon-button/index.ts";
 import { check } from "../../../icons/glyphs/check.ts";
 import { copy as copyIcon } from "../../../icons/glyphs/copy.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export interface CopyButtonProps {
   /** What is copied (read at click time). @tr Kopyalanan değer (tıklama anında okunur). */
@@ -22,9 +23,9 @@ export interface CopyButtonProps {
   /** An icon button without visible text (default false). @tr Görünür metni olmayan ikon düğmesi (varsayılan false). */
   iconOnly?: boolean;
   /** The copy icon: your own node / icon. A text button has no icon unless one is given (`true`: the default one). @tr Kopyala ikonu: kendi düğümün / ikonun. Metinli düğmede ikon yalnız verilirse olur (`true`: varsayılan ikon). */
-  icon?: unknown;
+  icon?: IconProp;
   /** The icon after a copy (default: a tick): your own node / icon, or false to keep the copy icon. @tr Kopyalamadan sonraki ikon (varsayılan: tik): kendi düğümün / ikonun ya da kopyala ikonunu korumak için false. */
-  copiedIcon?: unknown;
+  copiedIcon?: IconProp;
   /** Colour of the button after a copy (default: success). @tr Kopyalamadan sonra düğmenin rengi (varsayılan: success). */
   copiedColor?: ColorToken | undefined;
   /** How long the "Copied" state stays, ms (default 1500). @tr "Copied" durumunun ne kadar kaldığı, ms (varsayılan 1500). */

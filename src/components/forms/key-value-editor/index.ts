@@ -10,6 +10,7 @@ import { rowList, rowToolsProps, outsideField } from "../../../forms/rows.ts";
 import { Button } from "../../actions/button/index.ts";
 import { RowTools } from "../row-tools/index.ts";
 import { TextInput } from "../text-input/index.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export interface KeyValueEditorProps extends ControlProps<Record<string, string | number>> {
   /** Placeholder of the key fields (default "Key"). @tr Anahtar alanlarının yer tutucusu (varsayılan "Key"). */
@@ -25,7 +26,7 @@ export interface KeyValueEditorProps extends ControlProps<Record<string, string 
   /** The "Add row" button: `false` removes it. @tr "Add row" düğmesi: `false` kaldırır. */
   addable?: boolean | undefined;
   /** Content of the remove button instead of the "×" icon (a node, text or `() => node`). @tr Kaldırma düğmesinde "×" ikonu yerine içerik (düğüm, metin ya da `() => node`). */
-  removeIcon?: unknown;
+  removeIcon?: IconProp;
 }
 
 /**

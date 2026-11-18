@@ -11,6 +11,7 @@ import { accentList } from "../../../ui/accent.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { palette as paletteIcon } from "../../../icons/glyphs/palette.ts";
 import { SectionLabel } from "../../typography/section-label/index.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 /** Props of <ThemeMenu>. */
 export interface ThemeMenuProps {
@@ -23,7 +24,7 @@ export interface ThemeMenuProps {
   /** Where the panel opens beside the button (default "bottom-end"). @tr Panelin düğmenin yanında açıldığı yer (varsayılan "bottom-end"). */
   placement?: "bottom-start" | "bottom-end" | "top-start" | "top-end" | undefined;
   /** Button icon: your own icon, or false for a text-only button (default: the palette). @tr Düğme ikonu: kendi ikonun ya da yalnız metinli düğme için false (varsayılan: palet). */
-  icon?: unknown;
+  icon?: IconProp;
   /** Show light / dark / system (default true). @tr Açık / koyu / sistem seçeneklerini gösterir (varsayılan true). */
   modes?: boolean | undefined;
   /** How the themes are drawn: "list" (default: rows with a swatch) or "cards" (a grid of preview cards, each a small page drawn by the theme). @tr Temaların çizimi: "list" (varsayılan: renk örnekli satırlar) ya da "cards" (önizleme kartları ızgarası; her biri temanın çizdiği küçük bir sayfa). */

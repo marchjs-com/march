@@ -10,6 +10,7 @@ import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { Alert } from "../../feedback/alert/index.ts";
 import { Button } from "../../actions/button/index.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export type ToastKind = "info" | "success" | "warn" | "danger";
 export interface ToastAction {
@@ -24,7 +25,7 @@ export interface ToastOptions {
   /** ms; 0 = stays until dismissed. Default: 4s, 8s with an action or for danger. */
   timeout?: number;
   /** The icon: the kind's icon (default), your own (an IconDef, a short string or a node), or false for none. */
-  icon?: unknown;
+  icon?: IconProp;
   /** Theme color token of the icon (default: the kind's color). */
   color?: ColorToken | undefined;
   /** The close (×) button (default true). Without it give a timeout, an action, or dismiss it yourself. */

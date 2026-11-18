@@ -9,6 +9,7 @@ import { labelWithKey } from "../../../ui/keys.ts";
 import { val, cx, rest, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { Spinner } from "../../feedback/spinner/index.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "dark" | "link";
 export type ButtonSize = "sm" | "md" | "lg";
@@ -48,9 +49,9 @@ export interface ButtonProps {
    * @tr Yükleniyor göstergesi: true (varsayılan), false (yüklenirken ikon kalır) ya da kendi düğümün / ikonun. */
   spinner?: unknown;
   /** The icon before the label (an icon name or a node). @tr Etiketten önceki ikon (ikon adı ya da düğüm). */
-  icon?: unknown;
+  icon?: IconProp;
   /** The icon after the label. @tr Etiketten sonraki ikon. */
-  iconEnd?: unknown;
+  iconEnd?: IconProp;
   /** Full width of its container. @tr Kapsayıcısının tam genişliği. */
   block?: boolean;
   /** A toggle button: sets `aria-pressed` and the shared pressed look (`is-pressed`). Leave unset for a plain button.
@@ -132,7 +133,7 @@ export interface ActionButtonProps<A extends unknown[] = unknown[], R = unknown>
   /** The busy spinner: true (default), false, or your own node / icon (see Button). @tr Meşgul göstergesi: true (varsayılan), false ya da kendi düğümün / ikonun (bkz. Button). */
   spinner?: unknown;
   /** The icon; the action's own icon when unset. @tr İkon; verilmezse eylemin kendi ikonu. */
-  icon?: unknown;
+  icon?: IconProp;
   /** See Button. @tr Bkz. Button: `pill` uçları tam yuvarlar. */
   shape?: MaybeFn<"pill" | undefined>;
   /** Full width of its container. @tr Kapsayıcısının tam genişliği. */

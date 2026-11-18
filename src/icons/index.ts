@@ -8,6 +8,7 @@ import { paintIcon, type IconDef } from "./svg.ts";
 
 export { svgIcon, paintIcon, defineIcon, isIconDef } from "./svg.ts";
 export type { IconDef } from "./svg.ts";
+export type { IconType, IconProp, MarchIconName, IconPackId } from "./types.ts";
 export * from "./all.ts";
 
 export interface IconProps {

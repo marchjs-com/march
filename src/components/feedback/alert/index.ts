@@ -14,6 +14,7 @@ import { alertTriangle } from "../../../icons/glyphs/alertTriangle.ts";
 import { alertCircle } from "../../../icons/glyphs/alertCircle.ts";
 import { actionsOf, type ActionsProp, type Tone } from "../../../ui/display-base.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export interface AlertProps {
   /** Meaning, colours and icon: info (default), success, warn, danger or neutral. @tr Anlam, renk ve ikon: info (varsayılan), success, warn, danger ya da neutral. */
@@ -21,7 +22,7 @@ export interface AlertProps {
   /** A bold first line. @tr Kalın ilk satır. */
   title?: unknown;
   /** The icon (a node or a glyph); default the tone's icon, `null` hides it. @tr İkon (düğüm ya da glif); varsayılan tonun ikonu, `null` gizler. */
-  icon?: unknown;
+  icon?: IconProp;
   /** The message (children work too). @tr Mesaj (children da olur). */
   body?: unknown;
   /** The next step: a node, a list of nodes or `action()` objects (drawn as small buttons). @tr Sonraki adım: bir düğüm, düğüm listesi ya da `action()` nesneleri (küçük düğmeler olarak çizilir). */
@@ -33,7 +34,7 @@ export interface AlertProps {
   /** Accessible name of the dismiss button (default "Dismiss", translated). @tr Kapatma düğmesinin erişilebilir adı (varsayılan "Dismiss", çevrilir). */
   dismissLabel?: MaybeFn<string | undefined>;
   /** Glyph or node inside the dismiss button (default: the × glyph). @tr Kapatma düğmesindeki glif ya da düğüm (varsayılan: × glifi). */
-  dismissIcon?: unknown;
+  dismissIcon?: IconProp;
   /** Called after the alert is dismissed. @tr Uyarı kapatıldıktan sonra çağrılır. */
   onDismiss?: () => void;
   /** "soft" (default: the tone's tinted fill) or "raised": a floating message (a toast) on the surface of a layer with a shadow; the tone colours the icon alone. @tr "soft" (varsayılan: tonun renkli dolgusu) ya da "raised": bir katmanın yüzeyinde gölgeli, yüzen mesaj (bildirim); ton yalnız ikonu renklendirir. */

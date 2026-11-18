@@ -35,3 +35,19 @@ export const A = () => <div><Button icon="lucide:heart" iconEnd="chevron-down">H
 test("gen-icon-names --check: the compiler's icon table matches the icons", () => {
   execFileSync(process.execPath, ["tools/gen-icon-names.js", "--check"], { cwd: new URL("..", import.meta.url), stdio: "pipe" });
 });
+
+test("compiler: an object's icon key and icon(\"…\") of march/icons/packs written with a name are imports; other strings stay", () => {
+  const out = compile(`import { icon } from "march/icons/packs"
+const items = [{ label: "Kalp", icon: "lucide:heart" }, { "closeIcon": "x" }, { icon: name }]
+let a = "lucide:icon"
+const t = { title: "lucide:heart" }
+const b = icon("tabler:rocket"), c = icon(dyn)`, { filename: "a.tsx" }).code;
+  assert.match(out, /icon: _mi_lucide_heart/);
+  assert.match(out, /"closeIcon": _mi_march_x/);
+  assert.match(out, /icon: name/);
+  assert.match(out, /let a = "lucide:icon"/, "a plain variable stays a text");
+  assert.match(out, /title: "lucide:heart"/, "a key that is no icon key stays a text");
+  assert.match(out, /const b = _mi_tabler_rocket, c = icon\(dyn\)/, "a written name is an import; a name known at run time goes through icon()");
+  assert.match(out, /import \{ rocket as _mi_tabler_rocket \} from "march\/icons\/tabler"/);
+  assert.match(compile(`const b = icon("tabler:rocket")`, { filename: "b.tsx" }).code, /icon\("tabler:rocket"\)/, "an icon() that is not march's stays");
+});

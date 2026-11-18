@@ -13,15 +13,16 @@ import { animate } from "../../../motion/animate.ts";
 import { setStyle } from "../../../motion/env.ts";
 import { openCreateMenu, type BottomNavAction, type CreateMenuLook } from "./actions.ts";
 import "./bottom-nav.css";
+import type { IconProp } from "../../../icons/types.ts";
 
 export type { BottomNavAction, CreateMenuLook };
 
 export interface BottomNavItem {
   id: string;
   label: MaybeFn<string>;
-  icon?: unknown;
+  icon?: IconProp;
   /** Icon while active (default: `icon`). */
-  activeIcon?: unknown;
+  activeIcon?: IconProp;
   /** Count badge (hidden at 0; 120 → "99+"). */
   badge?: MaybeFn<number | null | undefined>;
   /** A dot instead of a count. */
@@ -54,7 +55,7 @@ export interface BottomNavProps {
   /** Accessible name of the Create button (default "Create"). @tr Create düğmesinin erişilebilir adı (varsayılan "Create"). */
   createLabel?: MaybeFn<string | undefined>;
   /** Own icon of the Create button (default: a plus). @tr Create düğmesinin kendi ikonu (varsayılan: artı). */
-  createIcon?: unknown;
+  createIcon?: IconProp;
   /** Ring colors of the Create button: color tokens ("brand-orange", "primary" …) or CSS colors; `false`: no ring. Default: the four HADİ colors (a theme's brand tokens first). @tr Create düğmesinin halka renkleri: renk token'ları ("brand-orange", "primary" …) ya da CSS renkleri; `false`: halka yok. Varsayılan: dört HADİ rengi (önce temanın marka token'ları). */
   ring?: readonly string[] | false | undefined;
   /** The colored bubble behind the active tab. Default true; `false`: the active tab is marked by its color only. @tr Etkin sekmenin arkasındaki renkli kabarcık. Varsayılan true; `false`: etkin sekme yalnız rengiyle belli olur. */

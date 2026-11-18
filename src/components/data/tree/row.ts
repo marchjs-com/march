@@ -6,6 +6,7 @@ import { cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { ListRow } from "../list-row/index.ts";
 import { Chevron } from "../../actions/chevron/index.ts";
 import { moveCursor } from "../../../behaviors/list-nav/index.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 /** Parts of a tree row. Everything else in `attrs` goes to the ListRow (class, role, aria-*, data-*, listeners, active, selected, disabled). */
 export interface TreeRowParts {
@@ -23,7 +24,7 @@ export interface TreeRowParts {
   /** Size of the arrow (default "xs"). */
   chevronSize?: "xs" | "sm" | undefined;
   /** The icon node after the arrow. */
-  icon?: unknown;
+  icon?: IconProp;
   label: unknown;
   /** A second line under the label (a problem, a path): a node or an accessor. */
   sub?: unknown;

@@ -28,6 +28,7 @@ import { CountRoll } from "../../social/count-roll/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import "./post-card.css";
 import { withColor } from "../../../theme/colors.ts";
+import type { IconProp } from "../../../icons/types.ts";
 
 export interface PostAuthor { name: string; handle?: string | undefined; avatar?: string | undefined; verified?: boolean | undefined }
 export interface Post {
@@ -86,15 +87,15 @@ export interface PostCardProps {
   /** The time in the header: true (default, relative), false, or `(time) => content`. @tr Başlıktaki zaman: true (varsayılan, göreli), false ya da `(time) => içerik`. */
   time?: boolean | ((time: Post["time"]) => unknown) | undefined;
   /** Own icons (an icon of march/icons, text or a node); `false` hides the verified mark, the place pin or the large heart. @tr Kendi ikonların (march/icons ikonu, metin ya da düğüm); `false` onay işaretini, yer iğnesini ya da büyük kalbi gizler. */
-  verifiedIcon?: unknown;
+  verifiedIcon?: IconProp;
   /** The place pin before the location (icon, text or node); `false` hides it. @tr Konumun önündeki yer iğnesi (ikon, metin ya da düğüm); `false` gizler. */
-  placeIcon?: unknown;
+  placeIcon?: IconProp;
   /** Own icon of the comment button (icon, text or node). @tr Yorum düğmesinin kendi ikonu (ikon, metin ya da düğüm). */
-  commentIcon?: unknown;
+  commentIcon?: IconProp;
   /** Own icon of the share button (icon, text or node). @tr Paylaş düğmesinin kendi ikonu (ikon, metin ya da düğüm). */
-  shareIcon?: unknown;
+  shareIcon?: IconProp;
   /** Own icon of the ⋯ menu button (icon, text or node). @tr ⋯ menü düğmesinin kendi ikonu (ikon, metin ya da düğüm). */
-  menuIcon?: unknown;
+  menuIcon?: IconProp;
   /** The large heart of a double tap: default, `false` (the post is liked without it) or your own node. @tr Çift dokunuştaki büyük kalp: varsayılan, `false` (gönderi onsuz beğenilir) ya da kendi düğümün. */
   bigHeart?: unknown;
   /** Heart color while liked (default: brand-pink). @tr Beğenildiğinde kalbin rengi (varsayılan: brand-pink). */
