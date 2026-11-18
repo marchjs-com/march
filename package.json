@@ -139,6 +139,7 @@
     "bench": "node bench/run.js",
     "size": "node bench/size.js",
     "typecheck": "tsc -p tsconfig.json",
+    "sizes": "node tools/gen-export-sizes.js",
     "build:lib": "node tools/build-lib.js",
     "build:cdn": "node tools/build-cdn.js",
     "build:showcase": "node examples/showcase/build.mjs",
