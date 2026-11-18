@@ -38,3 +38,20 @@ test("codeRows: sx keys then values; m:parts components, props, values; handlers
   assert.deepEqual(labels(await rows(`<Button sx={`)), ["{ … }"]);
   assert.deepEqual(fileNames(value), { signals: ["$open"], fns: ["save"] });
 });
+
+test("iconRows: the file's icons, March's, every pack's (a taken name renamed), defineIcon; a pack shows PACK_ROWS at most", async () => {
+  const { iconRows, PACK_ROWS } = await import("../examples/showcase/src/playground/prop-helpers.ts");
+  const value = `import { plus } from "march/icons"\nimport { star } from "march/icons/lucide"\n`;
+  const packs = [{ id: "lucide", label: "Lucide", icons: ["heart", "heartCrack", "star"] }, { id: "material-symbols", label: "Material Symbols", icons: Array.from({ length: 200 }, (_, i) => `h${i}`) }];
+  const rows = iconRows("icon", "he", value, ["plus", "heart"], packs);
+  const lucide = rows.filter((r) => r.group === "Lucide");
+  assert.deepEqual(lucide.map((r) => r.label), ["heart", "heartCrack"]);
+  assert.equal(lucide[0].insert, "lucideHeart", "March has heart: the pack's comes in renamed");
+  assert.equal(lucide[0].head, `import { heart as lucideHeart } from "march/icons/lucide"`);
+  assert.equal(lucide[1].head, `import { heartCrack } from "march/icons/lucide"`);
+  assert.deepEqual(rows.filter((r) => r.group === "March").map((r) => r.label), ["heart"]);
+  const all = iconRows("icon", "", value, ["plus", "heart"], packs);
+  assert.deepEqual(all.filter((r) => r.group === "Bu dosyada").map((r) => r.label), ["plus", "star"], "both modules' imports");
+  assert.equal(all.filter((r) => r.group === "Material Symbols").length, PACK_ROWS);
+  assert.equal(all.at(-1).label, "defineIcon");
+});

@@ -193,22 +193,25 @@ function readMarch(packsDir) {
  * Gallery data for icon browsers, plain JSON (fetched on demand, so no JavaScript bundle grows):
  *   <dir>/index.json  every pack: id, name, license, count, version, home, mode + three sample icons
  *   <dir>/names.json  { id: "name name …" } for search across packs
+ *   <dir>/exports.json { id: "exportName exportName …" } (same order as names.json): what code imports (`aArrowDown`)
  *   <dir>/<id>.json   one pack: its drawing defaults (vb, sw | fill) and icons [name, export, d, flags?] (1 rtl, 2 fill)
  */
 export function writeGallery(packsDir, dir) {
   mkdirSync(dir, { recursive: true });
-  const names = {}, index = [];
+  const names = {}, exps = {}, index = [];
   const ids = existsSync(packsDir) ? readdirSync(packsDir).filter((id) => existsSync(join(packsDir, id, "pack.json"))).sort() : [];
   const all = [readMarch(packsDir), ...ids.map((id) => readPack(packsDir, id))].filter(Boolean);
   for (const { info, P, icons } of all) {
     writeFileSync(join(dir, `${info.id}.json`), J({ id: info.id, ...P, icons }));
     names[info.id] = icons.map((c) => c[0]).join(" ");
+    exps[info.id] = icons.map((c) => c[1]).join(" ");
     const pick = SAMPLES.map((n) => icons.find((c) => c[0] === n || c[0] === `${n}-line`)).filter(Boolean);
     const samples = [...pick, ...icons].slice(0, 3).map((c) => [c[0], c[2], ...c.slice(3)]);
     index.push({ id: info.id, name: info.name, license: info.license, count: icons.length, version: info.version ?? null, home: info.home, mode: info.mode, ...P, samples });
   }
   writeFileSync(join(dir, "index.json"), J(index));
   writeFileSync(join(dir, "names.json"), J(names));
+  writeFileSync(join(dir, "exports.json"), J(exps));
   return all.map((x) => x.info.id);
 }
 
