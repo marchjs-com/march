@@ -1347,7 +1347,8 @@
   "createVault": "Kullanıcının parolasıyla şifreli kasa: anahtarlar yalnız bellekte, diskte (IndexedDB) yalnız şifreli veri.",
   "VaultError": "Kasa hatası: kilitli, zaten var, yok, kısa parola, bekle, yanlış parola.",
   "unlockDelay": "Yanlış denemelerden sonra bir sonraki denemeye kadar beklenecek süre (ms).",
-  "_resetVaults": "Testler için: açılmış kasaları unutur."
+  "_resetVaults": "Testler için: açılmış kasaları unutur.",
+  "passLength": "Kasanın saydığı biçimde parola uzunluğu (NFC sonrası karakter)."
  },
  "march/ai": {
   "chat": "Kullanıcının anahtarıyla bir sağlayıcıya sohbet gönderir; yanıtı akış hâlinde verir, harcanan token'ı döndürür.",

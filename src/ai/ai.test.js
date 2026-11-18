@@ -70,21 +70,44 @@ test("models: chat models only; key hints and masks", async () => {
   assert.equal(keyLooksLike("sk-or-v1-x"), "openrouter");
   assert.equal(keyLooksLike("sk-plain"), null);
   assert.equal(maskKey("sk-ant-api03-abcdefghijkl1234"), "sk-ant-…1234");
-  assert.equal(PROVIDERS.length, 9);
+  assert.equal(PROVIDERS.length, 18);
 });
 
-test("aiKeys: keys and settings in the vault", async () => {
+test("aiKeys: several keys per provider, the active one is used; the old one-key layout is moved over", async () => {
   _resetVaults();
   const v = createVault({ name: "ai-t", memory: true, iterations: 1000, autoLock: 0 });
   await v.create("a long passphrase");
+  await v.set("ai:key:openai", "sk-old");
   const k = aiKeys(v);
-  await k.set("anthropic", " sk-ant-1 ");
-  assert.equal(await k.get("anthropic"), "sk-ant-1");
-  assert.deepEqual(await k.configured(), ["anthropic"]);
-  await k.saveSettings({ provider: "anthropic", models: { anthropic: "claude-sonnet-5-5" } });
+  assert.deepEqual((await k.list()).map((x) => [x.provider, x.key]), [["openai", "sk-old"]], "the old layout is moved over");
+  const a = await k.add("anthropic", " sk-ant-1 ", "work");
+  const b = await k.add("anthropic", "sk-ant-2", "personal");
+  assert.equal(await k.get("anthropic"), "sk-ant-1", "the first key is active");
+  assert.deepEqual((await k.list("anthropic")).map((x) => x.label), ["work", "personal"]);
+  assert.deepEqual((await k.list()).map((x) => x.provider), ["anthropic", "anthropic", "openai"], "in the providers' order");
+  await k.activate(b.id);
+  assert.equal(await k.get("anthropic"), "sk-ant-2");
+  await k.remove(b.id);
+  assert.equal(await k.get("anthropic"), "sk-ant-1", "the next key takes over");
+  await k.rename(a.id, "main");
+  assert.equal((await k.list("anthropic"))[0].label, "main");
+  assert.deepEqual(await k.configured(), ["anthropic", "openai"]);
   assert.equal((await k.settings()).provider, "anthropic");
-  await k.remove("anthropic");
-  assert.deepEqual(await k.configured(), []);
+  await k.remove(a.id);
+  assert.deepEqual(await k.configured(), ["openai"]);
+  assert.equal((await k.settings()).provider, "openai", "the default moves to a provider that still has a key");
+});
+
+test("local providers: no key needed, none sent", async () => {
+  serve(sse([{ choices: [{ delta: { content: "ok" }, finish_reason: "stop" }] }, "[DONE]"]));
+  const r = await chat({ provider: "ollama", key: "", model: "llama3", messages: [{ role: "user", content: "x" }] });
+  assert.equal(r.text, "ok");
+  assert.equal(last.url, "http://localhost:11434/v1/chat/completions");
+  assert.equal(last.init.headers.authorization, undefined);
+  serve(new Response("{}", { status: 404 }));
+  assert.deepEqual(await listModels("perplexity", "k"), ["sonar", "sonar-pro", "sonar-reasoning-pro"], "no model list: the known ones");
+  serve(new Response(JSON.stringify([{ id: "meta-llama/x" }])));
+  assert.deepEqual(await listModels("together", "k"), ["meta-llama/x"], "a bare array of models");
 });
 
 test("meta: OpenAI-compatible at api.meta.ai, bearer key", async () => {

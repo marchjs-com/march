@@ -89,3 +89,17 @@ test("auto-lock and live values", async () => {
   assert.equal(seen.at(-1), undefined, "a locked vault shows nothing");
   dispose();
 });
+
+test("length and hint: kept beside the vault (shown while locked); a hint that gives the passphrase away is refused", async () => {
+  const v = make();
+  await assert.rejects(v.create(PASS, { hint: `it is ${PASS}` }), (e) => e.code === "hint");
+  await assert.rejects(v.create(PASS, { hint: "correct horse" }), (e) => e.code === "hint", "most of it is too much");
+  await v.create(PASS, { hint: "the comic about passwords" });
+  v.lock();
+  assert.deepEqual(v.info(), { length: PASS.length, hint: "the comic about passwords" });
+  await v.changePassphrase(PASS, "ğüşiöç kısa değil", { hint: "" });
+  assert.deepEqual(v.info(), { length: 17 }, "counted in characters; no hint");
+  const w = make({ rememberLength: false });
+  await w.create(PASS);
+  assert.deepEqual(w.info(), {}, "rememberLength: false keeps no length");
+});

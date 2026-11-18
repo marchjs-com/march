@@ -1,5 +1,5 @@
-// The panels of the vault and AI plugins: "AI keys" (make / open the vault, a key per provider: paste, check, model,
-// default, remove) and "AI" (a chat about the open file: explain, fix, write tests; answers stream in, code blocks
+// The panels of the vault and AI plugins: "AI keys" (make / open the vault; keys by provider, several each: add,
+// check, use, remove; the model and the default provider) and "AI" (a chat about the open file: explain, fix, write tests; answers stream in, code blocks
 // apply to the file; the tokens used are shown, a Stop button ends a request). Everything goes from this browser to
 // the provider with the user's own key.
 import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
@@ -10,6 +10,7 @@ import { glyph } from "../../../ui/util.ts";
 import { Button } from "../../actions/button/index.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { PasswordInput } from "../../forms/password-input/index.ts";
+import { TextInput } from "../../forms/text-input/index.ts";
 import { Textarea } from "../../forms/textarea/index.ts";
 import { Select } from "../../forms/select/index.ts";
 import { Alert } from "../../feedback/alert/index.ts";
@@ -25,8 +26,9 @@ import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { check } from "../../../icons/glyphs/check.ts";
 import { shieldCheck } from "../../../icons/glyphs/shieldCheck.ts";
 import { refresh } from "../../../icons/glyphs/refresh.ts";
-import { VaultError, type Vault } from "../../../vault/index.ts";
-import { PROVIDERS, AiError, chat, listModels, keyLooksLike, maskKey, provider as providerOf, type AiKeys, type AiProvider, type AiSettings, type ChatMessage, type Usage } from "../../../ai/index.ts";
+import { plus } from "../../../icons/glyphs/plus.ts";
+import { VaultError, passLength, type Vault } from "../../../vault/index.ts";
+import { PROVIDERS, AiError, chat, listModels, keyLooksLike, maskKey, provider as providerOf, type AiKey, type AiKeys, type AiProvider, type AiSettings, type ChatMessage, type Usage } from "../../../ai/index.ts";
 
 /** How strong a passphrase looks: 0 (weak) … 4 (strong), by length and kinds of characters. */
 export function passStrength(p: string): number {
@@ -40,7 +42,7 @@ export function errText(e: unknown): string {
   if (e instanceof VaultError) {
     const s = Math.ceil(e.retryIn / 1000);
     return e.code === "wait" ? t`Too many wrong tries; wait ${s} s.` : e.code === "short" ? t("Choose a longer passphrase: 10+ characters, letters and digits (a short sentence is best).")
-      : e.code === "wrong" ? t("The current passphrase is wrong.") : e.code === "locked" ? t("The vault is locked.") : e.code === "exists" ? t("The vault already exists.") : t("There is no vault yet.");
+      : e.code === "wrong" ? t("The current passphrase is wrong.") : e.code === "hint" ? t("The hint gives the passphrase away: write something that only reminds you of it.") : e.code === "locked" ? t("The vault is locked.") : e.code === "exists" ? t("The vault already exists.") : t("There is no vault yet.");
   }
   if (e instanceof AiError) {
     const why = e.code === "auth" ? t("the key was refused (check it, or make a new one)") : e.code === "rate" ? t("the rate limit was hit; try again in a moment")
@@ -53,21 +55,28 @@ export function errText(e: unknown): string {
 // ------------------------------------------------------------------------------------------------- the vault gate
 /** Make or open the vault: shown while it is not open. */
 function VaultGate(props: { vault: Vault; intro?: unknown }) {
-  const pass = signal(""), again = signal(""), busy = signal(false), error = signal(""), confirmReset = signal(false);
+  const pass = signal(""), again = signal(""), hint = signal(""), busy = signal(false), error = signal(""), confirmReset = signal(false);
   const strength = computed(() => passStrength(pass()));
   const create = async (): Promise<void> => {
     error.set("");
     if (strength() < 2) { error.set(t("Choose a longer passphrase: 10+ characters, letters and digits (a short sentence is best).")); return; }
     if (pass() !== again()) { error.set(t("The passphrases do not match.")); return; }
     busy.set(true);
-    try { await props.vault.create(pass()); pass.set(""); again.set(""); } catch (e) { error.set(errText(e)); } finally { busy.set(false); }
+    try { await props.vault.create(pass(), { hint: hint() }); pass.set(""); again.set(""); hint.set(""); } catch (e) { error.set(errText(e)); } finally { busy.set(false); }
   };
+  // unlocking: tried as soon as the typed text is as long as the passphrase (the vault keeps its length), or on Enter
+  let tried = "";
   const unlock = async (): Promise<void> => {
-    if (!pass()) return;
-    error.set(""); busy.set(true);
-    try { if (!(await props.vault.unlock(pass()))) error.set(t("Wrong passphrase.")); else pass.set(""); }
-    catch (e) { error.set(errText(e)); } finally { busy.set(false); }
+    const p = untrack(pass);
+    if (!p || untrack(busy) || p === tried) return;
+    tried = p; error.set(""); busy.set(true);
+    try { if (!(await props.vault.unlock(p))) error.set(t("Wrong passphrase.")); else { pass.set(""); tried = ""; } }
+    catch (e) { error.set(errText(e)); tried = ""; } finally { busy.set(false); }
   };
+  const need = (): number | undefined => props.vault.info().length;
+  const typed = computed(() => passLength(pass()));
+  // (it reads the text, not only its length: a corrected letter at the same length is tried again)
+  effect(() => { const n = need(), p = pass(); if (n && p && passLength(p) === n && props.vault.state() === "locked" && props.vault.waitMs() === 0) untrack(() => void unlock()); });
   const enter = (fn: () => void) => (e: KeyboardEvent) => { if (e.key === "Enter") { e.preventDefault(); fn(); } };
   const wait = computed(() => Math.ceil(props.vault.waitMs() / 1000));
   return (
@@ -88,16 +97,27 @@ function VaultGate(props: { vault: Vault; intro?: unknown }) {
         <label class="m-vault-field" onKeyDown={enter(() => void create())}><span>{t("Again")}</span>
           <PasswordInput value={again} autocomplete="new-password" />
         </label>
+        <label class="m-vault-field" onKeyDown={enter(() => void create())}><span>{t("Hint (optional)")}</span>
+          <TextInput value={hint} placeholder={t("Something that reminds you, never the passphrase")} />
+        </label>
+        <p class="m-vault-note">{t("Unlocking needs no button: it opens the moment the passphrase is typed in full (the vault keeps its length; the hint is shown above it, unencrypted).")}</p>
         <Button variant="primary" icon={shieldCheck} loading={() => busy()} onClick={() => void create()}>{t("Create the vault")}</Button>
         <Else>
           <h3 class="m-vault-title">{t("The vault is locked")}</h3>
           <p class="m-vault-note">{props.intro ?? t("Enter your passphrase to use your AI keys.")}</p>
-          <label class="m-vault-field" onKeyDown={enter(() => void unlock())}><span>{t("Passphrase")}</span>
-            <PasswordInput value={pass} autocomplete="current-password" />
+          <If when={() => props.vault.info().hint}><p class="m-vault-hint"><b>{t("Hint")}:</b> {() => props.vault.info().hint}</p></If>
+          <label class="m-vault-field" onKeyDown={enter(() => { tried = ""; void unlock(); })}><span>{t("Passphrase")}</span>
+            <PasswordInput value={pass} autocomplete="current-password" disabled={wait() > 0} />
           </label>
-          <Button variant="primary" icon={keyIcon} loading={() => busy()} disabled={() => wait() > 0 || !pass()} onClick={() => void unlock()}>
-            {() => (wait() > 0 ? t`Wait ${wait()} s` : t("Unlock"))}
-          </Button>
+          <If when={() => need()} fallback={() => (
+            <Button variant="primary" icon={keyIcon} loading={() => busy()} disabled={() => wait() > 0 || !pass()} onClick={() => { tried = ""; void unlock(); }}>
+              {() => (wait() > 0 ? t`Wait ${wait()} s` : t("Unlock"))}
+            </Button>
+          )}>
+            <p class="m-vault-count" aria-live="polite" class:is-busy={busy()}>
+              {() => (wait() > 0 ? t`Wait ${wait()} s` : busy() ? t("Checking…") : `${typed()} / ${need()}`)}
+            </p>
+          </If>
           <If when={() => !confirmReset()}>
             <button type="button" class="m-vault-link" onClick={() => confirmReset.set(true)}>{t("Forgot the passphrase?")}</button>
             <Else>
@@ -113,116 +133,181 @@ function VaultGate(props: { vault: Vault; intro?: unknown }) {
 }
 
 // ------------------------------------------------------------------------------------------------- the keys panel
-interface Row { has: boolean; masked: string; models: string[]; state: "none" | "ok" | "error" | "checking"; msg: string }
-/** The AI keys panel: the vault gate, then a row per provider. */
+interface KeyState { state: "ok" | "error" | "checking"; msg: string }
+/**
+ * The AI keys panel: the vault gate, then the keys. A provider picker on top ("All", or one provider), the keys of the
+ * picked ones masked and grouped by provider (each group: the model, the default provider, where to get a key), and
+ * "Add": for the picked provider, or (with "All") a provider is chosen first. A provider may have several keys; one is
+ * in use.
+ */
 export function AiKeysPanel(props: { vault: Vault; keys: AiKeys; onChange?: () => void }) {
-  const rows = signal<Record<string, Row>>({}), settings = signal<AiSettings>({ models: {}, consent: {} });
-  const draft = signal<Record<string, string>>({}), changing = signal(false);
-  const oldPass = signal(""), newPass = signal(""), passMsg = signal("");
-  const row = (id: string): Row => rows()[id] ?? { has: false, masked: "", models: providerOf(id).models, state: "none", msg: "" };
-  const patch = (id: string, r: Partial<Row>): void => void rows.set({ ...untrack(rows), [id]: { ...row(id), ...untrack(rows)[id], ...r } });
+  const list = signal<readonly AiKey[]>([]), settings = signal<AiSettings>({ models: {}, consent: {}, active: {} });
+  const filter = signal<string>("all"), adding = signal(false), addFor = signal<string | null>(null);
+  const draftKey = signal(""), draftLabel = signal(""), addState = signal<KeyState | null>(null);
+  const states = signal<Record<string, KeyState>>({}), models = signal<Record<string, readonly string[]>>({});
+  const confirmDel = signal<string | null>(null), changing = signal(false);
+  const oldPass = signal(""), newPass = signal(""), newHint = signal(""), passMsg = signal("");
   const load = async (): Promise<void> => {
     if (props.vault.state() !== "unlocked") return;
-    const [have, s] = await Promise.all([props.keys.configured(), props.keys.settings()]);
-    settings.set(s);
-    for (const p of PROVIDERS) {
-      const k = have.includes(p.id) ? await props.keys.get(p.id) : undefined;
-      const cur = untrack(rows)[p.id];
-      patch(p.id, { has: !!k, masked: k ? maskKey(k) : "", models: cur?.models.length ? cur.models : p.models, ...(k ? {} : { state: "none", msg: "" }) });
-    }
+    const [l, s] = await Promise.all([props.keys.list(), props.keys.settings()]);
+    list.set(l); settings.set(s);
   };
   effect(() => { if (props.vault.state() === "unlocked") void load(); });
-  const changed = (): void => { props.onChange?.(); };
-  const check = async (id: string, key: string, save: boolean): Promise<void> => {
-    patch(id, { state: "checking", msg: "" });
-    try {
-      const models = await listModels(id, key);
-      if (save) await props.keys.set(id, key);
-      const s = untrack(settings);
-      const model = s.models[id] && models.includes(s.models[id]!) ? s.models[id]! : models[0] ?? providerOf(id).models[0];
-      settings.set(await props.keys.saveSettings({ models: { ...s.models, ...(model ? { [id]: model } : {}) }, ...(s.provider ? {} : { provider: id }) }));
-      patch(id, { has: true, masked: maskKey(key), models: models.length ? models : providerOf(id).models, state: "ok", msg: t`${models.length} models` });
-      draft.set({ ...untrack(draft), [id]: "" });
-      changed();
-    } catch (e) {
-      patch(id, { state: "error", msg: errText(e) });
+  const changed = (): void => { void load(); props.onChange?.(); };
+  const setState = (id: string, st: KeyState | null): void => { const all = { ...untrack(states) }; if (st) all[id] = st; else delete all[id]; states.set(all); };
+  const count = (p: string): number => list().filter((k) => k.provider === p).length;
+  const filterOptions = computed(() => [
+    { value: "all", label: t`All (${list().length})` },
+    ...PROVIDERS.map((p) => { const n = count(p.id); return { value: p.id, label: n ? `${p.name} (${n})` : p.name }; }),
+  ]);
+  // the groups shown: with "All", the providers that have a key; else the picked one (also with no key)
+  const groups = computed((): AiProvider[] => (filter() === "all" ? PROVIDERS.filter((p) => count(p.id)) : [providerOf(filter())]));
+  const modelsOf = (p: string): readonly string[] => models()[p] ?? providerOf(p).models;
+  const remember = async (p: string, found: readonly string[]): Promise<void> => {
+    if (found.length) models.set({ ...untrack(models), [p]: found });
+    const s = untrack(settings), cur = s.models[p];
+    if (!cur || (found.length && !found.includes(cur))) {
+      const m = found[0] ?? providerOf(p).models[0];
+      if (m) settings.set(await props.keys.saveSettings({ models: { ...s.models, [p]: m } }));
     }
   };
-  const save = (id: string): void => { const k = (untrack(draft)[id] ?? "").trim(); if (k) void check(id, k, true); };
-  const retest = async (id: string): Promise<void> => { const k = await props.keys.get(id); if (k) await check(id, k, false); };
-  const remove = async (id: string): Promise<void> => {
-    await props.keys.remove(id);
-    const s = untrack(settings);
-    if (s.provider === id) { const next = (await props.keys.configured())[0]; settings.set(await props.keys.saveSettings(next ? { provider: next } : {})); }
-    patch(id, { has: false, masked: "", state: "none", msg: "" });
-    changed();
+  const startAdd = (): void => {
+    adding.set(true); draftKey.set(""); draftLabel.set(""); addState.set(null);
+    addFor.set(untrack(filter) === "all" ? null : untrack(filter));
   };
-  const setDefault = async (id: string): Promise<void> => { settings.set(await props.keys.saveSettings({ provider: id })); changed(); };
-  const setModel = async (id: string, m: string): Promise<void> => { const s = untrack(settings); settings.set(await props.keys.saveSettings({ models: { ...s.models, [id]: m } })); changed(); };
+  const save = async (): Promise<void> => {
+    const p = untrack(addFor), key = untrack(draftKey).trim();
+    if (!p) { addState.set({ state: "error", msg: t("Choose a provider first.") }); return; }
+    const local = !!providerOf(p).local;
+    if (!key && !local) return;
+    addState.set({ state: "checking", msg: "" });
+    try {
+      const found = await listModels(p, key);
+      if (untrack(list).some((k) => k.provider === p && k.key === key)) { addState.set({ state: "error", msg: t("This key is already saved.") }); return; }
+      const k = await props.keys.add(p, key, untrack(draftLabel));
+      await remember(p, found);
+      adding.set(false); addState.set(null);
+      if (untrack(filter) !== "all") filter.set(p);
+      setState(k.id, { state: "ok", msg: t`${found.length} models` });
+      changed();
+    } catch (e) { addState.set({ state: "error", msg: errText(e) }); }
+  };
+  const retest = async (k: AiKey): Promise<void> => {
+    setState(k.id, { state: "checking", msg: "" });
+    try { const found = await listModels(k.provider, k.key); await remember(k.provider, found); setState(k.id, { state: "ok", msg: t`${found.length} models` }); }
+    catch (e) { setState(k.id, { state: "error", msg: errText(e) }); }
+  };
+  const remove = async (k: AiKey): Promise<void> => { confirmDel.set(null); await props.keys.remove(k.id); setState(k.id, null); changed(); };
+  const activate = async (k: AiKey): Promise<void> => { await props.keys.activate(k.id); changed(); };
+  const setDefault = async (p: string): Promise<void> => { settings.set(await props.keys.saveSettings({ provider: p })); props.onChange?.(); };
+  const setModel = async (p: string, m: string): Promise<void> => { const s = untrack(settings); settings.set(await props.keys.saveSettings({ models: { ...s.models, [p]: m } })); props.onChange?.(); };
+  const activeOf = (p: string): string | undefined => settings().active[p] ?? list().find((k) => k.provider === p)?.id;
   const changePass = async (): Promise<void> => {
     passMsg.set("");
     if (passStrength(newPass()) < 2) { passMsg.set(t("Choose a longer passphrase: 10+ characters, letters and digits (a short sentence is best).")); return; }
-    try { await props.vault.changePassphrase(oldPass(), newPass()); oldPass.set(""); newPass.set(""); changing.set(false); passMsg.set(t("The passphrase is changed.")); }
+    try { await props.vault.changePassphrase(oldPass(), newPass(), { hint: newHint() }); oldPass.set(""); newPass.set(""); newHint.set(""); changing.set(false); passMsg.set(t("The passphrase is changed.")); }
     catch (e) { passMsg.set(errText(e)); }
   };
-  const hint = (id: string): string => {
-    const k = draft()[id] ?? "", like = k.length > 6 ? keyLooksLike(k) : null;
-    return like && like !== id ? t`This looks like a ${providerOf(like).name} key.` : "";
+  const hint = (): string => {
+    const k = draftKey(), like = k.length > 6 ? keyLooksLike(k) : null, p = addFor();
+    return like && p && like !== p ? t`This looks like a ${providerOf(like).name} key.` : "";
   };
+  const nameOf = (k: AiKey): string => k.label || t`Key ${list().filter((x) => x.provider === k.provider).indexOf(k) + 1}`;
   return (
     <div class="m-ai-keys">
       <If when={() => props.vault.state() === "unlocked"}>
         <div class="m-ai-keys-bar">
-          <StatusDot tone="success" label={t("Vault open")} />
-          <span class="m-ai-keys-note">{t("Keys stay encrypted in this browser; usage is billed to your own accounts.")}</span>
+          <Select class="m-ai-keys-filter" aria-label={t("Provider")} placeholder={false} options={filterOptions()} value={filter()} onChange={(v) => { filter.set(String(v ?? "all")); if (adding()) startAdd(); }} />
+          <Button size="sm" variant="primary" icon={plus} onClick={startAdd}>{t("Add")}</Button>
           <span class="m-app-fill" />
           <Button size="sm" variant="ghost" onClick={() => changing.set(!changing())}>{t("Change passphrase")}</Button>
-          <Button size="sm" icon={lock} onClick={() => props.vault.lock()}>{t("Lock")}</Button>
+          <IconButton icon={lock} label={t("Lock")} onClick={() => props.vault.lock()} />
         </div>
         <If when={() => changing()}>
           <div class="m-ai-keys-pass">
             <PasswordInput value={oldPass} autocomplete="current-password" placeholder={t("Current passphrase")} />
             <PasswordInput value={newPass} autocomplete="new-password" placeholder={t("New passphrase")} />
+            <TextInput value={newHint} placeholder={t("Hint (optional)")} aria-label={t("Hint (optional)")} />
             <Button size="sm" variant="primary" onClick={() => void changePass()}>{t("Change")}</Button>
           </div>
         </If>
-        <If when={() => passMsg()}><p class="m-vault-note" role="status">{() => passMsg()}</p></If>
-        <ul class="m-ai-keys-list">
-          <For each={PROVIDERS} key="id">{(p: () => AiProvider) => {
-            const id = p().id;
-            const r = (): Row => row(id);
-            return (
-              <li class="m-ai-key" class:is-set={() => r().has} class:is-default={() => settings().provider === id}>
-                <div class="m-ai-key-head">
-                  <StatusDot tone={() => (r().state === "error" ? "danger" : r().has ? "success" : "neutral")} pulse={() => r().state === "checking"} />
-                  <strong class="m-ai-key-name">{p().name}</strong>
-                  <If when={() => settings().provider === id}><span class="m-ai-key-badge">{t("default")}</span></If>
-                  <If when={() => r().has}><code class="m-ai-key-mask">{() => r().masked}</code></If>
-                  <span class="m-app-fill" />
-                  <a class="m-ai-key-get" href={p().keyUrl} target="_blank" rel="noopener noreferrer">{t("Get a key")} {glyph(externalLink)}</a>
-                </div>
-                <If when={() => r().has}>
-                  <div class="m-ai-key-tools">
-                    <Select class="m-ai-key-model" aria-label={t("Model")} options={r().models} value={settings().models[id] ?? r().models[0] ?? null} onChange={(m) => { if (m) void setModel(id, String(m)); }} />
-                    <IconButton icon={refresh} label={t("Check the key")} disabled={() => r().state === "checking"} onClick={() => void retest(id)} />
-                    <If when={() => settings().provider !== id}><Button size="sm" variant="ghost" icon={check} onClick={() => void setDefault(id)}>{t("Make default")}</Button></If>
-                    <IconButton icon={trash} label={t("Remove the key")} variant="danger" onClick={() => void remove(id)} />
-                  </div>
-                  <Else>
-                    <div class="m-ai-key-tools" onKeyDown={(e: KeyboardEvent) => { if (e.key === "Enter" && (e.target as Element).tagName === "INPUT") save(id); }}>
-                      <PasswordInput class="m-ai-key-input" value={draft()[id] ?? ""} onChange={(v) => draft.set({ ...untrack(draft), [id]: v })}
-                        placeholder={p().keyPrefix ? `${p().keyPrefix}…` : t("API key")} autocomplete="off" aria-label={t`${p().name} API key`}
-                      />
-                      <Button size="sm" variant="primary" loading={() => r().state === "checking"} disabled={() => !(draft()[id] ?? "").trim()} onClick={() => save(id)}>{t("Check and save")}</Button>
-                    </div>
-                  </Else>
-                </If>
-                <If when={() => hint(id)}><p class="m-ai-key-msg is-warn">{() => hint(id)}</p></If>
-                <If when={() => r().msg}><p class="m-ai-key-msg" class:is-error={() => r().state === "error"} role={r().state === "error" ? "alert" : "status"}>{() => r().msg}</p></If>
-              </li>
-            );
-          }}</For>
-        </ul>
+        <If when={() => passMsg()}><p class="m-vault-note m-ai-keys-msg" role="status">{() => passMsg()}</p></If>
+        <If when={() => adding()}>
+          <form class="m-ai-add" onSubmit={(e: Event) => { e.preventDefault(); void save(); }}>
+            <div class="m-ai-add-row">
+              <If when={() => filter() === "all"}>
+                <Select class="m-ai-add-provider" aria-label={t("Provider")} placeholder={t("Choose a provider")} options={PROVIDERS.map((p) => ({ value: p.id, label: p.name }))} value={addFor()} onChange={(v) => addFor.set(v ? String(v) : null)} />
+              </If>
+              <TextInput class="m-ai-add-label" value={draftLabel} placeholder={t("Name (optional): work, personal…")} aria-label={t("Name")} />
+            </div>
+            <div class="m-ai-add-row">
+              <PasswordInput class="m-ai-add-key" value={draftKey} autocomplete="off" aria-label={t("API key")}
+                placeholder={addFor() && providerOf(addFor()!).local ? t("No key needed (optional)") : addFor() && providerOf(addFor()!).keyPrefix ? `${providerOf(addFor()!).keyPrefix}…` : t("API key")} />
+              <Button size="sm" variant="primary" type="submit" loading={() => addState()?.state === "checking"}
+                disabled={() => !addFor() || (!draftKey().trim() && !providerOf(addFor()!).local)}>{() => (addFor() && providerOf(addFor()!).local ? t("Connect") : t("Check and save"))}</Button>
+              <Button size="sm" variant="ghost" onClick={() => adding.set(false)}>{t("Cancel")}</Button>
+            </div>
+            <If when={() => addFor()}>
+              <p class="m-ai-key-msg">
+                <a class="m-ai-key-get" href={providerOf(addFor()!).keyUrl} target="_blank" rel="noopener noreferrer">{() => (providerOf(addFor()!).local ? t("Download") : t("Get a key"))} {glyph(externalLink)}</a>
+                {() => (providerOf(addFor()!).hint ? ` · ${t(providerOf(addFor()!).hint!)}` : "")}
+              </p>
+            </If>
+            <If when={() => hint()}><p class="m-ai-key-msg is-warn">{() => hint()}</p></If>
+            <If when={() => addState()?.msg}><p class="m-ai-key-msg" class:is-error={addState()?.state === "error"} role="alert">{() => addState()?.msg}</p></If>
+          </form>
+        </If>
+        <If when={() => groups().length} fallback={() => (
+          <div class="m-ai-keys-empty">
+            <p class="m-vault-note">{t("No keys yet. Add one: requests go from this browser straight to the provider and are billed to your account.")}</p>
+            <Button variant="primary" icon={plus} onClick={startAdd}>{t("Add a key")}</Button>
+          </div>
+        )}>
+          <div class="m-ai-groups">
+            <For each={groups} key="id">{(gp: () => AiProvider) => {
+              const p = gp().id;
+              const keysOf = computed(() => list().filter((k) => k.provider === p));
+              return (
+                <section class="m-ai-group" class:is-default={settings().provider === p}>
+                  <header class="m-ai-group-head">
+                    <strong class="m-ai-key-name">{gp().name}</strong>
+                    <If when={() => settings().provider === p}><span class="m-ai-key-badge">{t("default")}</span></If>
+                    <span class="m-app-fill" />
+                    <If when={() => keysOf().length}>
+                      <Select class="m-ai-key-model" aria-label={t("Model")} placeholder={false} options={modelsOf(p)} value={settings().models[p] ?? modelsOf(p)[0] ?? null} onChange={(m) => { if (m) void setModel(p, String(m)); }} />
+                      <If when={() => settings().provider !== p}><Button size="sm" variant="ghost" icon={check} onClick={() => void setDefault(p)}>{t("Make default")}</Button></If>
+                    </If>
+                    <a class="m-ai-key-get" href={gp().keyUrl} target="_blank" rel="noopener noreferrer">{gp().local ? t("Download") : t("Get a key")} {glyph(externalLink)}</a>
+                  </header>
+                  <If when={() => keysOf().length} fallback={() => <p class="m-ai-key-msg">{gp().hint ? t(gp().hint!) : t("No key for this provider yet.")}</p>}>
+                    <ul class="m-ai-key-list">
+                      <For each={keysOf} key="id">{(k: () => AiKey) => {
+                        const st = (): KeyState | undefined => states()[k().id];
+                        const used = (): boolean => activeOf(p) === k().id;
+                        return (
+                          <li class="m-ai-key" class:is-used={used()}>
+                            <StatusDot tone={st()?.state === "error" ? "danger" : used() ? "success" : "neutral"} pulse={st()?.state === "checking"} />
+                            <span class="m-ai-key-label">{() => nameOf(k())}</span>
+                            <code class="m-ai-key-mask">{() => (k().key ? maskKey(k().key) : t("no key"))}</code>
+                            <If when={() => used() && keysOf().length > 1}><span class="m-ai-key-badge">{t("in use")}</span></If>
+                            <span class="m-app-fill" />
+                            <If when={() => !used()}><Button size="sm" variant="ghost" onClick={() => void activate(k())}>{t("Use")}</Button></If>
+                            <IconButton icon={refresh} label={t("Check the key")} disabled={st()?.state === "checking"} onClick={() => void retest(k())} />
+                            <If when={() => confirmDel() === k().id} fallback={() => <IconButton icon={trash} label={t("Remove the key")} onClick={() => confirmDel.set(k().id)} />}>
+                              <Button size="sm" variant="danger" onClick={() => void remove(k())}>{t("Remove?")}</Button>
+                              <IconButton icon={xIcon} label={t("Cancel")} onClick={() => confirmDel.set(null)} />
+                            </If>
+                            <If when={() => st()?.msg}><p class="m-ai-key-msg" class:is-error={st()?.state === "error"} role={st()?.state === "error" ? "alert" : "status"}>{() => st()?.msg}</p></If>
+                          </li>
+                        );
+                      }}</For>
+                    </ul>
+                  </If>
+                </section>
+              );
+            }}</For>
+          </div>
+        </If>
         <Else><VaultGate vault={props.vault} /></Else>
       </If>
     </div>
@@ -282,7 +367,7 @@ const k = (n: number): string => (n >= 1000 ? `${(n / 1000).toFixed(n >= 10_000 
 /** The AI chat about the open file. */
 export function AiChatPanel(props: AiChatProps) {
   const msgs = signal<Msg[]>([]), input = signal(""), busy = signal(false), consentFor = signal<string | null>(null);
-  const settings = signal<AiSettings>({ models: {}, consent: {} }), configured = signal<string[]>([]), withCode = signal(true);
+  const settings = signal<AiSettings>({ models: {}, consent: {}, active: {} }), configured = signal<string[]>([]), withCode = signal(true);
   let stop: AbortController | null = null, pending: [string, string | undefined] | null = null, list!: HTMLElement;
   const load = async (): Promise<void> => {
     if (props.vault.state() !== "unlocked") return;

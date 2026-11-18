@@ -1,11 +1,12 @@
-// march/ai — the user's own AI: chat with Claude, ChatGPT, Gemini, DeepSeek, Kimi, Mistral, Groq, OpenRouter or Meta (Muse) straight
-// from the browser with the user's API key (the user's account pays; nothing goes through a server of the app). The
-// keys live in a march/vault; a request carries the key in a header (never in the URL), streams the answer and reports
-// the tokens it used.
+// march/ai — the user's own AI: chat with Claude, ChatGPT, Gemini, Grok, DeepSeek, Qwen, GLM, Kimi, Mistral, Meta (Muse),
+// Groq, Cerebras, Together, Fireworks, OpenRouter, Perplexity, or a model on the user's own computer (Ollama, LM Studio)
+// straight from the browser with the user's API key (the user's account pays; nothing goes through a server of the app).
+// The keys live in a march/vault (several per provider, one active); a request carries the key in a header (never in
+// the URL), streams the answer and reports the tokens it used.
 //
 //   import { chat, PROVIDERS, aiKeys } from "march/ai";
 //   const keys = aiKeys(vault);                        // vault: an unlocked march/vault
-//   await keys.set("anthropic", "sk-ant-…");
+//   await keys.add("anthropic", "sk-ant-…", "work");    // more keys per provider; the active one is used
 //   const r = await chat({ provider: "anthropic", key: await keys.get("anthropic"), model: "claude-sonnet-5-5",
 //     messages: [{ role: "user", content: "Hi" }], onText: (d) => out.append(d) });
 //   r.text; r.usage;                                   // { input, output } tokens
@@ -31,9 +32,13 @@ export interface AiProvider {
   models: string[];
   /** Keeps the provider's model list to chat models. */
   chatModel?: (id: string) => boolean;
+  /** Runs on the user's computer: no key needed (one is sent when given), the server must allow this page's origin. */
+  local?: boolean;
+  /** A note for the user (where the key comes from, what to set up). */
+  hint?: string;
 }
 const notChat = /embed|tts|whisper|audio|image|dall-e|realtime|transcribe|moderation|search|rerank|guard|ocr|vision-preview|computer-use/i;
-/** The providers march/ai talks to: Claude, ChatGPT, Gemini, DeepSeek, Kimi, Mistral, Groq, OpenRouter, Meta (Muse). */
+/** The providers march/ai talks to: the clouds' own APIs, the hosts of open models, and the user's own computer. */
 export const PROVIDERS: AiProvider[] = [
   { id: "anthropic", name: "Claude (Anthropic)", kind: "anthropic", base: "https://api.anthropic.com/v1", origin: "https://api.anthropic.com", keyUrl: "https://console.anthropic.com/settings/keys", keyPrefix: "sk-ant-", models: ["claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5"] },
   { id: "openai", name: "ChatGPT (OpenAI)", kind: "openai", base: "https://api.openai.com/v1", origin: "https://api.openai.com", keyUrl: "https://platform.openai.com/api-keys", keyPrefix: "sk-", models: [], chatModel: (m) => /^(gpt|o\d|chatgpt)/.test(m) && !notChat.test(m) },
@@ -45,6 +50,18 @@ export const PROVIDERS: AiProvider[] = [
   { id: "openrouter", name: "OpenRouter", kind: "openai", base: "https://openrouter.ai/api/v1", origin: "https://openrouter.ai", keyUrl: "https://openrouter.ai/settings/keys", keyPrefix: "sk-or-", models: [], chatModel: (m) => !notChat.test(m) },
   // Meta Model API (Muse Spark…): OpenAI-compatible; in public preview, the account and its region decide access
   { id: "meta", name: "Meta (Muse)", kind: "openai", base: "https://api.meta.ai/v1", origin: "https://api.meta.ai", keyUrl: "https://dev.meta.ai", models: [], chatModel: (m) => !notChat.test(m) },
+  { id: "xai", name: "Grok (xAI)", kind: "openai", base: "https://api.x.ai/v1", origin: "https://api.x.ai", keyUrl: "https://console.x.ai", keyPrefix: "xai-", models: [], chatModel: (m) => /grok/.test(m) && !notChat.test(m) },
+  { id: "qwen", name: "Qwen (Alibaba Cloud)", kind: "openai", base: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1", origin: "https://dashscope-intl.aliyuncs.com", keyUrl: "https://modelstudio.console.alibabacloud.com/", keyPrefix: "sk-", models: ["qwen-max", "qwen-plus", "qwen-turbo"], chatModel: (m) => /qwen/i.test(m) && !notChat.test(m) },
+  { id: "zai", name: "GLM (Z.ai)", kind: "openai", base: "https://api.z.ai/api/paas/v4", origin: "https://api.z.ai", keyUrl: "https://z.ai/manage-apikey/apikey-list", models: ["glm-4.6", "glm-4.5-air"], chatModel: (m) => /glm/i.test(m) && !notChat.test(m) },
+  { id: "together", name: "Together AI", kind: "openai", base: "https://api.together.xyz/v1", origin: "https://api.together.xyz", keyUrl: "https://api.together.ai/settings/api-keys", models: [], chatModel: (m) => !notChat.test(m) },
+  { id: "fireworks", name: "Fireworks", kind: "openai", base: "https://api.fireworks.ai/inference/v1", origin: "https://api.fireworks.ai", keyUrl: "https://fireworks.ai/account/api-keys", keyPrefix: "fw_", models: [], chatModel: (m) => !notChat.test(m) },
+  { id: "cerebras", name: "Cerebras", kind: "openai", base: "https://api.cerebras.ai/v1", origin: "https://api.cerebras.ai", keyUrl: "https://cloud.cerebras.ai", keyPrefix: "csk-", models: [], chatModel: (m) => !notChat.test(m) },
+  { id: "perplexity", name: "Perplexity (Sonar)", kind: "openai", base: "https://api.perplexity.ai", origin: "https://api.perplexity.ai", keyUrl: "https://www.perplexity.ai/account/api/keys", keyPrefix: "pplx-", models: ["sonar", "sonar-pro", "sonar-reasoning-pro"] },
+  // a model on the user's own computer: no key, nothing leaves the machine; the server must allow this page's origin
+  { id: "ollama", name: "Ollama (local)", kind: "openai", base: "http://localhost:11434/v1", origin: "http://localhost:11434", keyUrl: "https://ollama.com/download", models: [], local: true,
+    hint: "Ollama must allow this page: start it with OLLAMA_ORIGINS set to this site's address (or *)." },
+  { id: "lmstudio", name: "LM Studio (local)", kind: "openai", base: "http://localhost:1234/v1", origin: "http://localhost:1234", keyUrl: "https://lmstudio.ai", models: [], local: true,
+    hint: "In LM Studio: Developer › start the server and turn on CORS." },
 ];
 /** A provider by id ("anthropic", "openai"…); throws for an unknown one. */
 export const provider = (id: string): AiProvider => {
@@ -96,7 +113,7 @@ const send = async (url: string, init: RequestInit, p: AiProvider): Promise<Resp
   try { res = await fetch(url, { ...init, credentials: "omit", referrerPolicy: "no-referrer", cache: "no-store" }); }
   catch (e) {
     if ((e as Error)?.name === "AbortError") throw new AiError("abort", "Durduruldu");
-    throw new AiError("network", `${p.name}: bağlanılamadı (ağ ya da sayfanın izinleri: connect-src ${p.origin})`);
+    throw new AiError("network", p.local ? `${p.name}: bağlanılamadı (çalışıyor mu, bu sayfaya izin veriyor mu?)` : `${p.name}: bağlanılamadı (ağ ya da sayfanın izinleri: connect-src ${p.origin})`);
   }
   if (!res.ok) await fail(res, p);
   return res;
@@ -104,7 +121,7 @@ const send = async (url: string, init: RequestInit, p: AiProvider): Promise<Resp
 const headers = (p: AiProvider, key: string): Record<string, string> =>
   p.kind === "anthropic" ? { "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true", "content-type": "application/json" }
   : p.kind === "gemini" ? { "x-goog-api-key": key, "content-type": "application/json" }
-  : { authorization: `Bearer ${key}`, "content-type": "application/json", ...(p.id === "openrouter" ? { "x-title": "MarchIDE" } : {}) };
+  : { ...(key ? { authorization: `Bearer ${key}` } : {}), "content-type": "application/json", ...(p.id === "openrouter" ? { "x-title": "MarchIDE" } : {}) };
 
 /** The data lines of a server-sent event stream (one parsed JSON per event; "[DONE]" ends it). */
 export async function* sseEvents(res: Response): AsyncGenerator<Record<string, unknown>> {
@@ -130,7 +147,7 @@ type J = Record<string, any>; // eslint-disable-line @typescript-eslint/no-expli
 /** Sends a chat and streams the answer (onText); resolves with the whole answer and the tokens used. */
 export async function chat(r: ChatRequest): Promise<ChatResult> {
   const p = provider(r.provider);
-  if (!r.key) throw new AiError("auth", `${p.name}: API anahtarı yok`);
+  if (!r.key && !p.local) throw new AiError("auth", `${p.name}: API anahtarı yok`);
   const max = r.maxTokens ?? 4096, usage: Usage = { input: 0, output: 0 };
   let text = "", stop: string | undefined, model = r.model;
   const add = (d: string): void => { if (!d) return; text += d; r.onText?.(d, text); };
@@ -193,11 +210,17 @@ export async function chat(r: ChatRequest): Promise<ChatResult> {
 /** The provider's chat models for this key (also a check that the key works: it throws "auth" when it does not). */
 export async function listModels(id: string, key: string, signal?: AbortSignal): Promise<string[]> {
   const p = provider(id);
-  const res = await send(p.kind === "gemini" ? `${p.base}/models?pageSize=200` : `${p.base}/models${p.kind === "anthropic" ? "?limit=100" : ""}`, { headers: headers(p, key), ...(signal ? { signal } : {}) }, p);
+  let res: Response;
+  try { res = await send(p.kind === "gemini" ? `${p.base}/models?pageSize=200` : `${p.base}/models${p.kind === "anthropic" ? "?limit=100" : ""}`, { headers: headers(p, key), ...(signal ? { signal } : {}) }, p); }
+  catch (e) {
+    // a provider without a model list (it answers 404): the known models (the key was not refused)
+    if (e instanceof AiError && e.status === 404 && p.models.length) return [...p.models];
+    throw e;
+  }
   const j = await res.json() as J;
   let ids: string[] = p.kind === "gemini"
     ? (j.models ?? []).filter((m: J) => (m.supportedGenerationMethods ?? []).includes("generateContent")).map((m: J) => String(m.name).replace(/^models\//, ""))
-    : (j.data ?? []).map((m: J) => String(m.id));
+    : (Array.isArray(j) ? j : j.data ?? []).map((m: J) => String(m.id));
   if (p.chatModel) ids = ids.filter(p.chatModel);
   // the provider's order (newest first for Anthropic); the others: by name, newest-looking first
   return p.kind === "anthropic" ? ids : ids.sort((a, b) => b.localeCompare(a, "en", { numeric: true }));
@@ -206,30 +229,95 @@ export async function listModels(id: string, key: string, signal?: AbortSignal):
 /** A key that looks like another provider's (a hint before saving): the provider it looks like, or null. */
 export function keyLooksLike(key: string): string | null {
   const k = key.trim();
-  for (const id of ["anthropic", "openrouter", "groq", "gemini"]) if (k.startsWith(provider(id).keyPrefix!)) return id;
+  for (const id of ["anthropic", "openrouter", "groq", "gemini", "xai", "perplexity", "fireworks", "cerebras"]) if (k.startsWith(provider(id).keyPrefix!)) return id;
   return null;
 }
 /** A key shown safely: its start and its last four characters. */
 export const maskKey = (key: string): string => (key.length <= 12 ? "•".repeat(key.length) : `${key.slice(0, Math.min(7, key.indexOf("-", 3) + 1 || 4))}…${key.slice(-4)}`);
 
-export interface AiSettings { provider?: string; models: Record<string, string>; consent: Record<string, boolean> }
+export interface AiSettings {
+  provider?: string;
+  models: Record<string, string>;
+  consent: Record<string, boolean>;
+  /** The key used for each provider (its id; the first key when not set). */
+  active: Record<string, string>;
+}
+/** A saved key: its provider, the user's own name for it, the key, when it was added. */
+export interface AiKey { id: string; provider: string; label: string; key: string; added: number }
 export interface AiKeys {
-  get(id: string): Promise<string | undefined>;
-  set(id: string, key: string): Promise<void>;
+  /** The keys, in the providers' order (then oldest first); `provider` keeps that provider's. */
+  list(provider?: string): Promise<AiKey[]>;
+  /** Saves a key for a provider (a name of the user's: "work", "personal"…); the provider's first key becomes active. */
+  add(provider: string, key: string, label?: string): Promise<AiKey>;
+  rename(id: string, label: string): Promise<void>;
+  /** Removes a key; when it was the active one, the provider's next key is. */
   remove(id: string): Promise<void>;
+  /** Makes a key the one its provider uses. */
+  activate(id: string): Promise<void>;
+  /** The key a provider uses now (its active one), or undefined. */
+  get(provider: string): Promise<string | undefined>;
   /** The providers that have a key. */
   configured(): Promise<string[]>;
   settings(): Promise<AiSettings>;
   saveSettings(s: Partial<AiSettings>): Promise<AiSettings>;
 }
-/** The AI keys kept in a vault ("ai:key:<provider>"), and the choices (default provider, model per provider, consent). */
+const order = (p: string): number => { const i = PROVIDERS.findIndex((x) => x.id === p); return i < 0 ? PROVIDERS.length : i; };
+const rid = (): string => Array.from(globalThis.crypto.getRandomValues(new Uint8Array(6)), (b) => b.toString(16).padStart(2, "0")).join("");
+/**
+ * The AI keys kept in a vault ("ai:key:<provider>:<id>"), and the choices (default provider, model and active key per
+ * provider, consent). A key saved by the first version ("ai:key:<provider>", one per provider) is moved over when read.
+ */
 export function aiKeys(vault: Vault): AiKeys {
+  type Stored = { key: string; label: string; added: number };
+  const migrate = async (): Promise<void> => {
+    for (const n of await vault.names("ai:key:")) {
+      const rest = n.slice(7);
+      if (rest.includes(":")) continue;
+      const key = await vault.get<string>(n);
+      if (typeof key === "string" && key) await vault.set(`ai:key:${rest}:${rid()}`, { key, label: "", added: Date.now() } satisfies Stored);
+      await vault.remove(n);
+    }
+  };
+  let migrated: Promise<void> | null = null;
+  const ready = (): Promise<void> => (migrated ??= migrate().catch((e) => { migrated = null; throw e; }));
   const self: AiKeys = {
-    get: (id) => vault.get<string>(`ai:key:${id}`),
-    set: (id, key) => vault.set(`ai:key:${id}`, key.trim()),
-    remove: (id) => vault.remove(`ai:key:${id}`),
-    configured: async () => (await vault.names("ai:key:")).map((n) => n.slice(7)),
-    settings: async () => ({ models: {}, consent: {}, ...(await vault.get<AiSettings>("ai:settings")) }),
+    async list(p) {
+      await ready();
+      const out: AiKey[] = [];
+      for (const n of await vault.names(p ? `ai:key:${p}:` : "ai:key:")) {
+        const [, , prov, id] = n.split(":");
+        const v = await vault.get<Stored>(n);
+        if (prov && id && v) out.push({ id: `${prov}:${id}`, provider: prov, label: v.label ?? "", key: v.key, added: v.added ?? 0 });
+      }
+      return out.sort((a, b) => order(a.provider) - order(b.provider) || a.added - b.added);
+    },
+    async add(p, key, label = "") {
+      provider(p);
+      await ready();
+      const id = `${p}:${rid()}`, k: AiKey = { id, provider: p, label: label.trim(), key: key.trim(), added: Date.now() };
+      await vault.set(`ai:key:${id}`, { key: k.key, label: k.label, added: k.added } satisfies Stored);
+      const s = await self.settings();
+      if (!s.active[p]) await self.saveSettings({ active: { ...s.active, [p]: id }, ...(s.provider ? {} : { provider: p }) });
+      return k;
+    },
+    async rename(id, label) { const v = await vault.get<Stored>(`ai:key:${id}`); if (v) await vault.set(`ai:key:${id}`, { ...v, label: label.trim() }); },
+    async remove(id) {
+      await vault.remove(`ai:key:${id}`);
+      const p = id.split(":")[0]!, s = await self.settings();
+      if (s.active[p] === id || s.provider === p) {
+        const next = (await self.list(p))[0], active = { ...s.active };
+        if (next) active[p] = next.id; else delete active[p];
+        const def = s.provider === p && !next ? (await self.configured())[0] : s.provider;
+        await vault.set("ai:settings", { ...s, active, provider: def });
+      }
+    },
+    async activate(id) { const s = await self.settings(); await self.saveSettings({ active: { ...s.active, [id.split(":")[0]!]: id } }); },
+    async get(p) {
+      const list = await self.list(p), s = await self.settings();
+      return (list.find((k) => k.id === s.active[p]) ?? list[0])?.key;
+    },
+    configured: async () => [...new Set((await self.list()).map((k) => k.provider))],
+    settings: async () => ({ models: {}, consent: {}, active: {}, ...(await vault.get<Partial<AiSettings>>("ai:settings")) }) as AiSettings,
     async saveSettings(s) { const next = { ...(await self.settings()), ...s }; await vault.set("ai:settings", next); return next; },
   };
   return self;

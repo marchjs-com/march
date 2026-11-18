@@ -33,11 +33,20 @@ export interface VaultOptions {
   shareTabs?: boolean;
   /** Keep the encrypted data in memory only (tests). */
   memory?: boolean;
+  /**
+   * Keep the passphrase's length (in characters) beside the vault, so an unlock form can try it the moment that many
+   * characters are typed (no button). It tells someone who copies the disk only how long it is. Default true.
+   */
+  rememberLength?: boolean;
 }
+/** What may be shown before the vault is open: the passphrase's length (when kept) and the user's hint. */
+export interface VaultInfo { length?: number; hint?: string }
+/** A passphrase's length as the vault counts it (characters, after NFC normalization). */
+export const passLength = (passphrase: string): number => [...passphrase.normalize("NFC")].length;
 /** Why a call failed: "locked" (unlock first), "exists" (create on an existing vault), "short" (passphrase), "wait" (too many wrong tries: `retryIn` ms). */
 export class VaultError extends Error {
-  /** Why it failed (the kinds above, and "missing": no vault yet, "wrong": the current passphrase is wrong). */
-  code: "locked" | "exists" | "missing" | "short" | "wait" | "wrong";
+  /** Why it failed (the kinds above, and "missing": no vault yet, "wrong": the current passphrase is wrong, "hint": the hint gives the passphrase away). */
+  code: "locked" | "exists" | "missing" | "short" | "wait" | "wrong" | "hint";
   /** With "wait": ms until the next try is allowed. */
   retryIn: number;
   constructor(code: VaultError["code"], message: string, retryIn = 0) { super(message); this.name = "VaultError"; this.code = code; this.retryIn = retryIn; }
@@ -47,8 +56,10 @@ export interface Vault {
   state: Accessor<VaultState>;
   /** Ms until the next unlock try is allowed (0: now); live. */
   waitMs: Accessor<number>;
-  /** Makes a new vault with this passphrase and opens it. */
-  create(passphrase: string): Promise<void>;
+  /** The passphrase's length (when kept) and its hint; live. */
+  info: Accessor<VaultInfo>;
+  /** Makes a new vault with this passphrase (and a hint, stored as written: never the passphrase itself) and opens it. */
+  create(passphrase: string, o?: { hint?: string }): Promise<void>;
   /** Opens the vault: false when the passphrase is wrong (throws "wait" while tries are slowed down). */
   unlock(passphrase: string): Promise<boolean>;
   /** Forgets the keys (here and in the other tabs). */
@@ -62,14 +73,14 @@ export interface Vault {
   /** A value kept current for a component: undefined while locked or missing. */
   value<T = unknown>(name: string): Accessor<T | undefined>;
   /** Changes the passphrase (the data stays; only its key is wrapped again). */
-  changePassphrase(current: string, next: string): Promise<void>;
+  changePassphrase(current: string, next: string, o?: { hint?: string }): Promise<void>;
   /** Deletes the vault and everything in it (a forgotten passphrase: there is no other way back). */
   reset(): Promise<void>;
   /** Counts as use (holds off the auto-lock). */
   touch(): void;
 }
 
-interface Meta { v: 1; salt: Uint8Array; iterations: number; wrapIv: Uint8Array; dek: ArrayBuffer; macIv: Uint8Array; mac: ArrayBuffer; fails: number; until: number }
+interface Meta { v: 1; salt: Uint8Array; iterations: number; wrapIv: Uint8Array; dek: ArrayBuffer; macIv: Uint8Array; mac: ArrayBuffer; fails: number; until: number; len?: number; hint?: string }
 interface Item { id: string; iv: Uint8Array; data: ArrayBuffer }
 interface Keys { dek: CryptoKey; mac: CryptoKey }
 
@@ -110,7 +121,15 @@ export function createVault(opts: VaultOptions = {}): Vault {
   if (known) return known;
   const db: Db = openDb(`march-vault:${name}`, { version: 1, ...(opts.memory ? { memory: true } : {}), stores: { meta: {}, items: { key: "id" } } });
   const meta = db.store<Meta>("meta"), items = db.store<Item>("items");
-  const state = signal<VaultState>("loading"), waitMs = signal(0), changed = signal(0);
+  const state = signal<VaultState>("loading"), waitMs = signal(0), changed = signal(0), info = signal<VaultInfo>({});
+  const infoOf = (m: Meta | undefined): VaultInfo => (m ? { ...(m.len ? { length: m.len } : {}), ...(m.hint ? { hint: m.hint } : {}) } : {});
+  /** The length and hint kept with a passphrase (checked: a hint must not give the passphrase away). */
+  const extra = (passphrase: string, hint?: string): { len?: number; hint?: string } => {
+    const h = hint?.trim() ?? "", p = passphrase.normalize("NFC").toLocaleLowerCase();
+    if (h && (h.normalize("NFC").toLocaleLowerCase().includes(p) || (p.length >= 4 && h.toLocaleLowerCase().includes(p.slice(0, Math.ceil(p.length * 0.6))))))
+      throw new VaultError("hint", "march/vault: the hint gives the passphrase away");
+    return { ...(opts.rememberLength !== false ? { len: passLength(passphrase) } : {}), ...(h ? { hint: h.slice(0, 200) } : {}) };
+  };
   let keys: Keys | null = null, idle: ReturnType<typeof setTimeout> | undefined, waitTimer: ReturnType<typeof setTimeout> | undefined;
   const autoLock = opts.autoLock ?? 15 * 60_000, minLength = opts.minLength ?? 10;
 
@@ -120,6 +139,7 @@ export function createVault(opts: VaultOptions = {}): Vault {
   (ch as { unref?: () => void } | null)?.unref?.();
   const ready = (async () => {
     const m = await meta.get("meta");
+    info.set(infoOf(m));
     state.set(m ? "locked" : "new");
     if (m) showWait(m);
     if (m && ch) ch.postMessage({ t: "keys?" });
@@ -130,7 +150,8 @@ export function createVault(opts: VaultOptions = {}): Vault {
     else if (d.t === "keys?" && keys) ch.postMessage({ t: "keys", keys });
     else if (d.t === "keys" && !keys && d.keys && state.peek() === "locked") { keys = d.keys; state.set("unlocked"); arm(); changed.set(changed.peek() + 1); }
     else if (d.t === "changed") changed.set(changed.peek() + 1);
-    else if (d.t === "reset") { forget(); state.set("new"); }
+    else if (d.t === "reset") { forget(); info.set({}); state.set("new"); }
+    else if (d.t === "info") void meta.get("meta").then((m) => info.set(infoOf(m)));
   };
 
   const forget = (): void => { keys = null; clearTimeout(idle); if (state.peek() === "unlocked") state.set("locked"); changed.set(changed.peek() + 1); };
@@ -152,18 +173,19 @@ export function createVault(opts: VaultOptions = {}): Vault {
   const tell = (): void => { changed.set(changed.peek() + 1); ch?.postMessage({ t: "changed" }); };
 
   const self: Vault = {
-    name, state, waitMs,
-    async create(passphrase) {
+    name, state, waitMs, info,
+    async create(passphrase, o) {
       await ready;
       if (await meta.get("meta")) throw new VaultError("exists", "march/vault: the vault exists (unlock it, or reset)");
       if (passphrase.length < minLength) throw new VaultError("short", `march/vault: the passphrase needs ${minLength}+ characters`);
-      const iterations = opts.iterations ?? 600_000, salt = rand(16);
+      const iterations = opts.iterations ?? 600_000, salt = rand(16), more = extra(passphrase, o?.hint);
       const fresh: Keys = {
         dek: await subtle().generateKey(AES, true, ["encrypt", "decrypt"]) as CryptoKey,
         mac: await subtle().generateKey(HMAC, true, ["sign"]) as CryptoKey,
       };
-      const kek = await wrappingKey(passphrase, salt, iterations), m = await wrapInto(kek, fresh, { v: 1, salt, iterations, fails: 0, until: 0 });
+      const kek = await wrappingKey(passphrase, salt, iterations), m = await wrapInto(kek, fresh, { v: 1, salt, iterations, fails: 0, until: 0, ...more });
       await meta.put(m, "meta");
+      info.set(infoOf(m));
       // the keys kept in memory are the non-extractable copies
       keys = await unwrap(kek, m);
       state.set("unlocked"); arm(); tell();
@@ -222,23 +244,26 @@ export function createVault(opts: VaultOptions = {}): Vault {
       if (getOwner()) onCleanup(() => { seq++; });
       return acc;
     },
-    async changePassphrase(current, next) {
+    async changePassphrase(current, next, o) {
       await ready;
       if (next.length < minLength) throw new VaultError("short", `march/vault: the passphrase needs ${minLength}+ characters`);
+      const more = extra(next, o?.hint);
       const m = await meta.get("meta");
       if (!m) throw new VaultError("missing", "march/vault: no vault yet");
       let raw: Keys;
       try { raw = await unwrap(await wrappingKey(current, m.salt, m.iterations), m, true); }
       catch { throw new VaultError("wrong", "march/vault: the current passphrase is wrong"); }
       const salt = rand(16), iterations = Math.max(m.iterations, opts.iterations ?? 600_000);
-      await meta.put(await wrapInto(await wrappingKey(next, salt, iterations), raw, { v: 1, salt, iterations, fails: 0, until: 0 }), "meta");
+      const m2 = await wrapInto(await wrappingKey(next, salt, iterations), raw, { v: 1, salt, iterations, fails: 0, until: 0, ...more });
+      await meta.put(m2, "meta");
+      info.set(infoOf(m2)); ch?.postMessage({ t: "info" });
       arm();
     },
     async reset() {
       await ready;
       forget();
       await items.clear(); await meta.clear();
-      state.set("new"); waitMs.set(0);
+      info.set({}); state.set("new"); waitMs.set(0);
       ch?.postMessage({ t: "reset" });
       tell();
     },

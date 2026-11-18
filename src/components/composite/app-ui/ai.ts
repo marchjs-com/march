@@ -54,7 +54,15 @@ messages("tr", {
   "Too short": "Çok kısa", "Weak": "Zayıf", "Fair": "İdare eder", "Good": "İyi", "Strong": "Güçlü",
   "Explain": "Açıkla", "Fix": "Düzelt", "Write tests": "Test yaz", "Improve": "İyileştir",
   "Lock the vault": "Kasayı kilitle", "AI: explain the file": "AI: dosyayı açıkla", "AI: fix the file": "AI: dosyayı düzelt", "AI: write tests": "AI: test yaz",
-  "AI: ask about the selection": "AI: seçimi sor", "cached": "önbellekten", "The answer reached the length limit.": "Yanıt uzunluk sınırına ulaştı.", "Continue": "Devam et", "Open AI keys": "AI anahtarlarını aç", "Open the vault in AI keys; the chat is ready here as soon as it is open.": "Kasayı AI anahtarları sekmesinde aç; açılınca sohbet burada hazır olur.",
+  "AI: ask about the selection": "AI: seçimi sor", "cached": "önbellekten", "Hint (optional)": "İpucu (isteğe bağlı)", "Hint": "İpucu", "Something that reminds you, never the passphrase": "Sana hatırlatan bir şey; asla parolanın kendisi değil",
+  "Unlocking needs no button: it opens the moment the passphrase is typed in full (the vault keeps its length; the hint is shown above it, unencrypted).": "Açmak için düğmeye gerek yok: parola tam yazıldığı anda açılır (kasa uzunluğunu tutar; ipucu üstünde şifresiz görünür).",
+  "Checking…": "Denetleniyor…", "The hint gives the passphrase away: write something that only reminds you of it.": "İpucu parolayı ele veriyor: yalnız sana hatırlatan bir şey yaz.", "All ({0})": "Tümü ({0})", "Provider": "Sağlayıcı", "Add": "Ekle", "Choose a provider first.": "Önce bir sağlayıcı seç.",
+  "This key is already saved.": "Bu anahtar zaten kayıtlı.", "Choose a provider": "Sağlayıcı seç", "Name (optional): work, personal…": "Ad (isteğe bağlı): iş, kişisel…", "Name": "Ad",
+  "No key needed (optional)": "Anahtar gerekmez (isteğe bağlı)", "Connect": "Bağlan", "Download": "İndir",
+  "No keys yet. Add one: requests go from this browser straight to the provider and are billed to your account.": "Henüz anahtar yok. Bir tane ekle: istekler bu tarayıcıdan doğrudan sağlayıcıya gider, ücreti senin hesabından düşer.",
+  "No key for this provider yet.": "Bu sağlayıcıda henüz anahtar yok.", "Key {0}": "Anahtar {0}", "no key": "anahtarsız", "in use": "kullanılıyor", "Use": "Kullan", "Remove?": "Silinsin mi?",
+  "Ollama must allow this page: start it with OLLAMA_ORIGINS set to this site's address (or *).": "Ollama bu sayfaya izin vermeli: OLLAMA_ORIGINS bu sitenin adresi (ya da *) olarak başlat.",
+  "In LM Studio: Developer › start the server and turn on CORS.": "LM Studio'da: Developer › sunucuyu başlat ve CORS'u aç.", "The answer reached the length limit.": "Yanıt uzunluk sınırına ulaştı.", "Continue": "Devam et", "Open AI keys": "AI anahtarlarını aç", "Open the vault in AI keys; the chat is ready here as soon as it is open.": "Kasayı AI anahtarları sekmesinde aç; açılınca sohbet burada hazır olur.",
 });
 
 /** What the vault plugin provides (service "vault"): the vault and the AI keys in it. */
