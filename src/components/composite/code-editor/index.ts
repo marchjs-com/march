@@ -686,7 +686,19 @@ export function CodeEditor(props: CodeEditorProps): Element {
     if (item.again) ask(true);
   };
   /** The caret's place on screen: the same character in the coloured copy. */
-  const caretRect = (): DOMRect | null => { const d = done.peek(); return rectAt(d ? d.from : input.selectionStart ?? 0); };
+  const caretRect = (): DOMRect | null => {
+    const d = done.peek(), r = rectAt(d ? d.from : input.selectionStart ?? 0);
+    // the list opens under the line: its rows get the room left below it (they scroll inside); only with less than
+    // ~11 rows' room there does it go above
+    if (r) {
+      const vh = globalThis.document?.documentElement?.clientHeight || globalThis.innerHeight || 768;
+      const below = vh - r.bottom - 16, above = r.top - 16, room = below >= 180 ? below : Math.max(below, above);
+      globalThis.document?.documentElement?.style.setProperty("--m-ced-room", `${Math.round(Math.max(120, Math.min(room - 110, 420)))}px`);
+    }
+    return r;
+  };
+  // the room is known before the list is placed (it reads its own size first)
+  effect(() => { if (done()) untrack(caretRect); });
   /** A place of the text on screen (the same character in the coloured copy). */
   const rectAt = (at: number): DOMRect | null => {
     let left = at;

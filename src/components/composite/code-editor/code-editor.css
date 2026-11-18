@@ -67,6 +67,8 @@
 .m-ced-groups > * { flex: none; }
 .m-ced-none { color: var(--m-muted); font-size: var(--m-text-xs); }
 .m-ced-list { inline-size: min(26rem, calc(100vw - 16px)); font-family: var(--m-font-mono); }
+/* the rows scroll inside the room under the line (the editor sets --m-ced-room as it places the list) */
+.m-ced-list .m-option-list { max-block-size: var(--m-ced-room, 20rem); overflow-y: auto; overscroll-behavior: contain; }
 /* lineNumbers: a gutter at the start; each line's number (and its mark) sits at its line's start, the lit line's bar
    lies behind the text; the press area over the gutter takes the clicks (the text field keeps the rest) */
 .m-ced.is-gutter { --m-ced-gutter: 4em; }
