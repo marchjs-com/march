@@ -816,7 +816,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| AppUI | experimental | march-app-ui, the core of March IDE: a top bar (title, your tools, the Layout menu with presets, saved layouts and the panel list) over a DockLayout; plugins add file types (the code editor opens code files), panels, commands and services. | DockLayout, Menu, CodeEditor, ThemeMenu, Joined, Debugger, IconButton |
+| AppUI | experimental | march-app-ui, the core of March IDE: a top bar (title, your tools, the Layout menu with presets, saved layouts and the panel list) over a DockLayout; plugins add file types (the code editor opens code files), panels, commands and services. | DockLayout, Menu, CodeEditor, ThemeMenu, Joined, Debugger, IconButton, Button, PasswordInput, Textarea, Select, Alert, StatusDot, CodeView |
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText, ListRow, Drawer |
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, ReactionPicker, IconButton, StatusDot, ReplyQuote |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | ChatBubble, TypingIndicator, ReactionPicker, Avatar, Button, Picture |

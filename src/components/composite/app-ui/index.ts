@@ -24,6 +24,8 @@ export { marchLanguagePlugin } from "./march-lang.ts";
 export { AppPreview, PREVIEW_DEVICES } from "./preview.ts";
 export { typeScriptPlugin } from "./ts.ts";
 export { debuggerPlugin } from "./debug.ts";
+export { vaultPlugin, aiPlugin } from "./ai.ts";
+export type { VaultService, VaultPluginOptions, AiService, AiPluginOptions, AiContext } from "./ai.ts";
 export type { DebuggerService, GutterService, DebuggerPluginOptions } from "./debug.ts";
 export type { TypeScriptService, TypeScriptPluginOptions, CodeProblem, CodeReference, CodeSymbol, CodeInlay } from "./ts.ts";
 export type { AppPreviewProps, AppPreviewToolbar, AppPreviewDevice } from "./preview.ts";

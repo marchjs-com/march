@@ -30,6 +30,8 @@ export const MD_PENDING = new Set([
   "march/seo", "march/seo/hydrate", "march/managers/accessibility/ui",
   "march/managers/shortcut-hint", "march/managers/shortcut-hint/ui", "march/dom/safe",
   "march/dom/sanitize", "march/dom/to-markdown",
+  // the data layer (IndexedDB), the vault and the AI client: their pages come next
+  "march/db", "march/vault", "march/ai",
   // large components outside their category barrel (march/components/<category>/<name>)
   "march/components/composite/theme-editor", "march/components/data/data-grid",
   "march/components/data/gantt", "march/components/data/scheduler", "march/components/data/tree-view",

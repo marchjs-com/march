@@ -41,6 +41,8 @@ export const PENDING = new Set([
   "march/router", "march/seo/hydrate", "march/ui",
   // march-app-ui: the core is in, its pages come step by step
   "march/app-ui",
+  // the data layer (IndexedDB), the vault and the AI client: their examples come next
+  "march/db", "march/vault", "march/ai",
   // large components outside their category barrel (march/components/<category>/<name>)
   "march/components/composite/theme-editor", "march/components/data/data-grid",
   "march/components/data/gantt", "march/components/data/scheduler", "march/components/data/tree-view",

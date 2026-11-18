@@ -537,7 +537,9 @@
   "Widget": "Bir widget noktası çizer: `<Widget sources={[codeView]} input={{ source, lang: \"tsx\" }} />`.",
   "widgetPoint": "Bir widget noktası oluşturur (veya kimliğiyle getirir). `defaults` her zaman bulunur ve sonraki sağlayıcılarla eşitlikte kaybeder.",
   "Window": "Alanı içinde taşınır, boyutlanır pencere: kenara kenetlenir, küçülür, alanı kaplar, kapanır; HADİ, Mac ya da Windows görünümü.",
-  "Wizard": "Prop'lar: steps [{ title, description, fields?: [names], schema?: schema(), validate?(values) → {name: msg} | string | null, render?(form) → node }], schema (her adımın kendi şeması varsa isteğe bağlı), initial ve diğerleri."
+  "Wizard": "Prop'lar: steps [{ title, description, fields?: [names], schema?: schema(), validate?(values) → {name: msg} | string | null, render?(form) → node }], schema (her adımın kendi şeması varsa isteğe bağlı), initial ve diğerleri.",
+  "vaultPlugin": "Kullanıcının şifreli kasası (march/vault) ve \"AI anahtarları\" paneli: her sağlayıcıya bir anahtar, denenir, model seçilir.",
+  "aiPlugin": "AI paneli: açık dosya hakkında kullanıcının kendi anahtarıyla sohbet; açıkla, düzelt, test yaz komutları."
  },
  "march/components/registry.gen.ts": {
   "registry": "Her bileşen klasörü: meta, Kod sekmesi parçası ve tembel demo / oyun alanı yükleyicileri."
@@ -1334,5 +1336,28 @@
   "setActive": "Panelin sekmesini grubunda öne alır.",
   "singleLayout": "Bütün panelleri tek sekme grubunda toplayan düzen.",
   "zoneRects": "Grubun içindeki beş bırakma bölgesi."
+ },
+ "march/db": {
+  "openDb": "IndexedDB veritabanı açar: depolar, dizinler, sorgular, işlemler, canlı sorgular; IndexedDB yoksa bellekte çalışır.",
+  "compareKeys": "İki anahtarı IndexedDB'nin sırasıyla karşılaştırır (sayı < tarih < metin < ikili < dizi).",
+  "inRange": "Bir anahtar sorgunun aralığında mı (eq, gt, gte, lt, lte, prefix).",
+  "keyAt": "Bir kaydın anahtar yolundaki değeri (\"a.b\"; dizi yol dizi anahtar verir)."
+ },
+ "march/vault": {
+  "createVault": "Kullanıcının parolasıyla şifreli kasa: anahtarlar yalnız bellekte, diskte (IndexedDB) yalnız şifreli veri.",
+  "VaultError": "Kasa hatası: kilitli, zaten var, yok, kısa parola, bekle, yanlış parola.",
+  "unlockDelay": "Yanlış denemelerden sonra bir sonraki denemeye kadar beklenecek süre (ms).",
+  "_resetVaults": "Testler için: açılmış kasaları unutur."
+ },
+ "march/ai": {
+  "chat": "Kullanıcının anahtarıyla bir sağlayıcıya sohbet gönderir; yanıtı akış hâlinde verir, harcanan token'ı döndürür.",
+  "listModels": "Sağlayıcının bu anahtarla kullanılabilen sohbet modelleri (anahtarın çalıştığını da sınar).",
+  "PROVIDERS": "march/ai'nin konuştuğu sağlayıcılar: Anthropic, OpenAI, Google Gemini, DeepSeek, Moonshot (Kimi), Mistral, Groq, OpenRouter.",
+  "provider": "Kimliğiyle bir sağlayıcı (\"anthropic\", \"openai\"…).",
+  "AiError": "AI isteği hatası kullanıcının dilinde: anahtar, sınır, bakiye, ağ, istek, sağlayıcı, durduruldu.",
+  "aiKeys": "Bir kasadaki AI anahtarları ve seçimler (varsayılan sağlayıcı, sağlayıcı başına model, onay).",
+  "keyLooksLike": "Yapıştırılan anahtar başka bir sağlayıcınınkine benziyorsa o sağlayıcı.",
+  "maskKey": "Anahtarı güvenle gösterir: başı ve son dört karakteri.",
+  "sseEvents": "Bir server-sent events yanıtının veri satırları (her olay ayrıştırılmış JSON)."
  }
 }

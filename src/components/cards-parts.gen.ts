@@ -63,6 +63,7 @@ export const parts: Record<string, () => Promise<unknown>> = {
   Pagination: () => import("./navigation/pagination/index.ts").then((m) => (m as Record<string, unknown>)["Pagination"]),
   PanelHeader: () => import("./layout/panel-header/index.ts").then((m) => (m as Record<string, unknown>)["PanelHeader"]),
   Parallax: () => import("./landing/parallax/index.ts").then((m) => (m as Record<string, unknown>)["Parallax"]),
+  PasswordInput: () => import("./forms/password-input/index.ts").then((m) => (m as Record<string, unknown>)["PasswordInput"]),
   PeriodNav: () => import("./navigation/period-nav/index.ts").then((m) => (m as Record<string, unknown>)["PeriodNav"]),
   Picture: () => import("./media/picture/index.ts").then((m) => (m as Record<string, unknown>)["Picture"]),
   Popover: () => import("./overlays/popover/index.ts").then((m) => (m as Record<string, unknown>)["Popover"]),

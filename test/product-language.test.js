@@ -27,7 +27,9 @@ function published() {
 }
 
 // a name a showcase demo uses on purpose (the home page's chat card: its people), allowed in that file only
-const DEMO_NAMES = new Map([["tolgahan", /examples[\\/]showcase[\\/]src[\\/]home[\\/]bench\.tsx$/]]);
+const DEMO_NAMES = new Map([["tolgahan", /examples[\\/]showcase[\\/]src[\\/]home[\\/]bench\.tsx$/],
+  // the AI providers' product names (march/ai, its panels): which service a key is for, not who wrote the code
+  ["\\bclaude\\b", /src[\\/](ai[\\/]|components[\\/]composite[\\/]app-ui[\\/]ai)/]]);
 
 test("published files use product language only", () => {
   const hits = [];
