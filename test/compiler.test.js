@@ -236,6 +236,14 @@ test("texts: text written around {expressions} is one text, each expression a nu
     "an element between them ends a text; no letters around an expression (`, {name}!`, `{count}`): no text");
 });
 
+test("texts: strings people read in code: t(\"…\") keys, text fields of objects, toast / alert / confirm messages; not ids, icons, classes or URLs", () => {
+  const r = compile(`const moods = [{ id: "sun", label: "Enerjik", icon: "lucide:sun" }, { id: "x", label: 'Sakin "çok"', hint: "Yavaş" }]
+export default () => { const save = () => { toast("Kaydedildi"); toast.error("Hata oldu"); confirm('Silinsin mi?'); go("/home"); el.classList.add("is-on") }
+  return <a class="m-box" href="https://x.com">{t("Gönder")}{moods.map((m) => m.label)}</a> }`, { filename: "a.tsx" });
+  assert.deepEqual([...r.texts].sort(), ["Enerjik", "Hata oldu", "Kaydedildi", "Sakin \"çok\"", "Silinsin mi?", "Yavaş"].sort());
+  assert.deepEqual([...r.keys], ["Gönder"], "t(\"…\") is a key like t`…`");
+});
+
 test("compiler: a component's type arguments (<List<User> …>, <Pick<{ a: () => void }> …>) are erased like other types", () => {
   const out = c(`export const A = () => <div><List<string> items={[]} /><Pick<{ from: number; f: () => void }> open={() => true}>x</Pick></div>`);
   assert.match(out, /h\(List, \{items:/);

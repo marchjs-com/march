@@ -17,6 +17,8 @@ const { sx: resolveSx } = await importTs(new URL("../src/core/sx.ts", import.met
 
 /** Attributes whose string value people read (collected into `texts` with the JSX text). */
 const TEXT_ATTRS = new Set(["title", "placeholder", "label", "alt", "aria-label", "aria-description", "description", "hint", "message"]);
+// an object's fields whose string is read by people (lang.json collects them): `{ label: "Enerjik", hint: "…" }`
+const TEXT_KEYS = new Set(["label", "title", "text", "message", "description", "placeholder", "hint", "caption", "subtitle", "heading", "tooltip", "tip", "helperText", "emptyText", "confirmText", "cancelText", "okText"]);
 const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins", gen: "_$gen" };
 const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert", gen: "_gen" };
 // Templates: a native element subtree is built once (DOM calls, no HTML strings) and cloned; only its dynamic parts
@@ -237,6 +239,7 @@ class Transformer {
           const ic = key && isIconProp(key[1] ?? key[2] ?? key[3]) && !text.includes("\\") ? iconByName(text, this.iconBase()) : null;
           if (ic) { out.push(this.iconLocal(ic)); this.pos = e; prev = { t: "id" }; continue; }
         }
+        this.stringText(i, e, prev);
         out.push(src.slice(i, e)); this.pos = e; prev = { t: "str" }; continue;
       }
       if (c === "`") { out.push(this.template(prev, out)); prev = { t: "tpl" }; continue; }
@@ -422,6 +425,30 @@ class Transformer {
     const code = this.parse(end, true);
     this.pos = end;
     return code.trim();
+  }
+
+  /**
+   * A string literal people read goes to the texts (lang.json): `t("Kaydet")` (a key), a text field of an object
+   * (`{ label: "Enerjik" }`, title, text, message, description, placeholder, hint, caption…) and a message shown to the
+   * user (`toast("Kaydedildi")`, `toast.error(…)`, `alert`, `confirm`, `prompt`). Other strings (ids, classes, URLs, icon
+   * names) are not texts. Kept when it has a letter; the code is not changed (the preview and the exported page put a
+   * language's text in place of the code's own).
+   */
+  stringText(i, e, prev) {
+    const src = this.src, raw = src.slice(i + 1, e - 1);
+    if (raw.includes("\\u") || raw.includes("${")) return;
+    const text = raw.replace(/\\(["'\\])/g, "$1").replace(/\\n/g, "\n").trim();
+    if (!text || !/\p{L}/u.test(text) || text.length > 500) return;
+    const before = src.slice(Math.max(0, i - 80), i);
+    if (prev.t === "punct" && prev.v === ":") {
+      const key = /[{,]\s*(?:([A-Za-z_$][\w$]*)|"([A-Za-z_$][\w$]*)"|'([A-Za-z_$][\w$]*)')\s*:\s*$/.exec(before);
+      if (key && TEXT_KEYS.has(key[1] ?? key[2] ?? key[3])) this.texts.add(text);
+      return;
+    }
+    if (prev.t === "punct" && prev.v === "(") {
+      const call = /(?:^|[^\w$.])(t|toast(?:\.\w+)?|alert|confirm|prompt)\s*\(\s*$/.exec(before);
+      if (call) (call[1] === "t" ? this.keys : this.texts).add(text);
+    }
   }
 
   /** `await x` inside an async function → keep the owner across the await. */
