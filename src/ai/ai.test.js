@@ -70,7 +70,7 @@ test("models: chat models only; key hints and masks", async () => {
   assert.equal(keyLooksLike("sk-or-v1-x"), "openrouter");
   assert.equal(keyLooksLike("sk-plain"), null);
   assert.equal(maskKey("sk-ant-api03-abcdefghijkl1234"), "sk-ant-…1234");
-  assert.equal(PROVIDERS.length, 8);
+  assert.equal(PROVIDERS.length, 9);
 });
 
 test("aiKeys: keys and settings in the vault", async () => {
@@ -85,4 +85,12 @@ test("aiKeys: keys and settings in the vault", async () => {
   assert.equal((await k.settings()).provider, "anthropic");
   await k.remove("anthropic");
   assert.deepEqual(await k.configured(), []);
+});
+
+test("meta: OpenAI-compatible at api.meta.ai, bearer key", async () => {
+  serve(sse([{ choices: [{ delta: { content: "Hi" }, finish_reason: "stop" }] }, "[DONE]"]));
+  const r = await chat({ provider: "meta", key: "mk-1", model: "muse-spark", messages: [{ role: "user", content: "x" }] });
+  assert.equal(r.text, "Hi");
+  assert.equal(last.url, "https://api.meta.ai/v1/chat/completions");
+  assert.equal(last.init.headers.authorization, "Bearer mk-1");
 });

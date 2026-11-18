@@ -376,7 +376,7 @@ export function AiChatPanel(props: AiChatProps) {
           <div class="m-vault-mark" aria-hidden="true">{glyph(lock)}</div>
           <h3 class="m-vault-title">{() => (props.vault.state() === "new" ? t("Bring your own AI") : t("The vault is locked"))}</h3>
           <p class="m-vault-note">{() => (props.vault.state() === "new"
-            ? t("Add an API key (Claude, ChatGPT, Gemini, DeepSeek, Kimi, Mistral, Groq or OpenRouter); requests go straight from this browser to the provider and are billed to your account.")
+            ? t("Add an API key (Claude, ChatGPT, Gemini, DeepSeek, Kimi, Mistral, Groq, OpenRouter or Meta (Muse)); requests go straight from this browser to the provider and are billed to your account.")
             : t("Open the vault in AI keys; the chat is ready here as soon as it is open."))}</p>
           <Button variant="primary" icon={keyIcon} onClick={() => props.openKeys?.()}>{() => (props.vault.state() === "new" ? t("Add a key") : t("Open AI keys"))}</Button>
         </div>
@@ -385,7 +385,7 @@ export function AiChatPanel(props: AiChatProps) {
             <div class="m-ai-empty">
               <div class="m-vault-mark" aria-hidden="true">{glyph(sparkles)}</div>
               <h3 class="m-vault-title">{t("Bring your own AI")}</h3>
-              <p class="m-vault-note">{t("Add an API key (Claude, ChatGPT, Gemini, DeepSeek, Kimi, Mistral, Groq or OpenRouter); requests go straight from this browser to the provider and are billed to your account.")}</p>
+              <p class="m-vault-note">{t("Add an API key (Claude, ChatGPT, Gemini, DeepSeek, Kimi, Mistral, Groq, OpenRouter or Meta (Muse)); requests go straight from this browser to the provider and are billed to your account.")}</p>
               <Button variant="primary" icon={keyIcon} onClick={() => props.openKeys?.()}>{t("Add a key")}</Button>
             </div>
             <Else>

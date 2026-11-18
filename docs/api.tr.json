@@ -1352,7 +1352,7 @@
  "march/ai": {
   "chat": "Kullanıcının anahtarıyla bir sağlayıcıya sohbet gönderir; yanıtı akış hâlinde verir, harcanan token'ı döndürür.",
   "listModels": "Sağlayıcının bu anahtarla kullanılabilen sohbet modelleri (anahtarın çalıştığını da sınar).",
-  "PROVIDERS": "march/ai'nin konuştuğu sağlayıcılar: Anthropic, OpenAI, Google Gemini, DeepSeek, Moonshot (Kimi), Mistral, Groq, OpenRouter.",
+  "PROVIDERS": "march/ai'nin konuştuğu sağlayıcılar: Anthropic, OpenAI, Google Gemini, DeepSeek, Moonshot (Kimi), Mistral, Groq, OpenRouter, Meta (Muse).",
   "provider": "Kimliğiyle bir sağlayıcı (\"anthropic\", \"openai\"…).",
   "AiError": "AI isteği hatası kullanıcının dilinde: anahtar, sınır, bakiye, ağ, istek, sağlayıcı, durduruldu.",
   "aiKeys": "Bir kasadaki AI anahtarları ve seçimler (varsayılan sağlayıcı, sağlayıcı başına model, onay).",

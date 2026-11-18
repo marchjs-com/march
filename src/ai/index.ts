@@ -1,4 +1,4 @@
-// march/ai — the user's own AI: chat with Claude, ChatGPT, Gemini, DeepSeek, Kimi, Mistral, Groq or OpenRouter straight
+// march/ai — the user's own AI: chat with Claude, ChatGPT, Gemini, DeepSeek, Kimi, Mistral, Groq, OpenRouter or Meta (Muse) straight
 // from the browser with the user's API key (the user's account pays; nothing goes through a server of the app). The
 // keys live in a march/vault; a request carries the key in a header (never in the URL), streams the answer and reports
 // the tokens it used.
@@ -33,7 +33,7 @@ export interface AiProvider {
   chatModel?: (id: string) => boolean;
 }
 const notChat = /embed|tts|whisper|audio|image|dall-e|realtime|transcribe|moderation|search|rerank|guard|ocr|vision-preview|computer-use/i;
-/** The providers march/ai talks to: Claude, ChatGPT, Gemini, DeepSeek, Kimi, Mistral, Groq, OpenRouter. */
+/** The providers march/ai talks to: Claude, ChatGPT, Gemini, DeepSeek, Kimi, Mistral, Groq, OpenRouter, Meta (Muse). */
 export const PROVIDERS: AiProvider[] = [
   { id: "anthropic", name: "Claude (Anthropic)", kind: "anthropic", base: "https://api.anthropic.com/v1", origin: "https://api.anthropic.com", keyUrl: "https://console.anthropic.com/settings/keys", keyPrefix: "sk-ant-", models: ["claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5"] },
   { id: "openai", name: "ChatGPT (OpenAI)", kind: "openai", base: "https://api.openai.com/v1", origin: "https://api.openai.com", keyUrl: "https://platform.openai.com/api-keys", keyPrefix: "sk-", models: [], chatModel: (m) => /^(gpt|o\d|chatgpt)/.test(m) && !notChat.test(m) },
@@ -43,6 +43,8 @@ export const PROVIDERS: AiProvider[] = [
   { id: "mistral", name: "Mistral", kind: "openai", base: "https://api.mistral.ai/v1", origin: "https://api.mistral.ai", keyUrl: "https://console.mistral.ai/api-keys", models: [], chatModel: (m) => !notChat.test(m) },
   { id: "groq", name: "Groq", kind: "openai", base: "https://api.groq.com/openai/v1", origin: "https://api.groq.com", keyUrl: "https://console.groq.com/keys", keyPrefix: "gsk_", models: [], chatModel: (m) => !notChat.test(m) },
   { id: "openrouter", name: "OpenRouter", kind: "openai", base: "https://openrouter.ai/api/v1", origin: "https://openrouter.ai", keyUrl: "https://openrouter.ai/settings/keys", keyPrefix: "sk-or-", models: [], chatModel: (m) => !notChat.test(m) },
+  // Meta Model API (Muse Spark…): OpenAI-compatible; in public preview, the account and its region decide access
+  { id: "meta", name: "Meta (Muse)", kind: "openai", base: "https://api.meta.ai/v1", origin: "https://api.meta.ai", keyUrl: "https://dev.meta.ai", models: [], chatModel: (m) => !notChat.test(m) },
 ];
 /** A provider by id ("anthropic", "openai"…); throws for an unknown one. */
 export const provider = (id: string): AiProvider => {

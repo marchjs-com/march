@@ -22,8 +22,8 @@ async function ChatPanel(p: AiChatProps): Promise<unknown> { const m = await pan
 
 messages("tr", {
   "AI keys": "AI anahtarları", "AI": "AI", "API key": "API anahtarı", "Add a key": "Anahtar ekle",
-  "Add an API key (Claude, ChatGPT, Gemini, DeepSeek, Kimi, Mistral, Groq or OpenRouter); requests go straight from this browser to the provider and are billed to your account.":
-    "Bir API anahtarı ekle (Claude, ChatGPT, Gemini, DeepSeek, Kimi, Mistral, Groq ya da OpenRouter); istekler bu tarayıcıdan doğrudan sağlayıcıya gider, ücreti senin hesabından düşer.",
+  "Add an API key (Claude, ChatGPT, Gemini, DeepSeek, Kimi, Mistral, Groq, OpenRouter or Meta (Muse)); requests go straight from this browser to the provider and are billed to your account.":
+    "Bir API anahtarı ekle (Claude, ChatGPT, Gemini, DeepSeek, Kimi, Mistral, Groq, OpenRouter ya da Meta (Muse)); istekler bu tarayıcıdan doğrudan sağlayıcıya gider, ücreti senin hesabından düşer.",
   "Again": "Tekrar", "Apply": "Uygula", "Ask about the open file, or start with:": "Açık dosyayı sor ya da şununla başla:",
   "Ask about this file… (Enter sends, Shift+Enter: new line)": "Bu dosya hakkında sor… (Enter gönderir, Shift+Enter: yeni satır)",
   "Asked once per browser session; locked after 15 minutes without use and when the browser closes.": "Tarayıcı oturumunda bir kez sorulur; 15 dakika kullanılmazsa ve tarayıcı kapanınca kilitlenir.",
