@@ -379,7 +379,9 @@ class Transformer {
         this.pos = end;
       }
       const g = type ? `<${type}>` : "";
-      parts.push(kw === "const" && reactive ? `${name} = ${this.helper("computed")}${g}(() => (${init}))` : `${name} = ${this.helper("signal")}${g}(${init})`);
+      // a tool's build (opts.sourceMarks: MarchIDE) names each $ signal: its inspector lists them by name and line
+      const tag = this.opts.sourceMarks ? `, { name: ${JSON.stringify(`${name.slice(1)}@${this.opts.filename ?? ""}:${this.src.slice(0, this.pos).split("\n").length}`)} }` : "";
+      parts.push(kw === "const" && reactive ? `${name} = ${this.helper("computed")}${g}(() => (${init}))` : `${name} = ${this.helper("signal")}${g}(${init || (tag ? "undefined" : "")}${tag})`);
       const rest = /^\s*,/.exec(src.slice(this.pos, this.pos + 40));
       if (!rest) break;
       this.pos += rest[0].length;
