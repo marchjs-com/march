@@ -25,11 +25,20 @@
    so the browser's own cross-fade is off while a wave runs */
 :root[data-m-wave]::view-transition-old(root), :root[data-m-wave]::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
 :root[data-m-wave]::view-transition-new(root) { z-index: 2; }
+/* the drip with time stopped (theme-paint.ts frozenDrip): the old look's picture stays on top and the paint eats it
+   away (its clip is animated by the helper); the shadow under the paint's edge is a layer of its own above it, drawn
+   live (the helper animates it), with none of the browser's own fades */
+:root[data-m-wave="drip"]::view-transition-new(root) { z-index: auto; }
+:root[data-m-wave="drip"]::view-transition-old(root) { z-index: 2; }.m-wave-shade-vt { view-transition-name: m-wave-shade; }
+::view-transition-group(m-wave-shade), ::view-transition-new(m-wave-shade), ::view-transition-old(m-wave-shade) { animation: none; }
+::view-transition-group(m-wave-shade) { z-index: 3; }
 /* themeWave({ shape: "spray" }): the passive veil over the live page, a copy of the page in the old look that the
    spray eats away (its mask is set and animated by the helper); it never takes the pointer */
 .m-wave-veil { position: fixed; inset: 0; z-index: 2147483000; overflow: hidden; contain: strict; pointer-events: none; mask-repeat: no-repeat; }
 .m-wave-shade { position: fixed; inset: 0; z-index: 2147483001; overflow: hidden; contain: strict; pointer-events: none; }
-.m-wave-shade-blur { position: absolute; inset: 0; filter: blur(36px); opacity: .5; }
+/* the shadow is drawn at a quarter of the size (its outline too: theme-paint.ts SHADE_SCALE) and enlarged four times:
+   the same 36px blur, worked out on a sixteenth of the pixels on every frame */
+.m-wave-shade-blur { position: absolute; top: 0; left: 0; width: 25%; height: 25%; transform: scale(4); transform-origin: 0 0; filter: blur(9px); opacity: .5; will-change: transform; }
 .m-wave-shade-shape { position: absolute; inset: 0; background: #000; }
 /* the drip's shine: an SVG above the veil drawing it along the paint's edge (paths animated by the helper); it never
    takes the pointer */

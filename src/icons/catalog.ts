@@ -34,6 +34,7 @@ export const ICONS: Readonly<Record<string, IconDef>> = {
   pause: { name: "pause", d: ["b:6,5,4,14,1", "b:14,5,4,14,1"] },
   stepForward: { name: "step-forward", d: ["M5 5v14l10-7z", "M19 5v14"] },
   download: { name: "download", d: ["M12 3v12", "m7 10 5 5 5-5", "M5 21h14"] },
+  save: { name: "save", d: ["M5 3h11l5 5v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z", "M7 21v-7h10v7", "M8 3v4h7"] },
   upload: { name: "upload", d: ["M12 15V3", "m7 8 5-5 5 5", "M5 21h14"] },
   filter: { name: "filter", d: ["M3 5h18l-7 8.5V19l-4 2v-7.5z"] },
   sliders: { name: "sliders", d: ["M4 6h9", "M17 6h3", "o:15,6,2", "M4 12h3", "M11 12h9", "o:9,12,2", "M4 18h11", "M19 18h1", "o:17,18,2"] },

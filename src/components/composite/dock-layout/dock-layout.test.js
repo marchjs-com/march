@@ -158,3 +158,32 @@ test("DockLayout: the panel list may change (an editor opens next to its place, 
   dispose();
 });
 
+
+test("DockLayout narrowTabs: narrow, the one group's tabs go under the panel and the panel starts at the frame's top", async () => {
+  // a phone-wide workspace (the test DOM lays nothing out: its width is given)
+  const proto = Object.getPrototypeOf(document.createElement("div"));
+  const was = Object.getOwnPropertyDescriptor(proto, "clientWidth"), wasH = Object.getOwnPropertyDescriptor(proto, "clientHeight");
+  Object.defineProperty(proto, "clientWidth", { configurable: true, get() { return this.classList?.contains("m-dock") ? 375 : 0; } });
+  Object.defineProperty(proto, "clientHeight", { configurable: true, get() { return this.classList?.contains("m-dock") ? 600 : 0; } });
+  // a ResizeObserver that reports the size once it observes
+  const RO = globalThis.ResizeObserver;
+  globalThis.ResizeObserver = class { constructor(cb) { this.cb = cb; } observe(el) { queueMicrotask(() => this.cb([{ target: el, contentRect: { width: 375, height: 600 } }])); } unobserve() {} disconnect() {} };
+  try {
+    for (const where of ["bottom", undefined]) {
+      const { el, dispose } = mount(() => h(DockLayout, { panels: panelsOf(DEFS), presets: { main: PRESET }, commands: false, narrowTabs: where }));
+      await tick();
+      const root = el.querySelector(".m-dock");
+      assert.ok(root.classList.contains("is-narrow"), "under 560 px it is narrow");
+      assert.equal(root.classList.contains("is-tabs-bottom"), where === "bottom");
+      const shown = [...root.querySelectorAll(".m-dock-panel")].find((p) => !p.classList.contains("is-hidden"));
+      const top = parseFloat(shown.style.top || shown.style.getPropertyValue("top"));
+      // the frame starts at the inset (8): with the tabs below, the panel sits right under the frame's border
+      assert.equal(top < 20, where === "bottom", `panel top ${top}`);
+      dispose();
+    }
+  } finally {
+    globalThis.ResizeObserver = RO;
+    if (was) Object.defineProperty(proto, "clientWidth", was); else delete proto.clientWidth;
+    if (wasH) Object.defineProperty(proto, "clientHeight", wasH); else delete proto.clientHeight;
+  }
+});

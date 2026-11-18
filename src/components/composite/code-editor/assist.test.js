@@ -56,3 +56,14 @@ test("fitPaste and applyEdits", () => {
   const r = applyEdits("let  a=1", [{ from: 3, to: 5, text: " " }, { from: 6, to: 7, text: " = " }], 8);
   assert.deepEqual(r, { value: "let a = 1", caret: 9 });
 });
+
+test("headEdit: a name joins the module's import line; a new module gets its own line; a present one nothing", async () => {
+  const { headEdit } = await import("./assist.ts");
+  const v = `import { plus, heart } from "march/icons"\nconst a = 1`;
+  const e = headEdit(v, `import { trash } from "march/icons"`);
+  assert.equal(v.slice(0, e.at) + e.text + v.slice(e.at), `import { plus, heart, trash } from "march/icons"\nconst a = 1`);
+  assert.equal(headEdit(v, `import { heart } from "march/icons"`), null);
+  assert.deepEqual(headEdit(v, `import { Button } from "march/ui"`), { at: 0, text: `import { Button } from "march/ui"\n` });
+  const b = `import {} from "x"`, f = headEdit(b, `import { y } from "x"`);
+  assert.equal(b.slice(0, f.at) + f.text + b.slice(f.at), `import { y } from "x"`);
+});

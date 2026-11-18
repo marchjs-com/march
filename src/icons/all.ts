@@ -29,6 +29,7 @@ export { play } from "./glyphs/play.ts";
 export { pause } from "./glyphs/pause.ts";
 export { stepForward } from "./glyphs/stepForward.ts";
 export { download } from "./glyphs/download.ts";
+export { save } from "./glyphs/save.ts";
 export { upload } from "./glyphs/upload.ts";
 export { filter } from "./glyphs/filter.ts";
 export { sliders } from "./glyphs/sliders.ts";

@@ -1,7 +1,7 @@
 // Playground: the elements a file writes at its top level (assigned to nothing) are components of their own.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-const { findRoots, exportRoots } = await import("../examples/showcase/src/playground/roots.ts");
+const { findRoots, exportRoots, jsxTree } = await import("../examples/showcase/src/playground/roots.ts");
 
 const SRC = `import { Debugger, CodeEditor, createDebugSession } from "march/ui";
 
@@ -47,4 +47,35 @@ test("viewRoots: the inserts map positions both ways (a typed props parameter fo
   assert.equal(viewRoots(src, false).text.includes("__p: any"), false);
   for (const pos of [0, 5, src.indexOf("x="), src.indexOf("<B"), src.length]) assert.equal(toOriginal(v.inserts, toView(v.inserts, pos)), pos, `round trip at ${pos}`);
   assert.equal(v.text.slice(toView(v.inserts, src.indexOf("x=")), toView(v.inserts, src.indexOf("x=")) + 5), "x={a}");
+});
+
+test("findRoots: an element written as a value is skipped whole (its children on their own lines are not roots)", () => {
+  const src = `export const SaveBar = () => <div style={{ display: "flex" }}>
+  <Button variant="ghost">Vazgeç</Button>
+  <Button variant="primary">Kaydet</Button>
+</div>
+
+const box =
+  <section>
+    <p>in a value</p>
+  </section>
+
+<Button>a root</Button>
+`;
+  assert.deepEqual(findRoots(src).map((r) => r.name), ["Button_1"]);
+  assert.ok(src.slice(findRoots(src)[0].from).startsWith("<Button>a root"));
+});
+
+test("jsxTree: every element where it is written, nested, with the ones inside {…} expressions", () => {
+  const src = `const Row = (p) => <div sx={{ gap: 2 }}>{p.children}</div>
+export function Lab() {
+  if (a < b) return null
+  return <div>
+    <Row>{list.map((v) => <Button icon={x}>{v}</Button>)}</Row>
+    <form on:submit={(e) => e.preventDefault()}><Button type="submit">Gönder ({n})</Button></form>
+    <>{ok && <Badge />}</>
+  </div>
+}`;
+  const show = (ns) => ns.map((n) => n.kids.length ? `${n.tag}(${show(n.kids)})` : n.tag).join(" ");
+  assert.equal(show(jsxTree(src)), "div div(Row(Button) form(Button) (Badge))");
 });

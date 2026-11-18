@@ -101,7 +101,7 @@ Morph, Sayfa geçişi efektleri, Mikro etkileşimler, Kaydırma, Listeler.
   is up (text, attributes, inline styles, nodes, field values; every running animation and transition on the page's
   own clock). A canvas drawn by `Overlay` is drawn twice by its own function, each in its screen's colours (the
   `m-wave-twin` event); any other canvas has its picture copied every frame. The paint eats the veil away:
-  - `drip` (default 2200 ms): a thick paint poured at one place along the top: a thick stream runs down fast, the paint
+  - `drip` (default 1500 ms): a thick paint poured at one place along the top: a thick stream runs down fast, the paint
     spreads to both sides, the edge coming down later and slower the farther it is from the pour, in smooth rounded
     lobes, everything slowing as the paint runs out (an ease out); drips run ahead with a heavy round drop; a shine runs
     along the edge. One outline (`dripState`, `liquidPath`), a clip path with the same commands in every keyframe, so

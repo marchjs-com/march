@@ -149,22 +149,68 @@ test("CodeEditor: suggest=\"ghost\" writes the likeliest row faintly (same case 
   const complete = (c) => { const w = /\w*$/.exec(c.before)[0]; return { from: c.caret - w.length, items: [{ label: "button" }, { label: "Button", head: "import { Button } from \"x\"" }] }; };
   const [el, dispose] = mount(() => h(CodeEditor, { value: code, complete, suggest: "ghost" }));
   const input = caretOf(el.querySelector("textarea"));
-  type(input, "Bu", 2, "u");
+  type(input, "B", 1, "B");
   await tick();
-  assert.equal(document.querySelector(".m-ced-list"), null, "no list while typing");
-  assert.equal(el.querySelector(".m-ced-ghost")?.textContent, "tton", "the row of the same case");
+  assert.equal(document.querySelector(".m-ced-list"), null, "no list under listAfter (2 letters)");
+  assert.equal(el.querySelector(".m-ced-ghost")?.textContent, "utton", "the row of the same case");
   assert.ok(key(input, "Tab").defaultPrevented);
   assert.equal(code(), "import { Button } from \"x\"\nButton", "Tab writes the row and its head line");
   assert.equal(el.querySelector(".m-ced-ghost"), null);
-  type(input, "bu", 2, "u");
+  type(input, "b", 1, "b");
   await tick();
-  assert.equal(el.querySelector(".m-ced-ghost")?.textContent, "tton");
+  assert.equal(el.querySelector(".m-ced-ghost")?.textContent, "utton");
   key(input, "Escape");
   await tick();
   assert.equal(el.querySelector(".m-ced-ghost"), null, "Escape drops the ghost");
   key(input, " ", { ctrlKey: true, code: "Space" });
   await tick();
   assert.ok(document.querySelector(".m-ced-list"), "Ctrl + Space opens the list");
+  dispose();
+});
+
+test("CodeEditor: a completion with open: true opens the list at once (after a space, with the ghost) and keeps it open while the word narrows it", async () => {
+  const code = signal("");
+  const props = [{ label: "variant" }, { label: "size" }, { label: "shape" }];
+  // a tag's props: the place lists its words before anything is typed
+  const complete = (c) => { const m = /<Button\s+([\w-]*)$/.exec(c.before); return m ? { from: c.caret - m[1].length, items: props, open: true } : null; };
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, complete, suggest: "ghost" }));
+  const input = caretOf(el.querySelector("textarea"));
+  type(input, "<Button ", 8, " ");
+  await tick();
+  assert.equal(document.querySelectorAll(".m-ced-list [role=option]").length, 3, "open after the space, nothing typed");
+  type(input, "<Button s", 9, "s");
+  await tick();
+  assert.deepEqual([...document.querySelectorAll(".m-ced-list [role=option]")].map((o) => o.textContent.trim()).sort(), ["shape", "size"], "one letter (under the ghost's 2) keeps it open, narrowed");
+  dispose();
+});
+
+test("CodeEditor: Tab on the ghost of a row with again opens the next list; rows with groups get group chips that filter", async () => {
+  const code = signal("");
+  const props = [{ label: "variant", insert: 'variant=""', back: 1, again: true, group: "March" }, { label: "sx", group: "Ortak" }, { label: "id", group: "HTML" }];
+  const values = [{ label: "primary" }, { label: "ghost" }];
+  const complete = (c) => {
+    const v = /variant="(\w*)$/.exec(c.before);
+    if (v) return { from: c.caret - v[1].length, items: values, all: true, open: true };
+    const m = /<Button\s+([\w-]*)$/.exec(c.before);
+    return m ? { from: c.caret - m[1].length, items: props, all: true, open: true } : null;
+  };
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, complete, suggest: "ghost" }));
+  const input = caretOf(el.querySelector("textarea"));
+  type(input, "<Button ", 8, " ");
+  await tick();
+  const chips = [...document.querySelectorAll(".m-ced-groups button, .m-ced-groups [role=button], .m-ced-groups .m-chip")];
+  assert.ok(chips.length >= 4, "a chip for every row and one per group");
+  chips.find((c) => c.textContent.trim() === "Ortak").click();
+  await tick();
+  assert.deepEqual([...document.querySelectorAll(".m-ced-list [role=option]")].map((o) => o.textContent.trim()), ["sx"], "the group's rows only");
+  chips[0].click();
+  await tick();
+  type(input, "<Button v", 9, "v");
+  await tick();
+  key(input, "Tab");
+  await tick();
+  assert.equal(code.peek(), '<Button variant=""');
+  assert.deepEqual([...document.querySelectorAll(".m-ced-list [role=option]")].map((o) => o.textContent.trim()), ["primary", "ghost"], "the values open at once");
   dispose();
 });
 
@@ -250,7 +296,7 @@ test("CodeEditor: a dot opens the list even with suggest=\"ghost\"; rows keep th
   dispose();
 });
 
-test("CodeEditor ranking: the shortest same-case start first (con → console), then March's rows, then the others; with the ghost the list opens from 3 letters", async () => {
+test("CodeEditor ranking: the shortest same-case start first (con → console), then March's rows, then the others; with the ghost the list opens from 2 letters", async () => {
   const code = signal("");
   const items = [
     { label: "consoleTransport", source: "march" }, { label: "Contrast", source: "march" }, { label: "constructor", source: "js" },
@@ -260,13 +306,13 @@ test("CodeEditor ranking: the shortest same-case start first (con → console), 
   const [el, dispose] = mount(() => h(CodeEditor, { value: code, suggest: "ghost", sources, source: "all", complete: (c) => ({ from: c.caret - (/\w*$/.exec(c.before)?.[0].length ?? 0), items }) }));
   const input = el.querySelector("textarea");
   const rows = () => [...document.querySelectorAll(".m-ced-list [role=option]")].map((o) => o.textContent);
-  type(input, "co", 2, "o"); await tick();
-  assert.equal(rows().length, 0, "two letters: the ghost only");
-  assert.equal(el.querySelector(".m-ced-ghost").textContent, "nsole", "the ghost is the best row already");
+  type(input, "c", 1, "c"); await tick();
+  assert.equal(rows().length, 0, "one letter: the ghost only");
+  assert.equal(el.querySelector(".m-ced-ghost").textContent, "onsole", "the ghost is the best row already");
   type(input, "con", 3, "n"); await tick();
   assert.deepEqual(rows().map((r) => r.replace(/\s.*$/, "")), ["console", "consoleTransport", "Contrast", "constructor"]);
   assert.equal(el.querySelector(".m-ced-ghost").textContent, "sole", "ghost and list together");
-  type(input, "co", 2, ""); await tick();
+  type(input, "c", 1, ""); await tick();
   assert.equal(rows().length, 0, "shorter again: the list closes");
   dispose();
 });

@@ -60,6 +60,8 @@
 .m-ced-ghost-at { position: relative; display: inline-block; inline-size: 0; }
 .m-ced-ghost { position: absolute; inset-inline-start: 0; inset-block-start: 0; white-space: pre; color: var(--m-muted); opacity: .75; pointer-events: none; }
 .m-ced-sources { display: flex; flex-wrap: wrap; align-items: center; gap: var(--m-space-1); padding: var(--m-space-1) var(--m-space-2); border-block-start: var(--m-border-w, 1px) solid var(--m-border); font-family: var(--m-font); }
+.m-ced-groups { display: flex; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: var(--m-space-1); padding: var(--m-space-1) var(--m-space-2); border-block-end: var(--m-border-w, 1px) solid var(--m-border); font-family: var(--m-font); }
+.m-ced-groups > * { flex: none; }
 .m-ced-none { color: var(--m-muted); font-size: var(--m-text-xs); }
 .m-ced-list { inline-size: min(26rem, calc(100vw - 16px)); font-family: var(--m-font-mono); }
 /* lineNumbers: a gutter at the start; each line's number (and its mark) sits at its line's start, the lit line's bar
@@ -98,6 +100,11 @@
 .m-ced-doc-sig { font-family: var(--m-font-mono); overflow-wrap: anywhere; white-space: pre-wrap; }
 .m-ced-doc > * { min-inline-size: 0; }
 .m-ced-doc-text { margin: 0; color: var(--m-muted); white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--m-font-sans, inherit); }
+/* a doc's parts (a component's props): name and type in code, what it does beside it, quiet */
+.m-ced-doc-list { display: grid; gap: 1px; margin: 2px 0 0; padding: 4px 0 0; list-style: none; border-block-start: var(--m-border-w, 1px) solid var(--m-border-subtle, var(--m-border)); }
+.m-ced-doc-list li { display: flex; flex-wrap: wrap; gap: 0 var(--m-space-2); align-items: baseline; }
+.m-ced-doc-list code { font-family: var(--m-font-mono); color: var(--m-text); }
+.m-ced-doc-list span { color: var(--m-muted); }
 .m-ced-sig-panel { max-inline-size: min(36rem, calc(100vw - 16px)); }
 .m-ced-sig { display: grid; gap: 3px; padding: var(--m-space-1) var(--m-space-2); font-size: var(--m-text-xs); }
 .m-ced-sig-line { font-family: var(--m-font-mono); white-space: pre-wrap; overflow-wrap: anywhere; }
@@ -116,8 +123,9 @@
 .m-ced-find-count { min-inline-size: 4.5em; padding-inline: 4px; color: var(--m-muted); font-size: var(--m-text-xs); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .m-ced-find-count.is-none { color: var(--m-danger-text); }
 /* the hover's definition and the short note over a word; the rename field under the name */
-.m-ced-tip-panel { max-inline-size: min(32rem, calc(100vw - 16px)); }
-.m-ced-doc.is-tip { border-block-start: 0; padding: var(--m-space-1) var(--m-space-2); max-block-size: 16rem; overflow: auto; }
+/* as wide as its text (up to 32rem): placed near the window's edge it would otherwise shrink to the room left there */
+.m-ced-tip-panel { inline-size: max-content; max-inline-size: min(32rem, calc(100vw - 16px)); }
+.m-ced-doc.is-tip { border-block-start: 0; padding: var(--m-space-1) var(--m-space-2); max-block-size: 20rem; max-inline-size: 34rem; overflow: auto; }
 .m-ced-area.is-hovering .m-ced-input { cursor: help; }
 .m-ced-rename { display: grid; gap: 3px; padding: 4px; }
 .m-ced-rename .m-input.m-ced-rename-field { inline-size: 14rem; block-size: 28px; font-family: var(--m-font-mono); font-size: var(--m-text-sm); }

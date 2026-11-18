@@ -112,6 +112,8 @@ export interface DockLayoutProps {
   actions?: MaybeFn<boolean | readonly DockAction[] | undefined>;
   /** Below this width (px) the workspace is one tab group, no drag (default 560). @tr Bu genişliğin (px) altında çalışma alanı tek sekme grubudur, sürükleme yok (varsayılan 560). */
   narrow?: number | undefined;
+  /** Where the tabs are while narrow: "top" (default) or "bottom" (in reach of the thumb on a phone). The strip scrolls sideways when the tabs do not fit. @tr Dar iken sekmelerin yeri: "top" (varsayılan) ya da "bottom" (telefonda başparmağın erişiminde). Sekmeler sığmayınca şerit yana kayar. */
+  narrowTabs?: "top" | "bottom" | undefined;
   /** The short slide when the layout changes (default true; none with reduced motion). @tr Düzen değişince kısa kayma (varsayılan true; azaltılmış harekette yok). */
   motion?: MaybeFn<boolean | undefined>;
   /** Own icons of the group buttons. @tr Grup düğmelerinin kendi ikonları. */
@@ -196,7 +198,9 @@ export function DockLayout(props: DockLayoutProps): Element {
     root.classList.toggle("is-anim", anim);
     if (anim) animT = setTimeout(() => root.classList.remove("is-anim"), 240);
     const liveF = new Set<string>(), liveS = new Set<string>(), liveK = new Set<string>();
-    const bodyOf = (r: Rect): Rect => ({ x: r.x + 1, y: r.y + head, w: Math.max(0, r.w - 2), h: Math.max(0, r.h - head - 1) });
+    // narrow with the tabs at the bottom: the body starts at the frame's top, the header is under it
+    const low = narrow && props.narrowTabs === "bottom";
+    const bodyOf = (r: Rect): Rect => ({ x: r.x + 1, y: low ? r.y + 1 : r.y + head, w: Math.max(0, r.w - 2), h: Math.max(0, r.h - head - 1) });
     for (const g of C.groups(V.root)) {
       const r = rects.groups[g.id];
       if (!r) { for (const id of g.panels) { const p = panels.get(id); if (p) setShown(p, false); } continue; } // collapsed: hidden at its last size
@@ -234,6 +238,17 @@ export function DockLayout(props: DockLayoutProps): Element {
       place(el, s.rect);
     }
     for (const [k, e] of seps) if (!liveK.has(k)) { e.el.remove(); e.dispose(); seps.delete(k); }
+    if (narrow) queueMicrotask(revealTab);
+  }
+  /** Narrow: the strip scrolls sideways, so the chosen tab is brought into it (a panel opened from a menu or a command). */
+  function revealTab(): void {
+    for (const f of frames.values()) {
+      const strip = f.el.querySelector<HTMLElement>(".m-dock-tabs"), tab = strip?.querySelector<HTMLElement>('.m-dock-tab[aria-selected="true"]');
+      if (!strip || !tab) continue;
+      const sr = strip.getBoundingClientRect(), r = tab.getBoundingClientRect(), pad = 8;
+      if (r.left < sr.left) strip.scrollLeft -= sr.left - r.left + pad;
+      else if (r.right > sr.right) strip.scrollLeft += r.right - sr.right + pad;
+    }
   }
   function commit(next: DockTree | null, o: { anim?: boolean; save?: boolean } = {}): boolean {
     const cur = view();
@@ -566,6 +581,7 @@ export function DockLayout(props: DockLayoutProps): Element {
     menuOpen.set(false);
     narrow = n;
     root.classList.toggle("is-narrow", n);
+    root.classList.toggle("is-tabs-bottom", n && props.narrowTabs === "bottom");
     if (n && L) { const open = C.groups(L.root).find((g) => !g.collapsed); phone = C.singleLayout(defs, open?.active); }
     L$.set(view());
   }

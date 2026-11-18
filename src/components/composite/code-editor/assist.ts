@@ -143,3 +143,27 @@ export function applyEdits(value: string, edits: readonly { from: number; to: nu
   }
   return { value: out, caret: c };
 }
+
+/**
+ * Where a suggestion's import line (`head`) goes in `value`: nothing when the text has it; a name from a module the
+ * text already imports from (`import { plus } from "march/icons"` + head `import { trash } from "march/icons"`) joins
+ * that line's braces (`{ plus, trash }`); anything else, its own line at the top.
+ */
+export function headEdit(value: string, head: string | undefined): { at: number; text: string } | null {
+  if (!head || value.includes(head)) return null;
+  const m = /^import\s*\{([^}]*)\}\s*from\s*(["'])([^"']+)\2;?\s*$/.exec(head.trim());
+  if (m) {
+    const esc = m[3]!.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const line = new RegExp(`import\\s*\\{([^}]*)\\}\\s*from\\s*["']${esc}["']`).exec(value);
+    if (line) {
+      const local = (x: string): string => x.trim().split(/\s+as\s+/).pop()!.trim();
+      const have = new Set(line[1]!.split(",").map(local).filter(Boolean));
+      const add = m[1]!.split(",").map((x) => x.trim()).filter((x) => x && !have.has(local(x)));
+      if (!add.length) return null;
+      const inner = line[1]!, kept = inner.trimEnd();
+      const at = line.index + line[0].indexOf("{") + 1 + kept.length;
+      return { at, text: `${kept.trim() ? (kept.endsWith(",") ? " " : ", ") : " "}${add.join(", ")}${kept.trim() ? "" : " "}` };
+    }
+  }
+  return { at: 0, text: `${head}\n` };
+}

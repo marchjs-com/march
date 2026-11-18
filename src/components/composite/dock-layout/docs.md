@@ -31,6 +31,7 @@ Panels never move in the DOM: an iframe keeps running, an editor keeps its state
 | `onClose` | `(panel) => boolean \| Promise` | — | a closable tab's close mark: remove the panel from `panels`; `false` keeps it |
 | `actions` | boolean / `("menu" \| "maximize" \| "collapse")[]` | `true` | the buttons of a group; without "collapse" the panel menu cannot collapse either (`api` still can) |
 | `narrow` | number | `560` | below this width: one tab group, no drag |
+| `narrowTabs` | `"top"` \| `"bottom"` | `"top"` | while narrow: where the tabs are (bottom: in reach of the thumb); the strip scrolls sideways and keeps the chosen tab in view |
 | `motion` | boolean | `true` | the short slide when the layout changes |
 | `icons` | `{ menu, maximize, restore, collapse }` | — | own icons |
 | `labels` | `{ menu, maximize, restore, collapse, panels, strip }` | — | own texts |

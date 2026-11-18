@@ -11,6 +11,9 @@
 //   splat  patches burst out from the pressed point, specks flying ahead
 import { animateEl } from "./env.ts";
 import { onFrame } from "./engine/clock.ts";
+import { setTimeWarp, timeWarp } from "./engine/config.ts";
+import { startUnwarped } from "./engine/native.ts";
+import { installCssControl } from "./engine/css-control.ts";
 import { clamp } from "../core/util.ts";
 
 export type PaintShape = "drip" | "spray" | "sweep" | "splat";
@@ -217,7 +220,7 @@ const n1 = (v: number): string => String(Math.round(v * 10) / 10);
  * corner anywhere, a liquid has none). Always the same commands, so the browser tweens it between keyframes. `dx`,
  * `dy` move it (the shine's copy).
  */
-export function liquidPath(s: DripState, t: number, dx = 0, dy = 0): string {
+export function liquidPath(s: DripState, t: number, dx = 0, dy = 0, k = 1): string {
   const { edge, drips } = s.at(t);
   const pts: [number, number][] = [];
   for (let j = edge.length - 1; j >= 0; j--) {
@@ -233,9 +236,10 @@ export function liquidPath(s: DripState, t: number, dx = 0, dy = 0): string {
       [q.x, y + L + r * k], [q.x - r * 0.7 * k, y + L + r * 0.75 * k], [q.x - r * k, y + L], [q.x - n * k, y + L * 0.45], [q.x - (n + f) * k, y]);
   }
   const P = (i: number): [number, number] => pts[clamp(i, 0, pts.length - 1)]!;
-  const X = (v: number): string => n1(v + dx), Y = (v: number): string => n1(v + dy);
+  // `k` scales the whole outline (the shadow is drawn at a quarter of the size, then enlarged: paintWave)
+  const X = (v: number): string => n1((v + dx) * k), Y = (v: number): string => n1((v + dy) * k), TOP = n1(-60 * k);
   const first = pts[0]!, last = pts[pts.length - 1]!;
-  let d = `M${X(last[0])} -60L${X(first[0])} -60L${X(first[0])} ${Y(first[1])}`;
+  let d = `M${X(last[0])} ${TOP}L${X(first[0])} ${TOP}L${X(first[0])} ${Y(first[1])}`;
   for (let i = 0; i < pts.length - 1; i++) {
     const p0 = P(i - 1), p1 = P(i), p2 = P(i + 1), p3 = P(i + 2);
     d += `C${X(p1[0] + (p2[0] - p0[0]) / 6)} ${Y(p1[1] + (p2[1] - p0[1]) / 6)} ${X(p2[0] - (p3[0] - p1[0]) / 6)} ${Y(p2[1] - (p3[1] - p1[1]) / 6)} ${X(p2[0])} ${Y(p2[1])}`;
@@ -244,15 +248,18 @@ export function liquidPath(s: DripState, t: number, dx = 0, dy = 0): string {
 }
 
 const STEPS_LIQUID = 30;
+/** The size the drip's shadow is drawn at (enlarged back by motion.css .m-wave-shade-blur). */
+const SHADE_SCALE = 0.25;
 /** The paint's outline at every step: `inside` the paint itself; else everything but the paint (the screen with a
  *  hole, to be filled even-odd). */
-function liquidPaths(s: DripState, inside: boolean, dx = 0, dy = 0): string[] {
-  const frame = `M-100 -100H${n1(s.w + 100)}V${n1(s.h + 100)}H-100Z`;
-  return Array.from({ length: STEPS_LIQUID + 1 }, (_, i) => { const p = liquidPath(s, i / STEPS_LIQUID, dx, dy); return inside ? p : frame + p; });
+function liquidPaths(s: DripState, inside: boolean, dx = 0, dy = 0, k = 1): string[] {
+  const frame = `M${n1(-100 * k)} ${n1(-100 * k)}H${n1((s.w + 100) * k)}V${n1((s.h + 100) * k)}H${n1(-100 * k)}Z`;
+  return Array.from({ length: STEPS_LIQUID + 1 }, (_, i) => { const p = liquidPath(s, i / STEPS_LIQUID, dx, dy, k); return inside ? p : frame + p; });
 }
-/** Keyframes of a clip by the paint (CSS clip-path): `inside` the paint itself; else everything but the paint. */
-export function liquidFrames(s: DripState, inside: boolean, dx = 0, dy = 0): Keyframe[] {
-  return liquidPaths(s, inside, dx, dy).map((p, i) => ({ offset: i / STEPS_LIQUID, clipPath: inside ? `path("${p}")` : `path(evenodd, "${p}")` } as Keyframe));
+/** Keyframes of a clip by the paint (CSS clip-path): `inside` the paint itself; else everything but the paint. `k`
+ *  scales the outline (an element drawn smaller and enlarged). */
+export function liquidFrames(s: DripState, inside: boolean, dx = 0, dy = 0, k = 1): Keyframe[] {
+  return liquidPaths(s, inside, dx, dy, k).map((p, i) => ({ offset: i / STEPS_LIQUID, clipPath: inside ? `path("${p}")` : `path(evenodd, "${p}")` } as Keyframe));
 }
 /** The layers of a shape. */
 export function paintLayers(shape: Exclude<PaintShape, "drip">, w: number, h: number, origin?: { x: number; y: number } | null, rnd: Rnd = Math.random): Layer[] {
@@ -335,7 +342,9 @@ export function captureVeil(doc: Document): Captured | null {
   const page = copyPage(body, w, h, twins, later);
   // the page's own box (the viewport less its scrollbar) where it is scrolled to, so every line breaks where it does
   const box = body.getBoundingClientRect();
-  for (const [k, val] of [["position", "absolute"], ["margin", "0"], ["overflow", "hidden"], ["top", px(-win.scrollY)], ["left", px(-win.scrollX)], ["width", px(box.width)], ["height", px(box.height)]] as const) page.style.setProperty(k, val);
+  // (a layer of its own: drawn once and kept, while only the veil's outline changes on every frame; without it the whole
+  // copy was painted again on every frame of the wave)
+  for (const [k, val] of [["position", "absolute"], ["margin", "0"], ["overflow", "hidden"], ["top", px(-win.scrollY)], ["left", px(-win.scrollX)], ["width", px(box.width)], ["height", px(box.height)], ["will-change", "transform"]] as const) page.style.setProperty(k, val);
   shadow.append(page);
   root.append(v);
   veil = v;
@@ -353,6 +362,199 @@ export function captureVeil(doc: Document): Captured | null {
   };
   return cap;
 }
+
+/**
+ * Time eases to `to` (0 stops it, 1 gives it back) over `ms` of real time: every animation of the central control
+ * follows (the engine's, and the page's CSS animations and transitions: css-control). Slowing down eases out (time
+ * coasts to a stop), speeding up eases in (it picks up). Resolves when it is there.
+ */
+export function warpTime(to: number, ms: number): Promise<void> {
+  installCssControl();
+  const from = timeWarp();
+  if (ms <= 0 || from === to) { setTimeWarp(to); return Promise.resolve(); }
+  return new Promise((resolve) => {
+    // its own real time: each warp step tells the clock, which then starts its next frame afresh (dt 0)
+    const t0 = performance.now();
+    let t = 0;
+    const off = onFrame(() => {
+      t = Math.min(1, (performance.now() - t0) / ms);
+      const k = to < from ? 1 - (1 - t) ** 3 : t ** 3;
+      setTimeWarp(from + (to - from) * k);
+      if (t >= 1) { off(); resolve(); }
+    }, { essential: true });
+  });
+}
+
+type FreezeVT = { finished: Promise<void>; ready: Promise<void> };
+/** Whether a frozen drip can run here: View Transitions and a clip by a path. */
+export const canFreezeDrip = (doc: Document): boolean =>
+  typeof (doc as Document & { startViewTransition?: unknown }).startViewTransition === "function"
+  && !!(globalThis as { CSS?: { supports?: (p: string, v: string) => boolean } }).CSS?.supports?.("clip-path", 'path("M0 0H1V1Z")');
+
+/**
+ * The drip with time stopped: everything that moves slows down to a stop, the screen as it stands is taken as a
+ * picture (the browser's View Transition snapshot: made by the browser, nothing copied), the page takes the new look
+ * behind it, and the same paint as the veil's eats the picture away, with the same soft shadow under its edge (a layer
+ * of the transition of its own, above the picture). When the paint is all down, time picks up again. Nothing of the
+ * page is copied or drawn again on any frame, however large the page or the screen.
+ */
+let freezing = false;
+export async function frozenDrip(doc: Document, change: () => void, o: { duration?: number | undefined } = {}): Promise<void> {
+  // a change while one is painting lands at once (time is not stopped twice)
+  if (freezing) { change(); return; }
+  freezing = true;
+  try { await frozen(doc, change, o); } finally { freezing = false; }
+}
+async function frozen(doc: Document, change: () => void, o: { duration?: number | undefined }): Promise<void> {
+  const root = doc.documentElement, start = (doc as Document & { startViewTransition: (cb: () => void) => FreezeVT }).startViewTransition.bind(doc);
+  const w = globalThis.innerWidth || root.clientWidth, h = globalThis.innerHeight || root.clientHeight;
+  let thaw: Promise<void> | null = null, press: (() => void) | null = null;
+  const shade = doc.createElement("div");
+  try {
+    await warpTime(0, FREEZE_MS);
+    const st = dripState(w, h);
+    // the shadow: its own layer of the transition (in the new state only, above the old picture), drawn small and enlarged
+    const blur = doc.createElement("div"), shape = doc.createElement("div");
+    shade.className = "m-wave-shade m-wave-shade-vt"; blur.className = "m-wave-shade-blur"; shape.className = "m-wave-shade-shape";
+    blur.append(shape); shade.append(blur);
+    root.setAttribute("data-m-wave", "drip");
+    let vt: FreezeVT;
+    try { vt = start(() => { change(); root.append(shade); }); } catch { change(); return; }
+    const timing = { duration: o.duration ?? 1500, easing: "linear", fill: "both" as const };
+    await vt.ready.then(() => {
+      // the browser's own transition animations keep their time (they would wait for time to come back)
+      for (const a of doc.getAnimations?.() ?? []) if ((a.effect as KeyframeEffect | null)?.pseudoElement?.startsWith("::view-transition")) a.cancel();
+      const paint = [
+        startUnwarped(root, liquidFrames(st, false), { ...timing, pseudoElement: "::view-transition-old(root)" }),
+        startUnwarped(shade, liquidFrames(st, false), timing),
+        startUnwarped(shape, liquidFrames(st, true, 0, 18, SHADE_SCALE), timing),
+      ].filter((a): a is Animation => !!a);
+      // a back buffer: the new look is drawn behind the whole picture first and the paint starts only then. Revealed
+      // at once, its tiles not drawn yet would show as white squares for a frame. Held on its first frame (the
+      // picture whole), the paint keeps the transition open meanwhile
+      for (const a of paint) a.pause();
+      // time picks up as the paint starts: what moves does so under the picture, where it is not seen until the paint
+      // reaches it, and nothing waits for the paint to end
+      const go = (): void => { for (const a of paint) a.play(); thaw ??= warpTime(1, THAW_MS); };
+      void backBuffer(doc).then(go, go);
+      // the picture takes no input (the browser sends every press to <html> while a transition runs): a press, a key
+      // or a wheel turn hurries the paint to its end, and the press is given to the control under it once it is gone
+      press = hurryOnInput(doc, paint);
+    }).catch(() => undefined);
+    await vt.finished.catch(() => undefined);
+  } finally {
+    shade.remove();
+    (press as (() => void) | null)?.();
+    root.removeAttribute("data-m-wave");
+    // whatever happened on the way, time comes back
+    await (thaw ?? warpTime(1, THAW_MS));
+  }
+}
+
+/**
+ * While the paint runs, input hurries it: the first press, key or wheel turn plays the rest of the paint in HURRY_MS. A
+ * press is held (it reached <html>, not the control under the picture) and given to the control under it when the
+ * picture is gone: down at once, then up and click when the finger or the button is lifted (at once if it already was).
+ * Keys need nothing more: they go to the focused element all along. Returns the function to call when the picture is
+ * gone.
+ */
+function hurryOnInput(doc: Document, paint: Animation[]): () => void {
+  let hurried = false, held: PointerEvent | null = null, lifted: PointerEvent | null = null;
+  const hurry = (): void => {
+    if (hurried) return;
+    hurried = true;
+    for (const a of paint) {
+      const end = Number(a.effect?.getComputedTiming().endTime ?? 0), now = Number(a.currentTime ?? 0);
+      if (end > now) a.updatePlaybackRate(Math.max(1, (end - now) / HURRY_MS));
+    }
+  };
+  const stop = (e: Event): void => { e.preventDefault(); e.stopImmediatePropagation(); };
+  const down = (e: PointerEvent): void => { hurry(); if (!e.isPrimary) return; stop(e); held = e; lifted = null; };
+  const up = (e: PointerEvent): void => { if (held && e.pointerId === held.pointerId) { stop(e); lifted = e; } };
+  const swallow = (e: Event): void => { if (held) stop(e); };
+  const opts = { capture: true, passive: false } as const;
+  doc.addEventListener("pointerdown", down, opts);
+  doc.addEventListener("pointerup", up, opts);
+  for (const t of ["mousedown", "mouseup", "click", "contextmenu"]) doc.addEventListener(t, swallow, opts);
+  doc.addEventListener("keydown", hurry, true);
+  doc.addEventListener("wheel", hurry, { capture: true, passive: true });
+  return () => {
+    doc.removeEventListener("pointerdown", down, opts);
+    doc.removeEventListener("pointerup", up, opts);
+    // a mouse's own mouseup / click still on its way to <html> after the paint are let through: they reach <html> only
+    for (const t of ["mousedown", "mouseup", "click", "contextmenu"]) doc.removeEventListener(t, swallow, opts);
+    doc.removeEventListener("keydown", hurry, true);
+    doc.removeEventListener("wheel", hurry, { capture: true } as EventListenerOptions);
+    if (held) replay(doc, held, lifted);
+  };
+}
+/** Give a held press to the element under it now: down (and focus), then up and click when it is lifted. */
+function replay(doc: Document, down: PointerEvent, up: PointerEvent | null): void {
+  const target = doc.elementFromPoint(down.clientX, down.clientY) as HTMLElement | null;
+  if (!target) return;
+  const fire = (type: string, from: PointerEvent): void => {
+    const init = { bubbles: true, cancelable: true, composed: true, clientX: from.clientX, clientY: from.clientY, screenX: from.screenX, screenY: from.screenY,
+      button: from.button, buttons: from.buttons, ctrlKey: from.ctrlKey, shiftKey: from.shiftKey, altKey: from.altKey, metaKey: from.metaKey,
+      pointerId: from.pointerId, pointerType: from.pointerType, isPrimary: from.isPrimary, view: doc.defaultView };
+    const Ev = type.startsWith("pointer") ? globalThis.PointerEvent : type === "click" ? globalThis.PointerEvent ?? globalThis.MouseEvent : globalThis.MouseEvent;
+    target.dispatchEvent(new Ev(type, init));
+  };
+  fire("pointerdown", down);
+  fire("mousedown", down);
+  // what the browser does on a press: the control (or its focusable ancestor) takes the focus
+  (target.closest<HTMLElement>("button, a[href], input, select, textarea, [tabindex], [contenteditable]") ?? null)?.focus?.({ preventScroll: true });
+  const finish = (u: PointerEvent): void => {
+    fire("pointerup", u);
+    fire("mouseup", u);
+    const at = doc.elementFromPoint(u.clientX, u.clientY);
+    if (u.button === 0 && at && (target === at || target.contains(at))) fire("click", u);
+  };
+  if (up) { finish(up); return; }
+  // still held: the real lift arrives on the control, but its own click would go to <html> (where the press began)
+  const lift = (u: PointerEvent): void => {
+    if (u.pointerId !== down.pointerId) return;
+    doc.removeEventListener("pointerup", lift, true);
+    doc.addEventListener("click", (c) => { if (c.target === doc.documentElement) { c.preventDefault(); c.stopImmediatePropagation(); } }, { capture: true, once: true });
+    const at = doc.elementFromPoint(u.clientX, u.clientY);
+    if (u.button === 0 && at && (target === at || target.contains(at))) fire("click", u);
+  };
+  doc.addEventListener("pointerup", lift, true);
+}
+
+/**
+ * Resolves when the new look is drawn behind the picture: its fonts are in, the images in view are decoded and the
+ * frames come at their pace again (BUFFER_FRAMES quiet ones in a row: the style pass, the layout and the drawing of the
+ * new look are over; the first switch to a look draws everything afresh and takes longest). Never later than
+ * BUFFER_MAX_MS: the paint starts then anyway.
+ */
+function backBuffer(doc: Document): Promise<void> {
+  const t0 = performance.now();
+  let loaded = false;
+  const vw = globalThis.innerWidth || 0, vh = globalThis.innerHeight || 0;
+  const inView = [...doc.images].filter((img) => {
+    if (img.complete && img.naturalWidth) return false;
+    const r = img.getBoundingClientRect();
+    return r.bottom > 0 && r.right > 0 && r.top < vh && r.left < vw;
+  });
+  void Promise.all([doc.fonts?.ready, ...inView.map((img) => img.decode().catch(() => undefined))]).then(() => { loaded = true; }, () => { loaded = true; });
+  return new Promise((resolve) => {
+    let last = t0, calm = 0;
+    const off = onFrame(() => {
+      const now = performance.now();
+      calm = now - last < QUIET_FRAME_MS ? calm + 1 : 0;
+      last = now;
+      if ((loaded && calm >= BUFFER_FRAMES) || now - t0 > BUFFER_MAX_MS) { off(); resolve(); }
+    }, { essential: true });
+  });
+}
+/** Quiet frames in a row the new look needs behind the picture; a frame is quiet when it came within QUIET_FRAME_MS. */
+const BUFFER_FRAMES = 3, QUIET_FRAME_MS = 25;
+/** The longest the paint waits for the new look to be drawn (ms). */
+const BUFFER_MAX_MS = 400;
+/** How long the rest of the paint takes once input hurries it (ms). */
+const HURRY_MS = 160;
+/** How long time takes to come to a stop before the picture, and to pick up again after the paint (ms). */
+const FREEZE_MS = 220, THAW_MS = 350;
 
 /** Runs a painted wave: the veil goes up (or was taken already), the page takes the new look under it, the paint
  *  eats the veil away. */
@@ -378,7 +580,10 @@ export async function paintWave(doc: Document, change: () => void, o: PaintOptio
     const blur = doc.createElement("div"), shape = doc.createElement("div");
     blur.className = "m-wave-shade-blur"; shape.className = "m-wave-shade-shape";
     blur.append(shape); shade.append(blur);
-    runs.push([shade, liquidFrames(st, false)], [shape, liquidFrames(st, true, 0, 18)]);
+    // the blur is drawn at a quarter of the size and enlarged four times (motion.css): a blurred picture has no fine
+    // detail to lose, and the full-screen blur, worked out again on every frame, costs a sixteenth (on a large or
+    // dense screen it held the whole wave back)
+    runs.push([shade, liquidFrames(st, false)], [shape, liquidFrames(st, true, 0, 18, SHADE_SCALE)]);
   } else if (o.shape === "spray" && sprayOn) {
     // the worklet sprays from a random place in the middle of the screen: a dense core, a mist of specks thinning out,
     // splats, drips (spray-worklet.js); only its progress is animated
@@ -397,7 +602,7 @@ export async function paintWave(doc: Document, change: () => void, o: PaintOptio
   cap.seal();
   cap.release(120);
   // the pour takes its time (thick paint); the sprays are quicker
-  const timing = { duration: o.duration ?? (o.shape === "drip" ? 2200 : o.shape === "spray" && sprayOn ? 2000 : 1600), easing: "linear", fill: "forwards" as const };
+  const timing = { duration: o.duration ?? (o.shape === "drip" ? 1500 : o.shape === "spray" && sprayOn ? 2000 : 1600), easing: "linear", fill: "forwards" as const };
   const anims = runs.map(([el, frames]) => animateEl(el, frames, timing));
   const done = cap;
   return new Promise<void>((resolve) => {
@@ -533,16 +738,49 @@ type Twins = WeakMap<Node, Node>;
 /**
  * A copy of the page for the veil, cut to what is near the screen: an element more than a screen away keeps its box
  * (an empty element of the same size) but not its content, so the copy lays out in a few milliseconds even on a long
- * page. No ids (no duplicates), no frames or media that would load again; field values, canvas pictures and scroll
- * places are copied (scroll places once the copy is in the page: `later`).
+ * page. The same inside an element that scrolls (a panel, a list, a code view): what lies more than the element's own
+ * size outside its box is out of sight too, and keeps only its box (an app made of panels, an IDE, is mostly that).
+ * No ids (no duplicates), no frames or media that would load again; field values, canvas pictures and scroll places
+ * are copied (scroll places once the copy is in the page: `later`).
  */
 function copyPage(body: HTMLElement, w: number, h: number, twins: Twins, later: (() => void)[]): HTMLElement {
   const page = body.cloneNode(true) as HTMLElement;
-  walk(body, page, w, h, twins, later);
+  const clip: Box = w && h ? { l: -w, t: -h, r: 2 * w, b: 2 * h } : { l: -Infinity, t: -Infinity, r: Infinity, b: Infinity };
+  walk(body, page, { twins, later, sticky: stickyOf(body) }, clip);
   return page;
 }
 
-function walk(s: Node, d: Node, w: number, h: number, twins: Twins, later: (() => void)[]): void {
+/** A box on the screen: left, top, right, bottom. */
+interface Box { l: number; t: number; r: number; b: number }
+interface Walk { twins: Twins; later: (() => void)[]; sticky: Set<Element> | null }
+
+/**
+ * The page's sticky elements, found once: the selectors of the style rules that make an element sticky, matched on
+ * the page, and the elements whose own style does (one style read per element, on a page of thousands, took longer
+ * than the copy itself). Null when a rule cannot be matched so (a nested rule): each element is then asked itself.
+ * A selector of a rule whose media does not apply only finds an element that is not sticky: it is set where it stands.
+ */
+function stickyOf(body: HTMLElement): Set<Element> | null {
+  const doc = body.ownerDocument, sels = new Set<string>();
+  let exact = true;
+  const read = (rules: CSSRuleList, nested: boolean): void => {
+    for (const rule of rules) {
+      const style = (rule as CSSStyleRule).style, sel = (rule as CSSStyleRule).selectorText;
+      if (style && sel && /sticky/.test(style.position)) { if (nested) exact = false; else sels.add(sel); }
+      const inner = (rule as CSSGroupingRule).cssRules;
+      if (inner?.length) read(inner, nested || !!sel);
+    }
+  };
+  for (const sheet of [...(doc.styleSheets ?? []), ...(doc.adoptedStyleSheets ?? [])]) { try { read(sheet.cssRules, false); } catch { exact = false; } }
+  if (!exact) return null;
+  const out = new Set<Element>();
+  for (const sel of sels) { try { for (const e of body.querySelectorAll(sel)) out.add(e); } catch { return null; } }
+  for (const e of body.querySelectorAll('[style*="sticky"]')) out.add(e);
+  return out;
+}
+
+function walk(s: Node, d: Node, x: Walk, clip: Box): void {
+  const { twins, later } = x;
   twins.set(s, d);
   if (!(s instanceof Element) || !(d instanceof Element)) return;
   d.removeAttribute("id");
@@ -554,10 +792,11 @@ function walk(s: Node, d: Node, w: number, h: number, twins: Twins, later: (() =
     twins.set(s, stand);
     return;
   }
+  let r: DOMRect | null = null;
   if (s !== s.ownerDocument.body) {
-    const r = s.getBoundingClientRect();
-    if (w && h && r.width && r.height && (r.bottom < -h || r.top > 2 * h || r.right < -w || r.left > 2 * w)) {
-      // far off screen: the box stays, its content does not
+    r = s.getBoundingClientRect();
+    if (r.width && r.height && (r.bottom < clip.t || r.top > clip.b || r.right < clip.l || r.left > clip.r)) {
+      // far off screen (or far out of the box of an element that scrolls): the box stays, its content does not
       const box = (d as HTMLElement).style;
       d.replaceChildren();
       box.setProperty("box-sizing", "border-box"); box.setProperty("width", px(r.width)); box.setProperty("height", px(r.height));
@@ -569,12 +808,20 @@ function walk(s: Node, d: Node, w: number, h: number, twins: Twins, later: (() =
   // a sticky element sticks to the page's scroller; in the copy (which does not scroll: it is moved up by the scroll)
   // it would ride up with the content, so it is put back where it stands on the page
   const view = s.ownerDocument.defaultView;
-  if (s instanceof HTMLElement && typeof view?.getComputedStyle === "function" && view.getComputedStyle(s).position === "sticky") {
-    const r = s.getBoundingClientRect();
-    later.push(() => { const c = (d as HTMLElement).getBoundingClientRect(), dx = r.left - c.left, dy = r.top - c.top; if (dx || dy) (d as HTMLElement).style.setProperty("translate", `${px(dx)} ${px(dy)}`); });
+  if (s instanceof HTMLElement && (x.sticky ? x.sticky.has(s) : typeof view?.getComputedStyle === "function" && view.getComputedStyle(s).position === "sticky")) {
+    const at = r ?? s.getBoundingClientRect();
+    later.push(() => { const c = (d as HTMLElement).getBoundingClientRect(), dx = at.left - c.left, dy = at.top - c.top; if (dx || dy) (d as HTMLElement).style.setProperty("translate", `${px(dx)} ${px(dy)}`); });
+  }
+  // an element whose content overflows it and that clips (it scrolls, or hides the rest): its content is seen through
+  // its box only, so what lies more than the box's own size outside it is out of sight (asked only of the elements
+  // that overflow: a size read, then one style read)
+  let inner = clip;
+  if (r && (s.scrollHeight > s.clientHeight + 1 || s.scrollWidth > s.clientWidth + 1) && typeof view?.getComputedStyle === "function"
+    && /(auto|scroll|hidden|clip)/.test(view.getComputedStyle(s).overflow)) {
+    inner = { l: Math.max(clip.l, r.left - r.width), t: Math.max(clip.t, r.top - r.height), r: Math.min(clip.r, r.right + r.width), b: Math.min(clip.b, r.bottom + r.height) };
   }
   const a = s.childNodes, b = [...d.childNodes];
-  for (let i = 0; i < a.length && i < b.length; i++) walk(a[i]!, b[i]!, w, h, twins, later);
+  for (let i = 0; i < a.length && i < b.length; i++) walk(a[i]!, b[i]!, x, inner);
 }
 
 function copyValue(s: Element, d: Element): void {

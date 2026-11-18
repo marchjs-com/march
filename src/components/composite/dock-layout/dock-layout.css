@@ -70,4 +70,11 @@
 .m-dock.is-narrow .m-dock-head { cursor: default; touch-action: pan-x; }
 .m-dock.is-narrow .m-dock-tab { touch-action: manipulation; }
 .m-dock.is-narrow .m-dock-hb:not(.m-dock-hb-menu) { display: none; }
+/* narrow: one group, every tab at its own width in a strip that scrolls sideways (a finger swipes it) */
+.m-dock.is-narrow .m-dock-tabs { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+.m-dock.is-narrow .m-dock-tabs::-webkit-scrollbar { display: none; }
+.m-dock.is-narrow .m-dock-tab { flex: none; min-inline-size: 0; max-inline-size: none; }
+/* narrowTabs="bottom": the strip under the panel, its mark on the side that meets the panel */
+.m-dock.is-tabs-bottom .m-dock-frame { flex-direction: column-reverse; }
+.m-dock.is-tabs-bottom .m-dock-head { border-block-end: 0; border-block-start: 1px solid var(--m-border); }
 .m-menu.m-dock-menu { min-inline-size: 15rem !important; inline-size: max-content; overflow-x: hidden; max-inline-size: min(24rem, 92vw); }

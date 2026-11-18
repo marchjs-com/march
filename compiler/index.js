@@ -482,6 +482,9 @@ class Transformer {
       else if (src[i] === ".") { i++; ws(); }
       else if (src[i] === "(" || src[i] === "[") { i = this.walk(i + 1, () => false) + 1; continue; }
       else if (src[i] === "`") { i = this.skipTemplate(i); continue; }
+      // TypeScript's non-null mark (`x!`, `x!()`, `x!.y`) belongs to the operand; `!=` / `!==` does not, nor a `!`
+      // on the next line (TypeScript reads that as a new statement too)
+      else if (src[i] === "!" && src[i + 1] !== "=" && !src.slice(save, i).includes("\n")) { i++; continue; }
       else { i = save; break; }
       if (src[i] === "(" || src[i] === "[") { i = this.walk(i + 1, () => false) + 1; continue; }
       while (isIdPart(src[i] ?? "")) i++;
@@ -652,18 +655,23 @@ class Transformer {
     const src = this.src;
     const kids = [];
     let text = "";
-    const flush = () => { const s = jsxText(text); if (s) { kids.push({ code: JSON.stringify(s), dynamic: false, text: true }); if (/\p{L}/u.test(s)) this.texts.add(s.trim()); } text = ""; };
+    // the text people read: the text and the {expressions} written side by side are one text, each expression a
+    // numbered placeholder (`Gönder ({0})`), so a translation can say it its own way (`{0} kez gönderildi`); an element
+    // between them ends it. Kept when its own words have a letter.
+    let said = "", slots = 0, words = "";
+    const say = () => { if (/\p{L}/u.test(words)) this.texts.add(said.trim()); said = ""; slots = 0; words = ""; };
+    const flush = () => { const s = jsxText(text); if (s) { kids.push({ code: JSON.stringify(s), dynamic: false, text: true }); said += s; words += s; } text = ""; };
     for (;;) {
       if (this.pos >= src.length) throw fail(src, this.pos, `missing closing tag </${tag}>`);
       const c = src[this.pos];
       if (c === "<" && src[this.pos + 1] === "/") {
-        flush();
+        flush(); say();
         const m = /^<\/\s*([A-Za-z_$][\w$.:-]*)?\s*>/.exec(src.slice(this.pos, this.pos + 200));
         if (!m || (m[1] ?? "") !== tag) throw fail(src, this.pos, `expected </${tag}>`);
         this.pos += m[0].length;
         return kids;
       }
-      if (c === "<") { flush(); const code = this.jsx(); kids.push({ code, dynamic: false }); continue; }
+      if (c === "<") { flush(); say(); const code = this.jsx(); kids.push({ code, dynamic: false }); continue; }
       if (c === "{") {
         flush();
         this.pos++;
@@ -673,6 +681,7 @@ class Transformer {
         const code = this.containerExpr(end).trim();
         this.pos = end + 1;
         kids.push({ code, dynamic: !isStaticCode(code) });
+        said += `{${slots++}}`;
         continue;
       }
       text += c;

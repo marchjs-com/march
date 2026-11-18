@@ -1,6 +1,9 @@
 // The theme wave: a page-wide restyle (color theme, light / dark, accent) brought in with a transition.
 //   circle (default)  a circle of the new look grows from the pressed point (View Transitions + a clip-path animation
 //                     on the new snapshot)
+//   drip               time slows to a stop, the screen is taken as a picture (a View Transition snapshot), the page
+//                     takes the new look behind it and the paint eats the picture away; then time picks up again
+//                     (theme-paint.ts frozenDrip; without View Transitions, painted on like the others below)
 //   drip, spray, sweep, splat  painted on (theme-paint.ts, a lazy part loaded the first time one runs): the page takes
 //                     the new look at once and stays live and usable while a passive live copy in the old look above
 //                     it is painted away (paint running down from the top; a nozzle in strokes; a sweep row by row;
@@ -22,7 +25,7 @@ export interface ThemeWaveOptions {
   origin?: { x: number; y: number } | Element | null | undefined;
   /** How the new look arrives (default "circle"); every other shape paints it on and loads its part lazily. */
   shape?: ThemeWaveShape | undefined;
-  /** ms (default 700 for the circle, 2200 for the drip, 1600 for the other painted shapes). */
+  /** ms (default 700 for the circle, 1500 for the drip, 1600 for the other painted shapes). */
   duration?: number | undefined;
   /** The address of spray-worklet.js on your own origin (from march/src/motion/): the "spray" shape draws with it
    *  (thousands of fine specks); without it, or where CSS Paint is missing, it sprays soft spots. */
@@ -48,6 +51,9 @@ export function themeWave(change: () => void, o: ThemeWaveOptions = {}, taken?: 
   else if (from) { x = from.x; y = from.y; }
   const shape = o.shape ?? "circle";
   if (shape !== "circle") return paint().then(async (m) => {
+    // the drip stops time and paints a picture of the screen away (nothing of the page is copied); where the browser
+    // cannot take that picture, the live copy of the page is painted away instead
+    if (shape === "drip" && m.canFreezeDrip(doc)) { (taken as { stop?: () => void } | undefined)?.stop?.(); return m.frozenDrip(doc, change, { duration: o.duration }); }
     if (shape === "spray" && o.worklet) await m.prepareSpray(o.worklet);
     return m.paintWave(doc, change, { shape, origin: { x, y }, duration: o.duration }, taken as Parameters<typeof m.paintWave>[3]);
   }, () => { change(); });
@@ -78,7 +84,8 @@ export function installThemeWave(o: Omit<ThemeWaveOptions, "origin"> = {}): () =
   const painted = !!o.shape && o.shape !== "circle";
   let part: Awaited<ReturnType<typeof paint>> | null = null, taken: { stop(): void } | null = null;
   if (painted) void paint().then((m) => { part = m; m.prepareVeil(view); if (o.shape === "spray" && o.worklet) void m.prepareSpray(o.worklet); }, () => undefined);
-  const prepare = (): void => { if (!part || reducedNow() || pausedNow()) return; taken?.stop(); taken = part.captureVeil(view); };
+  // (the drip with time stopped takes its picture itself: no copy ahead)
+  const prepare = (): void => { if (!part || reducedNow() || pausedNow() || (o.shape === "drip" && part.canFreezeDrip(view))) return; taken?.stop(); taken = part.captureVeil(view); };
   let last: { x: number; y: number; at: number } | null = null;
   const press = (e: Event): void => { const p = e as PointerEvent; last = { x: p.clientX, y: p.clientY, at: Date.now() }; };
   const key = (e: Event): void => {

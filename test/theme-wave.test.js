@@ -163,8 +163,8 @@ test("painted wave: a live veil over the live page; the page takes the new look 
   observed([{ type: "attributes", target: para, attributeName: "class" }]);
   assert.equal(veil.querySelector(".t").getAttribute("class"), "t is-on", "the copy follows the page");
   // (the theme change's own update a moment ago was not copied: the first observation was dropped)
-  const run = anims.find((a) => a.o?.duration === 2200);
-  assert.ok(run, "the pour runs for 2200 ms");
+  const run = anims.find((a) => a.o?.duration === 1500);
+  assert.ok(run, "the pour runs for 1500 ms");
   run.done(); await wave;
   assert.equal(document.documentElement.querySelector(".m-wave-veil"), null, "the veil is gone at the end");
   proto.animate = before; delete globalThis.CSS; delete globalThis.getComputedStyle; delete globalThis.MutationObserver;

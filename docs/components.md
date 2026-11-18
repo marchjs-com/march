@@ -656,22 +656,12 @@ Full page: src/components/typography/clamp-text/docs.md
 
 ## CodeEditor
 
-A small code field for one snippet: the text is coloured while it is typed (the CodeView colours; unfinished code too), a suggestion list opens at the caret, ranges can be marked (a flash for "this just changed", an underline for "this is wrong") and a foot line says what the owner thinks of the code. It does **not** run or compile anything: the owner reads `value` and decides what it means (the showcase reads a component's props from it).
+
 
 Composed of: [EditorFrame](#editorframe), [Popover](#popover), [OptionList](#optionlist), [CopyButton](#copybutton), Dropdown, [Kbd](#kbd), [StatusDot](#statusdot), [Chip](#chip), [TextInput](#textinput), [IconButton](#iconbutton), [Button](#button)
 
 ```tsx
-import { CodeEditor, jsxCompleter } from "march/ui";
 
-<CodeEditor bind:value={$code} lang="tsx" message={$note} status={$bad ? "error" : "ok"}
-  complete={jsxCompleter({ tag: "Button", props: [
-    { name: "variant", hint: "look", values: ["primary", "secondary", "ghost"] },   // variant="…": values inside the quotes
-    { name: "icon", hint: "icon", value: "={plus}" },                              // written as icon={plus}
-    { name: "disabled" },                                                          // a bare prop
-  ] })}
-  marks={[{ from: 8, to: 23, kind: "flash" }]} />
-<CodeEditor value={$css} onChange={save} lang="css" complete={(ctx) => ({ from: ctx.caret, items: [{ label: "color" }] })} />
-<CodeEditor bind:value={$one} multiline={false} message={false} copy={false} />   // one bare line
 ```
 
 Full page: src/components/composite/code-editor/docs.md
@@ -962,17 +952,12 @@ Full page: src/components/layout/disclosure/docs.md
 
 ## DockLayout
 
-An IDE workspace, the dock of march-app-ui (after HADİ Studio Kit): tab groups in rows and columns. Drag a tab to a **side** of a group (a new split), onto its **centre** or **between two tabs** (a tab there), or to the **outer edge** of the whole layout. Closing never deletes: the group **collapses to a strip** (vertical in a row, horizontal in a column) and gets its size back when opened. Groups fill the whole area, layouts come from presets and are saved as plain JSON. Panels never move in the DOM: an iframe keeps running, an editor keeps its state.
+
 
 Composed of: [Tabs](#tabs), [IconButton](#iconbutton), [Button](#button), [ResizeHandle](#resizehandle), [Menu](#menu), [OverflowText](#overflowtext)
 
 ```tsx
-<DockLayout panels={[
-  { id: "files", title: "Files", icon: folder, min: [150, 120], content: () => <FileTree /> },
-  { id: "editor", title: "main.ts", icon: fileText, content: () => <Editor />, dirty: () => $dirty },
-  { id: "console", title: "Console", icon: terminal, content: () => <Console /> },
-]} presets={{ main: { title: "Main", tree: () => row([.26, tabs("files")], [.74, col([.68, tabs("editor")], [.32, tabs("console")])]) } }}
-   persist="ide.layout" api={(a) => dock = a} />
+
 ```
 
 Full page: src/components/composite/dock-layout/docs.md

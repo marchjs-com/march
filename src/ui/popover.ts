@@ -60,8 +60,13 @@ export function floating(o: FloatingOptions): unknown {
   const pos = signal<PlacedStyle>({ top: "0px", left: "0px" });
   let panel: HTMLElement | undefined;
   const update = (): void => { if (panel && o.anchor) pos.set(place(o.anchor, panel, o.placement)); };
-  // the panel lives in a Portal: carry over the anchor's color token and theme so it looks like its control
-  const scoped = (attr: string): string | null => o.anchor?.closest?.(`[${attr}]`)?.getAttribute(attr) ?? null;
+  // the panel lives in a Portal: carry over the anchor's color token and theme so it looks like its control. The page's
+  // own (on its root) is not copied: the panel is under the root and wears it anyway, and a copy taken when it opened
+  // would keep the old one when the page's changes (a theme menu would stay in the theme it was opened in)
+  const scoped = (attr: string): string | null => {
+    const s = o.anchor?.closest?.(`[${attr}]`);
+    return s && s !== s.ownerDocument?.documentElement ? s.getAttribute(attr) : null;
+  };
   const el = h("div", { ...(o.attrs ?? {}), class: cx("m-pop", o.class), role: o.role, id: o.id, "data-m-color": scoped("data-m-color"), "data-m-theme": scoped("data-m-theme"),
     style: () => pos(), ref: (x: HTMLElement) => { panel = x; o.ref?.(x); } }, o.children);
   update();
@@ -71,7 +76,11 @@ export function floating(o: FloatingOptions): unknown {
   dismiss(() => panel, { inside: () => [o.anchor], onDismiss: (why) => (why === "escape" ? o.onClose(true) : o.onClose()) });
   on(globalThis.window, "resize", update);
   on(globalThis.window, "scroll", update, true);
-  return h(Portal, { layer: o.role === "tooltip" ? "tooltip" : o.role === "menu" || o.role === "listbox" ? "menu" : "popover", children: el });
+  // it opens where its anchor is: inside the <OverlayScope> around the anchor (a preview's own menu stays in the
+  // preview), else on the page. Not where the focus or the last event is: a code editor's list opened by a timer
+  // while the focus sat in a preview would land in the preview
+  const around = o.anchor?.closest?.(".m-overlay-scope") as HTMLElement | null | undefined;
+  return h(Portal, { layer: o.role === "tooltip" ? "tooltip" : o.role === "menu" || o.role === "listbox" ? "menu" : "popover", target: o.anchor ? around ?? "page" : "nearest", children: el });
 }
 
 /**

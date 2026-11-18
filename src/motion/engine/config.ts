@@ -2,7 +2,7 @@
 // Saved in localStorage (a preference, not a secret) so the user's choice survives reloads.
 import { signal } from "../../core/reactive.ts";
 import { setReducedOverride } from "./prefs.ts";
-import { load, save } from "../../core/util.ts";
+import { load, save, clamp } from "../../core/util.ts";
 
 export type ReduceMode = "system" | "reduce" | "full";
 export interface MotionSettings {
@@ -83,10 +83,22 @@ export function setPaused(on: boolean): void {
   emit("pause");
 }
 
+/** A multiplier of every animation's time that is not a setting: a theme wave slows time down to a stop while it
+ *  paints and brings it back after (theme-paint.ts). 1 = untouched. */
+let warp = 1;
+/** Set the time warp (0 stops time, 1 gives it back); every clock and native animation follows at once. */
+export function setTimeWarp(w: number): void {
+  const next = clamp(w, 0, 1);
+  if (next === warp) return;
+  warp = next;
+  emit("settings");
+}
+/** The time warp now. */
+export const timeWarp = (): number => warp;
 /** Multiplier for clock time (0 while paused). Hot path: plain reads, no signals. */
-export const timeScale = (): number => (pausedFlag ? 0 : cur.speed * cur.slowMo);
+export const timeScale = (): number => (pausedFlag ? 0 : cur.speed * cur.slowMo * warp);
 /** Multiplier for native (WAAPI / CSS) playback rates; pause is applied separately. */
-export const rateScale = (): number => cur.speed * cur.slowMo;
+export const rateScale = (): number => cur.speed * cur.slowMo * warp;
 /** Default duration (ms) and easing after the character is applied. */
 export function defaultTiming(): { duration: number; easing: string } {
   const ch = CHARACTERS[cur.character] ?? {};

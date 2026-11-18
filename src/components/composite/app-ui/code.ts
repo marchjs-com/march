@@ -16,6 +16,8 @@ import { toast } from "../../overlays/toast/index.ts";
 /** What a language service plugin provides (service "language"). */
 export interface LanguageService {
   complete?(path: string, ctx: CodeCompleteContext): CodeCompletion | null | undefined | Promise<CodeCompletion | null | undefined>;
+  /** What the word at `at` is (a component's prop: its type and text), asked before TypeScript when the pointer rests. */
+  hover?(path: string, at: { value: string; at: number }): CodeDoc | null | undefined | Promise<CodeDoc | null | undefined>;
 }
 export interface CodeEditorPluginOptions {
   /** Suggestions when no language service is there. */
@@ -91,9 +93,14 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
             // after a space only where a value is expected (= ( , : return case ===…): then only the rows of the type
             // the place expects (const ok: boolean = → true, false); elsewhere a blank asks nothing
             const blank = !c.forced && /(^|\s)$/.test(c.before);
+            // a place the language service owns (a component tag's props, a prop's value in its quotes, `open`): its rows
+            // alone, at once, typed or not
+            const lang = ctx.service<LanguageService>("language");
+            const mine = await Promise.resolve(lang?.complete?.(file.path, c)).catch(() => null);
+            if (mine?.open) return mine.items.length ? mine : null;
             if (blank && !(ts && /(?:[=(,:?[]|\breturn|\bcase)\s*$/.test(c.before))) return null;
             const [own, fromTs] = await Promise.all([
-              blank ? null : Promise.resolve(ctx.service<LanguageService>("language")?.complete?.(file.path, c)).catch(() => null),
+              blank ? null : mine,
               ts ? ts.complete(file.path, c).catch(() => null) : Promise.resolve(o.complete?.(file.path, c) ?? null),
             ]);
             // a comment or the text between JSX tags is no code: nothing; a string: only its type's words (TypeScript's)
@@ -129,11 +136,16 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
               definition: (at: { value: string; at: number }) => ts.definition(file.path, at.value, at.at).catch(() => null),
               rename: (at: { value: string; at: number }) => ts.rename(file.path, at.value, at.at).catch(() => null),
               format: (value: string) => ts.format(file.path, value, 2).catch(() => null),
-              hover: async (at: { value: string; at: number }): Promise<CodeDoc | null> => {
-                const q = await ts.hover(file.path, at.at, at.value).catch(() => null);
-                return q && (q.text || q.doc) ? { kind: kindLabel(q.kind), signature: q.text, doc: q.doc } : null;
-              },
             } : {}),
+            // the pointer's rest: the language service first (a March component's prop: its type and what it does;
+            // TypeScript sees March's imports as any), then TypeScript
+            hover: async (at: { value: string; at: number }): Promise<CodeDoc | null> => {
+              const own = await Promise.resolve(ctx.service<LanguageService>("language")?.hover?.(file.path, at)).catch(() => null);
+              if (own && (own.signature || own.doc)) return own;
+              if (!ts) return null;
+              const q = await ts.hover(file.path, at.at, at.value).catch(() => null);
+              return q && (q.text || q.doc) ? { kind: kindLabel(q.kind), signature: q.text, doc: q.doc } : null;
+            },
             // the undo history (500 steps) per file, kept in the browser session: it outlives a tab switch and a reload
             history: { key: `code:${file.path}`, limit: 500 },
             get fontSize() { return fontSize(); },

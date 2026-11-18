@@ -95,6 +95,14 @@ test("async functions keep their owner across await", () => {
   assert.match(out, /async \(\) => \{const _\$o=_\$getOwner\(\); _\$enter\(_\$o, await _\$leave\(y\)\)/);
 });
 
+test("await takes TypeScript's non-null mark as part of its operand", () => {
+  const out = body("async function P() { const m = (await L[k]!()).default; const n = await a!.b!; return m !== n && await c !== d }");
+  assert.match(out, /\(_\$enter\(_\$o, await _\$leave\(L\[k\]!\(\)\)\)\)\.default/);
+  assert.match(out, /_\$enter\(_\$o, await _\$leave\(a!\.b!\)\)/);
+  assert.match(out, /_\$enter\(_\$o, await _\$leave\(c\)\) !== d/);
+  assert.match(body("async function Q() { await e\n!f && g() }"), /_\$enter\(_\$o, await _\$leave\(e\)\)\n!f/);
+});
+
 test("css extraction, t keys, line numbers preserved", () => {
   const r = compile("const s = css`.a{color:red}`\nconst m = t`Hi ${name}!`\nconst e = <div>\n<b/>\n</div>\nconst after = 1", { runtime: RT });
   assert.equal(r.css, ".a{color:red}");
@@ -214,5 +222,16 @@ test("auto import of project components: named or default export", () => {
 
 test("texts: the words people read (JSX text and text attributes) are collected for the locale file", () => {
   const r = compile(`export default () => <Button title="Kaydet" placeholder="Ara…" data-id="x1" onClick={go}>Tıklandı: {n} <b> </b>42</Button>`, { filename: "a.tsx" });
-  assert.deepEqual([...r.texts].sort(), ["Ara…", "Kaydet", "Tıklandı:"], "letters only: no numbers, spaces or data attributes");
+  assert.deepEqual([...r.texts].sort(), ["Ara…", "Kaydet", "Tıklandı: {0}"], "letters only: no numbers, spaces or data attributes");
+});
+
+test("texts: text written around {expressions} is one text, each expression a numbered placeholder", () => {
+  const r = compile(`export default () => <div>
+    <Button>Gönder ({$sent})</Button>
+    <p>{a} / {b} öğe seçili</p>
+    <p>Merhaba <b>dünya</b>, {name}!</p>
+    <i>{count}</i>
+  </div>`, { filename: "a.tsx" });
+  assert.deepEqual([...r.texts].sort(), ["dünya", "Gönder ({0})", "Merhaba", "{0} / {1} öğe seçili"].sort(),
+    "an element between them ends a text; no letters around an expression (`, {name}!`, `{count}`): no text");
 });

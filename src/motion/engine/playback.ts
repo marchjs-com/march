@@ -14,7 +14,7 @@ import { normalize, nativeFrames, Track, type Frames, type RawTrack } from "./tr
 import { driverFor, type Driver } from "./drivers.ts";
 import { getKeyframes, type KeyframesDef, type Timing } from "./keyframes.ts";
 import { isVisible, watchVisibility } from "./visibility.ts";
-import { ours } from "./native.ts";
+import { ours, setRate } from "./native.ts";
 import { clamp } from "../../core/util.ts";
 
 export type { Timing };
@@ -497,7 +497,7 @@ export class Playback {
   /** Global speed or own rate changed. */
   syncRate(): void {
     const rate = this.#rate * rateScale();
-    for (const e of this.#collect()) if (e.native) { try { e.native.updatePlaybackRate(rate); } catch { e.native.playbackRate = rate; } }
+    for (const e of this.#collect()) if (e.native) setRate(e.native, rate);
   }
   /** Global pause changed. */
   syncPause(): void { if (this.state === "running") this.#syncNatives(true); }

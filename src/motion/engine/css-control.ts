@@ -4,7 +4,7 @@
 // View Transition snapshots included.
 //   cssAnimations(panel).pause()   cssAnimations().rate(0.5)   cssAnimations(dialog).finish()
 import { onConfig, rateScale, pausedNow } from "./config.ts";
-import { ours, baseRate, pausedByUs, adopt } from "./native.ts";
+import { ours, baseRate, pausedByUs, adopt, setRate } from "./native.ts";
 
 export interface CssControls {
   /** The CSS animations and transitions found (not the engine's own). */
@@ -34,7 +34,7 @@ export function cssAnimations(root?: Element | Document): CssControls {
     play: () => list.forEach((a) => a.play()),
     finish: () => list.forEach((a) => { try { a.finish(); } catch { /* endless */ } }),
     cancel: () => list.forEach((a) => a.cancel()),
-    rate: (r) => list.forEach((a) => { baseRate.set(a, r); a.updatePlaybackRate(r * rateScale()); }),
+    rate: (r) => list.forEach((a) => { baseRate.set(a, r); setRate(a, r * rateScale()); }),
   };
 }
 

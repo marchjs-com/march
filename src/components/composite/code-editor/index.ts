@@ -14,7 +14,7 @@ import { uid } from "../../../core/util.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { model, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { tokenize, type Token } from "../../../ui/highlight.ts";
-import { scanBrackets, bracketAt, wordAt, occurrences, findAll, pairAction, pairAround, tagToClose, fitPaste, applyEdits, PAIRS } from "./assist.ts";
+import { scanBrackets, bracketAt, wordAt, occurrences, findAll, pairAction, pairAround, tagToClose, fitPaste, applyEdits, PAIRS, headEdit } from "./assist.ts";
 import { findBar, type FindState, type FindMode } from "./find.ts";
 import { createHistory } from "./history.ts";
 import { TextInput } from "../../forms/text-input/index.ts";
@@ -35,7 +35,7 @@ import { withColor } from "../../../theme/colors.ts";
 export { jsxCompleter, type JsxProp } from "./jsx.ts";
 
 messages("tr", {
-  "Code": "Kod", "Suggestions": "Öneriler", "suggestions": "öneriler", "Copy": "Kopyala", "Suggestion source": "Önerilerin kaynağı", "No suggestions here": "Bu kaynakta öneri yok",
+  "Code": "Kod", "Suggestions": "Öneriler", "suggestions": "öneriler", "Copy": "Kopyala", "Suggestion source": "Önerilerin kaynağı", "Suggestion group": "Öneri grubu", "No suggestions here": "Bu kaynakta öneri yok",
   "Keyboard shortcuts": "Klavye kısayolları", "Editor": "Editör", "Indent (or take the suggestion)": "Girinti (ya da öneriyi al)", "Outdent": "Girintiyi azalt",
   "New line, keeping the indent": "Yeni satır, girinti korunur", "Comment / uncomment lines": "Satırları yorum yap / aç", "Move lines up": "Satırları yukarı taşı",
   "Move lines down": "Satırları aşağı taşı", "Copy lines up": "Satırları yukarı kopyala", "Copy lines down": "Satırları aşağı kopyala", "Delete lines": "Satırları sil",
@@ -78,7 +78,11 @@ export interface CodeSuggestion {
   priority?: number;
 }
 /** A row's definition, shown under the list for the row picked out: its kind, its signature, what it does. */
-export interface CodeDoc { kind?: string | undefined; signature?: string | undefined; doc?: string | undefined }
+export interface CodeDoc {
+  kind?: string | undefined; signature?: string | undefined; doc?: string | undefined;
+  /** Its parts under the text (a component's props: name and type, then what it does), one row each. */
+  list?: readonly { label: string; doc?: string | undefined }[] | undefined;
+}
 /** A parameter of a signature: its text ("data: any[]") and what it is. */
 export interface CodeParam { label: string; doc?: string | undefined }
 /**
@@ -99,6 +103,9 @@ export interface CodeCompletion {
   all?: boolean;
   /** Where the caret is, as a language service sees it: in code, a string, a comment or the text between tags. */
   where?: "code" | "string" | "comment" | "text";
+  /** The list opens at once (after a space, in an empty value) and stays open while the word is typed, narrowing as
+   * it goes (a tag's props, a prop's values), also with suggest="ghost". */
+  open?: boolean;
 }
 /** Where the caret is when suggestions are asked for. */
 export interface CodeCompleteContext {
@@ -196,7 +203,7 @@ export interface CodeEditorProps extends ControlProps<string> {
   suggest?: "list" | "ghost" | undefined;
   /** Characters that open the list even with suggest="ghost" (default "."): `console.` lists its members. @tr suggest="ghost" iken bile listeyi açan karakterler (varsayılan "."): `console.` üyelerini listeler. */
   listOn?: string | undefined;
-  /** With suggest="ghost": the list opens too once the word is this long (default 3); 0: only with Ctrl+Space or `listOn`. @tr suggest="ghost" iken kelime bu uzunluğa varınca liste de açılır (varsayılan 3); 0: yalnız Ctrl+Space ya da `listOn` ile. */
+  /** With suggest="ghost": the list opens too once the word is this long (default 2); 0: only with Ctrl+Space or `listOn`. @tr suggest="ghost" iken kelime bu uzunluğa varınca liste de açılır (varsayılan 2); 0: yalnız Ctrl+Space ya da `listOn` ile. */
   listAfter?: number | undefined;
   /** The chosen chip (default: the first); `onSourceChange` tells the owner (to keep it). @tr Seçili çip (varsayılan: ilki); `onSourceChange` sahibine bildirir (tutması için). */
   source?: MaybeFn<string | undefined>;
@@ -280,7 +287,14 @@ export function CodeEditor(props: CodeEditorProps): Element {
   // the source chips: the rows shown are the chosen source's ("all": every row)
   const chosen = signal(untrack(() => val(props.source)) ?? props.sources?.[0]?.value ?? "all");
   effect(() => { const s = val(props.source); if (s) chosen.set(s); });
-  const shown = computed((): readonly CodeSuggestion[] => { const d = done(), items = d?.items ?? [], s = chosen(); return !props.sources || s === "all" || d?.all ? items : items.filter((it) => it.source === s); });
+  // the group chips over a list whose rows have headings ("": every group): the rows shown are the chosen group's
+  const groupPick = signal("");
+  const groupsOf = computed((): string[] => [...new Set((done()?.items ?? []).map((it) => it.group ?? ""))].filter(Boolean));
+  const shown = computed((): readonly CodeSuggestion[] => {
+    const d = done(), s = chosen(), g = groupPick();
+    const items = !props.sources || s === "all" || d?.all ? d?.items ?? [] : (d?.items ?? []).filter((it) => it.source === s);
+    return g && groupsOf().includes(g) ? items.filter((it) => it.group === g) : items;
+  });
 
   // ---- the coloured copy under the (transparent) text field: same text, same wrapping
   const seen = new Set<string>();
@@ -472,10 +486,12 @@ export function CodeEditor(props: CodeEditorProps): Element {
     const show = (c: CodeCompletion | null | undefined): void => {
       const word = c ? input.value.slice(c.from, caret) : "";
       const items = c ? rank(c.items, word) : [];
+      // a place that lists its words at once (a tag's props): open, and kept open while typing
+      if (c?.open && items.length) sticky = true;
       const ghosting = props.suggest === "ghost";
       // the ghost (the best row's rest at the caret) and, below, the list: both while typing
       ghost.set(ghosting && !forced && c ? likeliest({ ...c, items }, caret) : null);
-      const min = props.listAfter ?? 3;
+      const min = props.listAfter ?? 2;
       // rows the place's type expects open the list even before a letter is typed (const ok: boolean = → true, false)
       const open = !ghosting || sticky || (min > 0 && word.length >= min) || (!word && items.some((it) => (it.priority ?? 0) > 0));
       batch(() => { active.set(0); done.set(open && c && items.length ? { from: c.from, to: c.to ?? caret, items, ...(c.all ? { all: true } : {}) } : null); });
@@ -509,23 +525,31 @@ export function CodeEditor(props: CodeEditorProps): Element {
     close();
     const text = g.item.insert ?? g.item.label;
     input.setRangeText(text, g.from, g.at, "end");
-    let caret = g.from + text.length - (g.item.back ?? 0);
-    if (g.item.head && !input.value.includes(g.item.head)) { input.setRangeText(`${g.item.head}\n`, 0, 0, "preserve"); caret += g.item.head.length + 1; }
+    const caret = addHead(g.item.head, g.from + text.length - (g.item.back ?? 0));
     input.setSelectionRange(caret, caret);
     set(input.value);
+    // `again` (a prop with values: variant="|"): the next list opens at once, as after a pick from the list
+    if (g.item.again) ask(true);
   };
-  const close = (): void => { sticky = false; if (done.peek()) done.set(null); };
+  /** A row's import line written into the text (see headEdit); returns the caret moved by what went before it. */
+  const addHead = (head: string | undefined, caret: number): number => {
+    const e = headEdit(input.value, head);
+    if (!e) return caret;
+    input.setRangeText(e.text, e.at, e.at, "preserve");
+    return e.at <= caret ? caret + e.text.length : caret;
+  };
+  const close = (): void => { sticky = false; groupPick.set(""); if (done.peek()) done.set(null); };
   const pick = (i: number): void => {
     const d = done.peek(), item = shown.peek()[i];
     if (!d || !item) return;
     ghost.set(null);
     const text = item.insert ?? item.label;
     input.setRangeText(text, d.from, d.to, "end");
-    let caret = d.from + text.length - (item.back ?? 0);
-    // the row's import, at the top, when the text does not have it
-    if (item.head && !input.value.includes(item.head)) { input.setRangeText(`${item.head}\n`, 0, 0, "preserve"); caret += item.head.length + 1; }
+    // the row's import, when the text does not have it (joined to the module's import line, else at the top)
+    const caret = addHead(item.head, d.from + text.length - (item.back ?? 0));
     input.setSelectionRange(caret, caret);
     // `again`: the list stays open and takes the next rows (closing and opening it again would mount a second list)
+    groupPick.set("");
     if (!item.again) { sticky = false; done.set(null); }
     set(input.value);
     if (item.again) ask(true);
@@ -1051,7 +1075,8 @@ export function CodeEditor(props: CodeEditorProps): Element {
   });
   const docView = (doc: CodeDoc, cls: string): unknown => h("div", { class: cx("m-ced-doc", cls) },
     doc.kind || doc.signature ? h("div", { class: "m-ced-doc-head" }, doc.kind ? h("span", { class: "m-ced-doc-kind" }, doc.kind) : null, doc.signature ? h("code", { class: "m-ced-doc-sig" }, doc.signature) : null) : null,
-    doc.doc ? h("p", { class: "m-ced-doc-text" }, doc.doc) : null);
+    doc.doc ? h("p", { class: "m-ced-doc-text" }, doc.doc) : null,
+    doc.list?.length ? h("ul", { class: "m-ced-doc-list" }, doc.list.map((x) => h("li", {}, h("code", {}, x.label), x.doc ? h("span", {}, x.doc) : null))) : null);
   const detailPane = (): unknown => { const doc = detail()?.doc; return doc && (doc.signature || doc.doc) ? docView(doc, "is-row") : null; };
   // the signature: the overload that fits, its parameters with the one being written lit, then that parameter's text
   const sigAnchor = virtualAnchor(() => rectAt(input.selectionStart ?? 0), () => input);
@@ -1072,12 +1097,19 @@ export function CodeEditor(props: CodeEditorProps): Element {
   });
   const list = h(Popover, {
     anchor: () => anchor, open: () => open(), onOpenChange: (o: boolean) => { if (!o) close(); }, role: null, flush: true, autoFocus: false, placement: "bottom-start", panelClass: "m-ced-list",
-    children: (_close: unknown) => [h(OptionList<number>, {
+    children: (_close: unknown) => [() => (groupsOf().length > 1 ? groupBar() : null), h(OptionList<number>, {
       id: `${id}-list`, keysFrom: input, active, inline: true, check: false, size: "sm", label: () => val(props.suggestionsLabel) ?? t`Suggestions`, empty: false,
       options: () => shown().map((it, i) => ({ value: i, label: it.label, hint: it.hint, group: it.group })),
       onPick: (i: number) => { pick(i); input.focus(); },
     }), detailPane, props.sources?.length ? () => (done()?.all ? null : sourceBar()) : null],
   });
+  // the group chips over a list with headings (March, Ortak, HTML…): one group's rows, or every row; a press keeps the
+  // focus in the text (the list stays open, typing still narrows it)
+  const groupBar = (): unknown => h("div", { class: "m-ced-groups", role: "group", "aria-label": t`Suggestion group`, onPointerdown: (e: Event) => e.preventDefault() },
+    ["", ...groupsOf()].map((g) => h(Chip, {
+      size: "sm", selected: () => groupPick() === g, children: g || t`All`,
+      onClick: () => { groupPick.set(g); active.set(0); },
+    })));
   // the chips under the list; a press keeps the focus in the text (the list stays open)
   const sourceBar = (): unknown => h("div", { class: "m-ced-sources", role: "group", "aria-label": t`Suggestion source`, onPointerdown: (e: Event) => e.preventDefault() },
     (props.sources ?? []).map((s) => h(Chip, {

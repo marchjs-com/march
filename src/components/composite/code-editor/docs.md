@@ -44,7 +44,7 @@ typed and on Ctrl + Space (names already written are left out); the values of a 
 | `shortcutsLabel` | string / accessor | "Keyboard shortcuts" | name of the button and the menu |
 | `describe` | `(row, { value, at }) => CodeDoc \| Promise` | — | the definition of the row picked out in the list (`{ kind, signature, doc }`), shown under it; a row's own `doc` comes first |
 | `signature` | `({ value, caret }) => CodeSignature \| Promise` | — | inside a call's parentheses: asked on `(` and `,` and while the caret moves in the call; the overload that fits, the parameter being written lit, its documentation; `)` or Escape closes it |
-| `listAfter` | number | `3` | with `suggest="ghost"`: the list opens too once the word is this long; 0: only on Ctrl+Space / `listOn` |
+| `listAfter` | number | `2` | with `suggest="ghost"`: the list opens too once the word is this long; 0: only on Ctrl+Space / `listOn` |
 | `listOn` | string | `"."` | characters that open the list even with `suggest="ghost"` (a member list) |
 | `copy` | boolean | `true` | the copy button (an icon button) |
 | `copyLabel` | string / accessor | "Copy" | its accessible name and tooltip |
@@ -86,7 +86,9 @@ nothing in a comment or the text between JSX tags, and in a string only the word
 A suggestion: `{ label, hint?, insert?, back?, again?, source?, head?, priority? }`: `insert` replaces the word being written (default: the
 label), `back` moves the caret back into what was inserted (`variant=""` → inside the quotes), `again` asks for
 suggestions right after the pick (the values of the prop just written), `source` is what the `sources` chips filter
-by, `head` a line written at the top of the text with the pick when it is not there yet (the row's import).
+by, `head` a line written with the pick when the text does not have it yet (the row's import): a name from a module the
+text already imports from joins that import's braces (`{ plus, trash }`), anything else goes at the top. `again` works
+for a pick by Tab on the ghost too.
 
 ## Keys
 
@@ -112,7 +114,8 @@ by, `head` a line written at the top of the text with the pick when it is not th
 
 Edits go through the browser's own undo (Ctrl+Z). Rows are ranked for the word typed: first the shortest name that
 starts with it in the same case (`con` → `console` before `consoleTransport`), then by source in the chips' order
-(March first), how well they fit and length; the ghost shows the first row. A row with a `group` is listed under its heading; a completion with
+(March first), how well they fit and length; the ghost shows the first row. A row with a `group` is listed under its heading, and a list with two
+or more groups gets a chip per group over it (All, then each group: the rows of that group only); a completion with
 `all: true` shows every row whatever source chip is chosen (a member list after a dot: `console.` → Methods, Properties).
 
 ## Code style
