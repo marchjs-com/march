@@ -39,6 +39,11 @@ A panel can show a **file** instead of `content`: `{ id, title, file: { path, te
 file type that opens its path draws it (a plugin may come later: the panel is drawn again then); without one it is plain
 text. `codeEditorPlugin()` opens code files (.ts, .tsx, .js, .jsx, .css, .html, .json, .sh) in a CodeEditor; a
 language service plugin can give its suggestions (the `language` service: `complete(path, ctx)`).
+Its options: `save(file)` (Ctrl+S), `match` (the paths it opens), `problems(path, list, text)` (a file's TypeScript
+errors and warnings changed; empty when it has none or its editor closed: an app's Problems panel),
+`openProblems(path)` (the problem count under the code becomes a button) and `goTo(path)` (reactive: where to put a
+file's caret, a new `{ from, to? }` each time: a problem picked from a list). Lines with a problem get a red / amber
+icon in the gutter.
 
 ```tsx
 const myPlugin = definePlugin({

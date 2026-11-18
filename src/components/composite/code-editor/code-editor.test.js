@@ -226,6 +226,24 @@ test("CodeEditor: a word written whole whose row writes more (icon → icon=\"\"
   dispose();
 });
 
+test("CodeEditor: a line with an error / warning mark gets an icon in the gutter; onMessage makes the message a button; goTo puts the caret", async () => {
+  const code = signal("a\nbb\ncc"), go = signal(null), opened = [];
+  const marks = [{ from: 2, to: 4, kind: "error", title: "nope" }, { from: 5, to: 6, kind: "warning", title: "hmm" }];
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, lineNumbers: true, marks, message: "1 hata", onMessage: () => opened.push(1), goTo: go }));
+  const ln = (n) => el.querySelector(`.m-ced-ln[data-line="${n}"]`);
+  assert.ok(ln(2).classList.contains("has-error") && ln(2).querySelector(".m-ced-prob svg"), "line 2: the error icon");
+  assert.equal(ln(2).getAttribute("title"), "nope");
+  assert.ok(ln(3).classList.contains("has-warning"));
+  assert.equal(ln(1).querySelector(".m-ced-prob"), null);
+  el.querySelector("button.m-ced-msg-text").click();
+  assert.deepEqual(opened, [1]);
+  const input = caretOf(el.querySelector("textarea"));
+  go.set({ from: 5, to: 7 });
+  await tick(); await tick();
+  assert.equal(input.selectionStart, 5, "the caret at the problem");
+  dispose();
+});
+
 test("CodeEditor: lineNumbers draw a number per line with its mark, the active line is lit, F9 and the gutter call onGutter", async () => {
   const marks = signal([{ line: 2, kind: "conditional", title: "if: x" }]), lit = signal(null), pressed = [];
   const [el, dispose] = mount(() => h(CodeEditor, { value: "a\nb\nc", lineNumbers: true, lineMarks: marks, activeLine: lit, onGutter: (line) => pressed.push(line) }));

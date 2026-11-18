@@ -3,7 +3,7 @@
 // March language plugin: March's exports) and, when it has none for the place, from the "typescript" service (the
 // whole JavaScript / TypeScript / DOM API); the TypeScript plugin's errors and warnings are underlined in the code
 // (red, amber) and counted under it with the first one's line and text.
-import { computed, signal } from "../../../core/reactive.ts";
+import { computed, signal, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { CodeEditor, type CodeCompleteContext, type CodeCompletion, type CodeMark, type CodeSuggestion, type CodeDoc } from "../code-editor/index.ts";
 import { definePlugin, type AppPlugin, type AppFile } from "./kit.ts";
@@ -26,6 +26,12 @@ export interface CodeEditorPluginOptions {
   save?: ((file: AppFile) => void) | undefined;
   /** The paths it opens (default: the code extensions above). */
   match?: RegExp | undefined;
+  /** A file's errors and warnings changed (TypeScript's): `list` is empty when it has none or its editor closed. */
+  problems?: ((path: string, list: readonly CodeProblem[], text: string) => void) | undefined;
+  /** Pressing the problem count under a file's code (e.g. open a Problems panel). */
+  openProblems?: ((path: string) => void) | undefined;
+  /** Where to put a file's caret (reactive; a new object each time): a problem picked from a list. */
+  goTo?: ((path: string) => { from: number; to?: number } | null | undefined) | undefined;
 }
 
 const CODE = /\.(m?[jt]sx?|css|html?|json|sh)$/i;
@@ -87,6 +93,11 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
           const tracked = ts?.track(file);
           const problems = computed((): readonly CodeProblem[] => tracked?.problems() ?? []);
           const errors = (): number => problems().filter((p) => p.error).length;
+          // the owner hears about the file's problems (a Problems panel), and that they are gone when the editor closes
+          if (o.problems) {
+            effect(() => { const list = problems(); o.problems!(file.path, list, untrack(file.text)); });
+            onCleanup(() => o.problems!(file.path, [], ""));
+          }
           // March's rows first, then TypeScript's (JS and TS), one row per name; nothing on a blank (a space, a new
           // line, an empty text) unless asked with Ctrl + Space
           const complete = async (c: CodeCompleteContext): Promise<CodeCompletion | null> => {
@@ -155,8 +166,10 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
             sources: SOURCES, get source() { return source(); }, onSourceChange: (v: string) => { source.set(v); try { localStorage.setItem(SOURCE_KEY, v); } catch { /* private mode */ } },
             marks: (): CodeMark[] => problems().map((p) => ({ from: p.from, to: Math.max(p.to, p.from + 1), kind: p.error ? "error" : "warning", title: p.message })),
             // under the code: how many errors and warnings, and the first one with its line
+            ...(o.goTo ? { goTo: () => o.goTo!(file.path) } : {}),
             ...(ts ? {
               status: () => (errors() ? "error" : "ok"),
+              ...(o.openProblems ? { onMessage: () => o.openProblems!(file.path) } : {}),
               message: () => {
                 const list = problems();
                 if (!list.length) return "";

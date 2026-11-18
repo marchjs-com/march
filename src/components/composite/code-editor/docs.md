@@ -35,6 +35,8 @@ typed and on Ctrl + Space (names already written are left out); the values of a 
 | `flash` | `glow` `none` / `false` | `glow` | how a flash mark shows |
 | `message` | text / node / accessor / `false` | — | the foot line; `false`: no foot bar |
 | `status` | `ok` `error` / `false` / accessor | `ok` | the dot before the message; `false`: no dot |
+| `onMessage` | `() => void` | — | the message becomes a button (e.g. open a list of problems) |
+| `goTo` | `{ from, to? }` / accessor | — | puts the caret (or a selection) there, focused and in view; a new object each time |
 | `hint` | node | — | your own node at the end of the foot line |
 | `keys` | `false` / `{ [command]: boolean }` | all on | the IDE keys (below); `false`: none, Tab moves the focus |
 | `tabSize` | number | `2` | spaces of one indent |
@@ -58,7 +60,7 @@ typed and on Ctrl + Space (names already written are left out); the values of a 
 | `onBlur` | `(e) => void` | — | focus left the field (tidy the code here) |
 | `inputRef` | `(textarea) => void` | — | the text field |
 | `lineNumbers` | boolean / accessor | `false` | a gutter with each line's number (a wrapped line keeps one) |
-| `lineMarks` | `{ line, kind?, title? }[]` / accessor | — | marks beside the numbers: `breakpoint` (red dot), `conditional` (amber), `log` (diamond), `off` (hollow); any other kind is a class `is-<kind>` to style |
+| `lineMarks` | `{ line, kind?, title? }[]` / accessor | — | marks beside the numbers: `breakpoint` (red dot), `conditional` (amber), `log` (diamond), `off` (hollow); any other kind is a class `is-<kind>` to style. With line numbers, a line holding a `marks` range of kind `error` / `warning` shows a red / amber icon there (and its number in that colour; the marks' titles are its tooltip) |
 | `activeLine` | number / `{ line, kind? }` / accessor | — | a line lit across the editor (a debugger's paused line; kinds `current`, `exception`, `frame`), scrolled into view |
 | `onGutter` | `(line, e) => void` | — | a press on the gutter, or F9 at the caret's line (toggle a breakpoint) |
 | `palette` | `ide` `theme` / accessor | `ide` | syntax colours: an IDE's palette from the theme's category colours (keywords, types, functions, members, strings, numbers, tags, attributes each their own; light and dark), or the CodeView colours |

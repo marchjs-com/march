@@ -11,7 +11,7 @@ import { signal, computed, effect, untrack, batch, onCleanup, type Signal } from
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { uid } from "../../../core/util.ts";
-import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { model, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { tokenize, type Token } from "../../../ui/highlight.ts";
 import { scanBrackets, bracketAt, wordAt, occurrences, findAll, pairAction, pairAround, tagToClose, fitPaste, applyEdits, PAIRS, headEdit } from "./assist.ts";
@@ -29,6 +29,8 @@ import { Chip } from "../../actions/chip/index.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 import { Dropdown } from "../../actions/menu/index.ts";
 import { command as commandIcon } from "../../../icons/glyphs/command.ts";
+import { xCircle } from "../../../icons/glyphs/xCircle.ts";
+import { alertTriangle } from "../../../icons/glyphs/alertTriangle.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { withColor } from "../../../theme/colors.ts";
 
@@ -159,6 +161,13 @@ export interface CodeEditorProps extends ControlProps<string> {
   marks?: MaybeFn<readonly CodeMark[] | undefined>;
   /** The foot line: what the owner says about the code (a text or a node; reactive). `false`: no foot bar. @tr Alt satır: sahibinin kod hakkında söylediği (metin ya da düğüm; reaktif). `false`: alt çubuk yok. */
   message?: MaybeFn<unknown>;
+  /** Pressing the foot line's message (it becomes a button): e.g. open the list of problems. @tr Alt satırdaki mesaja basınca (mesaj düğme olur): ör. sorunlar listesini aç. */
+  onMessage?: (() => void) | undefined;
+  /**
+   * Put the caret (or a selection) there, focused and in view: a new object each time (`{ from, to? }`, the text's
+   * offsets). @tr İmleci (ya da seçimi) oraya koy, odaklı ve görünür: her seferinde yeni bir nesne (`{ from, to? }`, metnin konumları).
+   */
+  goTo?: MaybeFn<{ from: number; to?: number | undefined } | null | undefined>;
   /** The dot before the message: "ok" (default) or "error". `false`: no dot. @tr Mesajdan önceki nokta: "ok" (varsayılan) ya da "error". `false`: nokta yok. */
   status?: MaybeFn<"ok" | "error" | false | undefined>;
   /** Your own node at the end of the foot line, before the shortcuts and copy buttons (default none). @tr Alt satırın sonunda, kısayol ve kopyala düğmelerinden önce kendi düğümün (varsayılan yok). */
@@ -338,10 +347,21 @@ export function CodeEditor(props: CodeEditorProps): Element {
       for (const m of val(props.lineMarks) ?? []) lineMark.set(m.line, m);
     }
     let next = 0;
+    // the lines with a problem (marks of kind "error" / "warning"): an icon in the gutter, the worst one wins
+    const probs = new Map<number, { error: boolean; titles: string[] }>();
+    if (gutter()) for (const m of list) {
+      if (m.kind !== "error" && m.kind !== "warning") continue;
+      let lo = 0, hi = starts.length - 1;
+      while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (starts[mid]! <= m.from) lo = mid; else hi = mid - 1; }
+      const p = probs.get(lo + 1) ?? { error: false, titles: [] };
+      p.error ||= m.kind === "error"; if (m.title) p.titles.push(m.title);
+      probs.set(lo + 1, p);
+    }
     const lineNode = (n: number): unknown => {
-      const m = lineMark.get(n);
+      const m = lineMark.get(n), p = probs.get(n);
       return [active?.line === n ? h("span", { class: `m-ced-lit is-${active.kind ?? "current"}`, "aria-hidden": "true" }) : null,
-        h("span", { class: cx("m-ced-ln", m && `is-${m.kind ?? "breakpoint"}`), "data-line": n, title: m?.title ?? null })];
+        h("span", { class: cx("m-ced-ln", m && `is-${m.kind ?? "breakpoint"}`, p && (p.error ? "has-error" : "has-warning")), "data-line": n, title: m?.title ?? (p ? p.titles.join("\n") : null) },
+          p && !m ? h("span", { class: "m-ced-prob", "aria-hidden": "true" }, glyph(p.error ? xCircle : alertTriangle)) : null)];
     };
     const g = ghost();
     let ghostDone = !g;
@@ -809,6 +829,16 @@ export function CodeEditor(props: CodeEditorProps): Element {
     input.focus({ preventScroll: true }); input.setSelectionRange(at, at); readSel(); reveal(at);
   };
 
+  // goTo: the owner puts the caret there (a problem picked from a list)
+  effect(() => {
+    const g = val(props.goTo);
+    if (!g) return;
+    untrack(() => {
+      const at = Math.min(Math.max(0, g.from), input.value.length), to = Math.min(Math.max(at, g.to ?? at), input.value.length);
+      queueMicrotask(() => { input.focus({ preventScroll: true }); input.setSelectionRange(at, to); readSel(); reveal(at); });
+    });
+  });
+
   // ---- definition (F12, Ctrl + click), rename (F2), format (Shift + Alt + F), the note at the caret
   const note = signal<{ at: number; doc: CodeDoc; n: number } | null>(null);
   let notes = 0, noteTimer: ReturnType<typeof setTimeout> | undefined;
@@ -1152,7 +1182,9 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const keysButton = props.shortcuts === false ? null : h(Dropdown, { icon: commandIcon, label: keysLabel, variant: "ghost", size: "sm", placement: "top-end", class: "m-ced-keys-btn", panelClass: "m-ced-keys-panel", children: () => keysMenu() });
   const foot = props.message === false ? undefined : h("span", { class: () => cx("m-ced-msg", status() === "error" && "is-error"), id: `${id}-msg`, role: "status", "aria-live": "polite" },
     () => (status() === false ? null : h(StatusDot, { tone: untrack(status) === "error" ? "warn" : "success", size: "sm" })),
-    h("span", { class: "m-ced-msg-text" }, () => val(props.message)));
+    props.onMessage
+      ? h("button", { type: "button", class: "m-ced-msg-text is-button", onClick: () => props.onMessage!() }, () => val(props.message))
+      : h("span", { class: "m-ced-msg-text" }, () => val(props.message)));
   // the find bar (made once, kept while it is open)
   let bar: Element | null = null;
   const barOpen = computed(() => !!fs.mode());
