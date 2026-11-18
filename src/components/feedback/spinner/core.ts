@@ -1,4 +1,4 @@
-// The spinner's ring alone: one element and its classes; no text, no colour lists. Spinner and Button draw this one.
+// The spinner's ring alone: one element and its classes; no text, no colour lists. Spinner draws it (Button draws the Spinner itself, so the Hierarchy and m:parts see it).
 import { h } from "../../../dom/h.ts";
 import { val, cx, type MaybeFn } from "../../../ui/util.ts";
 
