@@ -245,10 +245,16 @@ export interface AiChatProps {
   system?: string | (() => string | Promise<string>) | undefined;
   /** A signal the plugin sets to send a message from a command ("explain", "fix"…). */
   ask?: (() => { text: string; label?: string; n: number } | null) | undefined;
+  /** Reference text for one message (the docs of what it uses): sent with that message only, not kept in the history. */
+  reference?: ((text: string, context: AiContext) => Promise<string>) | undefined;
   /** Bumped when the keys change (the provider list is read again). */
   version?: (() => number) | undefined;
 }
-interface Msg { role: "user" | "assistant"; content: string; shown?: string; usage?: Usage; model?: string; error?: string; done?: boolean }
+interface Msg { role: "user" | "assistant"; content: string; shown?: string; usage?: Usage; model?: string; error?: string; done?: boolean; cut?: boolean }
+/** The answer stopped at the length limit (each provider names it its own way). */
+const isCut = (stop: string | undefined): boolean => stop === "max_tokens" || stop === "length" || stop === "MAX_TOKENS";
+/** The longest answer asked for (a whole file fits; a longer one goes on with Continue). */
+const MAX_ANSWER = 16_000;
 const MAX_CODE = 60_000;
 /** The parts of an answer: text and fenced code blocks. */
 export interface Part { code: boolean; text: string; lang: string }
@@ -315,17 +321,35 @@ export function AiChatPanel(props: AiChatProps) {
     msgs.set([...untrack(msgs), user, answer]);
     input.set(""); busy.set(true);
     stop = new AbortController();
-    const at = untrack(msgs).length - 1;
+    const ref = props.reference ? await props.reference(`${text}\n${ctx}`, props.context?.() ?? {}).catch(() => "") : "";
+    await run(cur, key, untrack(msgs).length - 1, [...history, { role: "user", content: ref ? `${ref}\n\n${user.content}` : user.content }], "");
+  };
+  /** Asks and streams the answer into message `at`, after `before` (the text it already has: a continuation). */
+  const run = async (cur: { id: string; model: string }, key: string, at: number, messages: ChatMessage[], before: string): Promise<void> => {
+    busy.set(true);
+    stop = new AbortController();
     const put = (m: Partial<Msg>): void => { const all = [...untrack(msgs)]; all[at] = { ...all[at]!, ...m }; msgs.set(all); };
+    const was = untrack(msgs)[at]?.usage;
     queueMicrotask(scroll);
     try {
       const base = await systemText();
-      const r = await chat({ provider: cur.id, key, model: cur.model, system: `${base ? `${base}\n\n` : ""}The user's interface language: ${untrack(locale)}; answer in it unless the user writes in another one.`, messages: [...history, { role: "user", content: user.content }], signal: stop.signal,
-        onText: (_, all) => { put({ content: all }); scroll(); } });
-      put({ content: r.text, usage: r.usage, model: r.model, done: true });
+      const r = await chat({ provider: cur.id, key, model: cur.model, maxTokens: MAX_ANSWER, system: `${base ? `${base}\n\n` : ""}The user's interface language: ${untrack(locale)}; answer in it unless the user writes in another one.`, messages, signal: stop.signal,
+        onText: (_, all) => { put({ content: before + all }); scroll(); } });
+      const usage = was ? { input: was.input + r.usage.input, output: was.output + r.usage.output, ...((was.cached ?? 0) + (r.usage.cached ?? 0) ? { cached: (was.cached ?? 0) + (r.usage.cached ?? 0) } : {}) } : r.usage;
+      put({ content: before + r.text, usage, model: r.model, done: true, cut: isCut(r.stop) });
     } catch (e) {
       put({ error: e instanceof AiError && e.code === "abort" ? t("Stopped.") : errText(e), done: true });
     } finally { busy.set(false); stop = null; queueMicrotask(scroll); }
+  };
+  /** An answer cut at the length limit goes on in the same message (the model is told where it stopped). */
+  const goOn = async (at: number): Promise<void> => {
+    const cur = untrack(current), key = cur ? await props.keys.get(cur.id) : undefined, all = untrack(msgs), m = all[at];
+    if (!cur || !key || !m || untrack(busy)) return;
+    const history: ChatMessage[] = all.slice(0, at).filter((x) => !x.error).map((x) => ({ role: x.role, content: x.content }));
+    const open = (m.content.match(/```/g)?.length ?? 0) % 2 === 1;
+    const ask = `Your answer stopped at the length limit. Continue exactly where it stopped: no repeat, no preface${open ? ", and you are inside a code block: go on with its code (do not open a new block), then close it" : ""}.`;
+    const all2 = [...all]; all2[at] = { ...m, done: false, cut: false }; msgs.set(all2);
+    await run(cur, key, at, [...history, { role: "assistant", content: m.content }, { role: "user", content: ask }], m.content);
   };
   const agree = async (): Promise<void> => {
     const id = untrack(consentFor);
@@ -394,12 +418,16 @@ export function AiChatPanel(props: AiChatProps) {
                         <For each={() => answerParts(m().content)}>{(p: () => Part) => (
                           <If when={() => p().code}>
                             <CodeView class="m-ai-code" code={() => p().text} lang={p().lang} copy buttons="icon" label={t("Code")}
-                              tools={() => (props.apply && props.context?.().file && m().done ? <Button size="sm" variant="secondary" icon={check} onClick={() => props.apply!(props.context!().file!, p().text)}>{t("Apply")}</Button> : null)} />
+                              tools={() => (props.apply && props.context?.().file && m().done && !m().cut ? <Button size="sm" variant="secondary" icon={check} onClick={() => props.apply!(props.context!().file!, p().text)}>{t("Apply")}</Button> : null)} />
                             <Else><p class="m-ai-text">{() => inline(p().text.trim())}</p></Else>
                           </If>
                         )}</For>
                         <If when={() => m().done === false && !m().content}><p class="m-ai-wait" aria-label={t("Thinking")}><i /><i /><i /></p></If>
                         <If when={() => m().error}><p class="m-ai-err" role="alert">{() => m().error}</p></If>
+                        <If when={() => m().cut}>
+                          <div class="m-ai-cut"><span>{t("The answer reached the length limit.")}</span>
+                            <Button size="sm" variant="primary" disabled={() => busy()} onClick={() => void goOn(msgs().indexOf(m()))}>{t("Continue")}</Button></div>
+                        </If>
                         <If when={() => m().usage}><p class="m-ai-meta">{() => `${m().model ?? ""} · ↑${k(m().usage!.input)}${m().usage!.cached ? ` (${k(m().usage!.cached!)} ${t("cached")})` : ""} ↓${k(m().usage!.output)}`}</p></If>
                       </Else>
                     </If>

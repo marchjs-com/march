@@ -100,7 +100,9 @@
 .m-ai-msg { display: grid; gap: var(--m-space-2); max-inline-size: 100%; }
 .m-ai-msg.is-user { justify-self: end; max-inline-size: 85%; padding: var(--m-space-2) var(--m-space-3); border-radius: var(--m-radius-3) var(--m-radius-3) var(--m-radius-1) var(--m-radius-3); background: color-mix(in oklab, var(--m-primary) 12%, var(--m-surface)); }
 .m-ai-text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--m-text-sm); line-height: 1.55; }
-.m-ai-code { max-block-size: 24rem; }
+/* a code block scrolls inside (its frame hides what overflows: the limit goes on the code, not the frame) */
+.m-ai-code .m-code-pre { max-block-size: min(28rem, 60vh); }
+.m-ai-cut { display: flex; flex-wrap: wrap; align-items: center; gap: var(--m-space-2); color: var(--m-muted); font-size: var(--m-text-xs); }
 .m-ai-meta { margin: 0; color: var(--m-muted); font: var(--m-text-xs) var(--m-font-mono); }
 .m-ai-wait { display: flex; gap: .3rem; margin: 0; }
 .m-ai-wait > i { inline-size: .4rem; block-size: .4rem; border-radius: 50%; background: var(--m-muted); opacity: .35; animation: m-fade-in var(--m-dur-slow) infinite alternate; }

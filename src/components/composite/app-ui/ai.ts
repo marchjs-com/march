@@ -54,7 +54,7 @@ messages("tr", {
   "Too short": "Çok kısa", "Weak": "Zayıf", "Fair": "İdare eder", "Good": "İyi", "Strong": "Güçlü",
   "Explain": "Açıkla", "Fix": "Düzelt", "Write tests": "Test yaz", "Improve": "İyileştir",
   "Lock the vault": "Kasayı kilitle", "AI: explain the file": "AI: dosyayı açıkla", "AI: fix the file": "AI: dosyayı düzelt", "AI: write tests": "AI: test yaz",
-  "AI: ask about the selection": "AI: seçimi sor", "cached": "önbellekten", "Open AI keys": "AI anahtarlarını aç", "Open the vault in AI keys; the chat is ready here as soon as it is open.": "Kasayı AI anahtarları sekmesinde aç; açılınca sohbet burada hazır olur.",
+  "AI: ask about the selection": "AI: seçimi sor", "cached": "önbellekten", "The answer reached the length limit.": "Yanıt uzunluk sınırına ulaştı.", "Continue": "Devam et", "Open AI keys": "AI anahtarlarını aç", "Open the vault in AI keys; the chat is ready here as soon as it is open.": "Kasayı AI anahtarları sekmesinde aç; açılınca sohbet burada hazır olur.",
 });
 
 /** What the vault plugin provides (service "vault"): the vault and the AI keys in it. */
@@ -99,6 +99,8 @@ export interface AiPluginOptions {
   system?: string | (() => string | Promise<string>) | undefined;
   /** The panel (id "ai"). */
   panel?: { id?: string; title?: string; place?: DockPanel["place"] } | undefined;
+  /** Reference text for a message (the docs of the names it uses), sent with that message only. */
+  reference?: ((text: string, context: AiContext) => Promise<string>) | undefined;
   /** The keys panel's id (default "ai-keys"). */
   keysPanel?: string | undefined;
 }
@@ -121,7 +123,7 @@ export function aiPlugin(o: AiPluginOptions = {}): AppPlugin {
       };
       ctx.provide("ai", svc);
       ctx.panel({ id: panelId, title: o.panel?.title ?? t("AI"), icon: sparkles, ...(o.panel?.place ? { place: o.panel.place } : {}),
-        content: () => h(ChatPanel, { vault: v.vault, keys: v.keys, context: o.context, apply: o.apply, system: o.system, ask: () => asked(), version: v.version,
+        content: () => h(ChatPanel, { vault: v.vault, keys: v.keys, context: o.context, apply: o.apply, system: o.system, reference: o.reference, ask: () => asked(), version: v.version,
           openKeys: () => o.open?.(o.keysPanel ?? "ai-keys") }) });
       const cmds: [string, string, string, (() => boolean)?][] = [
         ["ai.explain", "AI: explain the file", "Explain what this code does, briefly, step by step."],
