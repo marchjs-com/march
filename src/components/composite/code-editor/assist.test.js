@@ -81,3 +81,30 @@ test("tagPair: an opening tag's name and its closing tag's, past nested and self
   assert.equal(tagPair(v, v.indexOf("Button") + 1), null, "a self-closing tag has no pair");
   assert.equal(tagPair(v, 0), null, "outside a name");
 });
+
+test("folding: ranges (brackets, JSX elements over lines), the view and its positions, an edit made on the model", async () => {
+  const { foldRanges, foldView, toFoldView, toFoldModel, foldEdit, scanBrackets: scan } = await import("./assist.ts");
+  const { tokenize: tok } = await import("../../../ui/highlight.ts");
+  const src = "function A() {\n  return <Row>\n    <B />\n  </Row>\n}\nx";
+  const r = foldRanges(src, scan(tok(src, "tsx")).mate);
+  assert.deepEqual(r.map((x) => x.line), [1, 2]);
+  assert.equal(src.slice(r[0].from, r[0].to), "\n  return <Row>\n    <B />\n  </Row>\n");
+  assert.equal(src.slice(r[1].from, r[1].to), "\n    <B />\n  ");
+  const folds = [{ from: r[1].from, to: r[1].to, text: src.slice(r[1].from, r[1].to) }];
+  const view = foldView(src, folds, "⋯");
+  assert.equal(view, "function A() {\n  return <Row>⋯</Row>\n}\nx");
+  const ph = view.indexOf("⋯");
+  assert.equal(toFoldView(folds, r[1].from + 3), ph, "inside a fold: its placeholder");
+  assert.equal(toFoldModel(folds, ph), r[1].from);
+  assert.equal(toFoldModel(folds, ph + 1), r[1].to);
+  assert.equal(toFoldView(folds, src.length), view.length);
+  // typing after the fold moves it; deleting its placeholder takes its text
+  const e1 = foldEdit(src, folds, view, view.replace("\nx", "\nxy"));
+  assert.equal(e1.model, src + "y");
+  assert.equal(e1.folds.length, 1);
+  const e2 = foldEdit(src, folds, view, view.replace("⋯", ""));
+  assert.equal(e2.model, "function A() {\n  return <Row></Row>\n}\nx");
+  assert.equal(e2.folds.length, 0);
+  const e3 = foldEdit(src, folds, view, view.replace("function", "const"));
+  assert.equal(e3.folds[0].from, r[1].from - 3, "an edit before it moves it back");
+});

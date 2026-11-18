@@ -69,11 +69,11 @@
 .m-ced-list { inline-size: min(26rem, calc(100vw - 16px)); font-family: var(--m-font-mono); }
 /* lineNumbers: a gutter at the start; each line's number (and its mark) sits at its line's start, the lit line's bar
    lies behind the text; the press area over the gutter takes the clicks (the text field keeps the rest) */
-.m-ced.is-gutter { --m-ced-gutter: 3.4em; }
+.m-ced.is-gutter { --m-ced-gutter: 4em; }
 .m-ced.is-gutter :is(.m-ced-paint, .m-ced-deco, .m-ced-input) { padding-inline-start: calc(var(--m-ced-gutter) + var(--m-space-3)); }
 
 .m-ced.is-gutter .m-ced-area::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: var(--m-ced-gutter); border-inline-end: var(--m-border-w, 1px) solid var(--m-border); background: color-mix(in srgb, var(--m-text) 3%, transparent); pointer-events: none; }
-.m-ced-ln { position: absolute; inset-inline-start: 0; inline-size: var(--m-ced-gutter); padding-inline-end: .7em; box-sizing: border-box; text-align: end; color: var(--m-muted); opacity: .7; font-size: .85em; line-height: calc(var(--m-ced-lh, 1.7) * 1em / .85); }
+.m-ced-ln { position: absolute; inset-inline-start: 0; inline-size: var(--m-ced-gutter); padding-inline-end: 1.35em; box-sizing: border-box; text-align: end; color: var(--m-muted); opacity: .7; font-size: .85em; line-height: calc(var(--m-ced-lh, 1.7) * 1em / .85); }
 .m-ced-ln::before { content: attr(data-line); }
 .m-ced-ln::after { content: ""; position: absolute; inset-inline-start: .45em; inset-block-start: 50%; inline-size: .8em; block-size: .8em; translate: 0 -50%; border-radius: 50%; opacity: 0; transition: opacity var(--m-dur-fast) var(--m-ease); }
 .m-ced-ln.is-hover::after { opacity: .35; background: var(--m-danger); }
@@ -153,12 +153,18 @@
 .m-ced-refs .m-option-hint, .m-ced-refs [class*="hint"] { font-variant-numeric: tabular-nums; }
 /* sticky scroll: the lines that open the blocks around the top line, over the text while it scrolls */
 .m-ced-sticky { position: absolute; z-index: 4; inset-inline: 0; inset-block-start: var(--m-ced-sticky-top, 0); display: grid; background: var(--m-surface); border-block-end: var(--m-border-w, 1px) solid var(--m-border); box-shadow: 0 4px 10px -8px color-mix(in srgb, var(--m-text) 40%, transparent); font: var(--m-ced-size, var(--m-text-sm)) / var(--m-ced-lh, 1.7) var(--m-font-mono); }
-.m-ced-sticky-line { display: grid; grid-template-columns: var(--m-ced-gutter, 3.4em) minmax(0, 1fr); align-items: baseline; cursor: pointer; white-space: pre; overflow: hidden; }
+.m-ced-sticky-line { display: grid; grid-template-columns: var(--m-ced-gutter, 4em) minmax(0, 1fr); align-items: baseline; cursor: pointer; white-space: pre; overflow: hidden; }
 .m-ced-sticky-line:hover { background: color-mix(in srgb, var(--m-text) 5%, transparent); }
-.m-ced-sticky-n { padding-inline-end: .7em; color: var(--m-muted); font-size: .85em; text-align: end; }
+.m-ced-sticky-n { padding-inline-end: 1.35em; color: var(--m-muted); font-size: .85em; text-align: end; }
 .m-ced-sticky-text { padding-inline-start: var(--m-space-3); overflow: hidden; text-overflow: ellipsis; }
 /* inlay hints: at the end of their line, faint, taking no room (the text and the caret do not move) */
 .m-ced-inlay { display: inline-block; inline-size: 0; overflow: visible; white-space: nowrap; vertical-align: top; pointer-events: none; }
 .m-ced-inlay > span { margin-inline-start: 1.2ch; padding: 0 .45ch; border-radius: 3px; background: color-mix(in srgb, var(--m-text) 6%, transparent); color: var(--m-muted); font-size: .85em; font-style: italic; }
 /* a string that names a colour: a line of that colour under it */
 .m-ced-color { text-decoration: underline 3px var(--m-ced-swatch); text-underline-offset: 3px; text-decoration-skip-ink: none; }
+/* folding: a chevron at the gutter's end on the lines that open a block (shown on hover, always when folded) */
+.m-ced-fold { position: absolute; inset-inline-end: .45em; inset-block-start: 50%; inline-size: .55em; block-size: .55em; translate: 0 -60%; border-inline-end: 1.5px solid currentColor; border-block-end: 1.5px solid currentColor; rotate: 45deg; opacity: 0; color: var(--m-muted); transition: opacity var(--m-dur-fast) var(--m-ease), rotate var(--m-dur-fast) var(--m-ease); pointer-events: none; }
+.m-ced-fold.is-closed { rotate: -45deg; opacity: 1; color: var(--m-editor-accent, var(--m-primary)); }
+.m-ced.is-gutter .m-ced-area:hover .m-ced-fold.is-open, .m-ced-ln.is-hover .m-ced-fold { opacity: .8; }
+/* a folded range's placeholder: a pill (a press opens it) */
+.m-ced-fold-ph { border-radius: 4px; background: color-mix(in srgb, var(--m-editor-accent, var(--m-primary)) 18%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m-editor-accent, var(--m-primary)) 35%, transparent); }

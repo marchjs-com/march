@@ -14,7 +14,7 @@ import { uid } from "../../../core/util.ts";
 import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { model, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { tokenize, type Token } from "../../../ui/highlight.ts";
-import { scanBrackets, bracketAt, wordAt, occurrences, findAll, pairAction, pairAround, tagToClose, fitPaste, applyEdits, PAIRS, headEdit, tagPair } from "./assist.ts";
+import { scanBrackets, bracketAt, wordAt, occurrences, findAll, pairAction, pairAround, tagToClose, fitPaste, applyEdits, PAIRS, headEdit, tagPair, foldRanges, foldView, toFoldView, toFoldModel, foldEdit, type Fold } from "./assist.ts";
 import { findBar, type FindState, type FindMode } from "./find.ts";
 import { createHistory } from "./history.ts";
 import { TextInput } from "../../forms/text-input/index.ts";
@@ -38,7 +38,7 @@ import { withColor } from "../../../theme/colors.ts";
 export { jsxCompleter, type JsxProp } from "./jsx.ts";
 
 messages("tr", {
-  "Code": "Kod", "Suggestions": "Öneriler", "suggestions": "öneriler", "Copy": "Kopyala", "Suggestion source": "Önerilerin kaynağı", "Suggestion group": "Öneri grubu", "No suggestions here": "Bu kaynakta öneri yok", "Quick fixes": "Hızlı düzeltmeler", "Quick fix": "Hızlı düzeltme", "No quick fixes here": "Burada hızlı düzeltme yok", "No references here": "Burada kullanım yok", "References": "Kullanımlar", "{n} references": "{n} kullanım", "written": "yazılıyor", "Find all references": "Tüm kullanımlar",
+  "Code": "Kod", "Suggestions": "Öneriler", "suggestions": "öneriler", "Copy": "Kopyala", "Suggestion source": "Önerilerin kaynağı", "Suggestion group": "Öneri grubu", "No suggestions here": "Bu kaynakta öneri yok", "Quick fixes": "Hızlı düzeltmeler", "Quick fix": "Hızlı düzeltme", "No quick fixes here": "Burada hızlı düzeltme yok", "No references here": "Burada kullanım yok", "References": "Kullanımlar", "{n} references": "{n} kullanım", "written": "yazılıyor", "Find all references": "Tüm kullanımlar", "Fold / unfold": "Katla / aç",
   "Keyboard shortcuts": "Klavye kısayolları", "Editor": "Editör", "Indent (or take the suggestion)": "Girinti (ya da öneriyi al)", "Outdent": "Girintiyi azalt",
   "New line, keeping the indent": "Yeni satır, girinti korunur", "Comment / uncomment lines": "Satırları yorum yap / aç", "Move lines up": "Satırları yukarı taşı",
   "Move lines down": "Satırları aşağı taşı", "Copy lines up": "Satırları yukarı kopyala", "Copy lines down": "Satırları aşağı kopyala", "Delete lines": "Satırları sil",
@@ -265,6 +265,8 @@ export interface CodeEditorProps extends ControlProps<string> {
   multiCursor?: MaybeFn<boolean | undefined>;
   /** With line numbers, while scrolled: the lines that open the blocks the top line is in (a function, a `return (`), kept on top; a press goes there. Default true. @tr Satır numaralarıyla, kaydırılınca: üstteki satırın içinde olduğu blokları açan satırlar (bir işlev, bir `return (`) üstte kalır; basınca oraya gider. Varsayılan true. */
   stickyScroll?: MaybeFn<boolean | undefined>;
+  /** With line numbers: a chevron beside each line that opens a block (a bracket pair or a JSX element over lines); a press folds it to "⋯" (a press on that opens it). Ctrl+Shift+[ / ] fold / unfold at the caret. Default true. @tr Satır numaralarıyla: bir blok (satırlara yayılan parantez çifti ya da JSX öğesi) açan her satırın yanında bir ok; basınca "⋯" olarak katlanır (ona basınca açılır). Ctrl+Shift+[ / ] imleçte katlar / açar. Varsayılan true. */
+  folding?: MaybeFn<boolean | undefined>;
   /**
    * Inlay hints (a parameter's name, an inferred type): shown faintly at the end of their line, so the text does not
    * move. @tr Satır içi ipuçları (bir parametrenin adı, çıkarılan bir tür): satırlarının sonunda soluk gösterilir, metin kaymaz.
@@ -314,7 +316,32 @@ export interface CodeEditorProps extends ControlProps<string> {
 
 /** `<CodeEditor bind:value={$code} complete={jsxCompleter({ tag: "Button", props })} message={$note} />` */
 export function CodeEditor(props: CodeEditorProps): Element {
-  const [get, set] = model(props, "");
+  const [get, setModel] = model(props, "");
+  // ---- folding: the text field holds the view (each folded range one "⋯"); get() stays the whole text (the model).
+  // Everything the editor draws and edits is the view; what goes out (the value, the services' questions) is the model.
+  const PH = "\u22ef";
+  const folds = signal<readonly Fold[]>([]);
+  const liveFolds = computed((): readonly Fold[] => { const m = get(); return folds().filter((f) => m.slice(f.from, f.to) === f.text); });
+  const text = computed((): string => { const l = liveFolds(); return l.length ? foldView(get(), l, PH) : get(); });
+  const toView = (pos: number): number => toFoldView(liveFolds.peek(), pos);
+  const toModel = (pos: number): number => toFoldModel(liveFolds.peek(), pos);
+  let lastView = untrack(text);
+  /** The text field's new text: the model takes the same change (folds before it stay, after it move, inside it go). */
+  const set = (v: string): void => {
+    const l = liveFolds.peek();
+    if (!l.length) { lastView = v; setModel(v); return; }
+    const r = foldEdit(untrack(get), l, lastView, v);
+    lastView = v;
+    batch(() => { folds.set(r.folds); setModel(r.model); });
+  };
+  /** Every fold opened (before an edit made on the model: a format, a rename, a quick fix, undo). */
+  const unfoldAll = (): void => { if (!folds.peek().length) return; folds.set([]); const v = untrack(text); if (input.value !== v) input.value = v; lastView = v; };
+  /** A model place shown: the fold around it opened; its place in the view. */
+  const showAt = (pos: number): number => {
+    const f = liveFolds.peek().find((x) => pos > x.from && pos < x.to);
+    if (f) { folds.set(folds.peek().filter((x) => x !== f)); const v = untrack(text); if (input.value !== v) input.value = v; lastView = v; }
+    return toView(pos);
+  };
   const id = uid("m-ced");
   const ro = (): boolean => !!(props.readonly || props.disabled);
   const done = signal<{ from: number; to: number; items: readonly CodeSuggestion[]; all?: boolean } | null>(null);
@@ -324,7 +351,11 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const refs = signal<{ at: number; items: readonly { from: number; to: number; write?: boolean }[] } | null>(null);
   const refActive = signal(0);
   const active = signal(0);
-  const marks = (): readonly CodeMark[] => val(props.marks) ?? [];
+  const marks = (): readonly CodeMark[] => {
+    const ms = val(props.marks) ?? [], l = liveFolds();
+    if (!l.length) return ms;
+    return ms.map((m) => { const a = toFoldView(l, m.from), b = toFoldView(l, m.to); return { ...m, from: a, to: b > a ? b : a + 1 }; });
+  };
   // suggest="ghost": the rest of the likeliest row, shown faintly at the caret (`at`); Tab writes it
   const ghost = signal<{ from: number; at: number; rest: string; item: CodeSuggestion } | null>(null);
   // the source chips: the rows shown are the chosen source's ("all": every row)
@@ -342,7 +373,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
   // ---- the coloured copy under the (transparent) text field: same text, same wrapping
   const seen = new Set<string>();
   const flag = (p: MaybeFn<boolean | undefined>): boolean => val(p) !== false;
-  const tokens = computed((): Token[] => tokenize(get(), props.lang ?? "tsx"));
+  const tokens = computed((): Token[] => tokenize(text(), props.lang ?? "tsx"));
   const brackets = computed(() => scanBrackets(tokens()));
   /** The tokens with each bracket on its own, coloured by its depth ("br0"… "br2"; "br-bad": no mate). */
   const pieces = (): readonly (readonly [string, string])[] => {
@@ -376,7 +407,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     return props.colorOf?.(inner) ?? (CSS_COLOR.test(inner) ? inner : null);
   };
   const paint = (): unknown => {
-    const src = get(), list = [...marks()].filter((m) => m.to > m.from).sort((a, b) => a.from - b.from);
+    const src = text(), list = [...marks()].filter((m) => m.to > m.from).sort((a, b) => a.from - b.from);
     const out: unknown[] = [], now = new Set<string>();
     let at = 0;
     // the gutter: a number (and its mark) at each line's start, the lit line's bar behind it; the tokens are cut there
@@ -399,11 +430,23 @@ export function CodeEditor(props: CodeEditorProps): Element {
       p.error ||= m.kind === "error"; if (m.title) p.titles.push(m.title);
       probs.set(lo + 1, p);
     }
+    // folding: the lines that open a range (a chevron), the lines with a folded one (closed); the model's line numbers
+    const foldable = new Set<number>(), closed = new Set<number>(), hidden: [number, number][] = [];
+    if (gutter() && flag(props.folding)) {
+      for (const r of foldRanges(src, brackets().mate)) foldable.add(r.line);
+      for (const f of liveFolds()) {
+        const at = toFoldView(liveFolds(), f.from);
+        closed.add(src.slice(0, at).split("\n").length);
+        hidden.push([at, f.text.split("\n").length - 1]);
+      }
+    }
+    const modelLine = (n: number): number => { const st = starts[n - 1] ?? 0; let add = 0; for (const [at, k] of hidden) if (at < st) add += k; return n + add; };
     const lineNode = (n: number): unknown => {
-      const m = lineMark.get(n), p = probs.get(n);
-      return [active?.line === n ? h("span", { class: `m-ced-lit is-${active.kind ?? "current"}`, "aria-hidden": "true" }) : null,
-        h("span", { class: cx("m-ced-ln", m && `is-${m.kind ?? "breakpoint"}`, p && (p.error ? "is-error" : "is-warning")), "data-line": n, title: m?.title ?? (p ? p.titles.join("\n") : null) },
-          p && !m ? h("span", { class: "m-ced-prob", "aria-hidden": "true" }, glyph(p.error ? xCircle : alertTriangle)) : null)];
+      const ml = modelLine(n), m = lineMark.get(ml), p = probs.get(n), fold = closed.has(n) ? "is-closed" : foldable.has(n) ? "is-open" : null;
+      return [active?.line === ml ? h("span", { class: `m-ced-lit is-${active.kind ?? "current"}`, "aria-hidden": "true" }) : null,
+        h("span", { class: cx("m-ced-ln", m && `is-${m.kind ?? "breakpoint"}`, p && (p.error ? "is-error" : "is-warning")), "data-line": ml, "data-vline": n, title: m?.title ?? (p ? p.titles.join("\n") : null) },
+          p && !m ? h("span", { class: "m-ced-prob", "aria-hidden": "true" }, glyph(p.error ? xCircle : alertTriangle)) : null,
+          fold ? h("span", { class: `m-ced-fold ${fold}`, "aria-hidden": "true" }) : null)];
     };
     const g = ghost();
     let ghostDone = !g;
@@ -452,14 +495,14 @@ export function CodeEditor(props: CodeEditorProps): Element {
   // find (Ctrl+F / Ctrl+H) and go to line (Ctrl+G)
   const fs: FindState = { mode: signal<FindMode | null>(null), text: signal(""), with: signal(""), case: signal(false), word: signal(false), regex: signal(false), line: signal("") };
   const finding = (): boolean => { const m = fs.mode(); return m === "find" || m === "replace"; };
-  const matches = computed((): [number, number][] => (finding() ? findAll(get(), { text: fs.text(), case: fs.case(), word: fs.word(), regex: fs.regex() }) : []));
+  const matches = computed((): [number, number][] => (finding() ? findAll(text(), { text: fs.text(), case: fs.case(), word: fs.word(), regex: fs.regex() }) : []));
   const current = signal(-1);
   // a place to bring into view (an empty mark in the layer, scrolled to once drawn)
   const revealAt = signal<{ at: number; n: number } | null>(null);
   let reveals = 0;
   const reveal = (at: number): void => { revealAt.set({ at, n: ++reveals }); queueMicrotask(() => deco.querySelector?.(".m-ced-at")?.scrollIntoView?.({ block: "nearest", inline: "nearest" })); };
   const decorate = (): unknown => {
-    const src = get(), [a, b] = sel(), on = focused(), unitLen = props.tabSize ?? 2;
+    const src = text(), [a, b] = sel(), on = focused(), unitLen = props.tabSize ?? 2;
     const ranges: [number, number, string][] = [];
     if (flag(props.guides)) {
       for (let ls = 0; ls <= src.length;) {
@@ -479,11 +522,16 @@ export function CodeEditor(props: CodeEditorProps): Element {
     for (const r of refs()?.items ?? []) ranges.push([r.from, r.to, r.write ? "m-ced-ref is-write" : "m-ced-ref"]);
     // inlay hints: each line's at its end (the text does not move)
     const hints = new Map<number, string[]>();
-    for (const x of val(props.inlays) ?? []) {
+    for (const x0 of val(props.inlays) ?? []) {
+      const lf = liveFolds();
+      if (lf.some((f) => x0.at > f.from && x0.at < f.to)) continue;
+      const x = { ...x0, at: toFoldView(lf, x0.at) };
       if (x.at < 0 || x.at > src.length) continue;
       const e = src.indexOf("\n", x.at), end = e < 0 ? src.length : e;
       hints.set(end, [...(hints.get(end) ?? []), x.text.replace(/^:\s*/, "").trim()]);
     }
+    // folded ranges: their placeholder drawn as a pill
+    { const l = liveFolds(); for (const f of l) { const at = toFoldView(l, f.from); ranges.push([at, at + 1, "m-ced-fold-ph"]); } }
     // the other carets: a selection's range, a collapsed one's bar (a point below)
     const bars = new Set<number>();
     for (const [x, y] of extra()) if (y > x) ranges.push([x, y, "m-ced-xsel"]); else bars.add(Math.min(x, src.length));
@@ -561,8 +609,10 @@ export function CodeEditor(props: CodeEditorProps): Element {
     // what opens the list for good: asked for, or the word follows a `listOn` character (console. / console.ta: a member)
     const opener = props.listOn ?? ".", before = input.value.slice(0, caret).replace(/[\w$]*$/, "");
     if (forced || (!!opener && !!before && opener.includes(before.slice(-1)))) sticky = true;
-    const r = props.complete({ value: input.value, caret, before: input.value.slice(0, caret), forced, typed });
+    const mv = untrack(get), mc = toModel(caret);
+    const r = props.complete({ value: mv, caret: mc, before: mv.slice(0, mc), forced, typed });
     const show = (c: CodeCompletion | null | undefined): void => {
+      if (c && liveFolds.peek().length) c = { ...c, from: toView(c.from), ...(c.to != null ? { to: toView(c.to) } : {}) };
       const word = c ? input.value.slice(c.from, caret) : "";
       const items = c ? rank(c.items, word) : [];
       // a place that lists its words at once (a tag's props): open, and kept open while typing
@@ -647,7 +697,16 @@ export function CodeEditor(props: CodeEditorProps): Element {
       if (left <= len) {
         const r = globalThis.document.createRange();
         r.setStart(n, left); r.setEnd(n, left);
-        return r.getClientRects?.()[0] ?? r.getBoundingClientRect?.() ?? null;
+        const own = r.getClientRects?.()[0] ?? r.getBoundingClientRect?.() ?? null;
+        if (own && own.height) return own;
+        // a collapsed place a browser gives no box (the end of a token before a line break): the character beside it
+        // tells where it is (its right edge, or the next one's left edge), one pixel wide
+        const side = left > 0 ? [left - 1, left] : len > 0 ? [0, 1] : null;
+        if (!side) return own;
+        r.setStart(n, side[0]!); r.setEnd(n, side[1]!);
+        const c = r.getClientRects?.()[0] ?? r.getBoundingClientRect?.();
+        if (!c || !c.height || typeof DOMRect === "undefined") return own;
+        return new DOMRect(left > 0 ? c.right : c.left, c.top, 1, c.height);
       }
       left -= len;
     }
@@ -821,8 +880,8 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const askSignature = (): void => {
     if (!props.signature || ro()) return;
     const caret = input.selectionStart ?? input.value.length, value = input.value, n = ++sigAsked;
-    const take = (r: CodeSignature | null | undefined): void => { if (n === sigAsked && input.value === value && (input.selectionStart ?? -1) === caret) sig.set(r && r.items.length ? r : null); };
-    const r = props.signature({ value, caret });
+    const take = (r: CodeSignature | null | undefined): void => { if (n === sigAsked && input.value === value && (input.selectionStart ?? -1) === caret) sig.set(r && r.items.length ? { ...r, start: toView(r.start) } : null); };
+    const r = props.signature({ value: untrack(get), caret: toModel(caret) });
     if (r && typeof (r as Promise<unknown>).then === "function") void (r as Promise<CodeSignature | null | undefined>).then(take, () => undefined);
     else take(r as CodeSignature | null | undefined);
   };
@@ -966,7 +1025,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     const g = val(props.goTo);
     if (!g) return;
     untrack(() => {
-      const at = Math.min(Math.max(0, g.from), input.value.length), to = Math.min(Math.max(at, g.to ?? at), input.value.length);
+      const at0 = showAt(Math.max(0, g.from)), at = Math.min(at0, input.value.length), to = Math.min(Math.max(at, toView(g.to ?? g.from)), input.value.length);
       queueMicrotask(() => { input.focus({ preventScroll: true }); input.setSelectionRange(at, to); readSel(); reveal(at); });
     });
   });
@@ -983,14 +1042,16 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const settle = <T>(r: Maybe<T>): Promise<T | null | undefined> => Promise.resolve(r).catch(() => null);
   const goDefinition = async (at: number): Promise<void> => {
     if (!props.definition) return;
-    const value = input.value, r = await settle(props.definition({ value, at }));
+    const value = input.value, r = await settle(props.definition({ value: untrack(get), at: toModel(at) }));
     if (input.value !== value) return;
     if (!r) { notice(t`No definition found`, at); return; }
-    input.focus({ preventScroll: true }); input.setSelectionRange(r.from, r.to); readSel(); reveal(r.from);
+    const a = showAt(r.from), b = toView(r.to);
+    input.focus({ preventScroll: true }); input.setSelectionRange(a, b); readSel(); reveal(a);
   };
   const renaming = signal<{ from: number; to: number; locations: readonly CodeRange[]; value: string; name: Signal<string> } | null>(null);
   const startRename = async (): Promise<void> => {
     if (!props.rename || ro()) return;
+    unfoldAll();
     const value = input.value, at = input.selectionStart ?? 0, r = await settle(props.rename({ value, at }));
     if (input.value !== value) return;
     if (!r || "error" in r) { notice(r && "error" in r && r.error ? r.error : t`This can't be renamed`, at); return; }
@@ -1011,6 +1072,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
   };
   const formatAll = async (): Promise<void> => {
     if (!props.format || ro()) return;
+    unfoldAll();
     const value = input.value, edits = await settle(props.format(value));
     if (input.value !== value || !edits) return;
     const at = input.selectionStart ?? 0;
@@ -1029,6 +1091,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
   };
   const openFixes = async (at: number): Promise<void> => {
     if (!props.fixes || ro()) return;
+    if (liveFolds.peek().length) { at = toModel(at); unfoldAll(); }
     const value = input.value, [from, to] = lineRange(at);
     close(); closeSignature();
     const items = await settle(props.fixes({ value, from, to }));
@@ -1052,7 +1115,8 @@ export function CodeEditor(props: CodeEditorProps): Element {
     if (!props.references) return;
     const value = input.value;
     close(); closeSignature(); fixList.set(null);
-    const items = await settle(props.references({ value, at }));
+    const found = await settle(props.references({ value: untrack(get), at: toModel(at) }));
+    const items = found?.map((r) => ({ ...r, from: toView(r.from), to: toView(r.to) })).filter((r) => r.to > r.from);
     if (input.value !== value) return;
     if (!items?.length) { notice(t`No references here`, at); return; }
     const w = wordAt(value, at);
@@ -1122,7 +1186,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
       const r = wordRect(w[0], w[1]);
       if (!r || x < r.left || x > r.right || y < r.top || y > r.bottom) return;
       const n = ++hoverN;
-      void settle(props.hover!({ value, at: w[0] + Math.min(1, w[1] - w[0] - 1) })).then((doc) => {
+      void settle(props.hover!({ value: untrack(get), at: toModel(w[0] + Math.min(1, w[1] - w[0] - 1)) })).then((doc) => {
         if (n !== hoverN || input.value !== value || !doc || !(doc.signature || doc.doc)) return;
         clearTimeout(hideTimer);
         hoverDoc.set({ from: w[0], to: w[1], doc });
@@ -1138,7 +1202,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     }
     if (mod && e.code === "Space" && on("suggest")) { e.preventDefault(); ask(true); return; }
     if (e.key === "F9" && props.onGutter) { e.preventDefault(); props.onGutter(input.value.slice(0, input.selectionStart ?? 0).split("\n").length, e); return; }
-    if (mod && !e.shiftKey && !e.altKey && e.key.toLowerCase() === "s" && on("save")) { e.preventDefault(); props.onSave!(input.value); return; }
+    if (mod && !e.shiftKey && !e.altKey && e.key.toLowerCase() === "s" && on("save")) { e.preventDefault(); props.onSave!(untrack(get)); return; }
     hideHover();
     const k = e.key.toLowerCase(), multi0 = props.multiline !== false;
     if (mod && !e.altKey && hist && on("undo") && (k === "z" || e.code === "KeyZ" || k === "y" || e.code === "KeyY")) {
@@ -1162,6 +1226,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
       if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); fixList.set(null); return; }
       fixList.set(null);
     }
+    if (mod && e.shiftKey && !e.altKey && (e.code === "BracketLeft" || e.code === "BracketRight") && flag(props.folding) && props.multiline !== false) { e.preventDefault(); if (e.code === "BracketLeft") foldAtCaret(); else unfoldAtCaret(); return; }
     if (mod && !e.altKey && e.key === "." && props.fixes) { e.preventDefault(); void openFixes(input.selectionStart ?? 0); return; }
     if (refs.peek()) {
       if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter") return; // the list's keys
@@ -1218,7 +1283,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
       ["copyUp", "Shift+Alt+↑", () => t`Copy lines up`, multi], ["copyDown", "Shift+Alt+↓", () => t`Copy lines down`, multi],
       ["deleteLine", "Ctrl+Shift+K", () => t`Delete lines`, multi], ["suggest", "Ctrl+Space", () => t`Suggestions list`, !!props.complete],
       ["find", "Ctrl+F", () => t`Find`], ["replace", "Ctrl+H", () => t`Find / replace`, !ro()], ["find", "F3 / Shift+F3", () => t`Next / previous match`],
-      ["goToLine", "Ctrl+G", () => t`Go to line`, multi], ["", "Ctrl+.", () => t`Quick fix`, !!props.fixes], ["", "Shift+F12", () => t`Find all references`, !!props.references], ["definition", "F12 / Ctrl+Click", () => t`Go to definition`, !!props.definition],
+      ["goToLine", "Ctrl+G", () => t`Go to line`, multi], ["", "Ctrl+.", () => t`Quick fix`, !!props.fixes], ["", "Shift+F12", () => t`Find all references`, !!props.references], ["", "Ctrl+Shift+[ / ]", () => t`Fold / unfold`, multi], ["definition", "F12 / Ctrl+Click", () => t`Go to definition`, !!props.definition],
       ["rename", "F2", () => t`Rename symbol`, !!props.rename && !ro()], ["format", "Shift+Alt+F", () => t`Format document`, !!props.format && !ro()],
       ["zoom", "Ctrl+= / Ctrl+- / Ctrl+0", () => t`Bigger / smaller / default text`],
       ["save", "Ctrl+S", () => t`Save`], ["", "F9", () => t`Toggle a breakpoint`, !!props.onGutter],
@@ -1246,6 +1311,9 @@ export function CodeEditor(props: CodeEditorProps): Element {
       // Alt+click: one more caret (the one before stays); a plain click: one caret again
       if (altFrom) { const keep = altFrom; altFrom = null; extra.set([...extra.peek(), keep]); }
       else dropMulti();
+      // a press on a fold's placeholder: it opens
+      { const c = input.selectionStart ?? 0, l = liveFolds.peek(), f = l.find((x) => { const at = toFoldView(l, x.from); return at === c || at === c - 1; });
+        if (f && input.selectionStart === input.selectionEnd && (input.value[c] === PH || input.value[c - 1] === PH)) { folds.set(folds.peek().filter((x) => x !== f)); return; } }
       close(); ghost.set(null); readSel();
       if ((e.ctrlKey || e.metaKey) && props.definition && on("definition")) { void goDefinition(input.selectionStart ?? 0); return; }
       if (sig.peek()) askSignature();
@@ -1278,7 +1346,8 @@ export function CodeEditor(props: CodeEditorProps): Element {
     onFocus: () => { focused.set(true); readSel(); globalThis.document.addEventListener("selectionchange", onSelChange); },
     onBlur: (e: FocusEvent) => { close(); ghost.set(null); closeSignature(); focused.set(false); globalThis.document.removeEventListener("selectionchange", onSelChange); props.onBlur?.(e); },
   }) as HTMLTextAreaElement;
-  syncValue(input, get);
+  // the text field shows the view (the model with its folds)
+  effect(() => { const v = text(); untrack(() => { if (input.value !== v) input.value = v; lastView = v; }); });
 
   // ---- undo: every change of the value is a step (typing, the editor's commands, a value set from outside); the
   // editor's own history, so it outlives the text field (and, with a key, the page)
@@ -1300,6 +1369,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
   });
   const history = (back: boolean): void => {
     if (!hist || ro()) return;
+    unfoldAll();
     const r = back ? hist.undo(input.value) : hist.redo(input.value);
     if (!r) return;
     close(); ghost.set(null);
@@ -1323,7 +1393,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     if (untrack(detail)?.key === key) return;
     if (it.doc) { detail.set({ key, doc: it.doc }); return; }
     if (!props.describe) { detail.set(null); return; }
-    const r = props.describe(it, { value: input.value, at: d.to });
+    const r = props.describe(it, { value: untrack(get), at: toModel(d.to) });
     if (r && typeof (r as Promise<unknown>).then === "function") {
       detail.set({ key, doc: null });
       void (r as Promise<CodeDoc | null | undefined>).then((doc) => { if (detail.peek()?.key === key) detail.set({ key, doc: doc ?? null }); }, () => undefined);
@@ -1356,7 +1426,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     anchor: () => refAnchor, open: () => !!refs(), onOpenChange: (o: boolean) => { if (!o) refs.set(null); }, role: null, flush: true, autoFocus: false, placement: "bottom-start", panelClass: "m-ced-list m-ced-refs",
     children: () => [h("div", { class: "m-ced-fixes-head" }, () => t("{n} references", { n: refs()?.items.length ?? 0 })), h(OptionList<number>, {
       id: `${id}-refs`, keysFrom: input, active: refActive, inline: true, check: false, size: "sm", label: () => t`References`, empty: false,
-      options: () => { const v = get(); return (refs()?.items ?? []).map((r, i) => { const l = lineOf(v, r.from); return { value: i, label: l.text || " ", hint: `${r.write ? `${t`written`} · ` : ""}${l.n}` }; }); },
+      options: () => { const v = text(); return (refs()?.items ?? []).map((r, i) => { const l = lineOf(v, r.from); return { value: i, label: l.text || " ", hint: `${r.write ? `${t`written`} · ` : ""}${l.n}` }; }); },
       onPick: (i: number) => goRef(i),
     })],
   });
@@ -1406,8 +1476,10 @@ export function CodeEditor(props: CodeEditorProps): Element {
       if (e.button !== 0) return;
       e.preventDefault();
       // a line with a problem: its quick fixes; else the owner's (a breakpoint)
-      const n = lineAt(e.clientY), el = code.querySelector(`.m-ced-ln[data-line="${n}"]`);
-      if (props.fixes && el?.matches(".is-error, .is-warning")) { const v = input.value.split("\n"); let at = 0; for (let i = 0; i < n - 1; i++) at += v[i]!.length + 1; input.setSelectionRange(at, at); readSel(); void openFixes(at); return; }
+      const n = lineAt(e.clientY), el = code.querySelector<HTMLElement>(`.m-ced-ln[data-line="${n}"]`), vl = Number(el?.dataset["vline"] ?? n);
+      // the gutter's end (the chevron): fold / unfold the line's range
+      if (el?.querySelector(".m-ced-fold") && e.clientX >= hit.getBoundingClientRect().right - 22) { toggleFold(vl); return; }
+      if (props.fixes && el?.matches(".is-error, .is-warning")) { const v = input.value.split("\n"); let at = 0; for (let i = 0; i < vl - 1; i++) at += v[i]!.length + 1; input.setSelectionRange(at, at); readSel(); void openFixes(at); return; }
       props.onGutter?.(n, e);
     },
     onPointermove: (e: PointerEvent) => { const el = code.querySelector(`.m-ced-ln[data-line="${lineAt(e.clientY)}"]`); if (el !== hover) { unhover(); hover = el; el?.classList.add("is-hover"); } },
@@ -1473,6 +1545,38 @@ export function CodeEditor(props: CodeEditorProps): Element {
       const end = input.value.length; input.setSelectionRange(end, end); readSel();
     },
   }, deco, pre, input, () => (gutter() ? hit : null)) as HTMLElement;
+  // ---- folding commands: the gutter's chevron, Ctrl+Shift+[ / ], a press on a placeholder
+  /** Folds the range that opens on a view line, or opens the folds on it. */
+  const toggleFold = (vl: number): void => {
+    const v = input.value, lines = v.split("\n");
+    let a = 0; for (let i = 0; i < vl - 1 && i < lines.length; i++) a += lines[i]!.length + 1;
+    const e = a + (lines[vl - 1]?.length ?? 0), l = liveFolds.peek();
+    const here = l.filter((f) => { const at = toFoldView(l, f.from); return at >= a && at <= e; });
+    if (here.length) { folds.set(folds.peek().filter((f) => !here.includes(f))); return; }
+    foldLine(vl);
+  };
+  const foldLine = (vl: number): boolean => {
+    const r = foldRanges(input.value, brackets().mate).find((x) => x.line === vl);
+    if (!r) return false;
+    const m = untrack(get), from = toModel(r.from), to = toModel(r.to);
+    const caret = toModel(input.selectionStart ?? 0);
+    folds.set([...folds.peek().filter((f) => f.to <= from || f.from >= to), { from, to, text: m.slice(from, to) }].sort((x, y) => x.from - y.from));
+    // a caret that was inside: after the placeholder
+    if (caret > from && caret < to) { const at = toView(to); input.setSelectionRange(at, at); readSel(); }
+    return true;
+  };
+  /** Ctrl+Shift+[: the innermost range around the caret folds (its line, or the nearest line above that opens one). */
+  const foldAtCaret = (): void => {
+    const v = input.value, at = input.selectionStart ?? 0;
+    const ranges = foldRanges(v, brackets().mate).filter((r) => r.from <= at && r.to >= at).sort((x, y) => (y.from - x.from));
+    const line = v.slice(0, at).split("\n").length;
+    const own = foldRanges(v, brackets().mate).find((r) => r.line === line);
+    if (own) { foldLine(line); return; }
+    if (ranges[0]) foldLine(ranges[0].line);
+  };
+  /** Ctrl+Shift+]: the folds on the caret's line open. */
+  const unfoldAtCaret = (): void => toggleFold(input.value.slice(0, input.selectionStart ?? 0).split("\n").length);
+
   // ---- sticky scroll: the lines that open the blocks around the first line on screen (up to 3, innermost last)
   const stuck = signal<readonly { at: number; n: number; text: string }[]>([]);
   let stickyQueued = false;
@@ -1481,8 +1585,8 @@ export function CodeEditor(props: CodeEditorProps): Element {
     if (!gutter() || val(props.stickyScroll) === false || area.scrollTop < 4) { if (stuck.peek().length) stuck.set([]); return; }
     const top = area.scrollTop;
     let first = 1;
-    for (const el of code.querySelectorAll<HTMLElement>(".m-ced-ln")) { if (el.offsetTop + 2 >= top) { first = Number(el.dataset["line"]); break; } }
-    const v = get(), lines = v.split("\n");
+    for (const el of code.querySelectorAll<HTMLElement>(".m-ced-ln")) { if (el.offsetTop + 2 >= top) { first = Number(el.dataset["vline"] ?? el.dataset["line"]); break; } }
+    const v = text(), lines = v.split("\n");
     let topAt = 0;
     for (let i = 0; i < first - 1 && i < lines.length; i++) topAt += lines[i]!.length + 1;
     const lineAtPos = (pos: number): number => v.slice(0, pos).split("\n").length;
@@ -1495,7 +1599,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
       const ls = v.lastIndexOf("\n", o - 1) + 1, le = v.indexOf("\n", o);
       const text = v.slice(ls, le < 0 ? v.length : le);
       if (!text.trim()) continue;
-      out.push({ at: ls, n, text: text.length > 160 ? `${text.slice(0, 159)}…` : text });
+      out.push({ at: ls, n: untrack(get).slice(0, toModel(ls)).split("\n").length, text: text.length > 160 ? `${text.slice(0, 159)}…` : text });
     }
     const keep = out.slice(-3);
     const cur = stuck.peek();
@@ -1503,7 +1607,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
   };
   const queueSticky = (): void => { if (stickyQueued) return; stickyQueued = true; measure(updateSticky); };
   area.addEventListener("scroll", queueSticky, { passive: true });
-  effect(() => { get(); untrack(queueSticky); });
+  effect(() => { text(); untrack(queueSticky); });
   const stickyBar = (): unknown => (stuck().length ? h("div", { class: "m-ced-sticky", "aria-hidden": "true" },
     stuck().map((s) => h("div", { class: "m-ced-sticky-line", onPointerdown: (e: PointerEvent) => {
       e.preventDefault(); input.focus({ preventScroll: true }); input.setSelectionRange(s.at, s.at); readSel();

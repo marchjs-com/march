@@ -169,7 +169,7 @@ export function headEdit(value: string, head: string | undefined): { at: number;
 }
 
 /** A JSX / HTML tag of a text: where its name is, whether it closes (`</x>`) or closes itself (`<x />`). */
-interface TagTok { start: number; end: number; closing: boolean; self: boolean }
+interface TagTok { start: number; end: number; closing: boolean; self: boolean; /** Where the tag ends (its `>`). */ close: number }
 /** The tags of a text in order, skipping quotes, braces' contents and comments inside a tag (`{a > b}`). */
 function tags(value: string): TagTok[] {
   const out: TagTok[] = [];
@@ -188,7 +188,7 @@ function tags(value: string): TagTok[] {
       else if (c === "}") depth--;
       else if (depth <= 0 && (c === ">" || c === "<")) break;
     }
-    out.push({ start, end, closing, self: !closing && value[i] === ">" && value[i - 1] === "/" });
+    out.push({ start, end, closing, self: !closing && value[i] === ">" && value[i - 1] === "/", close: i });
     re.lastIndex = Math.max(re.lastIndex, end);
   }
   return out;
@@ -221,4 +221,75 @@ export function tagPair(value: string, at: number): { self: [number, number]; pa
     }
   }
   return null;
+}
+
+/** A range that folds: the line that opens it (1-based) and the text hidden when folded ([from, to)). */
+export interface FoldRange { line: number; from: number; to: number }
+/**
+ * What can be folded in a text: a bracket pair (`{` `(` `[`) whose mate is on a later line (the text between them
+ * folds: `{⋯}`), and a JSX / HTML element over several lines (its content folds: `<Row>⋯</Row>`). `mate`: the
+ * brackets' mates (scanBrackets). One range per line (the outermost, the first that opens there).
+ */
+export function foldRanges(value: string, mate: ReadonlyMap<number, number>): FoldRange[] {
+  const starts: number[] = [0];
+  for (let i = value.indexOf("\n"); i >= 0; i = value.indexOf("\n", i + 1)) starts.push(i + 1);
+  const lineOf = (pos: number): number => { let lo = 0, hi = starts.length - 1; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (starts[m]! <= pos) lo = m; else hi = m - 1; } return lo + 1; };
+  const byLine = new Map<number, FoldRange>();
+  const add = (from: number, to: number): void => {
+    if (to <= from) return;
+    const line = lineOf(from);
+    if (line === lineOf(to)) return;
+    const cur = byLine.get(line);
+    if (!cur || to - from > cur.to - cur.from) byLine.set(line, { line, from, to });
+  };
+  for (const [o, c] of mate) if (o < c && "{([".includes(value[o] ?? "")) add(o + 1, c);
+  const list = tags(value), stack: TagTok[] = [];
+  for (const t of list) {
+    if (t.self) continue;
+    if (!t.closing) { stack.push(t); continue; }
+    const open = stack.pop();
+    if (open) add(open.close + 1, t.start - 2);
+  }
+  return [...byLine.values()].sort((a, b) => a.line - b.line);
+}
+
+/** A folded range of the model text: where it is and the text it hides (a fold whose text changed is dropped). */
+export interface Fold { from: number; to: number; text: string }
+/** The view of a text with folds: each folded range is one `ph` character. */
+export function foldView(model: string, folds: readonly Fold[], ph: string): string {
+  let out = "", at = 0;
+  for (const f of folds) { out += model.slice(at, f.from) + ph; at = f.to; }
+  return out + model.slice(at);
+}
+/** A model position in the view (inside a fold: its placeholder). */
+export function toFoldView(folds: readonly Fold[], pos: number): number {
+  let shift = 0;
+  for (const f of folds) { if (pos <= f.from) break; if (pos < f.to) return f.from - shift; shift += f.to - f.from - 1; }
+  return pos - shift;
+}
+/** A view position in the model (before a placeholder: the fold's start; after it: the fold's end). */
+export function toFoldModel(folds: readonly Fold[], pos: number): number {
+  let shift = 0;
+  for (const f of folds) { const v = f.from - shift; if (pos <= v) break; shift += f.to - f.from - 1; }
+  return pos + shift;
+}
+/**
+ * An edit of the view (`before` → `after`) made on the model: its common head and tail are kept, the rest replaces the
+ * model's range there. Folds before the edit stay, folds after it move, folds it touches are dropped (their text goes
+ * with a placeholder that was deleted).
+ */
+export function foldEdit(model: string, folds: readonly Fold[], before: string, after: string): { model: string; folds: Fold[] } {
+  let p = 0;
+  while (p < before.length && p < after.length && before[p] === after[p]) p++;
+  let e = 0;
+  while (e < before.length - p && e < after.length - p && before[before.length - 1 - e] === after[after.length - 1 - e]) e++;
+  const ins = after.slice(p, after.length - e);
+  const from = toFoldModel(folds, p), to = toFoldModel(folds, before.length - e);
+  const delta = ins.length - (to - from);
+  const next: Fold[] = [];
+  for (const f of folds) {
+    if (f.to <= from && !(f.to === from && f.from === from)) next.push(f);
+    else if (f.from >= to) next.push({ ...f, from: f.from + delta, to: f.to + delta });
+  }
+  return { model: model.slice(0, from) + ins + model.slice(to), folds: next };
 }

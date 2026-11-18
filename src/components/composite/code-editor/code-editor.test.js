@@ -285,6 +285,28 @@ test("CodeEditor: more carets: Ctrl+D picks the word then its next place; typing
   dispose();
 });
 
+test("CodeEditor folding: Ctrl+Shift+[ folds the block to ⋯ (the value stays whole), typing after it keeps it, Ctrl+Shift+] opens it", async () => {
+  const code = signal("function A() {\n  const x = 1\n  return x\n}\nend");
+  const [el, dispose] = mount(() => h(CodeEditor, { value: code, lang: "ts", lineNumbers: true }));
+  const input = caretOf(el.querySelector("textarea"));
+  input.setSelectionRange(3, 3);
+  key(input, "{", { ctrlKey: true, shiftKey: true, code: "BracketLeft" });
+  await tick();
+  assert.equal(input.value, "function A() {⋯}\nend", "the view");
+  assert.equal(code(), "function A() {\n  const x = 1\n  return x\n}\nend", "the value stays whole");
+  assert.ok(el.querySelector(".m-ced-fold.is-closed"), "a closed chevron on the line");
+  assert.deepEqual([...el.querySelectorAll(".m-ced-ln")].map((x) => x.getAttribute("data-line")), ["1", "5"], "the lines keep their numbers");
+  type(input, "function A() {⋯}\nend!", 21, "!");
+  await tick();
+  assert.equal(code(), "function A() {\n  const x = 1\n  return x\n}\nend!", "an edit outside the fold lands in the whole text");
+  assert.equal(input.value, "function A() {⋯}\nend!", "still folded");
+  input.setSelectionRange(2, 2);
+  key(input, "}", { ctrlKey: true, shiftKey: true, code: "BracketRight" });
+  await tick();
+  assert.equal(input.value, code(), "open again");
+  dispose();
+});
+
 test("CodeEditor: lineNumbers draw a number per line with its mark, the active line is lit, F9 and the gutter call onGutter", async () => {
   const marks = signal([{ line: 2, kind: "conditional", title: "if: x" }]), lit = signal(null), pressed = [];
   const [el, dispose] = mount(() => h(CodeEditor, { value: "a\nb\nc", lineNumbers: true, lineMarks: marks, activeLine: lit, onGutter: (line) => pressed.push(line) }));

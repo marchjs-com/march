@@ -15,6 +15,12 @@ import { applyEdits } from "../code-editor/assist.ts";
 const JSX_OR_SCRIPT = /\.(m?[jt]sx?)$/i;
 
 const TOKEN_COLORS = new Set<string>(COLOR_TOKENS);
+// the looks that are no colour token but have one (a Button's variants, the text tones): the colour they are drawn in
+const LOOK_COLORS: Record<string, string> = {
+  secondary: "var(--m-border-strong, color-mix(in srgb, var(--m-text) 30%, transparent))", ghost: "color-mix(in srgb, var(--m-text) 18%, transparent)",
+  dark: "var(--m-text)", link: "var(--m-link, var(--m-primary))", muted: "var(--m-muted)", faint: "var(--m-faint)", accent: "var(--m-accent, var(--m-primary))",
+  brand: "var(--m-brand-orange)", text: "var(--m-text)", surface: "var(--m-surface)",
+};
 import type { GutterService } from "./debug.ts";
 import { hotkeys } from "../../../managers/hotkey/index.ts";
 import { t, messages } from "../../../core/i18n.ts";
@@ -219,7 +225,7 @@ export function codeEditorPlugin(o: CodeEditorPluginOptions = {}): AppPlugin {
             ...(o.goTo ? { goTo: () => o.goTo!(file.path) } : {}),
             inlays: () => inlays(),
             // a colour token's name ("brand-orange", "danger") is the theme's colour; CSS colours as the editor knows them
-            colorOf: (text: string) => (TOKEN_COLORS.has(text) ? `var(--m-${text})` : null),
+            colorOf: (text: string) => (TOKEN_COLORS.has(text) ? `var(--m-${text})` : LOOK_COLORS[text] ?? null),
             ...(ts ? {
               status: () => (errors() ? "error" : "ok"),
               ...(o.openProblems ? { onMessage: () => o.openProblems!(file.path) } : {}),

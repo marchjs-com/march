@@ -14,3 +14,11 @@ test("history: a line diff (kept, taken out, put in, with their numbers); folded
   assert.equal(diffText([{ op: "-", text: "a" }, null, { op: "+", text: "b" }]), "- a\n…\n+ b");
   assert.deepEqual(lineDiff("same", "same").map((l) => l.op), [" "]);
 });
+
+test("history rows: the unsaved changes first, then each save against the one before it, the oldest the opening text", async () => {
+  const { historyRows } = await import("../examples/showcase/src/playground/history-panel.tsx");
+  const list = [{ at: 3, text: "c" }, { at: 2, text: "b" }, { at: 1, text: "a" }];
+  const rows = historyRows(list, "d");
+  assert.deepEqual(rows.map((r) => [r.k, r.before, r.after]), [[-1, "c", "d"], [0, "b", "c"], [1, "a", "b"], [2, "a", "a"]]);
+  assert.equal(historyRows(list, "c")[0].k, 0, "no unsaved row when the text is the last save");
+});
