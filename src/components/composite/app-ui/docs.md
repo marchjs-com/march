@@ -98,7 +98,9 @@ whole JavaScript / TypeScript / DOM API (after the March plugin's own), and ever
 underlined in the code editor (red, amber) and counted under it with the first one's line. The app serves three things:
 `ts-worker.js` (from this folder), the typescript package's `lib/typescript.js` and its `lib/lib.*.d.ts` files (read on
 demand from `lib`). Under a CSP with Trusted Types the worker starts through the `march-worker` policy (same-origin `.js`
-only): the CSP must list `trusted-types march-worker`.
+only): the CSP must list `trusted-types march-worker`. Every `march` import is `any` to it; `env` gives it real
+declarations, fetched once before its first answer (`env: async () => ({ "/march-icons.d.ts": 'declare module "march/icons" { … }' })`:
+MarchIDE declares march/icons that way, so `import type { IconType }` is a type and a wrong icon name is an error).
 
 The service also answers the code editor's `describe` (a suggestion's kind, signature and documentation, under the list)
 and `signature` (inside a call: the signature with the parameter being written lit); the rows say their kind (method,

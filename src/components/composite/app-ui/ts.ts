@@ -65,6 +65,11 @@ export interface TypeScriptPluginOptions {
    * was inserted ([at, length] in the file's text): problems, suggestions and hovers are mapped back to the file.
    */
   view?: ((path: string, text: string) => { text: string; inserts: readonly (readonly [number, number])[] }) | undefined;
+  /**
+   * Declaration files the service reads besides the code (path → text), fetched once before its first answer: a
+   * module's real exports and types (`declare module "march/icons" { … }`) instead of the `any` every march import is.
+   */
+  env?: (() => Promise<Record<string, string>> | Record<string, string>) | undefined;
 }
 type Inserts = readonly (readonly [number, number])[];
 /** A position of the file in the view (an insert at the position comes before it). */
@@ -114,7 +119,11 @@ export function typeScriptPlugin(o: TypeScriptPluginOptions): AppPlugin {
       });
       const version = signal("");
       const ready = call<{ version: string }>("init", { tsUrl: new URL(o.typescript, globalThis.location.href).href, lib: new URL(o.lib, globalThis.location.href).href })
-        .then((r) => { version.set(r.version); ctx.emit("typescript:ready", r.version); return true; })
+        // the host's declaration files (env) go in before the first answer, so the first errors already know them
+        .then(async (r) => {
+          if (o.env) { const env = await Promise.resolve(o.env()).catch(() => ({} as Record<string, string>)); for (const [path, text] of Object.entries(env)) await call("update", { path, text }); }
+          version.set(r.version); ctx.emit("typescript:ready", r.version); return true;
+        })
         // the errors in the page's language (tr: TypeScript's own Turkish messages); followed when it changes
         .then(async (ok) => { if (ok) await call("locale", { locale: locale.peek() }).catch(() => undefined); return ok; })
         .catch((err) => { console.error("march-app-ui: TypeScript did not start", err); return false; });
