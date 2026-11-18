@@ -13,6 +13,7 @@ Read this before writing code with March. It is the contract; when in doubt, pre
 4. **Ownership cleans up.** Listeners, effects, timers registered with `onCleanup`, queries and child components are
    disposed when their branch disappears (`<If>`, `<For>` row removed, route change).
 5. **Control flow is components:** `If/Else`, `For` (keyed), `Switch/Match`, `Try` (errors + async loading), `Await`.
+   Components may be `async` or generators (`function*` streams pieces in, `async function*` replaces with each value).
 6. **Modules are separate:** core, router, seo, data (+access), net, errors, schema, ui (+forms), table, charts, channel, testing.
 
 ## 2. Syntax cheat sheet (March JSX, `.jsx` files)
@@ -69,6 +70,12 @@ $items.peek()                            // read without tracking (explicit API 
   `extensions.list()`, `extensions.of(el)`.
 - Async component: `async function Page() { const data = await api(); return <View data={data} /> }` — wrap in
   `<Try loading={…} fallback={(e, retry) => …}>` (or rely on the default spinner / error box).
+- Generator component: `function* List(p) { for (const r of p.rows) yield <Row r={r} /> }` — each yield is ADDED,
+  drawn a frame at a time (`List.chunk = 50` parts per frame). `async function* Clock() { while (true) { yield <T/>; await sleep(1000) } }`
+  — each yield REPLACES the last; `<Try loading/fallback>` as for async components. `Comp.yields = "append"` for a
+  stream (`for await (const m of s) { yield <Msg m={m} /> }`, body in braces). Removal runs the generator's `finally`.
+  A live value (clock text, counter) is a signal, not a generator; generators are for flowing / progressive content.
+  Capitalised `function*` declarations only (an expression: `generator(fn, { chunk, yields })`).
 
 ## 3. Data
 

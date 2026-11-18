@@ -16,7 +16,9 @@ import { tmpdir } from "node:os";
 // 15.8 KB since sx works on components (the sx common prop and _sxClass shared with elements) and its scales are
 // exported (SX); m:text-color lives in march/props (docs/internal/size-watch.md).
 // 15.9 KB since sx has a colour key (the 24 colour words of sx color: the text colour, which replaced m:text-color).
-export const BUDGET = { core: 15.9 * 1024, minimal: 5 * 1024 };
+// 16.45 KB since generator components (dom/generator.ts: _gen, generator(); +0.51 KB). Tree-shaken: only an app that writes a
+// function* / async function* component pays (minimal unchanged; docs/internal/size-watch.md).
+export const BUDGET = { core: 16.45 * 1024, minimal: 5 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const ENTRIES = { core: "src/index.ts", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
 

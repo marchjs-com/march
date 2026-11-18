@@ -172,6 +172,55 @@ Functions called once with a props object. Props from JSX are getters (live). As
 pending the nearest `<Try loading>` (or a default spinner) shows; rejections go to the nearest `<Try fallback>`.
 `define("x-tag", Comp, { props: ["a"], shadow })` registers a custom element.
 
+### Generator components
+A component may be a generator. Each `yield` is a piece of its output, drawn as it comes, so the component never has to
+build everything it can show before anything appears.
+
+```jsx
+function* List(props) {              // sync: each yield is ADDED after the previous one
+  for (const row of props.rows) yield <Row row={row} />;
+}
+List.chunk = 50;                     // parts per frame (default: as many as fit in ~8 ms)
+
+async function* Clock() {            // async: each yield REPLACES the previous one (the last value shows)
+  try { while (true) { yield <time>{new Date().toLocaleTimeString()}</time>; await sleep(1000); } }
+  finally { /* runs when Clock is removed */ }
+}
+
+async function* Chat(props) {        // async + append: a stream of messages
+  for await (const msg of props.stream) yield <Message msg={msg} />;
+}
+Chat.yields = "append";
+```
+
+- **Sync `function*`: progressive.** The first chunk is drawn synchronously (the first frame is never empty); the rest
+  is drawn a frame at a time (`requestAnimationFrame`), so a 10 000-row list does not block the main thread. The
+  generator is pulled lazily: it does not run ahead of what is drawn.
+- **Async `async function*`: live replacement.** Until the first value the nearest `<Try loading>` (or the default
+  spinner) shows, exactly like an async component; an error, before or after the first value, goes to `<Try fallback>`.
+- **Append or replace.** The default follows the kind of generator (sync appends, async replaces) because that is what
+  each is usually for; `Comp.yields = "append" | "replace"` turns it around. Why a static property and not a wrapper per
+  value (`yield append(x)`) or accumulating in the generator (`yield [...all, x]`): the choice belongs to the component,
+  not to each value; a wrapper would cost an allocation per item and a mix of modes in one stream has no clear meaning,
+  and accumulating re-inserts every earlier node on each step (quadratic DOM work for a chat log). A sync generator
+  with `"replace"` shows steps (a wizard, a progress text) and ends on the last.
+- **Cancellation.** When the component is removed, the generator's `return()` runs (its `finally` blocks), a value that
+  arrives after a pending `await` is dropped, and a half-drawn list stops pulling. Clean up in `finally` (or with
+  `onCleanup` before the first `yield`, append mode).
+- **Ownership.** The compiler keeps the component's owner across `await` and at the start of each `for await` body
+  (write the body in braces), so context, `onCleanup` and `<Try>` work inside the generator. In replace mode what a step
+  created (effects, child components) is disposed when the next step replaces it: a ticking clock does not pile up
+  effects.
+- **How it compiles.** A capitalised declaration `function* Name(` / `async function* Name(` becomes a plain component
+  `Name` that runs the generator (static properties are read from it). A generator written as an expression, or used
+  with `h()` by hand, is wrapped with `generator(fn, { chunk, yields })`. Lowercase generators (`function* range()`)
+  are left alone. Only an app that has a generator component pays for the runtime (~0.5 KB gzip).
+
+**Signal or generator?** A *live value* (a clock's text, a counter, a price) is a signal: one text node updates in place.
+A generator that yields a new `<time>` every second rebuilds that subtree each second, which costs more. Use a generator
+for *flowing or progressive content*: a long list drawn in chunks, a stream of messages, a sequence of steps, content
+whose shape changes from one value to the next.
+
 ## Control flow
 `If` (`when`, `else`/`<Else>`, function child gets the value), `For` (`each`, `key`, `fallback`; child `(item, index) =>`
 with accessors; rows reused by key, reordered with the fewest moves (longest increasing subsequence), cleared at once

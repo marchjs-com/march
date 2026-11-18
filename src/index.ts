@@ -7,6 +7,7 @@ export { If, Else, Try } from "./dom/flow.ts";
 export { For, setFlipHook } from "./dom/for.ts";
 export { Switch, Match } from "./dom/switch.ts";
 export { Await } from "./dom/await.ts";
+export { generator, _gen, type GeneratorOptions } from "./dom/generator.ts";
 export { Dynamic } from "./dom/dynamic.ts";
 export { Portal, PortalTarget, portalTarget, openLayer, layers, type LayerKind, type PortalProps, type PortalTargetProps } from "./dom/portal.ts";
 export { render } from "./dom/render.ts";

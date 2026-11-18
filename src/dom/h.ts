@@ -133,7 +133,8 @@ function createComponent(Comp: Component<Props>, raw: Props, children: unknown[]
 
 // ------------------------------------------------------------------ async components
 export const LoadingContext: { id: symbol; defaultValue: (() => unknown) | null } = { id: Symbol("m.loading"), defaultValue: null };
-function defaultLoading(): Element {
+/** The spinner shown while an async component (or the first value of an async generator) is on its way. */
+export function defaultLoading(): Element {
   const s = doc().createElement("span");
   s.className = "m-loading";
   s.setAttribute("role", "status");

@@ -15,8 +15,8 @@ const { sx: resolveSx } = await importTs(new URL("../src/core/sx.ts", import.met
 
 /** Attributes whose string value people read (collected into `texts` with the JSX text). */
 const TEXT_ATTRS = new Set(["title", "placeholder", "label", "alt", "aria-label", "aria-description", "description", "hint", "message"]);
-const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins" };
-const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert" };
+const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins", gen: "_$gen" };
+const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert", gen: "_gen" };
 // Templates: a native element subtree is built once (DOM calls, no HTML strings) and cloned; only its dynamic parts
 // (bound attributes, events, refs, directives, {expressions}, components) are wired on the clone. Not templated:
 // SVG (namespace), forbidden tags (h() throws for them), spreads.
@@ -207,6 +207,8 @@ class Transformer {
     const stack = []; // {ch, frame}
     let prev = { t: "start" };
     let asyncPending = null; // stack depth at which an async function's body `{` is expected
+    // `for await (…)` inside an async function: the depth of its head and of the body brace that restores the owner
+    let forAwait = null, ownerBrace = null;
     while (this.pos < limit) {
       const i = this.pos, c = src[i];
       if (c === " " || c === "\t" || c === "\n" || c === "\r") { out.push(c); this.pos++; continue; }
@@ -231,6 +233,8 @@ class Transformer {
         if (!afterDot) {
           if ((word === "let" || word === "const" || word === "var") && this.nextIsSignal()) { out.push(this.declaration(word)); prev = { t: "punct", v: ";" }; continue; }
           if (word === "async") asyncPending = stack.length;
+          if (word === "function") { const g = this.generatorDecl(out, i, j); if (g) { out.push(g); prev = { t: "id" }; continue; } }
+          if (word === "await" && prev.v === "for" && this.asyncFrames > 0) { out.push(word); forAwait = stack.length; prev = { t: "kw", v: word }; continue; }
           if (word === "await" && this.asyncFrames > 0) { out.push(this.awaitExpr()); prev = { t: "id" }; continue; }
           if (this.signals.has(word)) { out.push(this.signalRef(word, prev, stack[stack.length - 1]?.ch)); prev = { t: "id" }; continue; }
           if (!this.isObjectKey(prev)) this.used.add(word);
@@ -248,6 +252,10 @@ class Transformer {
         if (c === "{" && asyncPending !== null && stack.length === asyncPending && !typeBrace) {
           frame = true; asyncPending = null; this.asyncFrames++;
           out.push(`{const _$o=${this.helper("getOwner")}();`);
+        } else if (c === "{" && ownerBrace === stack.length) {
+          // the body of `for await`: each iteration starts after an await the compiler cannot see, so it restores the owner
+          ownerBrace = null;
+          out.push(`{${this.helper("enter")}(_$o,0);`);
         } else out.push(c);
         stack.push({ ch: c, frame });
         this.pos++; prev = { t: "punct", v: c }; continue;
@@ -256,6 +264,7 @@ class Transformer {
         if (!stack.length) { if (stopOnClose) break; throw fail(src, i, `unexpected "${c}"`); }
         const top = stack.pop();
         if (top.frame) this.asyncFrames--;
+        if (c === ")" && forAwait === stack.length) { forAwait = null; if (/^\s*\{/.test(src.slice(i + 1, i + 40))) ownerBrace = stack.length; }
         out.push(c); this.pos++; prev = { t: "punct", v: c };
         if (c === ")" && asyncPending !== null && stack.length < asyncPending) asyncPending = null;
         continue;
@@ -275,6 +284,25 @@ class Transformer {
     }
     if (!stopOnClose && stack.length) throw fail(src, this.pos, `unclosed "${stack[stack.length - 1].ch}"`);
     return out.join("");
+  }
+
+  /**
+   * `function* Name(` / `async function* Name(` declared as a statement, with a capitalised name: a generator component.
+   * It becomes a plain component that runs the generator through _gen() (the static properties `Name.chunk` /
+   * `Name.yields` are read from it) and the generator itself under another name, both hoisted like the original.
+   * `i`: where `function` starts, `j`: just after it. Returns the replacement text (null: not a generator component).
+   */
+  generatorDecl(out, i, j) {
+    const src = this.src;
+    const m = /^\s*\*\s*([A-Z][\w$]*)(?=\s*[<(])/.exec(src.slice(j, j + 120));
+    if (!m || !/(^|[;{}\n]|\bexport|\bdefault)\s*(async\s+)?$/.test(src.slice(Math.max(0, i - 60), i))) return null;
+    let k = out.length - 1;
+    while (k >= 0 && !out[k].trim()) k--;
+    const isAsync = out[k] === "async";
+    if (isAsync) out.splice(k, 1);
+    const name = m[1], inner = `_$g${name}`;
+    this.pos = j + m[0].length;
+    return `function ${name}(p){return ${this.helper("gen")}(${inner}(p),${name})}${isAsync ? "async " : ""}function* ${inner}`;
   }
 
   isObjectKey(prev) {
