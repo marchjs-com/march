@@ -698,7 +698,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | MultiSelect | stable | Several values as removable chips: a Combobox with multiple (static options or async search). | Combobox |
 | NumberInput | stable | Locale-aware number (never NaN) with IntInput, MoneyInput (currency side and decimals) and PercentInput. | — |
 | OptionList | experimental | A list of choices inside a panel: radio group, listbox (one or many) or command menu; rows with lead, label, hint, trailing part and tick; arrow keys, or driven by a field (aria-activedescendant). | ListRow, SectionLabel |
-| PasswordInput | stable | Password field with a show / hide button (aria-pressed). | Button |
+| PasswordInput | stable | Password field with a show / hide button (aria-pressed). | Button, IconButton |
 | PhoneInput | stable | Phone number kept as "+" and digits; the country code is a prefix. | — |
 | RadioGroup | stable | Radio buttons for one value; classic, soft, chip, card or segmented look. | — |
 | Rating | stable | Star rating as a radio group: arrow keys (RTL mirrored), hover preview, half stars when read-only, any colour token. | — |

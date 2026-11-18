@@ -1,6 +1,6 @@
 # PasswordInput
 
-A password field with a Show / Hide button. `autocomplete` defaults to `current-password`; use `new-password` on
+A password field with a show / hide button (an eye). `autocomplete` defaults to `current-password`; use `new-password` on
 sign-up forms so password managers offer to generate one.
 
 ```tsx
@@ -15,12 +15,13 @@ sign-up forms so password managers offer to generate one.
 | `autocomplete` | string | `"current-password"` | |
 | `placeholder`, `maxLength`, `minLength` | | | |
 | `readonly`, `disabled` | boolean | — | |
-| `toggle` | boolean or `(shown) => node` | `true` | `false` removes the show / hide button; a function draws its content |
-| `labels` | `{ show?, hide?, showPassword?, hidePassword? }` | "Show", "Hide", "Show password", "Hide password" | button text and its accessible name |
+| `toggle` | `"icon"`, `"text"`, `false` or `(shown) => node` | `"icon"` | the eye; `"text"` the words; a function draws its content; `false` removes it |
+| `onToggle` | `(shown) => void` | | called when the password is shown or hidden again |
+| `labels` | `{ show?, hide?, showPassword?, hidePassword? }` | "Show", "Hide", "Show password", "Hide password" | the text button's words; the button's accessible name and hint |
 | `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 
-An icon instead of the text: `<PasswordInput bind:value={$pw} toggle={(shown) => <Icon of={shown ? eyeOff : eye} />} />`;
-your own words: `labels={{ show: "Göster", hide: "Gizle" }}`; no button: `toggle={false}`.
+Words instead of the eye: `<PasswordInput bind:value={$pw} toggle="text" />` (your own: `labels={{ show: "Göster", hide: "Gizle" }}`);
+your own drawing: `toggle={(shown) => …}`; no button: `toggle={false}`.
 
 ## Accessibility
 

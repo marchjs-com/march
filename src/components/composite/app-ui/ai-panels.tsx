@@ -61,9 +61,11 @@ export function errText(e: unknown): string {
 /** Make or open the vault: shown while it is not open. */
 function VaultGate(props: { vault: Vault; intro?: unknown }) {
   const pass = signal(""), again = signal(""), hint = signal(""), busy = signal(false), error = signal(""), confirmReset = signal(false);
+  // a passphrase shown while it is typed needs no second typing (what is written is seen)
+  const shown = signal(false);
   const strength = computed(() => passStrength(pass()));
   const rules = computed(() => passRules(pass()));
-  const same = computed(() => !!again() && again() === pass());
+  const same = computed(() => shown() || (!!again() && again() === pass()));
   const canCreate = computed(() => rules().long && rules().varied && same() && !busy());
   const create = async (): Promise<void> => {
     error.set("");
@@ -98,18 +100,20 @@ function VaultGate(props: { vault: Vault; intro?: unknown }) {
           <li class="is-warn">{t("There is no recovery: a forgotten passphrase means making a new vault.")}</li>
         </ul>
         <label class="m-vault-field" onKeyDown={enter(() => void create())}><span>{t("Passphrase")}</span>
-          <PasswordInput value={pass} autocomplete="new-password" placeholder={t("e.g. a short sentence only you know")} />
+          <PasswordInput value={pass} autocomplete="new-password" placeholder={t("e.g. a short sentence only you know")} onToggle={(v: boolean) => shown.set(v)} />
         </label>
         <div class="m-vault-meter" data-level={() => strength()} aria-live="polite"><i /><i /><i /><i /><span>{() => (pass() ? t(STRENGTH[strength()]!) : "")}</span></div>
         <ul class="m-vault-rules" aria-label={t("The passphrase needs")}>
           <li class:is-ok={rules().long}>{() => glyph(rules().long ? check : xIcon)} {t("At least 10 characters")}</li>
           <li class:is-ok={rules().varied}>{() => glyph(rules().varied ? check : xIcon)} {t("Two kinds of characters (letters and digits, capitals or signs), or 16+ characters")}</li>
         </ul>
-        <label class="m-vault-field" onKeyDown={enter(() => void create())}><span>{t("Again")}</span>
-          <PasswordInput value={again} autocomplete="new-password" invalid={!!again() && !same()} />
-        </label>
-        <If when={() => again()}>
-          <p class="m-vault-match" class:is-ok={same()} role="status">{() => glyph(same() ? check : xIcon)} {() => (same() ? t("The passphrases match") : t("The passphrases do not match."))}</p>
+        <If when={() => !shown()}>
+          <label class="m-vault-field" onKeyDown={enter(() => void create())}><span>{t("Again")}</span>
+            <PasswordInput value={again} autocomplete="new-password" invalid={!!again() && !same()} />
+          </label>
+          <If when={() => again()}>
+            <p class="m-vault-match" class:is-ok={same()} role="status">{() => glyph(same() ? check : xIcon)} {() => (same() ? t("The passphrases match") : t("The passphrases do not match."))}</p>
+          </If>
         </If>
         <label class="m-vault-field" onKeyDown={enter(() => void create())}><span>{t("Hint (optional)")}</span>
           <TextInput value={hint} placeholder={t("Something that reminds you, never the passphrase")} />

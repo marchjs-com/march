@@ -49,3 +49,18 @@ test("PasswordInput: the toggle can go or be redrawn; its texts are yours", () =
   assert.equal(own.el.querySelector("input").getAttribute("type"), "text");
   own.dispose();
 });
+
+test("PasswordInput: the eye by default (crossed out while shown), toggle=\"text\" the words, onToggle hears it", () => {
+  const seen = [];
+  const { el } = mount(() => h(PasswordInput, { value: "x", onToggle: (v) => seen.push(v) }));
+  const b = el.querySelector("button");
+  assert.ok(b.classList.contains("m-icon-btn") && b.querySelector("svg"), "an icon button");
+  assert.equal(b.getAttribute("title"), "Show password", "its hint says what it does");
+  b.click();
+  assert.equal(b.getAttribute("aria-pressed"), "true");
+  assert.equal(b.querySelector("svg").getAttribute("data-icon"), "eye-off");
+  b.click();
+  assert.deepEqual(seen, [true, false]);
+  const txt = mount(() => h(PasswordInput, { value: "x", toggle: "text" }));
+  assert.equal(txt.el.querySelector("button").textContent, "Show");
+});

@@ -6,9 +6,9 @@ import { eye } from "../../../icons/glyphs/eye.ts";
 import { eyeOff } from "../../../icons/glyphs/eyeOff.ts";
 import { computed, untrack } from "../../../core/reactive.ts";
 
-export const code = `<Field label="Parola" help="Güçlü bir parola seç"><PasswordInput bind:value={$pw} autocomplete="new-password" /></Field>
-<PasswordInput bind:value={$pw} toggle={(shown) => <Icon of={shown ? eyeOff : eye} />} />   // an icon; toggle={false}: no button
-<PasswordInput bind:value={$pw} labels={{ show: "Göster", hide: "Gizle" }} />`
+export const code = `<Field label="Parola" help="Güçlü bir parola seç"><PasswordInput bind:value={$pw} autocomplete="new-password" /></Field>   // the eye
+<PasswordInput bind:value={$pw} toggle="text" labels={{ show: "Göster", hide: "Gizle" }} />   // words; toggle={false}: no button
+<PasswordInput bind:value={$pw} toggle={(shown) => (shown ? "🙈" : "🐵")} onToggle={(shown) => …} />   // your own drawing`
 
 export default function PasswordInputDemo(props: { values: { disabled: boolean; toggle: string } }) {
   let $pw = "hadi-2026"
@@ -16,9 +16,9 @@ export default function PasswordInputDemo(props: { values: { disabled: boolean; 
   const kind = computed(() => props.values.toggle)
   return <div>{() => {
     const toggle = kind()
-    return untrack(() => <Field label="Parola" help="Göster düğmesiyle yazdığını kontrol et">
+    return untrack(() => <Field label="Parola" help="Göz düğmesiyle yazdığını kontrol et">
       <PasswordInput value={$pw} onChange={(v: string) => { $pw = v }} disabled={props.values.disabled} autocomplete="new-password" labels={{ show: "Göster", hide: "Gizle", showPassword: "Parolayı göster", hidePassword: "Parolayı gizle" }}
-        toggle={toggle === "off" ? false : toggle === "icon" ? (shown: boolean) => <Icon of={shown ? eyeOff : eye} /> : true} />
+        toggle={toggle === "off" ? false : toggle === "text" ? "text" : toggle === "own" ? (shown: boolean) => <Icon of={shown ? eyeOff : eye} /> : "icon"} />
     </Field>)
   }}</div>
 }

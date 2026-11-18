@@ -72,7 +72,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | MultiSelect | stable | Several values as removable chips: a Combobox with multiple (static options or async search). | [Combobox](#combobox) |
 | NumberInput | stable | Locale-aware number (never NaN) with IntInput, MoneyInput (currency side and decimals) and PercentInput. | — |
 | OptionList | experimental | A list of choices inside a panel: radio group, listbox (one or many) or command menu; rows with lead, label, hint, trailing part and tick; arrow keys, or driven by a field (aria-activedescendant). | [ListRow](#listrow), [SectionLabel](#sectionlabel) |
-| PasswordInput | stable | Password field with a show / hide button (aria-pressed). | [Button](#button) |
+| PasswordInput | stable | Password field with a show / hide button (aria-pressed). | [Button](#button), [IconButton](#iconbutton) |
 | PhoneInput | stable | Phone number kept as "+" and digits; the country code is a prefix. | — |
 | RadioGroup | stable | Radio buttons for one value; classic, soft, chip, card or segmented look. | — |
 | Rating | stable | Star rating as a radio group: arrow keys (RTL mirrored), hover preview, half stars when read-only, any colour token. | — |
@@ -1905,9 +1905,9 @@ Full page: src/components/landing/parallax/docs.md
 
 ## PasswordInput
 
-A password field with a Show / Hide button. `autocomplete` defaults to `current-password`; use `new-password` on sign-up forms so password managers offer to generate one.
+A password field with a show / hide button (an eye). `autocomplete` defaults to `current-password`; use `new-password` on sign-up forms so password managers offer to generate one.
 
-Composed of: [Button](#button)
+Composed of: [Button](#button), [IconButton](#iconbutton)
 
 ```tsx
 <Field label="Password" help="At least 10 characters"><PasswordInput bind:value={$pw} autocomplete="new-password" /></Field>
