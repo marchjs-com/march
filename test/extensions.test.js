@@ -333,3 +333,16 @@ test("intercept props: a ref (and a use: action) reaches the element as it is, s
   assert.equal(used, btn, "the use: action ran on it");
   dispose(); off();
 });
+
+test("errors: what the component itself throws goes up through a render extension to the nearest catcher; the extension is not blamed", async () => {
+  function Boom() { throw new Error("component"); }
+  const off = intercept(Boom, { name: "wrap", render: (next, p) => next(p) });
+  let caught = null;
+  const seen = await quiet(() => {
+    const { dispose } = mount(() => M.catchError(() => h(Boom, {}), (e) => { caught = e; }));
+    dispose();
+  });
+  off();
+  assert.equal(caught?.message, "component", "the component's error reaches the catcher");
+  assert.ok(!seen.some((s) => s.includes('"wrap"')), `the extension is not blamed: ${seen.join(" | ")}`);
+});

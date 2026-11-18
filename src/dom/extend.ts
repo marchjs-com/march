@@ -448,10 +448,11 @@ function runPipeline(Comp: Component<Props>, raw0: Props, path?: readonly AnyCom
       const w = on[k]!, orig = cur[k];
       const base = typeof orig === "function" ? (orig as (...a: unknown[]) => unknown) : (): void => {};
       cur[k] = function (this: unknown, ...args: unknown[]): unknown {
-        let called = false, res: unknown;
-        const nx = (...a: unknown[]): unknown => { called = true; return (res = base.apply(this, a.length ? a : args)); };
+        let called = false, res: unknown, own: unknown;
+        // what the wrapped callback itself throws is its own error: it goes up as it is (not the extension's)
+        const nx = (...a: unknown[]): unknown => { called = true; try { return (res = base.apply(this, a.length ? a : args)); } catch (err) { throw (own = err); } };
         try { return w.call(this, nx, ...args, full ?? live); }
-        catch (err) { fail(e, c, err); return called ? res : base.apply(this, args); }
+        catch (err) { if (called && err === own) throw err; fail(e, c, err); return called ? res : base.apply(this, args); }
       };
     }
     step(e, "on");
@@ -467,10 +468,12 @@ function runPipeline(Comp: Component<Props>, raw0: Props, path?: readonly AnyCom
     if (!r) continue;
     const inner = fn, ctx = ctxOf(e);
     fn = (p) => {
-      let called = false, res: unknown;
-      const nx = (q?: Props): unknown => { called = true; return (res = inner(q ?? p)); };
+      let called = false, res: unknown, own: unknown;
+      // what the component (or an inner extension) throws while drawing is its own error: it goes up as it is, to the
+      // nearest <Try>; only an error of this extension's own code is reported and skipped
+      const nx = (q?: Props): unknown => { called = true; try { return (res = inner(q ?? p)); } catch (err) { throw (own = err); } };
       try { return r(nx, p, ctx); }
-      catch (err) { fail(e, c, err); return called ? res : inner(p); }
+      catch (err) { if (called && err === own) throw err; fail(e, c, err); return called ? res : inner(p); }
     };
     step(e, "render");
   }
