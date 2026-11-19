@@ -17,4 +17,4 @@ export { t, locale, setLocale, messages, _tr, _trf } from "./core/i18n.ts";
 export { missing, setFallbackLocale } from "./core/i18n-tools.ts";
 export { sx, sxValue, SX } from "./core/sx.ts";
 /** The library version. */
-export const version = "0.1.0";
+export const version = "0.2.0";

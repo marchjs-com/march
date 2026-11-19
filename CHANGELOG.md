@@ -2,7 +2,30 @@
 
 All notable changes to March. Versions follow [semver](https://semver.org/).
 
-## 0.1.0 — unreleased
+## 0.2.0 — 2026-11-19
+
+### march/db, march/vault, march/ai
+- `march/db`: IndexedDB made plain: stores and indexes, queries (range, prefix, order, page, filter), transactions,
+  live queries a component reads like a signal (this tab and the others); the same API in memory without IndexedDB.
+- `march/vault`: secrets encrypted with the user's passphrase (PBKDF2-SHA-256 600 000 rounds, AES-GCM-256, HMAC names);
+  keys only in memory, auto-lock, slowed-down wrong tries; the passphrase's length and an optional hint for an unlock
+  form without a button.
+- `march/ai`: chat with 18 providers (Anthropic, OpenAI, Google Gemini, xAI, DeepSeek, Alibaba Qwen, Z.ai, Moonshot,
+  Mistral, Meta, Groq, Cerebras, Together, Fireworks, OpenRouter, Perplexity, Ollama, LM Studio) or one the user adds (an endpoint and its
+  format) with the user's own key: streaming, token usage with the cached part, several keys per provider.
+- march-app-ui: `vaultPlugin` (the AI keys panel) and `aiPlugin` (a chat about the open file).
+
+### i18n builds
+- The compiler's `i18n` option passes what is shown (JSX text, read attributes, {expression} children, toast / alert /
+  confirm messages) through `_tr` / `_trf`: a locale switch writes only those texts again, state is kept; the data
+  stays a string. Texts in code are collected too (`t("…")`, text fields of objects, value branches of JSX expressions).
+
+### Components and core
+- `h()`: a getter prop stays a getter (the component reads it live).
+- PasswordInput: an eye icon by default (`toggle="text"` for words), `onToggle`.
+- Form controls get an id when none is given; PropertyGrid's names are labels of their field (or text for a group).
+
+## 0.1.0
 
 ### The repository is github.com/marchjs-com/march
 - Moved from tlghn/hadimarch with its whole history. Install with `npm i github:marchjs-com/march#<commit-sha>`; the
