@@ -1,13 +1,17 @@
 import { definePlayground } from "../../meta.ts";
 
-interface Values { iconOnly: boolean; icon: string; copiedIcon: string; copiedLabel: string; copiedColor: string }
+interface Values { text: string; iconOnly: boolean; icon: string; copiedIcon: string; copiedLabel: string; copiedColor: string }
 
 export default definePlayground<Values>({
   options: [
+    // text is required (what is copied): the raw component in MarchIDE gets this default
+    { key: "text", label: "Kopyalanan (text)", default: "npm i github:marchjs-com/march", kind: "text" },
     { key: "iconOnly", label: "Yalnız ikon", default: false },
-    { key: "icon", label: "İkon", default: "default", options: [{ value: "default", label: "varsayılan" }, { value: "own", label: "kendi ikonum" }] },
-    { key: "copiedIcon", label: "Kopyalandı ikonu", default: "check", options: [{ value: "check", label: "tik" }, { value: "own", label: "kalp" }, { value: "off", label: "değişmesin" }], visibleWhen: (v) => v.iconOnly || v.icon === "own" },
-    { key: "copiedLabel", label: "Kopyalandı metni", default: "default", options: [{ value: "default", label: "Kopyalandı" }, { value: "own", label: "Panoda!" }], visibleWhen: (v) => !v.iconOnly },
+    // icon names (MarchIDE's icon picker passes the name on to the raw component); empty: the component's own
+    { key: "icon", label: "İkon", default: "", options: [{ value: "", label: "varsayılan" }, { value: "link", label: "kendi ikonum (bağlantı)" }] },
+    { key: "copiedIcon", label: "Kopyalandı ikonu", default: "check", options: [{ value: "check", label: "tik" }, { value: "heart", label: "kalp" }, { value: "off", label: "değişmesin" }], visibleWhen: (v) => v.iconOnly || !!v.icon },
+    // empty: the component's own "Copied" (translated)
+    { key: "copiedLabel", label: "Kopyalandı metni", default: "", kind: "text", visibleWhen: (v) => !v.iconOnly },
     { key: "copiedColor", label: "Kopyalandı rengi", default: "", options: [{ value: "", label: "yeşil" }, { value: "brand-blue", label: "mavi" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-purple", label: "mor" }] },
   ],
 });

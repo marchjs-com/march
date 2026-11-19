@@ -7,16 +7,14 @@ export const code = `<SectionTimeline items={sections} hash fixed intro />      
 <SectionTimeline items={steps} orientation="horizontal" root={() => box} />   // a scrolling box: a row of dots under it
 <SectionTimeline items={sections} magnify={false} onChange={(i) => $read = i} />`
 
-const NAMES = ["Giriş", "Kurulum", "Sinyaller", "Bileşenler", "Temalar", "Hareket", "Yönlendirici", "Formlar", "Tablolar", "Grafikler",
-  "Çeviri", "Erişilebilirlik", "Güvenlik", "Test", "Derleme", "Yayın"]
-
-export default function SectionTimelineDemo(props: { values: { orientation: string; count: number; magnify: boolean; intro: boolean; reach: number; grow: number; wave: number; smooth: boolean; color: string; line: number } }) {
+export default function SectionTimelineDemo(props: { values: { items: readonly SectionTimelineItem[]; orientation: string; count: number; magnify: boolean; intro: boolean; reach: number; grow: number; wave: number; smooth: boolean; color: string; line: number } }) {
   let $read = -1
   let box: HTMLElement | undefined
   return <div class="sc-col">
     {() => {
       const v = { ...props.values }
-      const names = NAMES.slice(0, v.count)
+      // the chosen list (playground.ts), as many as the count, each dot pointed at its section in the box
+      const names = v.items.slice(0, v.count).map((it) => it.label)
       const color = v.color === "primary" ? undefined : v.color as "brand-blue"
       const items: SectionTimelineItem[] = names.map((n, i) => ({ label: n, target: () => box?.querySelector(`[data-sec="${i}"]`) ?? null }))
       const row = v.orientation === "horizontal"

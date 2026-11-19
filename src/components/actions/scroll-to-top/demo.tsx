@@ -13,7 +13,7 @@ export const code = `// once in the app shell: shows after scrolling, sits in th
 
 const MOTIONS: Record<string, string> = { pop: "zıplayarak", fade: "belirerek", slide: "kayarak", own: "dönerek", none: "yok" }
 
-export default function ScrollToTopDemo(props: { values: { threshold: number; motion: string; icon: string; color: string } }) {
+export default function ScrollToTopDemo(props: { values: { inline: boolean; threshold: number; motion: string; icon: string; color: string } }) {
   const lines = Array.from({ length: 24 }, (_, i) => <p>{`HADİ bülteni, bölüm ${i + 1}: aşağı kaydır, düğme belirsin.`}</p>)
   let $top = 0
   const box = (<div class="sc-totop-box" on:scroll={(e: Event) => { $top = Math.round((e.currentTarget as HTMLElement).scrollTop) }}>{lines}</div>) as HTMLElement
@@ -30,8 +30,8 @@ export default function ScrollToTopDemo(props: { values: { threshold: number; mo
       const spin = (el: HTMLElement, shown: boolean) => animate(el, shown
         ? [{ opacity: 0, transform: "rotate(-180deg) scale(0.6)" }, { opacity: 1, transform: "none" }]
         : [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "rotate(180deg) scale(0.6)" }], { duration: 420, easing: "easeOutCubic", fill: "forwards" })
-      return <ScrollToTop inline target={box} threshold={v.threshold} motion={v.motion === "own" ? spin : v.motion as "pop"}
-        icon={v.icon === "chevron" ? chevronUp : v.icon === "text" ? "⇧" : undefined} m:color={(v.color || undefined) as never} />
+      return <ScrollToTop inline={v.inline} target={box} threshold={v.threshold} motion={v.motion === "own" ? spin : v.motion as "pop"}
+        icon={v.icon === "chevronUp" ? chevronUp : v.icon === "⇧" ? "⇧" : undefined} m:color={(v.color || undefined) as never} />
     }}</div>
   </div>
 }

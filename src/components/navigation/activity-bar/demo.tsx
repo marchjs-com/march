@@ -1,15 +1,7 @@
-// Showcase stage for ActivityBar: the bar beside the view it switches (Playground values in playground.ts).
-import { signal } from "../../../core/reactive.ts";
-import { ActivityBar } from "./index.ts";
-import { files } from "../../../icons/glyphs/files.ts";
-import { search } from "../../../icons/glyphs/search.ts";
-import { gitBranch } from "../../../icons/glyphs/gitBranch.ts";
-import { bug } from "../../../icons/glyphs/bug.ts";
-import { settings } from "../../../icons/glyphs/settings.ts";
-import { user } from "../../../icons/glyphs/user.ts";
-import { fileText } from "../../../icons/glyphs/fileText.ts";
-import { clock } from "../../../icons/glyphs/clock.ts";
-import { star } from "../../../icons/glyphs/star.ts";
+// Showcase stage for ActivityBar: the bar beside the view it switches; its views and the active one come from the
+// Playground (playground.ts) like the rest of its values.
+import { signal, effect, untrack } from "../../../core/reactive.ts";
+import { ActivityBar, type ActivityItem } from "./index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 
 export const code = `<ActivityBar value={$view} onChange={(v) => $view = v} controls="side-view" items={[
@@ -23,32 +15,30 @@ export const code = `<ActivityBar value={$view} onChange={(v) => $view = v} cont
 <ActivityBar items={views} value={$view} onChange={(v) => $view = v} showLabels tooltips={false} />   // adlar ikonun altında
 <ActivityBar items={sections} value={$section} onChange={pick} subItems subValue={$page} onSubSelect={(c) => go(c.id)} />   // seçilenin alt öğeleri altında`
 
-const TITLES: Record<string, string> = { files: "Dosyalar", search: "Ara", git: "Kaynak denetimi", debug: "Hata ayıkla" }
 // the indicator's motion shows only while the view changes: the stage says which one is on
 const MOTIONS: Record<string, string> = { glide: "Çizgi etkin simgeye kayarak gider", fade: "Çizgi etkin simgede yerinde belirir", none: "Çizgi hareketsiz yer değiştirir", off: "Çizgi yok" }
 
-export default function ActivityBarDemo(props: { values: { orientation: string; badges: boolean; indicator: string; color: string; tooltips: boolean; showLabels: boolean; glass: boolean; subItems: boolean } }) {
-  const view = signal<string | null>("files"), sub = signal<string | null>("open")
+export default function ActivityBarDemo(props: { values: { items: readonly ActivityItem[]; value: string; orientation: string; badges: boolean; indicator: boolean; motion: string; color: string; tooltips: boolean; showLabels: boolean; glass: boolean; subItems: boolean } }) {
+  const view = signal<string | null>(props.values.value || null), sub = signal<string | null>("open")
+  // the value option sets the active view; the bar changes it too
+  effect(() => { const v = props.values.value; untrack(() => view.set(v || null)) })
+  // the chosen views (playground.ts): badges follow their option; the end items are actions that close the side view
+  const items = (): ActivityItem[] => props.values.items.map((it) => ({
+    ...it, ...(it.badge !== undefined ? { badge: () => (props.values.badges ? it.badge as number : 0) } : {}),
+    ...(it.position === "end" ? { onSelect: () => view.set(null) } : {}),
+  }))
+  const title = (): string => { const it = props.values.items.find((x) => x.id === view()); return it ? String(it.label) : "" }
   return <div class={() => (props.values.orientation === "horizontal" ? "sc-ab-stage is-h" : "sc-ab-stage")}>
     {() => {
       // the indicator, its motion, the tooltips and the color are read once: the bar is drawn again when one changes
-      const ind = props.values.indicator, showLabels = props.values.showLabels, tooltips = props.values.tooltips && !showLabels, color = (props.values.color || undefined) as ColorToken
+      const ind = props.values.indicator, motion = props.values.motion as "glide", showLabels = props.values.showLabels, tooltips = props.values.tooltips && !showLabels, color = (props.values.color || undefined) as ColorToken
       return <ActivityBar value={view} onChange={(v: string | null) => view.set(v)} controls="sc-ab-view"
-      indicator={ind !== "off"} motion={ind === "off" ? undefined : ind as "glide"} tooltips={tooltips} showLabels={showLabels} glass={props.values.glass} subItems={props.values.subItems} subValue={() => sub()} onSubSelect={(c: { id: string }) => sub.set(c.id)} m:color={color}
-      orientation={() => props.values.orientation as "vertical"} label="Görünümler" items={[
-        { id: "files", label: "Dosyalar", icon: files, shortcut: "mod+shift+e", children: [
-          { id: "open", label: "Açık dosyalar", short: "Açık", icon: fileText }, { id: "recent", label: "Son kullanılanlar", short: "Son", icon: clock }, { id: "starred", label: "Yıldızlılar", short: "Yıldız", icon: star },
-        ] },
-        { id: "search", label: "Ara", icon: search, badge: () => (props.values.badges ? 12 : 0) },
-        { id: "git", label: "Kaynak denetimi", short: "Kaynak", icon: gitBranch, badge: () => (props.values.badges ? 3 : 0) },
-        { id: "debug", label: "Hata ayıkla", short: "Ayıkla", icon: bug },
-        { id: "account", label: "Hesap", icon: user, position: "end", onSelect: () => view.set(null) },
-        { id: "settings", label: "Ayarlar", icon: settings, position: "end", onSelect: () => view.set(null) },
-      ]} />
+      indicator={ind} motion={ind ? motion : undefined} tooltips={tooltips} showLabels={showLabels} glass={props.values.glass} subItems={props.values.subItems} subValue={() => sub()} onSubSelect={(c: { id: string }) => sub.set(c.id)} m:color={color}
+      orientation={() => props.values.orientation as "vertical"} label="Görünümler" items={items} />
     }}
     <div id="sc-ab-view" class="sc-ab-view" role="tabpanel">
-      {() => (view() ? <strong>{TITLES[view()!]}</strong> : <span class="m-muted">Yan görünüm kapalı: bir simgeye bas.</span>)}
-      <small class="m-muted">{() => MOTIONS[props.values.indicator]}: başka bir simgeye basınca görünür.</small>
+      {() => (view() ? <strong>{title()}</strong> : <span class="m-muted">Yan görünüm kapalı: bir simgeye bas.</span>)}
+      <small class="m-muted">{() => MOTIONS[props.values.indicator ? props.values.motion : "off"]}: başka bir simgeye basınca görünür.</small>
     </div>
   </div>
 }

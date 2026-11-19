@@ -82,7 +82,7 @@ export function ActivityBar(props: ActivityBarProps): Element {
   const choose = (it: ActivityItem | undefined): void => {
     if (!it) return;
     if (it.onSelect) { void it.onSelect(); return; }
-    props.onChange(current() === it.id && props.collapsible !== false ? null : it.id);
+    props.onChange?.(current() === it.id && props.collapsible !== false ? null : it.id);
   };
   // the indicator glides from the old view to the new one (a turned bar starts it afresh)
   const ind = props.indicator !== false ? h("span", { class: "m-ab-ind", "aria-hidden": "true" }) as HTMLElement : null;
@@ -111,7 +111,7 @@ export function ActivityBar(props: ActivityBarProps): Element {
       kids.map((k, i) => h("button", {
         type: "button", class: () => cx("m-ab-sub-btn", val(props.subValue) === k.id && "is-current"), "data-sub": k.id, "aria-label": () => val(k.label),
         "aria-current": () => (val(props.subValue) === k.id ? "page" : null), ref: (el: HTMLElement) => el.style.setProperty("--m-ab-i", String(i)),
-        onClick: () => (props.onSubSelect ? props.onSubSelect(k, parent) : props.onChange(k.id)),
+        onClick: () => (props.onSubSelect ? props.onSubSelect(k, parent) : props.onChange?.(k.id)),
       }, icon(k.icon, "m-ab-icon"), props.showLabels && h("span", { class: "m-ab-text" }, () => val(k.short) ?? val(k.label))))));
   };
   const tabs = computed((): TabSpec[] => ordered().map((it) => ({

@@ -36,7 +36,7 @@ export default function ChevronDemo(props: { values: { open: boolean; direction:
   return <div class="sc-col">
     <div class="sc-row">
       {() => {
-        const icon = props.values.icon === "arrow" ? arrowRight : props.values.icon === "text" ? "›" : undefined
+        const icon = props.values.icon === "arrowRight" ? arrowRight : props.values.icon || undefined
         return <Chevron open={open} direction={direction} size={size} motion={motion} m:color={color} icon={icon} />
       }}
       <span class="m-muted">{() => (props.values.open ? "open: ok döndü" : "open={false}")} · {() => MOTION_NOTE[props.values.motion] ?? ""}</span>

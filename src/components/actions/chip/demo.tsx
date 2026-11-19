@@ -2,7 +2,8 @@
 import { Chip } from "./index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { heart } from "../../../icons/glyphs/heart.ts";
-import { trash } from "../../../icons/glyphs/trash.ts";
+import { tag } from "../../../icons/glyphs/tag.ts";
+import { star } from "../../../icons/glyphs/star.ts";
 
 export const code = `<Chip>Tasarım</Chip>
 <Chip selected={$on} onClick={() => $on = !$on}>Açık</Chip>          // filter: aria-pressed
@@ -11,17 +12,22 @@ export const code = `<Chip>Tasarım</Chip>
 <Chip selected={$on} selectedIcon={heart} onClick={toggle}>Beğenilenler</Chip>   // selectedIcon: false | your own icon
 <Chip onRemove={drop} removeIcon={trash} removeLabel="Etiketi sil">{tag}</Chip>`
 
-export default function ChipDemo(props: { values: { tone: string; size: string; mode: string; color: string; selectedIcon: string; removeIcon: string } }) {
+// the Playground's icon names → their glyphs
+const ICONS: Record<string, typeof tag> = { tag, star }
+
+export default function ChipDemo(props: { values: { label: string; mode: string; tone: string; size: string; icon: string; color: string; selectedIcon: string } }) {
   let $on = new Set(["Açık"])
-  let $tags = ["Tasarım", "Ürün", "Çok uzun bir etiket adı kayarak okunur"]
+  let $removed = new Set<string>()
   return <div class="sc-row">
     {() => {
       const v = props.values, tone = v.tone as "neutral", size = v.size as "md", color = (v.color || undefined) as ColorToken | undefined
-      const selectedIcon = v.selectedIcon === "off" ? false : v.selectedIcon === "own" ? heart : true
-      const own = v.removeIcon === "own"
-      if (v.mode === "toggle") return ["Açık", "Bekliyor", "Çözüldü"].map((f) => <Chip tone={tone} size={size} m:color={color} selectedIcon={selectedIcon} selected={$on.has(f)} onClick={() => { const n = new Set($on); n.has(f) ? n.delete(f) : n.add(f); $on = n }}>{f}</Chip>)
-      if (v.mode === "remove") return $tags.map((t) => <Chip tone={tone} size={size} m:color={color} removeIcon={own ? trash : undefined} removeLabel={own ? "Etiketi sil" : undefined} onRemove={() => { $tags = $tags.filter((x) => x !== t) }}>{t}</Chip>)
-      return ["Tasarım", "Ürün", "Pazarlama"].map((t) => <Chip tone={tone} size={size} m:color={color}>{t}</Chip>)
+      const icon = v.icon ? ICONS[v.icon] ?? tag : undefined
+      const selectedIcon = v.selectedIcon === "off" ? false : v.selectedIcon === "heart" ? heart : true
+      // the first chip carries the Playground's label
+      const first = (list: string[]): string[] => [v.label || list[0] || "", ...list.slice(1)]
+      if (v.mode === "toggle") return first(["Açık", "Bekliyor", "Çözüldü"]).map((f) => <Chip tone={tone} size={size} icon={icon} m:color={color} selectedIcon={selectedIcon} selected={$on.has(f)} onClick={() => { const n = new Set($on); n.has(f) ? n.delete(f) : n.add(f); $on = n }}>{f}</Chip>)
+      if (v.mode === "remove") return first(["Tasarım", "Ürün", "Çok uzun bir etiket adı kayarak okunur"]).filter((t) => !$removed.has(t)).map((t) => <Chip tone={tone} size={size} icon={icon} m:color={color} removeLabel="Etiketi sil" onRemove={() => { $removed = new Set([...$removed, t]) }}>{t}</Chip>)
+      return first(["Tasarım", "Ürün", "Pazarlama"]).map((t) => <Chip tone={tone} size={size} icon={icon} m:color={color}>{t}</Chip>)
     }}
   </div>
 }

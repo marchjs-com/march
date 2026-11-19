@@ -23,7 +23,7 @@ import { addBottomRightControl } from "../../layout/bottom-right-controls/index.
 import type { IconProp } from "../../../icons/types.ts";
 
 export interface ScrollToTopProps {
-  /** Scrolled distance (px) after which the button shows. Default 320. @tr Düğmenin göründüğü kaydırma mesafesi (px). Varsayılan 320. */
+  /** Scrolled distance (px) after which the button shows (0: always shown). Default 320. @tr Düğmenin göründüğü kaydırma mesafesi (px; 0: hep görünür). Varsayılan 320. */
   threshold?: number | undefined;
   /** Place in the page corner (lower = nearer the edge). Default 0. @tr Sayfa köşesindeki sırası (küçük = kenara daha yakın). Varsayılan 0. */
   order?: number | undefined;
@@ -68,7 +68,7 @@ export function ScrollToTop(props: ScrollToTopProps = {}): Node {
     const tg = e?.target;
     if (props.target) { if (tg && tg !== props.target && !(props.target === win && isPage(tg))) return; }
     else if (tg) { if (!isPage(tg)) return; scroller = tg === doc || tg === doc?.documentElement || tg === doc?.body ? win : (tg as Element); }
-    if (scroller) shown.set(topOf(scroller) > threshold);
+    if (scroller) shown.set(threshold <= 0 || topOf(scroller) > threshold);
   };
   onCleanup(listen(globalThis.document, { scroll: read }, { capture: true, passive: true }));
 

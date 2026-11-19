@@ -21,18 +21,18 @@ const HINT: Record<string, string> = {
 }
 
 const SAMPLES = [
-  ["TR", "Haftalık etkinlik özeti: Kadıköy koşu grubu, Moda sahili buluşması ve akşam yemeği"],
+  ["TR", ""], // the Playground's text
   ["EN", "Weekly digest: Saturday running club, beach clean-up meetup and the community dinner"],
   ["AR", "ملخص الأسبوع: نادي الجري يوم السبت، لقاء تنظيف الشاطئ وعشاء المجتمع"],
   ["Karışık", "HADİ — مرحبا بكم في المجتمع — welcome to the community"],
   ["Kısa", "Sığan metin kaymaz"],
 ] as const
 
-export default function OverflowTextDemo(props: { values: { duplicate: boolean; trigger: string; mode: string; speed: number; disabled: boolean; ticker: boolean; separator: string } }) {
+export default function OverflowTextDemo(props: { values: { text: string; duplicate: boolean; trigger: string; mode: string; speed: number; disabled: boolean; ticker: boolean; separator: string } }) {
   return <div class="sc-mq-demo">
     {() => { const trigger = props.values.trigger as MarqueeTrigger, mode = props.values.mode as MarqueeMode, speed = props.values.speed, disabled = props.values.disabled; return <div class="sc-mq-list">
       <p class="m-muted">{disabled ? "Kaydırma kapalı: sığmayan metin kırpılmış kalır." : `${HINT[trigger]} İlk satır seçili satır gibi hep kayar (play).`}</p>
-      {SAMPLES.map(([lang, text], i) => <button type="button" class="sc-mq-row"><span class="sc-mq-lang">{lang}</span><OverflowText class="sc-mq-text" text={text} trigger={trigger} mode={mode} speed={speed} disabled={disabled} play={i === 0 ? () => true : undefined} /></button>)}
+      {SAMPLES.map(([lang, text], i) => <button type="button" class="sc-mq-row"><span class="sc-mq-lang">{lang}</span><OverflowText class="sc-mq-text" text={i === 0 ? props.values.text : text} trigger={trigger} mode={mode} speed={speed} disabled={disabled} play={i === 0 ? () => true : undefined} /></button>)}
     </div> }}
     {() => {
       if (!props.values.ticker) return null

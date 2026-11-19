@@ -1,11 +1,8 @@
-// Showcase stage for NavMenu: a small admin menu in a framed column (Playground values in playground.ts). On narrow
+// Showcase stage for NavMenu: the chosen menu (Playground items) in a framed column (values in playground.ts). On narrow
 // screens the menu is a drawer: the menu button opens it.
-import { NavMenu } from "./index.ts";
-import { inbox } from "../../../icons/glyphs/inbox.ts";
+import { NavMenu, type NavItem } from "./index.ts";
 import { users } from "../../../icons/glyphs/users.ts";
 import { wallet } from "../../../icons/glyphs/wallet.ts";
-import { barChart } from "../../../icons/glyphs/barChart.ts";
-import { settings } from "../../../icons/glyphs/settings.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
 import type { Href } from "../../../router/router.ts";
 import { load, save } from "../../../core/util.ts";
@@ -21,17 +18,7 @@ export const code = `<NavMenu brand="HADİ" filter collapsible items={[
 // demo links stay on this page (a query only)
 const link = (id: string): Href => `/navigation?nm=${id}` as Href
 
-const ITEMS = [
-  { id: "inbox", title: "Gelen kutusu", href: link("inbox"), icon: inbox, badge: 4 },
-  { id: "reports", title: "Raporlar", href: link("reports"), icon: barChart },
-  { id: "members", title: "Üyeler", href: link("members"), group: "Yönetim" },
-  { id: "roles", title: "Roller ve izinler", href: link("roles"), group: "Yönetim" },
-  { id: "payments", title: "Ödemeler", href: link("payments"), group: "Finans" },
-  { id: "invoices", title: "Faturalar ve iade talepleri arşivi", href: link("invoices"), group: "Finans" },
-  { id: "settings", title: "Ayarlar", href: link("settings"), icon: settings },
-]
-
-export default function NavMenuDemo(props: { values: { filter: boolean; groupsCollapsed: boolean; collapsible: boolean; pins: boolean; chevron: string; texts: boolean } }) {
+export default function NavMenuDemo(props: { values: { items: readonly NavItem[]; filter: boolean; groupsCollapsed: boolean; collapsible: boolean; pins: boolean; chevron: string; texts: boolean } }) {
   return <div class="sc-navmenu-frame">
     {() => {
       // read here so the menu is drawn again when an option changes (it reads its props once)
@@ -40,7 +27,9 @@ export default function NavMenuDemo(props: { values: { filter: boolean; groupsCo
       // first visit: one pinned page, so the pinned block (and its heading) shows before anything is starred
       const storageKey = `sc.navmenu.${groupsCollapsed}`
       if (load<unknown>(storageKey, null) == null) save(storageKey, { pins: ["reports"] })
-      return <NavMenu items={ITEMS} brand={<strong>HADİ</strong>} label="Örnek menü" palette={false} storageKey={storageKey}
+      // the chosen pages (playground.ts), their links pointed at this page
+      const items = props.values.items.map((it) => ({ ...it, href: link(it.id) }))
+      return <NavMenu items={items} brand={<strong>HADİ</strong>} label="Örnek menü" palette={false} storageKey={storageKey}
         filter={filter} groupsCollapsed={groupsCollapsed} collapsible={collapsible} groupIcons={{ "Yönetim": users, "Finans": wallet }}
         pins={pins} icons={chevron === "plus" ? { chevron: plus } : chevron === "off" ? { chevron: false } : undefined}
         labels={texts ? { filterPlaceholder: "Sayfa bul…", filter: "Sayfalarda ara", noMatches: "Böyle bir sayfa yok", pinned: "Sık kullandıklarım", recent: "Son baktıklarım" } : undefined} />

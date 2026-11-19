@@ -1,9 +1,6 @@
-// Showcase stage for Breadcrumbs: narrow it to collapse the middle (Playground values in playground.ts).
+// Showcase stage for Breadcrumbs: the path comes from the Playground (playground.ts); narrow it to collapse the middle.
 import { signal } from "../../../core/reactive.ts";
-import { Breadcrumbs, type Crumb } from "./index.ts";
-import { folder } from "../../../icons/glyphs/folder.ts";
-import { fileText } from "../../../icons/glyphs/fileText.ts";
-import { hash } from "../../../icons/glyphs/hash.ts";
+import { Breadcrumbs, type Crumb, type CrumbSibling } from "./index.ts";
 import { arrowRight } from "../../../icons/glyphs/arrowRight.ts";
 
 export const code = `<Breadcrumbs label="Dosya yolu" items={[
@@ -14,23 +11,20 @@ export const code = `<Breadcrumbs label="Dosya yolu" items={[
 <Breadcrumbs items={path} separator="/" />                       // kendi ayracın: metin, ikon ya da () => düğüm
 <Breadcrumbs items={path} separator={false} collapse={false} />  // ayraçsız, toplamadan`
 
-const FILES = ["app.ts", "router.ts", "theme.css", "store.ts"]
-const ABOUT: Record<string, string> = { "app.ts": "Uygulamanın girişi", "router.ts": "Rota tablosu", "theme.css": "Tema tokenları", "store.ts": "Ortak durum" }
 const SEPARATORS: Record<string, unknown> = { chevron: undefined, slash: "/", dot: "•", icon: arrowRight, off: false }
 
-export default function BreadcrumbsDemo(props: { values: { width: number; siblings: boolean; subs: boolean; separator: string; collapse: boolean } }) {
-  const file = signal("app.ts")
-  const items = (): Crumb[] => {
-    const sib = props.values.siblings ? FILES.map((f) => ({ id: f, label: f, icon: fileText, sub: props.values.subs ? ABOUT[f] : undefined, current: f === file(), onSelect: () => file.set(f) })) : undefined
-    return [
-      { id: "hadi", label: "hadi", icon: folder, onSelect: () => file.set("app.ts") },
-      { id: "packages", label: "packages", icon: folder },
-      { id: "web", label: "web-istemci", icon: folder },
-      { id: "src", label: "src", icon: folder },
-      { id: "file", label: file(), icon: fileText, ...(sib ? { siblings: sib } : {}) },
-      { id: "sym", label: "startApp()", icon: hash },
-    ]
-  }
+export default function BreadcrumbsDemo(props: { values: { items: readonly Crumb[]; width: number; siblings: boolean; subs: boolean; separator: string; collapse: boolean } }) {
+  // the sibling chosen in a crumb's menu (crumb id → its label); the first crumb goes back to the path as given
+  const picked = signal<Record<string, string>>({})
+  const items = (): Crumb[] => props.values.items.map((c, i): Crumb => {
+    if (i === 0) return { ...c, onSelect: () => picked.set({}) }
+    const sib = c.siblings as readonly CrumbSibling[] | undefined
+    if (!sib) return c
+    const now = picked()[c.id] ?? String(c.label)
+    return { ...c, label: now, ...(props.values.siblings ? { siblings: sib.map((x) => ({
+      ...x, sub: props.values.subs ? x.sub : undefined, current: x.label === now, onSelect: () => picked.set({ ...picked(), [c.id]: x.label }),
+    })) } : { siblings: undefined }) }
+  })
   // separator and collapse are read once: the path is drawn again when one of them changes
   return <div class="sc-bc-stage" style={{ "--sc-bc-w": `${props.values.width}px` }}>{() => {
     const separator = SEPARATORS[props.values.separator], collapse = props.values.collapse
