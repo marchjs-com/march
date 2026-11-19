@@ -135,7 +135,7 @@ export function IconPicker(props: IconPickerProps): unknown {
     return out;
   });
   // a new search, filter or set starts at the first page again
-  const restart = (): void => limit.set(step);
+  const restart = (): void => { limit.set(step); };
   /** Add or take out a chip's value (a set: at least one stays). */
   const toggle = (list: typeof setIds, v: string, keepOne: boolean): void => {
     const now = list.peek(), on = now.includes(v);

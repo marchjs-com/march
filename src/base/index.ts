@@ -33,7 +33,7 @@ export function appBaseUrl(): URL | null {
       : new URL(l.protocol === "file:" ? "./" : "/", l.href);
   } catch { u = null; }
   // not kept before the document can answer (a module runs after parsing, so this is rare)
-  if (d?.querySelector) cached = u;
+  if (typeof d?.querySelector === "function") cached = u;
   return u;
 }
 

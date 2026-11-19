@@ -4,7 +4,11 @@ import { untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { model, ctl, cx, type ControlProps } from "../../../forms/util.ts";
 
-export interface ToggleProps extends ControlProps<boolean | null> {
+export interface ToggleProps extends Omit<ControlProps<boolean | null>, "setValue" | "onChange"> {
+  /** Writes the value back (set by `bind:value`); null only with `tristate`. @tr Değeri geri yazar (`bind:value` bunu verir); null yalnız `tristate` ile. */
+  setValue?(v: boolean | null): void;
+  /** Called with the new value on every change; null only with `tristate`. @tr Her değişiklikte yeni değerle çağrılır; null yalnız `tristate` ile. */
+  onChange?(v: boolean | null): void;
   /** Text next to the switch (or use children). @tr Anahtarın yanındaki metin (ya da children kullanılır). */
   label?: unknown;
   /**

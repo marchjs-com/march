@@ -198,7 +198,7 @@ export function FontPicker(props: FontPickerProps): unknown {
   effect(() => { const o = val(props.open as Signal<boolean> | boolean | undefined); if (o != null) isOpen.set(o); });
   const setOpen = (v: boolean): void => {
     if (v === isOpen.peek() || (v && ro())) return;
-    const o = props.open as Partial<Signal<boolean>> | boolean | undefined;
+    const o = props.open as ((() => boolean) & Partial<Signal<boolean>>) | boolean | undefined;
     if (typeof o === "function" && o.signal) o.set?.(v); else if (o === undefined) isOpen.set(v);
     props.onOpenChange?.(v);
     if (!v) { query.set(""); active.set(-1); }
@@ -381,7 +381,7 @@ export function FontPicker(props: FontPickerProps): unknown {
           options: () => sorts().map((x) => ({ value: x, label: sortName(x) })),
         })),
         () => (props.subsets === false || !subsetList().length ? null : h(Select, {
-          class: "m-fp-subset", "aria-label": L().subset ?? t`Subset`, placeholder: false, value: live(() => subset()), onChange: (v: string | null) => subset.set(v ?? "all"),
+          class: "m-fp-subset", "aria-label": L().subset ?? t`Subset`, placeholder: false as const, value: live(() => subset()), onChange: (v: string | null) => subset.set(v ?? "all"),
           options: () => [{ value: "all", label: L().allSubsets ?? t`All subsets` }, ...subsetList().map((x) => ({ value: x, label: subsetName(x) }))],
         })),
         () => (props.favorites === false ? null : h(IconButton, {
@@ -418,7 +418,7 @@ export function FontPicker(props: FontPickerProps): unknown {
           if (!f || props.styleControls === false) return null;
           return [
             f.weights.length > 1 ? h(Select, {
-              class: "m-fp-weight", "aria-label": L().weight ?? t`Weight`, placeholder: false, value: live(() => style().weight), disabled: live(ro),
+              class: "m-fp-weight", "aria-label": L().weight ?? t`Weight`, placeholder: false as const, value: live(() => style().weight), disabled: live(ro),
               options: f.weights.map((w) => ({ value: w, label: `${WEIGHT_NAMES[w]?.() ?? ""} ${w}`.trim() })),
               onChange: (w: number | null) => { if (w) { weight.set(w); restyle(); } },
             }) : null,
@@ -478,7 +478,7 @@ export function FontPicker(props: FontPickerProps): unknown {
     typeOn(name, () => (get() ? current() ?? { family: get(), category: "sans-serif", source: "web", weights: [untrack(weight)], italics: [], subsets: [] } : undefined), { text: get });
     return h(Button, {
       id: c.id, class: "m-fp-trigger", variant: "secondary", size: props.size, iconEnd: chevronsUpDown, disabled: live(() => !!props.disabled),
-      "aria-label": c["aria-label"], "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"], ...(view === "dialog" ? { "aria-haspopup": "dialog", "aria-expanded": () => String(isOpen()) } : {}),
+      "aria-label": c["aria-label"], "aria-labelledby": props.labelledby ?? null, "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"], ...(view === "dialog" ? { "aria-haspopup": "dialog", "aria-expanded": () => String(isOpen()) } : {}),
       onBlur: props.onBlur, onFocus: props.onFocus, onClick: view === "dialog" ? api.toggle : undefined,
     }, h("span", { class: "m-fp-trigger-aa", "aria-hidden": "true" }, "Aa"), name);
   };

@@ -150,7 +150,7 @@ export function Table<R = DefaultRow>(props: TableProps<R>): Element {
     colCount: () => table.visibleColumns().length + lead + trail,
   };
 
-  const root: HTMLElement = h("div", {
+  const root = h("div", {
     class: () => ["m-table", layout() === "cards" ? "m-table--cards" : "m-table--grid", table.refreshing() && "is-refreshing", table.hasWidths() && "m-table--fixed", props.class],
     id: ctx.id,
     "aria-busy": () => (table.loading() || table.refreshing() ? "true" : null),
@@ -159,7 +159,7 @@ export function Table<R = DefaultRow>(props: TableProps<R>): Element {
   Chips(ctx),
   ctx.selectable ? BulkBar(ctx) : null,
   () => { const l = layout(), v = table.isVirtual(); return untrack(() => (l === "cards" ? Cards(ctx) : Grid(ctx, v))); },
-  table.paged ? Footer(ctx) : null);
+  table.paged ? Footer(ctx) : null) as HTMLElement;
   ctx.root = root;
   return root;
 }

@@ -32,7 +32,7 @@ export default function ExplodedViewDemo(props: { values: { open: boolean; mode:
             <div class="sc-row"><Button size="sm" icon={plus}>Projeye ekle</Button><Button size="sm" variant="ghost">Profil</Button></div>
           </Card>
         </ExplodedView>
-        : <ExplodedView open={v.open} tags={v.tags} gap={v.gap} motion={v.motion as "smooth"} m:color={color} layers={{ ring: v.ring ? undefined : false }} onPick={pick} active={$picked}>
+        : <ExplodedView open={v.open} tags={v.tags} gap={v.gap} motion={v.motion as "smooth"} m:color={color} layers={v.ring ? {} : { ring: false }} onPick={pick} active={$picked}>
           <Button icon={plus}>Yeni proje</Button>
         </ExplodedView>
     }}

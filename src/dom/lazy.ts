@@ -18,6 +18,9 @@ type Loaded<P> = Comp<P> | { default: Comp<P> } | Record<string, unknown>;
 export type LazyWhen = "idle" | "visible" | "interaction" | "immediate";
 export type LazyPlaceholder = "block" | "text" | "card" | "table" | "chart" | "form" | "none";
 
+/** What lazy() returns: the component, plus `preload()` (load it ahead) and `loaded`. */
+export type LazyComponent<P> = Comp<P> & { preload(): Promise<Comp<P>>; readonly loaded: boolean };
+
 export interface LazyOptions<P> {
   /** When to load (default "immediate" — on first render; "idle" after the first paint; "visible" near the viewport). */
   when?: LazyWhen;

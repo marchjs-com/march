@@ -40,7 +40,7 @@ const familyOf = (stack: string): string => (stack.split(",")[0] ?? "").trim().r
  * the pick loads the font and writes its CSS stack into the draft. The code font opens on the monospace ones. */
 function fontRow(ctx: ThemeEditorContext, key: "body" | "display" | "mono", label: () => string): Element {
   return row(label, (labelId) => h(FontPicker, {
-    "aria-labelledby": labelId, category: key === "mono" ? "monospace" : undefined, readonly: live(() => ctx.readonly()),
+    labelledby: labelId, category: key === "mono" ? "monospace" : undefined, readonly: live(() => ctx.readonly()),
     value: live(() => familyOf(ctx.draft().type[key])),
     onPick: (f: FontChoice) => ctx.change(label(), (d) => ({ ...d, type: { ...d.type, [key]: key === "mono" ? `${f.stack}, ui-monospace, monospace` : f.stack } })),
   }));
