@@ -569,7 +569,8 @@ export function DockLayout(props: DockLayoutProps): Element {
       if (!started) return;
       // new panels go to their `place` (or next to the panel `place.near` names), gone ones leave the tree
       L = L ? (C.restoreLayout(C.serialize(L), defs) ?? base0()) : base0();
-      for (const p of fresh) if (L) L = C.reveal(L, p.id, fit());
+      // the last one revealed is in front of its group: the first of the new ones (an editor's files: its first file)
+      for (const p of [...fresh].reverse()) if (L) L = C.reveal(L, p.id, fit());
       if (narrow) phone = C.singleLayout(defs, fresh[0]?.id ?? (phone?.root.t === "tabs" ? phone.root.active : null));
       L$.set(view());
       if (L) { persist(); props.onChange?.(L); }
