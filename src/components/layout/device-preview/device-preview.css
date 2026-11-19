@@ -13,7 +13,7 @@
   background: linear-gradient(145deg, color-mix(in srgb, var(--m-text) 92%, var(--m-bg)), var(--m-text));
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--m-text) 60%, transparent), var(--m-shadow-3), inset 0 0 0 2px color-mix(in srgb, var(--m-bg) 18%, transparent);
   /* tilt (deviceorientation): the body leans with it */
-  transform: perspective(1600px) rotateX(var(--m-dev-rx, 0deg)) rotateY(var(--m-dev-ry, 0deg));
+  transform: perspective(1600px) rotateX(var(--m-dev-rx, 0deg)) rotateY(var(--m-dev-ry, 0deg)) rotateZ(var(--m-dev-rz, 0deg));
   transition: transform var(--m-dur-slow) var(--m-ease, ease);
 }
 .m-device-tablet { --m-dev-bezel: 18px; }
@@ -120,6 +120,7 @@
   background: var(--m-primary); color: var(--m-on-primary); font: 700 .6rem / 1 var(--m-font-sans, system-ui); }
 .m-device-pop { display: grid; gap: var(--m-space-3); min-inline-size: 15rem; }
 .m-device-pop-row { display: grid; gap: var(--m-space-1); font-size: var(--m-text-sm); color: var(--m-muted); }
+.m-device-pop-reset { justify-self: center; }
 /* the events it fired, for a moment */
 .m-device-log { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; min-block-size: 1.7rem; max-inline-size: 100%; }
 .m-device-log[hidden] { display: none; }

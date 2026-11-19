@@ -155,6 +155,8 @@ export function DevicePreview(props: DevicePreviewProps): Element {
   const st = { online: signal(true), battery: signal<Battery>({ level: 0.82, charging: false }), hidden: signal(false), tilt: signal<Tilt>({ alpha: 0, beta: 0, gamma: 0 }) };
   const kbManual = signal<boolean | null>(null), fieldFocused = signal(false);
   const kbShown = (): boolean => { if (desk()) return false; const m = kbManual(); if (m != null) return m; const k = val(props.keyboard) ?? "auto"; return k === true || (k === "auto" && touchOn() && fieldFocused()); };
+  // a field taking or leaving the focus opens / closes the keyboard ("auto"), whatever the rail said before
+  const setField = (on: boolean): void => { if (on !== fieldFocused.peek()) kbManual.set(null); fieldFocused.set(on); };
   // the event ticker
   let seq = 0;
   const log = signal<{ id: number; name: string; detail?: string | undefined }[]>([]);
@@ -230,7 +232,9 @@ export function DevicePreview(props: DevicePreviewProps): Element {
     style: () => {
       const s = spec(), w = land() ? s.height : s.width, hh = land() ? s.width : s.height, tl = st.tilt();
       return { "--m-dev-w": `${w}px`, "--m-dev-h": `${hh}px`, "--m-dev-r": `${s.radius ?? 24}px`, "--m-dev-scale": String(scale()),
-        "--m-dev-rx": `${(-tl.beta * 0.3).toFixed(1)}deg`, "--m-dev-ry": `${(tl.gamma * 0.3).toFixed(1)}deg` };
+        "--m-dev-rx": `${(-tl.beta * 0.3).toFixed(1)}deg`, "--m-dev-ry": `${(tl.gamma * 0.3).toFixed(1)}deg`,
+        // alpha (the compass heading) turns the body on the table: signed, a quarter of it
+        "--m-dev-rz": `${(-(tl.alpha > 180 ? tl.alpha - 360 : tl.alpha) * 0.25).toFixed(1)}deg` };
     },
   }, h("div", { class: "m-device-camera", "aria-hidden": "true" }), screen) as HTMLElement;
 
@@ -256,8 +260,8 @@ export function DevicePreview(props: DevicePreviewProps): Element {
       sim = s;
       const sensors = deviceSensors(frame.contentWindow as Window & typeof globalThis, { dpr: () => dprOf(spec()), landscape: land, onEvent: say, state: st });
       sens = sensors;
-      const fin = (e: FocusEvent): void => { fieldFocused.set(isField(e.target as Element)); };
-      const fout = (): void => { setTimeout(() => fieldFocused.set(isField(doc.activeElement)), 0); };
+      const fin = (e: FocusEvent): void => { setField(isField(e.target as Element)); };
+      const fout = (): void => { setTimeout(() => setField(isField(doc.activeElement)), 0); };
       doc.addEventListener("focusin", fin); doc.addEventListener("focusout", fout);
       unbind = () => { s.dispose(); sensors.dispose(); cls(); doc.removeEventListener("focusin", fin); doc.removeEventListener("focusout", fout); };
     };
@@ -268,8 +272,8 @@ export function DevicePreview(props: DevicePreviewProps): Element {
     const toLayer = (x: number, y: number): { x: number; y: number } => { const b = r(); return { x: (x - b.left) / k(), y: (y - b.top) / k() }; };
     sim = touchSim({ ...common, surface: viewport, toLayer, fromLayer: (x, y) => { const b = r(); return { x: b.left + x * k(), y: b.top + y * k() }; }, root: () => viewport, onHover: (x, y) => hover(toLayer(x, y)) });
     onCleanup(() => sim?.dispose());
-    viewport.addEventListener("focusin", (e) => fieldFocused.set(isField(e.target as Element)));
-    viewport.addEventListener("focusout", () => { setTimeout(() => fieldFocused.set(isField(document.activeElement) && viewport.contains(document.activeElement)), 0); });
+    viewport.addEventListener("focusin", (e) => setField(isField(e.target as Element)));
+    viewport.addEventListener("focusout", () => { setTimeout(() => setField(isField(document.activeElement) && viewport.contains(document.activeElement)), 0); });
   }
   screen.addEventListener("pointerenter", () => screen.classList.add("is-over"));
   screen.addEventListener("pointerleave", () => screen.classList.remove("is-over"));
@@ -312,7 +316,7 @@ export function DevicePreview(props: DevicePreviewProps): Element {
       trigger: h(IconButton, { icon: compass, size: "sm", variant: "ghost", label: () => t`Tilt`, pressed: () => { const x = st.tilt(); return !!(x.alpha || x.beta || x.gamma); } }),
       children: () => h("div", { class: "m-device-pop" },
         tiltRow(() => t`Forward / back (beta)`, "beta", -90, 90), tiltRow(() => t`Left / right (gamma)`, "gamma", -90, 90), tiltRow(() => t`Turn (alpha)`, "alpha", 0, 360),
-        h(Button, { size: "sm", variant: "ghost", onClick: () => st.tilt.set({ alpha: 0, beta: 0, gamma: 0 }) }, () => t`Hold it flat`)) }))),
+        h(Button, { size: "sm", variant: "ghost", class: "m-device-pop-reset", onClick: () => st.tilt.set({ alpha: 0, beta: 0, gamma: 0 }) }, () => t`Hold it flat`)) }))),
     btn(() => (st.online() ? wifi : wifiOff), () => (st.online() ? t`Go offline` : t`Go online`), () => st.online.set(!st.online.peek()), () => !st.online()),
     () => untrack(() => h(Popover, { placement: "bottom-end", title: () => t`Battery`, width: "sm",
       trigger: h(IconButton, { icon: batteryIcon, size: "sm", variant: "ghost", label: () => `${t`Battery`} · ${battery()}` }),

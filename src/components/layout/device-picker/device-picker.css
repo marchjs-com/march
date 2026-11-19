@@ -3,9 +3,11 @@
 .m-dpick-top { display: flex; gap: var(--m-space-2); align-items: center; }
 .m-dpick-top > :first-child { flex: 1; min-inline-size: 0; }
 .m-dpick-groups { justify-self: start; max-inline-size: 100%; overflow-x: auto; }
-.m-dpick-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 2px; max-block-size: min(22rem, 50vh); overflow: auto; padding: 2px; margin: -2px; overscroll-behavior: contain; }
+.m-dpick-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: var(--m-space-1) var(--m-space-3); max-block-size: min(26rem, 55vh); overflow: auto; padding: 2px; margin: -2px; overscroll-behavior: contain; }
 .m-dpick-list > .m-empty { grid-column: 1 / -1; }
-.m-dpick-item { text-align: start; }
+.m-dpick-item { text-align: start; padding-block: .55rem; border-radius: var(--m-radius-2, 8px); }
+/* the size line is quiet: the name leads, the numbers follow */
+.m-dpick-item .m-listrow-sub { color: color-mix(in srgb, var(--m-muted) 78%, transparent); margin-block-start: 2px; font-variant-numeric: tabular-nums; }
 .m-dpick-item.is-fit { grid-column: 1 / -1; }
 /* the silhouette: the device's proportions in a 30px box */
 .m-dpick-shape { display: inline-grid; place-items: center; inline-size: 34px; block-size: 34px; flex: none; }

@@ -138,6 +138,11 @@
 .m-ai-ctx { display: inline-flex; align-items: center; gap: .35rem; color: var(--m-muted); font-size: var(--m-text-xs); min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { .m-ai-wait > i { animation: none; } }
 .m-ai-text code { padding: 0 .25em; border-radius: var(--m-radius-1); background: var(--m-bg-subtle); font: .92em var(--m-font-mono); }
-.m-app-pv-device .m-btn, .m-app-pv-net-btn { gap: .4rem; }
-.m-popover-panel.m-app-pv-device-panel { inline-size: min(36rem, calc(100vw - 2rem)); max-inline-size: none; }
+/* the device and network buttons: icon and text on one centre line, a clear gap between them */
+.m-app-pv-tool { display: inline-flex; align-items: center; gap: .45rem; }
+.m-app-pv-tool .m-svg { display: block; flex: none; }
+.m-popover-panel.m-app-pv-device-panel { inline-size: min(38rem, calc(100vw - 2rem)); max-inline-size: none; }
 .m-app-pv-device-panel .m-dpick { inline-size: 100%; }
+/* the network panel is as wide as its content (no empty band on the end side) */
+.m-popover-panel.m-app-pv-net-panel { inline-size: min(25rem, calc(100vw - 2rem)); max-inline-size: none; }
+.m-app-pv-net-panel .m-nt { inline-size: 100%; }

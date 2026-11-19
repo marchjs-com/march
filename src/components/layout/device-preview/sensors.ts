@@ -80,7 +80,7 @@ function sensorsIn(win: Window & typeof globalThis, o: SensorOptions, disposeRoo
     const C = (win as unknown as { DeviceOrientationEvent?: typeof DeviceOrientationEvent }).DeviceOrientationEvent;
     return C ? new C("deviceorientation", { ...t, absolute: false }) : Object.assign(new Ev("deviceorientation"), t, { absolute: false });
   };
-  onChange(tilt, (t) => { fire(win, orientationEvent(t)); say("deviceorientation", `β ${Math.round(t.beta)}° γ ${Math.round(t.gamma)}°`); });
+  onChange(tilt, (t) => { fire(win, orientationEvent(t)); say("deviceorientation", `α ${Math.round(t.alpha)}° β ${Math.round(t.beta)}° γ ${Math.round(t.gamma)}°`); });
 
   let shaking: ReturnType<typeof setTimeout> | undefined;
   const motion = (x: number, y: number, z: number, i: number): Event => {
