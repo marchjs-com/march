@@ -21,7 +21,7 @@ const OWN: CheckMarkIcons = { yes: heart, no: trash, partial: more }
 const EMOJI: CheckMarkIcons = { yes: "👍", no: "👎", partial: "~" }
 const LABELS = { yes: "Evet", no: "Hayır", partial: "Kısmen" }
 
-type Values = { value: string; variant: string; size: string; text: boolean; icons: string; color: string; motion: string }
+type Values = { value: string; label: string; variant: string; size: string; text: boolean; icons: string; color: string; motion: string }
 // "own": the arriving glyph slides up while the old one fades (the leaving glyph is removed when the promise settles)
 const slide: CheckMarkMotionFn = (next, prev) => {
   animate(prev, { opacity: [1, 0] }, { duration: 160, fill: "forwards" })
@@ -30,7 +30,7 @@ const slide: CheckMarkMotionFn = (next, prev) => {
 
 export default function CheckMarkDemo(props: { values: Values }) {
   // the marks are built again only when the look changes: a new value plays the transition on the same mark
-  const look = computed(() => { const v = props.values; return [v.variant, v.size, v.text, v.icons, v.color, v.motion].join("|") })
+  const look = computed(() => { const v = props.values; return [v.variant, v.size, v.text, v.icons, v.color, v.motion, v.label].join("|") })
   let $flag = true
   return <div class="sc-col">
     {() => {
@@ -43,8 +43,8 @@ export default function CheckMarkDemo(props: { values: Values }) {
       }
       return <>
         <div class="sc-row">
-          <CheckMark m:color={v.color || undefined} value={VALUES[props.values.value] ?? true} {...shared} />
-          <span class="m-muted">{`ekran okuyucu: "${LABELS[props.values.value as "yes"] ?? "Evet"}"`}</span>
+          <CheckMark m:color={v.color || undefined} value={VALUES[props.values.value] ?? true} label={v.label || undefined} {...shared} />
+          <span class="m-muted">{`ekran okuyucu: "${v.label || (LABELS[props.values.value as "yes"] ?? "Evet")}"`}</span>
         </div>
         <div class="sc-row">
           <CheckMark m:color={v.color || undefined} value={$flag} {...shared} variant="soft" />

@@ -11,7 +11,7 @@ export const code = `<Alert tone="warn" title="Kota" dismissable onDismiss={() =
 <Alert tone="danger" action={<Button size="sm">Yeniden dene</Button>} actionPlacement="below">Sunucu yanıt vermedi.</Alert>`
 
 
-export default function AlertDemo(props: { values: { action: string; tone: string; color: string; icon: string; title: boolean; dismissable: boolean; dismissIcon: string } }) {
+export default function AlertDemo(props: { values: { action: boolean; actionPlacement: string; tone: string; color: string; icon: string; title: boolean; body: string; variant: string; dismissable: boolean; dismissIcon: string } }) {
   let $round = 0
   let $gone = false
   let $tries = 0
@@ -20,9 +20,9 @@ export default function AlertDemo(props: { values: { action: string; tone: strin
       const v = props.values
       void $round
       const [title, body] = TEXT[v.tone] ?? TEXT.info!
-      const action = v.action === "off" ? undefined : <Button size="sm" on:click={() => { $tries++ }}>{() => ($tries ? `Yeniden dene (${$tries})` : "Yeniden dene")}</Button>
+      const action = !v.action ? undefined : <Button size="sm" on:click={() => { $tries++ }}>{() => ($tries ? `Yeniden dene (${$tries})` : "Yeniden dene")}</Button>
       return <Alert tone={v.tone} m:color={v.color === "tone" ? undefined : (v.color as "brand-purple")} icon={v.icon === "off" ? null : v.icon === "own" ? sparkles : undefined}
-        title={v.title ? title : undefined} action={action} actionPlacement={v.action === "below" ? "below" : "end"} dismissable={v.dismissable} dismissIcon={v.dismissIcon === "check" ? check : undefined} dismissLabel="Bildirimi kapat" onDismiss={() => { $gone = true }}>{body}</Alert>
+        title={v.title ? title : undefined} action={action} actionPlacement={v.actionPlacement === "below" ? "below" : "end"} variant={v.variant === "raised" ? "raised" : "soft"} dismissable={v.dismissable} dismissIcon={v.dismissIcon === "check" ? check : undefined} dismissLabel="Bildirimi kapat" onDismiss={() => { $gone = true }}>{v.body || body}</Alert>
     }}
     {() => ($gone ? <div class="sc-row"><Button size="sm" on:click={() => { $gone = false; $round++ }}>Geri getir</Button></div> : null)}
   </div>

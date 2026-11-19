@@ -797,7 +797,7 @@ Full page: src/components/actions/copy-button/docs.md
 
 ## CornerMark
 
-A small round mark in a corner of a picture, a card or an avatar: the video sign on a photo tile, the arrow that appears on a project cover, the "+" badge on a story ring. The parent must be positioned (`position: relative`).
+A small round mark in a corner of a picture, a card or an avatar: the video sign on a photo tile, the arrow that appears on a project cover, the "+" badge on a story ring. The parent must be positioned (`position: relative`); a parent with class `m-corner-host` is (unless its own CSS sets another position).
 
 ```tsx
 <div class="tile"><Picture source={photo} fit="cover" /><CornerMark icon={video} /></div>

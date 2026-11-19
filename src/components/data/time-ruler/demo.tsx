@@ -11,8 +11,8 @@ export const code = `<TimeRuler duration={2000} value={$now} onSeek={(ms) => pla
 
 const clock = (ms: number): string => { const s = Math.floor(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}` }
 
-export default function TimeRulerDemo(props: { values: { duration: number; seekable: boolean; minor: boolean; major: string; head: string; color: string; format: string } }) {
-  let $now = 1200
+export default function TimeRulerDemo(props: { values: { duration: number; value: number; seekable: boolean; minor: boolean; major: string; head: string; color: string; format: string } }) {
+  let $now = props.values.value ?? 1200
   let $playing = false
   let stop: (() => void) | null = null
   const play = (on: boolean): void => {
@@ -20,9 +20,12 @@ export default function TimeRulerDemo(props: { values: { duration: number; seeka
     if (on) stop = onFrame((_t, dt) => { const d = props.values.duration; $now = $now + dt >= d ? 0 : $now + dt })
   }
   onCleanup(() => stop?.())
+  // a new playhead value from the Playground moves the playhead there (dragging and playing move it too)
+  let given = props.values.value
   return <div class="sc-col">
     {() => {
       const v = { ...props.values }
+      if (v.value != null && v.value !== given) { given = v.value; queueMicrotask(() => { $now = v.value }) }
       const color = v.color === "primary" ? undefined : v.color as "brand-blue"
       const head = v.head === "off" ? false : v.head === "own" ? <span class="sc-ruler-own" aria-hidden="true">▼</span> as Node : true
       const onSeek = v.seekable ? (ms: number) => { $now = ms } : undefined

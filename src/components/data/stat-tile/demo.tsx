@@ -11,7 +11,7 @@ export const code = `<StatTile value="128" label="Gönderi" />
 
 const ITEMS = [{ id: "posts", label: "Gönderi", hint: "bu yıl 31" }, { id: "followers", label: "Takipçi", hint: "son 30 günde +212" }, { id: "following", label: "Takip", hint: "12 ortak" }]
 
-export default function StatDemo(props: { values: { variant: string; size: string; align: string; order: string; color: string; hint: boolean; clickable: boolean; counter: boolean } }) {
+export default function StatDemo(props: { values: { value: string; label: string; variant: string; size: string; align: string; order: string; color: string; hint: boolean; clickable: boolean; counter: boolean } }) {
   let $n: Record<string, number> = { posts: 128, followers: 12480, following: 342 }
   let $last = ""
   return <div class="sc-col">
@@ -19,10 +19,11 @@ export default function StatDemo(props: { values: { variant: string; size: strin
       const v = { ...props.values }
       const color = (v.color || undefined) as ColorToken | undefined
       return <div class="sc-row">
-        {ITEMS.map((it) => {
-          const value = v.counter ? <Counter value={() => $n[it.id] ?? 0} mode="roll" start="now" /> : () => ($n[it.id] ?? 0).toLocaleString("tr")
+        {ITEMS.map((it, i) => {
+          const own = i === 0 && v.value && v.value !== "128" ? v.value : null
+          const value = own != null ? own : v.counter ? <Counter value={() => $n[it.id] ?? 0} mode="roll" start="now" /> : () => ($n[it.id] ?? 0).toLocaleString("tr")
           const onClick = v.clickable ? () => { $n = { ...$n, [it.id]: ($n[it.id] ?? 0) + 1 }; $last = it.label } : undefined
-          return <StatTile value={value} label={it.label} hint={v.hint ? it.hint : undefined} variant={v.variant as "tile"} size={v.size as "md"}
+          return <StatTile value={value} label={i === 0 && v.label ? v.label : it.label} hint={v.hint ? it.hint : undefined} variant={v.variant as "tile"} size={v.size as "md"}
             align={v.align as "center"} order={v.order as "value"} m:color={color} onClick={onClick} />
         })}
       </div>

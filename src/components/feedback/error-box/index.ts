@@ -13,7 +13,7 @@ export interface ErrorBoxProps {
   message?: MaybeFn<unknown>;
   /** A bold first line. @tr Kalın ilk satır. */
   title?: unknown;
-  /** Adds a retry button that calls it. @tr Bunu çağıran bir yeniden dene düğmesi ekler. */
+  /** Adds a retry button that calls it (a bare `retry`, as MarchIDE's Properties give it, shows the button only). @tr Bunu çağıran bir yeniden dene düğmesi ekler (çıplak `retry`, MarchIDE'nin Özellikler'inin verdiği gibi, yalnız düğmeyi gösterir). */
   retry?: (() => unknown) | undefined;
   /** Content of the retry button: text or a node (default "Retry", translated). @tr Yeniden dene düğmesinin içeriği: metin ya da düğüm (varsayılan "Retry", çevrilir). */
   retryLabel?: unknown;
@@ -32,6 +32,6 @@ export function ErrorBox(props: ErrorBoxProps): Element {
     tone: "danger", icon: null, actionPlacement: "below", class: () => cx("m-error", "m-errorbox", val(props.class)),
     title: props.title != null ? h("span", { class: "m-errorbox-title" }, () => val(props.title)) : undefined,
     body: h("p", { class: "m-errorbox-text" }, msg),
-    action: props.retry ? h(Button, { variant: "secondary", size: "sm", class: "m-errorbox-retry", onClick: () => props.retry?.() }, () => val(props.retryLabel) ?? t`Retry`) : undefined,
+    action: props.retry ? h(Button, { variant: "secondary", size: "sm", class: "m-errorbox-retry", onClick: () => { if (typeof props.retry === "function") props.retry(); } }, () => val(props.retryLabel) ?? t`Retry`) : undefined,
   }) as () => Element)();
 }

@@ -7,6 +7,8 @@
 .m-carousel.is-instant .m-carousel-track { scroll-behavior: auto; }
 .m-carousel-track::-webkit-scrollbar { display: none; }
 .m-carousel-track > * { scroll-snap-align: start; min-width: 0; }
+/* a text slide (children given as text) */
+.m-carousel-text { display: grid; place-items: center; min-height: 8rem; padding: var(--m-space-4); border-radius: var(--m-radius-3); background: var(--m-surface-2); font-weight: 600; text-align: center; }
 @media (max-width: 640px) { .m-carousel { --m-per: 1.15; } }
 /* previous / next: raised round IconButtons; here only their place and how they leave */
 .m-icon-btn.m-carousel-btn { position: absolute; top: calc(50% - 1.5rem); transition: opacity var(--m-dur) var(--m-ease), transform var(--m-dur) var(--m-ease), border-color var(--m-dur) var(--m-ease); }

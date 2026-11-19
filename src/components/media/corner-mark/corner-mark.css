@@ -18,6 +18,8 @@
 .m-corner-mark-surface[data-m-color] { color: var(--m-accent-text); }
 .m-corner-mark-solid { background: var(--m-accent, var(--m-primary)); color: var(--m-on-accent, var(--m-on-primary-fill)); }
 .m-corner-mark.is-ringed { box-shadow: 0 0 0 2px var(--m-surface); }
+/* the host is the mark's containing block (zero specificity: a host's own position wins) */
+:where(.m-corner-host) { position: relative; }
 /* show="hover": appears while the host (class m-corner-host) is hovered or holds focus */
 .m-corner-mark.is-hover { opacity: 0; transform: translateY(6px) scale(.9); transition: opacity var(--m-dur) var(--m-ease), transform var(--m-dur) var(--m-ease-spring, var(--m-ease)); }
 .m-corner-host:hover .m-corner-mark.is-hover, .m-corner-host:focus-within .m-corner-mark.is-hover { opacity: 1; transform: none; }

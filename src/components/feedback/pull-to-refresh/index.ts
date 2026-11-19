@@ -18,8 +18,8 @@ import type { IconProp } from "../../../icons/types.ts";
 export type PullPhase = "idle" | "pull" | "ready" | "refreshing";
 
 export interface PullToRefreshProps {
-  /** Runs when released past the threshold; the indicator spins until the returned promise settles. @tr Eşiğin ötesinde bırakılınca çalışır; gösterge, dönen söz (promise) sonuçlanana dek döner. */
-  onRefresh: () => unknown;
+  /** Runs when released past the threshold; the indicator spins until the returned promise settles (none: a short spin). @tr Eşiğin ötesinde bırakılınca çalışır; gösterge, dönen söz (promise) sonuçlanana dek döner (verilmezse kısa bir dönüş). */
+  onRefresh?: (() => unknown) | undefined;
   /** Pull distance (px) that triggers a refresh. Default 72. @tr Yenilemeyi tetikleyen çekme mesafesi (px). Varsayılan 72. */
   threshold?: number | undefined;
   /** Pulling and the Refresh button do nothing. @tr Çekme ve Refresh düğmesi hiçbir şey yapmaz. */
@@ -80,7 +80,7 @@ export function PullToRefresh(props: PullToRefreshProps): Element {
     setPhase("refreshing");
     if (spin) spinning = animate(spin, [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], { duration: 800, iterations: Infinity, easing: "linear", essential: true });
     void to(threshold * 0.8);
-    try { await props.onRefresh(); } catch { /* the caller reports its own errors; the indicator still finishes */ }
+    try { await (props.onRefresh ? props.onRefresh() : new Promise((r) => setTimeout(r, 600))); } catch { /* the caller reports its own errors; the indicator still finishes */ }
     spinning?.cancel(); spinning = null;
     await to(0);
     setPhase("idle");

@@ -1,6 +1,9 @@
-// Showcase stage for DataGrid: up to 100 000 generated orders (deterministic, neutral demo data).
+// Showcase stage for DataGrid: up to 100 000 generated orders (deterministic, neutral demo data), or the Playground's rows and columns (JSON).
 import { signal } from "march";
 import { DataGrid, type DataGridColumn } from "./index.ts";
+import { ROWS, COLUMNS } from "./playground.ts";
+
+const parse = <T,>(json: string, or: string): T[] => { try { const x = JSON.parse(json || or); return Array.isArray(x) ? x : [] } catch { return [] } }
 
 export const code = `<DataGrid rows={$orders} rowKey="id" selectable groupBy={["region"]}
   columns={[
@@ -41,18 +44,19 @@ const columns = (pinned: boolean): DataGridColumn<Order>[] => [
   ...EXTRA.map((label, j): DataGridColumn<Order> => ({ key: `x${j}`, label, width: 150, value: (r) => `${label} ${1 + rnd(r.id * (j + 3), 60)}` })),
 ];
 
-export default function DataGridDemo(props: { values: { rows: string; group: string; density: string; selectable: boolean; pinned: boolean; footer: boolean; toolbar: string; columnMenu: boolean; labels: boolean; animate: boolean } }) {
+export default function DataGridDemo(props: { values: { rows: string; columns: string; label: string; count: string; groupBy: string; rowHeight: number; selectable: boolean; pinned: boolean; footer: boolean; toolbar: string; columnMenu: boolean; labels: boolean; animate: boolean } }) {
   return <div class="sc-stage">
     {() => {
       const v = props.values
-      const data = signal(make(Number(v.rows)))
-      return <DataGrid rows={data} rowKey="id" height={460} label="Siparişler" filename="siparisler"
-        selectable={v.selectable} footer={v.footer} columns={columns(v.pinned)}
+      const own = v.count === "json"
+      const data = signal<Order[]>(own ? parse<Order>(v.rows, ROWS) : make(Number(v.count)))
+      return <DataGrid rows={data} rowKey="id" height={460} label={() => props.values.label || "Siparişler"} filename="siparisler"
+        selectable={v.selectable} footer={v.footer} columns={own ? parse<DataGridColumn<Order>>(v.columns, COLUMNS) : columns(v.pinned)}
         toolbar={v.toolbar === "off" ? false : v.toolbar === "lean" ? { groups: false, filters: false, csv: false } : true}
         columnMenu={v.columnMenu} animate={v.animate}
         labels={v.labels ? { search: "Sipariş ara", rows: (n: string) => `${n} sipariş`, selected: (n: string) => `${n} tanesi seçili`, total: "Genel toplam", csv: "Dışa aktar", filters: "Süzgeçler", groupHint: "Gruplamak için sütun menüsünü kullanın" } : undefined}
-        groupBy={() => (props.values.group ? props.values.group.split(",") : [])}
-        rowHeight={() => Number(props.values.density)}
+        groupBy={() => parse<string>(props.values.groupBy, "[]")}
+        rowHeight={() => Number(props.values.rowHeight)}
         onEdit={(row: Order, key: string, value: unknown) => { data.set(data().map((r) => (r.id === row.id ? { ...r, [key]: value, amount: key === "qty" ? Number(value) * (r.amount / r.qty) : r.amount } : r))) }} />
     }}
     <p class="m-muted">{() => (props.values.animate

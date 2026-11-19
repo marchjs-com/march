@@ -1,4 +1,4 @@
-// Showcase stage for Progress: value, look (bar / line), parts, colours, paint, tone and size from the Playground
+// Showcase stage for Progress: label, value, look (bar / line), parts, colours, paint, tone and size from the Playground
 // values (playground.ts). Timed parts fill one after the other and start over.
 import { Progress } from "./index.ts";
 
@@ -14,7 +14,7 @@ export const code = `<Progress value={$p} label="Yükleniyor" showValue />
 
 const COLORS: Record<string, "single" | "brand" | ("brand-blue" | "brand-green")[]> = { tone: "single", brand: "brand", pair: ["brand-blue", "brand-green"] }
 
-export default function ProgressDemo(props: { values: { variant: string; parts: number; timed: boolean; indeterminate: boolean; value: number; colors: string; paint: string; tone: string; size: string; showValue: boolean; valueText: string } }) {
+export default function ProgressDemo(props: { values: { label: string; variant: string; parts: number; timed: boolean; indeterminate: boolean; value: number; colors: string; paint: string; tone: string; size: string; showValue: boolean; valueText: string } }) {
   let $part = 0
   return <div class="sc-col">
     {() => {
@@ -24,10 +24,10 @@ export default function ProgressDemo(props: { values: { variant: string; parts: 
         const n = v.parts
         if (v.timed) return [<Progress variant={variant} size={size} tone={tone} colors={colors} segments={n} value={() => $part % n} duration={1800} onDone={() => { $part++ }} ariaLabel="Hikâye" valueText={(i: number, m: number) => `${i + 1} / ${m}`} />,
           <span class="m-muted">{() => `Parça ${($part % n) + 1} / ${n} doluyor; dolunca sıradaki başlar.`}</span>]
-        return <Progress variant={variant} size={size} tone={tone} colors={colors} segments={n} value={(v.value / 100) * n} label="Adımlar" />
+        return <Progress variant={variant} size={size} tone={tone} colors={colors} segments={n} value={(v.value / 100) * n} label={v.label || "Adımlar"} />
       }
       const show = v.showValue && !v.indeterminate
-      return <Progress variant={variant} value={v.indeterminate ? null : v.value} label={v.indeterminate ? "Hazırlanıyor" : "Yükleniyor"}
+      return <Progress variant={variant} value={v.indeterminate ? null : v.value} label={v.label || undefined}
         showValue={show && v.valueText === "own" ? (pct: number) => `${Math.round(pct * 4.8)} / 480 MB` : show}
         size={size} tone={tone} colors={colors} paint={v.colors === "tone" || v.variant !== "bar" ? undefined : (v.paint as "gradient")} />
     }}

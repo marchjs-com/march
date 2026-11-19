@@ -14,8 +14,8 @@ columns.
 | Prop | Type | |
 |---|---|---|
 | `columns` | `{ id, title, tone?, color?, items }[]` / accessor | the board |
-| `card` | `(item) => node` | card content |
-| `itemKey` | `(item) => string` | stable key |
+| `card` | `(item) => node` | card content (default: the item's `title`, else `label`) |
+| `itemKey` | `(item) => string` | stable key (default: the item's `id`) |
 | `onMove` | `(item, from, to) => void` | a card was dropped on another column |
 | `dot` | boolean / `(column) => node` | the dot before a column title (default `true`), off, or your own mark |
 | `count` | boolean / `(column) => node` | the card count (default `true`), off, or your own content |

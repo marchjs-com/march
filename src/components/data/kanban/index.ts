@@ -26,10 +26,10 @@ export interface KanbanColumn<T> {
 export interface KanbanProps<T> {
   /** The columns, each with its id, title, dot colour and items. @tr Sütunlar; her biri kimliği, başlığı, nokta rengi ve ögeleriyle. */
   columns: MaybeFn<readonly KanbanColumn<T>[]>;
-  /** Card content for an item. @tr Bir ögenin kart içeriği. */
-  card: (item: T) => unknown;
-  /** Stable key of an item (keeps cards in place across updates). @tr Bir ögenin kalıcı anahtarı (güncellemelerde kartları yerinde tutar). */
-  itemKey: (item: T) => string;
+  /** Card content for an item (default: its `title`, else `label`, else the item as text). @tr Bir ögenin kart içeriği (varsayılan: `title`'ı, yoksa `label`'ı, yoksa ögenin metni). */
+  card?: ((item: T) => unknown) | undefined;
+  /** Stable key of an item (keeps cards in place across updates; default: its `id`). @tr Bir ögenin kalıcı anahtarı (güncellemelerde kartları yerinde tutar; varsayılan: `id`'si). */
+  itemKey?: ((item: T) => string) | undefined;
   /** Called when a card is dropped on another column (drag and drop; keyboard: Alt+← / Alt+→ on a focused card). @tr Bir kart başka bir sütuna bırakılınca çağrılır (sürükle bırak; klavye: odaklı kartta Alt+← / Alt+→). */
   onMove?: (item: T, from: string, to: string) => void;
   /** The dot before a column title: true (default), false, or `(column) => node`. @tr Sütun başlığının önündeki nokta: true (varsayılan), false ya da `(column) => node`. */
@@ -44,6 +44,10 @@ export interface KanbanProps<T> {
 /** Board with columns and draggable cards. */
 export function Kanban<T>(props: KanbanProps<T>): Element {
   const over = signal<string | null>(null);
+  // without card / itemKey (data from JSON): the item's title / label and its id
+  const field = (it: T, k: string): unknown => (it as Record<string, unknown> | null)?.[k];
+  const cardOf = props.card ?? ((it: T): unknown => field(it, "title") ?? field(it, "label") ?? String(it));
+  const keyOf = props.itemKey ?? ((it: T): string => String(field(it, "id") ?? it));
   const cards = new WeakMap<Element, { item: T; from: string }>();
   let card: HTMLElement | null = null, ghost: DragGhost | null = null;
   const colAt = (x: number, y: number): string | null => {
@@ -63,13 +67,13 @@ export function Kanban<T>(props: KanbanProps<T>): Element {
       meta: props.count === false ? undefined : h(Badge, { class: cx("m-kanban-count", typeof props.count === "function" && "is-own") }, typeof props.count === "function" ? props.count(col) : String(col.items.length)),
     }),
     h("div", { class: "m-kanban-list" }, col.items.map((it) => h("article", {
-      class: "m-kanban-card", tabindex: "0", "data-key": props.itemKey(it), ref: (el: Element) => { cards.set(el, { item: it, from: col.id }); },
+      class: "m-kanban-card", tabindex: "0", "data-key": keyOf(it), ref: (el: Element) => { cards.set(el, { item: it, from: col.id }); },
       onKeydown: (e: KeyboardEvent) => {
         if (!e.altKey || (e.key !== "ArrowLeft" && e.key !== "ArrowRight")) return;
         const to = cols[ci + (e.key === "ArrowRight" ? 1 : -1)];
         if (to) { e.preventDefault(); props.onMove?.(it, col.id, to.id); }
       },
-    }, props.card(it)))))));
+    }, cardOf(it)))))));
   }) as HTMLElement;
   // one drag session per press on a card: a copy of the card follows the pointer, the column under it is marked
   owned(draggable(root, {

@@ -1,4 +1,4 @@
-// Showcase stage for LiveStatus: the buttons change a selection count; the status line says it. With "Görünür metin"
+// Showcase stage for LiveStatus: the buttons change a selection count; the status line says it (the Playground text after the count). With "Görünür metin"
 // off the line is only read, so the stage prints what a screen reader hears.
 import { LiveStatus } from "./index.ts";
 import { Button } from "../../actions/button/index.ts";
@@ -8,9 +8,10 @@ export const code = `<LiveStatus text={() => \`\${$count} satır seçildi\`} /> 
 <LiveStatus visible={false} text={$moved} help="Taşımak için sürükleyin" helpId="plan-help" />   // ipucu + yalnız okunan durum
 <section aria-describedby="plan-help">…</section>`
 
-export default function LiveStatusDemo(props: { values: { visible: boolean; help: string; politeness: string; as: string } }) {
+export default function LiveStatusDemo(props: { values: { text: string; visible: boolean; help: string; politeness: string; as: string } }) {
   let $count = 2
-  const text = (): string => ($count ? `${$count} satır seçildi` : "Seçim yok")
+  // the Playground text with the live count in front of it ("2 satır seçildi" → "3 satır seçildi")
+  const text = (): string => ($count ? `${$count} ${(props.values.text || "satır seçildi").replace(/^\d+\s*/, "")}` : "Seçim yok")
   return <div class="sc-col">
     <div class="sc-row">
       <Button size="sm" on:click={() => { $count = $count + 1 }}>Bir satır seç</Button>

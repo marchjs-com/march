@@ -1,8 +1,8 @@
-// Showcase stage for Gantt: a product launch plan around today (neutral demo data).
+// Showcase stage for Gantt: the Playground's launch plan around today (tasks as JSON, neutral demo data).
 import { signal, computed, untrack } from "march";
 import { Gantt, type GanttTask } from "./index.ts";
 import { Button } from "../../../ui/button.ts";
-import { todayIso, addDays } from "../../../core/date.ts";
+import { TASKS } from "./playground.ts";
 
 export const code = `<Gantt tasks={$tasks} scale="day" cascade
   onChange={(task) => api.save(task)}
@@ -11,24 +11,15 @@ export const code = `<Gantt tasks={$tasks} scale="day" cascade
 // a task: { id, name, start, end, progress, deps: ["design"], color, milestone }
 // names={false} help={false} todayLine={false} animate={false} barLabel={(task) => …} labels={{ today: "Şimdi", days: (n) => n + " gün" }}`
 
-const PLAN: [id: string, name: string, from: number, days: number, progress: number, deps: string[], color: string, milestone?: boolean][] = [
-  ["brief", "Kapsam ve hedefler", -12, 4, 1, [], "brand-purple"],
-  ["research", "Kullanıcı araştırması", -8, 6, 1, ["brief"], "brand-purple"],
-  ["design", "Arayüz tasarımı", -2, 7, 0.6, ["research"], "brand-blue"],
-  ["api", "API ve veri modeli", -1, 9, 0.45, ["research"], "brand-green"],
-  ["web", "Web uygulaması", 6, 10, 0.1, ["design", "api"], "brand-orange"],
-  ["mobile", "Mobil uygulama", 8, 12, 0, ["design", "api"], "brand-orange"],
-  ["qa", "Test ve düzeltmeler", 21, 6, 0, ["web", "mobile"], "brand-gold"],
-  ["docs", "Belgeler", 18, 7, 0, ["web"], "brand-green"],
-  ["beta", "HADİ ile beta", 27, 1, 0, ["qa"], "brand-pink", true],
-  ["launch", "Yayın", 30, 1, 0, ["beta", "docs"], "brand-orange", true],
-];
+// the Playground's tasks (JSON)
+const parse = (json: string): GanttTask[] => { try { const x = JSON.parse(json || TASKS); return Array.isArray(x) ? x : [] } catch { return [] } }
 
-export default function GanttDemo(props: { values: { scale: string; arrows: boolean; cascade: boolean; editable: boolean; todayLine: boolean; names: boolean; help: string; barLabel: string; animate: boolean } }) {
-  const t0 = todayIso()
-  const plan = (): GanttTask[] => PLAN.map(([id, name, from, days, progress, deps, color, milestone]) =>
-    ({ id, name, start: addDays(t0, from), end: addDays(t0, from + days - 1), progress, deps, color: color as "brand-blue", milestone }))
+export default function GanttDemo(props: { values: { tasks: string; label: string; scale: string; arrows: boolean; cascade: boolean; editable: boolean; todayLine: boolean; names: boolean; help: string; barLabel: string; animate: boolean } }) {
+  const plan = (): GanttTask[] => parse(untrack(() => props.values.tasks))
   const tasks = signal<GanttTask[]>(plan())
+  // a new JSON in the Playground replaces the plan
+  const fromJson = computed(() => props.values.tasks)
+  const sync = () => { const j = fromJson(); untrack(() => tasks.set(parse(j))) }
   const last = signal("")
   let stage: HTMLElement | undefined
   // the plan as it was, then "Arayüz tasarımı" three days later with the keyboard gesture (Alt+→): with "Ardılları it"
@@ -45,13 +36,14 @@ export default function GanttDemo(props: { values: { scale: string; arrows: bool
   const once = computed(() => [props.values.names, props.values.help, props.values.barLabel, props.values.animate].join("|"))
   const parts = () => { once(); return untrack(() => [props.values.names, props.values.help, props.values.barLabel, props.values.animate] as const) }
   return <div class="sc-stage" ref={(el: Element) => { stage = el as HTMLElement }}>
+    {() => { sync(); return null }}
     {() => (props.values.editable ? <div class="sc-row"><Button size="sm" variant="secondary" data-audit-try on:click={delay}>Tasarımı 3 gün ertele (Alt+→)</Button></div> : null)}
     {() => {
       // parts read once by the chart (names column, hint, bar text, motion): it is drawn again only when one of them
       // changes; scale, arrows and the rest stay live on the same chart
       const [names, help, bar, animate] = parts()
       return untrack(() => <Gantt tasks={tasks} scale={() => props.values.scale as "day"} arrows={() => props.values.arrows} cascade={() => props.values.cascade}
-        editable={() => props.values.editable} height={430} label="Ürün yayın planı"
+        editable={() => props.values.editable} height={430} label={() => props.values.label || "Ürün yayın planı"}
         todayLine={() => props.values.todayLine} names={names} animate={animate}
         help={help === "off" ? false : help === "own" ? "Çubuğu sürükleyin; ardıl görevler kendiliğinden kayar." : true}
         barLabel={bar === "own" ? (task: GanttTask) => `${task.name} · %${Math.round((task.progress ?? 0) * 100)}` : undefined}

@@ -243,11 +243,15 @@ function currentLocation(): { p: string; search: string; hash: string } {
   return { p: stripBase(l.pathname, r?.base ?? ""), search: l.search, hash: l.hash };
 }
 
+// a fragment, another scheme (mailto:, https:) or another host: not a route (hrefOf writes it as given, Link lets the browser follow it)
+const OUTSIDE = /^(#|[a-z][a-z\d+.-]*:|\/\/)/i;
 /**
  * The href of a route as it goes into the page: in history mode relative to the current address ("../flow"), so the
  * link is right under any base, also opened in a new tab; in hash mode "#/flow".
  */
 export function hrefOf(to: string): string {
+  // a fragment ("#top"), another scheme (mailto:, https:) or another host is not a route: written as given
+  if (OUTSIDE.test(to)) return to;
   const r = S.router;
   if (r?.mode !== "history") return `#${to}`;
   // every link re-reads its href on a route change: the answer depends only on the current folder and the target, so
@@ -639,13 +643,14 @@ export function Link(props: {
     ...rest,
     // relative to the current address, so re-read on every route change
     href: () => { S.path(); return hrefOf(href()); },
-    "aria-current": () => (active() ? "page" : null),
+    // the caller's own aria-current wins (ListRow's active); else the route says
+    "aria-current": "aria-current" in rest ? rest["aria-current"] : () => (active() ? "page" : null),
     // the link being opened shows a spinner while the navigation is slow (router.css)
     "aria-busy": () => (S.slow() && S.path() === target() ? "true" : null),
     "class:active": active,
     ...(mode === "hover" ? { onPointerenter: pre, onFocus: pre } : {}),
     onClick: (e: MouseEvent) => {
-      if (e.defaultPrevented || e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || props.target === "_blank") return;
+      if (e.defaultPrevented || e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || props.target === "_blank" || OUTSIDE.test(href())) return;
       e.preventDefault();
       if (props.outlet) void openOutlet(props.outlet, href(), { replace: !!props.replace });
       else void navigate(href() as Href, { replace: !!props.replace, modal: !!props.modal });

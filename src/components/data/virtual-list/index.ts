@@ -16,8 +16,8 @@ export interface VirtualListProps<T> {
   items: MaybeFn<readonly T[]>;
   /** Stable row key (default: the index). @tr Kalıcı satır anahtarı (varsayılan: sıra numarası). */
   key?: ((item: T, index: number) => string | number) | undefined;
-  /** Draws a row; `item` is an accessor that follows updates of the same key. @tr Bir satırı çizer; `item`, aynı anahtarın güncellemelerini izleyen bir erişimcidir. */
-  render: (item: () => T, index: number) => unknown;
+  /** Draws a row; `item` is an accessor that follows updates of the same key. Without it a row shows the item's `title`, `label` or `name` (or the item itself). @tr Bir satırı çizer; `item`, aynı anahtarın güncellemelerini izleyen bir erişimcidir. Verilmezse satır ögenin `title`, `label` ya da `name` alanını (ya da ögenin kendisini) gösterir. */
+  render?: ((item: () => T, index: number) => unknown) | undefined;
   /** Height guess (px) for rows not measured yet. Default 120. @tr Henüz ölçülmemiş satırlar için yükseklik tahmini (px). Varsayılan 120. */
   estimate?: number | undefined;
   /** Extra pixels kept rendered above and below the viewport. Default 600. @tr Görünür alanın üstünde ve altında çizili tutulan ek piksel. Varsayılan 600. */
@@ -61,6 +61,9 @@ const scrollParent = (el: HTMLElement): HTMLElement => {
   }
   return (document.scrollingElement ?? document.documentElement) as HTMLElement;
 };
+
+// the row without `render`: the item's title / label / name, or the item as text
+const plainRow = (it: () => unknown): unknown => () => { const x = it() as Record<string, unknown> | null; return String((x && typeof x === "object" ? x.title ?? x.label ?? x.name : x) ?? ""); };
 
 /** `<VirtualList items={$posts} key={(p) => p.id} render={(p) => <PostCard post={p} />} onEndReached={loadMore} />` */
 export function VirtualList<T>(props: VirtualListProps<T>): Element {
@@ -129,7 +132,7 @@ export function VirtualList<T>(props: VirtualListProps<T>): Element {
       if (!r) {
         r = createRoot((dispose) => {
           const item = signal(it), index = signal(i);
-          const el = h("div", { class: "m-vlist-row", role: plain ? "listitem" : "presentation" }, props.render(() => item(), i)) as HTMLElement;
+          const el = h("div", { class: "m-vlist-row", role: plain ? "listitem" : "presentation" }, (props.render ?? plainRow)(() => item(), i)) as HTMLElement;
           return { el, item, index, dispose };
         });
         (r.el as unknown as { mKey: string | number }).mKey = k;

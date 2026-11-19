@@ -106,7 +106,8 @@ export function listRow(props: ListRowProps, scroll?: ScrollLine): Element {
   const attrs: Record<string, unknown> = {
     title: () => val(props.tooltip) ?? null,
     ...(said ? { [said]: () => String(on("selected")) } : {}),
-    ...(kind === "a" ? { "aria-current": () => (on("active") ? "page" : null) } : {}),
+    // a link's aria-current: from active when it is given, else the router's Link says (the route)
+    ...(kind === "a" && props.active !== undefined ? { "aria-current": () => (on("active") ? "page" : null) } : {}),
     ...(kind === "button" ? { type: "button", disabled: () => on("disabled") } : { "aria-disabled": () => (on("disabled") ? "true" : null) }),
     ...rest(props, USED),
     class: () => cx("m-listrow", `m-listrow-${val(props.size) ?? "md"}`, mode !== "scroll" && `is-${mode}`, val(props.align) === "start" && "is-top",

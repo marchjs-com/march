@@ -1,4 +1,4 @@
-// Showcase stage for PullToRefresh: a short feed in a fixed-height scroll area (playground.ts sets threshold, delay).
+// Showcase stage for PullToRefresh: a short feed in a fixed-height scroll area (playground.ts sets the text above it, threshold, indicator, icon, colour, settle, keyboard button, delay).
 import { PullToRefresh, type PullPhase } from "./index.ts";
 import { Button } from "../../actions/button/index.ts";
 import { Icon } from "../../../icons/index.ts";
@@ -6,6 +6,11 @@ import { sparkles } from "../../../icons/glyphs/sparkles.ts";
 import { arrowDown } from "../../../icons/glyphs/arrowDown.ts";
 import { arrowUp } from "../../../icons/glyphs/arrowUp.ts";
 import { hourglass } from "../../../icons/glyphs/hourglass.ts";
+import { refresh } from "../../../icons/glyphs/refresh.ts";
+import { rotateCw } from "../../../icons/glyphs/rotateCw.ts";
+
+// the Playground's icon names → their glyphs
+const ICONS = { refresh, sparkles, hourglass, rotateCw } as Record<string, typeof refresh>;
 
 export const code = `<PullToRefresh onRefresh={() => api.get("/feed").then((x) => $items = x)} threshold={72}>
   <For each={$items}>{(it) => <FeedRow item={it} />}</For>
@@ -15,7 +20,7 @@ export const code = `<PullToRefresh onRefresh={() => api.get("/feed").then((x) =
 
 const NAMES = ["Kadıköy koşu grubu", "Moda sahili buluşması", "Akşam yemeği", "Kitap kulübü", "Bisiklet turu", "Fotoğraf yürüyüşü", "Masa oyunları", "Kahve sohbeti"]
 
-export default function PullToRefreshDemo(props: { values: { threshold: number; delay: number; indicator: string; color: string; settle: boolean; disabled: boolean } }) {
+export default function PullToRefreshDemo(props: { values: { children: string; threshold: number; delay: number; indicator: string; icon: string; color: string; settle: boolean; refreshButton: boolean; disabled: boolean } }) {
   let $round = 0
   let $phase = "idle"
   const PHASES: Record<string, string> = { idle: "Hazır", pull: "Çekiliyor", ready: "Bırakınca yenilenir", refreshing: "Yenileniyor…" }
@@ -28,14 +33,15 @@ export default function PullToRefreshDemo(props: { values: { threshold: number; 
     <div class="sc-row"><Button size="sm" data-audit-try disabled={() => props.values.disabled || $phase === "refreshing"} on:click={refreshNow}>Çekmeden yenile</Button></div>
     {() => {
       // threshold, indicator, icon, color and settle are read once by the component: it is drawn again when one changes
-      const threshold = props.values.threshold, indicator = props.values.indicator, color = props.values.color, settle = props.values.settle
+      const threshold = props.values.threshold, indicator = props.values.indicator, color = props.values.color, settle = props.values.settle, icon = props.values.icon, button = props.values.refreshButton
       $phase = "idle"
       return <PullToRefresh threshold={threshold} disabled={() => props.values.disabled} onPhase={(p) => { $phase = p }}
         indicator={indicator === "off" ? false : indicator === "own" ? (p: PullPhase) => <Icon of={p === "refreshing" ? hourglass : p === "ready" ? arrowUp : arrowDown} /> : true}
-        icon={indicator === "icon" ? sparkles : undefined} m:color={color === "primary" ? undefined : (color as "success")}
+        icon={ICONS[icon] ?? refresh} m:color={color ? (color as "success") : undefined} refreshButton={button}
         settle={settle ? undefined : false} labels={{ refresh: "Listeyi yenile" }}
         onRefresh={() => new Promise((r) => setTimeout(r, props.values.delay)).then(() => { $round = $round + 1 })}
         class="sc-ptr-demo">
+        <p class="m-muted">{() => props.values.children}</p>
         <ul class="sc-ptr-list">{() => items().map((x) => <li>{x}</li>)}</ul>
       </PullToRefresh>
     }}

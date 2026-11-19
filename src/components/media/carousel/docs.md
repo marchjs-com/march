@@ -18,7 +18,7 @@ A row of slides that scrolls and snaps: one to four per view on wide screens (a 
 | `dots` | `boolean` / `(index, active) => node` | `true` | `false`: no dots; a function draws its own content in each dot button |
 | `m:color` | colour token | `primary` | Common prop (march/props): the colour token of the component and everything in it. |
 | `smooth` | `boolean` | `true` | `false`: buttons and dots jump instead of scrolling smoothly |
-| children | nodes | | the slides |
+| children | nodes / text | | the slides; a text or number becomes a plain slide box |
 | `class` | class value | | |
 
 ```tsx

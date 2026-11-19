@@ -1,19 +1,16 @@
-// Showcase stage for JsonView: the initially open depth follows the Playground value (playground.ts).
-import { JsonView } from "./index.ts";
+// Showcase stage for JsonView: the value (JSON), the initially open depth, the arrow, the count texts and the name follow the Playground values (playground.ts).
+import { JsonView, type JsonViewLabels } from "./index.ts";
+import { ORDER } from "./playground.ts";
 
 export const code = `<JsonView value={order} open={1} />   // open = initially expanded depth
 <JsonView value={order} labels={{ items: "öğe", keys: "alan" }} arrow={(open) => <b>{() => (open() ? "−" : "+")}</b>} />   // or arrow={false}`
 
-const ORDER = {
-  id: 48210, customer: { name: "HADİ", city: "İstanbul", vip: true },
-  items: [{ sku: "KB-01", qty: 2, price: 499.9 }, { sku: "MS-07", qty: 1, price: 249.5 }],
-  shippedAt: "2026-11-12T11:40:00Z", coupon: null, total: 1249.3,
-}
+const parse = (json: string, or: unknown): unknown => { try { return JSON.parse(json) } catch { return or } }
 
-export default function JsonViewDemo(props: { values: { open: number; arrow: string; labels: boolean } }) {
+export default function JsonViewDemo(props: { values: { value: string; open: number; arrow: string; labels: string; label: string } }) {
   return <div class="sc-col">{() => {
-    const open = props.values.open, arrow = props.values.arrow, own = props.values.labels
-    return <JsonView value={ORDER} open={open} label="Sipariş" labels={own ? { items: "öğe", keys: "alan" } : undefined}
+    const v = props.values, arrow = v.arrow
+    return <JsonView value={parse(v.value || ORDER, null)} open={v.open} label={v.label || undefined} labels={parse(v.labels, undefined) as Partial<JsonViewLabels> | undefined}
       arrow={arrow === "off" ? false : arrow === "own" ? (isOpen: () => boolean) => <b>{() => (isOpen() ? "−" : "+")}</b> : true} />
   }}</div>
 }

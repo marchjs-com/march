@@ -1,8 +1,9 @@
-// Showcase stage for Timeline: tones, icons and the time format follow the Playground values (playground.ts).
-import { Timeline } from "./index.ts";
+// Showcase stage for Timeline: the items (JSON), dot, line, and the card's colours, icons and time format follow the Playground values (playground.ts).
+import { Timeline, type TimelineItem } from "./index.ts";
 import { check } from "../../../icons/glyphs/check.ts";
 import { truck } from "../../../icons/glyphs/truck.ts";
 import { creditCard } from "../../../icons/glyphs/creditCard.ts";
+import { ITEMS } from "./playground.ts";
 
 export const code = `<Timeline items={[
   { time: "Bugün 09:12", title: "Sipariş oluşturuldu", body: "#48210 · 3 ürün", tone: "info" },
@@ -11,20 +12,24 @@ export const code = `<Timeline items={[
 <Timeline items={…} line={false} dot={(item, i) => <b>{i + 1}</b>} formatTime={(v) => …} />  // or dot={false}`
 
 const BASE = Date.UTC(2026, 10, 12, 9, 12)
+const ICONS = [check, creditCard, truck]
+const BRAND = ["brand-blue", "brand-green", "brand-orange"] as const
+const MINUTES = [0, 2, 148]
+const parse = (json: string): TimelineItem[] => { try { const x = JSON.parse(json); return Array.isArray(x) ? x : [] } catch { return [] } }
 
-export default function TimelineDemo(props: { values: { tones: boolean; icons: boolean; time: string; dot: string; line: boolean } }) {
+export default function TimelineDemo(props: { values: { items: string; brand: boolean; tones: boolean; icons: boolean; time: string; dot: string; line: boolean } }) {
   return <div class="sc-col">
     {() => {
       const v = props.values
-      const at = (min: number, text: string) => (v.time === "none" ? undefined : v.time === "date" || v.time === "own" ? new Date(BASE + min * 60_000) : text)
-      const tone = (x: "info" | "success" | "warn") => (v.dot === "on" && v.tones ? x : undefined)
-      const color = (x: "brand-blue" | "brand-green" | "brand-orange") => (v.dot === "brand" ? x : undefined)
+      const items = parse(v.items || ITEMS).map((x, i) => ({
+        ...x,
+        time: v.time === "none" ? undefined : v.time === "date" || v.time === "own" ? new Date(BASE + (MINUTES[i] ?? i * 60) * 60_000) : x.time,
+        tone: v.dot === "on" && v.tones && !v.brand ? x.tone : undefined,
+        color: v.dot === "on" && v.brand ? BRAND[i % 3] : x.color,
+        icon: v.icons ? ICONS[i % 3] : x.icon,
+      }))
       return <Timeline line={v.line} dot={v.dot === "off" ? false : v.dot === "number" ? (_x: unknown, i: number) => <b>{String(i + 1)}</b> : true}
-        formatTime={v.time === "own" ? (d: unknown) => `saat ${(d as Date).toISOString().slice(11, 16)}` : undefined} items={[
-        { time: at(0, "Bugün 09:12"), title: "Sipariş oluşturuldu", body: "#48210 · 3 ürün", tone: tone("info"), color: color("brand-blue"), icon: v.icons ? check : undefined },
-        { time: at(2, "Bugün 09:14"), title: "Ödeme alındı", body: "1.499,90 ₺ · kart", tone: tone("success"), color: color("brand-green"), icon: v.icons ? creditCard : undefined },
-        { time: at(148, "Bugün 11:40"), title: "Kargoya verildi", body: "Takip: HD123456", tone: tone("warn"), color: color("brand-orange"), icon: v.icons ? truck : undefined },
-      ]} />
+        formatTime={v.time === "own" ? (d: unknown) => `saat ${(d as Date).toISOString().slice(11, 16)}` : undefined} items={items} />
     }}
   </div>
 }

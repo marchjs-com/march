@@ -27,7 +27,7 @@ const ROWS = [
   { id: "settings", icon: settings, emoji: "⚙️", name: "Ayarlar", sub: "Hesap ve gizlilik", tone: "info", count: 0, keys: "mod+," },
 ]
 
-export default function ListRowDemo(props: { values: { kind: string; lead: string; sub: boolean; trail: string; size: string; color: string; overflow: string; indicator: boolean; disabled: boolean; direction: string; heading: boolean } }) {
+export default function ListRowDemo(props: { values: { kind: string; title: string; active: boolean; lead: string; sub: boolean; trail: string; size: string; color: string; overflow: string; indicator: boolean; disabled: boolean; direction: string; heading: boolean } }) {
   let $active = "home"
   let $said = ""
   return <div class="sc-col">
@@ -43,8 +43,8 @@ export default function ListRowDemo(props: { values: { kind: string; lead: strin
         const actions = v.trail === "actions" ? <IconButton icon={more} label={`${r.name}: diğer`} size="sm" onClick={() => { $said = `eylem: ${r.name}` }} /> : undefined
         const pick = () => { $active = r.id; $said = `seçildi: ${r.name}` }
         const shared = {
-          lead, trail, actions, title: r.name, sub: v.sub ? r.sub : undefined, size: v.size as "md", color, overflow: v.overflow as "scroll",
-          indicator: v.indicator, disabled: v.disabled && i === 2, active: () => $active === r.id,
+          lead, trail, actions, title: i === 0 && v.title ? v.title : r.name, sub: v.sub ? r.sub : undefined, size: v.size as "md", color, overflow: v.overflow as "scroll",
+          indicator: v.indicator, disabled: v.disabled && i === 2, active: () => $active === r.id || (v.active && i === 0),
           direction: v.direction === "row" ? "row" as const : "column" as const, align: v.direction === "center" ? "center" as const : undefined,
           titleAs: v.heading ? "h3" as const : undefined, subAs: v.heading ? "p" as const : undefined,
         }
