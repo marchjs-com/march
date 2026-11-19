@@ -1,5 +1,5 @@
 // Showcase stage for toast: the button shows a toast with the Playground values; the list below mirrors toast.list().
-import { toast } from "./index.ts";
+import { toast, ToastHost } from "./index.ts";
 import { Button } from "../../../ui/button.ts";
 import { star } from "../../../icons/glyphs/star.ts";
 
@@ -13,7 +13,7 @@ const TEXT: Record<string, string> = { info: "Yeni sürüm hazır.", success: "D
 
 const ICONS: Record<string, unknown> = { kind: undefined, own: star, emoji: "🎉", off: false }
 
-export default function ToastDemo(props: { values: { kind: string; action: boolean; timeout: number; icon: string; closable: boolean; motion: string } }) {
+export default function ToastDemo(props: { values: { position: string; kind: string; action: boolean; timeout: number; icon: string; closable: boolean; motion: string } }) {
   let $undone = 0
   const show = () => {
     const v = props.values
@@ -21,6 +21,7 @@ export default function ToastDemo(props: { values: { kind: string; action: boole
       icon: ICONS[v.icon], color: v.icon === "own" ? "brand-purple" : undefined, closable: v.closable, motion: v.motion as "spring" })
   }
   return <div class="sc-col">
+    {() => <ToastHost position={props.values.position as "bottom-end"} />}
     <code class="sc-call">{() => { const v = props.values; return `toast("${TEXT[v.kind]}", { kind: "${v.kind}"${v.action ? `, action: { label: "Geri al", run }` : ""}, timeout: ${v.timeout}${v.timeout ? "" : " /* kapatılana kadar */"}${v.icon === "own" ? `, icon: star, color: "brand-purple"` : v.icon === "emoji" ? `, icon: "🎉"` : v.icon === "off" ? ", icon: false" : ""}${v.closable ? "" : ", closable: false"}${v.motion === "spring" ? "" : `, motion: "${v.motion}"`} })` }}</code>
     <div class="sc-row">
       <Button variant="primary" on:click={show}>{() => `Göster: ${TEXT[props.values.kind]}`}</Button>

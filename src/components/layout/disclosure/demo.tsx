@@ -7,11 +7,11 @@ import { Icon } from "../../../icons/index.ts";
 export const code = `<Disclosure title={<span>Gelişmiş ayarlar</span>} open={$open} onToggle={(o) => $open = o}>…</Disclosure>
 <Disclosure title="Gelişmiş ayarlar" marker={<Icon of={settings} />}>…</Disclosure>   // marker={false}: işaretsiz`
 
-export default function DisclosureDemo(props: { values: { open: boolean; marker: string } }) {
+export default function DisclosureDemo(props: { values: { title: string; open: boolean; marker: string; content: string } }) {
   const last = signal("—")
   return <div class="sc-disc-demo">
-    {() => { const open = props.values.open, marker = props.values.marker === "off" ? false : props.values.marker === "own" ? <Icon of={settings} /> : true; return <Disclosure title="Gelişmiş ayarlar" open={open} marker={marker} onToggle={(o: boolean) => last.set(o ? "açıldı" : "kapandı")}>
-      <p>Önbellek süresi 10 dakika; günlük kayıtları 30 gün saklanır.</p>
+    {() => { const open = props.values.open, marker = props.values.marker === "off" ? false : props.values.marker === "own" ? <Icon of={settings} /> : true; return <Disclosure title={props.values.title} open={open} marker={marker} onToggle={(o: boolean) => last.set(o ? "açıldı" : "kapandı")}>
+      <p>{props.values.content}</p>
     </Disclosure> }}
     <Disclosure title="Sık sorulan: verilerim nerede tutulur?">
       <p>Avrupa'daki veri merkezlerinde, şifreli olarak.</p>

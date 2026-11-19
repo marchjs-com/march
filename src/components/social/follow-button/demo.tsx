@@ -12,10 +12,10 @@ export const code = `<FollowButton state={$state} name={user.name} private={user
 <FollowButton state={$state} onChange={set} labels={{ follow: "Katıl", following: "Üyesin" }}
   m:color="brand-green" icon={(s) => <Icon of={s === "follow" ? sparkles : star} />} burst={false} />`
 
-type Values = { private: boolean; size: string; block: boolean; labels: string; icon: string; color: string; burst: boolean; morph: boolean }
+type Values = { state: string; private: boolean; size: string; block: boolean; labels: string; icon: string; color: string; burst: boolean; morph: boolean }
 
 export default function FollowButtonDemo(props: { values: Values }) {
-  let $state: FollowState = "follow"
+  let $state = props.values.state as FollowState
   let button: HTMLElement | null = null
   // the burst and the morph show only while the state changes: a new choice plays one follow, so it is seen at once
   const motion = computed(() => `${props.values.burst} ${props.values.morph}`), iconOf = computed(() => props.values.icon)

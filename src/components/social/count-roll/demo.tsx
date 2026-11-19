@@ -7,8 +7,8 @@ import { Button } from "../../../ui/button.ts";
 export const code = `<CountRoll value={$likes} />                 // 1,2 B · rolls on change
 <CountRoll value={$followers} format="full" />  // 12.480`
 
-export default function CountRollDemo(props: { values: { format: string; step: number; roll: boolean; duration: number } }) {
-  let $n = 1234
+export default function CountRollDemo(props: { values: { value: number; format: string; step: number; roll: boolean; duration: number } }) {
+  let $n = props.values.value
   const rolling = computed(() => `${props.values.roll} ${props.values.duration}`)
   let played = false
   effect(() => {

@@ -12,7 +12,7 @@ export const code = `<div class="desk">                               // the are
   <Window title="Notlar" color="brand-orange" stripe={false} icons={{ close: "✕", minimize: "–" }} labels={{ close: "Notları kapat" }}>…</Window>
 </div>`
 
-export default function WindowDemo(props: { values: { chrome: string; snap: boolean; resizable: boolean; color: string; stripe: boolean; icons: boolean } }) {
+export default function WindowDemo(props: { values: { chrome: string; snap: boolean; resizable: boolean; color: string; stripe: boolean; icons: boolean; title: string } }) {
   const notes = signal(true), order = signal(true)
   const chrome = (): "hadi" | "mac" | "windows" => props.values.chrome as "hadi"
   const OWN = { close: "✕", minimize: "–", maximize: "□", restore: "❐" }
@@ -21,7 +21,7 @@ export default function WindowDemo(props: { values: { chrome: string; snap: bool
       // the frame options are read when a window is made: a change draws the two windows again
       const v = props.values, color = v.color as "primary", stripe = v.stripe, icons = v.icons ? OWN : undefined, snap = v.snap, resizable = v.resizable
       return <>
-        <Window title="Notlar" icon={<Icon of={fileText} />} chrome={chrome} snap={snap} resizable={resizable} color={color} stripe={stripe} icons={icons} x={24} y={24} width={330} height={210}
+        <Window title={v.title} icon={<Icon of={fileText} />} chrome={chrome} snap={snap} resizable={resizable} color={color} stripe={stripe} icons={icons} x={24} y={24} width={330} height={210}
           open={() => notes()} onClose={() => notes.set(false)}>
           <div class="sc-win-pad"><strong>Bugün</strong><ul><li>HADİ vitrinini gözden geçir</li><li>Pencereyi kenara sürükle: yarısına yerleşir</li><li>Başlığa çift tıkla: alanı kaplar</li></ul></div>
         </Window>

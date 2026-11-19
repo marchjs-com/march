@@ -136,7 +136,8 @@ export function renderTest(fn: () => unknown, opts: RenderTestOptions = {}): Tes
     async press(key, target = doc.activeElement) {
       const init: KeyboardEventInit = { key, bubbles: true, cancelable: true, ctrlKey: /ctrl|mod/i.test(key), metaKey: false, shiftKey: /shift/i.test(key) };
       init.key = key.split("+").pop() as string;
-      (target as Element).dispatchEvent(new Event("keydown", init));
+      // a KeyboardEvent: a plain Event drops `key` in a browser (the fake DOM's KeyboardEvent keeps the init too)
+      (target as Element).dispatchEvent(new KeyboardEvent("keydown", init));
       await s.flush();
     },
     async submit(sel = "form") { (root().querySelector(sel) as Element).dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })); await s.flush(); },

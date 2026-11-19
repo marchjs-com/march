@@ -12,14 +12,13 @@ export const code = `<Joined>                                   // one under the
   <TextInput placeholder="Ara…" /><Button variant="primary">Ara</Button>
 </Joined>`
 
-export default function JoinedDemo(props: { values: { direction: string; radius: number; border: boolean; dividers: boolean } }) {
+export default function JoinedDemo(props: { values: { direction: string; radius: number; border: boolean; dividers: boolean; parts: number } }) {
   return <div class="sc-col">
     {() => {
       const v = props.values
       const dir = v.direction as "vertical"
       return <Joined direction={dir} radius={v.radius as 2} border={v.border} dividers={v.dividers}>
-        <Card title="Önizleme">Bir bütünün parçaları</Card>
-        <Card title="Kod">Kendi çerçeveleri yok</Card>
+        {["Önizleme", "Kod", "Notlar", "Geçmiş", "Paylaş"].slice(0, v.parts - 1).map((t) => <Card title={t}>Bir bütünün parçası: kendi çerçevesi yok</Card>)}
         <Button variant="ghost">Daha fazla</Button>
       </Joined>
     }}

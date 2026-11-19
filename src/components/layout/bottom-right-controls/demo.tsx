@@ -10,7 +10,7 @@ off()  // take it out (also when the component goes away)`
 
 const CORNER_NAMES: Record<Corner, string> = { "top-start": "üst baş", "top-end": "üst son", "bottom-start": "alt baş", "bottom-end": "alt son" }
 
-export default function CornersDemo(props: { values: { corner: Corner } }) {
+export default function CornersDemo(props: { values: { corner: Corner; label: string } }) {
   const added = signal<Node[]>([])
   let offs: (() => void)[] = []
   const add = (): void => {
@@ -28,6 +28,7 @@ export default function CornersDemo(props: { values: { corner: Corner } }) {
   onCleanup(() => offs.forEach((off) => off()))
   return <div class="sc-corner-demo">
     <p class="m-muted">Seçili köşeye sayfa çapında bir denetim ekle; köşedekiler sırayla dizilir, üst üste binmez.</p>
+    <p class="m-muted">{() => `Köşenin ekran okuyucudaki adı: ${props.values.label}`}</p>
     <p>Hedef köşe: <strong>{() => CORNER_NAMES[props.values.corner]}</strong>{() => (added().length ? ` (${added().length} denetim orada)` : "")}</p>
     <div class="sc-row">
       <Button variant="primary" data-audit-try onClick={add}>Köşeye ekle</Button>

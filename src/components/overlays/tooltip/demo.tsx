@@ -14,7 +14,7 @@ export const code = `<Tooltip text="Bağlantıyı kopyala" placement="top">
 
 const MOTIONS: Record<string, string> = { scale: "büyüyerek", fade: "belirerek", none: "hareketsiz" }
 
-export default function TooltipDemo(props: { values: { target: string; color: string; delay: number; motion: string } }) {
+export default function TooltipDemo(props: { values: { target: string; color: string; delay: number; motion: string; text: string; placement: string } }) {
   let row!: HTMLElement
   let last: number | null = null
   const fire = (type: string): void => { row.querySelector(".m-tip-anchor")?.dispatchEvent(new Event(type, { bubbles: true })) }
@@ -31,7 +31,7 @@ export default function TooltipDemo(props: { values: { target: string; color: st
       last = delay
       return props.values.target === "icon"
         ? <Tooltip text="3 yeni bildirim" placement="bottom" color={color} delay={delay} motion={motion}><IconButton icon={bell} label="Bildirimler" /></Tooltip>
-        : <Tooltip text="Bu bir ipucu: odakla ya da üstüne gel" placement="top" color={color} delay={delay} motion={motion}><Button variant="ghost" icon={sparkles}>Üstüme gel</Button></Tooltip>
+        : <Tooltip text={props.values.text} placement={props.values.placement as "top"} color={color} delay={delay} motion={motion}><Button variant="ghost" icon={sparkles}>Üstüme gel</Button></Tooltip>
     }}
     <span class="sc-strip-label">{() => `Üstüne gelince ${props.values.delay ? `${(props.values.delay / 1000).toLocaleString("tr-TR")} sn sonra` : "hemen"} açılır (odakta hemen) · giriş: ${MOTIONS[props.values.motion] ?? props.values.motion}`}</span>
   </div>

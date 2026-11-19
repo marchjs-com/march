@@ -5,8 +5,8 @@ import type { ColorToken } from "../../../theme/colors.ts";
 export const code = `<StoryProgress count={items.length} index={$i} run={item.id}
   duration={6000} paused={$hold} onDone={() => $i++} />`
 
-export default function StoryProgressDemo(props: { values: { count: number; duration: number; paused: boolean; color: string } }) {
-  let $i = 0
+export default function StoryProgressDemo(props: { values: { index: number; count: number; duration: number; paused: boolean; color: string } }) {
+  let $i = props.values.index
   let $round = 0
   return <div class="sc-social-sprog">
     <StoryProgress count={() => props.values.count} index={() => Math.min($i, props.values.count - 1)} run={() => `${$round}:${$i}`} duration={() => props.values.duration} paused={() => props.values.paused}

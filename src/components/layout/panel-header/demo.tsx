@@ -13,7 +13,7 @@ export const code = `<PanelHeader icon={settings} title="Ayarlar" subtitle="Çal
 <PanelHeader as="footer" title="3 değişiklik" actions={<Button size="sm">Uygula</Button>} divider />
 <PanelHeader drag title={$title} ref={(bar) => track(bar, move)} onClose={close} />   // pencere başlığı`
 
-interface Values { kind: string; size: string; icon: boolean; subtitle: boolean; meta: boolean; actions: boolean; close: string; divider: boolean; tone: string; color: string }
+interface Values { kind: string; size: string; icon: boolean; subtitle: boolean; meta: boolean; actions: boolean; close: string; divider: boolean; tone: string; color: string; title: string }
 
 export default function PanelHeaderDemo(props: { values: Values }) {
   let $closed = 0
@@ -24,7 +24,7 @@ export default function PanelHeaderDemo(props: { values: Values }) {
       const bar = <PanelHeader as={foot ? "footer" : "header"} size={v.size as "md"} divider={v.divider} tone={v.tone as "plain"}
         m:color={v.color === "none" ? undefined : v.color as "primary"}
         icon={v.icon ? settings : undefined}
-        title={foot ? "3 değişiklik kaydedilmedi" : "Ayarlar"}
+        title={foot ? "3 değişiklik kaydedilmedi" : v.title}
         subtitle={v.subtitle ? "Çalışma alanı · herkese açık" : undefined}
         meta={v.meta ? <Badge>3</Badge> : undefined}
         actions={v.actions ? <><Button size="sm" variant={foot ? "primary" : "secondary"}>{foot ? "Uygula" : "Kaydet"}</Button><IconButton size="sm" icon={more} label="Diğer" /></> : undefined}

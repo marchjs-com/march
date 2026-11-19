@@ -8,13 +8,13 @@ export const code = `<OverlayScope class="app">
 </OverlayScope>
 openDrawer(render, { target: "page" })                                  // the whole page`
 
-export default function OverlayScopeDemo(props: { values: { target: string } }) {
+export default function OverlayScopeDemo(props: { values: { target: string; content: string } }) {
   const target = (): "page" | "nearest" => (props.values.target === "page" ? "page" : "nearest")
   return <OverlayScope class="sc-scope-demo">
     <div class="sc-scope-bar"><strong>HADİ panel</strong>
       <Button size="sm" data-audit-try onClick={() => void openDrawer(() => <ul class="sc-scope-list"><li>Özet</li><li>Raporlar</li><li>Ayarlar</li></ul>, { title: "Menü", side: "end", target: target() })}>Çekmece</Button>
       <Button size="sm" variant="primary" onClick={() => void openDialog(() => <p>Bu pencere yalnız bu kutuyu örter; sayfanın geri kalanı çalışmaya devam eder.</p>, { title: "Kutu içi pencere", target: target() })}>Pencere</Button>
     </div>
-    <p class="m-muted sc-scope-body">Çekmece ve pencere bu kutunun içinde açılır; "sayfada" seçilirse bütün sayfayı örter.</p>
+    <p class="m-muted sc-scope-body">{() => props.values.content} "Sayfada" seçilirse bütün sayfayı örter.</p>
   </OverlayScope>
 }

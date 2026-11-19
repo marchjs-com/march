@@ -10,10 +10,10 @@ export const code = `<LikeButton liked={$liked} count={$likes}
   onToggle={(on) => { $liked = on; $likes += on ? 1 : -1 }} />
 heartBurst(photoEl)   // the same burst anywhere (double-tap on a photo)`
 
-type Values = { size: string; burst: boolean; colors: string; color: string; count: boolean; icon: string; pop: boolean; ring: boolean }
+type Values = { liked: boolean; size: string; burst: boolean; colors: string; color: string; count: boolean; icon: string; pop: boolean; ring: boolean }
 
 export default function LikeButtonDemo(props: { values: Values }) {
-  let $liked = false
+  let $liked = props.values.liked
   let $likes = 128
   let tile!: HTMLElement, mark!: HTMLElement
   const play = (): void => { if (props.values.pop) heartPop(mark, true); if (props.values.burst) heartBurst(tile, { radius: 46, count: 14, colors: props.values.colors as "brand", ring: props.values.ring }) }

@@ -13,7 +13,7 @@ export const code = `<Popover trigger={<Button icon={filter}>Süzgeçler</Button
 
 const SORTS = [{ value: "new", label: "En yeni", hint: "Önce son eklenenler" }, { value: "old", label: "En eski" }, { value: "name", label: "Ada göre" }]
 
-interface Values { content: string; placement: string; motion: string; title: boolean; closable: boolean; width: string; outside: boolean }
+interface Values { trigger: string; defaultOpen: boolean; content: string; placement: string; motion: string; title: boolean; closable: boolean; width: string; outside: boolean }
 
 export default function PopoverDemo(props: { values: Values }) {
   let $sort = "new"
@@ -22,7 +22,7 @@ export default function PopoverDemo(props: { values: Values }) {
     {() => {
       const v = { ...props.values }
       const list = v.content === "list"
-      return <Popover trigger={<Button icon={filter} variant="secondary">{list ? "Sırala" : "Süzgeçler"}</Button>} placement={v.placement as "bottom-start"} motion={v.motion as "scale"}
+      return <Popover trigger={<Button icon={filter} variant="secondary">{list ? "Sırala" : v.trigger}</Button>} defaultOpen={v.defaultOpen} placement={v.placement as "bottom-start"} motion={v.motion as "scale"}
         title={v.title ? (list ? "Sıralama" : "Süzgeçler") : undefined} label={list ? "Sıralama" : "Süzgeçler"} closable={v.closable} closeLabel="Kapat" width={v.width as "auto"} flush={list}
         closeOnOutside={v.outside} onOpenChange={(open, why) => { $log = open ? "açık" : `kapandı (${why})` }}
         footer={list ? undefined : <Button size="sm" variant="primary">Uygula</Button>}>

@@ -12,7 +12,7 @@ export const code = `<ReplyQuote name="Deniz Kaya" text={m.text} />             
 
 const TEXT = "Cumartesi sabahı sahil koşusu için buluşma yerini değiştirdik: iskelenin yanındaki çay bahçesinin önü. Yeni katılanlar için tempo yavaş tutulacak, su ve atıştırmalık getirmeyi unutmayın."
 
-export default function ReplyQuoteDemo(props: { values: { place: string; lines: number; color: string; bar: boolean; close: string; click: boolean } }) {
+export default function ReplyQuoteDemo(props: { values: { name: string; text: string; place: string; lines: number; color: string; bar: boolean; close: string; click: boolean } }) {
   let $shown = true
   let $log = ""
   // a narrow column, as a message field is: the text takes more lines than the limit, so the line count shows
@@ -22,7 +22,7 @@ export default function ReplyQuoteDemo(props: { values: { place: string; lines: 
       const bubble = v.place === "bubble"
       const color = (v.color || undefined) as ColorToken | undefined
       const jump = v.click ? () => { $log = "Alıntılanan mesaja gidildi" } : undefined
-      const quote = () => <ReplyQuote name={bubble ? "Deniz Kaya" : "Deniz Kaya'ya yanıt"} text={TEXT} lines={v.lines} bar={v.bar} m:color={bubble ? undefined : color}
+      const quote = () => <ReplyQuote name={bubble ? v.name : `${v.name}'ya yanıt`} text={v.text || TEXT} lines={v.lines} bar={v.bar} m:color={bubble ? undefined : color}
         variant={bubble ? "inverse" : "soft"} onClick={jump}
         onClose={bubble || v.close === "off" ? undefined : () => { $shown = false; $log = "Yanıttan vazgeçildi" }} close={v.close === "own" ? trash : undefined} closeLabel="Yanıttan vazgeç" />
       return bubble

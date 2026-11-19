@@ -78,6 +78,13 @@ export interface PlaygroundOption<V = Record<string, unknown>> {
    * the usual rule (the choice whose toCode equals what is written; a literal for sliders and text).
    */
   fromCode?: (attrs: Readonly<Record<string, string>>, children: string | null) => unknown;
+  /**
+   * MarchIDE: the value the bare component gets for this option's prop, when the option's value is not the prop
+   * itself (a count that becomes `items`, a yes / no that becomes sample children). Wins over toCode there.
+   */
+  toProp?: (value: unknown, values: V) => unknown;
+  /** MarchIDE: several props from this one option (`{ onMore: fn, moreIcon: "icon:smile" }`); wins over toProp. */
+  toProps?: (value: unknown, values: V) => Readonly<Record<string, unknown>>;
 }
 
 /** The code the showcase writes from the options (and reads back when it is edited). */
