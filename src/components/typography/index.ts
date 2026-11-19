@@ -4,4 +4,5 @@ export * from "./clamp-text/index.ts";
 export * from "./code-view/index.ts";
 export * from "./kbd/index.ts";
 export * from "./overflow-text/index.ts";
+export * from "./secret/index.ts";
 export * from "./section-label/index.ts";

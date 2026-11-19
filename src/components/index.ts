@@ -111,6 +111,7 @@ export * from "./composite/rich-text-editor/index.ts";
 export * from "./forms/row-tools/index.ts";
 export * from "./actions/scroll-to-top/index.ts";
 export * from "./forms/search-box/index.ts";
+export * from "./typography/secret/index.ts";
 export * from "./typography/section-label/index.ts";
 export * from "./navigation/section-timeline/index.ts";
 export * from "./forms/segmented/index.ts";

@@ -355,6 +355,8 @@
   "PanelHeader": "Panelin üst (ya da `as=\"footer\"` ile alt) çubuğu: ikon, başlık, alt başlık, sayı, eylemler ve kapat düğmesi; sürükleme tutamacı olarak da kullanılır. `<PanelHeader title=\"Ayarlar\" onClose={kapat} divider />`.",
   "Popover": "Tetikleyici ve yanında yüzen panel: dışarı tıklama ya da Esc ile kapanır, odak içeri girip tetikleyiciye döner; açıklık kendi durumu ya da `open` ile denetlenir. `<Popover trigger={<Button>Süzgeçler</Button>} title=\"Süzgeçler\">…</Popover>`.",
   "ResizeHandle": "resize-handle davranışının hazır öğesi: kenarda ya da köşede tek görünümlü tutamaç; `value` + `set` ile tam ayırıcı (sürükleme, ok tuşları, ARIA), onlarsız yalın tutamaç. `<ResizeHandle value={() => $w} set={(w) => $w = w} />`.",
+  "Secret": "Gizli parçaları olan değer (API anahtarı, kart numarası): dizinle gizli aralıklar, göz düğmesi, isteğe bağlı kopyala; gizli karakterler DOM'da hiç yer almaz.",
+  "secretParts": "Değeri görünen ve gizli parçalarına ayırır (regions çözülür, çakışanlar birleşir): kendi çiziminiz için.",
   "SectionLabel": "Panel içindeki grubun küçük başlığı (büyük harf, soluk): ikon, sayı ve sonda eylem yuvası. `<SectionLabel count={3}>Sık kullanılanlar</SectionLabel>`.",
   "key": "Genel kısayol kaydeder. Kaydı kaldıran bir işlev döndürür (mevcut sahip ile otomatik de çağrılır). `combo` örn. \"mod+k\", \"/\", \"shift+?\" (\"g u\" dizileri desteklenmez; yalnızca tek tuş birleşimleri).",
   "KeyframeTimeline": "Anahtar kare zaman çizelgesi düzenleyicisi: `<KeyframeTimeline bind:value={$timeline} />`.",

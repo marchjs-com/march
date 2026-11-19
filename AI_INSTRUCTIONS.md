@@ -664,6 +664,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | CodeView | stable | Read-only code block: line numbers, syntax colours (js/ts/jsx/tsx, css, html, json, sh), wrap toggle and a copy button. | CopyButton, Button, IconButton, PanelHeader |
 | Kbd | stable | Keyboard key: text, or a shortcut string (mod+k) written for the platform (Ctrl+K, ⌘K). | — |
 | OverflowText | stable | Text that scrolls only when it does not fit: hover, focus, always or while visible; bounce, loop or once; RTL-aware fade; Marquee is the endless ticker. | — |
+| Secret | stable | A value with hidden parts (API key, card number): index-based hidden regions, an eye button to show it, an optional copy button; hidden characters are never in the DOM. | IconButton, CopyButton |
 | SectionLabel | experimental | The small heading of a group inside a panel (menu, palette, sidebar, property grid): uppercase and faint, with an icon, a count and an actions slot. | — |
 
 ### Actions — `march/actions`

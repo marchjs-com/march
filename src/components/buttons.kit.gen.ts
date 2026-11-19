@@ -10,6 +10,7 @@ export * from "./typography/kbd/index.ts";
 export * from "./actions/made-with-march/index.ts";
 export * from "./actions/menu/index.ts";
 export * from "./actions/scroll-to-top/index.ts";
+export * from "./typography/secret/index.ts";
 export * from "./typography/section-label/index.ts";
 export * from "./overlays/tooltip/index.ts";
 export * from "./actions/undo-redo/index.ts";

@@ -144,6 +144,7 @@ export const roots: Record<string, string> = {
   "ScrollStory": "m-story",
   "ScrollToTop": "m-icon-btn",
   "SearchBox": "m-search",
+  "Secret": "m-secret",
   "SectionHead": "m-section-head",
   "SectionLabel": "m-section-label",
   "SectionTimeline": "m-stl",

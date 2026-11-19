@@ -33,6 +33,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | CodeView | stable | Read-only code block: line numbers, syntax colours (js/ts/jsx/tsx, css, html, json, sh), wrap toggle and a copy button. | [CopyButton](#copybutton), [Button](#button), [IconButton](#iconbutton), [PanelHeader](#panelheader) |
 | Kbd | stable | Keyboard key: text, or a shortcut string (mod+k) written for the platform (Ctrl+K, ⌘K). | — |
 | OverflowText | stable | Text that scrolls only when it does not fit: hover, focus, always or while visible; bounce, loop or once; RTL-aware fade; Marquee is the endless ticker. | — |
+| Secret | stable | A value with hidden parts (API key, card number): index-based hidden regions, an eye button to show it, an optional copy button; hidden characters are never in the DOM. | [IconButton](#iconbutton), [CopyButton](#copybutton) |
 | SectionLabel | experimental | The small heading of a group inside a panel (menu, palette, sidebar, property grid): uppercase and faint, with an icon, a count and an actions slot. | — |
 
 ### Actions — `march/actions`
@@ -2298,6 +2299,21 @@ Composed of: [IconButton](#iconbutton), [Kbd](#kbd)
 ```
 
 Full page: src/components/forms/search-box/docs.md
+
+## Secret
+
+A value with hidden parts: an API key, a card number, a phone number. `regions` lists the hidden ranges by character index (`[start, end]`, end not included; a negative index counts from the end; no end = to the end). The default shows the first and the last 4 characters; a value of 8 or fewer characters is hidden whole. The eye button shows the whole value (`revealed`, with `bind:revealed` it is written back); `copy` adds a button that copies the real value, hidden or not.
+
+Composed of: [IconButton](#iconbutton), [CopyButton](#copybutton)
+
+```tsx
+<Secret value={$key} />                                   // sk_l••••••••••••••••d05a
+<Secret value={card} regions={[[4, 12]]} mask="*" />       // 4111********1111
+<Secret value={$key} regions={[[8]]} maskLength={6} copy bind:revealed={$open} />
+<Secret value={phone} regions={[[3, -2]]} toggle={false} size="sm" />
+```
+
+Full page: src/components/typography/secret/docs.md
 
 ## SectionHead
 
