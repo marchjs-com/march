@@ -13,7 +13,7 @@ export default function OverlayDemo(props: { values: { effect: string; color: st
     {() => {
       const v = props.values
       return <div class="sc-ov-card">
-        <Overlay effect={v.effect as "mesh"} m:color={v.color === "theme" ? undefined : (v.color as "brand-orange")} front={v.front} opacity={v.opacity} inset={v.inset} blend={v.blend === "normal" ? undefined : v.blend} />
+        <Overlay effect={v.effect as "mesh"} m:color={v.color === "theme" ? undefined : (v.color as "brand-orange")} front={v.front} opacity={v.opacity} inset={v.inset} blend={v.blend === "normal" ? "" : v.blend} />
         <strong>HADİ Konferansı</strong>
         <p>Katman tıklamaları almaz: bu düğme çalışır.</p>
         <Button size="sm">Kayıt ol</Button>

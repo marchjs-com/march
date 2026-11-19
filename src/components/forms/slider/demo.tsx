@@ -14,7 +14,7 @@ export default function SliderDemo(props: { values: { step: number; showValue: b
   return <div class="sc-col">{() => {
     const v = { ...props.values }
     const color = (v.color || undefined) as Opt<ColorToken>
-    return <Field label="Ses"><Slider value={$vol} onChange={(x: number) => { $vol = x }} min={0} max={100} step={v.step} format={(x: number) => `%${x}`} showValue={v.showValue} track={v.track === "ramp" ? true : undefined} m:color={color} /></Field>
+    return <Field label="Ses"><Slider value={$vol} onChange={(x: number) => { $vol = x }} min={0} max={100} step={v.step} format={(x: number) => `%${x}`} showValue={v.showValue} {...({ track: v.track === "ramp" } as object)} m:color={color} /></Field>
   }}
     <span class="sc-demo-call">{() => `Adım ${props.values.step}: 0, ${props.values.step}, ${props.values.step * 2} … 100 (${Math.floor(100 / props.values.step) + 1} konum); ok tuşları değeri ${props.values.step} değiştirir.`}</span>
   </div>
