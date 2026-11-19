@@ -136,7 +136,8 @@ export interface CtlAttrs {
 export function ctl(props: CommonProps, extra: Record<string, unknown> = {}): CtlAttrs {
   const fc = useContext(FieldContext);
   return {
-    id: props.id ?? fc?.id,
+    // an id always: the browser's autofill and its form checks need a field to have an id or a name
+    id: props.id ?? fc?.id ?? uid("m-f"),
     name: props.name,
     disabled: () => !!props.disabled,
     required: () => !!props.required,

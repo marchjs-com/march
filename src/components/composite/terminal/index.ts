@@ -159,7 +159,7 @@ export function Terminal(props: TerminalProps): Element {
   let search: { q: string; hit: number } | null = null;
 
   const out = h("div", { class: "m-term-out", role: "log", "aria-live": "polite", "aria-label": () => props.label ?? t`Terminal output` }) as HTMLElement;
-  const input = h("input", { class: "m-term-input", type: "text", spellcheck: "false", autocomplete: "off", autocapitalize: "off", "aria-label": () => props.labels?.command ?? t`Command` }) as HTMLInputElement;
+  const input = h("input", { class: "m-term-input", name: "command", type: "text", spellcheck: "false", autocomplete: "off", autocapitalize: "off", "aria-label": () => props.labels?.command ?? t`Command` }) as HTMLInputElement;
   const promptEl = h("span", { class: "m-term-prompt", "aria-hidden": "true" }, () => (search ? `(${searchText()}) ` : val(props.prompt) ?? "$ ")) as HTMLElement;
   // our own cursor: the browser's caret shows only while the input has focus; this one blinks always (solid while typing)
   const measure = h("span", { class: "m-term-measure", "aria-hidden": "true" }) as HTMLElement;

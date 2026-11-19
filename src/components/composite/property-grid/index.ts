@@ -200,8 +200,16 @@ export function PropertyGrid(props: PropertyGridProps): Element {
     Object.defineProperty(cp, "describedby", { get: () => [p.description ? descId : "", errors()[p.key] ? errId : ""].filter(Boolean).join(" ") || null, enumerable: true });
     cp["setValue"] = (v: unknown) => change(p, v);
     const control = untrack(() => Comp(cp));
+    // the name is the label of the editor's one form field (a text box, a select, a switch's checkbox, a combobox's
+    // input; given an id when it has none); an editor of several choices (radios, buttons) is named by aria-labelledby
+    // and its name is plain text (a label would pick its first choice when clicked)
+    const fields = control instanceof Element
+      ? [control, ...control.querySelectorAll("input, select, textarea")].filter((e) => /^(INPUT|SELECT|TEXTAREA)$/.test(e.tagName) && (e as HTMLInputElement).type !== "radio" && (e as HTMLInputElement).type !== "hidden")
+      : [];
+    const field = fields.length === 1 ? fields[0]! : null;
+    if (field && !field.id) field.id = `${id}-f`;
     const label = h("div", { class: "m-pg-label" },
-      h("label", { id: labelId, for: id, class: "m-pg-name", title: () => (p.description ? null : labelOf(p)) }, () => labelOf(p)),
+      h(field ? "label" : "span", { id: labelId, ...(field ? { for: field.id } : {}), class: "m-pg-name", title: () => (p.description ? null : labelOf(p)) }, () => labelOf(p)),
       props.changeMarks === false ? null : () => (changed() ? h(StatusDot, { class: "m-pg-dot", tone: "primary", size: "xs", title: L().changed ?? t`Changed`, label: L().changed ?? t`changed` }) : null),
       p.description && h("span", { id: descId, class: "m-pg-desc" }, p.description));
     // a described property: its label and name, then the whole text, in a tooltip over the label
