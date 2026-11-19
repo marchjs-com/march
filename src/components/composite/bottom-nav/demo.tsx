@@ -1,4 +1,5 @@
 // Showcase stage for BottomNav: a phone-width frame with the bar at the bottom, for the Playground values (playground.ts).
+import { effect } from "../../../core/reactive.ts";
 import { BottomNav, type BottomNavItem } from "./index.ts";
 import { OverlayScope } from "../../layout/overlay-scope/index.ts";
 import { home, compass, message, bell, user, calendar, image, film, radio, barChart } from "../../../icons/index.ts";
@@ -32,11 +33,13 @@ const ALL = [
   { id: "me", label: "Profil", icon: user },
 ]
 
-export default function BottomNavDemo(props: { values: { count: number; create: boolean; menu: string; labels: boolean; variant: string; tint: string; badges: boolean; bubble: boolean; ring: string; motion: boolean } }) {
+export default function BottomNavDemo(props: { values: { value: string; count: number; create: boolean; menu: string; labels: boolean; variant: string; tint: string; badges: boolean; bubble: boolean; ring: string; motion: boolean } }) {
   let $tab = "home"
   let $unread = 3
   let $created = 0
   let $last = ""
+  // the Playground's active tab (value) picks the tab; a tap on the bar still moves it
+  effect(() => { $tab = props.values.value })
   const label = (id: string) => ALL.find((x) => x.id === id)?.label ?? id
   // the frame is an OverlayScope: the Create menu (and its dimmed backdrop) opens inside the phone-sized frame
   return <OverlayScope class="sc-bnav-frame">

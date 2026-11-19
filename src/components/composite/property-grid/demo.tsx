@@ -26,7 +26,7 @@ const PROPS: PropertySpec[] = [
   { key: "accent", label: "Vurgu rengi", type: "color", group: "Görünüm", hidden: (v) => v["tone"] !== "accent" },
 ]
 
-export default function PropertyGridDemo(props: { values: { layout: string; search: boolean; save: boolean; historyButtons: boolean; resetButtons: boolean; changeMarks: boolean; footer: boolean; ownLabels: boolean } }) {
+export default function PropertyGridDemo(props: { values: { properties: string; layout: string; search: boolean; save: boolean; historyButtons: boolean; resetButtons: boolean; changeMarks: boolean; footer: boolean; ownLabels: boolean } }) {
   const card = signal<Record<string, unknown>>({ title: "HADİ bülteni", body: "Haftalık özet", width: 300, align: "start", elevated: true, radius: 12, tone: "light", accent: "#1d9ad6" })
   // an edit without typing: the change marks (row dot, group count), the reset button and the footer show what an edit does
   const RADII = [20, 4, 16]
@@ -43,7 +43,7 @@ export default function PropertyGridDemo(props: { values: { layout: string; sear
       }}
     </div>
     <div class="sc-pg-panel">
-      {() => <PropertyGrid properties={PROPS} value={card} label="Kart özellikleri" layout={props.values.layout as "auto"} search={props.values.search}
+      {() => <PropertyGrid properties={props.values.properties === "look" ? PROPS.filter((p) => p.group === "Görünüm") : PROPS} value={card} label="Kart özellikleri" layout={props.values.layout as "auto"} search={props.values.search}
         historyButtons={props.values.historyButtons} resetButtons={props.values.resetButtons} changeMarks={props.values.changeMarks} footer={props.values.footer}
         labels={props.values.ownLabels ? { search: "Bir ayar bul", save: "Yayınla", revert: "Vazgeç", unsaved: (n) => `${n} düzenleme yayınlanmadı`, noChanges: "Her şey yayında" } : undefined}
         onSave={props.values.save ? () => { toast("Kaydedildi", { kind: "success" }) } : undefined} />}

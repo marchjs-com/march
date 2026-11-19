@@ -18,7 +18,7 @@ const PRESETS: Record<string, Preset> = {
 }
 const pane = (title: string, text: string) => <div class="sc-dock-pane"><strong>{title}</strong><p class="m-muted">{text}</p></div>
 
-export default function AppUIDemo(props: { values: { title: string; description: string; layoutMenu: boolean; groupMenu: boolean; bar: boolean; preset: string; ownIcon: boolean } }) {
+export default function AppUIDemo(props: { values: { panels: string; title: string; description: string; layoutMenu: boolean; groupMenu: boolean; bar: boolean; preset: string; ownIcon: boolean } }) {
   const panels: DockPanel[] = [
     { id: "files", title: "Dosyalar", icon: folder, min: [140, 100], content: () => pane("Dosyalar", "Sekmeyi sürükleyip başka bir grubun kenarına bırak.") },
     { id: "editor", title: "Düzenleyici", icon: fileText, content: () => pane("Düzenleyici", "Yerleşim menüsünden hazır bir düzen seç.") },
@@ -27,7 +27,8 @@ export default function AppUIDemo(props: { values: { title: string; description:
   return <div class="sc-dock-stage">
     {() => {
       const v = props.values
-      return <AppUI title={v.title} description={v.description} layoutMenu={v.layoutMenu} actions={v.groupMenu ? true : ["maximize", "collapse"]} bar={v.bar} layoutIcon={v.ownIcon ? grid : undefined} panels={panels} presets={PRESETS} preset={v.preset} commands={false} label="Örnek uygulama" />
+      // "two": no console (the presets' console group stays empty)
+      return <AppUI title={v.title} description={v.description} layoutMenu={v.layoutMenu} actions={v.groupMenu ? true : ["maximize", "collapse"]} bar={v.bar} layoutIcon={v.ownIcon ? grid : undefined} panels={v.panels === "two" ? panels.filter((p) => p.id !== "console") : panels} presets={PRESETS} preset={v.preset} commands={false} label="Örnek uygulama" />
     }}
   </div>
 }

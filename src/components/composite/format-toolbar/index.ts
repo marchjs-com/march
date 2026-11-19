@@ -115,7 +115,7 @@ export function FormatToolbar<T extends FormatTool = FormatTool>(props: FormatTo
       ...(on ? { pressed: on } : null), "aria-keyshortcuts": key,
       disabled: () => off(tool),
       // keep the text selection: the button never takes focus on pointer down
-      onMouseDown: (e: MouseEvent) => e.preventDefault(), onClick: () => props.onTool(tool),
+      onMouseDown: (e: MouseEvent) => e.preventDefault(), onClick: () => props.onTool?.(tool),
     }) as Element;
   };
   const bar = h(Toolbar, {

@@ -77,8 +77,8 @@ function fileView(kit: AppKit, file: AppFile): () => unknown {
 /** `<AppUI title="My IDE" panels={panels} presets={PRESETS} plugins={[codeEditorPlugin()]} persist="ide" />` */
 export function AppUI(props: AppUIProps): Element {
   let dock: DockApi | undefined;
-  // title and description are read from props when drawn (live: a getter prop follows its value)
-  const { title: _title, description: _description, layoutMenu: _layoutMenu, descriptionMark, tools, side, status, bar, layoutLabel, layoutIcon, class: cls, api, plugins, kit: onKit, panels: _panels, ...rest } = props;
+  // title, description, layoutMenu and bar are read from props when drawn (live: a getter prop follows its value)
+  const { title: _title, description: _description, layoutMenu: _layoutMenu, descriptionMark, tools, side, status, bar: _bar, layoutLabel, layoutIcon, class: cls, api, plugins, kit: onKit, panels: _panels, ...rest } = props;
   const kit = createAppKit(plugins ?? []);
   onCleanup(() => kit.dispose());
   onKit?.(kit);
@@ -101,7 +101,7 @@ export function AppUI(props: AppUIProps): Element {
     items: () => dock?.layoutMenu() ?? [],
   });
   return h("div", { class: () => cx("m-app", val(cls)) },
-    () => (val(bar) === false ? null : h("div", { class: "m-app-bar" },
+    () => (val(props.bar) === false ? null : h("div", { class: "m-app-bar" },
       () => (val(props.title) ? h("span", { class: "m-app-title" }, () => val(props.title)) : null),
       () => { const d = val(props.description); return d ? h("span", { class: "m-app-desc" }, (descriptionMark ?? "//") ? h("span", { class: "m-app-desc-mark", "aria-hidden": "true" }, `${descriptionMark ?? "//"} `) : null, d) : null; },
       h("span", { class: "m-app-fill" }), tools ?? null, () => (val(props.layoutMenu) === false ? null : menu))),

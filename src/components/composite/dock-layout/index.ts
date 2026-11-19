@@ -538,7 +538,8 @@ export function DockLayout(props: DockLayoutProps): Element {
   function addPanel(def: DockPanel): void {
     defs.push(def);
     createRoot((dispose) => {
-      const body = div("m-dock-panel is-hidden is-snap", { id: `${base}-p-${def.id}`, role: "tabpanel", "aria-labelledby": `${base}-t-${def.id}` }, def.content());
+      // a panel given as plain data (no content: MarchIDE's Properties) is an empty panel
+      const body = div("m-dock-panel is-hidden is-snap", { id: `${base}-p-${def.id}`, role: "tabpanel", "aria-labelledby": `${base}-t-${def.id}` }, def.content?.());
       const stab: HTMLElement = h(Button, {
         variant: "ghost", size: "sm", class: "m-dock-stab", icon: def.icon, "aria-expanded": "false", title: () => `${val(def.title)} · ${t`Open panel`}`,
         onClick: () => { if (!dragged) restore(def.id); },

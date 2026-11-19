@@ -5,7 +5,7 @@
 // search filters the tree; every change is one step of the editor's own undo history (Ctrl+Z / Ctrl+Shift+Z).
 import "./tree-editor.css";
 import "../../../ui/field.css";
-import { signal, computed, untrack } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { For } from "../../../dom/for.ts";
 import { t, dir } from "../../../core/i18n.ts";
@@ -114,10 +114,10 @@ export function TreeEditor(props: TreeEditorProps): unknown {
 
   const errors = computed(() => {
     const v = get();
-    const list = [...J.validateJson(v, props.schema), ...(props.validate?.(v) ?? [])];
-    props.onValidate?.(list);
-    return list;
+    return [...J.validateJson(v, props.schema), ...(props.validate?.(v) ?? [])];
   });
+  // told from an effect, not from inside the computed: the owner may write its own signals there
+  effect(() => { const list = errors(); untrack(() => props.onValidate?.(list)); });
   const errorAt = computed(() => { const m = new Map<string, string>(); for (const e of errors()) { const p = J.pointer(e.path); if (!m.has(p)) m.set(p, e.message); } return m; });
 
   const rows = computed((): Row[] => {

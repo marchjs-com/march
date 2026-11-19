@@ -6,7 +6,8 @@ export default definePlayground<Values>({
   options: [
     { key: "format", label: "Biçim", default: "hex", kind: "segmented", options: [{ value: "hex", label: "HEX" }, { value: "rgb", label: "RGB" }, { value: "hsl", label: "HSL" }] },
     { key: "alpha", label: "Saydamlık", default: true },
-    { key: "palettes", label: "Paletler", default: true },
+    // on: the default palettes (the prop left out); a bare true is no list of palettes
+    { key: "palettes", label: "Paletler", default: true, toCode: { true: null, false: "{false}" } },
     { key: "contrast", label: "Kontrast", default: true },
     // only where the browser has the EyeDropper API (the picker draws no button elsewhere)
     { key: "eyedropper", label: "Göz damlası", default: true, visibleWhen: () => "EyeDropper" in globalThis },

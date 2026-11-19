@@ -24,13 +24,15 @@ const FIRST = {
   "data/badge": `<Badge tone="success">Etkin</Badge>`,
   "navigation/tabs": `<Tabs bind:value={$tab} label="Proje" tabs={tabs} />`,
   "social/avatar": `<Avatar name="Elif Arslan" src={photo} />`,
-  "composite/post-card": `<PostCard post={post} onLike={like} menu={items} />`,
+  // the post and the ⋯ menu are JSON literals (MarchIDE gives the same values to the raw PostCard)
+  "composite/post-card": /^<PostCard onLike=\{like\}\n  post=\{\{"id":"p1",.*"media":\[(\{"src":"data:image\/png;base64,[^"]+","alt":"Fotoğraf \d"\},?){3}\].*\}\}\n  menu=\{\[\{"label":"Bağlantıyı kopyala"\},.*\]\} \/>$/,
 };
 
 test("the first folders write the expected code for their default options", async () => {
   for (const [folder, code] of Object.entries(FIRST)) {
     const spec = await load(folder);
-    assert.equal(genCode(spec, nameOf(folder), defaults(spec)), code, folder);
+    const got = genCode(spec, nameOf(folder), defaults(spec));
+    if (code instanceof RegExp) assert.match(got, code, folder); else assert.equal(got, code, folder);
   }
 });
 

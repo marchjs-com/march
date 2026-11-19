@@ -2,6 +2,7 @@
 // can read it back), for the Playground values (playground.ts).
 import { signal } from "../../../core/reactive.ts";
 import { ImageCropper, DEFAULT_CROP, type CropState } from "./index.ts";
+import { DEFAULT_SRC } from "./playground.ts";
 
 const token = (name: string): string => globalThis.getComputedStyle?.(globalThis.document.documentElement).getPropertyValue(name).trim() || "gray"
 
@@ -33,7 +34,7 @@ function scene(): Promise<string> {
 const TOOLS: Record<string, boolean | ("rotateLeft" | "rotateRight" | "mirror" | "reset")[]> = { all: true, rotate: ["rotateLeft", "rotateRight"], none: false }
 const SLIDERS: Record<string, boolean | ("zoom" | "angle")[]> = { all: true, zoom: ["zoom"], none: false }
 
-export default function ImageCropperDemo(props: { values: { aspect: string; maxZoom: number; preview: boolean; readonly: boolean; grid: boolean; hint: boolean; tools: string; sliders: string; labels: boolean } }) {
+export default function ImageCropperDemo(props: { values: { src: string; aspect: string; maxZoom: number; preview: boolean; readonly: boolean; grid: boolean; hint: boolean; tools: string; sliders: string; labels: boolean } }) {
   const src = signal("")
   // starts at 2×: the zoom slider is part way, so a new zoom limit moves it; the state outlives a rebuilt cropper
   let $crop: CropState = { ...DEFAULT_CROP, zoom: 2 }
@@ -43,7 +44,9 @@ export default function ImageCropperDemo(props: { values: { aspect: string; maxZ
       // the parts are chosen when the cropper is made: it is made again when one of them changes
       const parts = { grid: props.values.grid, hint: props.values.hint, tools: TOOLS[props.values.tools], sliders: SLIDERS[props.values.sliders] }
       const labels = props.values.labels ? { zoom: "Büyüklük", angle: "Eğim", free: "Dilediğin gibi", hint: "Sürükle, tekerlekle yaklaş; R döndürür, F aynalar." } : undefined
-      return src() ? <ImageCropper src={src()} alt="Tepeler ve güneş" value={$crop} onChange={(c: CropState) => { $crop = c }} aspect={props.values.aspect === "choices" ? undefined : Number(props.values.aspect)}
+      // the Options' own image once it is changed; the themed scene while it is the default
+      const own = props.values.src && props.values.src !== DEFAULT_SRC ? props.values.src : ""
+      return own || src() ? <ImageCropper src={own || src()} alt="Tepeler ve güneş" value={$crop} onChange={(c: CropState) => { $crop = c }} aspect={props.values.aspect === "choices" ? undefined : Number(props.values.aspect)}
         maxZoom={props.values.maxZoom} preview={props.values.preview} readonly={props.values.readonly} {...parts} labels={labels} /> : null
     }}
     {() => (SLIDERS[props.values.sliders] === false ? null : <p class="m-muted">{`Yakınlaştırma kaydırıcısı %100 ile %${props.values.maxZoom * 100} arasında.`}</p>)}

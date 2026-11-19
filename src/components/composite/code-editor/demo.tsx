@@ -22,7 +22,7 @@ const PROPS = [
 ]
 
 type Values = {
-  lineNumbers: boolean; complete: boolean; multiline: boolean; message: boolean; keys: boolean; shortcuts: boolean; tabSize: number; copy: boolean; flash: boolean; color: string; state: string;
+  lineNumbers: boolean; complete: boolean; multiline: boolean; message: boolean; keys: boolean; shortcuts: boolean; tabSize: number; copy: boolean; flash: boolean; color: string; readonly: boolean; disabled: boolean;
   palette: string; bracketColors: boolean; matchBrackets: boolean; guides: boolean; currentLine: boolean; occurrences: boolean; autoClose: boolean; pasteIndent: boolean; find: boolean; fontSize: number; lineHeight: number;
 }
 
@@ -58,7 +58,7 @@ export default function CodeEditorDemo(props: { values: Values }) {
       const v = { ...props.values }
       const color: ColorToken | undefined = v.color ? v.color as ColorToken : undefined
       return <CodeEditor value={$code} onChange={change} lang="tsx" multiline={v.multiline} copy={v.copy} flash={v.flash ? "glow" : "none"}
-        m:color={color} readonly={v.state === "readonly"} disabled={v.state === "disabled"}
+        m:color={color} readonly={v.readonly} disabled={v.disabled}
         complete={v.complete ? jsxCompleter({ tag: "Button", props: PROPS }) : undefined}
         keys={v.keys ? (v.find ? undefined : { find: false, replace: false, goToLine: false }) : false} tabSize={v.tabSize}
         palette={v.palette === "theme" ? "theme" : "ide"} bracketColors={v.bracketColors} matchBrackets={v.matchBrackets} guides={v.guides}

@@ -21,7 +21,7 @@ const ACTIONS: Record<string, boolean | DockAction[]> = { all: true, nomenu: ["m
 
 const pane = (title: string, lines: string[]) => <div class="sc-dock-pane"><strong>{title}</strong>{lines.map((l) => <p class="m-muted">{l}</p>)}</div>
 
-export default function DockLayoutDemo(props: { values: { preset: string; actions: string; collapsed: boolean; icons: boolean; motion: boolean } }) {
+export default function DockLayoutDemo(props: { values: { panels: string; preset: string; actions: string; collapsed: boolean; icons: boolean; motion: boolean } }) {
   const panels: DockPanel[] = [
     { id: "files", title: "Dosyalar", icon: folder, min: [140, 100], content: () => pane("HADİ", ["src/", "  app.ts", "  theme.css", "README.md"]) },
     { id: "editor", title: "app.ts", icon: fileText, content: () => pane("app.ts", ["Sekmeyi bir grubun kenarına sürükle: yeni bölme.", "Ortasına ya da sekmelerin arasına: sekme.", "Alanın kenarına: tüm yerleşimin kenarı."]) },
@@ -35,7 +35,9 @@ export default function DockLayoutDemo(props: { values: { preset: string; action
       const collapsed = props.values.collapsed
       // the group buttons are drawn with each group: the workspace is made again when they change
       const own = props.values.icons
-      return <DockLayout panels={panels} presets={presets} commands="dockDemo" label="Örnek çalışma alanı" actions={ACTIONS[props.values.actions]}
+      // "three": files, app.ts and the console (the presets' other places stay empty)
+      const shown = props.values.panels === "three" ? panels.filter((p) => ["files", "editor", "console"].includes(p.id)) : panels
+      return <DockLayout panels={shown} presets={presets} commands="dockDemo" label="Örnek çalışma alanı" actions={ACTIONS[props.values.actions]}
         motion={props.values.motion}
         icons={own ? { menu: "⋯", maximize: "▢", restore: "❐", collapse: "–" } : undefined}
         labels={own ? { menu: "Seçenekler", maximize: "Tam boy", restore: "Eski boyuna dön", collapse: "Şeride indir" } : undefined}

@@ -30,7 +30,7 @@ import { StatusDot } from "../../feedback/status-dot/index.ts";
 import { Splitter } from "../../layout/splitter/index.ts";
 import { CopyButton } from "../../actions/copy-button/index.ts";
 import { stickToBottom } from "../../../ui/observe.ts";
-import { accessorKind, isUndeclared, text, type DebugSession, type StepView, type WatchValue } from "./session.ts";
+import { createDebugSession, accessorKind, isUndeclared, text, type DebugSession, type StepView, type WatchValue } from "./session.ts";
 
 export { createDebugSession, accessorKind, isUndeclared } from "./session.ts";
 export type { DebugSession, DebugSessionOptions, DebugMeta, Breakpoint, Watch, WatchValue, StackFrame, ScopeGroup, StepView, OutputLine, DebugState, PauseReason } from "./session.ts";
@@ -82,8 +82,8 @@ const ICONS: Record<DebuggerIcon, IconDef> = {
 };
 
 export interface DebuggerProps {
-  /** The debug session the panel shows and drives (createDebugSession). @tr Panelin gösterdiği ve yönettiği hata ayıklama oturumu (createDebugSession). */
-  session: DebugSession;
+  /** The debug session the panel shows and drives (createDebugSession; none: an empty one of its own). @tr Panelin gösterdiği ve yönettiği hata ayıklama oturumu (createDebugSession; verilmezse kendine ait boş bir oturum). */
+  session?: DebugSession | undefined;
   /** Start (idle) or restart (a run is on) a run: the host builds the code with the debugger's calls. No button without it. @tr Bir çalıştırmayı başlat (boştayken) ya da yeniden başlat (çalışırken): kodu hata ayıklayıcı çağrılarıyla ana uygulama derler. Verilmezse düğme yok. */
   onStart?: (() => void) | undefined;
   /** End the run (default: `session.end()`); the host may build the code again without the calls. @tr Çalıştırmayı bitir (varsayılan: `session.end()`); ana uygulama kodu çağrılar olmadan yeniden derleyebilir. */
@@ -131,7 +131,7 @@ const describeWith = (undeclared: () => string) => (v: unknown): string | null =
 
 /** `<Debugger session={session} onStart={run} onReveal={(file, line) => open(file, line)} />` */
 export function Debugger(props: DebuggerProps): Element {
-  const s = props.session;
+  const s = props.session ?? createDebugSession();
   const L = (k: keyof DebuggerLabels): string => props.labels?.[k] ?? t(LABELS[k]);
   const describe = describeWith(() => L("undeclared"));
   const value = (v: unknown): unknown => h(JsonView, { value: () => v, open: props.depth ?? 0, describe, class: "m-dbg-value" });

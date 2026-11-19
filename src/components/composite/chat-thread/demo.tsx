@@ -22,8 +22,10 @@ const START: ChatMessage[] = [
 ]
 const ANSWERS = [["a", "HADİ Koşu Kulübü", "Harika, listeye ekledim ✅"], ["b", "Kitap Kulübü", "Ben de geliyorum!"], ["a", "HADİ Koşu Kulübü", "Su ve rahat ayakkabı unutmayın 👟"]] as const
 
-export default function ChatThreadDemo(props: { values: { group: boolean; replyDelay: number; days: string; motion: boolean } }) {
+export default function ChatThreadDemo(props: { values: { first: string; group: boolean; replyDelay: number; days: string; motion: boolean } }) {
   let $messages: ChatMessage[] = START
+  // the Playground's "İlk mesaj" is the first message's text
+  effect(() => { const text = props.values.first; untrack(() => { $messages = $messages.map((m) => (m.id === "m1" ? { ...m, text } : m)) }) })
   let $typing: string[] = []
   let $reply: ChatMessage | null = null
   let n = 0

@@ -13,7 +13,7 @@ export const code = `<EditorFrame head={<FormatToolbar onTool={exec} />} actions
 </EditorFrame>
 <EditorFrame showHead={() => $tools.length > 0} headProps={{ sticky: true }} footProps={{ divider: true }} ring={false} … />`
 
-export default function EditorFrameDemo(props: { values: { head: boolean; actions: boolean; foot: boolean; sticky: boolean; ring: boolean; color: string; state: string } }) {
+export default function EditorFrameDemo(props: { values: { head: boolean; actions: boolean; foot: boolean; sticky: boolean; ring: boolean; color: string; readonly: boolean; disabled: boolean } }) {
   let $text = "HADİ koşu kulübü cumartesi sabahı sahilde buluşuyor.\nYeni katılanlar için tempo yavaş tutulacak."
   let $last = ""
   const words = () => $text.trim().split(/\s+/).filter(Boolean).length
@@ -24,18 +24,18 @@ export default function EditorFrameDemo(props: { values: { head: boolean; action
     {() => {
       const v = { ...props.values }
       const color = (v.color || undefined) as ColorToken | undefined
-      const off = v.state !== "normal"
+      const off = v.readonly || v.disabled
       return <EditorFrame
         head={v.head ? <FormatToolbar tools={["bold", "italic", "|", "link", "ul"]} disabled={off} onTool={(tool) => { $last = tool }} /> : undefined}
         actions={v.head && v.actions ? <Badge tone="neutral">{() => `${words()} kelime`}</Badge> : undefined}
         headProps={{ sticky: v.sticky }}
         foot={v.foot ? <span>{() => ($last ? `Son araç: ${$last}` : "Çerçevenin içine tıklayın: kenar ve halka odakla renklenir.")}</span> : undefined}
         footProps={{ divider: true }}
-        ring={v.ring} m:color={color} disabled={v.state === "disabled"} readonly={v.state === "readonly"}>
-        <textarea class="m-editor-area" rows={4} aria-label="Not" readonly={v.state === "readonly"} disabled={v.state === "disabled"}
+        ring={v.ring} m:color={color} disabled={v.disabled} readonly={v.readonly}>
+        <textarea class="m-editor-area" rows={4} aria-label="Not" readonly={v.readonly} disabled={v.disabled}
           value={untrack(() => $text)} on:input={(e: Event) => { $text = (e.target as HTMLTextAreaElement).value }} />
       </EditorFrame>
     }}
-    {() => (props.values.state === "disabled" ? null : <div class="sc-row"><Button size="sm" variant="secondary" data-audit-try on:click={focusNote}>Notu odakla (halkayı göster)</Button></div>)}
+    {() => (props.values.disabled ? null : <div class="sc-row"><Button size="sm" variant="secondary" data-audit-try on:click={focusNote}>Notu odakla (halkayı göster)</Button></div>)}
   </div>
 }

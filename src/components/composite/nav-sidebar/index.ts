@@ -157,6 +157,13 @@ export interface NavSidebarProps {
 interface Saved { open?: unknown; recent?: unknown; rail?: unknown; width?: unknown }
 const text = (x: MaybeFn<string | null | undefined> | undefined): string => String(val(x as MaybeFn<string>) ?? "");
 
+/** A shortcut as `aria-keyshortcuts` says it: "mod+k" → "Control+K Meta+K", "alt+shift+s" → "Alt+Shift+S". */
+const ariaKeys = (sc: string): string => {
+  const name: Record<string, string> = { ctrl: "Control", control: "Control", cmd: "Meta", meta: "Meta", alt: "Alt", shift: "Shift" };
+  const keys = sc.split("+").map((k) => name[k.toLowerCase()] ?? (k.toLowerCase() === "mod" ? "mod" : k.length === 1 ? k.toUpperCase() : k));
+  return keys.includes("mod") ? ["Control", "Meta"].map((m) => keys.map((k) => (k === "mod" ? m : k)).join("+")).join(" ") : keys.join("+");
+};
+
 /** Side menu: groups, search, recent and featured items, collapsible rail, resizable width, remembered state. */
 export function NavSidebar(props: NavSidebarProps): Element {
   const storeKey = props.storageKey ?? "m.sidebar";
@@ -532,7 +539,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
         (title != null || props.collapsible) && h(PanelHeader, { as: "div", class: "m-sb-titlebar", title: title ?? undefined, titleAs: "span", subtitle: props.subtitle ?? undefined,
           actions: props.collapsible ? h(IconButton, { class: "m-nav-rail-btn", size: "sm", icon: panelLeft, "aria-pressed": () => String(rail()), label: railLabel, onClick: () => { rail.update((x) => !x); persist(); } }) : undefined }),
         hasSearch && h(SearchBox, {
-          class: "m-sb-search", inputClass: "m-sb-input", value: q, debounce: 0, inputRef: (x: HTMLInputElement) => { searchEl = x; if (hk) x.setAttribute("aria-keyshortcuts", "Control+K Meta+K"); },
+          class: "m-sb-search", inputClass: "m-sb-input", value: q, debounce: 0, inputRef: (x: HTMLInputElement) => { searchEl = x; if (hk) x.setAttribute("aria-keyshortcuts", ariaKeys(props.shortcut ?? "mod+k")); },
           placeholder: () => val(props.placeholder) ?? t`Search or ask…`, label: () => val(props.labels?.search) ?? val(props.placeholder) ?? t`Search the menu`,
           clearLabel: () => L("clearSearch", t`Clear search`), shortcutHint: hk ? props.shortcut ?? "mod+k" : false, onKeyDown: onSearchKey,
         })),
