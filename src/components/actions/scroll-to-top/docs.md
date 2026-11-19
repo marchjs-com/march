@@ -20,7 +20,7 @@ import { ScrollToTop } from "march/ui";
 
 | Prop | |
 |---|---|
-| `threshold` | Scrolled distance (px) after which it shows. Default 320. |
+| `threshold` | Scrolled distance (px) after which it shows. At the end of something that cannot scroll that far (a short article), it shows anyway. Default 320. |
 | `order` | Place in the corner (lower = nearer the edge). |
 | `inline` | Render where it is written instead of the corner. |
 | `target` | What to scroll; default: what the user last scrolled. |

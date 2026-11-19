@@ -24,6 +24,19 @@ test("ScrollToTop: hidden until the scrolled box passes the threshold; labelled;
   dispose();
 });
 
+test("ScrollToTop: at the end of a box that cannot scroll past the threshold it still shows (a short article)", () => {
+  const box = document.createElement("div"); document.body.appendChild(box);
+  Object.defineProperty(box, "scrollHeight", { value: 313 }); Object.defineProperty(box, "clientHeight", { value: 220 });
+  const host = document.createElement("div"); document.body.appendChild(host);
+  const dispose = render(() => h(ScrollToTop, { inline: true, target: box, threshold: 320 }), host);
+  const btn = host.querySelector(".m-to-top");
+  box.scrollTop = 50; box.dispatchEvent(new Event("scroll"));
+  assert.equal(btn.getAttribute("data-shown"), "false", "not yet: neither past 320 px nor at the end");
+  box.scrollTop = 93; box.dispatchEvent(new Event("scroll"));
+  assert.equal(btn.getAttribute("data-shown"), "true", "at the end (93 of 93 px) it shows although 320 is out of reach");
+  dispose();
+});
+
 test("ScrollToTop: by default it goes into the bottom-end corner and leaves with its component", () => {
   const host = document.createElement("div"); document.body.appendChild(host);
   const dispose = render(() => h(ScrollToTop, {}), host);

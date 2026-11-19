@@ -23,7 +23,7 @@ import { addBottomRightControl } from "../../layout/bottom-right-controls/index.
 import type { IconProp } from "../../../icons/types.ts";
 
 export interface ScrollToTopProps {
-  /** Scrolled distance (px) after which the button shows (0: always shown). Default 320. @tr Düğmenin göründüğü kaydırma mesafesi (px; 0: hep görünür). Varsayılan 320. */
+  /** Scrolled distance (px) after which the button shows (0: always shown); at the end of something that cannot scroll that far it shows too. Default 320. @tr Düğmenin göründüğü kaydırma mesafesi (px; 0: hep görünür); o kadar kayamayan bir şeyin sonuna gelince de görünür. Varsayılan 320. */
   threshold?: number | undefined;
   /** Place in the page corner (lower = nearer the edge). Default 0. @tr Sayfa köşesindeki sırası (küçük = kenara daha yakın). Varsayılan 0. */
   order?: number | undefined;
@@ -50,6 +50,11 @@ const FROM = { pop: { y: 12 }, fade: {}, slide: {} };
 
 type Scroller = Element | Window;
 const topOf = (s: Scroller): number => (s instanceof Element ? s.scrollTop : (s as Window).scrollY ?? 0);
+/** How far it can scroll at most (0 when unknown). */
+const maxOf = (s: Scroller): number => {
+  const e = s instanceof Element ? s : globalThis.document?.documentElement;
+  return e ? Math.max(0, e.scrollHeight - e.clientHeight) : 0;
+};
 const setTop = (s: Scroller, y: number): void => { if (s instanceof Element) s.scrollTop = y; else (s as Window).scrollTo(0, y); };
 
 /** A button that scrolls the page back to the top; hidden until the page is scrolled past `threshold`. */
@@ -68,7 +73,8 @@ export function ScrollToTop(props: ScrollToTopProps = {}): Node {
     const tg = e?.target;
     if (props.target) { if (tg && tg !== props.target && !(props.target === win && isPage(tg))) return; }
     else if (tg) { if (!isPage(tg)) return; scroller = tg === doc || tg === doc?.documentElement || tg === doc?.body ? win : (tg as Element); }
-    if (scroller) shown.set(threshold <= 0 || topOf(scroller) > threshold);
+    // past the threshold, or at the end of a box that cannot scroll that far (a short article): it shows either way
+    if (scroller) { const top = topOf(scroller), max = maxOf(scroller); shown.set(threshold <= 0 || top > threshold || (max > 0 && top > 0 && top >= max - 1)); }
   };
   onCleanup(listen(globalThis.document, { scroll: read }, { capture: true, passive: true }));
 
