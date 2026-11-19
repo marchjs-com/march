@@ -45,9 +45,12 @@
 .m-app-pv-lang-icon .m-svg { inline-size: 1rem; block-size: 1rem; }
 .m-app-pv-stage { min-block-size: 0; overflow: auto; display: grid; background: var(--m-bg); color: var(--m-text); font-family: var(--m-font); }
 .m-app-pv-accent { display: grid; place-items: center; min-block-size: 100%; padding: var(--m-space-4); box-sizing: border-box; }
-/* a device size: the content in a frame of that size, centred on the stage (which scrolls when it is larger) */
-.m-app-pv-stage.is-device { place-items: start center; padding: var(--m-space-4); background: color-mix(in srgb, var(--m-text) 5%, var(--m-bg)); }
-.m-app-pv-stage.is-device > .m-app-pv-accent { inline-size: var(--m-pv-w); block-size: var(--m-pv-h); min-block-size: 0; max-inline-size: none; overflow: auto; border: var(--m-border-w, 1px) solid var(--m-border); border-radius: 18px; background: var(--m-bg); box-shadow: 0 8px 30px color-mix(in srgb, var(--m-text) 14%, transparent); container-type: inline-size; }
+/* a device: DevicePreview fills the stage (fitted inside it), on a quiet dotted floor */
+.m-app-pv-stage.is-device { display: block; overflow: hidden; background: radial-gradient(circle, color-mix(in srgb, var(--m-text) 9%, transparent) 1px, transparent 1.4px) 0 0 / 18px 18px, color-mix(in srgb, var(--m-text) 3%, var(--m-bg)); }
+.m-app-pv-stage.is-device > .m-device-stage { block-size: 100%; }
+.m-app-pv-stage.is-device .m-app-pv-accent { min-block-size: 100%; }
+.m-app-pv-net-btn.is-on { color: var(--m-warn-text, var(--m-text)); background: color-mix(in srgb, var(--m-warn) 14%, transparent); }
+.m-app-pv-net-btn .m-status-dot { margin-inline-start: .15rem; }
 
 /* the vault and AI panels: one column that scrolls, quiet text, the theme's tokens */
 .m-vault-gate, .m-ai-empty { display: grid; gap: var(--m-space-3); justify-items: start; max-inline-size: 30rem; margin-inline: auto; padding: var(--m-space-5) var(--m-space-4); }
@@ -135,3 +138,6 @@
 .m-ai-ctx { display: inline-flex; align-items: center; gap: .35rem; color: var(--m-muted); font-size: var(--m-text-xs); min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { .m-ai-wait > i { animation: none; } }
 .m-ai-text code { padding: 0 .25em; border-radius: var(--m-radius-1); background: var(--m-bg-subtle); font: .92em var(--m-font-mono); }
+.m-app-pv-device .m-btn, .m-app-pv-net-btn { gap: .4rem; }
+.m-popover-panel.m-app-pv-device-panel { inline-size: min(36rem, calc(100vw - 2rem)); max-inline-size: none; }
+.m-app-pv-device-panel .m-dpick { inline-size: 100%; }

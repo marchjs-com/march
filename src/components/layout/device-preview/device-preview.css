@@ -1,6 +1,9 @@
-/* DevicePreview: a phone or tablet body around a real-size screen. --m-dev-w / -h / -r come from the device spec;
-   --m-dev-scale fits it into its place (CSS zoom keeps layout and hit-testing in step). */
-.m-device-stage { display: flex; justify-content: center; padding: var(--m-space-4); min-inline-size: 0; }
+/* DevicePreview: a phone or tablet body (or a desktop window) around a real-size screen. --m-dev-w / -h / -r come from
+   the device spec; --m-dev-scale fits it into its place (CSS zoom keeps layout and hit-testing in step). */
+.m-device-stage { display: flex; justify-content: center; align-items: flex-start; gap: var(--m-space-4); padding: var(--m-space-4); min-inline-size: 0; }
+.m-device-stage.is-contain { block-size: 100%; box-sizing: border-box; align-items: center; }
+.m-device-stage.is-contain > .m-device-rail { align-self: center; inset-block-start: 0; }
+.m-device-col { display: flex; flex-direction: column; align-items: center; gap: var(--m-space-2); min-inline-size: 0; }
 .m-device {
   --m-dev-bezel: 12px;
   position: relative; flex: none; zoom: var(--m-dev-scale, 1);
@@ -9,14 +12,30 @@
   border-radius: calc(var(--m-dev-r) + var(--m-dev-bezel));
   background: linear-gradient(145deg, color-mix(in srgb, var(--m-text) 92%, var(--m-bg)), var(--m-text));
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--m-text) 60%, transparent), var(--m-shadow-3), inset 0 0 0 2px color-mix(in srgb, var(--m-bg) 18%, transparent);
+  /* tilt (deviceorientation): the body leans with it */
+  transform: perspective(1600px) rotateX(var(--m-dev-rx, 0deg)) rotateY(var(--m-dev-ry, 0deg));
+  transition: transform var(--m-dur-slow) var(--m-ease, ease);
 }
 .m-device-tablet { --m-dev-bezel: 18px; }
 .m-device-screen {
-  inline-size: 100%; block-size: 100%; overflow: hidden; border-radius: var(--m-dev-r);
+  position: relative; inline-size: 100%; block-size: 100%; overflow: hidden; border-radius: var(--m-dev-r);
   background: var(--m-bg); color: var(--m-text); display: flex; flex-direction: column;
 }
-.m-device-viewport { --m-site-nav-top: 0px; position: relative; isolation: isolate; flex: 1 1 auto; overflow: auto; overscroll-behavior: contain; scrollbar-width: none; container: m-site / inline-size; }
+.m-device-viewport { --m-site-nav-top: 0px; position: relative; isolation: isolate; flex: 1 1 auto; min-block-size: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: none; container: m-site / inline-size; }
 .m-device-viewport::-webkit-scrollbar { display: none; }
+/* a desktop: a browser window (no bezel, a title bar with its address) */
+.m-device-desktop { --m-dev-bezel: 0px; padding: 0; background: var(--m-surface, var(--m-bg)); border-radius: var(--m-dev-r);
+  inline-size: calc(var(--m-dev-w) + 2px); block-size: calc(var(--m-dev-h) + 40px); border: 1px solid var(--m-border);
+  box-shadow: 0 30px 80px -30px color-mix(in srgb, var(--m-text) 45%, transparent), var(--m-shadow-2); }
+.m-device-bar { flex: none; display: flex; align-items: center; gap: .9rem; block-size: 38px; padding-inline: .85rem; border-block-end: 1px solid var(--m-border);
+  background: color-mix(in srgb, var(--m-text) 4%, var(--m-bg)); font: 500 .8rem / 1 var(--m-font-sans, system-ui); color: var(--m-muted); }
+.m-device-lights { display: inline-flex; gap: .4rem; }
+.m-device-lights i { inline-size: .72rem; block-size: .72rem; border-radius: 50%; background: var(--m-danger); }
+.m-device-lights i:nth-child(2) { background: var(--m-warn); }
+.m-device-lights i:nth-child(3) { background: var(--m-success); }
+.m-device-address { flex: 1; max-inline-size: 34rem; margin-inline: auto; padding: .38rem .9rem; border-radius: 999px; background: color-mix(in srgb, var(--m-text) 6%, var(--m-bg)); text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.m-device-size { font-variant-numeric: tabular-nums; opacity: .8; }
+.m-device-bar[hidden] { display: none; }
 /* status bar */
 .m-device-status { flex: none; display: flex; align-items: center; justify-content: space-between; block-size: 2.75rem; padding-inline: 1.75rem 1.4rem;
   font: 600 var(--m-text-sm) / 1 var(--m-font-sans, system-ui); color: var(--m-text); background: var(--m-bg); z-index: 1; }
@@ -24,8 +43,12 @@
 .m-device-icons { display: inline-flex; align-items: center; gap: .3rem; }
 .m-device-icons i { display: inline-block; background: currentColor; }
 .m-device-signal { inline-size: .9rem; block-size: .55rem; clip-path: polygon(0 100%, 100% 0, 100% 100%); }
-.m-device-wifi { inline-size: .8rem; block-size: .6rem; border-radius: .8rem .8rem 0 0; clip-path: polygon(50% 100%, 0 0, 100% 0); }
-.m-device-battery { inline-size: 1.3rem; block-size: .6rem; border-radius: .2rem; box-shadow: inset 0 0 0 1.5px currentColor; background: linear-gradient(90deg, currentColor 70%, transparent 70%) !important; }
+.m-device-wifi { inline-size: .8rem; block-size: .6rem; border-radius: .8rem .8rem 0 0; clip-path: polygon(50% 100%, 0 0, 100% 0); transition: opacity var(--m-dur-fast) var(--m-ease); }
+.m-device-wifi.is-off { opacity: .2; }
+.m-device-battery { position: relative; inline-size: 1.3rem; block-size: .6rem; border-radius: .2rem; box-shadow: inset 0 0 0 1.5px currentColor;
+  background: linear-gradient(90deg, currentColor var(--m-dev-bat, 70%), transparent var(--m-dev-bat, 70%)) !important; }
+.m-device-battery.is-low { color: var(--m-danger); }
+.m-device-battery.is-charging { color: var(--m-success); }
 /* camera */
 .m-device-camera { position: absolute; z-index: 3; inset-block-start: calc(var(--m-dev-bezel) + .55rem); inset-inline: 0; margin-inline: auto; background: var(--m-text); pointer-events: none; }
 .m-device-cam-island .m-device-camera { inline-size: 7.2rem; block-size: 2.1rem; border-radius: 1.2rem; }
@@ -33,7 +56,7 @@
 .m-device-cam-notch .m-device-camera { inline-size: 9.5rem; block-size: 1.9rem; inset-block-start: var(--m-dev-bezel); border-radius: 0 0 1.1rem 1.1rem; }
 .m-device-cam-none .m-device-camera { display: none; }
 /* home indicator */
-.m-device-home { position: absolute; z-index: 3; inset-block-end: calc(var(--m-dev-bezel) + .5rem); inset-inline: 0; margin-inline: auto; inline-size: 8.5rem; block-size: .3rem; border-radius: 1rem;
+.m-device-home { position: absolute; z-index: 3; inset-block-end: .5rem; inset-inline: 0; margin-inline: auto; inline-size: 8.5rem; block-size: .3rem; border-radius: 1rem;
   background: color-mix(in srgb, var(--m-text) 75%, transparent); pointer-events: none; }
 .m-device-tablet .m-device-home { inline-size: 12rem; }
 /* landscape: the camera moves to the side, the status bar stays thin */
@@ -41,21 +64,67 @@
 .m-device.is-landscape.m-device-cam-punch .m-device-camera { inline-size: .8rem; block-size: .8rem; }
 .m-device.is-landscape.m-device-cam-notch .m-device-camera { inline-size: 1.9rem; block-size: 9.5rem; inset-inline-start: var(--m-dev-bezel); }
 .m-device.is-landscape .m-device-status { block-size: 1.5rem; }
-/* touch: no cursor, a finger dot that grows while pressed */
-.m-device.is-touch .m-device-screen, .m-device.is-touch .m-device-screen * { cursor: none !important; }
-.m-device-touch { position: absolute; z-index: var(--m-z-drag, 250); inset-block-start: 0; inset-inline-start: 0; inline-size: 2.2rem; block-size: 2.2rem; margin-block-start: -1.1rem; margin-inline-start: -1.1rem; border-radius: 50%;
-  background: color-mix(in srgb, var(--m-text) 18%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--m-bg) 60%, transparent); pointer-events: none; opacity: 0;
+/* touch: no cursor; a finger dot follows the mouse, each pressed finger leaves its own print */
+.m-device.is-touch .m-device-viewport, .m-device.is-touch .m-device-viewport * { cursor: none !important; }
+.m-device-touch, .m-device-finger, .m-device-pivot { position: absolute; z-index: var(--m-z-drag, 250); inset-block-start: 0; inset-inline-start: 0; pointer-events: none; border-radius: 50%; }
+.m-device-touch { inline-size: 2.2rem; block-size: 2.2rem; margin: -1.1rem 0 0 -1.1rem;
+  background: color-mix(in srgb, var(--m-text) 16%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--m-bg) 60%, transparent); opacity: 0;
   transition: opacity var(--m-dur-fast) var(--m-ease), scale var(--m-dur-fast) var(--m-ease); }
-.m-device.is-touch .m-device-screen:hover .m-device-touch { opacity: 1; }
-.m-device-screen.is-pressed .m-device-touch { scale: .8; background: color-mix(in srgb, var(--m-primary) 35%, transparent); }
+.m-device.is-touch .m-device-screen.is-over .m-device-touch { opacity: 1; }
+.m-device-screen.is-pressed .m-device-touch { opacity: 0 !important; }
 .m-device:not(.is-touch) .m-device-touch { display: none; }
-@media (prefers-reduced-motion: reduce) { .m-device-touch { transition: none; } }
+.m-device-finger { inline-size: 2.6rem; block-size: 2.6rem; margin: -1.3rem 0 0 -1.3rem;
+  background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--m-primary) 55%, transparent) 0 38%, color-mix(in srgb, var(--m-primary) 22%, transparent) 40% 62%, transparent 64%);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--m-primary) 45%, transparent), 0 6px 18px -4px color-mix(in srgb, var(--m-primary) 60%, transparent);
+  animation: m-fade-in var(--m-dur-fast) var(--m-ease, ease) both; transition: opacity var(--m-dur-slow), scale var(--m-dur-slow); }
+.m-device-finger.is-up { opacity: 0; scale: 1.5; }
+.m-device-pivot { inline-size: .7rem; block-size: .7rem; margin: -.35rem 0 0 -.35rem; border: 2px dashed color-mix(in srgb, var(--m-primary) 70%, transparent); opacity: 0; transition: opacity var(--m-dur-slow); }
+.m-device-pivot.is-on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .m-device-touch, .m-device-finger, .m-device { transition: none; animation: none; } }
 /* a preview is looked at, not copied from: only fields keep text selection */
 .m-device-screen { user-select: none; -webkit-user-select: none; }
 .m-device-screen :is(input, textarea, select, [contenteditable="true"]) { user-select: text; -webkit-user-select: text; }
 /* src mode: the content is a page in an iframe (its own viewport, scrolling and media queries) */
 .m-device-viewport.is-framed { overflow: hidden; }
 .m-device-frame { display: block; inline-size: 100%; block-size: 100%; border: 0; background: var(--m-bg); }
-.m-device.is-touch .m-device-screen.is-over .m-device-touch { opacity: 1; }
 /* statusBar={false} / homeIndicator={false} */
 .m-device-status[hidden], .m-device-home[hidden] { display: none; }
+/* the on-screen keyboard: it takes the bottom of the screen, the page above gets smaller (as on a phone) */
+.m-device-kb { flex: none; display: grid; gap: 8px; padding: 8px 4px 26px; background: color-mix(in srgb, var(--m-text) 10%, var(--m-bg)); border-block-start: 1px solid var(--m-border);
+  animation: m-drawer-in-bottom var(--m-dur-slow) cubic-bezier(.2,.9,.3,1) both; font: 400 1.05rem / 1 var(--m-font-sans, system-ui); }
+.m-device-kb[hidden] { display: none; }
+.m-device-kb-row { display: flex; justify-content: center; gap: 5px; }
+.m-device-key { flex: 1 1 0; max-inline-size: 2.6rem; display: grid; place-items: center; block-size: 2.6rem; border-radius: 6px; background: var(--m-bg); color: var(--m-text);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--m-text) 25%, transparent); cursor: pointer; transition: scale var(--m-dur-fast), background var(--m-dur-fast); }
+.m-device-key:active { scale: 1.12; background: color-mix(in srgb, var(--m-primary) 18%, var(--m-bg)); }
+.m-device-key.is-wide { flex: 1.5 1 0; max-inline-size: 3.6rem; }
+.m-device-key.is-fn { background: color-mix(in srgb, var(--m-text) 18%, var(--m-bg)); font-size: .85rem; }
+.m-device-key.is-space { flex: 5 1 0; max-inline-size: none; }
+.m-device-key.is-go { background: var(--m-primary); color: var(--m-on-primary); }
+.m-device-landscape .m-device-key, .m-device.is-landscape .m-device-key { block-size: 2rem; }
+.m-device-tablet .m-device-key { max-inline-size: 4.2rem; block-size: 3rem; }
+/* in the background: the app shrinks away */
+.m-device-away { position: absolute; inset: 0; z-index: 4; display: grid; place-content: center; gap: .4rem; text-align: center;
+  background: color-mix(in srgb, var(--m-text) 55%, transparent); backdrop-filter: blur(14px) saturate(1.4); color: var(--m-bg); cursor: pointer;
+  animation: m-fade-in var(--m-dur-slow) var(--m-ease, ease) both; font: 500 var(--m-text-sm) / 1.3 var(--m-font-sans, system-ui); }
+.m-device-away strong { font-size: 1.3rem; }
+.m-device-away[hidden] { display: none; }
+/* the control rail */
+.m-device-rail { position: sticky; inset-block-start: var(--m-space-2); flex: none; max-block-size: calc(100% - var(--m-space-2)); overflow-y: auto; scrollbar-width: none; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px;
+  border-radius: 999px; background: color-mix(in srgb, var(--m-bg) 82%, transparent); backdrop-filter: blur(12px);
+  border: 1px solid var(--m-border); box-shadow: var(--m-shadow-2); }
+.m-device-rail[hidden] { display: none; }
+.m-device-rail .m-btn, .m-device-rail .m-icon-btn { border-radius: 999px; }
+.m-device-fingers { position: relative; }
+.m-device-count { position: absolute; inset-block-end: 1px; inset-inline-end: 1px; min-inline-size: .9rem; block-size: .9rem; border-radius: 999px; display: grid; place-items: center;
+  background: var(--m-primary); color: var(--m-on-primary); font: 700 .6rem / 1 var(--m-font-sans, system-ui); }
+.m-device-pop { display: grid; gap: var(--m-space-3); min-inline-size: 15rem; }
+.m-device-pop-row { display: grid; gap: var(--m-space-1); font-size: var(--m-text-sm); color: var(--m-muted); }
+/* the events it fired, for a moment */
+.m-device-log { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; min-block-size: 1.7rem; max-inline-size: 100%; }
+.m-device-log[hidden] { display: none; }
+.m-device-ev { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .65rem; border-radius: 999px; font: 500 .75rem / 1 var(--m-font-mono, ui-monospace, monospace);
+  background: color-mix(in srgb, var(--m-primary) 12%, var(--m-bg)); color: var(--m-text); border: 1px solid color-mix(in srgb, var(--m-primary) 30%, transparent);
+  animation: m-rise-in var(--m-dur-slow) var(--m-ease, ease) both; }
+.m-device-ev b { color: var(--m-primary); font-weight: 700; }
+@media (prefers-reduced-motion: reduce) { .m-device-kb, .m-device-away, .m-device-ev { animation: none; } }

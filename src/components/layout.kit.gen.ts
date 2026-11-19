@@ -2,6 +2,7 @@
 export * from "./layout/accordion/index.ts";
 export * from "./layout/app-shell/index.ts";
 export * from "./layout/bottom-right-controls/index.ts";
+export * from "./layout/device-picker/index.ts";
 export * from "./layout/device-preview/index.ts";
 export * from "./layout/disclosure/index.ts";
 export * from "./layout/exploded-view/index.ts";

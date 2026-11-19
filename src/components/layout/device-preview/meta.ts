@@ -4,9 +4,9 @@ export default defineMeta({
   name: "DevicePreview",
   status: "experimental",
   since: "0.1.0",
-  summary: "Content as on a real phone or tablet: device body, notch, status bar, home indicator, real screen size, rotation; the mouse acts as a finger (drag to scroll, fling, long press).",
+  summary: "Content as on a real device: phone / tablet body or desktop window, ~35 devices, real size, turning; the mouse as 1–3 fingers (real touch events, pinch, rotate, gestures); a control rail for shake, tilt, offline, battery, background and keyboard.",
   category: "layout",
-  composedOf: ["OverlayScope"],
-  behaviors: ["touch emulation"],
+  composedOf: ["OverlayScope", "IconButton", "Button", "Menu", "Popover", "Slider", "Toggle"],
+  behaviors: ["touch emulation", "device events"],
   showcase: "/layout",
 });

@@ -19,6 +19,7 @@ export * from "./json-editor/index.ts";
 export * from "./keyframe-timeline/index.ts";
 export * from "./markdown-editor/index.ts";
 export * from "./nav-sidebar/index.ts";
+export * from "./network-throttle/index.ts";
 export * from "./post-card/index.ts";
 export * from "./profile-header/index.ts";
 export * from "./property-grid/index.ts";

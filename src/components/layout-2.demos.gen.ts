@@ -2,8 +2,8 @@
 export * from "./layout.kit.gen.ts";
 import * as d0 from "./layout/bottom-right-controls/demo.tsx";
 import * as p0 from "./layout/bottom-right-controls/playground.ts";
-import * as d1 from "./layout/device-preview/demo.tsx";
-import * as p1 from "./layout/device-preview/playground.ts";
-import * as d2 from "./layout/disclosure/demo.tsx";
-import * as p2 from "./layout/disclosure/playground.ts";
+import * as d1 from "./layout/device-picker/demo.tsx";
+import * as p1 from "./layout/device-picker/playground.ts";
+import * as d2 from "./layout/device-preview/demo.tsx";
+import * as p2 from "./layout/device-preview/playground.ts";
 export { d0, p0, d1, p1, d2, p2 };

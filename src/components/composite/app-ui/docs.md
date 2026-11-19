@@ -70,7 +70,14 @@ middle. Every picker is off until asked for (`toolbar={{ theme: true, mode: true
 picker added later stays hidden. The bar shows only while at least one picker (or your `tools`) does. `theme`, `accent`
 and `mode` take signals to keep the choices; `footer` sits under the stage (the shown component's code); the bar, the
 stage and the footer are one piece (Joined). The theme picker's first entry is "Page theme" (the default: `""`, the page's
-theme). `toolbar={{ device: true }}` adds a screen-size menu: the stage shows its content in a frame of a phone, a tablet or a laptop (`devices`: `[{ value, label, width, height }]`, default `PREVIEW_DEVICES`), turned sideways on demand (`device` / `rotate` signals keep the choice); the content lays out at that width (container queries follow it; the page's media queries do not: it is not a separate window). `toolbar={{ fullscreen: true }}` adds a full-screen button: the preview alone fills the screen (the footer steps aside), Esc or the button brings it back; where the browser refuses full screen (an embedded view) the preview covers the page instead; with a mouse the toolbar floats over the top and slides away after a moment, the pointer at the top edge (or the keyboard inside it) brings it back, touch screens keep it in place. `toolbar={{ language: true }}` adds a language menu: `languages` (`[{ value, label }]`, `""` the default texts)
+theme). `toolbar={{ device: true }}` adds a device picker (DevicePicker in a popover: dozens of phones, tablets and desktop
+screens, search, portrait / landscape, your own devices): the stage shows its content in DevicePreview — a phone or
+tablet body or a desktop window at its real size, fitted to the stage — with its control rail (fingers and gestures,
+shake, tilt, offline, battery, background, keyboard); `device` / `rotate` signals keep the choice, `devices` replaces
+the list. `toolbar={{ network: true }}` adds the network speed (NetworkThrottle in a popover; the button names the
+network and glows while it is limited): the preview's fetch / XHR / module loads come at that speed. When the preview
+shares the page with its tool (MarchIDE), `scope` (a CallScope over the call stack) limits the device values and the
+network speed to the preview's code; the page keeps its own. `toolbar={{ fullscreen: true }}` adds a full-screen button: the preview alone fills the screen (the footer steps aside), Esc or the button brings it back; where the browser refuses full screen (an embedded view) the preview covers the page instead; with a mouse the toolbar floats over the top and slides away after a moment, the pointer at the top edge (or the keyboard inside it) brings it back, touch screens keep it in place. `toolbar={{ language: true }}` adds a language menu: `languages` (`[{ value, label }]`, `""` the default texts)
 and `language` (a signal) keep the choice; what it means for the stage is the owner's (the playground translates the
 drawn texts).
 

@@ -1,0 +1,32 @@
+/* NetworkThrottle: gauge, preset chips, your own sliders, the requests' waterfall. */
+.m-nt { display: grid; gap: var(--m-space-3); inline-size: min(24rem, 100%); }
+.m-nt-gauge { display: grid; grid-template-columns: 7.5rem 1fr; align-items: center; gap: var(--m-space-3); }
+.m-nt-gauge svg { inline-size: 7.5rem; overflow: visible; }
+.m-nt-track, .m-nt-fill { fill: none; stroke-width: 9; stroke-linecap: round; }
+.m-nt-track { stroke: color-mix(in srgb, var(--m-text) 10%, transparent); }
+.m-nt-fill { stroke: var(--m-primary); transition: stroke var(--m-dur-slow); }
+.m-nt.is-on .m-nt-fill { stroke: var(--m-warn); }
+.m-nt-gauge.is-off .m-nt-fill { stroke: var(--m-danger); }
+.m-nt-needle { transform-origin: 60px 62px; }
+.m-nt-needle path { stroke: var(--m-text); stroke-width: 3; stroke-linecap: round; }
+.m-nt-needle circle { fill: var(--m-text); }
+.m-nt-read { display: grid; gap: .25rem; min-inline-size: 0; }
+.m-nt-read strong { font: 800 1.6rem / 1 var(--m-font-display, var(--m-font)); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.m-nt-read span { color: var(--m-muted); font-size: var(--m-text-sm); font-variant-numeric: tabular-nums; }
+.m-nt-presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.m-nt-custom { display: grid; gap: var(--m-space-2); }
+.m-nt-row { display: grid; grid-template-columns: 4.5rem 1fr; align-items: center; gap: var(--m-space-2); font-size: var(--m-text-sm); }
+.m-nt-row-label { color: var(--m-muted); }
+.m-nt-log { display: grid; gap: 4px; }
+.m-nt-req { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name meta" "bar bar"; gap: 3px var(--m-space-2); padding: 5px 0; border-block-start: 1px solid color-mix(in srgb, var(--m-border) 60%, transparent); font-size: var(--m-text-xs, .75rem); }
+.m-nt-req-name { grid-area: name; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.m-nt-req-name b { display: inline-block; min-inline-size: 2.8rem; margin-inline-end: .4rem; color: var(--m-muted); font: 600 .68rem / 1 var(--m-font-mono, ui-monospace, monospace); text-transform: uppercase; }
+.m-nt-req-meta { grid-area: meta; color: var(--m-muted); font-variant-numeric: tabular-nums; }
+.m-nt-req-bar { grid-area: bar; position: relative; block-size: 6px; border-radius: 3px; background: color-mix(in srgb, var(--m-text) 5%, transparent); overflow: hidden; }
+.m-nt-req-bar i { position: absolute; inset-block: 0; border-radius: 3px; }
+.m-nt-req-bar .is-wait { background: color-mix(in srgb, var(--m-warn) 55%, transparent); }
+.m-nt-req-bar .is-recv { background: var(--m-primary); }
+.m-nt-req.is-error .m-nt-req-meta, .m-nt-req.is-error .m-nt-req-name { color: var(--m-danger); }
+.m-nt-req.is-error .is-recv { background: var(--m-danger); }
+.m-nt-req.is-live .is-recv { background: linear-gradient(90deg, var(--m-primary) 30%, color-mix(in srgb, var(--m-primary) 45%, transparent) 50%, var(--m-primary) 70%) 0 0 / 200% 100%; animation: m-skel calc(var(--m-dur-slow) * 5) linear infinite; }
+@media (prefers-reduced-motion: reduce) { .m-nt-req.is-live .is-recv { animation: none; } }

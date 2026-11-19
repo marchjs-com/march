@@ -10,7 +10,8 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Accordion | stable | Stacked sections that open one at a time or several together: animated height, ↑ ↓ Home End between headers, separated or contained look. | [ListRow](#listrow), [Chevron](#chevron) |
 | AppShell | stable | The application frame: a sidebar column and the main area with optional banner and sticky header; a skip link; full width on narrow screens. | [Layout](#layout) |
 | BottomRightControls | stable | One fixed page corner (bottom, end side; mirrors in RTL) that page-wide controls put themselves into, in order, instead of overlapping. | — |
-| DevicePreview | experimental | Content as on a real phone or tablet: device body, notch, status bar, home indicator, real screen size, rotation; the mouse acts as a finger (drag to scroll, fling, long press). | [OverlayScope](#overlayscope) |
+| DevicePicker | experimental | Choose a device to preview on: dozens of phones, tablets and desktop screens with their silhouette, size and pixel ratio; search, groups, portrait / landscape and your own devices. | [SearchBox](#searchbox), [Segmented](#segmented), [ListRow](#listrow), [Empty](#empty), Field, [TextInput](#textinput), [NumberInput](#numberinput), [Toggle](#toggle), [Button](#button), [IconButton](#iconbutton) |
+| DevicePreview | experimental | Content as on a real device: phone / tablet body or desktop window, ~35 devices, real size, turning; the mouse as 1–3 fingers (real touch events, pinch, rotate, gestures); a control rail for shake, tilt, offline, battery, background and keyboard. | [OverlayScope](#overlayscope), [IconButton](#iconbutton), [Button](#button), [Menu](#menu), [Popover](#popover), [Slider](#slider), [Toggle](#toggle) |
 | Disclosure | stable | A collapsible section on native details / summary: keyboard and screen reader support built in, animated open and close. | [Chevron](#chevron) |
 | ExplodedView | experimental | Takes its content apart like an exploded drawing and puts it back: the same elements tilt and rise as plates with name tags (chosen parts), or one element opens into its shadow, surface, content and focus ring. | — |
 | Grid | stable | Responsive grid that never overflows: fixed or automatic columns, fill or balance the last row, equal row heights; pure CSS. | — |
@@ -191,7 +192,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
-| AppUI | experimental | march-app-ui, the core of March IDE: a top bar (title, your tools, the Layout menu with presets, saved layouts and the panel list) over a DockLayout; plugins add file types (the code editor opens code files), panels, commands and services. | [DockLayout](#docklayout), [Menu](#menu), [CodeEditor](#codeeditor), [ThemeMenu](#thememenu), [Joined](#joined), [Debugger](#debugger), [IconButton](#iconbutton), [Button](#button), [PasswordInput](#passwordinput), [Textarea](#textarea), [Select](#select), [Alert](#alert), [StatusDot](#statusdot), [CodeView](#codeview), [TextInput](#textinput) |
+| AppUI | experimental | march-app-ui, the core of March IDE: a top bar (title, your tools, the Layout menu with presets, saved layouts and the panel list) over a DockLayout; plugins add file types (the code editor opens code files), panels, commands and services. | [DockLayout](#docklayout), [Menu](#menu), [CodeEditor](#codeeditor), [ThemeMenu](#thememenu), [Joined](#joined), [Debugger](#debugger), [IconButton](#iconbutton), [Button](#button), [PasswordInput](#passwordinput), [Textarea](#textarea), [Select](#select), [Alert](#alert), [StatusDot](#statusdot), [CodeView](#codeview), [TextInput](#textinput), [Popover](#popover), [DevicePicker](#devicepicker), [DevicePreview](#devicepreview), [NetworkThrottle](#networkthrottle) |
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | [Badge](#badge), [OverflowText](#overflowtext), [ListRow](#listrow), [Drawer](#drawer) |
 | ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | [Menu](#menu), [Textarea](#textarea), [ReactionPicker](#reactionpicker), [IconButton](#iconbutton), [StatusDot](#statusdot), [ReplyQuote](#replyquote) |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [ReactionPicker](#reactionpicker), [Avatar](#avatar), [Button](#button), [Picture](#picture) |
@@ -214,6 +215,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | KeyframeTimeline | experimental | Keyframe timeline on the motion engine: transport, scrub ruler and playhead, colored lanes with value curves, draggable keyframes, EasingCurveEditor per keyframe. | [EasingCurveEditor](#easingcurveeditor), [Card](#card), [TimeRuler](#timeruler), [ListRow](#listrow), [StatusDot](#statusdot), [IconButton](#iconbutton), [Segmented](#segmented), [NumberInput](#numberinput) |
 | MarkdownEditor | experimental | Markdown source with live preview: write / preview / resizable split with synced scrolling / rich view, toolbar, list continuation, HTML paste → Markdown. | [EditorFrame](#editorframe), [FormatToolbar](#formattoolbar), [Splitter](#splitter), [Tabs](#tabs), [RichTextEditor](#richtexteditor) |
 | NavSidebar | stable | Side menu: categories, typo-tolerant search, recent and featured items, icon rail, resizable width, remembered state. | [ListRow](#listrow), [SearchBox](#searchbox), [PanelHeader](#panelheader), [SectionLabel](#sectionlabel), [IconButton](#iconbutton), [Button](#button), [Badge](#badge), [Chevron](#chevron), [Empty](#empty), [ResizeHandle](#resizehandle), [Drawer](#drawer) |
+| NetworkThrottle | experimental | Network speed panel as in the developer tools: offline, slow / fast 3G, 4G, Wi-Fi or your own bandwidths and latency, for the page or only a scope of code; a speed gauge and the slowed requests as a live waterfall. | [Chip](#chip), [Slider](#slider), [SectionLabel](#sectionlabel), [IconButton](#iconbutton), [Empty](#empty) |
 | PostCard | experimental | Feed post: author header with ⋯ menu, MediaGrid, double-tap like with a large heart burst, LikeButton and rolling counts, caption folded to three lines. | [Card](#card), [Avatar](#avatar), [Menu](#menu), [MediaGrid](#mediagrid), [LikeButton](#likebutton), [CountRoll](#countroll), [Button](#button), [ClampText](#clamptext), [ListRow](#listrow), [VerifiedMark](#verifiedmark) |
 | ProfileHeader | experimental | Profile top: cover (photo or four-color art) with a dim, StoryRing avatar, name / verified / handle / bio, stats with rolling counts, FollowButton, Message and ⋯ Menu. | [Card](#card), [StoryRing](#storyring), [FollowButton](#followbutton), [CountRoll](#countroll), [Button](#button), [Menu](#menu), [Picture](#picture), [StatTile](#stattile), [VerifiedMark](#verifiedmark) |
 | PropertyGrid | experimental | Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save. | [Disclosure](#disclosure), [SearchBox](#searchbox), [PanelHeader](#panelheader), [UndoRedo](#undoredo), [IconButton](#iconbutton), [Button](#button), [Badge](#badge), [Chip](#chip), [StatusDot](#statusdot), [Tooltip](#tooltip), [SectionLabel](#sectionlabel), [Empty](#empty), [TextInput](#textinput), [NumberInput](#numberinput), [Slider](#slider), [Toggle](#toggle), [Select](#select), [Segmented](#segmented), [ColorInput](#colorinput), [Textarea](#textarea) |
@@ -319,15 +321,12 @@ Full page: src/components/layout/app-shell/docs.md
 
 ## AppUI
 
-march-app-ui, the core of March IDE and the base of an IDE shell: a top bar (a title, your tools and the **Layout** menu), a side slot (an ActivityBar), the [DockLayout](#docklayout) workspace and a status slot (a StatusBar). The Layout menu lists the presets, the saved layouts ("Save this layout"), every panel (checked when it is open; choosing one opens or collapses it), "Open all panels" and "Reset to default". Colours come from the page's theme and accent. Activity bars, status bars and editors are built on top of it.
 
-Composed of: [DockLayout](#docklayout), [Menu](#menu), [CodeEditor](#codeeditor), [ThemeMenu](#thememenu), [Joined](#joined), [Debugger](#debugger), [IconButton](#iconbutton), [Button](#button), [PasswordInput](#passwordinput), [Textarea](#textarea), [Select](#select), [Alert](#alert), [StatusDot](#statusdot), [CodeView](#codeview), [TextInput](#textinput)
+
+Composed of: [DockLayout](#docklayout), [Menu](#menu), [CodeEditor](#codeeditor), [ThemeMenu](#thememenu), [Joined](#joined), [Debugger](#debugger), [IconButton](#iconbutton), [Button](#button), [PasswordInput](#passwordinput), [Textarea](#textarea), [Select](#select), [Alert](#alert), [StatusDot](#statusdot), [CodeView](#codeview), [TextInput](#textinput), [Popover](#popover), [DevicePicker](#devicepicker), [DevicePreview](#devicepreview), [NetworkThrottle](#networkthrottle)
 
 ```tsx
-<AppUI title="march-app-ui" panels={panels} presets={{
-  default: { title: "Default", tree: () => row([.24, tabs("files")], [.76, col([.7, tabs("editor")], [.3, tabs("console")])]) },
-  code: { title: "Code", tree: () => row([.2, tabs("files", { collapsed: true })], [.8, tabs(["editor", "console"])]) },
-}} persist="my-ide" tools={<Button>Run</Button>} />
+
 ```
 
 Full page: src/components/composite/app-ui/docs.md
@@ -927,17 +926,33 @@ const session = createDebugSession({ persist: "my-ide.debug" });   // evaluate: 
 
 Full page: src/components/composite/debugger/docs.md
 
+## DevicePicker
+
+Choose a device to preview on: the whole DevicePreview catalog — phones, tablets and desktop screens — each with a silhouette in its proportions, its CSS size, pixel ratio and whether it is a touch screen. Search by name or size ("390", "ipad"), filter by group, switch portrait / landscape, and make your own devices (name, width × height, pixel ratio, kind, touch), saved in this browser; a device of yours has a remove button.
+
+Composed of: [SearchBox](#searchbox), [Segmented](#segmented), [ListRow](#listrow), [Empty](#empty), Field, [TextInput](#textinput), [NumberInput](#numberinput), [Toggle](#toggle), [Button](#button), [IconButton](#iconbutton)
+
+```tsx
+import { DevicePicker, DevicePreview } from "march/layout";
+
+const $device = signal("iphone-15"), $land = signal(false)
+<DevicePicker value={$device} landscape={$land} fit />
+<DevicePreview device={$device} landscape={$land} controls>…</DevicePreview>
+```
+
+Full page: src/components/layout/device-picker/docs.md
+
 ## DevicePreview
 
-Shows content as on a real phone or tablet: the device body with its camera (island, punch hole or notch), the status bar (time, signal, battery), the home indicator, the real screen size in CSS pixels, portrait or landscape. The mouse acts like a finger: the cursor becomes a touch dot, dragging scrolls whatever is under it (with a fling that slows down), a long press opens the context menu, a drag never also clicks.
+Shows content as on a real device: a phone or tablet body with its camera (island, punch hole or notch), the status bar (time, signal, Wi-Fi, battery), the home indicator — or a desktop browser window with its title bar and address — at the real screen size in CSS pixels, portrait or landscape (the body turns into the new orientation with a motion).
 
-Composed of: [OverlayScope](#overlayscope)
+Composed of: [OverlayScope](#overlayscope), [IconButton](#iconbutton), [Button](#button), [Menu](#menu), [Popover](#popover), [Slider](#slider), [Toggle](#toggle)
 
 ```tsx
 import { DevicePreview, DEVICES } from "march/layout";
 
 <DevicePreview device="iphone-15"><MySite /></DevicePreview>
-<DevicePreview device="ipad" landscape touch={false}>…</DevicePreview>
+<DevicePreview device="ipad" landscape={$land} controls>…</DevicePreview>
 <DevicePreview device={{ name: "Kiosk", width: 1080, height: 1920, radius: 0, kind: "screen" }}>…</DevicePreview>
 ```
 
@@ -1724,6 +1739,21 @@ Composed of: [ListRow](#listrow), [SearchBox](#searchbox), [PanelHeader](#panelh
 ```
 
 Full page: src/components/composite/nav-sidebar/docs.md
+
+## NetworkThrottle
+
+A network speed panel as in the browsers' developer tools. Ready-made networks — no limit, Wi-Fi, 4G, fast 3G, slow 3G, offline — or your own incoming and outgoing bandwidth (20 kb/s to 100 Mb/s, or no limit) and latency (0–3000 ms). A gauge's needle springs to the speed; the requests it slowed show as a live waterfall (the wait in amber, the download in the accent colour, failures in red).
+
+Composed of: [Chip](#chip), [Slider](#slider), [SectionLabel](#sectionlabel), [IconButton](#iconbutton), [Empty](#empty)
+
+```tsx
+import { NetworkThrottle } from "march/ui";
+
+<NetworkThrottle />                                          // the whole page, while it is shown
+<NetworkThrottle scope={(stack) => /blob:/.test(stack)} />   // only code loaded from blob: modules
+```
+
+Full page: src/components/composite/network-throttle/docs.md
 
 ## Newsletter
 
