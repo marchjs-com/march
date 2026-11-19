@@ -1,4 +1,5 @@
-// Showcase stage for OptionList: a panel of choices; role, layout and parts follow the Playground values.
+// Showcase stage for OptionList: a panel of choices; role (and several choices), the chosen row, layout, parts, the
+// hint beside the label and a long label follow the Playground values.
 import { OptionList, type OptionItem } from "./index.ts";
 import { SearchBox } from "../search-box/index.ts";
 import { Kbd } from "../../typography/kbd/index.ts";
@@ -14,7 +15,7 @@ export const code = `<OptionList bind:value={$theme} label="Tema"
 <OptionList mode="menu" options={blockTypes} onPick={(type) => insert(type)} />
 <OptionList keysFrom={() => input} options={$matches} onPick={choose} />   // alanın tuşlarıyla`
 
-interface Values { mode: string; field: boolean; icons: boolean; hints: boolean; trailing: boolean; groups: boolean; check: string; columns: number; size: string; color: string }
+interface Values { mode: string; field: boolean; multiple: boolean; value: string; inline: boolean; overflow: string; lead: boolean; hints: boolean; trailing: boolean; groups: boolean; check: string; columns: number; size: string; color: string }
 
 const BASE = [
   { value: "light", label: "Açık", icon: sun, hint: "Gündüz için", group: "Hazır" },
@@ -28,7 +29,7 @@ const BASE = [
 const ROLE: Record<string, string> = { radio: 'role="radiogroup" › radio', listbox: 'role="listbox" › option', multi: 'role="listbox" (aria-multiselectable) › option', menu: 'role="menu" › menuitem' }
 
 export default function OptionListDemo(props: { values: Values }) {
-  let $one = "dark"
+  let $one = props.values.value
   let $many = ["light", "system"]
   let $last = "—"
   let $q = ""
@@ -36,11 +37,11 @@ export default function OptionListDemo(props: { values: Values }) {
     {() => {
       const v = { ...props.values }
       const opts: OptionItem[] = BASE.map((o) => ({
-        value: o.value, label: o.label, disabled: o.disabled, icon: v.icons ? o.icon : undefined, hint: v.hints ? o.hint : undefined,
+        value: o.value, label: o.label, disabled: o.disabled, icon: v.lead ? o.icon : undefined, hint: v.hints ? o.hint : undefined,
         group: v.groups ? o.group : undefined, trailing: v.trailing && o.value === "system" ? <Kbd>S</Kbd> : undefined,
       }))
       const shared = {
-        size: v.size as "md", columns: v.columns, label: "Tema",
+        size: v.size as "md", columns: v.columns, label: "Tema", inline: v.inline, overflow: v.overflow as "wrap",
         check: v.check === "off" ? false : v.check === "own" ? () => <Icon of={star} /> : true,
         onPick: (x: string) => { $last = x },
       }
@@ -53,9 +54,9 @@ export default function OptionListDemo(props: { values: Values }) {
         </>
       }
       if (v.mode === "menu") return <OptionList m:color={v.color === "default" ? undefined : v.color} {...shared} mode="menu" options={opts} />
-      if (v.mode === "multi") return <OptionList m:color={v.color === "default" ? undefined : v.color} {...shared} multiple options={opts} bind:value={$many} />
+      if (v.mode === "listbox" && v.multiple) return <OptionList m:color={v.color === "default" ? undefined : v.color} {...shared} multiple options={opts} bind:value={$many} />
       return <OptionList m:color={v.color === "default" ? undefined : v.color} {...shared} mode={v.mode as "radio"} options={opts} bind:value={$one} />
     }}
-    <p class="sc-demo-call">{() => `${ROLE[props.values.field ? "listbox" : props.values.mode] ?? ""} · tek: ${$one} · çoklu: ${$many.join(", ") || "—"} · son seçilen: ${$last}`}</p>
+    <p class="sc-demo-call">{() => `${ROLE[props.values.field ? "listbox" : props.values.mode === "listbox" && props.values.multiple ? "multi" : props.values.mode] ?? ""} · tek: ${$one} · çoklu: ${$many.join(", ") || "—"} · son seçilen: ${$last}`}</p>
   </div>
 }
