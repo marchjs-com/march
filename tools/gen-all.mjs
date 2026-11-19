@@ -33,7 +33,7 @@ export const GENERATORS = [
   // the API page data (public/api/*.json): JSDoc, Turkish summaries, long-form docs and the examples' demo links
   // MarchIDE's ide.json texts as t`…`, so the build extracts them for translation
   { name: "icon-names", script: "tools/gen-icon-names.js", inputs: ["src/icons/set.ts", "src/icons/packs"], outputs: ["compiler/icon-names.gen.js", "src/icons/names.gen.ts"] },
-  { name: "ide-texts", script: "tools/gen-ide-texts.js", inputs: ["examples/showcase/public/components"], outputs: ["examples/showcase/src/playground/ide-texts.gen.tsx"] },
+  { name: "ide-texts", script: "tools/gen-ide-texts.js", inputs: ["examples/showcase/public/components"], outputs: ["examples/showcase/src/playground/ide-texts.gen.tsx", "examples/showcase/src/playground/ide-list.gen.ts"] },
   { name: "api-docs", script: "tools/api-docs.js", inputs: ["src", "package.json", "docs/api.tr.json", "docs/api", "examples/showcase/src/api-examples", "examples/showcase/src/sections.gen.ts"], outputs: ["examples/showcase/public/api/index.en.json"] },
 ];
 
