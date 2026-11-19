@@ -22,12 +22,14 @@ export function appBaseUrl(): URL | null {
   if (!l?.href) return null;
   const q = (s: string): string | null | undefined => d?.querySelector?.(s)?.getAttribute(s[0] === "m" ? "content" : s[0] === "b" ? "href" : "src");
   const dir = (s: string): string => s.replace(/\/?$/, "/");
-  // the entry script: <root>/assets/main.js (also on a prerendered sub-page: ../assets/main.js)
+  // the entry script: <root>/assets/main.js (also on a prerendered sub-page: ../assets/main.js). A relative src or
+  // meta is read against the address the document was loaded from: the router may have moved since (pushState)
   const src = q("script[type=module][src]"), meta = q('meta[name="march-base"]');
+  const at = (globalThis.performance?.getEntriesByType?.("navigation")[0] as { name?: string } | undefined)?.name || l.href;
   let u: URL | null;
   try {
     u = custom != null ? new URL(dir(custom), l.href) : q("base[href]") != null ? new URL("./", d.baseURI)
-      : meta ? new URL(dir(meta), l.href) : src && /\/assets\/[^/]*$/.test(new URL(src, l.href).pathname) ? new URL("../", new URL(src, l.href))
+      : meta ? new URL(dir(meta), at) : src && /\/assets\/[^/]*$/.test(new URL(src, at).pathname) ? new URL("../", new URL(src, at))
       : new URL(l.protocol === "file:" ? "./" : "/", l.href);
   } catch { u = null; }
   // not kept before the document can answer (a module runs after parsing, so this is rare)
