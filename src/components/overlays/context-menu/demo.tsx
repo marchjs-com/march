@@ -1,7 +1,7 @@
 // Showcase stage for ContextMenu: right-click (or Shift+F10) a card. Code is shown in the Code tab.
 import { ContextMenu } from "./index.ts";
 import { Button } from "../../actions/button/index.ts";
-import type { MenuItem } from "../../../ui/menu.ts";
+import { itemsOf, FILES } from "./playground.ts";
 
 export const code = `<ContextMenu items={(target) => [
   { label: "Kopyala", shortcut: "mod+c", onSelect: () => copy(target) },
@@ -9,23 +9,20 @@ export const code = `<ContextMenu items={(target) => [
   { label: "Sil", danger: true, onSelect: () => remove(target) },
 ]}>{cards}</ContextMenu>`
 
-export default function ContextMenuDemo(props: { values: { danger: boolean; shortcuts: boolean } }) {
+type Values = { danger: boolean; shortcuts: boolean; label: string; cardsOnly: boolean; area: string }
+
+export default function ContextMenuDemo(props: { values: Values }) {
   let $last = "Bir karta sağ tıklayın ya da odaklayıp Shift+F10'a basın."
-  let $cards = ["Rapor.pdf", "Bütçe.xlsx", "Sunum.key"]
-  const items = (target: Element): MenuItem[] => {
-    const name = target.closest("[data-card]")?.getAttribute("data-card") ?? "alan"
-    const sc = (k: string) => (props.values.shortcuts ? { shortcut: k } : {})
-    return [
-      { label: `Aç: ${name}`, ...sc("Enter"), onSelect: () => { $last = `Açıldı: ${name}` } },
-      { label: "Kopyala", ...sc("mod+c"), onSelect: () => { $last = `Kopyalandı: ${name}` } },
-      { label: "Yeniden adlandır", ...sc("F2"), onSelect: () => { $last = `Yeniden adlandır: ${name}` } },
-      "-" as const,
-      { label: "Sil", danger: props.values.danger, ...sc("Delete"), onSelect: () => { $cards = $cards.filter((c) => c !== name); $last = `Silindi: ${name}` } },
-    ]
-  }
+  let $cards = [...FILES]
+  const items = (target: Element) => itemsOf({ shortcuts: props.values.shortcuts, danger: props.values.danger }, (what) => {
+    $last = what
+    if (what.startsWith("Silindi: ")) { const name = what.slice(9); $cards = $cards.filter((c) => c !== name) }
+  })(target)
   return <div class="sc-flow-stack">
-    <ContextMenu items={items} label="Dosya işlemleri">
-      <div class="sc-row">{() => $cards.map((c, i) => <Button data-card={c} data-audit-try={i === 0 ? "contextmenu" : undefined}>{c}</Button>)}</div>
+    <ContextMenu items={items} label={() => props.values.label} when={(t: Element) => !props.values.cardsOnly || !!t.closest("[data-card]")}>
+      {() => (props.values.area === "text"
+        ? <p tabindex="0">Bu paragrafa sağ tıklayın ya da odaklayıp Shift+F10'a basın.</p>
+        : <div class="sc-row">{() => $cards.map((c, i) => <Button data-card={c} data-audit-try={i === 0 ? "contextmenu" : undefined}>{c}</Button>)}</div>)}
     </ContextMenu>
     <p class="sc-flow-muted" role="status">{() => $last}</p>
   </div>

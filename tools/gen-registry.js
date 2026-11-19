@@ -154,7 +154,8 @@ export async function generate(root = ROOT) {
   }
   // a component with its own entry is shown statically on its page: no lazy loader here (a lazy demo would be a part
   // carrying the whole feature), the page imports demo.tsx and playground.ts itself
-  const loader = (c, kind, file) => { if (c.meta?.entry) return `() => ownPage("${nameOf(c)}")`; const g = groupOf.get(c.folder); return g ? `() => import("./${g.file}").then((m) => m.${kind}${g.j})` : `() => import("./${c.folder}/${file}")`; };
+  // (its option spec is plain data, so MarchIDE still loads playground.ts lazily)
+  const loader = (c, kind, file) => { if (c.meta?.entry && kind === "d") return `() => ownPage("${nameOf(c)}")`; if (c.meta?.entry) return `() => import("./${c.folder}/${file}")`; const g = groupOf.get(c.folder); return g ? `() => import("./${g.file}").then((m) => m.${kind}${g.j})` : `() => import("./${c.folder}/${file}")`; };
   files["src/components/registry.gen.ts"] = HEAD + `import type { ComponentMeta, PlaygroundSpec } from "./meta.ts";\n` +
     list.map((c, i) => `import m${i} from "./${c.folder}/meta.ts";\n`).join("") +
     `\nexport interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }\n` +
@@ -180,7 +181,8 @@ export async function generate(root = ROOT) {
   const apiName = (c) => (apiIndex.some((x) => x.items.some((it) => it[0] === nameOf(c))) ? nameOf(c) : nameOf(c)[0].toLowerCase() + nameOf(c).slice(1));
   const pick = (c) => ({ f: c.folder, n: nameOf(c), s: c.meta?.summary ?? "", ...(c.meta?.composedOf?.length ? { p: c.meta.composedOf } : {}), ...(ownPage(c) ? { w: ownPage(c) } : {}), ...(apiOf(c) ? { a: `${apiOf(c)}/${apiName(c)}` } : {}) });
   const load = (c) => {
-    if (c.meta?.entry) return `...E`;
+    // its own entry: the page imports the demo; the option spec is plain data, so MarchIDE still loads it
+    if (c.meta?.entry) return `demo: own, playground: () => import("./${c.folder}/playground.ts")`;
     const g = groupOf.get(c.folder);
     return g ? `...L(${groups.indexOf(g.file)}, ${g.j})` : `demo: () => import("./${c.folder}/demo.tsx"), playground: () => import("./${c.folder}/playground.ts")`;
   };
@@ -189,7 +191,7 @@ export async function generate(root = ROOT) {
     `export interface CardEntry { f: string; n: string; s: string; p?: readonly string[]; w?: string; a?: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }\n` +
     `type Mod = Record<string, { default: never }>;\nconst G: (() => Promise<Mod>)[] = [${groups.map((f) => `() => import("./${f}") as Promise<never>`).join(", ")}];\n` +
     `const L = (i: number, j: number) => ({ demo: () => G[i]!().then((m) => m[\`d\${j}\`]!), playground: () => G[i]!().then((m) => m[\`p\${j}\`]!) });\n` +
-    (list.some((c) => c.meta?.entry) ? `const own = (): Promise<never> => Promise.reject(new Error("this component has its own entry: its page imports the demo"));\nconst E = { demo: own, playground: own };\n` : "") +
+    (list.some((c) => c.meta?.entry) ? `const own = (): Promise<never> => Promise.reject(new Error("this component has its own entry: its page imports the demo"));\n` : "") +
     `/** Every component folder as a showcase card needs it (registry.gen.ts has the full meta). */\nexport const cards: readonly CardEntry[] = [\n` +
     list.map((c) => `  { ${JSON.stringify(pick(c)).slice(1, -1)}, ${load(c)} },\n`).join("") + `];\n` +
     `/** The Code-tab snippet of a folder (one lazy module for every card). */\nexport const cardCode = (folder: string): Promise<string> => import("./cards-code.gen.ts").then((m) => m.code[folder] ?? "");\n`;
