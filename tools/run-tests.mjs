@@ -38,7 +38,8 @@ const PASS_FILE = join(ROOT, "node_modules", ".cache", "march", "tests.json");
 const readJson = (f) => { try { return JSON.parse(readFileSync(f, "utf8")); } catch { return {}; } };
 const writeJson = (f, v) => { mkdirSync(dirname(f), { recursive: true }); writeFileSync(f, `${JSON.stringify(v, null, 1)}\n`); };
 
-const SKIP = new Set(["node_modules", ".git", "dist"]);
+// .claude holds other checkouts (session worktrees): their test files are not this one's
+const SKIP = new Set(["node_modules", ".git", "dist", ".claude"]);
 function testFiles(dir = ROOT, rel = "") {
   return readdirSync(dir, { withFileTypes: true }).filter((d) => !SKIP.has(d.name)).flatMap((d) => {
     const r = rel ? `${rel}/${d.name}` : d.name;
