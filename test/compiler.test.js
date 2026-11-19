@@ -244,6 +244,12 @@ export default () => { const save = () => { toast("Kaydedildi"); toast.error("Ha
   assert.deepEqual([...r.keys], ["Gönder"], "t(\"…\") is a key like t`…`");
 });
 
+test("texts: a string a JSX expression shows as a whole value (a branch of ?: / && / ??) is a text; others are not", () => {
+  const r = compile(`export default () => <button title={$open ? "Kapat" : "Aç"} class={$on ? "is-on" : "is-off"}>
+    {$liked ? "Beğenildi" : 'Beğen'}{$err && "Hata oldu"}{$name ?? "Adsız"}{icon("lucide:x")}{$a ? "lucide:sun" : "x"}{f("b c")}</button>`, { filename: "a.tsx" });
+  assert.deepEqual([...r.texts].sort(), ["Adsız", "Aç", "Beğen", "Beğenildi", "Hata oldu", "Kapat"].sort(), "not classes, icon names or a function's argument");
+});
+
 test("compiler: a component's type arguments (<List<User> …>, <Pick<{ a: () => void }> …>) are erased like other types", () => {
   const out = c(`export const A = () => <div><List<string> items={[]} /><Pick<{ from: number; f: () => void }> open={() => true}>x</Pick></div>`);
   assert.match(out, /h\(List, \{items:/);

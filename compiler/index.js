@@ -451,6 +451,19 @@ class Transformer {
     }
   }
 
+  /**
+   * The texts a JSX expression shows as a whole value: `{liked ? "Beğenildi" : "Beğen"}`, `{err && "Hata"}`,
+   * `title={open ? "Kapat" : "Aç"}`: a string that is a branch of ?: / && / || / ?? or the whole expression.
+   */
+  valueTexts(raw) {
+    const re = /(?:^|[?:]|&&|\|\||\?\?)\s*("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')(?=\s*(?:$|[:)]|&&|\|\||\?\?))/g;
+    for (const m of raw.matchAll(re)) {
+      const text = m[1].slice(1, -1).replace(/\\(["'\\])/g, "$1").trim();
+      // two letters at least ("x", "a" are names, not words); "pack:icon" is an icon's name
+      if (text && /\p{L}[^]*\p{L}/u.test(text) && !text.includes("${") && !/^[\w-]+:[\w-]+$/.test(text)) this.texts.add(text);
+    }
+  }
+
   /** `await x` inside an async function → keep the owner across the await. */
   awaitExpr() {
     const src = this.src;
@@ -703,6 +716,7 @@ class Transformer {
       if (src[end] !== "}") throw fail(src, this.pos, `unterminated {…} for ${name}`);
       const raw = src.slice(this.pos, end);
       const save = this.pos;
+      if (TEXT_ATTRS.has(name)) this.valueTexts(raw.trim());
       let code;
       if (name.startsWith("bind:")) {
         const b = /^\s*(\$[A-Za-z_][\w$]*)\s*$/.exec(raw);
@@ -789,6 +803,7 @@ class Transformer {
         const end = this.walk(this.pos, () => false);
         const raw = src.slice(this.pos, end);
         if (!raw.replace(/\/\*[\s\S]*?\*\//g, "").trim()) { this.pos = end + 1; continue; } // {/* comment */}
+        this.valueTexts(raw.trim());
         const code = this.containerExpr(end).trim();
         this.pos = end + 1;
         kids.push({ code, dynamic: !isStaticCode(code) });
