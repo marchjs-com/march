@@ -219,14 +219,15 @@ export { fold } from "../core/text.ts";
 /** Equality for option values (primitives, or objects by JSON). Truthy when equal. */
 export const same = (a: unknown, b: unknown): unknown => a === b || (a && b && typeof a === "object" && JSON.stringify(a) === JSON.stringify(b));
 
-/** Options prop: values or `{ value, label, hint, disabled }` objects (or a function returning the list). */
-export type OptionsProp = readonly unknown[] | (() => readonly unknown[]) | null | undefined;
+/** Options prop: values or `{ value, label, hint, disabled }` objects (or a function returning the list), or a
+ * comma-separated text (`"S, M, L"`: each part is its value and label). */
+export type OptionsProp = readonly unknown[] | (() => readonly unknown[]) | string | null | undefined;
 /** A normalized option. */
 export interface Option { value: unknown; label: string; hint?: unknown; disabled?: boolean; [k: string]: unknown }
 
 /** Normalize an options prop into [{ value, label, hint, disabled }]. */
 export function normOptions(o: OptionsProp): Option[] {
-  const list = typeof o === "function" ? o() : o ?? [];
+  const list = typeof o === "function" ? o() : typeof o === "string" ? o.split(",").map((x) => x.trim()).filter(Boolean) : o ?? [];
   return list.map((x): Option => (x && typeof x === "object" ? { ...(x as Option), label: (x as Partial<Option>).label ?? String((x as Option).value) } : { value: x, label: String(x) }));
 }
 

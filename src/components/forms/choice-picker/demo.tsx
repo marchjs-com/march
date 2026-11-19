@@ -1,13 +1,12 @@
 // Showcase stage for ChoicePicker: the same control with more or fewer options, or a forced look.
 import { ChoicePicker, pickerKind } from "./index.ts";
 import { normOptions } from "../../../forms/util.ts";
+import { CITIES } from "./playground.ts";
 
 export const code = `<ChoicePicker bind:value={$v} options={["Gün", "Hafta", "Ay"]} />                 // segmented
 <ChoicePicker bind:value={$v} options={eightCities} />                             // chips
 <ChoicePicker bind:value={$v} options={cities} />                                  // 10+ → combobox
 <ChoicePicker bind:value={$v} kind="cards" options={themes.map((t) => ({ ...t, preview: () => <Swatch of={t} /> }))} />`
-
-const CITIES = ["İstanbul", "Ankara", "İzmir", "Bursa", "Antalya", "Konya", "Adana", "Trabzon", "Samsun", "Eskişehir", "Kayseri", "Mersin"]
 
 export default function ChoicePickerDemo(props: { values: { count: number; kind: string } }) {
   let $city = "İzmir"

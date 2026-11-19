@@ -12,7 +12,7 @@ list's `count` and the arrows switch off on the first and the last row.
 
 | Prop | Type | Default | |
 |---|---|---|---|
-| `actions` | `("up" \| "down" \| "remove")[]` | all three | which tools, in this order |
+| `actions` | `("up" \| "down" \| "remove")[]` | all three | which tools, in this order; also a string of names (`"up down"`) |
 | `onUp`, `onDown`, `onRemove` | `() => void` | | |
 | `onAction` | `(action) => void` | | one handler for every tool |
 | `index` | `number` / accessor | | "up" is off at `0` |

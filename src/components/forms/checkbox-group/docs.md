@@ -13,7 +13,7 @@ the usual ones for groups), `inline` lays them in a row, and `colors="brand"` gi
 | Prop | Type | Default | |
 |---|---|---|---|
 | `value` / `bind:value` | array | `[]` | |
-| `options` | `[{ value, label, hint?, icon?, meta?, disabled? }]` | — | icon, hint and meta show in the card look |
+| `options` | `[{ value, label, hint?, icon?, meta?, disabled? }]`, `[value]` or `"Mon, Tue"` | — | icon, hint and meta show in the card look; a comma-separated text: each part is a value and its label |
 | `inline` | boolean | — | a row instead of a column |
 | `variant`, `size`, `shape`, `color` | | | as Checkbox |
 | `colors` | `"brand"` or tokens | — | one color per option in turn |

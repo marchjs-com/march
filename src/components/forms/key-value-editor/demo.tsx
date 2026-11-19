@@ -1,15 +1,15 @@
-// Showcase stage for KeyValueEditor: numbers on or off (see the stored object) and read-only.
+// Showcase stage for KeyValueEditor: the sample rows, numbers on or off (see the stored object) and read-only.
 import { KeyValueEditor } from "./index.ts";
 import { Field } from "../../../forms/field.ts";
+import { START } from "./playground.ts";
 
 export const code = `<Field label="Kota" group><KeyValueEditor bind:value={$limits} numbers keyPlaceholder="Plan" valuePlaceholder="Koltuk" /></Field>
 <KeyValueEditor bind:value={$limits} removable={false} addable={false} labels={{ key: "Plan", value: "Koltuk", add: "Satır ekle" }} />`
 
 type Limits = Record<string, string | number>
-const START: Limits = { free: "1", team: "10" }
 
-export default function KeyValueEditorDemo(props: { values: { numbers: boolean; readonly: boolean; addable: boolean; removable: boolean } }) {
-  let $limits = START
+export default function KeyValueEditorDemo(props: { values: { sample: boolean; numbers: boolean; readonly: boolean; addable: boolean; removable: boolean } }) {
+  let $limits: Limits = props.values.sample ? START : {}
   return <div class="sc-stack">
     {() => <Field label="Kota" group><KeyValueEditor value={$limits} onChange={(v: Limits) => { $limits = v }} numbers={props.values.numbers} readonly={props.values.readonly} keyPlaceholder="Plan" valuePlaceholder="Koltuk"
       addable={props.values.addable} removable={props.values.removable} labels={{ key: "Plan", value: "Koltuk", remove: "Kaldır", add: "Satır ekle", duplicate: "Bu ad zaten var" }} /></Field>}

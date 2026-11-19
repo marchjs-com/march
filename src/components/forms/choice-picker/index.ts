@@ -14,7 +14,7 @@ import { Combobox } from "../combobox/index.ts";
 
 export type PickerKind = "segmented" | "chips" | "cards" | "grid" | "combobox";
 export interface ChoicePickerProps<T = unknown> extends ControlProps<T | null> {
-  /** [value] or [{ value, label, hint?, disabled?, preview?: () => node }]. @tr [value] ya da [{ value, label, hint?, disabled?, preview?: () => node }]. */
+  /** [value] or [{ value, label, hint?, disabled?, preview?: () => node }], or a comma-separated text ("Gün, Hafta, Ay"). @tr [value] ya da [{ value, label, hint?, disabled?, preview?: () => node }], ya da virgülle ayrılmış bir metin ("Gün, Hafta, Ay"). */
   options?: OptionsProp;
   /** "auto" (default) applies the rule above; any other kind forces it. @tr "auto" (varsayılan) görünümü seçeneklere göre seçer (10+ seçenek: Combobox, preview olan: kartlar, 2–6 kısa etiket: Segmented, diğerleri: chip); başka bir değer o görünümü zorlar. */
   kind?: PickerKind | "auto" | undefined;

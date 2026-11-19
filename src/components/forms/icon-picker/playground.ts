@@ -6,8 +6,9 @@ export default definePlayground<Values>({
   stage: "center",
   options: [
     { key: "inline", label: "Satır içi (düğmesiz)", default: true },
-    { key: "groups", label: "Süzgeç çipleri", default: true, visibleWhen: (v) => v.inline },
-    { key: "none", label: "\"Simge yok\" seçeneği", default: true, visibleWhen: (v) => v.inline },
+    // groups takes a list or false: on → left out (the default chips), off → {false}
+    { key: "groups", label: "Süzgeç çipleri", default: true, visibleWhen: (v) => v.inline, toCode: { true: null, false: "{false}" } },
+    { key: "none", label: "\"Simge yok\" seçeneği", default: true, visibleWhen: (v) => v.inline, toCode: { true: null, false: "{false}" } },
     { key: "size", label: "Düğme boyutu", default: "sm", options: [{ value: "sm", label: "küçük" }, { value: "md", label: "orta" }], visibleWhen: (v) => !v.inline },
   ],
 });

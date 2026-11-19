@@ -16,6 +16,6 @@ export default function CodeInputDemo(props: { values: V }) {
     const sample = (v.pattern === "numeric" ? "482915730264" : v.pattern === "alpha" ? "MARCHDEMOKOD" : "M4RCHD3M0K0D").slice(0, n)
     let $code = sample
     return <CodeInput bind:value={$code} length={n} pattern={v.pattern as "numeric"} colors={v.colors as "brand"} font={v.font as "display"} size={v.size as "md"} variant={v.variant as "outline"}
-      groups={v.groups && n >= 4 ? [Math.ceil(n / 2), Math.floor(n / 2)] : undefined} mask={v.mask} separator={v.separator === "off" ? false : v.separator === "dot" ? "•" : undefined} boxLabel={(i: number, len: number) => `${len} hanenin ${i}.`} aria-label="Doğrulama kodu" onComplete={(c: string) => toast(`Kod: ${c}`, { kind: "success" })} />
+      groups={v.groups && n >= 4 ? Math.ceil(n / 2) : undefined} mask={v.mask} separator={v.separator === "off" ? false : v.separator === "dot" ? "•" : undefined} boxLabel={(i: number, len: number) => `${len} hanenin ${i}.`} aria-label="Doğrulama kodu" onComplete={(c: string) => toast(`Kod: ${c}`, { kind: "success" })} />
   }}</div>
 }

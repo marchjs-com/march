@@ -9,7 +9,7 @@ import { choiceBox, choiceText, itemColor, groupClass, type ChoiceGroupLook } fr
 export type { ChoiceGroupLook };
 
 export interface CheckboxGroupProps<T = unknown> extends ControlProps<T[]>, ChoiceGroupLook {
-  /** [{ value, label, hint?, icon?, meta?, disabled? }] (icon, hint and meta — a price or badge — show in the card variant). @tr [{ value, label, hint?, icon?, meta?, disabled? }] (icon, hint ve meta — fiyat ya da rozet — card görünümünde görünür). */
+  /** [{ value, label, hint?, icon?, meta?, disabled? }] (icon, hint and meta — a price or badge — show in the card variant), `[value]` or a comma-separated text ("Mon, Tue, Wed"). @tr [{ value, label, hint?, icon?, meta?, disabled? }] (icon, hint ve meta — fiyat ya da rozet — card görünümünde görünür), `[value]` ya da virgülle ayrılmış metin ("Pzt, Sal, Çar"). */
   options?: OptionsProp;
   /** Lays the options out in a row instead of a column. @tr Seçenekleri sütun yerine yan yana dizer. */
   inline?: boolean | undefined;
@@ -21,7 +21,7 @@ export function CheckboxGroup<T = unknown>(props: CheckboxGroupProps<T>): unknow
   const field = useField();
   const baseId = props.id ?? field?.id ?? uid("m-cbg");
   const c = ctl(props);
-  return h("div", { role: "group", class: () => groupClass(props, "checkbox"), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
+  return h("div", { role: "group", class: () => groupClass(props, "checkbox"), "aria-labelledby": labelledBy(props), "aria-label": c["aria-label"], "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
     () => normOptions(props.options).map((o, i) => h("label", { class: "m-check", "data-m-color": () => itemColor(props.colors, i) },
       h("input", {
         type: "checkbox", class: "m-check-input", id: i ? `${baseId}-${i}` : baseId, name: props.name, onBlur: props.onBlur,

@@ -1,7 +1,6 @@
-// Showcase stage for Slider: step, how the value is shown and the track (the browser's, a color ramp, your own node).
+// Showcase stage for Slider: step, whether the value is shown and the track (the browser's or a color ramp).
 import { Slider } from "./index.ts";
 import { Field } from "../../../forms/field.ts";
-import { Progress } from "../../feedback/progress/index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 type Opt<T> = T | undefined
 
@@ -10,14 +9,12 @@ export const code = `<Field label="Ses"><Slider bind:value={$vol} min={0} max={1
 <Slider bind:value={$hue} max={360} track="ton-seridi" showValue={false} aria-label="Ton" />   // .ton-seridi { background: linear-gradient(…) }
 <Slider bind:value={$vol} track={<Progress value={100} colors="brand" paint="segments" />} />  // kendi düğümün`
 
-export default function SliderDemo(props: { values: { step: number; format: string; showValue: boolean; track: string; color: string } }) {
+export default function SliderDemo(props: { values: { step: number; showValue: boolean; track: string; color: string } }) {
   let $vol = 60
   return <div class="sc-col">{() => {
     const v = { ...props.values }
-    const format = v.format === "percent" ? (x: number) => `%${x}` : v.format === "level" ? (x: number) => (x < 34 ? "düşük" : x < 67 ? "orta" : "yüksek") : undefined
-    const track = v.track === "ramp" ? true : v.track === "node" ? <Progress value={100} colors="brand" paint="segments" /> : undefined
     const color = (v.color || undefined) as Opt<ColorToken>
-    return <Field label="Ses"><Slider value={$vol} onChange={(x: number) => { $vol = x }} min={0} max={100} step={v.step} format={format} showValue={v.showValue} track={track} m:color={color} /></Field>
+    return <Field label="Ses"><Slider value={$vol} onChange={(x: number) => { $vol = x }} min={0} max={100} step={v.step} format={(x: number) => `%${x}`} showValue={v.showValue} track={v.track === "ramp" ? true : undefined} m:color={color} /></Field>
   }}
     <span class="sc-demo-call">{() => `Adım ${props.values.step}: 0, ${props.values.step}, ${props.values.step * 2} … 100 (${Math.floor(100 / props.values.step) + 1} konum); ok tuşları değeri ${props.values.step} değiştirir.`}</span>
   </div>

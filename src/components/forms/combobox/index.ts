@@ -15,7 +15,7 @@ import { OptionList, type OptionItem } from "../option-list/index.ts";
 import type { IconProp } from "../../../icons/types.ts";
 
 export interface ComboboxProps<T = unknown> extends ControlProps<T | null | T[]> {
-  /** Static options: [value] or [{ value, label, hint, disabled }]. @tr Sabit seçenekler: [value] ya da [{ value, label, hint, disabled }]. */
+  /** Static options: [value] or [{ value, label, hint, disabled }], or a comma-separated text ("Kadıköy, Beşiktaş"). @tr Sabit seçenekler: [value] ya da [{ value, label, hint, disabled }], ya da virgülle ayrılmış bir metin ("Kadıköy, Beşiktaş"). */
   options?: OptionsProp;
   /** Async options for the typed text. @tr Yazılan metne göre eşzamansız seçenekler. */
   search?: ((q: string) => Promise<readonly unknown[]> | readonly unknown[]) | undefined;

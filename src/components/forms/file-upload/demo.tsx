@@ -49,7 +49,7 @@ export default function FileUploadDemo(props: { values: { multiple: boolean; acc
         return <FileUpload multiple={multiple} accept={props.values.accept || undefined} maxSize={5_000_000} upload={upload ? fake : undefined}
         label={multiple ? "Dosyaları bırak ya da seç" : "Bir dosya bırak ya da seç"}
         hint={props.values.hint === "off" ? false : props.values.hint === "own" ? "En çok 5 MB; görseller önerilir" : undefined} preview={preview}
-        removeIcon={remove === "icon" ? () => <Icon of={trash} /> : undefined}
+        removeIcon={remove === "trash" ? () => <Icon of={trash} /> : undefined}
         labels={{ uploaded: "Yüklendi", cancel: "Vazgeç", max: (s: string) => `en çok ${s}`, remove: (n: string) => `${n} dosyasını kaldır` }} />
       })
     }}

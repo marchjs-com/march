@@ -12,7 +12,7 @@ periods). Arrow keys move and select; only the chosen button is in the Tab order
 | Prop | Type | Default | |
 |---|---|---|---|
 | `value` / `bind:value` | option value | `null` | |
-| `options` | `[value]` or `[{ value, label, icon, title, disabled }]` | — | `icon`: before the text; `title`: a tooltip (why it is disabled); `label: ""` with an icon: an icon-only segment named by `title` |
+| `options` | `[value]`, `[{ value, label, icon, title, disabled }]` or `"Day, Week"` | — | a comma-separated text: each part is a value and its label; `icon`: before the text; `title`: a tooltip (why it is disabled); `label: ""` with an icon: an icon-only segment named by `title` |
 | `indicator` | `"fill"` `"slide"` | `"fill"` | `"slide"`: one thumb glides to the chosen segment |
 | `m:color` | ColorToken | — | Common prop (march/props): the colour token of the component and everything in it. |
 | `disabled`, `readonly` | boolean | — | |

@@ -20,8 +20,8 @@ export type RowAction = "up" | "down" | "remove";
 const ALL: readonly RowAction[] = ["up", "down", "remove"];
 
 export interface RowToolsProps {
-  /** Which tools, in this order (default: up, down, remove). @tr Hangi araçlar, bu sırayla (varsayılan: up, down, remove). */
-  actions?: readonly RowAction[] | undefined;
+  /** Which tools, in this order (default: up, down, remove); also a string of names ("up down"). @tr Hangi araçlar, bu sırayla (varsayılan: up, down, remove); adlar bir metin olarak da verilebilir ("up down"). */
+  actions?: readonly RowAction[] | string | undefined;
   /** Called when "Move up" is clicked. @tr "Move up" tıklanınca çağrılır. */
   onUp?: (() => void) | undefined;
   /** Called when "Move down" is clicked. @tr "Move down" tıklanınca çağrılır. */
@@ -48,6 +48,10 @@ export interface RowToolsProps {
   class?: ClassProp;
 }
 
+// the tools to draw: a list, or a string of names ("up down", "remove"); unknown names are skipped
+const tools = (a: readonly RowAction[] | string | undefined): readonly RowAction[] =>
+  typeof a === "string" ? a.split(/[\s,]+/).filter((x): x is RowAction => (ALL as readonly string[]).includes(x)) : a ?? ALL;
+
 /** `<RowTools index={i} count={() => list().length} onUp={…} onDown={…} onRemove={…} />`, `<RowTools actions={["remove"]} onRemove={…} />` */
 export function RowTools(props: RowToolsProps): Element {
   const ICON: Record<RowAction, unknown> = { up: arrowUp, down: arrowDown, remove: xIcon };
@@ -60,7 +64,7 @@ export function RowTools(props: RowToolsProps): Element {
   };
   const run = (a: RowAction): void => { (a === "up" ? props.onUp : a === "down" ? props.onDown : props.onRemove)?.(); props.onAction?.(a); };
   return h("span", { class: () => cx("m-row-tools", val(props.class)), role: "group", "aria-label": () => val(props.labels?.group) ?? t`Row tools` },
-    (props.actions ?? ALL).map((a) => h(IconButton, {
+    tools(props.actions).map((a) => h(IconButton, {
       class: `m-row-tool m-row-tool-${a}`, icon: () => ownPart(props.icons?.[a], () => ICON[a]), label: () => name(a), size: props.size,
       variant: a === "remove" && props.danger ? "danger" : undefined, disabled: () => off(a), onClick: () => run(a) })));
 }

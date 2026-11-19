@@ -19,8 +19,8 @@ export interface CodeInputProps extends ControlProps<string> {
   numeric?: boolean | undefined;
   /** Force capitals (default true for letters). @tr Büyük harfe çevirir (harflerde varsayılan true). */
   uppercase?: boolean | undefined;
-  /** Visual groups, e.g. [3, 3] → "123 456" with a separator between the groups. @tr Görsel gruplar, ör. [3, 3] → "123 456", gruplar arasında ayraç. */
-  groups?: readonly number[] | undefined;
+  /** Visual groups, e.g. [3, 3] → "123 456" with a separator between the groups; a number is the boxes per group (3 → "123 456" for six boxes). @tr Görsel gruplar, ör. [3, 3] → "123 456", gruplar arasında ayraç; bir sayı grup başına kutu sayısıdır (altı kutuda 3 → "123 456"). */
+  groups?: readonly number[] | number | undefined;
   /** Hide the characters (PINs). @tr Karakterleri gizler (PIN'ler). */
   mask?: boolean | (() => boolean) | undefined;
   /** Hides the characters. @deprecated alias of mask. @tr Karakterleri gizler. */
@@ -131,7 +131,8 @@ export function CodeInput(props: CodeInputProps): unknown {
   }
   // groups: a separator between them ([3, 3] → 123–456)
   const parts: unknown[] = [];
-  const sizes = props.groups?.length ? props.groups : [n];
+  const g = props.groups;
+  const sizes = typeof g === "number" ? Array.from({ length: Math.ceil(n / Math.max(1, Math.floor(g))) }, () => Math.max(1, Math.floor(g))) : g?.length ? g : [n];
   let k = 0;
   sizes.forEach((g, gi) => {
     if (gi && props.separator !== false && props.separator !== null) parts.push(props.separator === undefined || props.separator === true ? h("span", { class: "m-otp-sep", "aria-hidden": "true" })

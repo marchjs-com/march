@@ -6,13 +6,13 @@ import { h } from "../../../dom/h.ts";
 import { model, ctl, cx, normOptions, same, type ControlProps, type OptionsProp } from "../../../forms/util.ts";
 
 export interface SelectProps<T = unknown> extends ControlProps<T | null> {
-  /** [value] or [{ value, label, disabled }]; may be live. @tr [value] ya da [{ value, label, disabled }]; canlı olabilir. */
+  /** [value] or [{ value, label, disabled }]; may be live. A text is a comma-separated list ("Tea, Coffee"). @tr [value] ya da [{ value, label, disabled }]; canlı olabilir. Metin virgülle ayrılmış bir listedir ("Çay, Kahve"). */
   options?: OptionsProp;
   /** Text of the empty first option; false: no empty option (a choice that is never empty, e.g. a language). @tr Boş ilk seçeneğin metni; false: boş seçenek yok (hiç boş kalmayan bir seçim, ör. dil). */
   placeholder?: string | false | undefined;
 }
 
-/** Native select. Props: options ([value] or [{value,label,disabled}], may be live), placeholder. Values keep their type. */
+/** Native select. Props: options ([value] or [{value,label,disabled}], may be live, or a comma-separated text), placeholder. Values keep their type. */
 export function Select<T = unknown>(props: SelectProps<T>): unknown {
   const [get, set] = model<T | null>(props, null);
   const opts = computed(() => normOptions(props.options));

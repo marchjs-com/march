@@ -88,7 +88,9 @@ export function IconPicker(props: IconPickerProps): unknown {
   const value = (): string | null => {
     const v = props.value as unknown;
     if (v === undefined) return own();
-    return (typeof v === "function" ? (v as () => string | null | undefined)() : (v as string | null)) ?? null;
+    const x = typeof v === "function" ? (v as () => unknown)() : v;
+    // only a name counts (a tool handing over an icon object or a number must not throw on split)
+    return typeof x === "string" ? x : null;
   };
   const pick = (n: string | null): void => {
     const v = props.value as { set?: (x: string | null) => void } | undefined;

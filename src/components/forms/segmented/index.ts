@@ -23,7 +23,7 @@ export interface SegmentedOption {
 }
 
 export interface SegmentedProps<T = unknown> extends ControlProps<T | null> {
-  /** `[value]` or `[{ value, label, icon, title, disabled }]` (see SegmentedOption); may be a function. @tr `[value]` ya da `[{ value, label, icon, title, disabled }]` (bkz. SegmentedOption); fonksiyon da olabilir. */
+  /** `[value]`, `[{ value, label, icon, title, disabled }]` (see SegmentedOption) or a comma-separated text ("Day, Week"); may be a function. @tr `[value]`, `[{ value, label, icon, title, disabled }]` (bkz. SegmentedOption) ya da virgülle ayrılmış metin ("Gün, Hafta"); fonksiyon da olabilir. */
   options?: OptionsProp;
   /** How the chosen segment is marked: "fill" (default: it is raised in place) or "slide" (one thumb glides to it). @tr Seçili parçanın işareti: "fill" (varsayılan: yerinde kabarır) ya da "slide" (tek bir başparmak ona kayar). */
   indicator?: "fill" | "slide" | undefined;

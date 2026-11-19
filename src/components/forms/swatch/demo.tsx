@@ -16,11 +16,12 @@ const PALETTES: Record<string, [string, string][]> = {
   token: [["brand-orange", "brand-orange"], ["brand-blue", "brand-blue"], ["brand-green", "brand-green"], ["brand-purple", "brand-purple"], ["danger", "danger"], ["primary", "primary"]],
 }
 
-export default function SwatchDemo(props: { values: { palette: string; size: string; shape: string; mark: string; checker: boolean; clickable: boolean } }) {
-  let $picked = 0
+export default function SwatchDemo(props: { values: { palette: string; size: string; shape: string; mark: string; checker: boolean; selected: boolean; clickable: boolean } }) {
   return <div class="sc-col">
     {() => {
       const v = { ...props.values }
+      // "Seçili başla" off: nothing is selected until a click
+      let $picked = v.selected === false ? -1 : 0
       const list = PALETTES[v.palette] ?? PALETTES.solid!
       const mark = v.mark === "check" ? true : v.mark === "own" ? heart : false
       return <>
@@ -28,10 +29,10 @@ export default function SwatchDemo(props: { values: { palette: string; size: str
           {list.map(([color, label], i) => {
             const onClick = v.clickable ? () => { $picked = i } : undefined
             return <Swatch color={color} label={label} size={v.size as "md"} shape={v.shape as "round"} checker={v.checker} mark={mark}
-              selected={() => $picked % list.length === i} onClick={onClick} />
+              selected={() => $picked === i} onClick={onClick} />
           })}
         </div>
-        <p class="m-muted">{() => { const [color, label] = list[$picked % list.length]!; return `${label}: ${color}` }}</p>
+        <p class="m-muted">{() => { const at = list[$picked]; return at ? `${at[1]}: ${at[0]}` : "Seçili renk yok" }}</p>
       </>
     }}
   </div>

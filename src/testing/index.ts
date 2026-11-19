@@ -96,7 +96,8 @@ export function renderTest(fn: () => unknown, opts: RenderTestOptions = {}): Tes
     const lab = byText(label, "label")[0];
     if (lab) {
       const id = lab.getAttribute("for");
-      return (id && doc.getElementById(id)) || lab.querySelector("input,textarea,select");
+      // the label's control inside the screen's root first: another copy on the page (a preview) may hold the same id
+      return (id && (root().querySelector(`[id="${id.replace(/"/g, '\\"')}"]`) ?? doc.getElementById(id))) || lab.querySelector("input,textarea,select");
     }
     return all("input,textarea,select").find((i) => i.getAttribute("aria-label") === label || i.getAttribute("placeholder") === label || i.getAttribute("name") === label) ?? null;
   };

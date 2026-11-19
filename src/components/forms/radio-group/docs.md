@@ -13,7 +13,7 @@ Radio boxes are always round.
 | Prop | Type | Default | |
 |---|---|---|---|
 | `value` / `bind:value` | option value | `null` | |
-| `options` | `[{ value, label, hint?, icon?, meta?, disabled? }]` | — | |
+| `options` | `[{ value, label, hint?, icon?, meta?, disabled? }]`, `[value]` or `"S, M, L"` | — | a comma-separated text: each part is a value and its label |
 | `inline` | boolean | — | a row |
 | `variant` | `classic` `soft` `chip` `card` `segmented` | `classic` | |
 | `size`, `color`, `colors` | | | as CheckboxGroup |

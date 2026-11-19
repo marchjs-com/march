@@ -7,7 +7,7 @@ import { colorAttr } from "../../../theme/colors.ts";
 import { choiceBox, choiceText, itemColor, groupClass, type ChoiceGroupLook } from "../../../forms/choice.ts";
 
 export interface RadioGroupProps<T = unknown> extends ControlProps<T | null>, ChoiceGroupLook {
-  /** The choices: `[value]` or `[{ value, label, hint?, icon?, meta?, disabled? }]`. @tr Seçenekler: `[value]` ya da `[{ value, label, hint?, icon?, meta?, disabled? }]`. */
+  /** The choices: `[value]`, `[{ value, label, hint?, icon?, meta?, disabled? }]` or a comma-separated text ("S, M, L"). @tr Seçenekler: `[value]`, `[{ value, label, hint?, icon?, meta?, disabled? }]` ya da virgülle ayrılmış metin ("S, M, L"). */
   options?: OptionsProp;
   /** Lays the options out in a row instead of a column. @tr Seçenekleri sütun yerine yan yana dizer. */
   inline?: boolean | undefined;
@@ -20,7 +20,7 @@ export function RadioGroup<T = unknown>(props: RadioGroupProps<T>): unknown {
   const baseId = props.id ?? field?.id ?? uid("m-rg");
   const name = props.name ?? baseId;
   const c = ctl(props);
-  return h("div", { role: "radiogroup", class: () => groupClass(props, "radio"), "aria-labelledby": labelledBy(props), "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
+  return h("div", { role: "radiogroup", class: () => groupClass(props, "radio"), "aria-labelledby": labelledBy(props), "aria-label": c["aria-label"], "aria-describedby": c["aria-describedby"], "aria-invalid": c["aria-invalid"] },
     () => normOptions(props.options).map((o, i) => h("label", { class: "m-check", "data-m-color": () => itemColor(props.colors, i) },
       h("input", {
         type: "radio", class: "m-check-input", id: i ? `${baseId}-${i}` : baseId, name, onBlur: props.onBlur,

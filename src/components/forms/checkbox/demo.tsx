@@ -10,7 +10,7 @@ export const code = `<Checkbox bind:value={$agree} label="Kullanım koşulların
 
 const ROWS = ["Ayşe Yılmaz", "Mehmet Demir", "Zeynep Kaya", "Can Öztürk", "Elif Şahin"]
 
-export default function CheckboxDemo(props: { values: { variant: string; size: string; indeterminate: boolean; grid: boolean } }) {
+export default function CheckboxDemo(props: { values: { label: string; variant: string; size: string; indeterminate: boolean; grid: boolean } }) {
   let $agree = true
   const picked = signal<number[]>([1])
   let anchor = 1
@@ -31,7 +31,7 @@ export default function CheckboxDemo(props: { values: { variant: string; size: s
     const partial = v.indeterminate && (v.variant === "classic" || v.variant === "soft")
     return <div class="sc-col">
       <Checkbox value={$agree} onChange={(x: boolean) => { $agree = x }} variant={v.variant as "classic"} size={v.size as "md"} indeterminate={v.indeterminate}
-        label={v.variant === "card" ? "Ekip planı" : "Bildirimleri al"} hint={v.variant === "card" ? "10 kişiye kadar, paylaşılan alanlar" : undefined} icon={v.variant === "card" ? users : undefined} />
+        label={v.label || "Bildirimleri al"} hint={v.variant === "card" ? "Yeni yorum ve üye katılınca haber ver" : undefined} icon={v.variant === "card" ? users : undefined} />
       <p class="m-muted">{() => (partial ? "Kısmi: kutuda işaret yerine çizgi durur (alt öğelerin bir bölümü seçili)." : $agree ? "Seçili" : "Seçili değil")}</p>
     </div>
   }}</div>

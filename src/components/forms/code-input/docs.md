@@ -17,7 +17,7 @@ HADİ color and the display font, as in the HADİ apps; boxes shrink on narrow s
 | `value` / `bind:value` | string | `""` | |
 | `length` | 3–12 | `6` | |
 | `pattern` | `numeric` `alpha` `alphanumeric` | `numeric` | numeric keypad and one-time-code autofill for numeric |
-| `groups` | number[] | — | `[3, 3]` → a separator between groups |
+| `groups` | number[] or number | — | `[3, 3]` → a separator between groups; a number: boxes per group (`3` → `[3, 3]` for six) |
 | `mask` | boolean | — | dots (PINs) |
 | `colors` | `single` `brand` `palette` or tokens | theme | one color per box |
 | `font` | `display` `mono` `body` | theme | |

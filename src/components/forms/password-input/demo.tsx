@@ -1,9 +1,6 @@
 // Showcase stage for PasswordInput.
 import { PasswordInput } from "./index.ts";
 import { Field } from "../../../forms/field.ts";
-import { Icon } from "../../../icons/index.ts";
-import { eye } from "../../../icons/glyphs/eye.ts";
-import { eyeOff } from "../../../icons/glyphs/eyeOff.ts";
 import { computed, untrack } from "../../../core/reactive.ts";
 
 export const code = `<Field label="Parola" help="Güçlü bir parola seç"><PasswordInput bind:value={$pw} autocomplete="new-password" /></Field>   // the eye
@@ -18,7 +15,7 @@ export default function PasswordInputDemo(props: { values: { disabled: boolean; 
     const toggle = kind()
     return untrack(() => <Field label="Parola" help="Göz düğmesiyle yazdığını kontrol et">
       <PasswordInput value={$pw} onChange={(v: string) => { $pw = v }} disabled={props.values.disabled} autocomplete="new-password" labels={{ show: "Göster", hide: "Gizle", showPassword: "Parolayı göster", hidePassword: "Parolayı gizle" }}
-        toggle={toggle === "off" ? false : toggle === "text" ? "text" : toggle === "own" ? (shown: boolean) => <Icon of={shown ? eyeOff : eye} /> : "icon"} />
+        toggle={toggle === "off" ? false : toggle === "text" ? "text" : "icon"} />
     </Field>)
   }}</div>
 }

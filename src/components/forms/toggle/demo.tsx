@@ -1,4 +1,4 @@
-// Showcase stage for Toggle: the color token, three states and the disabled state.
+// Showcase stage for Toggle: the label, the color token, three states and the disabled state.
 import { Toggle } from "./index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 // unions live outside JSX: the March compiler reads `|` in a JSX expression as a pipe
@@ -10,7 +10,7 @@ export const code = `<Toggle bind:value={$notify} label="Anlık bildirimler" />
 <Toggle bind:value={$dark} m:color="brand-purple" label="Koyu tema" />
 <Toggle tristate bind:value={$pressed} label="Basılı" />   // null (not set) → true → false → null`
 
-export default function ToggleDemo(props: { values: { color: string; tristate: boolean; disabled: boolean } }) {
+export default function ToggleDemo(props: { values: { label: string; color: string; tristate: boolean; disabled: boolean } }) {
   let $notify = true
   let $digest = false
   let $pressed: boolean | null = null
@@ -18,7 +18,7 @@ export default function ToggleDemo(props: { values: { color: string; tristate: b
   return <div class="sc-stack">{() => {
     const color = pick(props.values.color) as Opt<ColorToken>
     return [
-      <Toggle value={$notify} onChange={(x: boolean) => { $notify = x }} m:color={color} disabled={props.values.disabled} label="Anlık bildirimler" />,
+      <Toggle value={$notify} onChange={(x: boolean) => { $notify = x }} m:color={color} disabled={props.values.disabled} label={props.values.label} />,
       <Toggle value={$digest} onChange={(x: boolean) => { $digest = x }} m:color={color} disabled={props.values.disabled} label="Haftalık özet" />,
       props.values.tristate ? <Toggle tristate value={$pressed} onChange={(x: boolean | null) => { $pressed = x }} m:color={color} disabled={props.values.disabled} label={() => `Basılı: ${word($pressed)}`} /> : null,
     ]

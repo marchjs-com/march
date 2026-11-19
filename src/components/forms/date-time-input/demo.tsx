@@ -8,10 +8,10 @@ export const code = `<Field label="Başlangıç"><DateTimeInput bind:value={$sta
 
 const START_AT: Maybe<string> = "2026-03-14T09:30:00.000Z"
 
-export default function DateTimeInputDemo(props: { values: { disabled: boolean } }) {
+export default function DateTimeInputDemo(props: { values: { defaultTime: string; timeLabel: string; disabled: boolean; readonly: boolean } }) {
   let $at = START_AT
   return <div class="sc-stack">
-    {() => <Field label="Başlangıç"><DateTimeInput value={$at} onChange={(v: Maybe<string>) => { $at = v }} defaultTime="09:00" disabled={props.values.disabled} /></Field>}
+    {() => <Field label="Başlangıç"><DateTimeInput value={$at} onChange={(v: Maybe<string>) => { $at = v }} defaultTime={props.values.defaultTime || undefined} timeLabel={props.values.timeLabel || undefined} disabled={props.values.disabled} readonly={props.values.readonly} /></Field>}
     <p class="m-muted">{() => `Değer (UTC): ${$at ?? "—"}`}</p>
   </div>
 }
