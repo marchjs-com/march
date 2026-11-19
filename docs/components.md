@@ -10,7 +10,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Accordion | stable | Stacked sections that open one at a time or several together: animated height, ↑ ↓ Home End between headers, separated or contained look. | [ListRow](#listrow), [Chevron](#chevron) |
 | AppShell | stable | The application frame: a sidebar column and the main area with optional banner and sticky header; a skip link; full width on narrow screens. | [Layout](#layout) |
 | BottomRightControls | stable | One fixed page corner (bottom, end side; mirrors in RTL) that page-wide controls put themselves into, in order, instead of overlapping. | — |
-| DevicePicker | experimental | Choose a device to preview on: dozens of phones, tablets and desktop screens with their silhouette, size and pixel ratio; search, groups, portrait / landscape and your own devices. | [SearchBox](#searchbox), [Segmented](#segmented), [ListRow](#listrow), [Empty](#empty), Field, [TextInput](#textinput), [NumberInput](#numberinput), [Toggle](#toggle), [Button](#button), [IconButton](#iconbutton) |
+| DevicePicker | experimental | Choose a device to preview on: dozens of phones, tablets and desktop screens with their silhouette, size and pixel ratio; search, groups, portrait / landscape and your own devices. | [SearchBox](#searchbox), [Segmented](#segmented), [ListRow](#listrow), [SectionLabel](#sectionlabel), [Empty](#empty), Field, [TextInput](#textinput), [NumberInput](#numberinput), [Toggle](#toggle), [Button](#button), [IconButton](#iconbutton) |
 | DevicePreview | experimental | Content as on a real device: phone / tablet body or desktop window, ~35 devices, real size, turning; the mouse as 1–3 fingers (real touch events, pinch, rotate, gestures); a control rail for shake, tilt, offline, battery, background and keyboard. | [OverlayScope](#overlayscope), [IconButton](#iconbutton), [Button](#button), [Menu](#menu), [Popover](#popover), [Slider](#slider), [Toggle](#toggle) |
 | Disclosure | stable | A collapsible section on native details / summary: keyboard and screen reader support built in, animated open and close. | [Chevron](#chevron) |
 | ExplodedView | experimental | Takes its content apart like an exploded drawing and puts it back: the same elements tilt and rise as plates with name tags (chosen parts), or one element opens into its shadow, surface, content and focus ring. | — |
@@ -321,12 +321,15 @@ Full page: src/components/layout/app-shell/docs.md
 
 ## AppUI
 
-
+march-app-ui, the core of March IDE and the base of an IDE shell: a top bar (a title, your tools and the **Layout** menu), a side slot (an ActivityBar), the [DockLayout](#docklayout) workspace and a status slot (a StatusBar). The Layout menu lists the presets, the saved layouts ("Save this layout"), every panel (checked when it is open; choosing one opens or collapses it), "Open all panels" and "Reset to default". Colours come from the page's theme and accent. Activity bars, status bars and editors are built on top of it.
 
 Composed of: [DockLayout](#docklayout), [Menu](#menu), [CodeEditor](#codeeditor), [ThemeMenu](#thememenu), [Joined](#joined), [Debugger](#debugger), [IconButton](#iconbutton), [Button](#button), [PasswordInput](#passwordinput), [Textarea](#textarea), [Select](#select), [Alert](#alert), [StatusDot](#statusdot), [CodeView](#codeview), [TextInput](#textinput), [Popover](#popover), [DevicePicker](#devicepicker), [DevicePreview](#devicepreview), [NetworkThrottle](#networkthrottle)
 
 ```tsx
-
+<AppUI title="march-app-ui" panels={panels} presets={{
+  default: { title: "Default", tree: () => row([.24, tabs("files")], [.76, col([.7, tabs("editor")], [.3, tabs("console")])]) },
+  code: { title: "Code", tree: () => row([.2, tabs("files", { collapsed: true })], [.8, tabs(["editor", "console"])]) },
+}} persist="my-ide" tools={<Button>Run</Button>} />
 ```
 
 Full page: src/components/composite/app-ui/docs.md
@@ -928,16 +931,12 @@ Full page: src/components/composite/debugger/docs.md
 
 ## DevicePicker
 
-Choose a device to preview on: the whole DevicePreview catalog — phones, tablets and desktop screens — each with a silhouette in its proportions, its CSS size, pixel ratio and whether it is a touch screen. Search by name or size ("390", "ipad"), filter by group, switch portrait / landscape, and make your own devices (name, width × height, pixel ratio, kind, touch), saved in this browser; a device of yours has a remove button.
 
-Composed of: [SearchBox](#searchbox), [Segmented](#segmented), [ListRow](#listrow), [Empty](#empty), Field, [TextInput](#textinput), [NumberInput](#numberinput), [Toggle](#toggle), [Button](#button), [IconButton](#iconbutton)
+
+Composed of: [SearchBox](#searchbox), [Segmented](#segmented), [ListRow](#listrow), [SectionLabel](#sectionlabel), [Empty](#empty), Field, [TextInput](#textinput), [NumberInput](#numberinput), [Toggle](#toggle), [Button](#button), [IconButton](#iconbutton)
 
 ```tsx
-import { DevicePicker, DevicePreview } from "march/layout";
 
-const $device = signal("iphone-15"), $land = signal(false)
-<DevicePicker value={$device} landscape={$land} fit />
-<DevicePreview device={$device} landscape={$land} controls>…</DevicePreview>
 ```
 
 Full page: src/components/layout/device-picker/docs.md

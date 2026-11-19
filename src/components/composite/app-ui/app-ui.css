@@ -141,7 +141,10 @@
 /* the device and network buttons: icon and text on one centre line, a clear gap between them */
 .m-app-pv-tool { display: inline-flex; align-items: center; gap: .45rem; }
 .m-app-pv-tool .m-svg { display: block; flex: none; }
-.m-popover-panel.m-app-pv-device-panel { inline-size: min(38rem, calc(100vw - 2rem)); max-inline-size: none; }
+/* the device panel takes the room it needs: wide (several columns) and as tall as its list; only a window too small
+   for it makes the panel itself scroll */
+.m-popover-panel.m-app-pv-device-panel { inline-size: min(80rem, calc(100vw - 2rem)); max-inline-size: none; max-block-size: calc(100dvh - 1rem); }
+.m-app-pv-device-panel .m-popover-body { padding: var(--m-space-4); }
 .m-app-pv-device-panel .m-dpick { inline-size: 100%; }
 /* the network panel is as wide as its content (no empty band on the end side) */
 .m-popover-panel.m-app-pv-net-panel { inline-size: min(25rem, calc(100vw - 2rem)); max-inline-size: none; }

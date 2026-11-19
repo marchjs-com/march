@@ -1,24 +1,29 @@
-/* DevicePicker: search + orientation, groups, a two-column list of devices (each with its silhouette), your own device. */
-.m-dpick { display: grid; gap: var(--m-space-2); inline-size: min(34rem, 100%); }
-.m-dpick-top { display: flex; gap: var(--m-space-2); align-items: center; }
-.m-dpick-top > :first-child { flex: 1; min-inline-size: 0; }
-.m-dpick-groups { justify-self: start; max-inline-size: 100%; overflow-x: auto; }
-.m-dpick-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: var(--m-space-1) var(--m-space-3); max-block-size: min(26rem, 55vh); overflow: auto; padding: 2px; margin: -2px; overscroll-behavior: contain; }
-.m-dpick-list > .m-empty { grid-column: 1 / -1; }
-.m-dpick-item { text-align: start; padding-block: .55rem; border-radius: var(--m-radius-2, 8px); }
+/* DevicePicker: one row of search, groups and orientation; the devices in sections by kind, each a roomy grid that
+   takes the height it needs (the list itself never scrolls); "fit the panel" and your own device in the top row. */
+.m-dpick { display: grid; gap: var(--m-space-4); inline-size: 100%; min-inline-size: min(40rem, 100%); }
+.m-dpick-top { display: flex; flex-wrap: wrap; gap: var(--m-space-2) var(--m-space-3); align-items: center; }
+.m-dpick-top > :first-child { flex: 1 1 14rem; min-inline-size: 0; }
+.m-dpick-add { margin-inline-start: auto; }
+.m-dpick-list { display: grid; gap: var(--m-space-4); }
+.m-dpick-list > .m-empty { padding-block: var(--m-space-5); }
+.m-dpick-section { display: grid; gap: var(--m-space-2); }
+.m-dpick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: var(--m-space-2) var(--m-space-3); }
+/* a device: room inside, round corners, a soft hover and a clear chosen state */
+.m-dpick-item.m-listrow { gap: var(--m-space-3); padding: var(--m-space-2) var(--m-space-3); min-block-size: 3.25rem; text-align: start;
+  border-radius: var(--m-radius-3, 12px); border: 1px solid transparent; background: transparent;
+  transition: background-color var(--m-dur-fast) var(--m-ease, ease), border-color var(--m-dur-fast) var(--m-ease, ease); }
+.m-dpick-item.m-listrow:hover { background: color-mix(in srgb, var(--m-text) 5%, transparent); }
+.m-dpick-item.m-listrow:is(.is-selected, [aria-pressed="true"]) { background: color-mix(in srgb, var(--m-primary) 12%, var(--m-bg)); border-color: color-mix(in srgb, var(--m-primary) 35%, transparent); }
+.m-dpick-item .m-listrow-title { line-height: 1.25; }
 /* the size line is quiet: the name leads, the numbers follow */
-.m-dpick-item .m-listrow-sub { color: color-mix(in srgb, var(--m-muted) 78%, transparent); margin-block-start: 2px; font-variant-numeric: tabular-nums; }
-.m-dpick-item.is-fit { grid-column: 1 / -1; }
+.m-dpick-item .m-listrow-sub { color: color-mix(in srgb, var(--m-muted) 78%, transparent); margin-block-start: .2rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
 /* the silhouette: the device's proportions in a 30px box */
 .m-dpick-shape { display: inline-grid; place-items: center; inline-size: 34px; block-size: 34px; flex: none; }
 .m-dpick-shape::before { content: ""; inline-size: var(--w); block-size: var(--h); border-radius: var(--r); box-sizing: border-box;
   border: 2px solid currentColor; background: linear-gradient(160deg, color-mix(in srgb, var(--m-primary) 26%, transparent), transparent 70%); transition: inline-size var(--m-dur-slow) var(--m-ease, ease), block-size var(--m-dur-slow) var(--m-ease, ease); }
 .m-dpick-shape.is-desktop::before { border-block-start-width: 4px; border-radius: 2px; }
-.m-dpick-item[aria-selected="true"] .m-dpick-shape, .m-dpick-item.is-selected .m-dpick-shape { color: var(--m-primary); }
-.m-dpick-fit { display: inline-grid; place-items: center; inline-size: 34px; block-size: 34px; color: var(--m-muted); }
-.m-dpick-fit .m-svg { inline-size: 1.1rem; block-size: 1.1rem; }
-.m-dpick-add { justify-self: start; }
+.m-dpick-item:is(.is-selected, [aria-pressed="true"]) .m-dpick-shape { color: var(--m-primary); }
 .m-dpick-form { display: grid; gap: var(--m-space-2); padding: var(--m-space-3); border-radius: var(--m-radius-3, 12px); background: color-mix(in srgb, var(--m-text) 4%, var(--m-bg)); border: 1px solid var(--m-border); }
 .m-dpick-form-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--m-space-2); }
 .m-dpick-form-row.is-end { display: flex; justify-content: flex-end; }
-@media (prefers-reduced-motion: reduce) { .m-dpick-shape::before { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .m-dpick-shape::before, .m-dpick-item.m-listrow { transition: none; } }

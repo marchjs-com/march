@@ -99,6 +99,12 @@ export function AppPreview(props: AppPreviewProps): Element {
   onCleanup(onThrottle(() => { net.set(throttleLabel()); netOn.set(throttled(getThrottle())); }));
   // full screen: the preview's own element fills the screen (the browser's Fullscreen API; Esc leaves it too)
   let root: HTMLElement | null = null;
+  // the device panel is as tall as its list; only the room under its button limits it (then the panel scrolls, the
+  // list in it never does)
+  const fitDevicePanel = (): void => {
+    const btn = root?.querySelector(".m-app-pv-device .m-btn"), panel = globalThis.document?.querySelector<HTMLElement>(".m-app-pv-device-panel");
+    if (btn && panel) panel.style.maxBlockSize = `${Math.max(240, Math.floor((globalThis.innerHeight || 800) - btn.getBoundingClientRect().bottom - 16))}px`;
+  };
   const full = signal(false);
   const doc = globalThis.document as Document | undefined;
   // where the browser refuses it (an embedded view, a frame without allow="fullscreen") the preview covers the page instead
@@ -146,7 +152,7 @@ export function AppPreview(props: AppPreviewProps): Element {
       trigger: [h("span", { class: "m-app-pv-lang-icon", "aria-hidden": "true" }, icon(globe)), h("span", {}, langName)],
       items: () => langs().map((x) => ({ label: x.label, checked: () => language() === x.value, radio: true, onSelect: () => language.set(x.value) })),
     })) : null),
-    () => (on("device") ? untrack(() => h(Popover, { placement: "bottom-end", label: () => t`Device`, class: "m-app-pv-device", panelClass: "m-app-pv-device-panel",
+    () => (on("device") ? untrack(() => h(Popover, { placement: "bottom-end", label: () => t`Device`, class: "m-app-pv-device", panelClass: "m-app-pv-device-panel", onOpenChange: (open: boolean) => { if (open) setTimeout(fitDevicePanel, 0); },
       // the icon in Button's own icon slot: its gap and its centre line, as every toolbar button
       trigger: h(Button, { size: "sm", variant: "ghost", class: "m-app-pv-tool", "aria-label": () => `${t`Screen size`}: ${spec()?.name ?? t`Fit`}`,
         icon: () => (spec() && (spec()!.kind ?? "phone") === "phone" ? phone : monitor) }, () => spec()?.name ?? t`Fit`),

@@ -18,17 +18,18 @@ import { Button } from "../../actions/button/index.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { ListRow } from "../../data/list-row/index.ts";
 import { Empty } from "../../feedback/empty/index.ts";
+import { SectionLabel } from "../../typography/section-label/index.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { maximize } from "../../../icons/glyphs/maximize.ts";
 import { allDevices, addDevice, removeDevice, isTouch, dprOf, type DeviceSpec, type DeviceKind } from "../device-preview/devices.ts";
 
 messages("tr", {
-  "Devices": "Cihazlar", "Search devices": "Cihaz ara", "All": "Tümü", "Phones": "Telefon", "Tablets": "Tablet", "Desktop": "Masaüstü", "Mine": "Benim",
+  "Devices": "Cihazlar", "Desktop and screens": "Masaüstü ve ekranlar", "Search devices": "Cihaz ara", "All": "Tümü", "Phones": "Telefon", "Tablets": "Tablet", "Desktop": "Masaüstü", "Mine": "Benim",
   "Portrait": "Dikey", "Landscape": "Yatay", "Fit the panel": "Panele sığdır", "Fills the space it has": "Bulunduğu yeri doldurur",
   "Your own device": "Kendi cihazın", "Name": "Ad", "Width": "Genişlik", "Height": "Yükseklik", "Pixel ratio": "Piksel oranı", "Kind": "Tür",
   "Touch screen": "Dokunmatik ekran", "Save": "Kaydet", "Cancel": "Vazgeç", "Remove {0}": "{0} cihazını sil", "No device matches": "Eşleşen cihaz yok",
-  "Phone": "Telefon", "Tablet": "Tablet", "Screen": "Ekran", "touch": "dokunmatik", "My device": "Cihazım",
+  "Phone": "Telefon", "Tablet": "Tablet", "Screen": "Ekran", "touch": "dokunmatik", "no touch": "dokunmasız", "My device": "Cihazım",
 });
 
 export type DevicePickerGroup = "all" | DeviceKind | "mine";
@@ -85,7 +86,9 @@ export function DevicePicker(props: DevicePickerProps): Element {
 
   const row = (d: DeviceSpec): Element => h(ListRow, {
     as: "button", size: "sm", class: "m-dpick-item", selected: () => get() === d.id, onClick: () => pick(d.id ?? ""),
-    lead: () => deviceSilhouette(d, isLand()), title: d.name, sub: () => `${sizeText(d, isLand())}${isTouch(d) ? ` · ${t`touch`}` : ""}`,
+    lead: () => deviceSilhouette(d, isLand()), title: d.name,
+    // "touch" only where the kind does not say it (a touch kiosk, a phone without touch): phones and tablets are
+    sub: () => `${sizeText(d, isLand())}${isTouch(d) !== (d.kind === "phone" || d.kind === "tablet" || d.kind == null) ? ` · ${isTouch(d) ? t`touch` : t`no touch`}` : ""}`,
     trail: d.own ? h(IconButton, { icon: xIcon, size: "xs", variant: "ghost", label: t`Remove ${d.name}`, onClick: (e: MouseEvent) => { e.stopPropagation(); if (get() === d.id) set(""); removeDevice(d.id ?? ""); } }) : null,
   }) as Element;
 
@@ -109,16 +112,29 @@ export function DevicePicker(props: DevicePickerProps): Element {
         making.set(false); group.set("mine"); pick(id);
       } }, () => t`Save`)));
 
+  // the devices in sections by kind (each a grid that takes the room it needs: the list never scrolls by itself)
+  const SECTIONS: { key: string; label: () => string; has: (d: DeviceSpec) => boolean }[] = [
+    { key: "phone", label: () => t`Phones`, has: (d) => !d.own && (d.kind ?? "phone") === "phone" },
+    { key: "tablet", label: () => t`Tablets`, has: (d) => !d.own && d.kind === "tablet" },
+    { key: "desktop", label: () => t`Desktop and screens`, has: (d) => !d.own && (d.kind === "desktop" || d.kind === "screen") },
+    { key: "mine", label: () => t`Mine`, has: (d) => !!d.own },
+  ];
   return h("div", { class: () => cx("m-dpick", val(props.class)) },
     h("div", { class: "m-dpick-top" },
       () => (val(props.search) === false ? null : untrack(() => h(SearchBox, { value: q, size: "sm", label: () => t`Search devices`, placeholder: () => t`Search devices`, debounce: 0 }))),
-      land ? h(Segmented, { size: "sm", indicator: "slide" as const, get value() { return land!() ? "l" : "p"; }, onChange: (v: unknown) => land.set(v === "l"), options: () => [{ value: "p", label: t`Portrait` }, { value: "l", label: t`Landscape` }] }) : null),
-    h(Segmented, { class: "m-dpick-groups", size: "sm", indicator: "slide" as const, value: group, options: groups }),
+      h(Segmented, { class: "m-dpick-groups", size: "sm", indicator: "slide" as const, value: group, options: groups }),
+      land ? h(Segmented, { size: "sm", indicator: "slide" as const, get value() { return land!() ? "l" : "p"; }, onChange: (v: unknown) => land.set(v === "l"), options: () => [{ value: "p", label: t`Portrait` }, { value: "l", label: t`Landscape` }] }) : null,
+      // "fit the panel" and your own device sit in the top row: the list below is only devices
+      () => (fitText() ? untrack(() => h(Button, { size: "sm", variant: "ghost", class: "m-dpick-fit-btn", icon: maximize, pressed: () => get() === "", onClick: () => pick("") }, fitText)) : null),
+      () => (val(props.create) === false ? null : untrack(() => h(Button, { size: "sm", variant: "ghost", class: "m-dpick-add", icon: plus, pressed: making, onClick: () => making.set(!making.peek()) }, () => t`Your own device`)))),
+    () => (making() ? untrack(form) : null),
     h("div", { class: "m-dpick-list", role: "list", "aria-label": () => val(props.label) ?? t`Devices` },
-      () => (fitText() && group() === "all" && !q() ? untrack(() => h(ListRow, { as: "button", size: "sm", class: "m-dpick-item is-fit", selected: () => get() === "", onClick: () => pick(""),
-        lead: h("span", { class: "m-dpick-fit", "aria-hidden": "true" }, icon(maximize)), title: fitText, sub: () => t`Fills the space it has` })) : null),
-      () => { const ds = shown(); return ds.length ? untrack(() => ds.map(row)) : untrack(() => h(Empty, { size: "sm", title: () => t`No device matches` })); }),
-    () => (val(props.create) === false ? null : making() ? untrack(form)
-      : untrack(() => h(Button, { size: "sm", variant: "ghost", class: "m-dpick-add", icon: plus, onClick: () => making.set(true) }, () => t`Your own device`))),
+      () => {
+        const ds = shown();
+        if (!ds.length) return untrack(() => h(Empty, { size: "sm", title: () => t`No device matches` }));
+        return untrack(() => SECTIONS.map((s) => { const own = ds.filter(s.has); return own.length
+          ? h("section", { class: "m-dpick-section" }, h(SectionLabel, { size: "sm", label: s.label, count: own.length }), h("div", { class: "m-dpick-grid" }, own.map(row)))
+          : null; }));
+      }),
   );
 }
