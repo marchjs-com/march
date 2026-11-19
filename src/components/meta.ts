@@ -54,8 +54,9 @@ export interface PlaygroundOption<V = Record<string, unknown>> {
   default: unknown;
   /** Choices (ChoicePicker picks the look); omit for a boolean (switch), give min / max (slider) or kind "text". */
   options?: readonly (string | number | { value: unknown; label: string })[];
-  /** "text": a text field (the default is a string). */
-  kind?: "segmented" | "chips" | "cards" | "grid" | "combobox" | "text";
+  /** "text": a text field (the default is a string). "json": a data prop as JSON text (a required `nodes` / `items`):
+   * the field is text, the component gets the parsed value (MarchIDE's raw component); give toCode `(x) => \`{${x}}\``. */
+  kind?: "segmented" | "chips" | "cards" | "grid" | "combobox" | "text" | "json";
   min?: number;
   max?: number;
   step?: number;
