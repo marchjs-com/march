@@ -22,7 +22,7 @@ export interface HorizontalScrollProps {
   pinned?: boolean | undefined;
   /** Extra CSS class on the section (`.m-hs`). @tr Bölüme (`.m-hs`) eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
-  /** The panels. @tr Paneller. */
+  /** The panels (a string or number is drawn as a plain text card). @tr Paneller (metin ya da sayı düz bir metin kartı olarak çizilir). */
   children?: unknown;
 }
 
@@ -30,7 +30,10 @@ const native = (): boolean => reducedMotion() || !!globalThis.matchMedia?.("(hov
 
 /** `<HorizontalScroll label="Case studies"><Card/><Card/><Card/></HorizontalScroll>` */
 export function HorizontalScroll(props: HorizontalScrollProps): Element {
-  const track = h("div", { class: "m-hs-track" }, props.children) as HTMLElement;
+  // a text panel (a string or number child: the panel titles as data) is drawn as a plain card
+  const kids = Array.isArray(props.children) ? props.children : [props.children];
+  const panels = kids.map((c) => (typeof c === "string" || typeof c === "number" ? h("div", { class: "m-hs-text" }, String(c)) : c));
+  const track = h("div", { class: "m-hs-track" }, panels) as HTMLElement;
   const done = signal(0); // 0..1 of the pinned passage: the Progress line under the panels shows it
   const pin = h("div", { class: "m-hs-pin" }, h("div", { class: "m-hs-view" }, track),
     props.progress === false ? null : h(Progress, { variant: "line", decorative: true, smooth: false, value: done, max: 1, class: "m-hs-bar" })) as HTMLElement;

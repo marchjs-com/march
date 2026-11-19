@@ -16,7 +16,7 @@ optional big wordmark fills the last line.
 
 | Prop | Type | Default | |
 |---|---|---|---|
-| `brand` | Brand props or node | — | |
+| `brand` | Brand props, name (string) or node | — | |
 | `about` | node | — | short line under the brand |
 | `columns` | `{ title, links: { label, href }[] }[]` | — | |
 | `social` | `{ label, href, icon }[]` | — | icon links (label is the accessible name) |

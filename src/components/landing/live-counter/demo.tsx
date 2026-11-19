@@ -13,7 +13,7 @@ export const code = `import { splitFlap } from "march/motion/text"
 
 const EFFECTS: Record<string, LiveCounterEffect | "roll" | "none"> = { roll: "roll", none: "none", splitFlap, scramble, decode, odometer, pop, glitch } as never
 
-export default function LiveCounterDemo(props: { values: { effect: string; dot: string; bubble: string; beat: boolean; rate: number } }) {
+export default function LiveCounterDemo(props: { values: { from: number; label: string; effect: string; dot: string; bubble: string; beat: boolean; rate: number } }) {
   return <div class="sc-lc-stage">
     {() => {
       const v = { ...props.values }
@@ -24,7 +24,7 @@ export default function LiveCounterDemo(props: { values: { effect: string; dot: 
         bubble: v.bubble === "off" ? false : v.bubble === "own" ? (d: number) => <span class="sc-lc-own">{`❤ ${d} yeni`}</span> : true,
       }
       return <>
-        <LiveCounter from={18420} rate={v.rate} {...shared} label="kişi bu hafta bir etkinliğe katıldı" />
+        <LiveCounter from={v.from ?? 18420} rate={v.rate} {...shared} label={v.label || undefined} />
         <LiveCounter from={1264} rate={v.rate / 4} {...shared} label="etkinlik şu an devam ediyor" />
       </>
     }}

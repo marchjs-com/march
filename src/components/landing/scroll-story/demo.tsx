@@ -25,12 +25,12 @@ const turnIn = (incoming: HTMLElement, outgoing: HTMLElement | undefined, dir: 1
 // the visual changes while the page scrolls past a step: the stage says how it will come in
 const TRANSITIONS: Record<string, string> = { rise: "yükselerek gelir", fade: "solarak gelir", own: "dönerek gelir (kendi geçişim)", none: "hareketsiz değişir" }
 
-export default function ScrollStoryDemo(props: { values: { side: string; theme: boolean; dots: boolean; numbers: string; transition: string } }) {
+export default function ScrollStoryDemo(props: { values: { sample: number; side: string; theme: boolean; dots: boolean; numbers: string; transition: string } }) {
   return <div>
     <p class="m-muted">{() => `Sayfayı kaydır: adım değişince görsel ${TRANSITIONS[props.values.transition]}.`}</p>
     {() => {
       const v = { ...props.values }
-      return <ScrollStory steps={STORY} side={v.side as "end"} theme={v.theme} dots={v.dots}
+      return <ScrollStory steps={STORY.slice(0, v.sample)} side={v.side as "end"} theme={v.theme} dots={v.dots}
         numbers={v.numbers === "off" ? false : v.numbers === "own" ? (i: number) => `Adım ${i + 1}` : true}
         transition={v.transition === "own" ? turnIn : v.transition as "rise"} />
     }}

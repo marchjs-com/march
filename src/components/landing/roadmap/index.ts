@@ -39,7 +39,7 @@ const TONE: Record<RoadmapStatus, TimelineItem["tone"]> = { done: "success", now
 export function Roadmap(props: RoadmapProps): Element {
   const label = (s: RoadmapStatus): unknown => props.labels?.[s] ?? (s === "done" ? t`Done` : s === "now" ? t`In progress` : t`Planned`);
   const own = typeof props.badges === "function" ? props.badges : null;
-  const items = props.items.map((x) => ({
+  const items = (props.items ?? []).map((x) => ({ // no entries yet (a raw component in the IDE): an empty line, not an error
     time: x.time, icon: x.icon, tone: TONE[x.status ?? "next"], class: `is-${x.status ?? "next"}`, // the status styles the dot (colour, pulse)
     title: props.badges !== false && x.status ? h("span", { class: "m-rm-title" }, x.title,
       own ? own(x.status, label(x.status)) : h(Badge, { tone: x.status === "done" ? "success" : x.status === "now" ? "info" : "neutral", class: "m-rm-badge" }, label(x.status))) : x.title,

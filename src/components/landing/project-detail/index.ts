@@ -32,8 +32,8 @@ export interface ProjectDetailProps {
   project: ProjectDetails;
   /** Back to the list (shows the back button). @tr Listeye döner (geri düğmesini gösterir). */
   onBack?: (() => void) | undefined;
-  /** The next project (a card at the end). @tr Sonraki proje (sonda bir kart). */
-  next?: { project: Project; onOpen: (p: Project, cover: Element) => void } | undefined;
+  /** The next project (a card at the end); without `onOpen` the card is a plain link to its `href`. @tr Sonraki proje (sonda bir kart); `onOpen` olmadan kart, `href` adresine giden düz bir bağlantıdır. */
+  next?: { project: Project; onOpen?: ((p: Project, cover: Element) => void) | undefined } | undefined;
   /** Shared element name of the cover (default `project-<id>`, the name ProjectGrid gives its covers). @tr Kapağın paylaşılan öğe adı (varsayılan `project-<id>`, ProjectGrid'in kapaklarına verdiği ad). */
   shared?: string | undefined;
   /** The category line above the title (default true). @tr Başlığın üstündeki kategori satırı (varsayılan true). */
@@ -63,7 +63,8 @@ const coverNode = (c: ProjectCover | Node, eager = false): unknown => h(Picture,
 
 /** `<ProjectDetail project={p} onBack={() => $open = null} next={{ project: n, onOpen }} />` */
 export function ProjectDetail(props: ProjectDetailProps): Element {
-  const p = props.project;
+  // the raw component (no project yet) draws an empty page instead of failing
+  const p: ProjectDetails = props.project ?? { id: "project", title: "", cover: h("div") as Node };
   const L = props.labels ?? {};
   const facts = (props.facts === false ? [] : [
     p.role != null && { label: L.role ?? t`Role`, value: p.role },
@@ -92,7 +93,7 @@ export function ProjectDetail(props: ProjectDetailProps): Element {
     p.gallery?.length ? h("div", { class: "m-pd-gallery" }, p.gallery.map((g, i) => isPicture(g)
       ? h("button", { type: "button", class: "m-pd-shot", "aria-label": () => (L.openImage ? L.openImage(i + 1) : t`Open image ${i + 1}`), onClick: () => void openMedia(g.src, { alt: g.alt ?? "" }) }, coverNode(g))
       : h("div", { class: "m-pd-shot" }, g))) : null,
-    props.next ? h("a", { class: "m-pd-next", href: props.next.project.href ?? `#${props.next.project.id}`, onClick: (e: Event) => { e.preventDefault(); props.next?.onOpen(props.next.project, nextCover as Element); } },
+    props.next ? h("a", { class: "m-pd-next", href: props.next.project.href ?? `#${props.next.project.id}`, onClick: (e: Event) => { const open = props.next?.onOpen; if (!open || !props.next) return; e.preventDefault(); open(props.next.project, nextCover as Element); } },
       h("span", { class: "m-pd-next-text" }, h("span", { class: "m-pd-next-label" }, L.next ?? t`Next project`), h("span", { class: "m-pd-next-title" }, props.next.project.title, " ", nextIcon)),
       nextCover) : null) as Element;
 }

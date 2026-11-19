@@ -10,6 +10,7 @@
 .m-story-media { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; }
 .m-story-media.is-active { opacity: 1; }
 .m-story-media > * { max-width: 100%; max-height: 100%; }
+.m-story-glyph { font-size: clamp(3.5rem, 12cqi, 8rem); line-height: 1; }
 .m-story-step { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; gap: var(--m-space-3); opacity: .38; transition: opacity var(--m-dur-slow) var(--m-ease); }
 .m-story-step:first-child { min-height: 50vh; } .m-story-step:last-child { min-height: 80vh; }
 .m-story-step.is-active { opacity: 1; }

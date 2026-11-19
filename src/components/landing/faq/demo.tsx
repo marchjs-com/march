@@ -16,13 +16,13 @@ export const FAQ: FaqItem[] = [
   { q: "Güvende miyim?", a: "Profilleri doğrulama, şikâyet ve engelleme her ekranda bir dokunuş uzağında.", keywords: "güvenlik engelle şikayet" },
 ]
 
-export default function FaqDemo(props: { values: { layout: string; search: boolean; multiple: boolean; texts: boolean; count: boolean; reveal: string } }) {
+export default function FaqDemo(props: { values: { sample: number; title: string; lead: string; layout: string; search: boolean; multiple: boolean; texts: boolean; count: boolean; reveal: string } }) {
   return <div>
     {() => {
       const v = { ...props.values }
       return <Faq layout={v.layout as "split"} search={v.search} multiple={v.multiple} count={v.count} reveal={v.reveal as "up"}
         labels={v.texts ? { search: "Bir kelime yaz: bilet, yemek, iptal…", empty: "Bunu bulamadık. Bize yaz, yanıtlayalım.", count: (shown: number, total: number) => `${total} sorudan ${shown} tanesi` } : undefined}
-        items={FAQ} title="Sık sorulanlar" lead="Aradığını bulamadın mı? Bize yaz, yanıtlayalım." contact={<Button variant="secondary">Bize yaz</Button>} />
+        items={FAQ.slice(0, v.sample)} title={v.title || undefined} lead={v.lead || undefined} contact={<Button variant="secondary">Bize yaz</Button>} />
     }}
   </div>
 }

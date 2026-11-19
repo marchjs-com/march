@@ -15,7 +15,7 @@ Below 860 px the links move into a Drawer.
 
 | Prop | Type | Default | |
 |---|---|---|---|
-| `brand` | Brand props or a node | — | start of the bar |
+| `brand` | Brand props, a name or a node | — | start of the bar |
 | `links` | `{ label, href, active? }[]` | — | `active` marks the current page (`aria-current`) |
 | `actions` | node | — | end of the bar; also in the drawer |
 | `mode` | `solid` `transparent` `floating` | `solid` | |

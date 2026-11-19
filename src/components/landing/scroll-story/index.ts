@@ -44,17 +44,19 @@ export interface ScrollStoryProps {
 export function ScrollStory(props: ScrollStoryProps): Element {
   const active = signal(0);
   const stacked = signal(false);
-  const media = props.steps.map((s, i) => h("div", { class: () => cx("m-story-media", active() === i && "is-active"), "aria-hidden": () => (stacked() || active() === i ? null : "true") }, s.media) as HTMLElement);
-  const slots = props.steps.map(() => h("div", { class: "m-story-inline" }) as HTMLElement);
-  const steps = props.steps.map((s, i) => h("article", { class: () => cx("m-story-step", active() === i && "is-active") },
+  const list = props.steps ?? []; // no steps yet (a raw component in the IDE): an empty section, not an error
+  // a text media (an emoji, a word) is drawn large in the middle of the stage
+  const media = list.map((s, i) => h("div", { class: () => cx("m-story-media", active() === i && "is-active"), "aria-hidden": () => (stacked() || active() === i ? null : "true") }, typeof s.media === "string" ? h("span", { class: "m-story-glyph" }, s.media) : s.media) as HTMLElement);
+  const slots = list.map(() => h("div", { class: "m-story-inline" }) as HTMLElement);
+  const steps = list.map((s, i) => h("article", { class: () => cx("m-story-step", active() === i && "is-active") },
     slots[i],
     props.numbers === false ? null : h("span", { class: "m-story-num", "aria-hidden": "true" }, typeof props.numbers === "function" ? props.numbers(i) : String(i + 1).padStart(2, "0")),
     h("h3", { class: "m-story-title" }, s.title),
     s.body != null ? h("p", { class: "m-story-body" }, s.body) : null) as HTMLElement);
-  const dots = props.dots === false ? null : h(PageDots, { class: "m-story-dots", count: props.steps.length, value: active, decorative: true });
+  const dots = props.dots === false ? null : h(PageDots, { class: "m-story-dots", count: list.length, value: active, decorative: true });
   const root = h("section", {
     class: cx("m-story", props.side === "start" && "m-story-media-start", props.theme !== false && "is-themed", val(props.class)),
-    "data-m-color": () => (props.theme !== false ? colorAttr(props.steps[active()]?.color) : null),
+    "data-m-color": () => (props.theme !== false ? colorAttr(list[active()]?.color) : null),
   },
   h("div", { class: "m-story-pin" }, h("div", { class: "m-story-stage" }, media), dots),
   h("div", { class: "m-story-steps" }, steps)) as HTMLElement;

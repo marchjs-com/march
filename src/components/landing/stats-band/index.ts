@@ -41,7 +41,7 @@ export function StatsBand(props: StatsBandProps): Element {
   const mode = props.mode;
   return h(Reveal, { class: cx("m-stats", `m-stats-${props.variant ?? "divided"}`, val(props.class)), effect: "up", stagger: 90, ...(props.reveal === false ? { effect: "none" } : props.reveal), as: "dl" },
     // each item is a StatTile (dt / dd inside the dl): the figure is a Counter, or plain text with mode "none"
-    props.items.map((s) => h(StatTile, {
+    (props.items ?? []).map((s) => h(StatTile, { // no figures yet (a raw component in the IDE): an empty band
       term: true, size: "xl", variant: props.variant === "cards" ? "card" : "plain", class: "m-stats-item", label: s.label, hint: s.note ?? undefined,
       value: mode === "none"
         ? h("span", { class: "m-stats-plain" }, s.prefix ?? null, () => formatCount(val(s.value), s, locale()), s.suffix ?? null)

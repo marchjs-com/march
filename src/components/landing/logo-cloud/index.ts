@@ -17,7 +17,7 @@ export interface Logo {
   src?: string | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  /** Or any node (an inline SVG). */
+  /** Or any node (an inline SVG). Without `src` and `node` the name is shown as a text wordmark. */
   node?: unknown | undefined;
   href?: string | undefined;
 }
@@ -39,7 +39,9 @@ export interface LogoCloudProps {
 }
 
 function logoNode(l: Logo): Element {
+  // neither an image nor a node: the name itself as a text wordmark
   const inner = l.node != null ? h("span", { class: "m-logo-node" }, l.node)
+    : !l.src ? h("span", { class: "m-logo-name" }, l.name)
     : h(Picture, { src: l.src ?? "", alt: l.name, width: l.width, height: l.height, class: "m-logo-img" });
   return l.href ? h("a", { class: "m-logo", href: l.href, "aria-label": l.node != null ? l.name : null }, inner) as Element : h("span", { class: "m-logo" }, inner) as Element;
 }
@@ -47,10 +49,11 @@ function logoNode(l: Logo): Element {
 /** `<LogoCloud title="Trusted by" logos={[{ name: "HADİ", src: "/hadi.svg", width: 120, height: 32 }]} variant="marquee" />` */
 export function LogoCloud(props: LogoCloudProps): Element {
   const variant = props.variant ?? "grid";
+  const logos = props.logos ?? []; // no logos yet (a raw component in the IDE): only the title, not an error
   const body = variant === "marquee"
     // Marquee repeats the row until the strip is wider than the screen (the copies are hidden from screen readers)
-    ? h(Marquee, { class: "m-logos-marquee", speed: props.speed ?? 40, pause: 0, separator: false, duplicate: true }, h("span", { class: "m-logos-row" }, props.logos.map(logoNode)))
-    : h(Grid, { min: "9rem", gap: 3, class: "m-logos-cells" }, props.logos.map((l) => h("div", { class: "m-logos-cell" }, logoNode(l))));
+    ? h(Marquee, { class: "m-logos-marquee", speed: props.speed ?? 40, pause: 0, separator: false, duplicate: true }, h("span", { class: "m-logos-row" }, logos.map(logoNode)))
+    : h(Grid, { min: "9rem", gap: 3, class: "m-logos-cells" }, logos.map((l) => h("div", { class: "m-logos-cell" }, logoNode(l))));
   const root = h("div", { class: cx("m-logos", `m-logos-v-${variant}`, props.mono !== false && "is-mono", val(props.class)) },
     props.title != null && h("p", { class: "m-logos-title" }, () => val(props.title)),
     body) as HTMLElement;

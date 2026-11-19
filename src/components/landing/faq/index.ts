@@ -48,16 +48,17 @@ export interface FaqProps {
 /** `<Faq items={[{ q: "Is it free?", a: "Yes, MIT." }]} layout="split" title="Questions" search />` */
 export function Faq(props: FaqProps): Element {
   const q = signal("");
+  const all = (): readonly FaqItem[] => props.items ?? []; // no questions yet (a raw component in the IDE): the empty line, not an error
   const shown = computed(() => {
     const s = q().trim();
-    return s ? rank(s, props.items, (x) => ({ title: x.q, keywords: [x.keywords ?? "", typeof x.a === "string" ? x.a : ""] })).map((r) => r.item) : props.items;
+    return s ? rank(s, all(), (x) => ({ title: x.q, keywords: [x.keywords ?? "", typeof x.a === "string" ? x.a : ""] })).map((r) => r.item) : all();
   });
   const L = props.labels ?? {};
   const list = h("div", { class: "m-faq-list" },
     props.search ? h("div", { class: "m-faq-search" },
       h(SearchBox, { value: q, debounce: 120, placeholder: L.search ?? t`Search questions`, "aria-label": L.search ?? t`Search questions` }),
       props.count === false ? null : h("p", { class: "m-faq-count", "aria-live": "polite" },
-        () => (q().trim() ? (L.count ? L.count(shown().length, props.items.length) : t`${shown().length} of ${props.items.length} questions`) : ""))) : null,
+        () => (q().trim() ? (L.count ? L.count(shown().length, all().length) : t`${shown().length} of ${all().length} questions`) : ""))) : null,
     () => {
       const items = shown();
       if (!items.length) return h(Empty, { size: "sm", title: false, class: "m-faq-empty" }, L.empty ?? t`No question matches. Try other words.`);

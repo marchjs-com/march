@@ -75,7 +75,9 @@ export function compareRow(row: CompareRow, us: string): 1 | 0 | -1 | null {
 /** `<HonestCompare columns={[{ id: "us", name: "HADİ" }, { id: "a", name: "Other" }]} rows={[{ label: "Offline", values: { us: false, a: true }, note: "Planned for spring" }]} />` */
 export function HonestCompare(props: HonestCompareProps): Element {
   const us = props.us ?? "us";
-  const verdicts = props.rows.map((r) => compareRow(r, us));
+  // no columns / rows yet (a raw component): an empty table, not an error
+  const columns = props.columns ?? [], rows = props.rows ?? [];
+  const verdicts = rows.map((r) => compareRow(r, us));
   const onlyBehind = signal(false);
   const counts = computed(() => ({ ahead: verdicts.filter((v) => v === 1).length, even: verdicts.filter((v) => v === 0).length, behind: verdicts.filter((v) => v === -1).length }));
 
@@ -95,15 +97,15 @@ export function HonestCompare(props: HonestCompareProps): Element {
     props.tags === false ? null
       : v === -1 ? h(Badge, { tone: "warn", class: "m-hc-tag is-behind" }, L.behind ?? t`Behind`) : v === 1 ? h(Badge, { tone: "success", class: "m-hc-tag is-ahead" }, L.ahead ?? t`Ahead`) : null;
 
-  const body = h("tbody", null, ...props.rows.flatMap((r, i) => {
+  const body = h("tbody", null, ...rows.flatMap((r, i) => {
     const v = verdicts[i]!;
     const hidden = (): boolean => onlyBehind() && v !== -1;
     const line = h("tr", { class: () => cx("m-hc-row", v === -1 && "is-behind", v === 1 && "is-ahead", hidden() && "is-hidden"), hidden: hidden },
       h("th", { scope: "row", class: "m-hc-label" }, h("span", null, r.label), tag(v)),
-      ...props.columns.map((c) => h("td", { class: cx("m-hc-cell", c.id === us && "m-hc-us") }, cell(r.values[c.id], r, c, v))));
+      ...columns.map((c) => h("td", { class: cx("m-hc-cell", c.id === us && "m-hc-us") }, cell(r.values[c.id], r, c, v))));
     const note = r.note != null
       ? h("tr", { class: () => cx("m-hc-note-row", v === -1 && "is-behind"), hidden: hidden },
-        h("td", { colspan: String(props.columns.length + 1), class: "m-hc-note" }, r.note))
+        h("td", { colspan: String(columns.length + 1), class: "m-hc-note" }, r.note))
       : null;
     return note ? [line, note] : [line];
   }));
@@ -112,7 +114,7 @@ export function HonestCompare(props: HonestCompareProps): Element {
     h("caption", { class: props.showCaption ? "m-hc-caption" : "m-sr-only" }, props.caption ?? t`Comparison`),
     h("thead", null, h("tr", null,
       h("td", { class: "m-hc-corner" }),
-      ...props.columns.map((c) => h("th", { scope: "col", class: cx("m-hc-head", c.id === us && "m-hc-us") }, c.name)))),
+      ...columns.map((c) => h("th", { scope: "col", class: cx("m-hc-head", c.id === us && "m-hc-us") }, c.name)))),
     body);
 
   const summary = props.summary === false ? null : h("div", { class: "m-hc-summary" },

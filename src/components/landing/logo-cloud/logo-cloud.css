@@ -5,6 +5,7 @@
   transition: opacity var(--m-dur) var(--m-ease), filter var(--m-dur) var(--m-ease), transform var(--m-dur) var(--m-ease); }
 .m-logo-img { display: block; max-height: 100%; width: auto; max-width: 9rem; object-fit: contain; }
 .m-logo-node { display: inline-flex; align-items: center; }
+.m-logo-name { font-weight: 700; font-size: 1.125rem; letter-spacing: -0.01em; white-space: nowrap; }
 .is-mono .m-logo { opacity: .62; filter: grayscale(1); }
 .is-mono .m-logo:hover, .is-mono .m-logo:focus-visible { opacity: 1; filter: none; }
 .m-logos-cell { display: grid; place-items: center; min-height: 5rem; padding: var(--m-space-3); border-radius: var(--m-radius-3); border: var(--m-border-w, 1px) solid var(--m-border); background: var(--m-surface); }

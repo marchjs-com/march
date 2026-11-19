@@ -4,6 +4,8 @@
 .m-hs-view { overflow: hidden; padding-block: var(--m-space-3); }
 .m-hs-track { display: flex; gap: var(--m-space-4); width: max-content; padding-inline: clamp(1rem, 6cqi, 5rem); will-change: transform; }
 .m-hs-track > * { flex: none; width: var(--m-hs-panel); min-width: 0; }
+/* a text panel (string children) */
+.m-hs-text { display: grid; place-items: center; min-height: 14rem; padding: var(--m-space-5); border-radius: var(--m-radius-3); background: var(--m-surface-2); border: 1px solid var(--m-border-subtle); font-size: var(--m-text-xl); font-weight: 700; text-align: center; }
 .m-hs-bar { --m-progress-c: var(--m-brand-gradient); margin-inline: clamp(1rem, 6cqi, 5rem); }
 /* native: a normal horizontal scroller with snap points */
 .m-hs.is-native { height: auto; }

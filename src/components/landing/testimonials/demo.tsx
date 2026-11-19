@@ -17,12 +17,12 @@ export const QUOTES: Testimonial[] = [
   { quote: "Kitap kulübümüzün anılarını hikâyelerde paylaşıyoruz.", name: "Bora Er", role: "Kitap kulübü, Trabzon", rating: 5 },
 ]
 
-export default function TestimonialsDemo(props: { values: { variant: string; cols: number; rating: string; avatar: boolean; quotes: boolean } }) {
+export default function TestimonialsDemo(props: { values: { sample: number; variant: string; cols: number; rating: boolean; ratingColor: string; avatar: boolean; quotes: boolean } }) {
   return <div>
     {() => {
       const v = { ...props.values }
-      return <Testimonials variant={v.variant as "grid"} cols={v.cols as 3} items={QUOTES} avatar={v.avatar} quotes={v.quotes}
-        rating={v.rating !== "off"} ratingColor={v.rating === "off" || v.rating === "on" ? undefined : v.rating as "brand-gold"} />
+      return <Testimonials variant={v.variant as "grid"} cols={v.cols as 3} items={QUOTES.slice(0, v.sample)} avatar={v.avatar} quotes={v.quotes}
+        rating={v.rating} ratingColor={v.ratingColor ? v.ratingColor as "brand-gold" : undefined} />
     }}
   </div>
 }

@@ -11,7 +11,7 @@ export const code = `<Reveal effect="up" stagger={80}>
 // an own effect: any start and end state (transform / opacity / filter)
 const TURN = { from: { opacity: 0, transform: "rotate(-10deg) scale(.6)" }, to: { opacity: 1, transform: "rotate(0deg) scale(1)" } }
 
-export default function RevealDemo(props: { values: { effect: string; stagger: number; scrub: boolean } }) {
+export default function RevealDemo(props: { values: { text: string; effect: string; stagger: number; scrub: boolean } }) {
   let $run = 0
   return <div class="sc-web-col">
     <Button size="sm" variant="secondary" onClick={() => $run++}>Tekrar oynat</Button>
@@ -22,5 +22,6 @@ export default function RevealDemo(props: { values: { effect: string; stagger: n
         {["Hızlı", "Erişilebilir", "Temalı", "Küçük"].map((t, i) => <div class="sc-reveal-card"><strong>{t}</strong><span class="m-muted">Kart {i + 1}</span></div>)}
       </Reveal>
     }}
+    {() => props.values.text ? <p class="m-muted">{props.values.text}</p> : null}
   </div>
 }

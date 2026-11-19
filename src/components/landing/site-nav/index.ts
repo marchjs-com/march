@@ -20,8 +20,8 @@ import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 export interface SiteNavLink { label: unknown; href: string; active?: MaybeFn<boolean | undefined> }
 export interface SiteNavProps {
-  /** A Brand (props) or any node. @tr Bir Brand (özellikler) ya da herhangi bir düğüm. */
-  brand: BrandProps | Node;
+  /** A Brand (props), a name (a Brand with that name) or any node. @tr Bir Brand (özellikler), bir ad (o adla bir Brand) ya da herhangi bir düğüm. */
+  brand: BrandProps | Node | string;
   /** The links: `{ label, href, active? }`; `active` marks the current page (`aria-current`). @tr Bağlantılar: `{ label, href, active? }`; `active` geçerli sayfayı işaretler (`aria-current`). */
   links?: readonly SiteNavLink[] | undefined;
   /** Buttons at the end (sign in, primary call to action). Also shown in the mobile drawer. @tr Sondaki düğmeler (giriş yap, birincil eylem çağrısı). Mobil çekmecede de gösterilir. */
@@ -56,7 +56,8 @@ export interface SiteNavProps {
   class?: ClassProp | undefined;
 }
 
-const brandNode = (b: BrandProps | Node): unknown => ((b as Node).nodeType ? b : h(Brand, b as BrandProps));
+const brandNode = (b: BrandProps | Node | string | undefined): unknown =>
+  (b == null ? null : typeof b === "string" ? h(Brand, { name: b }) : (b as Node).nodeType ? b : h(Brand, b as BrandProps));
 
 /**
  * An in-page link (`#pricing`) scrolls to its section itself, so it also works under a hash router. A section that is

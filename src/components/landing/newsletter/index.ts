@@ -63,7 +63,7 @@ export function Newsletter(props: NewsletterProps): Element {
     const v = email.peek().trim();
     if (!EMAIL.test(v)) { fail(props.labels?.invalid ?? t`Enter a valid email address.`); return; }
     state.set("pending"); error.set("");
-    try { await props.onSubmit(v); } catch (err) { fail((err as Error)?.message || (props.labels?.error ?? t`Something went wrong. Please try again.`)); return; }
+    try { await props.onSubmit?.(v); } catch (err) { fail((err as Error)?.message || (props.labels?.error ?? t`Something went wrong. Please try again.`)); return; }
     const form = root.querySelector(".m-nl-form") as HTMLElement | null;
     if (form && props.motion !== false) await animate(form, { opacity: [1, 0], transform: ["scale(1)", "scale(.96)"] }, { duration: 220, easing: "in" }).finished;
     state.set("done");

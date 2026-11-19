@@ -32,9 +32,9 @@ export function activitySource(from = 0): () => FeedItem {
 }
 
 let round = 0
-export default function LiveFeedDemo(props: { values: { variant: string; enter: string; leave: string; glow: boolean; item: string; button: string; every: number; max: number } }) {
+export default function LiveFeedDemo(props: { values: { sample: number; variant: string; enter: string; leave: string; glow: boolean; item: string; button: string; every: number; max: number } }) {
   return <div class="sc-lf-stage">
-    {() => { const v = { ...props.values }; return <LiveFeed variant={v.variant as "list" | "wall"} enter={v.enter as "flip"} leave={v.leave as "blur"} glow={v.glow} every={v.every} first={600} max={v.max} next={activitySource(round++ * 7)} label="HADİ'de şimdi"
+    {() => { const v = { ...props.values }; return <LiveFeed variant={v.variant as "list" | "wall"} enter={v.enter as "flip"} leave={v.leave as "blur"} glow={v.glow} every={v.every} first={600} max={v.max} next={v.sample === 0 ? undefined : activitySource(round++ * 7)} label="HADİ'de şimdi"
       pausable={v.button !== "off"} pauseLabel={v.button === "own" ? "Yayında · durdur" : undefined} resumeLabel={v.button === "own" ? "Durdu · sürdür" : undefined} pulse={v.button !== "own"}
       renderItem={v.item === "own" ? (it) => <span class="sc-lf-own"><b>{it.title}</b> <small>{it.body}</small></span> : undefined} /> }}
   </div>

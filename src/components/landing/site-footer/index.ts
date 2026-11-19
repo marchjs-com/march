@@ -15,8 +15,8 @@ export interface FooterLink { label: unknown; href: string }
 export interface FooterColumn { title: unknown; links: readonly FooterLink[] }
 export interface FooterSocial { label: string; href: string; icon: unknown }
 export interface SiteFooterProps {
-  /** The brand: Brand props or your own node. @tr Marka: Brand özellikleri ya da kendi düğümünüz. */
-  brand: BrandProps | Node;
+  /** The brand: Brand props, just its name, or your own node. @tr Marka: Brand özellikleri, yalnız adı ya da kendi düğümünüz. */
+  brand: BrandProps | Node | string;
   /** Short line under the brand. @tr Markanın altındaki kısa satır. */
   about?: MaybeFn<unknown> | undefined;
   /** Link columns: `{ title, links: { label, href }[] }`. @tr Bağlantı sütunları: `{ title, links: { label, href }[] }`. */
@@ -43,14 +43,16 @@ export interface SiteFooterProps {
 
 /** `<SiteFooter brand={{ name: "HADİ" }} columns={[{ title: "Product", links: [{ label: "Pricing", href: "/pricing" }] }]} />` */
 export function SiteFooter(props: SiteFooterProps): Element {
-  const isNode = (props.brand as Node).nodeType != null;
-  const name = isNode ? "" : String(val((props.brand as BrandProps).name) ?? "");
+  // a bare string is the brand's name
+  const brand = typeof props.brand === "string" ? { name: props.brand } : props.brand ?? { name: "" };
+  const isNode = (brand as Node).nodeType != null;
+  const name = isNode ? "" : String(val((brand as BrandProps).name) ?? "");
   const year = new Date().getFullYear();
   return h("footer", { class: cx("m-sfoot", val(props.class)) },
     h("div", { class: "m-sfoot-inner" },
       h("div", { class: "m-sfoot-top" },
         h("div", { class: "m-sfoot-about" },
-          isNode ? props.brand : h(Brand, props.brand as BrandProps),
+          isNode ? brand : h(Brand, brand as BrandProps),
           props.about != null && h("p", { class: "m-sfoot-text" }, () => val(props.about)),
           props.social?.length ? h("ul", { class: "m-sfoot-social" }, props.social.map((s) => h("li", {}, h(IconButton, { href: s.href as never, label: s.label, icon: s.icon, shape: "round", class: "m-sfoot-social-link", rel: "noopener" })))) : null),
         (props.columns ?? []).map((c) => h("nav", { class: "m-sfoot-col", "aria-label": typeof c.title === "string" ? c.title : null },

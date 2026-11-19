@@ -11,7 +11,7 @@ export const code = `<Parallax pointer={1} layers={[
 
 const Hills = (p: { cls: string; d: string }) => <svg class={p.cls} viewBox="0 0 1200 400" preserveAspectRatio="none" aria-hidden="true"><path d={p.d} /></svg>
 
-export default function ParallaxDemo(props: { values: { depth: number; pointer: number } }) {
+export default function ParallaxDemo(props: { values: { sample: number; text: string; depth: number; pointer: number } }) {
   return <div class="sc-demo-stack"><div class="sc-site-frame">
     {() => {
       const v = { ...props.values }, d = v.depth
@@ -20,8 +20,8 @@ export default function ParallaxDemo(props: { values: { depth: number; pointer: 
         { content: <Hills cls="sc-plx-far" d="M0 260 C 200 160 340 220 520 170 S 900 120 1200 210 V400 H0 Z" />, speed: d },
         { content: <Hills cls="sc-plx-mid" d="M0 300 C 160 240 380 300 600 250 S 980 230 1200 290 V400 H0 Z" />, speed: d * 0.55 },
         { content: <div class="sc-plx-dots"><i /><i /><i /><i /></div>, speed: -d * 0.6, depth: 90 },
-      ]}>
-        <h3 class="sc-plx-title">Derinlik, yalnız transform</h3>
+      ].slice(0, v.sample)}>
+        <h3 class="sc-plx-title">{v.text || "Derinlik, yalnız transform"}</h3>
       </Parallax>
     }}
     </div>

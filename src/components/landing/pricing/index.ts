@@ -91,7 +91,8 @@ export function Pricing(props: PricingProps): Element {
     h(Segmented, { indicator: "slide" as const, value: sel, options: [{ value: "monthly", label: L.monthly ?? t`Monthly` }, { value: "yearly", label: L.yearly ?? t`Yearly` }] as never, onChange: (v: unknown) => setPeriod(v as BillingPeriod), "aria-label": L.billingPeriod ?? t`Billing period`, class: "m-price-seg" }),
     props.saving != null && h(Badge, { tone: "success", class: () => cx("m-price-saving", period() === "yearly" && "is-on") }, () => val(props.saving)));
 
-  const cards = props.plans.map((p) => {
+  // no plans yet (a raw component in the IDE): only the switch, not an error
+  const cards = (props.plans ?? []).map((p) => {
     const amount = (): number => priceOf(p, period()) ?? 0;
     const custom = priceOf(p, "monthly") == null && priceOf(p, "yearly") == null;
     const feats = (p.features ?? []).map((f) => {

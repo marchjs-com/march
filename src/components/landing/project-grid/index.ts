@@ -59,9 +59,10 @@ export interface ProjectGridProps {
 
 /** `<ProjectGrid projects={work} onOpen={(p, cover) => sharedTransition(`project-${p.id}`, cover, () => $open = p)} />` */
 export function ProjectGrid(props: ProjectGridProps): Element {
-  const cats = [...new Set(props.projects.map((p) => p.category).filter((c): c is string => !!c))];
+  const projects = props.projects ?? []; // the raw component (no projects yet) draws an empty grid
+  const cats = [...new Set(projects.map((p) => p.category).filter((c): c is string => !!c))];
   const filter = signal<string | null>(null);
-  const cards = props.projects.map((p) => {
+  const cards = projects.map((p) => {
     const cover = h("div", { class: "m-pg-cover", "data-project": p.id, "data-m-shared": `project-${p.id}` },
       h(Picture, { source: p.cover }),
       props.arrow === false ? null : typeof props.arrow === "function"

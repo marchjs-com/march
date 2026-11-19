@@ -17,7 +17,7 @@ const open = (p, cover) => sharedTransition(`project-${p.id}`, cover, () => { $o
 |---|---|---|---|
 | `project` | Project + `{ role?, client?, services?, body?, gallery?, links? }` | — | |
 | `onBack` | `() => void` | — | shows the back button |
-| `next` | `{ project, onOpen }` | — | next-project card (its cover morphs too) |
+| `next` | `{ project, onOpen? }` | — | next-project card (its cover morphs too); without `onOpen` a plain link to `project.href` |
 | `shared` | string | `project-<id>` | shared element name of the cover (ProjectGrid uses the same) |
 | `eyebrow` | boolean | `true` | the category line above the title |
 | `facts` | boolean | `true` | the facts list (role, client, year, category) |

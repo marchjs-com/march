@@ -6,6 +6,8 @@
 .m-ba-layer { grid-area: 1 / 1; min-width: 0; min-height: 0; }
 .m-ba-layer > img, .m-ba-layer > video, .m-ba-layer > svg { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; }
 .m-ba-before { clip-path: inset(0 calc(100% - var(--m-ba-pos)) 0 0); }
+.m-ba-text { display: grid; place-items: center; min-block-size: 12rem; block-size: 100%; padding: var(--m-space-5); background: var(--m-surface-2); font-size: var(--m-text-2xl); font-weight: var(--m-weight-semibold); text-align: center; }
+.m-ba-before > .m-ba-text { background: var(--m-surface-3); color: var(--m-text-2); }
 .m-ba:dir(rtl) .m-ba-before { clip-path: inset(0 0 0 calc(100% - var(--m-ba-pos))); }
 .m-ba-vertical .m-ba-before, .m-ba-vertical:dir(rtl) .m-ba-before { clip-path: inset(0 0 calc(100% - var(--m-ba-pos)) 0); }
 

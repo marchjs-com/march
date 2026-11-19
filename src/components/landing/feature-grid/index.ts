@@ -48,6 +48,7 @@ const TONES: IconTone[] = ["primary", "info", "success", "violet", "warn", "pink
 /** `<FeatureGrid items={[{ icon: zap, title: "Fast", body: "…" }]} variant="cards" cols={3} />` */
 export function FeatureGrid(props: FeatureGridProps): Element {
   const variant = props.variant ?? "cards";
+  const list = props.items ?? []; // no items yet (a raw component in the IDE): an empty grid, not an error
   const tile = (it: FeatureItem, i: number): Element => {
     const row = (as: "article" | "div", cls: string): Element => h(ListRow, {
       as, class: cls, direction: variant === "list" ? "row" : "column", align: "start", overflow: "wrap", titleAs: "h3", subAs: "p",
@@ -60,8 +61,8 @@ export function FeatureGrid(props: FeatureGridProps): Element {
     return row("article", cx("m-fg-row", cls));
   };
   const grid = variant === "bento"
-    ? h("div", { class: "m-fg-bento" }, props.items.map(tile))
-    : h(Grid, { cols: variant === "list" ? 2 : props.cols ?? 3, gap: variant === "plain" ? 6 : 4, equal: variant === "cards" }, props.items.map(tile));
+    ? h("div", { class: "m-fg-bento" }, list.map(tile))
+    : h(Grid, { cols: variant === "list" ? 2 : props.cols ?? 3, gap: variant === "plain" ? 6 : 4, equal: variant === "cards" }, list.map(tile));
   const root = h("div", { class: cx("m-fg", `m-fg-v-${variant}`, props.spotlight !== false && (variant === "cards" || variant === "bento") && "is-spotlight", val(props.class)) }, grid) as HTMLElement;
 
   if (props.reveal !== "none") owned(revealOnScroll(root, { effect: props.reveal ?? "up", select: ".m-fg-item", stagger: 70 }));

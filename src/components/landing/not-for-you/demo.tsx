@@ -20,10 +20,10 @@ export const FOR_YOU: NotForYouItem[] = [
 
 const OWN_MARKS = { not: "🙅", marked: "🎉", for: "👍" }
 
-export default function NotForYouDemo(props: { values: { variant: string; check: boolean; both: boolean; mark: string; me: boolean; verdict: boolean } }) {
+export default function NotForYouDemo(props: { values: { sample: number; title: string; variant: string; check: boolean; both: boolean; mark: string; me: boolean; verdict: boolean } }) {
   return <div>
-    {() => { const v = { ...props.values }; return <NotForYou variant={v.variant as "cards" | "list"} check={v.check} markedHint={v.me ? "Sen bir HADİ'lisin" : false}
+    {() => { const v = { ...props.values }; return <NotForYou title={v.title || undefined} variant={v.variant as "cards" | "list"} check={v.check} markedHint={v.me ? "Sen bir HADİ'lisin" : false}
       mark={v.mark === "off" ? false : v.mark === "own" ? (state) => OWN_MARKS[state] : true} meLabel={v.me ? undefined : false} hint={v.me ? undefined : false} verdict={v.verdict ? undefined : false}
-      items={NOT_FOR_YOU} forYou={v.both ? FOR_YOU : undefined} /> }}
+      items={NOT_FOR_YOU.slice(0, v.sample ?? 4)} forYou={v.both ? FOR_YOU : undefined} /> }}
   </div>
 }

@@ -13,11 +13,11 @@ export const STATS: StatItem[] = [
   { value: 81, label: "ilde etkinlik" },
 ]
 
-export default function StatsBandDemo(props: { values: { variant: string; mode: string; color: string; reveal: string } }) {
+export default function StatsBandDemo(props: { values: { sample: number; variant: string; mode: string; color: string; reveal: string } }) {
   return <div>
     {() => {
       const v = { ...props.values }
-      return <StatsBand variant={v.variant as "plain"} mode={v.mode as "count"} items={STATS} m:color={v.color === "default" ? undefined : v.color as "brand-orange"}
+      return <StatsBand variant={v.variant as "plain"} mode={v.mode as "count"} items={STATS.slice(0, v.sample)} m:color={v.color === "default" ? undefined : v.color as "brand-orange"}
         reveal={v.reveal === "off" ? false : { effect: v.reveal as "up" }} />
     }}
   </div>

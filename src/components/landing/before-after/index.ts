@@ -17,7 +17,7 @@ import tr from "./tr.ts";
 messages("tr", tr);
 
 export interface BeforeAfterProps {
-  /** The first layer (start / top side): an image, a mock, any node. @tr İlk katman (başlangıç / üst taraf): bir görsel, bir taslak, herhangi bir düğüm. */
+  /** The first layer (start / top side): an image, a mock, any node; a string is drawn as a large centred text. @tr İlk katman (başlangıç / üst taraf): bir görsel, bir taslak, herhangi bir düğüm; bir metin ortada büyük yazılır. */
   before: unknown;
   /** The second layer (end / bottom side). @tr İkinci katman (bitiş / alt taraf). */
   after: unknown;
@@ -85,12 +85,14 @@ export function BeforeAfter(props: BeforeAfterProps): Element {
   const label = (x: unknown, side: "before" | "after"): Element | null =>
     x == null ? null : h("span", { class: () => cx("m-ba-label", `m-ba-label-${side}`, (side === "before" ? pos() < 14 : pos() > 86) && "is-hidden"), "aria-hidden": "true" }, h(Badge, {}, x));
 
+  // a plain text layer: a filled panel with the text in the middle (a quick sketch, the raw component's look)
+  const layer = (x: unknown): unknown => (typeof x === "string" || typeof x === "number" ? h("span", { class: "m-ba-text" }, x) : x);
   const root = h("div", {
     class: () => cx("m-ba", vertical() && "m-ba-vertical", props.follow && "m-ba-follow", val(props.class)),
     role: "group", "aria-label": () => props.label ?? t`Before and after`,
   },
-    h("div", { class: "m-ba-layer m-ba-after" }, props.after),
-    h("div", { class: "m-ba-layer m-ba-before" }, props.before),
+    h("div", { class: "m-ba-layer m-ba-after" }, layer(props.after)),
+    h("div", { class: "m-ba-layer m-ba-before" }, layer(props.before)),
     label(props.beforeLabel, "before"), label(props.afterLabel, "after"),
     handle) as HTMLElement;
 

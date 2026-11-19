@@ -8,12 +8,12 @@ export const code = `<LogoCloud title="Bu topluluklar HADİ'de buluşuyor" varia
 ]} />
 <LogoCloud logos={logos} reveal="up" />     // grid: another entrance; reveal="none": the logos are simply there`
 
-export default function LogoCloudDemo(props: { values: { variant: string; mono: boolean; speed: number; reveal: string } }) {
+export default function LogoCloudDemo(props: { values: { sample: number; title: string; variant: string; mono: boolean; speed: number; reveal: string } }) {
   const logos = LOGO_NAMES.filter((name) => name !== "HADİ").map((name) => ({ name, node: <Wordmark name={name} /> }))
   return <div>
     {() => {
       const v = { ...props.values }
-      return <LogoCloud title="Bu topluluklar HADİ'de buluşuyor" variant={v.variant as "grid"} mono={v.mono} speed={v.speed} reveal={v.reveal as "fade"} logos={logos} />
+      return <LogoCloud title={v.title || undefined} variant={v.variant as "grid"} mono={v.mono} speed={v.speed} reveal={v.reveal as "fade"} logos={logos.slice(0, v.sample)} />
     }}
   </div>
 }

@@ -64,7 +64,9 @@ export function notForYouVerdict(n: number, total: number): string {
 /** `<NotForYou check items={[{ text: "You need offline sync", detail: "…" }]} forYou={[…]} />` */
 export function NotForYou(props: NotForYouProps): Element {
   const marked = signal<ReadonlySet<number>>(new Set());
-  const total = props.items.length;
+  // no items yet (a raw component): the heading and an empty list, not an error
+  const items = props.items ?? [];
+  const total = items.length;
   const toggle = (i: number): void => {
     const next = new Set(marked.peek());
     if (next.has(i)) next.delete(i); else next.add(i);
@@ -107,7 +109,7 @@ export function NotForYou(props: NotForYouProps): Element {
 
   return h("div", { class: () => cx("m-nfy", `m-nfy-v-${props.variant ?? "cards"}`, props.forYou?.length && "m-nfy-both", val(props.class)) },
     h("div", { class: "m-nfy-cols" },
-      list(props.title ?? t`Not for you if…`, props.items, "not"),
+      list(props.title ?? t`Not for you if…`, items, "not"),
       props.forYou?.length ? list(props.forYouTitle ?? t`For you if…`, props.forYou, "for") : null),
     props.check && props.verdict !== false ? h("p", { class: () => cx("m-nfy-verdict", count() >= total && "is-in", count() > 0 && count() < total && "is-some"), role: "status", "aria-live": "polite" },
       () => (props.verdict || notForYouVerdict)(count(), total)) : null);

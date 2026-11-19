@@ -110,17 +110,19 @@ export function storyEndings(passages: Record<string, StoryPassage>, start: stri
 
 /** `<BranchingStory start="intro" passages={{ intro: { body: "…", choices: [{ label: "Go", to: "next" }] }, next: { body: "The end", ending: "Short" } }} />` */
 export function BranchingStory(props: BranchingStoryProps): Element {
-  const path = signal<string[]>(untrack(() => val(props.path)) ?? [props.start]);
+  // no passages yet (a raw component): the start passage reads as missing, not an error
+  const passages = props.passages ?? {}, start = props.start ?? "";
+  const path = signal<string[]>(untrack(() => val(props.path)) ?? [start]);
   if (props.path !== undefined) effect(() => { const p = val(props.path); if (p?.length) path.set(p); });
-  const all = storyEndings(props.passages, props.start);
+  const all = storyEndings(passages, start);
   const found = signal<ReadonlySet<string>>(new Set());
-  const current = computed(() => { const p = path(); return p[p.length - 1] ?? props.start; });
+  const current = computed(() => { const p = path(); return p[p.length - 1] ?? start; });
   let forward = true;
   const go = (next: string[]): void => {
     forward = next.length >= path.peek().length;
     path.set(next);
     const id = next[next.length - 1]!;
-    if (!props.passages[id]?.choices?.length && !found.peek().has(id)) found.set(new Set([...found.peek(), id]));
+    if (!passages[id]?.choices?.length && !found.peek().has(id)) found.set(new Set([...found.peek(), id]));
     props.onChange?.(next);
   };
 
@@ -131,7 +133,7 @@ export function BranchingStory(props: BranchingStoryProps): Element {
     h(Breadcrumbs, {
       class: "m-bs-trail", label: () => L.path ?? t`Your path`,
       items: () => path().map((id, i, p): Crumb => {
-        const prev = i ? props.passages[p[i - 1]!] : null;
+        const prev = i ? passages[p[i - 1]!] : null;
         const via = prev?.choices?.find((c) => c.to === id)?.label ?? L.start ?? t`Start`;
         return { id: `${i}:${id}`, label: via as string, onSelect: () => go(p.slice(0, i + 1)) };
       }),
@@ -155,7 +157,7 @@ export function BranchingStory(props: BranchingStoryProps): Element {
   const scopes = new WeakMap<HTMLElement, () => void>();
   const drop = (el: HTMLElement): void => { el.remove(); scopes.get(el)?.(); };
   const passage = (id: string): HTMLElement => createRoot((dispose) => {
-    const p = props.passages[id] ?? { body: L.missing ?? t`This part of the story is missing.` };
+    const p = passages[id] ?? { body: L.missing ?? t`This part of the story is missing.` };
     const choices = p.choices ?? [];
     const heading = h("h3", { class: "m-bs-title", tabindex: "-1" }, p.title ?? (choices.length ? "" : p.ending ?? L.end ?? t`The end`));
     const el = h("article", { class: cx("m-bs-passage", !choices.length && "is-ending"), "data-m-color": colorAttr(p.color) },
@@ -176,7 +178,7 @@ export function BranchingStory(props: BranchingStoryProps): Element {
             sub: props.renderChoice ? undefined : c.note ?? undefined,
           })))))
           : props.restart === false && props.action == null ? null : h("div", { class: "m-bs-end" },
-            props.restart === false ? null : h(Button, { class: "m-bs-restart", onClick: () => go([props.start]) }, () => L.restart ?? t`Start again`),
+            props.restart === false ? null : h(Button, { class: "m-bs-restart", onClick: () => go([start]) }, () => L.restart ?? t`Start again`),
             props.action ?? null))) as HTMLElement;
     scopes.set(el, dispose);
     return el;

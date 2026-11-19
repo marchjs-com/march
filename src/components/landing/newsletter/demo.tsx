@@ -8,7 +8,7 @@ export const code = `<Newsletter title="Haberdar ol" lead="Ayda bir e-posta, yal
 <Newsletter onSubmit={save} button="Katıl" done="Kaydın alındı." doneIcon={<Icon of={heart} />} motion={false}
   labels={{ email: "E-posta adresin", invalid: "Bu bir e-posta adresine benzemiyor." }} />   // own texts, own mark, no motion`
 
-export default function NewsletterDemo(props: { values: { layout: string; outcome: string; doneIcon: string; motion: boolean; texts: boolean } }) {
+export default function NewsletterDemo(props: { values: { title: string; lead: string; layout: string; outcome: string; doneIcon: string; motion: boolean; texts: boolean } }) {
   // the answer shows on the next send: the line under the form says what the fake server will do (a rebuild here would
   // drop a typed address); the mark and the motion are read by the form when it needs them, so they stay live
   let wrap: HTMLElement | undefined
@@ -30,7 +30,7 @@ export default function NewsletterDemo(props: { values: { layout: string; outcom
       const layout = props.values.layout, texts = props.values.texts
       void $run
       $sent = false
-      return <Newsletter layout={layout as "inline"} title="Haberdar ol" lead="Ayda bir e-posta, yalnız yenilikler." note="İstediğin an ayrılabilirsin."
+      return <Newsletter layout={layout as "inline"} title={props.values.title || undefined} lead={props.values.lead || undefined} note="İstediğin an ayrılabilirsin."
         motion={props.values.motion} doneIcon={props.values.doneIcon === "off" ? false : props.values.doneIcon === "own" ? <Icon of={heart} /> as Node : true}
         button={texts ? "Katıl" : undefined} done={texts ? "Kaydın alındı. Gelen kutuna bak." : undefined} placeholder={texts ? "adın@ornek.com" : undefined}
         labels={texts ? { email: "E-posta adresin", invalid: "Bu bir e-posta adresine benzemiyor." } : undefined}

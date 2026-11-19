@@ -39,7 +39,8 @@ export interface ParallaxProps {
 
 /** `<Parallax layers={[{ src: "/sky.jpg", speed: .5 }, { src: "/hills.png", speed: .25 }, { content: <Logo/>, speed: -.1 }]} pointer={1}>…</Parallax>` */
 export function Parallax(props: ParallaxProps): Element {
-  const layerEls = props.layers.map((l, i) => h(Overlay, {
+  const layers = props.layers ?? []; // the raw component (no layers yet) draws an empty stage
+  const layerEls = layers.map((l, i) => h(Overlay, {
     ...(l.src ? { src: l.src, alt: l.alt } : { svg: h("div", { class: "m-plx-node" }, l.content) }),
     inset: `-${l.bleed ?? "12%"}`, opacity: l.opacity, blend: l.blend, layer: i + 1, class: cx("m-plx-layer", val(l.class as MaybeFn<unknown>)),
   } as OverlayProps) as HTMLElement);
@@ -49,7 +50,7 @@ export function Parallax(props: ParallaxProps): Element {
   // scroll: the motion core's parallaxLayers seeks each layer by the section's passage (far layers lag: negative depth);
   // pointer: hoverParallax shifts the layer contents by their depth with a spring. Reduced motion: still layers.
   layerEls.forEach((el, i) => {
-    const l = props.layers[i]!;
+    const l = layers[i]!;
     el.setAttribute("data-depth", String(-(l.speed ?? 0.2)));
     const inner = el.firstElementChild as HTMLElement | null;
     if (inner) inner.setAttribute("data-depth", String((l.depth ?? (l.speed ?? 0.2) * 60) / 60));

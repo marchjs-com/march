@@ -72,18 +72,19 @@ export function Testimonials(props: TestimonialsProps): Element {
   const variant = props.variant ?? "grid";
   const cls = cx("m-tm", `m-tm-${variant}`, props.quotes === false && "m-tm-plain", val(props.class));
   const L = props.labels ?? {};
+  const items = props.items ?? []; // no quotes yet (a raw component in the IDE): an empty list, not an error
   if (variant === "marquee") {
-    const half = Math.ceil(props.items.length / 2);
+    const half = Math.ceil(items.length / 2);
     // Marquee repeats the strip until it is wider than the screen (the copies are hidden from screen readers)
     const row = (list: readonly Testimonial[], speed: number): unknown => h(Marquee, { speed, pause: 0, separator: false, duplicate: true, class: "m-tm-row" },
       h("span", { class: "m-tm-strip" }, list.map((x) => quoteCard(x, props))));
-    return h("div", { class: cls }, row(props.items.slice(0, half), props.speed?.[0] ?? 28), row(props.items.slice(half), props.speed?.[1] ?? 20)) as Element;
+    return h("div", { class: cls }, row(items.slice(0, half), props.speed?.[0] ?? 28), row(items.slice(half), props.speed?.[1] ?? 20)) as Element;
   }
-  if (variant === "slider") return h("div", { class: cls }, h(Carousel, { perView: props.cols ?? 1, label: L.slider ?? t`Testimonials` }, props.items.map((x) => h("div", { class: "m-tm-slide" }, quoteCard(x, props))))) as Element;
+  if (variant === "slider") return h("div", { class: cls }, h(Carousel, { perView: props.cols ?? 1, label: L.slider ?? t`Testimonials` }, items.map((x) => h("div", { class: "m-tm-slide" }, quoteCard(x, props))))) as Element;
   const open = signal(props.more === false);
-  const list = h("div", { class: () => cx("m-tm-list", variant === "grid" && `m-tm-cols-${props.cols ?? 3}`, variant === "wall" && !open() && "is-closed") }, props.items.map((x) => quoteCard(x, props))) as HTMLElement;
+  const list = h("div", { class: () => cx("m-tm-list", variant === "grid" && `m-tm-cols-${props.cols ?? 3}`, variant === "wall" && !open() && "is-closed") }, items.map((x) => quoteCard(x, props))) as HTMLElement;
   const root = h("div", { class: cls }, list,
-    variant === "wall" && props.more !== false && props.items.length > 6 ? h("div", { class: () => cx("m-tm-more", open() && "is-open") }, h(Button, { variant: "secondary", onClick: () => open.set(!open()), "aria-expanded": () => String(open()) }, () => (open() ? L.less ?? t`Show less` : L.more ?? t`Show more`))) : null) as Element;
+    variant === "wall" && props.more !== false && items.length > 6 ? h("div", { class: () => cx("m-tm-more", open() && "is-open") }, h(Button, { variant: "secondary", onClick: () => open.set(!open()), "aria-expanded": () => String(open()) }, () => (open() ? L.less ?? t`Show less` : L.more ?? t`Show more`))) : null) as Element;
   if (props.reveal !== false) owned(revealOnScroll(list, { effect: "up", stagger: 60, ...props.reveal, select: ".m-tm-card" }));
   return root;
 }

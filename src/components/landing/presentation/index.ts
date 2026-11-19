@@ -105,7 +105,7 @@ export interface PresentationProps {
   } | undefined;
   /** Extra CSS class on the deck. @tr Sunuma eklenen ek CSS sınıfı. */
   class?: ClassProp | undefined;
-  /** The slides (`Slide` elements). @tr Slaytlar (`Slide` öğeleri). */
+  /** The slides (`Slide` elements; a string or number is drawn as a title slide). @tr Slaytlar (`Slide` öğeleri; metin ya da sayı bir başlık slaytı olarak çizilir). */
   children?: unknown;
 }
 
@@ -113,7 +113,9 @@ interface Pos { i: number; s: number }
 
 /** `<Presentation bind:index={$slide} transition="slide"><Slide layout="title">…</Slide><Slide>…</Slide></Presentation>` */
 export function Presentation(props: PresentationProps): Element {
-  const stage = h("div", { class: "m-deck-stage" }, props.children) as HTMLElement;
+  // a text slide (a string or number child: the slide titles as data) is drawn as a title Slide
+  const kids = Array.isArray(props.children) ? props.children : [props.children];
+  const stage = h("div", { class: "m-deck-stage" }, kids.map((c) => (typeof c === "string" || typeof c === "number" ? h(Slide, { layout: "title" }, h("h2", {}, String(c))) : c))) as HTMLElement;
   const slides = (): HTMLElement[] => ([...stage.children] as HTMLElement[]).filter((c) => c.classList.contains("m-slide"));
   const steps = (el: HTMLElement | undefined): HTMLElement[] => (el ? [...el.querySelectorAll<HTMLElement>(".m-appear")].flatMap((a) => [...a.children] as HTMLElement[]) : []);
   const list = slides();
