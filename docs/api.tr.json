@@ -8,6 +8,8 @@
   "withExtensions": "Eklentileri yalnız içeride çizilen bileşenlere uygular (şimdi ya da sonra): `withExtensions([track], () => …)`; genel olanlara ve dış kapsama eklenir.",
   "Extensions": "`withExtensions` bileşen olarak: `<Extensions use={[track, smallButtons]}>…</Extensions>`.",
   "extensions": "Araçlar için eklenti kaydı: `extensions.list()` (reaktif; kayıtlılar, hedefleri, kapsamları), `extensions.of(el)` (bir bileşene hangi eklentinin ne yaptığı), `extensions.propsOf(Comp)`.",
+  "_tr": "Derleyici yardımcısı (doğrudan kullanım için değil, i18n derlemesinde): gösterilen değer etkin dilde (dize sözlükte aranır, kaynak metin anahtardır; veri değişmez).",
+  "_trf": "Derleyici yardımcısı (doğrudan kullanım için değil, i18n derlemesinde): yer tutuculu metin (\"Gönder ({0})\") etkin dilde; değerler çevirinin koyduğu yere.",
   "_gen": "Derleyici yardımcısı (doğrudan kullanım için değil): çalışan bir generator'ı bileşen çıktısı olarak çizer; `function* Ad` bildirimi bu çağrıya dönüşür.",
   "generator": "Generator fonksiyonundan bileşen yapar: `function*` her yield'ı öncekinin yanına ekler (karede `chunk` parça), `async function*` öncekinin yerine koyar; `{ yields: \"append\" | \"replace\" }`. Büyük harfli bildirimleri derleyici kendisi sarar.",
   "_enter": "Eşzamansız bileşenler için derleyici kancası: `await` sonrasında sahibi geri yükler (doğrudan kullanım için değil).",

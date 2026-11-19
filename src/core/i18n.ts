@@ -5,7 +5,7 @@
 //   t("greet", { g: "female", name })                  "{g, select, female {Welcome, {name}} other {Hi {name}}}"
 //   loadLocale("de", () => import("./de.js"));  await setLocale("de")
 //   const tt = typed<typeof en>();  tt("cart.items", { n: 1 })   // keys and variables type-checked
-import { signal, computed, untrack } from "./reactive.ts";
+import { signal, computed, untrack, reactive } from "./reactive.ts";
 
 type Dict = Record<string, string>;
 interface Sig<T> { (): T; peek(): T; set(v: T): T }
@@ -62,6 +62,33 @@ function lookup(key: string): string {
   if (b && key in b) return b[key] as string;
   const f = dicts.get(fallback.loc);
   return f && key in f ? (f[key] as string) : key;
+}
+
+// ------------------------------------------------------------------ shown texts (i18n builds)
+// A build with i18n (the compiler's `i18n` option) passes what it shows people through _tr: JSX text, the read
+// attributes (title, placeholder, aria-label…), every {expression} child and the messages of toast / alert / confirm.
+// The data stays as it is (a label is a string, `label === "Enerjik"` holds); only the shown text is looked up, in the
+// active locale's messages, with the source text as the key; a text with no translation shows as it is. Reactive:
+// a locale switch writes only those texts again (nothing is drawn again, state is kept).
+const shown = (s: string): string => {
+  const loc = locale();
+  version();
+  const d = dicts.get(loc) ?? dicts.get(loc.split("-")[0] ?? loc);
+  return d && s in d ? (d[s] as string) : s;
+};
+/** Compiler helper (not for direct use): a shown value in the active locale (a string looked up; a value getter followed; anything else as it is). */
+export function _tr(v: unknown): unknown {
+  if (typeof v === "string") return shown(v);
+  // a getter child ({count}: a signal) is followed; a function with parameters (a render function) is not a value
+  if (typeof v === "function" && (v as () => unknown).length === 0) return reactive(() => _tr((v as () => unknown)()));
+  return v;
+}
+/** Compiler helper (not for direct use): a text with placeholders (`Gönder ({0})`) in the active locale, its values (nodes or getters) put where the translation says. */
+export function _trf(key: string, values: readonly unknown[]): () => unknown[] {
+  return reactive(() => shown(key).split(/(\{\d+\})/).filter((x) => x).map((piece) => {
+    const m = /^\{(\d+)\}$/.exec(piece);
+    return m && Number(m[1]) < values.length ? values[Number(m[1])] : piece;
+  }));
 }
 
 // ------------------------------------------------------------------ ICU-style formatting

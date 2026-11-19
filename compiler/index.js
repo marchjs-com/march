@@ -19,8 +19,8 @@ const { sx: resolveSx } = await importTs(new URL("../src/core/sx.ts", import.met
 const TEXT_ATTRS = new Set(["title", "placeholder", "label", "alt", "aria-label", "aria-description", "description", "hint", "message"]);
 // an object's fields whose string is read by people (lang.json collects them): `{ label: "Enerjik", hint: "…" }`
 const TEXT_KEYS = new Set(["label", "title", "text", "message", "description", "placeholder", "hint", "caption", "subtitle", "heading", "tooltip", "tip", "helperText", "emptyText", "confirmText", "cancelText", "okText"]);
-const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins", gen: "_$gen" };
-const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert", gen: "_gen" };
+const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins", gen: "_$gen", tr: "_$tr", trf: "_$trf" };
+const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert", gen: "_gen", tr: "_tr", trf: "_trf" };
 // Templates: a native element subtree is built once (DOM calls, no HTML strings) and cloned; only its dynamic parts
 // (bound attributes, events, refs, directives, {expressions}, components) are wired on the clone. Not templated:
 // SVG (namespace), forbidden tags (h() throws for them), spreads.
@@ -239,8 +239,8 @@ class Transformer {
           const ic = key && isIconProp(key[1] ?? key[2] ?? key[3]) && !text.includes("\\") ? iconByName(text, this.iconBase()) : null;
           if (ic) { out.push(this.iconLocal(ic)); this.pos = e; prev = { t: "id" }; continue; }
         }
-        this.stringText(i, e, prev);
-        out.push(src.slice(i, e)); this.pos = e; prev = { t: "str" }; continue;
+        const shownCode = this.stringText(i, e, prev);
+        out.push(shownCode ?? src.slice(i, e)); this.pos = e; prev = { t: "str" }; continue;
       }
       if (c === "`") { out.push(this.template(prev, out)); prev = { t: "tpl" }; continue; }
       if (c === "/" && exprAllowed(prev)) { const e = skipRegex(src, i); out.push(src.slice(i, e)); this.pos = e; prev = { t: "str" }; continue; }
@@ -447,7 +447,10 @@ class Transformer {
     }
     if (prev.t === "punct" && prev.v === "(") {
       const call = /(?:^|[^\w$.])(t|toast(?:\.\w+)?|alert|confirm|prompt)\s*\(\s*$/.exec(before);
-      if (call) (call[1] === "t" ? this.keys : this.texts).add(text);
+      if (call) {
+        (call[1] === "t" ? this.keys : this.texts).add(text);
+        if (call[1] !== "t" && this.opts.i18n) return `${this.helper("tr")}(${src.slice(i, e)})`;
+      }
     }
   }
 
@@ -707,7 +710,11 @@ class Transformer {
       const e = skipString(src, this.pos);
       const v = src.slice(this.pos + 1, e - 1).replace(/&quot;/g, '"').replace(/&amp;/g, "&");
       this.pos = e;
-      if (TEXT_ATTRS.has(name) && /\p{L}/u.test(v)) this.texts.add(v.trim());
+      if (TEXT_ATTRS.has(name) && /\p{L}/u.test(v)) {
+        this.texts.add(v.trim());
+        // i18n: shown in the active locale (a live attribute; a locale switch writes it again)
+        if (this.opts.i18n) return { name, code: `${this.helper("tr")}(${JSON.stringify(v)})`, dynamic: true };
+      }
       return { name, code: JSON.stringify(v), dynamic: false, literal: v };
     }
     if (c === "{") {
@@ -726,6 +733,7 @@ class Transformer {
         code = this.sxLiteral(raw, save);
       } else code = this.containerExpr(end);
       this.pos = end + 1;
+      if (this.opts.i18n && TEXT_ATTRS.has(name)) return { name, code: `${this.helper("tr")}(${code.trim()})`, raw, dynamic: true };
       return { name, code: code.trim(), raw, dynamic: !NO_WRAP.test(name) && !isStaticCode(code.trim()) };
     }
     if (c === "<") { const code = this.jsx(); return { name, code, dynamic: false }; }
@@ -783,8 +791,26 @@ class Transformer {
     // the text people read: the text and the {expressions} written side by side are one text, each expression a
     // numbered placeholder (`Gönder ({0})`), so a translation can say it its own way (`{0} kez gönderildi`); an element
     // between them ends it. Kept when its own words have a letter.
-    let said = "", slots = 0, words = "";
-    const say = () => { if (/\p{L}/u.test(words)) this.texts.add(said.trim()); said = ""; slots = 0; words = ""; };
+    let said = "", slots = 0, words = "", runStart = 0;
+    const i18n = !!this.opts.i18n;
+    const say = () => {
+      if (/\p{L}/u.test(words)) {
+        const key = said.trim();
+        this.texts.add(key);
+        // i18n: the run is shown in the active locale: a text as _tr("…"), a text with values as _trf("… {0} …", [values])
+        // (the values in the order the translation puts them); its spaces at the ends stay outside
+        if (i18n && key) {
+          const run = kids.splice(runStart), lead = /^\s*/.exec(said)[0], trail = /\s*$/.exec(said)[0];
+          const shownCode = slots
+            ? `${this.helper("trf")}(${JSON.stringify(key)}, [${run.filter((k) => !k.text).map((k) => `${this.helper("r")}(() => (${k.code}))`).join(", ")}])`
+            : `${this.helper("tr")}(${JSON.stringify(key)})`;
+          if (lead) kids.push({ code: JSON.stringify(lead), dynamic: false, text: true });
+          kids.push(slots ? { code: shownCode, dynamic: false } : { code: shownCode, dynamic: true });
+          if (trail) kids.push({ code: JSON.stringify(trail), dynamic: false, text: true });
+        }
+      }
+      said = ""; slots = 0; words = ""; runStart = kids.length;
+    };
     const flush = () => { const s = jsxText(text); if (s) { kids.push({ code: JSON.stringify(s), dynamic: false, text: true }); said += s; words += s; } text = ""; };
     for (;;) {
       if (this.pos >= src.length) throw fail(src, this.pos, `missing closing tag </${tag}>`);
@@ -796,7 +822,7 @@ class Transformer {
         this.pos += m[0].length;
         return kids;
       }
-      if (c === "<") { flush(); say(); const code = this.jsx(); kids.push({ code, dynamic: false }); continue; }
+      if (c === "<") { flush(); say(); const code = this.jsx(); kids.push({ code, dynamic: false }); runStart = kids.length; continue; }
       if (c === "{") {
         flush();
         this.pos++;
@@ -804,9 +830,11 @@ class Transformer {
         const raw = src.slice(this.pos, end);
         if (!raw.replace(/\/\*[\s\S]*?\*\//g, "").trim()) { this.pos = end + 1; continue; } // {/* comment */}
         this.valueTexts(raw.trim());
-        const code = this.containerExpr(end).trim();
+        const raw0 = this.containerExpr(end).trim();
         this.pos = end + 1;
-        kids.push({ code, dynamic: !isStaticCode(code) });
+        // i18n: what an {expression} shows is in the active locale too (a string from data: a label, a message)
+        const code = i18n && !isStaticCode(raw0) ? `${this.helper("tr")}(${raw0})` : raw0;
+        kids.push({ code, dynamic: !isStaticCode(raw0) });
         said += `{${slots++}}`;
         continue;
       }

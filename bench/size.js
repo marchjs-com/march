@@ -22,7 +22,9 @@ import { tmpdir } from "node:os";
 // extension's and swallowed; measured 16.46 KB)
 // minimal 5.05 KB since a getter prop stays a getter (h(C, { get value() { … } }): the component reads it live; before, it
 // was read once and a plugin's editor or a debugger toggle never followed its value; +~40 bytes, measured 5.02 KB)
-export const BUDGET = { core: 16.5 * 1024, minimal: 5.05 * 1024 };
+// core 16.6 KB since shown texts follow the locale in i18n builds (_tr, _trf in core/i18n.ts; +~90 bytes, measured
+// 16.59 KB). Only an app built with i18n imports them: minimal and typical unchanged (docs/internal/size-watch.md).
+export const BUDGET = { core: 16.6 * 1024, minimal: 5.05 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const ENTRIES = { core: "src/index.ts", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
 

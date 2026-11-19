@@ -13,7 +13,7 @@ export { Portal, PortalTarget, portalTarget, openLayer, layers, type LayerKind, 
 export { render } from "./dom/render.ts";
 export { define } from "./dom/define.ts";
 export { pipe, applyPipe, toDate } from "./core/pipes.ts";
-export { t, locale, setLocale, messages } from "./core/i18n.ts";
+export { t, locale, setLocale, messages, _tr, _trf } from "./core/i18n.ts";
 export { missing, setFallbackLocale } from "./core/i18n-tools.ts";
 export { sx, sxValue, SX } from "./core/sx.ts";
 /** The library version. */
