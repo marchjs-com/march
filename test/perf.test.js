@@ -549,3 +549,26 @@ test("lazy(): a failed load is retried on its own while the skeleton stays", asy
   assert.equal(calls, 3);
   assert.equal(el.querySelector("s")?.textContent, "back");
 });
+
+test("global load listener: runLoad and trackLoad announce start and end; background loads are not counted", async () => {
+  const tick = () => new Promise((r) => setTimeout(r, 0));
+  const seen = [];
+  const off = L.onLoad((e) => seen.push(`${e.type}:${e.kind}:${e.active}${e.type === "end" ? (e.ok ? ":ok" : ":fail") : ""}`));
+  const fromWindow = [];
+  const onWin = (ev) => fromWindow.push(ev.detail.type);
+  globalThis.addEventListener?.("march:load", onWin);
+  let done, fail;
+  const p = L.runLoad(() => new Promise((r) => { done = r; }), { kind: "part", key: "x" });
+  const q = L.trackLoad(new Promise((_r, j) => { fail = j; }), { kind: "fetch", key: "/api" });
+  q.catch(() => {});
+  const bg = L.beginLoad({ kind: "file", key: "/build.txt", background: true });
+  assert.equal(L.loadsActive(), 2, "the background load is not counted");
+  done({ default: () => null }); await p; await tick();
+  fail(new Error("x")); await tick();
+  bg(true); bg(false);
+  off();
+  L.trackLoad(Promise.resolve(1)); await tick();
+  assert.deepEqual(seen, ["start:part:1", "start:fetch:2", "start:file:2", "end:part:1:ok", "end:fetch:0:fail", "end:file:0:ok"]);
+  assert.equal(L.loadsActive(), 0);
+  if (globalThis.addEventListener) { assert.ok(fromWindow.length >= 6); globalThis.removeEventListener("march:load", onWin); }
+});

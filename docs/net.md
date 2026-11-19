@@ -24,6 +24,23 @@ Events: `net:start`, `net:progress`, `net:retry`, `net:done`, `net:error`, `net:
 (`net.on(name, ({ ctx, error, loaded, total }) => …)`). `ctx.steps` holds every middleware step with its start and
 duration (the showcase request inspector draws them).
 
+## Global load listener
+
+Every network load March makes announces itself in one place, `march/lazy` (re-exported by `march/net`). That
+covers route and `lazy()` chunks, HttpTransport requests (`kind: "net"`), `fetchJson`, march/ai and the theme files.
+Each load sends one `start` event and one `end` event. The `end` event also arrives when the load fails or is aborted.
+
+```ts
+import { onLoad, trackLoad, beginLoad, loadsActive } from "march/lazy";
+const off = onLoad((e) => spinner.hidden = e.active === 0);   // e: { type, id, kind, key, background, ok?, error?, ms?, active }
+addEventListener("march:load", (ev) => console.log(ev.detail.kind, ev.detail.type));   // the same event, on window
+trackLoad(fetch("/report.csv"), { kind: "file", key: "report" });   // your own load, announced the same way
+const end = beginLoad({ kind: "upload", key: file.name }); …; end(true);   // or end(false, error)
+```
+
+`background: true` marks a load the user did not ask for, such as a version poll or a prefetch. `e.active` and
+`loadsActive()` leave those out.
+
 ## Middleware
 
 `(ctx, next) => …` in the order added (`net.use(a, b)`), then the built-in `retry` → `timeout` → transport. `next` may be

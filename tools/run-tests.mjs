@@ -99,10 +99,20 @@ if (run.length) {
   rmSync(out, { recursive: true, force: true });
   const conc = Number(val("--concurrency")) || Math.max(2, availableParallelism() - 1);
   const env = { ...process.env, MARCH_TEST_DEPS: out, MARCH_TEST_ROOT: ROOT, NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ""} --import=${pathToFileURL(join(ROOT, "tools/dep-recorder.mjs")).href}`.trim() };
-  code = await new Promise((done) => {
-    const p = spawn(process.execPath, ["--import", "./compiler/register.js", "--test", `--test-concurrency=${conc}`, ...run], { cwd: ROOT, env, stdio: "inherit" });
-    p.on("exit", (c) => done(c ?? 1));
-  });
+  // in batches: a long list (the whole suite) does not fit on one Windows command line (spawn ENAMETOOLONG)
+  const batches = [[]];
+  let len = 0;
+  for (const f of run) {
+    if (len + f.length + 1 > 24000 && batches.at(-1).length) { batches.push([]); len = 0; }
+    batches.at(-1).push(f); len += f.length + 1;
+  }
+  for (const files of batches) {
+    const c = await new Promise((done) => {
+      const p = spawn(process.execPath, ["--import", "./compiler/register.js", "--test", `--test-concurrency=${conc}`, ...files], { cwd: ROOT, env, stdio: "inherit" });
+      p.on("exit", (x) => done(x ?? 1));
+    });
+    if (c) code = c;
+  }
   // merge the per-process records: dependencies of a test file = union over its processes; it passed when its own
   // process exited 0 (a child it spawned may fail on purpose)
   const recs = existsSync(out) ? readdirSync(out).map((f) => readJson(join(out, f))) : [];

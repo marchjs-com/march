@@ -6,6 +6,7 @@
 //   users.refetch()    users.mutate(v)            invalidate("users")   (refetches every active query whose key starts with "users")
 //   const save = mutation((u) => api.save(u), { invalidates: ["users"] });  await save(u); save.pending()
 import { signal, effect, untrack, onCleanup, batch, getOwner, type Signal } from "../core/reactive.ts";
+import { beginLoad } from "../dom/loads.ts";
 
 export interface DataDefaults {
   retry: number;
@@ -238,8 +239,10 @@ interface ErrorBody { message?: string; error?: { message?: string }; title?: st
 /** fetch() wrapper: JSON in/out, errors carry `status` and the server's message. */
 export async function fetchJson<T = unknown>(url: string | URL, { method = "GET", body, headers, signal }: FetchJsonOptions = {}): Promise<T> {
   const init = { method, signal, headers: { accept: "application/json", ...(body !== undefined ? { "content-type": "application/json" } : {}), ...headers }, body: body !== undefined ? JSON.stringify(body) : undefined } as RequestInit;
-  const r = await fetch(url, init);
-  const j = (await r.json().catch(() => null)) as ErrorBody | null;
+  // announced to the global load listener (onLoad) until the body is read
+  const end = beginLoad({ kind: "fetch", key: String(url) });
+  let r: Response, j: ErrorBody | null;
+  try { r = await fetch(url, init); j = (await r.json().catch(() => null)) as ErrorBody | null; end(r.ok); } catch (e) { end(false, e); throw e; }
   if (!r.ok) throw Object.assign(new Error(j?.message || j?.error?.message || j?.title || `HTTP ${r.status}`), { status: r.status, body: j });
   return j as T;
 }

@@ -553,6 +553,11 @@ const save = users.update.mutation();     // after success: net cache + data que
   `timeout` per attempt; offline requests wait in the offline queue (`offline: "fail"` to fail fast).
 - Middleware is `(ctx, next)`: code before `await next()` sees `ctx.req`, after it `ctx.res` or the thrown AppError.
 - `net.pending("users")` is a reactive count; `net.on("net:error", …)` for events.
+- Global load listener: every network load March makes (route and `lazy()` chunks, net HTTP requests, `fetchJson`,
+  march/ai, theme files) announces a `start` and an `end` event. `onLoad((e) => …)` (march/lazy or march/net) hears them
+  all, and the same event is dispatched on window as `"march:load"`. `e.active` is the count of running loads, without
+  `background` ones (a version poll, a prefetch). Use it for a busy indicator. Announce your own load with
+  `trackLoad(promise, { kind, key })` or `const end = beginLoad({ kind, key }); … end(ok)`.
 - WebSocket: `socket(url, opts)` (reconnect, heartbeat, `subscribe(topic)`, `request(msg)` by correlation id, offline
   send queue, `shared: true` for one connection across tabs). SSE: `this.stream("sse:/path")`.
 - Mock: `import "march/net/mock"; net.mock({ ...crud("/api/users", seed), "GET /api/me": me }, { delay, errorRate })`,

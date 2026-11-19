@@ -5,6 +5,7 @@
 // <link rel="modulepreload"> instead of discovering them one import at a time.
 
 import { appBaseUrl } from "../base/index.ts";
+import { trackLoad } from "./loads.ts";
 
 type Manifest = Record<string, readonly string[]>;
 let manifest: Manifest | null | undefined;
@@ -85,11 +86,13 @@ type LoadRunner = <T>(fn: () => Promise<T>, info: LoadInfo) => Promise<T>;
 let runner: LoadRunner | null = null;
 /** Route and lazy() chunk loads go through `r` (march/net installs itself when it is imported). */
 export function setLoadRunner(r: LoadRunner | null): void { runner = r; }
-/** Load a route or lazy part: preload its files, honour the demo delay, then run it (through the load runner). */
+/** Load a route or lazy part: preload its files, honour the demo delay, then run it (through the load runner). It is
+ *  announced to the global load listener (onLoad) from start to end. */
 export function runLoad<T>(fn: () => Promise<T>, info: LoadInfo): Promise<T> {
   preloadChunks(loaderKey(fn) ?? null);
-  const go = (): Promise<T> => (runner ? runner(fn, { ...info, key: info.key || loaderKey(fn) || "" }) : fn());
-  return delayMs ? new Promise((r) => setTimeout(r, delayMs)).then(go) : go();
+  const key = info.key || loaderKey(fn) || "";
+  const go = (): Promise<T> => (runner ? runner(fn, { ...info, key }) : fn());
+  return trackLoad(delayMs ? new Promise((r) => setTimeout(r, delayMs)).then(go) : go(), { kind: info.kind, key });
 }
 
 /** Run `fn` when the browser is idle (setTimeout fallback). Returns a cancel function. */

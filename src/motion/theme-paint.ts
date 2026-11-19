@@ -15,6 +15,7 @@ import { setTimeWarp, timeWarp } from "./engine/config.ts";
 import { startUnwarped } from "./engine/native.ts";
 import { installCssControl } from "./engine/css-control.ts";
 import { clamp } from "../core/util.ts";
+import { trackLoad } from "../dom/loads.ts";
 
 export type PaintShape = "drip" | "spray" | "sweep" | "splat";
 export interface PaintOptions { shape: PaintShape; origin?: { x: number; y: number } | null | undefined; duration?: number | undefined }
@@ -625,7 +626,7 @@ function shadowCopy(sheet: CSSStyleSheet): Promise<CSSStyleSheet | null> {
   if (made) return made;
   const node = sheet.ownerNode as Element | null;
   const text: Promise<string | null> = node?.tagName === "STYLE" ? Promise.resolve(node.textContent)
-    : sheet.href ? fetch(sheet.href).then((r) => (r.ok ? r.text() : null), () => null) : Promise.resolve(null);
+    : sheet.href ? trackLoad(fetch(sheet.href), { kind: "file", key: sheet.href }).then((r) => (r.ok ? r.text() : null), () => null) : Promise.resolve(null);
   made = text.then((t) => {
     const media = sheet.media?.mediaText;
     const copy = new CSSStyleSheet(media ? { media } : {});

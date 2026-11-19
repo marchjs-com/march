@@ -21,6 +21,7 @@ import { OptionList } from "../components/forms/option-list/index.ts";
 import { OverflowText } from "../components/typography/overflow-text/index.ts";
 import { Alert } from "../components/feedback/alert/index.ts";
 import { restyleInstantly, restyleAhead } from "./restyle.ts";
+import { trackLoad } from "../dom/loads.ts";
 
 // a live prop for h(Component, …): it becomes a getter
 const live = reactive as <T>(fn: () => T) => T;
@@ -271,7 +272,8 @@ export function UpdateBanner(props: UpdateBannerProps = {}): () => unknown {
   const check = async (): Promise<void> => {
     if (!alive || stale.peek() || typeof globalThis.fetch !== "function") return;
     try {
-      const res = await globalThis.fetch(url, { cache: "no-store" });
+      // a background load for the global load listener: a poll the user did not ask for
+      const res = await trackLoad(globalThis.fetch(url, { cache: "no-store" }), { kind: "file", key: url, background: true });
       if (!res.ok) return;
       const text = (await res.text()).trim();
       if (!alive) return;

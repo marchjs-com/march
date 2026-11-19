@@ -38,5 +38,7 @@ export type { SocketState, SocketLike, SocketFactory, SocketProtocol, SocketOpti
 export { auth, acceptLanguage, idempotencyKey, retry, cache, timing, log, record, replay, normalizeErrors } from "./middleware.ts";
 export type { Recording } from "./middleware.ts";
 export { Api, api } from "./api.ts";
+// the global load listener: every request of HttpTransport is announced there too (kind "net")
+export { onLoad, beginLoad, trackLoad, loadsActive, type LoadEvent, type LoadKind, type LoadOptions } from "../dom/loads.ts";
 export type { Endpoint, EndpointArgs, EndpointOptions, CallOptions, Stream, Validator } from "./api.ts";
 export { AppError, isAbort } from "../errors/app-error.ts";

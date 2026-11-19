@@ -13,6 +13,7 @@
 //
 // The page's Content-Security-Policy must allow the providers' origins in connect-src (PROVIDERS[i].origin).
 import type { Vault } from "../vault/index.ts";
+import { trackLoad } from "../dom/loads.ts";
 
 export type AiKind = "anthropic" | "openai" | "gemini";
 export interface AiProvider {
@@ -132,7 +133,8 @@ const fail = async (res: Response, p: AiProvider): Promise<never> => {
 };
 const send = async (url: string, init: RequestInit, p: AiProvider): Promise<Response> => {
   let res: Response;
-  try { res = await fetch(url, { ...init, credentials: "omit", referrerPolicy: "no-referrer", cache: "no-store" }); }
+  // announced to the global load listener (onLoad) until the response arrives (a stream reads on after it)
+  try { res = await trackLoad(fetch(url, { ...init, credentials: "omit", referrerPolicy: "no-referrer", cache: "no-store" }), { kind: "ai", key: p.name }); }
   catch (e) {
     if ((e as Error)?.name === "AbortError") throw new AiError("abort", "Durduruldu");
     throw new AiError("network", p.local ? `${p.name}: bağlanılamadı (çalışıyor mu, bu sayfaya izin veriyor mu?)` : `${p.name}: bağlanılamadı (ağ ya da sayfanın izinleri: connect-src ${p.origin})`);

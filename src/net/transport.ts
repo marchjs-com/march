@@ -2,6 +2,7 @@
 // to fetch, a WebSocket, server-sent events or the mock provider.
 import { buildUrl, type Ctx, type NetResponse, type Transport } from "./core.ts";
 import { AppError } from "../errors/app-error.ts";
+import { beginLoad } from "../dom/loads.ts";
 
 const isRaw = (b: unknown): boolean =>
   typeof b === "string" || (typeof FormData !== "undefined" && b instanceof FormData) || (typeof Blob !== "undefined" && b instanceof Blob)
@@ -28,6 +29,11 @@ export class HttpTransport implements Transport {
   private fetchFn: typeof fetch;
   constructor(fetchFn: typeof fetch = (...a) => globalThis.fetch(...a)) { this.fetchFn = fetchFn; }
   async send(ctx: Ctx): Promise<NetResponse> {
+    // announced to the global load listener until the body is read (a prefetch is a background load)
+    const end = beginLoad({ kind: "net", key: ctx.req.url, background: ctx.req.priority === "prefetch" });
+    try { const r = await this.receive(ctx); end(r.ok); return r; } catch (e) { end(false, e); throw e; }
+  }
+  private async receive(ctx: Ctx): Promise<NetResponse> {
     const { req } = ctx;
     const raw = isRaw(req.body);
     const headers: Record<string, string> = { accept: req.responseType === "json" ? "application/json" : "*/*", ...req.headers };
