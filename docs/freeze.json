@@ -136,6 +136,14 @@
    ],
    "hash": "e6f9590f30af6586d582fbdc1d7c58c9"
   },
+  "KeyframeTimeline": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/keyframe-timeline",
+    "examples/showcase/public/components/keyframes/ide.json"
+   ],
+   "hash": "870578e9ae36f6a678f7abecd7d7c4ba"
+  },
   "LinkCard": {
    "frozen": "2026-11-20",
    "paths": [
