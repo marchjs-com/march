@@ -688,6 +688,14 @@
    ],
    "hash": "347baeb2cddcecfd51c72843ed400206"
   },
+  "Tabs": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/navigation/tabs",
+    "examples/showcase/public/components/tabs/ide.json"
+   ],
+   "hash": "40987218401ff38b53a59446658368c4"
+  },
   "Terminal": {
    "frozen": "2026-11-20",
    "paths": [
