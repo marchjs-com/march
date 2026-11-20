@@ -696,6 +696,14 @@
    ],
    "hash": "ecf150bc147fb68f32f452be9533c58e"
   },
+  "ProfileHeader": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/profile-header",
+    "examples/showcase/public/components/profile-header/ide.json"
+   ],
+   "hash": "7d65b2ca02a4b985185fed14d4fab3e7"
+  },
   "Progress": {
    "frozen": "2026-11-20",
    "paths": [
