@@ -1,5 +1,13 @@
 {
  "components": {
+  "Accordion": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/accordion",
+    "examples/showcase/public/components/accordion/ide.json"
+   ],
+   "hash": "8aca56564be861d56a0f9c629c3917ba"
+  },
   "ActivityBar": {
    "frozen": "2026-11-20",
    "paths": [
