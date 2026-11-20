@@ -624,6 +624,14 @@
    ],
    "hash": "6e14f5bc54e85d859df2c17db9c7b3bf"
   },
+  "TimeInput": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/time-input",
+    "examples/showcase/public/components/time/ide.json"
+   ],
+   "hash": "d8305d31f1e62145d51c9cb09cd39462"
+  },
   "Timeline": {
    "frozen": "2026-11-20",
    "paths": [
