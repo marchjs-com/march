@@ -216,6 +216,14 @@
    ],
    "hash": "6ce5a61684035d2a786e37b0f734e83a"
   },
+  "ListRow": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/list-row",
+    "examples/showcase/public/components/list-row/ide.json"
+   ],
+   "hash": "96b4676a2663936c2771d3679aa0ffb8"
+  },
   "MadeWithMarch": {
    "frozen": "2026-11-20",
    "paths": [
