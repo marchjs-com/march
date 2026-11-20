@@ -48,6 +48,14 @@
    ],
    "hash": "1449a656cbb1e817dda77ab0ab37e7bc"
   },
+  "Kbd": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/typography/kbd",
+    "examples/showcase/public/components/kbd/ide.json"
+   ],
+   "hash": "e6f9590f30af6586d582fbdc1d7c58c9"
+  },
   "MadeWithMarch": {
    "frozen": "2026-11-20",
    "paths": [
