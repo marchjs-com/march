@@ -408,6 +408,14 @@
    ],
    "hash": "be207d2725e85146f49435113eba093d"
   },
+  "ExplodedView": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/exploded-view",
+    "examples/showcase/public/components/exploded-view/ide.json"
+   ],
+   "hash": "25eba74693df590087bc14b7292247dd"
+  },
   "Feed": {
    "frozen": "2026-11-20",
    "paths": [
