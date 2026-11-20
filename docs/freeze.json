@@ -368,6 +368,14 @@
    ],
    "hash": "6ce5a61684035d2a786e37b0f734e83a"
   },
+  "ListEditor": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/list-editor",
+    "examples/showcase/public/components/list-editor/ide.json"
+   ],
+   "hash": "b42a590054477d900db2c8ad4c44a916"
+  },
   "ListRow": {
    "frozen": "2026-11-20",
    "paths": [
