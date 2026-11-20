@@ -1072,6 +1072,14 @@
    ],
    "hash": "3ee53b1554c490f0d0519eedfd78fc5f"
   },
+  "Roadmap": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/roadmap",
+    "examples/showcase/public/components/roadmap/ide.json"
+   ],
+   "hash": "4ef9452164cf1558a96acc659c0a9d2d"
+  },
   "RowTools": {
    "frozen": "2026-11-20",
    "paths": [
