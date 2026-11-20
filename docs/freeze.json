@@ -256,6 +256,14 @@
    ],
    "hash": "a381bd405c1554b56b8ff63129fb1b50"
   },
+  "Drawer": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/overlays/drawer",
+    "examples/showcase/public/components/drawer/ide.json"
+   ],
+   "hash": "5e7f129272449f102cbad8763151dad4"
+  },
   "EasingCurveEditor": {
    "frozen": "2026-11-20",
    "paths": [
