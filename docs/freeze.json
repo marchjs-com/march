@@ -96,6 +96,14 @@
    ],
    "hash": "5d54f6bb37aa46c88ca0707c04dff68e"
   },
+  "GradientEditor": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/gradient-editor",
+    "examples/showcase/public/components/gradient/ide.json"
+   ],
+   "hash": "d2a4e117661bacce2c7890626d9561f9"
+  },
   "IconButton": {
    "frozen": "2026-11-20",
    "paths": [
