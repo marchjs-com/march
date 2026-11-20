@@ -168,6 +168,14 @@
    ],
    "hash": "084888f7eba04815e15d172e9934f968"
   },
+  "CommandPalette": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/command-palette",
+    "examples/showcase/public/components/command-palette/ide.json"
+   ],
+   "hash": "3e7c24ea98390f79e97c570806337910"
+  },
   "CopyButton": {
    "frozen": "2026-11-20",
    "paths": [
