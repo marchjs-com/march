@@ -32,6 +32,14 @@
    ],
    "hash": "d57757d58a8b9647aaaac1c7f4d718a9"
   },
+  "CheckMark": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/feedback/check-mark",
+    "examples/showcase/public/components/check-mark/ide.json"
+   ],
+   "hash": "21a7a84c4a6db082a4e0e8f44af2d460"
+  },
   "Chevron": {
    "frozen": "2026-11-20",
    "paths": [
