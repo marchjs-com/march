@@ -3,6 +3,7 @@ import { defineMeta } from "../../meta.ts";
 export default defineMeta({
   name: "Dialog",
   status: "stable",
+  frozen: "2026-11-20",
   since: "0.1.0",
   summary: "Modal dialog: declarative <Dialog open> or openDialog() / openDrawer() returning a promise, plus confirm, prompt and askReason; focus trap, Escape, stacking.",
   category: "overlays",
