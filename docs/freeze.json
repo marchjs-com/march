@@ -230,7 +230,7 @@
     "src/components/forms/choice-picker",
     "examples/showcase/public/components/choice-picker/ide.json"
    ],
-   "hash": "14e59ba76b7da31c906b1c6075deea9d"
+   "hash": "0f7c1342d81a62f3746fc017f575de7c"
   },
   "ClampText": {
    "frozen": "2026-11-20",
@@ -1635,6 +1635,12 @@
    "name": "SearchBox",
    "what": "refresh",
    "reason": "Kendi ikonu düğüm olarak verilince yerine oturmuyordu; Lab'da meyve listesi ListRow oldu (madde işaretleri yazıların üstüne biniyordu)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ChoicePicker",
+   "what": "refresh",
+   "reason": "Lab'daki renk damlaları dolu ve kutunun ortasında"
   }
  ]
 }
