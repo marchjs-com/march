@@ -1112,6 +1112,14 @@
    ],
    "hash": "904330ae9f8dbf002b633af6a72f62c0"
   },
+  "ScrollStory": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/scroll-story",
+    "examples/showcase/public/components/scroll-story/ide.json"
+   ],
+   "hash": "0d03d70ca5e41fbb0732729c62e00e05"
+  },
   "ScrollToTop": {
    "frozen": "2026-11-20",
    "paths": [
