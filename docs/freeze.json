@@ -744,6 +744,14 @@
    ],
    "hash": "0912b56a198a174b2b3a00fc4766f793"
   },
+  "PropertyGrid": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/property-grid",
+    "examples/showcase/public/components/property-grid/ide.json"
+   ],
+   "hash": "f69d8137f67a09f760d6e28ccbdb71f2"
+  },
   "PullToRefresh": {
    "frozen": "2026-11-20",
    "paths": [

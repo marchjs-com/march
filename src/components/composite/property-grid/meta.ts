@@ -3,6 +3,7 @@ import { defineMeta } from "../../meta.ts";
 export default defineMeta({
   name: "PropertyGrid",
   status: "experimental",
+  frozen: "2026-11-20",
   category: "composite",
   since: "0.1.0",
   summary: "Inspector: grouped, searchable property rows edited with the form controls of their type; changes are undo steps (Undo) and unsaved ones are tracked (DirtyState); per-row reset, revert, save.",
