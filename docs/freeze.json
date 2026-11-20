@@ -736,6 +736,14 @@
    ],
    "hash": "158ced1b49d38c41d315e5fabd87891b"
   },
+  "ReactionPicker": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/social/reaction-picker",
+    "examples/showcase/public/components/reaction-picker/ide.json"
+   ],
+   "hash": "6846a26a4f8e9be48b5f073d6f8ad9ad"
+  },
   "RichTextEditor": {
    "frozen": "2026-11-20",
    "paths": [
