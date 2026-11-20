@@ -312,6 +312,14 @@
    ],
    "hash": "f817fd013562dc2e5cac3401afce8615"
   },
+  "Terminal": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/terminal",
+    "examples/showcase/public/components/terminal/ide.json"
+   ],
+   "hash": "938e1ef81ec1c14e97f7a64b862c226e"
+  },
   "Timeline": {
    "frozen": "2026-11-20",
    "paths": [
