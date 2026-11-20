@@ -328,6 +328,14 @@
    ],
    "hash": "52c4428ceab7cbc2b9874d78b5933d20"
   },
+  "CtaBand": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/cta-band",
+    "examples/showcase/public/components/cta-band/ide.json"
+   ],
+   "hash": "abdb56d70e8a0caf6723a384ca29625a"
+  },
   "DataGrid": {
    "frozen": "2026-11-20",
    "paths": [
