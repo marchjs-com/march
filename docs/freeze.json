@@ -56,6 +56,14 @@
    ],
    "hash": "59b0245e812e9090105b935bfcbe474e"
   },
+  "CheckboxGroup": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/checkbox-group",
+    "examples/showcase/public/components/checkbox-group/ide.json"
+   ],
+   "hash": "0f2f88fc0c5843ad549e63025a5e32c4"
+  },
   "CheckMark": {
    "frozen": "2026-11-20",
    "paths": [
