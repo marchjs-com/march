@@ -488,6 +488,14 @@
    ],
    "hash": "3ee53b1554c490f0d0519eedfd78fc5f"
   },
+  "RowTools": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/row-tools",
+    "examples/showcase/public/components/row-tools/ide.json"
+   ],
+   "hash": "ccb5aac51c8f5c886d5213669f5aacc4"
+  },
   "Scheduler": {
    "frozen": "2026-11-20",
    "paths": [
