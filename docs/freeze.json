@@ -1096,6 +1096,14 @@
    ],
    "hash": "9bbc568781f8a24cdd729313bd3c2d8c"
   },
+  "ScrollProgress": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/scroll-progress",
+    "examples/showcase/public/components/scroll-progress/ide.json"
+   ],
+   "hash": "904330ae9f8dbf002b633af6a72f62c0"
+  },
   "ScrollToTop": {
    "frozen": "2026-11-20",
    "paths": [
