@@ -1056,6 +1056,14 @@
    ],
    "hash": "8a44301e3b277e9df29df1df25ea274f"
   },
+  "Reveal": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/reveal",
+    "examples/showcase/public/components/web-reveal/ide.json"
+   ],
+   "hash": "129011305aa5e13082a3a2dd9935950f"
+  },
   "RichTextEditor": {
    "frozen": "2026-11-20",
    "paths": [
