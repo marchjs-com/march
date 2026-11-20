@@ -720,6 +720,14 @@
    ],
    "hash": "a8ed12fee60fc72a375277150b519df5"
   },
+  "OverflowToolbar": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/actions/overflow-toolbar",
+    "examples/showcase/public/components/overflow-toolbar/ide.json"
+   ],
+   "hash": "8f85f4f6550a4b6043fde09fba83580c"
+  },
   "Overlay": {
    "frozen": "2026-11-20",
    "paths": [
