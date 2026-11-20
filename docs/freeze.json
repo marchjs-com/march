@@ -600,6 +600,14 @@
    ],
    "hash": "39a1a35172113e39bb96b8405ddafd4b"
   },
+  "Popover": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/overlays/popover",
+    "examples/showcase/public/components/popover/ide.json"
+   ],
+   "hash": "27d3dbc208030bfadc65fd463b53a0f5"
+  },
   "Progress": {
    "frozen": "2026-11-20",
    "paths": [
