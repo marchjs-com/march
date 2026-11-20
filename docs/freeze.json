@@ -294,7 +294,7 @@
     "src/components/composite/command-palette",
     "examples/showcase/public/components/command-palette/ide.json"
    ],
-   "hash": "3e7c24ea98390f79e97c570806337910"
+   "hash": "f7ad320c4893d44da1bdb992436c7e21"
   },
   "ConsentBanner": {
    "frozen": "2026-11-20",
@@ -1683,6 +1683,12 @@
    "name": "TimeRuler",
    "what": "refresh",
    "reason": "Etiket ölçümü hareket motorunun karesinde (frame)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "CommandPalette",
+   "what": "refresh",
+   "reason": "Örneklerde örtük any parametreleri tiplendi"
   }
  ]
 }
