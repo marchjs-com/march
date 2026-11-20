@@ -1184,6 +1184,14 @@
    ],
    "hash": "247d5ccaec7c344a91be97960f869a2f"
   },
+  "SiteFooter": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/site-footer",
+    "examples/showcase/public/components/site-footer/ide.json"
+   ],
+   "hash": "9cac1693ec54614d12a1730d76663922"
+  },
   "Skeleton": {
    "frozen": "2026-11-20",
    "paths": [
