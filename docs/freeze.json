@@ -848,6 +848,14 @@
    ],
    "hash": "feff941f58d1b1d9d3b5cc78e786baf1"
   },
+  "Toast": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/overlays/toast",
+    "examples/showcase/public/components/toast/ide.json"
+   ],
+   "hash": "b5a58f229ecade90ad9ce02c558b574a"
+  },
   "Toggle": {
    "frozen": "2026-11-20",
    "paths": [
