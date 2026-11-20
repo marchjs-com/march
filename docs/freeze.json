@@ -384,6 +384,14 @@
    ],
    "hash": "f817fd013562dc2e5cac3401afce8615"
   },
+  "StatusDot": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/feedback/status-dot",
+    "examples/showcase/public/components/status-dot/ide.json"
+   ],
+   "hash": "1cd8aa351b0943d4b1290dbf7181bd87"
+  },
   "Terminal": {
    "frozen": "2026-11-20",
    "paths": [
