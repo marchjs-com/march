@@ -3,6 +3,7 @@ import { defineMeta } from "../../meta.ts";
 export default defineMeta({
   name: "Carousel",
   status: "stable",
+  frozen: "2026-11-20",
   since: "0.1.0",
   summary: "Scroll-snap carousel: one to four slides per view, previous / next buttons and dots, swipe on touch, one slide on phones.",
   category: "media",

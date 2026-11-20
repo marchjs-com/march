@@ -56,6 +56,14 @@
    ],
    "hash": "d57757d58a8b9647aaaac1c7f4d718a9"
   },
+  "Carousel": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/media/carousel",
+    "examples/showcase/public/components/carousel/ide.json"
+   ],
+   "hash": "1f7c77610ad393c41da8623d57c8e076"
+  },
   "Checkbox": {
    "frozen": "2026-11-20",
    "paths": [
