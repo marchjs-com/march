@@ -240,6 +240,14 @@
    ],
    "hash": "fe3aa723fa25fbb287d75c1c2fc6f9ea"
   },
+  "SectionLabel": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/typography/section-label",
+    "examples/showcase/public/components/section-label/ide.json"
+   ],
+   "hash": "d6b09c41cc080363189f8c3ec9de0be7"
+  },
   "StatTile": {
    "frozen": "2026-11-20",
    "paths": [
