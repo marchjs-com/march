@@ -1,0 +1,13 @@
+{
+ "components": {
+  "Gantt": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/gantt",
+    "examples/showcase/public/components/gantt/ide.json"
+   ],
+   "hash": "5d54f6bb37aa46c88ca0707c04dff68e"
+  }
+ },
+ "log": []
+}
