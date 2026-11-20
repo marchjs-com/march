@@ -448,6 +448,14 @@
    ],
    "hash": "1265aa45d790b52949fcc238bf84d8f2"
   },
+  "PhoneInput": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/phone-input",
+    "examples/showcase/public/components/phone/ide.json"
+   ],
+   "hash": "e8f50d36c37b2fb2f2ef85b9a7cf6c23"
+  },
   "Progress": {
    "frozen": "2026-11-20",
    "paths": [
