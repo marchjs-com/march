@@ -72,6 +72,14 @@
    ],
    "hash": "d3bf416eb2f27c7ac51a5ca7a278071a"
   },
+  "Debugger": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/debugger",
+    "examples/showcase/public/components/debugger/ide.json"
+   ],
+   "hash": "a219211283c7f8dd604e6ff300c90584"
+  },
   "Gantt": {
    "frozen": "2026-11-20",
    "paths": [
