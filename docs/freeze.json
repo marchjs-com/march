@@ -896,6 +896,14 @@
    ],
    "hash": "44625f59e6daf248cc91b80248aab1f7"
   },
+  "StoryRing": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/social/story-ring",
+    "examples/showcase/public/components/story-ring/ide.json"
+   ],
+   "hash": "9d5415b40a57d09bab21eb2b33784682"
+  },
   "Swatch": {
    "frozen": "2026-11-20",
    "paths": [
