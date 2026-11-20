@@ -896,6 +896,14 @@
    ],
    "hash": "825625cebe9ba9a1a438f4e27eb97b55"
   },
+  "Parallax": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/parallax",
+    "examples/showcase/public/components/parallax/ide.json"
+   ],
+   "hash": "60d7a8c08e13ed85600230656897bf79"
+  },
   "PasswordInput": {
    "frozen": "2026-11-20",
    "paths": [
