@@ -200,6 +200,14 @@
    ],
    "hash": "870578e9ae36f6a678f7abecd7d7c4ba"
   },
+  "KeyValue": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/key-value",
+    "examples/showcase/public/components/key-value/ide.json"
+   ],
+   "hash": "3d89d5f3ba1602d5c36dabaa5605d1ff"
+  },
   "LinkCard": {
    "frozen": "2026-11-20",
    "paths": [
