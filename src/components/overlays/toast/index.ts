@@ -59,6 +59,13 @@ const startTimer = (id: number, t: Timer): void => { t.at = Date.now(); t.run = 
 const pauseTimers = (): void => { if (paused) return; paused = true; for (const t of timers.values()) { clearTimeout(t.run); t.run = undefined; t.left -= Date.now() - t.at; } };
 const resumeTimers = (): void => { if (!paused) return; paused = false; for (const [id, t] of timers) startTimer(id, t); };
 let hosts = 0, autoHost: unknown = null, seq = 0;
+// the stacks of the hosts that are not a fallback: while one of them is on screen a fallback host (the automatic one, or
+// <ToastHost fallback />) draws nothing, so a toast shows once, where the app put its stack. One that is mounted but not
+// shown (a hidden tab or panel) does not count. `ownHosts` changes as they come and go; the list is read again on every
+// toast too, so a stack shown or hidden since then is seen then.
+const owners = new Set<Element>();
+const ownHosts = signal(0);
+const shown = (el: Element): boolean => el.isConnected && (typeof el.checkVisibility === "function" ? el.checkVisibility() : true);
 const MAX = 5;
 
 /** Show a toast. `timeout` in ms (0 = stays until dismissed). Default: 4s, 8s with an action or for danger. */
@@ -66,7 +73,7 @@ export const toast: Toast = Object.assign((message: unknown, opts: ToastOptions 
   const id = ++seq;
   const kind = opts.kind ?? "info";
   const item: ToastItem = { id, message, kind, action: opts.action ?? null, icon: opts.icon, color: opts.color, closable: opts.closable, closeLabel: opts.closeLabel, motion: opts.motion, class: opts.class };
-  if (!hosts && !autoHost && globalThis.document?.body) autoHost = createRoot(() => h(Portal, { layer: "toast", children: h(ToastHost, {}) }), null) ?? true;
+  if (!hosts && !autoHost && globalThis.document?.body) autoHost = createRoot(() => h(Portal, { layer: "toast", children: h(ToastHost, { fallback: true }) }), null) ?? true;
   list.update((l) => [...l, item].slice(-MAX));
   const ms = opts.timeout ?? (opts.action || kind === "danger" ? 8000 : 4000);
   if (ms > 0) { const tm: Timer = { left: ms, at: Date.now(), run: undefined }; timers.set(id, tm); if (!paused) startTimer(id, tm); }
@@ -87,19 +94,23 @@ export function ToastHost(props: {
   position?: "bottom-end" | "bottom-start" | "bottom-center" | "top-end" | "top-start" | "top-center" | undefined;
   /** Extra classes on the toast stack. @tr Bildirim yığınına eklenen sınıflar. */
   class?: ClassProp;
+  /** A fallback stack: it shows the toasts only while no other ToastHost is mounted (a frame that hosts pages which may bring their own). @tr Yedek yığın: bildirimleri yalnız başka bir ToastHost yokken gösterir (kendi yığınını getirebilen sayfaları barındıran bir çerçeve için). */
+  fallback?: boolean | undefined;
 } = {}): Element {
+  const auto = props.fallback === true;
+  let stack: Element | null = null;
   hosts++;
-  onCleanup(() => { hosts--; resumeTimers(); });
+  onCleanup(() => { hosts--; if (stack && owners.delete(stack)) ownHosts.update((n) => n + 1); resumeTimers(); });
   // the stack is the one live region (polite); toasts wait while the pointer or the focus is on them (WCAG 2.2.1)
   let hover = false, focus = false;
   const sync = (): void => { if (hover || focus) pauseTimers(); else resumeTimers(); };
-  return h("div", {
+  stack = h("div", {
     class: () => cx("m-toasts", props.position && props.position !== "bottom-end" && `m-toasts-${props.position}`, val(props.class)), "aria-live": "polite", "aria-relevant": "additions",
     onMouseenter: () => { hover = true; sync(); }, onMouseleave: () => { hover = false; sync(); },
     onFocusin: () => { focus = true; sync(); },
     onFocusout: (e: FocusEvent) => { if (!(e.currentTarget as Element).contains(e.relatedTarget as Node | null)) { focus = false; sync(); } },
   },
-    h(For<ToastItem>, { each: list, key: "id", children: (item) => {
+    h(For<ToastItem>, { each: auto ? () => { ownHosts(); const l = list(); return [...owners].some(shown) ? [] : l; } : list, key: "id", children: (item) => {
       const x = item.peek();
       const act = x.action;
       const own = x.icon;
@@ -118,5 +129,7 @@ export function ToastHost(props: {
         dismissable: x.closable !== false, dismissLabel: () => val(x.closeLabel) ?? t`Dismiss`, onDismiss: () => toast.dismiss(x.id),
       });
       return x.color ? h("div", { class: "m-toast-scope", "data-m-color": x.color }, alert) : alert;
-    } }));
+    } })) as Element;
+  if (!auto) { owners.add(stack); ownHosts.update((n) => n + 1); }
+  return stack;
 }

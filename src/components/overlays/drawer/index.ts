@@ -106,7 +106,12 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
   const dismissable = (): boolean => props.dismissable !== false;
   const canClose = (): boolean => dismissable() && props.dragToClose !== false;
   const win = globalThis as unknown as Window;
-  const vp = (): number => (axis === "x" ? win.innerWidth : win.innerHeight) || 0;
+  // the room the sheet opens in: its layer (the window, or an <OverlayScope> box such as a preview), else the window
+  let layer: HTMLElement | null = null;
+  const vp = (): number => {
+    const r = layer?.isConnected ? layer.getBoundingClientRect() : null;
+    return (r && (axis === "x" ? r.width : r.height)) || (axis === "x" ? win.innerWidth : win.innerHeight) || 0;
+  };
   const px = (p: number): number => (p <= 1 ? p * vp() : p);
   // the content's own size along the axis (head, handle and the whole body): a sheet never grows past it, and snap
   // points above it are cut down to it (Infinity until the panel is in the page, or across the axis)
@@ -131,6 +136,7 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
     onClose: () => props.onClose?.(),
   });
   root.classList.add("m-sheet-at", `m-sheet-at-${edge}`);
+  layer = root;
   const panel = root.firstElementChild as HTMLElement;
   const body = panel.querySelector<HTMLElement>(".m-dialog-body");
   if (handle) { if (edge === "top") panel.append(handle); else panel.prepend(handle); }

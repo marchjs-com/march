@@ -551,12 +551,12 @@ Full page: src/components/data/card/docs.md
 
 ## Carousel
 
-A row of slides that scrolls and snaps: one to four per view on wide screens (a slide and a peek of the next on phones), previous / next buttons that hide at the ends, and a dot per position. Touch users swipe; the track is keyboard scrollable.
+
 
 Composed of: [IconButton](#iconbutton), [PageDots](#pagedots)
 
 ```tsx
-<Carousel perView={3} label="Features">{items.map((x) => <FeatureCard {...x} />)}</Carousel>
+
 ```
 
 Full page: src/components/media/carousel/docs.md

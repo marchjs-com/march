@@ -69,3 +69,36 @@ test("toast: timers pause while the pointer or focus is on the stack", async () 
   await new Promise((r) => setTimeout(r, 60));
   assert.equal(toast.list().length, 0, "runs out after the pointer leaves");
 });
+
+test("toast: the app's own ToastHost takes the stack from the automatic one (a toast shows once)", async () => {
+  toast.clear();
+  toast("early", { timeout: 0 }); // no host yet: the automatic one is made
+  await tick();
+  assert.equal(document.querySelectorAll(".m-toast").length, 1);
+  const box = document.createElement("div");
+  document.body.append(box);
+  const dispose = render(() => h(ToastHost, { position: "top-center", class: "own" }), box);
+  toast("later", { timeout: 0 });
+  await tick();
+  const shown = [...document.querySelectorAll(".m-toast")];
+  assert.equal(shown.length, 2, "early and later, each once");
+  assert.ok(shown.every((el) => el.closest(".own")), "both in the app's host");
+  dispose();
+  await tick();
+  assert.equal(document.querySelectorAll(".m-toast").length, 2, "the automatic host shows them again");
+  // a fallback host the app renders (a frame for pages) yields the same way
+  const frame = document.createElement("div");
+  document.body.append(frame);
+  const stopFrame = render(() => h(ToastHost, { fallback: true, class: "frame" }), frame);
+  const page = render(() => h(ToastHost, { class: "page" }), box);
+  await tick();
+  assert.equal(frame.querySelectorAll(".m-toast").length, 0, "the frame's fallback is empty while the page has a host");
+  assert.equal(box.querySelectorAll(".m-toast").length, 2);
+  page();
+  await tick();
+  assert.ok(frame.querySelectorAll(".m-toast").length >= 2, "the fallback shows them when the page's host goes");
+  stopFrame();
+  toast.clear();
+  box.remove();
+  frame.remove();
+});

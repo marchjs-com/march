@@ -1,6 +1,6 @@
 /* March — PullToRefresh (src/components/feedback/pull-to-refresh). The element is the scroll area; the indicator sits above
    the content and follows the pull. Movement comes from the motion engine (no keyframes here). */
-.m-ptr { position: relative; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
+.m-ptr { position: relative; block-size: 100%; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
 .m-ptr.is-pulling { user-select: none; cursor: grabbing; }
 .m-ptr-content { position: relative; will-change: transform; }
 .m-ptr-ind { position: absolute; z-index: 1; inset-block-start: -2.75rem; inset-inline-start: 50%; margin-inline-start: -1.25rem; width: 2.5rem; height: 2.5rem;

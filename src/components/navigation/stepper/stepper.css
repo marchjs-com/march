@@ -8,7 +8,9 @@
 .m-stepper-nav { display: flex; align-items: center; justify-content: space-between; gap: var(--m-space-3); }
 .m-stepper-count { color: var(--m-text-2); font-size: var(--m-text-sm); font-variant-numeric: tabular-nums; }
 /* vertical: the steps in a column, the panel and its buttons beside them (stacked again when narrow) */
-.m-stepper { container-type: inline-size; }
+/* only the vertical stepper is a size container (its own width chooses side by side or stacked); a horizontal one
+   takes the width of its steps, so it never folds up where nothing gives it a width (a centred box) */
+.m-stepper-v { container-type: inline-size; inline-size: 100%; min-inline-size: min(22rem, 100%); }
 .m-stepper-v { grid-template-columns: max-content minmax(0, 1fr); align-items: start; column-gap: var(--m-space-6); }
 .m-stepper-v > .m-steps2 { grid-row: 1 / span 2; }
 @container (max-width: 30rem) { .m-stepper-v { grid-template-columns: minmax(0, 1fr); } .m-stepper-v > .m-steps2 { grid-row: auto; } }

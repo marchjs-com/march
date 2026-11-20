@@ -44,3 +44,18 @@ test("CodeView: own texts, no wrap button, no language label, no toolbar", () =>
   assert.equal(c.el.querySelectorAll(".m-code-line").length, 1);
   c.dispose();
 });
+
+test("tokenize tsx: JSX text is plain, {…} in it is code, a type argument or a comparison is no tag", async () => {
+  const { tokenize } = await import("../../../ui/highlight.ts");
+  const kinds = (src) => tokenize(src, "tsx").filter(([, t]) => t.trim());
+  const jsx = kinds(`return <span sx={{ p: 2 }} on:click={() => go()}>Ankara · İstanbul <b>Hello</b> {$n > 2 ? <i>Yes</i> : "No"}</span>`);
+  assert.deepEqual(jsx.filter(([k]) => k === "type"), [], "no word of the text reads as a type");
+  assert.ok(jsx.some(([k, t]) => k === "" && t.includes("Ankara · İstanbul")));
+  assert.ok(jsx.some(([k, t]) => k === "" && t === "Hello"));
+  assert.ok(jsx.some(([k, t]) => k === "attr" && t === "on:click"));
+  assert.ok(jsx.some(([k, t]) => k === "str" && t === '"No"'), "a string in a {…} among the children");
+  assert.ok(jsx.some(([k, t]) => k === "tag" && t === "</span>"));
+  const code = kinds(`const xs: Array<string> = []; if (a < b && c > d) f(<T,>(x: T) => x)\nconst m = new Map()`);
+  assert.deepEqual(code.filter(([k]) => k === "tag"), [], "generics and comparisons are not tags");
+  assert.ok(code.some(([k, t]) => k === "type" && t === "Map"), "code after them is still coloured");
+});

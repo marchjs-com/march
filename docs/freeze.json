@@ -94,7 +94,7 @@
     "src/components/composite/bottom-nav",
     "examples/showcase/public/components/bottom-nav/ide.json"
    ],
-   "hash": "076fa1de5cfdbf4f828f66b6bfd4b911"
+   "hash": "bc6372577c38d275e75f4d3b4a0446a2"
   },
   "BottomRightControls": {
    "frozen": "2026-11-20",
@@ -158,7 +158,7 @@
     "src/components/media/carousel",
     "examples/showcase/public/components/carousel/ide.json"
    ],
-   "hash": "1f7c77610ad393c41da8623d57c8e076"
+   "hash": "6c2ee98b0934682047297ada5b52ce82"
   },
   "ChatBubble": {
    "frozen": "2026-11-20",
@@ -262,7 +262,7 @@
     "src/components/typography/code-view",
     "examples/showcase/public/components/code-view/ide.json"
    ],
-   "hash": "a58240fce3e786f5d9f82b2b5291baf7"
+   "hash": "103a51dd8cbf3b86c01778b1997f51dc"
   },
   "ColorInput": {
    "frozen": "2026-11-20",
@@ -310,7 +310,7 @@
     "src/components/overlays/context-menu",
     "examples/showcase/public/components/context-menu/ide.json"
    ],
-   "hash": "1acfc2b44d2c4d25405dc1e569d3f5b2"
+   "hash": "c1f43575cf138b5f30dcdebbfeda8341"
   },
   "CopyButton": {
    "frozen": "2026-11-20",
@@ -438,7 +438,7 @@
     "src/components/overlays/drawer",
     "examples/showcase/public/components/drawer/ide.json"
    ],
-   "hash": "44aeacc12b16a56543c92ca311e1575b"
+   "hash": "5e9de45b1db7d12b7684b7d8ff9ad7d1"
   },
   "EasingCurveEditor": {
    "frozen": "2026-11-20",
@@ -886,7 +886,7 @@
     "src/components/typography/overflow-text",
     "examples/showcase/public/components/overflow-text/ide.json"
    ],
-   "hash": "a8ed12fee60fc72a375277150b519df5"
+   "hash": "e949ed788c5122cf4f279d4ea012eec3"
   },
   "OverflowToolbar": {
    "frozen": "2026-11-20",
@@ -990,7 +990,7 @@
     "src/components/overlays/popover",
     "examples/showcase/public/components/popover/ide.json"
    ],
-   "hash": "8bdfccf1dd5633e03a976eb70f433af3"
+   "hash": "8023690bfe335b3ec7e23c97bf5fe5f4"
   },
   "PostCard": {
    "frozen": "2026-11-20",
@@ -998,7 +998,7 @@
     "src/components/composite/post-card",
     "examples/showcase/public/components/post-card/ide.json"
    ],
-   "hash": "181ba29889ccdac9efca6bd7434d9e45"
+   "hash": "54f32300aa31eb5e6a36f3b0aaee4af0"
   },
   "Presentation": {
    "frozen": "2026-11-20",
@@ -1070,7 +1070,7 @@
     "src/components/feedback/pull-to-refresh",
     "examples/showcase/public/components/pull-to-refresh/ide.json"
    ],
-   "hash": "db5e159a14612f855d610c8e7c89038d"
+   "hash": "c4eb1c45489174c6e829268c60f29c2b"
   },
   "RadioGroup": {
    "frozen": "2026-11-20",
@@ -1214,7 +1214,7 @@
     "src/components/navigation/section-timeline",
     "examples/showcase/public/components/section-timeline/ide.json"
    ],
-   "hash": "b54a676c23024bcf3b41d2bd225a1b0a"
+   "hash": "b2ee04f83e501dd4babf8dda3116e7d6"
   },
   "Segmented": {
    "frozen": "2026-11-20",
@@ -1358,7 +1358,7 @@
     "src/components/navigation/stepper",
     "examples/showcase/public/components/stepper/ide.json"
    ],
-   "hash": "7de0d45a698fe12aafc22647b0d64649"
+   "hash": "b04b9a59fa6d77a5aaf0aeb38f3d7286"
   },
   "Steps": {
    "frozen": "2026-11-20",
@@ -1390,7 +1390,7 @@
     "src/components/composite/story-viewer",
     "examples/showcase/public/components/story-viewer/ide.json"
    ],
-   "hash": "15d0b2fe5b7c6898671376ee70835c51"
+   "hash": "206668540ef4fcfe8bee25fc8c05b41b"
   },
   "Swatch": {
    "frozen": "2026-11-20",
@@ -1494,7 +1494,7 @@
     "src/components/overlays/toast",
     "examples/showcase/public/components/toast/ide.json"
    ],
-   "hash": "b5a58f229ecade90ad9ce02c558b574a"
+   "hash": "c233edff1fd096cdae494cc891dd68f3"
   },
   "Toggle": {
    "frozen": "2026-11-20",
@@ -2469,6 +2469,84 @@
    "name": "Segmented",
    "what": "refresh",
    "reason": "Segmented demo size seçeneğini okur"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "BottomNav",
+   "what": "refresh",
+   "reason": "Önizleme düzeltmeleri: ToastHost fallback, Drawer durma noktaları katmana göre, ContextMenu imleçte açılır, Stepper/PullToRefresh boyutu, SectionTimeline yatay adlar dik, Carousel swipe seçeneği, kod renklendirmede JSX metni; örnekler"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Carousel",
+   "what": "refresh",
+   "reason": "Önizleme düzeltmeleri: ToastHost fallback, Drawer durma noktaları katmana göre, ContextMenu imleçte açılır, Stepper/PullToRefresh boyutu, SectionTimeline yatay adlar dik, Carousel swipe seçeneği, kod renklendirmede JSX metni; örnekler"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "CodeView",
+   "what": "refresh",
+   "reason": "Önizleme düzeltmeleri: ToastHost fallback, Drawer durma noktaları katmana göre, ContextMenu imleçte açılır, Stepper/PullToRefresh boyutu, SectionTimeline yatay adlar dik, Carousel swipe seçeneği, kod renklendirmede JSX metni; örnekler"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ContextMenu",
+   "what": "refresh",
+   "reason": "Önizleme düzeltmeleri: ToastHost fallback, Drawer durma noktaları katmana göre, ContextMenu imleçte açılır, Stepper/PullToRefresh boyutu, SectionTimeline yatay adlar dik, Carousel swipe seçeneği, kod renklendirmede JSX metni; örnekler"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Drawer",
+   "what": "refresh",
+   "reason": "Önizleme düzeltmeleri: ToastHost fallback, Drawer durma noktaları katmana göre, ContextMenu imleçte açılır, Stepper/PullToRefresh boyutu, SectionTimeline yatay adlar dik, Carousel swipe seçeneği, kod renklendirmede JSX metni; örnekler"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "OverflowText",
+   "what": "refresh",
+   "reason": "Önizleme düzeltmeleri: ToastHost fallback, Drawer durma noktaları katmana göre, ContextMenu imleçte açılır, Stepper/PullToRefresh boyutu, SectionTimeline yatay adlar dik, Carousel swipe seçeneği, kod renklendirmede JSX metni; örnekler"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Popover",
+   "what": "refresh",
+   "reason": "Önizleme düzeltmeleri: ToastHost fallback, Drawer durma noktaları katmana göre, ContextMenu imleçte açılır, Stepper/PullToRefresh boyutu, SectionTimeline yatay adlar dik, Carousel swipe seçeneği, kod renklendirmede JSX metni; örnekler"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "PostCard",
+   "what": "refresh",
+   "reason": "Önizleme düzeltmeleri: ToastHost fallback, Drawer durma noktaları katmana göre, ContextMenu imleçte açılır, Stepper/PullToRefresh boyutu, SectionTimeline yatay adlar dik, Carousel swipe seçeneği, kod renklendirmede JSX metni; örnekler"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "PullToRefresh",
+   "what": "refresh",
+   "reason": "Önizleme düzeltmeleri: ToastHost fallback, Drawer durma noktaları katmana göre, ContextMenu imleçte açılır, Stepper/PullToRefresh boyutu, SectionTimeline yatay adlar dik, Carousel swipe seçeneği, kod renklendirmede JSX metni; örnekler"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "SectionTimeline",
+   "what": "refresh",
+   "reason": "Önizleme düzeltmeleri: ToastHost fallback, Drawer durma noktaları katmana göre, ContextMenu imleçte açılır, Stepper/PullToRefresh boyutu, SectionTimeline yatay adlar dik, Carousel swipe seçeneği, kod renklendirmede JSX metni; örnekler"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Stepper",
+   "what": "refresh",
+   "reason": "Önizleme düzeltmeleri: ToastHost fallback, Drawer durma noktaları katmana göre, ContextMenu imleçte açılır, Stepper/PullToRefresh boyutu, SectionTimeline yatay adlar dik, Carousel swipe seçeneği, kod renklendirmede JSX metni; örnekler"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "StoryViewer",
+   "what": "refresh",
+   "reason": "Önizleme düzeltmeleri: ToastHost fallback, Drawer durma noktaları katmana göre, ContextMenu imleçte açılır, Stepper/PullToRefresh boyutu, SectionTimeline yatay adlar dik, Carousel swipe seçeneği, kod renklendirmede JSX metni; örnekler"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Toast",
+   "what": "refresh",
+   "reason": "Önizleme düzeltmeleri: ToastHost fallback, Drawer durma noktaları katmana göre, ContextMenu imleçte açılır, Stepper/PullToRefresh boyutu, SectionTimeline yatay adlar dik, Carousel swipe seçeneği, kod renklendirmede JSX metni; örnekler"
   }
  ]
 }

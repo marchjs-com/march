@@ -47,13 +47,20 @@
 .m-stl-vertical .m-stl-list.is-lens .m-stl-mark { inline-size: 16rem; }
 .m-stl-vertical .m-stl-list.is-lens .m-stl-mark::before { content: ""; position: absolute; inset-inline: 0; inset-block-start: 50%; block-size: 2.75rem; translate: 0 -50%; }
 
-/* horizontal: a row; the name of the dot under the pointer above it (only the nearest: the names would overlap) */
+/* horizontal: a row; each name an upright capsule read from the bottom up, wrapping its dot at its foot (the mirror of the
+   vertical one), scaled about the dot's centre: side by side the names never overlap, so all near ones show */
 .m-stl-horizontal .m-stl-list { flex-direction: row; }
 .m-stl-horizontal .m-stl-item { inline-size: var(--m-stl-step); translate: var(--m-stl-shift) 0; }
 .m-stl-horizontal .m-stl-mark { inline-size: 100%; }
-.m-stl-horizontal .m-stl-label { inset-block-end: calc(100% + .25rem); inset-inline-start: 50%; padding: .1875rem .625rem;
-  translate: -50% 0; transform-origin: 50% 100%; scale: calc(.8 + var(--k) * .2); opacity: clamp(0, calc((var(--k) - .7) * 3.4), 1); }
-.m-stl-horizontal .m-stl-list.is-lens .m-stl-mark { block-size: 4.5rem; align-items: flex-end; padding-block-end: 0; }
+.m-stl-horizontal .m-stl-label { --m-stl-pad: .25rem; inset-block-end: calc(-1 * var(--m-stl-pad)); inset-inline-start: 50%;
+  writing-mode: sideways-lr; min-block-size: calc(1.5rem + var(--m-stl-pad) * 2); padding-block: .125rem;
+  padding-inline: calc(1.5rem + var(--m-stl-pad) * 2) .75rem;
+  translate: -50% 0; transform-origin: 50% calc(100% - var(--m-stl-pad) - .75rem); scale: calc(.72 + var(--k) * .28); }
+/* without sideways writing: written top-down and turned over (in place, at full size) */
+@supports not (writing-mode: sideways-lr) {
+  .m-stl-horizontal .m-stl-label { writing-mode: vertical-rl; rotate: 180deg; transform-origin: 50% 50%; scale: none; }
+}
+.m-stl-horizontal .m-stl-list.is-lens .m-stl-mark { block-size: 12rem; align-items: flex-end; padding-block-end: 0; }
 .m-stl-horizontal .m-stl-list.is-lens .m-stl-mark::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 50%; inline-size: 2.75rem; translate: -50% 0; }
 .m-stl-horizontal .m-stl-list.is-lens .m-stl-dot { margin-block-end: 0; }
 
@@ -62,6 +69,6 @@
 .m-stl.is-fixed { position: fixed; z-index: var(--m-z-sticky, 20); contain: strict; box-sizing: border-box; }
 .m-stl-vertical.is-fixed { inset-inline-end: 0; inset-block: 0; inline-size: 19rem; padding-inline-end: var(--m-space-4, 1rem);
   flex-direction: column; justify-content: center; align-items: flex-end; --m-stl-step: min(1.5vh, .9375rem); }
-.m-stl-horizontal.is-fixed { inset-inline: 0; inset-block-end: 0; block-size: 8rem; padding-block-end: var(--m-space-4, 1rem);
+.m-stl-horizontal.is-fixed { inset-inline: 0; inset-block-end: 0; block-size: 14rem; padding-block-end: var(--m-space-4, 1rem);
   justify-content: center; align-items: flex-end; --m-stl-step: min(1.5vw, .9375rem); }
 @media (prefers-reduced-motion: reduce) { .m-stl-dot circle { transition: none; } }

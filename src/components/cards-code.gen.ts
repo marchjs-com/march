@@ -19,7 +19,7 @@ export const code: Record<string, string> = {
   "actions/button-group": "<ButtonGroup attached label=\"Alignment\">\n  <Button>Start</Button><Button>Center</Button><Button>End</Button>\n</ButtonGroup>",
   "forms/calendar": "<Calendar bind:value={$day} min=\"2026-03-10\" max=\"2026-04-20\" />\n<Calendar value={$from} rangeFrom={$from} rangeTo={$to} isDisabled={(iso) => holidays.has(iso)} />",
   "data/card": "<Card title=\"HADİ\" subtitle=\"Business plan\" actions={[edit]} footer={<span>Updated today</span>}>…</Card>\n<Card flush>…</Card>\n<Card as=\"article\" plain>…</Card>",
-  "media/carousel": "<Carousel perView={3} label=\"Features\">{items.map((x) => <FeatureCard {...x} />)}</Carousel>",
+  "media/carousel": "",
   "social/chat-bubble": "<ChatBubble mine text=\"See you at 7\" time={m.at} status=\"read\" position=\"last\" reactions={m.reactions} onReact={toggle} onReply={() => reply(m)} />",
   "composite/chat-composer": "<ChatComposer onSend={(text) => send(text)} onVoice={sendVoice} attachments={[photo, file]} replyTo={$reply} />",
   "composite/chat-thread": "<ChatThread messages={$messages} typing={$typing} group onReact={toggleReaction} onReply={(m) => $replyTo = m} />",

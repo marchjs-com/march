@@ -16,8 +16,16 @@ const STRING = /"(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?|`(?:\\[\s\S]|[^`\\])*`
 const NUMBER = /(?:0[xX][\da-fA-F_]+|\d[\d_]*(?:\.\d+)?(?:[eE][+-]?\d+)?n?|\.\d+)(?:%|[a-z]{1,4})?/y;
 const WORD = /[A-Za-z_$][\w$]*/y;
 const DASH_WORD = /[A-Za-z_@-][\w-]*/y;
+// an attribute name in a JSX tag: on:click|prevent, bind:value, m:color, aria-label
+const ATTR_WORD = /[A-Za-z_@-][\w:|-]*/y;
 const TAG = /<\/?[A-Za-z][\w.:-]*/y;
 const PUNCT = /[{}()[\];,.<>=+\-*/%!&|?:~^]+/y;
+// in JSX the braces and a tag's ">" are read one at a time (they open and close the parts), so a run stops at them
+const JSX_PUNCT = /[()[\];,.<=+\-*/%!&|?:~^]+|>/y;
+const TAG_PUNCT = /[()[\];,.<=+\-*%!&|?:~^]+/y;
+// a tag can open after these (a value is expected there): `return <a>`, `(<a>`, `x ? <a> : <b>`, `=> <a>`; after a name,
+// `)` or `]` a "<" is a type argument or a comparison (Array<string>, a < b)
+const TAG_AFTER = /(?:^|[(,=:?&|{[!;>}]|\breturn|\byield|\bdefault)\s*$/;
 const SPACE = /\s+/y;
 
 function at(re: RegExp, src: string, i: number): string | null { re.lastIndex = i; const m = re.exec(src); return m && m[0] ? m[0] : null; }
@@ -35,6 +43,12 @@ export function tokenize(src: string, lang = ""): Token[] {
     if (last && last[0] === kind) last[1] += text; else out.push([kind, text]);
   };
   let inTag = false;
+  // JSX (jsx / tsx): what the text at the current place is. A stack of frames: "tag" inside <Name …>, "text" among an
+  // element's children, "expr" inside a {…} (its open braces counted); no frame: plain code
+  const jsx = /^(jsx|tsx)$/.test(lang);
+  type Frame = { k: "tag"; close: boolean } | { k: "text" } | { k: "expr"; depth: number };
+  const stack: Frame[] = [];
+  const top = (): Frame | undefined => stack[stack.length - 1];
   // a template literal: its text is a string, each ${…} inside is code (coloured as such, nested templates too)
   const template = (s: number): number => {
     let j = s + 1, from = s;
@@ -60,6 +74,43 @@ export function tokenize(src: string, lang = ""): Token[] {
   };
   for (let i = 0; i < src.length;) {
     let m: string | null;
+    if (jsx) {
+      const f = top();
+      inTag = f?.k === "tag";
+      // among children: text is plain up to a tag or a {
+      if (f?.k === "text") {
+        if (src.startsWith("</>", i)) { push("tag", "</>"); stack.pop(); i += 3; continue; }
+        if (src.startsWith("<>", i)) { push("tag", "<>"); stack.push({ k: "text" }); i += 2; continue; }
+        if (src[i] === "{") { push("punct", "{"); stack.push({ k: "expr", depth: 1 }); i++; continue; }
+        if (src[i] === "<" && (m = at(TAG, src, i))) { push("tag", m); stack.push({ k: "tag", close: m[1] === "/" }); i += m.length; continue; }
+        let e = i + 1;
+        while (e < src.length && src[e] !== "<" && src[e] !== "{") e++;
+        push("", src.slice(i, e)); i = e; continue;
+      }
+      if (f?.k === "tag") {
+        if (src.startsWith("/>", i)) { push("tag", "/>"); stack.pop(); i += 2; continue; }
+        if (src[i] === ">") {
+          push("tag", ">"); stack.pop();
+          if (f.close) { if (top()?.k === "text") stack.pop(); } else stack.push({ k: "text" });
+          i++; continue;
+        }
+        if (src[i] === "{") { push("punct", "{"); stack.push({ k: "expr", depth: 1 }); i++; continue; }
+      }
+      if (f?.k === "expr" && (src[i] === "{" || src[i] === "}")) {
+        push("punct", src[i]!);
+        if (src[i] === "{") f.depth++; else if (!--f.depth) stack.pop();
+        i++; continue;
+      }
+      // code (or a {…} in JSX): a tag opens where a value is expected; not a type argument (<T,>, <T extends …>)
+      if (f?.k !== "tag" && src[i] === "<") {
+        const before = src.slice(Math.max(0, i - 12), i);
+        if (src.startsWith("<>", i) && TAG_AFTER.test(before)) { push("tag", "<>"); stack.push({ k: "text" }); i += 2; continue; }
+        if ((m = at(TAG, src, i)) && m[1] !== "/" && TAG_AFTER.test(before) && !/^\s*(?:,|extends\b)/.test(src.slice(i + m.length, i + m.length + 12))) {
+          push("tag", m); stack.push({ k: "tag", close: false }); i += m.length; continue;
+        }
+        push("punct", "<"); i++; continue;
+      }
+    }
     if ((m = at(SPACE, src, i))) { push("", m); i += m.length; continue; }
     if (js && src[i] === "`") { i = template(i); continue; }
     if ((m = (sh ? at(HASH_COMMENT, src, i) : null) ?? (js || css || (tags && !inTag && lang !== "html") ? at(COMMENT, src, i) : null))) { push("com", m); i += m.length; continue; }
@@ -68,11 +119,11 @@ export function tokenize(src: string, lang = ""): Token[] {
       const key = json && /^\s*:/.test(src.slice(i + m.length, i + m.length + 8));
       push(key ? "attr" : "str", m); i += m.length; continue;
     }
-    if (tags && (m = at(TAG, src, i)) && (lang === "html" || /^<\/?[A-Za-z]/.test(m))) { push("tag", m); i += m.length; inTag = true; continue; }
-    if (inTag && (src[i] === ">" || src.startsWith("/>", i))) { const t = src[i] === ">" ? ">" : "/>"; push("tag", t); i += t.length; inTag = false; continue; }
+    if (tags && !jsx && (m = at(TAG, src, i)) && (lang === "html" || /^<\/?[A-Za-z]/.test(m))) { push("tag", m); i += m.length; inTag = true; continue; }
+    if (!jsx && inTag && (src[i] === ">" || src.startsWith("/>", i))) { const t = src[i] === ">" ? ">" : "/>"; push("tag", t); i += t.length; inTag = false; continue; }
     if (/[\d.]/.test(src[i]!) && (m = at(NUMBER, src, i)) && /\d/.test(m)) { push("num", m); i += m.length; continue; }
     if (css && src[i] === "#" && (m = at(/#[\da-fA-F]{3,8}\b/y, src, i))) { push("num", m); i += m.length; continue; }
-    if ((m = at(css || inTag ? DASH_WORD : WORD, src, i))) {
+    if ((m = at(css || inTag ? (jsx ? ATTR_WORD : DASH_WORD) : WORD, src, i))) {
       const rest = src.slice(i + m.length, i + m.length + 2);
       let kind: TokenKind = "";
       if (inTag && /^\s*=/.test(rest)) kind = "attr";
@@ -85,7 +136,7 @@ export function tokenize(src: string, lang = ""): Token[] {
       else if (js && src[i - 1] === "." && src[i - 2] !== ".") kind = "prop";
       push(kind, m); i += m.length; continue;
     }
-    if ((m = at(PUNCT, src, i))) { push("punct", m); i += m.length; continue; }
+    if ((m = at(jsx && stack.length ? (inTag ? TAG_PUNCT : JSX_PUNCT) : PUNCT, src, i))) { push("punct", m); i += m.length; continue; }
     push("", src[i]!); i++;
   }
   return out;

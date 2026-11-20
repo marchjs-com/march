@@ -7,6 +7,11 @@
 .m-carousel.is-instant .m-carousel-track { scroll-behavior: auto; }
 .m-carousel-track::-webkit-scrollbar { display: none; }
 .m-carousel-track > * { scroll-snap-align: start; min-width: 0; }
+/* swipe={true}: the mouse drags it (grab cursor; while dragging no snapping or smoothing, and no text selection) */
+.m-carousel.is-swipe .m-carousel-track { cursor: grab; }
+.m-carousel.is-swipe .m-carousel-track.is-dragging { cursor: grabbing; scroll-snap-type: none; scroll-behavior: auto; user-select: none; }
+/* swipe={false}: no swiping; the buttons, dots and keys still move it */
+.m-carousel.is-noswipe .m-carousel-track { overflow-x: hidden; touch-action: pan-y; }
 /* a text slide (children given as text) */
 .m-carousel-text { display: grid; place-items: center; min-height: 8rem; padding: var(--m-space-4); border-radius: var(--m-radius-3); background: var(--m-surface-2); font-weight: 600; text-align: center; }
 @media (max-width: 640px) { .m-carousel { --m-per: 1.15; } }

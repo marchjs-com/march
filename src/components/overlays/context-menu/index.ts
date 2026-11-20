@@ -33,6 +33,10 @@ export function ContextMenu(props: ContextMenuProps): Element {
     if (props.when && !props.when(target)) return;
     returnTo = (globalThis.document?.activeElement as HTMLElement | null) ?? null;
     setStyle(anchor, { left: `${x}px`, top: `${y}px` });
+    // inside a box that holds fixed elements (an <OverlayScope>, a transformed parent) "fixed" starts at that box's
+    // corner, not the window's: the point is moved back by the difference, so the menu opens at the pointer
+    const at = anchor.getBoundingClientRect?.();
+    if (at && (Math.abs(at.left - x) > 0.5 || Math.abs(at.top - y) > 0.5)) setStyle(anchor, { left: `${2 * x - at.left}px`, top: `${2 * y - at.top}px` });
     open.set({ x, y, target });
     queueMicrotask(() => menuItems(panel)[0]?.focus());
   };
