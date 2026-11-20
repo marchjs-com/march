@@ -784,6 +784,14 @@
    ],
    "hash": "6e4809db7707a0a74083ac6bc4ce7472"
   },
+  "PanelHeader": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/panel-header",
+    "examples/showcase/public/components/panel-header/ide.json"
+   ],
+   "hash": "825625cebe9ba9a1a438f4e27eb97b55"
+  },
   "PasswordInput": {
    "frozen": "2026-11-20",
    "paths": [
