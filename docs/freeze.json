@@ -1352,6 +1352,14 @@
    ],
    "hash": "938e1ef81ec1c14e97f7a64b862c226e"
   },
+  "Testimonials": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/testimonials",
+    "examples/showcase/public/components/testimonials/ide.json"
+   ],
+   "hash": "bf46854bd7d86acd9dc67bc9705fcc1e"
+  },
   "Textarea": {
    "frozen": "2026-11-20",
    "paths": [
