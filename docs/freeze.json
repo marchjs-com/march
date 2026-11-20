@@ -728,6 +728,14 @@
    ],
    "hash": "f21f3a9dbd113c08a1f5306424b39335"
   },
+  "LogoCloud": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/logo-cloud",
+    "examples/showcase/public/components/logo-cloud/ide.json"
+   ],
+   "hash": "6dfc9ba837151e7feec49fb8bfcf9fd8"
+  },
   "MadeWithMarch": {
    "frozen": "2026-11-20",
    "paths": [
