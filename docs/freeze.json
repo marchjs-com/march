@@ -672,6 +672,14 @@
    ],
    "hash": "987dbd22f4945908d22cacacd18d9616"
   },
+  "Steps": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/navigation/steps",
+    "examples/showcase/public/components/steps/ide.json"
+   ],
+   "hash": "c663db2132501f99038a54ff10ca6e7b"
+  },
   "Swatch": {
    "frozen": "2026-11-20",
    "paths": [
