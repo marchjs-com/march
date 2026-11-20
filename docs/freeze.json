@@ -48,6 +48,14 @@
    ],
    "hash": "d63bd43213f86d978632fe1a48662f08"
   },
+  "Chip": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/actions/chip",
+    "examples/showcase/public/components/chip/ide.json"
+   ],
+   "hash": "0960edf9e8a1bb10c2800f8b3d32b59f"
+  },
   "ClampText": {
    "frozen": "2026-11-20",
    "paths": [
