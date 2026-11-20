@@ -10,6 +10,7 @@ import { key } from "../../../ui/keys.ts";
 import { val, cx, debounce, glyph, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
+import { isIconDef } from "../../../icons/svg.ts";
 import { Kbd } from "../../typography/kbd/index.ts";
 import { search as searchIcon } from "../../../icons/glyphs/search.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
@@ -94,7 +95,7 @@ export function SearchBox(props: SearchBoxProps): Element {
   return h("div", {
     class: () => cx("m-search", val(props.size) === "sm" && "m-search-sm", val(props.variant) === "plain" && "m-search-plain", props.icon === false && "m-search-no-icon", val(props.class)),
     role: "search", },
-  props.icon === false ? null : ownIcon ? icon(props.icon, "m-search-icon") : h("span", { class: "m-search-icon", "aria-hidden": "true" }, glyph(searchIcon)),
+  props.icon === false ? null : ownIcon ? (isIconDef(props.icon) || typeof props.icon === "string" ? icon(props.icon, "m-search-icon") : h("span", { class: "m-search-icon", "aria-hidden": "true" }, props.icon)) : h("span", { class: "m-search-icon", "aria-hidden": "true" }, glyph(searchIcon)),
   h("input", {
     type: "search", id: props.id, class: () => cx("m-input m-search-input", val(props.size) === "sm" && "m-input-sm", props.inputClass), ref: (x: HTMLInputElement) => { input = x; props.inputRef?.(x); }, value: current.peek(),
     placeholder: () => val(props.placeholder) ?? t`Search…`, "aria-label": () => val(props.label) ?? val(props.placeholder) ?? t`Search`,

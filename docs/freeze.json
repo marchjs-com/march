@@ -1182,7 +1182,7 @@
     "src/components/forms/search-box",
     "examples/showcase/public/components/search-box/ide.json"
    ],
-   "hash": "b8efc28c9f62e4bcaa54fdbf778fd5e8"
+   "hash": "8fd1ca11361e52f671d46537fc928fd5"
   },
   "Secret": {
    "frozen": "2026-11-20",
@@ -1629,6 +1629,12 @@
    "name": "ClampText",
    "what": "refresh",
    "reason": "Vitrin sayfası /buttons yerine yeni Metin ve ipuçları sayfası (/text)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "SearchBox",
+   "what": "refresh",
+   "reason": "Kendi ikonu düğüm olarak verilince yerine oturmuyordu; Lab'da meyve listesi ListRow oldu (madde işaretleri yazıların üstüne biniyordu)"
   }
  ]
 }
