@@ -6,7 +6,7 @@
     "src/components/layout/accordion",
     "examples/showcase/public/components/accordion/ide.json"
    ],
-   "hash": "8aca56564be861d56a0f9c629c3917ba"
+   "hash": "dd7705e7057ee44a3e37973bd3d166cc"
   },
   "ActivityBar": {
    "frozen": "2026-11-20",
@@ -166,7 +166,7 @@
     "src/components/social/chat-bubble",
     "examples/showcase/public/components/chat-bubble/ide.json"
    ],
-   "hash": "4540e19c54c041cce5d40995e0a71341"
+   "hash": "310407b35c331d643e839da34a082d91"
   },
   "ChatComposer": {
    "frozen": "2026-11-20",
@@ -934,7 +934,7 @@
     "src/components/layout/panel-header",
     "examples/showcase/public/components/panel-header/ide.json"
    ],
-   "hash": "825625cebe9ba9a1a438f4e27eb97b55"
+   "hash": "470ffee71d420e8a5a0bb9b897d41d44"
   },
   "Parallax": {
    "frozen": "2026-11-20",
@@ -1094,7 +1094,7 @@
     "src/components/social/reaction-picker",
     "examples/showcase/public/components/reaction-picker/ide.json"
    ],
-   "hash": "6846a26a4f8e9be48b5f073d6f8ad9ad"
+   "hash": "0fbfa9426c162c1659e8d5929da335b9"
   },
   "ReplyQuote": {
    "frozen": "2026-11-20",
@@ -1278,7 +1278,7 @@
     "src/components/layout/spacer",
     "examples/showcase/public/components/spacer/ide.json"
    ],
-   "hash": "7a84a76fa30464a7272ff23fb8a67422"
+   "hash": "1d5e036cb030f50d40f15c7320d17abf"
   },
   "Sparkline": {
    "frozen": "2026-11-20",
@@ -1310,7 +1310,7 @@
     "src/components/layout/stack",
     "examples/showcase/public/components/stack/ide.json"
    ],
-   "hash": "ea8eea9bcab52677672ff4918fdf551f"
+   "hash": "cd023622fd844f3c8623c933dbd8dca1"
   },
   "Stat": {
    "frozen": "2026-11-20",
@@ -1342,7 +1342,7 @@
     "src/components/layout/status-bar",
     "examples/showcase/public/components/status-bar/ide.json"
    ],
-   "hash": "13eda72375e6f3bc1c9e6bc768ae5f15"
+   "hash": "bcb10698af480ff087420ff064f99e6c"
   },
   "StatusDot": {
    "frozen": "2026-11-20",
@@ -1382,7 +1382,7 @@
     "src/components/social/story-ring",
     "examples/showcase/public/components/story-ring/ide.json"
    ],
-   "hash": "9d5415b40a57d09bab21eb2b33784682"
+   "hash": "de54ee08c49df63359e089e090b82183"
   },
   "StoryViewer": {
    "frozen": "2026-11-20",
@@ -1582,7 +1582,7 @@
     "src/components/layout/window",
     "examples/showcase/public/components/layout-window/ide.json"
    ],
-   "hash": "3b06b569f94022330b33f9bcdab9bab4"
+   "hash": "3343fdbf5c403c53e31353f8cdc8f2bf"
   },
   "Wizard": {
    "frozen": "2026-11-20",
@@ -1701,6 +1701,60 @@
    "name": "ListEditor",
    "what": "refresh",
    "reason": "Sürükleme ortak satır mantığına ve RowTools tutamağına taşındı"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Accordion",
+   "what": "refresh",
+   "reason": "Örnekler March'ta olmayan ikonları Lucide paketinden alır (march/icons/lucide)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ChatBubble",
+   "what": "refresh",
+   "reason": "Örnekler March'ta olmayan ikonları Lucide paketinden alır (march/icons/lucide)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "PanelHeader",
+   "what": "refresh",
+   "reason": "Örnekler March'ta olmayan ikonları Lucide paketinden alır (march/icons/lucide)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ReactionPicker",
+   "what": "refresh",
+   "reason": "Örnekler March'ta olmayan ikonları Lucide paketinden alır (march/icons/lucide)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Spacer",
+   "what": "refresh",
+   "reason": "Örnekler March'ta olmayan ikonları Lucide paketinden alır (march/icons/lucide)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Stack",
+   "what": "refresh",
+   "reason": "Örnekler March'ta olmayan ikonları Lucide paketinden alır (march/icons/lucide)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "StatusBar",
+   "what": "refresh",
+   "reason": "Örnekler March'ta olmayan ikonları Lucide paketinden alır (march/icons/lucide)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "StoryRing",
+   "what": "refresh",
+   "reason": "Örnekler March'ta olmayan ikonları Lucide paketinden alır (march/icons/lucide)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Window",
+   "what": "refresh",
+   "reason": "Örnekler March'ta olmayan ikonları Lucide paketinden alır (march/icons/lucide)"
   }
  ]
 }
