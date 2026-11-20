@@ -888,6 +888,14 @@
    ],
    "hash": "c663db2132501f99038a54ff10ca6e7b"
   },
+  "StoryProgress": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/social/story-progress",
+    "examples/showcase/public/components/story-progress/ide.json"
+   ],
+   "hash": "44625f59e6daf248cc91b80248aab1f7"
+  },
   "Swatch": {
    "frozen": "2026-11-20",
    "paths": [
