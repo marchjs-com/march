@@ -406,7 +406,7 @@
     "src/components/layout/device-preview",
     "examples/showcase/public/components/device-preview/ide.json"
    ],
-   "hash": "c7a71c23654d42d36e23888b77747d4b"
+   "hash": "7148c8e0f94fb9221b137af3e120cf6c"
   },
   "Dialog": {
    "frozen": "2026-11-20",
@@ -1593,5 +1593,12 @@
    "hash": "b19bfb66d4247d959ff763a9bd29aee9"
   }
  },
- "log": []
+ "log": [
+  {
+   "at": "2026-11-20",
+   "name": "DevicePreview",
+   "what": "refresh",
+   "reason": "Eğ paneli popover'dan geniş taşıyordu: Düz tut ortada değildi, kaydırıcı değerleri kesiliyordu"
+  }
+ ]
 }

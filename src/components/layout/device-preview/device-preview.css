@@ -118,7 +118,7 @@
 .m-device-fingers { position: relative; }
 .m-device-count { position: absolute; inset-block-end: 1px; inset-inline-end: 1px; min-inline-size: .9rem; block-size: .9rem; border-radius: 999px; display: grid; place-items: center;
   background: var(--m-primary); color: var(--m-on-primary); font: 700 .6rem / 1 var(--m-font-sans, system-ui); }
-.m-device-pop { display: grid; gap: var(--m-space-3); min-inline-size: 15rem; }
+.m-device-pop { display: grid; gap: var(--m-space-3); min-inline-size: 0; } /* fills the popover (a wider minimum overflowed it: the reset button sat off center, the slider values were cut) */
 .m-device-pop-row { display: grid; gap: var(--m-space-1); font-size: var(--m-text-sm); color: var(--m-muted); }
 .m-device-pop-reset { justify-self: center; }
 /* the events it fired, for a moment */
