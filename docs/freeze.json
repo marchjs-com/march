@@ -1256,6 +1256,14 @@
    ],
    "hash": "15399411e35a8987df55389d0d7cc6d3"
   },
+  "Window": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/window",
+    "examples/showcase/public/components/layout-window/ide.json"
+   ],
+   "hash": "3b06b569f94022330b33f9bcdab9bab4"
+  },
   "Wizard": {
    "frozen": "2026-11-20",
    "paths": [
