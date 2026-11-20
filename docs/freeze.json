@@ -304,6 +304,14 @@
    ],
    "hash": "a96b0f17d0d6a1a21970a16f828c7807"
   },
+  "TimeRuler": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/time-ruler",
+    "examples/showcase/public/components/time-ruler/ide.json"
+   ],
+   "hash": "feff941f58d1b1d9d3b5cc78e786baf1"
+  },
   "Tooltip": {
    "frozen": "2026-11-20",
    "paths": [
