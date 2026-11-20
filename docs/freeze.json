@@ -552,6 +552,14 @@
    ],
    "hash": "6e186860030d6ed3532071249a24aae4"
   },
+  "HorizontalScroll": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/horizontal-scroll",
+    "examples/showcase/public/components/horizontal-scroll/ide.json"
+   ],
+   "hash": "ad79feb777ee645187f3493560eefe15"
+  },
   "IconButton": {
    "frozen": "2026-11-20",
    "paths": [
