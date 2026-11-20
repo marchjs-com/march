@@ -128,6 +128,14 @@
    ],
    "hash": "a58240fce3e786f5d9f82b2b5291baf7"
   },
+  "ColorInput": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/color-input",
+    "examples/showcase/public/components/color-input/ide.json"
+   ],
+   "hash": "0c69b14ae8d08957e31fb64246911db0"
+  },
   "ColorPicker": {
    "frozen": "2026-11-20",
    "paths": [
