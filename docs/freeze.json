@@ -1032,6 +1032,14 @@
    ],
    "hash": "e8a4b72164fb8fe53811f2cd342e7e9c"
   },
+  "Stack": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/stack",
+    "examples/showcase/public/components/stack/ide.json"
+   ],
+   "hash": "ea8eea9bcab52677672ff4918fdf551f"
+  },
   "StatTile": {
    "frozen": "2026-11-20",
    "paths": [
