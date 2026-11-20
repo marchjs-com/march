@@ -608,6 +608,14 @@
    ],
    "hash": "938e1ef81ec1c14e97f7a64b862c226e"
   },
+  "TextInput": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/text-input",
+    "examples/showcase/public/components/text-input/ide.json"
+   ],
+   "hash": "6e14f5bc54e85d859df2c17db9c7b3bf"
+  },
   "Timeline": {
    "frozen": "2026-11-20",
    "paths": [
