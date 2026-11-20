@@ -224,6 +224,14 @@
    ],
    "hash": "9bbc568781f8a24cdd729313bd3c2d8c"
   },
+  "ScrollToTop": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/actions/scroll-to-top",
+    "examples/showcase/public/components/scroll-to-top/ide.json"
+   ],
+   "hash": "563e034dcb97f4672e49d957d72276bd"
+  },
   "Secret": {
    "frozen": "2026-11-20",
    "paths": [
