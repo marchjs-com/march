@@ -56,3 +56,20 @@ test("RowTools: an own icon may be a function, text or a node (a node already pl
   assert.ok(el.querySelector(".b .m-row-tool-remove .own-node"), "the second row has its own copy");
   dispose();
 });
+
+test("RowTools: the drag tool is a grip hidden from screen readers; a press calls onGrab; off for a single row", () => {
+  const count = signal(3), grabs = [];
+  const [el, dispose] = mount(() => h(RowTools, { actions: "drag up down", index: 0, count, onGrab: (e) => grabs.push(e.type) }));
+  const grip = el.querySelector(".m-row-grip");
+  assert.ok(grip, "a grip");
+  assert.equal(grip.getAttribute("aria-hidden"), "true");
+  assert.equal(grip.getAttribute("title"), "Drag to reorder");
+  assert.equal(el.querySelectorAll("button").length, 2, "the grip is no button");
+  grip.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+  assert.deepEqual(grabs, ["pointerdown"]);
+  count.set(1);
+  assert.ok(grip.classList.contains("is-off"));
+  grip.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+  assert.equal(grabs.length, 1, "nothing to reorder");
+  dispose();
+});

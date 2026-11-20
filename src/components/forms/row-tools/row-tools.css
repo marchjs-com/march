@@ -1,2 +1,18 @@
 /* RowTools. Theme tokens only, logical properties, no @keyframes (motion core). */
 .m-row-tools { display: inline-flex; align-items: center; flex: none; gap: var(--m-space-1); }
+/* the drag grip: dots in currentColor (or your own icon); the row it drags is marked by its editor (data-m-row) */
+.m-row-grip { display: inline-grid; place-items: center; flex: none; inline-size: 1.5rem; block-size: 1.75rem; border-radius: var(--m-radius-1, 4px); color: var(--m-faint);
+  cursor: grab; touch-action: none; user-select: none; transition: color var(--m-dur), background var(--m-dur); }
+.m-row-grip:empty { padding: 5px 6px; background-image: radial-gradient(circle, currentColor 1.25px, transparent 1.75px); background-size: 6px 6px; background-origin: content-box; background-clip: content-box; }
+.m-row-grip:hover { color: var(--m-muted); background-color: var(--m-surface-2); }
+.m-row-grip.is-off { visibility: hidden; }
+[data-m-rows].is-sorting, [data-m-rows].is-sorting .m-row-grip { cursor: grabbing; user-select: none; }
+[data-m-row].is-dragging { position: relative; z-index: 1; border-radius: var(--m-radius-2, 8px); background: var(--m-surface-raised); box-shadow: var(--m-shadow-3);
+  outline: 2px solid color-mix(in srgb, var(--m-accent, var(--m-primary)) 55%, transparent); outline-offset: 2px; }
+[data-m-row].is-dragging .m-row-grip { color: var(--m-accent, var(--m-primary)); }
+@media (prefers-reduced-motion: reduce) { .m-row-grip { transition: none; } }
+/* onReorder: the rows between slide aside while one is dragged */
+[data-m-row].is-sliding, li.is-sliding { transition: translate var(--m-dur) var(--m-ease-out, ease); }
+li.is-dragging { position: relative; z-index: 1; border-radius: var(--m-radius-2, 8px); background: var(--m-surface-raised); box-shadow: var(--m-shadow-3); }
+.is-sorting > li, .is-sorting > [data-m-row] { user-select: none; }
+@media (prefers-reduced-motion: reduce) { [data-m-row].is-sliding, li.is-sliding { transition: none; } }

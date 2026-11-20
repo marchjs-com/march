@@ -726,7 +726,7 @@
     "src/components/forms/list-editor",
     "examples/showcase/public/components/list-editor/ide.json"
    ],
-   "hash": "bff13c7a76ae327e515d7608f8173e2a"
+   "hash": "2ec115fe99533a05a74dc2c54382b713"
   },
   "ListRow": {
    "frozen": "2026-11-20",
@@ -1142,7 +1142,7 @@
     "src/components/forms/row-tools",
     "examples/showcase/public/components/row-tools/ide.json"
    ],
-   "hash": "ccb5aac51c8f5c886d5213669f5aacc4"
+   "hash": "ab52bd85957af666a321644ef072cbdf"
   },
   "Scheduler": {
    "frozen": "2026-11-20",
@@ -1689,6 +1689,18 @@
    "name": "CommandPalette",
    "what": "refresh",
    "reason": "Örneklerde örtük any parametreleri tiplendi"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "RowTools",
+   "what": "refresh",
+   "reason": "Sürükleyerek sıralama: drag aracı (tutamak), onReorder ve onGrab"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ListEditor",
+   "what": "refresh",
+   "reason": "Sürükleme ortak satır mantığına ve RowTools tutamağına taşındı"
   }
  ]
 }

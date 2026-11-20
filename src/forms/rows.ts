@@ -1,7 +1,8 @@
 // Shared logic of the row editors (ListEditor, KeyValueEditor, RecordListEditor): the row list (indexes, read-only,
-// full, move, remove), the props of a row's RowTools, controls outside the field context and line splitting. The
-// editors draw with RowTools, Button and TextInput themselves.
-import { computed, untrack, provide, getOwner, type Accessor } from "../core/reactive.ts";
+// full, move, remove, drag to reorder), the props of a row's RowTools, controls outside the field context and line
+// splitting. The editors draw with RowTools, Button and TextInput themselves.
+import { computed, untrack, provide, getOwner, signal, batch, type Accessor } from "../core/reactive.ts";
+import { pointerDrag } from "../behaviors/drag/index.ts";
 import { ownPart } from "../ui/parts.ts";
 import type { RowAction, RowToolsProps } from "../components/forms/row-tools/index.ts";
 import { FieldContext, scoped, type ClassProp } from "./util.ts";
@@ -14,7 +15,7 @@ export const splitLines = (s: unknown) => String(s ?? "").split(/\r?\n/).map((x)
 export const sameLength = (a: number[] | undefined, b: number[]) => a?.length === b.length;
 
 /** The row list of an editor. */
-export interface RowList {
+export interface RowList<T = unknown> {
   /** Row indexes (the `each` of the rows: a row is rebuilt only when the length changes). */
   idx: Accessor<number[]>;
   /** Disabled or read-only: no tools, no add. */
@@ -24,11 +25,49 @@ export interface RowList {
   count: () => number;
   move: (i: number, d: number) => void;
   remove: (i: number) => void;
+  /** The rows as drawn: while a row is dragged, in the order it would make (the value changes on drop). */
+  shown: () => readonly T[];
+  /** A row is being dragged. */
+  sorting: () => boolean;
+  /** Row `i` (drawn position) is the dragged one. */
+  dragging: (i: number) => boolean;
+  /** Start dragging row `i` from a pointerdown inside it (the grip). Rows are the elements marked `data-m-row`. */
+  grab: (e: PointerEvent, i: Accessor<number>) => void;
 }
 
 /** Row list state shared by the row editors. `list` reads the rows, `set` writes the changed copy. */
-export function rowList<T>(list: () => readonly T[], set: (next: T[]) => void, props: { disabled?: boolean | null | undefined; readonly?: boolean | null | undefined; max?: number | undefined }): RowList {
+export function rowList<T>(list: () => readonly T[], set: (next: T[]) => void, props: { disabled?: boolean | null | undefined; readonly?: boolean | null | undefined; max?: number | undefined }): RowList<T> {
+  // drag to reorder: the rows show the order the drop would make; the value is set once, on drop; Escape cancels
+  const from = signal<number | null>(null), to = signal(0);
+  const shown = (): readonly T[] => {
+    const l = list(), f = from();
+    if (f == null) return l;
+    const c = [...l]; const [x] = c.splice(f, 1); c.splice(to(), 0, x!); return c;
+  };
+  const grab = (e: PointerEvent, i: Accessor<number>): void => {
+    if (e.button !== 0 || props.disabled || props.readonly || untrack(list).length < 2) return;
+    const box = (e.target as Element).closest("[data-m-row]")?.parentElement;
+    if (!box) return;
+    e.preventDefault();
+    const start = i.peek();
+    pointerDrag(e, {
+      threshold: 2,
+      onStart: () => batch(() => { from.set(start); to.set(start); }),
+      onMove: (p) => {
+        // the new place: how many of the other rows have their middle above the pointer
+        const at = untrack(to);
+        let n = 0;
+        Array.from(box.children).filter((r) => r.hasAttribute("data-m-row")).forEach((r, k) => { if (k !== at) { const b = r.getBoundingClientRect(); if (p.clientY > b.top + b.height / 2) n++; } });
+        if (n !== at) to.set(n);
+      },
+      onEnd: (_p, cancelled) => {
+        const f = untrack(from), next = untrack(shown);
+        batch(() => { from.set(null); if (!cancelled && f != null && f !== untrack(to)) set([...next]); });
+      },
+    });
+  };
   return {
+    shown, grab, sorting: () => from() != null, dragging: (i) => from() != null && to() === i,
     idx: computed(() => list().map((_, i) => i), { equals: sameLength }),
     ro: () => !!(props.disabled || props.readonly),
     full: () => props.max != null && list().length >= props.max,
@@ -40,7 +79,7 @@ export function rowList<T>(list: () => readonly T[], set: (next: T[]) => void, p
 
 /** What a row editor lets the app change in the tools of a row. */
 export interface RowToolsLook {
-  /** `false`: no move up / down. */
+  /** `false`: no move up / down and no drag grip. */
   sortable?: boolean | undefined;
   /** `false`: no remove. */
   removable?: boolean | undefined;
@@ -49,10 +88,11 @@ export interface RowToolsLook {
   class?: ClassProp;
 }
 
-/** Props of the RowTools of row `i`: move up / down, remove (`<RowTools {...rowToolsProps(rows, i)} />`). */
-export function rowToolsProps(rows: RowList, i: Accessor<number>, look: RowToolsLook = {}): RowToolsProps {
+/** Props of the RowTools of row `i`: drag grip, move up / down, remove (`<RowTools {...rowToolsProps(rows, i)} />`). */
+export function rowToolsProps<T>(rows: RowList<T>, i: Accessor<number>, look: RowToolsLook = {}): RowToolsProps {
   return {
-    actions: [...(look.sortable === false ? [] : ["up", "down"] as const), ...(look.removable === false ? [] : ["remove"] as const)],
+    actions: [...(look.sortable === false ? [] : ["drag", "up", "down"] as const), ...(look.removable === false ? [] : ["remove"] as const)],
+    onGrab: (e: PointerEvent) => rows.grab(e, i),
     class: look.class, index: i, count: rows.count, labels: look.labels, icons: look.icons,
     onUp: () => rows.move(i.peek(), -1), onDown: () => rows.move(i.peek(), 1), onRemove: () => rows.remove(i.peek()),
   };

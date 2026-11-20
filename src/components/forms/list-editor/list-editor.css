@@ -3,15 +3,3 @@
 .m-list-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--m-space-1); }
 .m-list-items:empty { display: none; }
 .m-list-row, .m-list-add { display: flex; gap: var(--m-space-1); align-items: center; }
-/* drag to reorder: a dotted grip at the row start; the dragged row lifts, the others wait */
-.m-list-grip { flex: none; inline-size: .75rem; block-size: 1.125rem; margin-inline-end: var(--m-space-1); color: var(--m-faint);
-  background: radial-gradient(circle, currentColor 1.25px, transparent 1.75px) 0 0 / 6px 6px;
-  cursor: grab; touch-action: none; user-select: none; transition: color var(--m-dur); }
-/* the add line starts where the row fields start */
-.m-list-editor:has(.m-list-grip) .m-list-add { padding-inline-start: calc(.75rem + var(--m-space-1) + var(--m-space-1)); }
-.m-list-row:hover .m-list-grip, .m-list-grip:hover { color: var(--m-muted); }
-.m-list-items.is-sorting { cursor: grabbing; user-select: none; }
-.m-list-items.is-sorting .m-list-grip { cursor: grabbing; }
-.m-list-row.is-dragging { position: relative; z-index: 1; border-radius: var(--m-radius-2, 8px); background: var(--m-surface-raised); box-shadow: var(--m-shadow-3); outline: 2px solid color-mix(in srgb, var(--m-accent, var(--m-primary)) 55%, transparent); outline-offset: 2px; }
-.m-list-row.is-dragging .m-list-grip { color: var(--m-accent, var(--m-primary)); }
-@media (prefers-reduced-motion: reduce) { .m-list-grip { transition: none; } }

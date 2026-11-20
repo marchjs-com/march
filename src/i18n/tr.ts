@@ -191,6 +191,7 @@ const tr: Record<string, string> = {
   "Menu": "Menü",
   "Min": "En az",
   "Move down": "Aşağı taşı",
+  "Drag to reorder": "Sürükleyerek sırala",
   "Move up": "Yukarı taşı",
   "Move {0} down": "{0} aşağı taşı",
   "Move {0} up": "{0} yukarı taşı",

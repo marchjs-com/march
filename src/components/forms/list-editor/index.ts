@@ -1,9 +1,8 @@
-// ListEditor: edit an array of strings (add, remove, reorder by the buttons or by dragging a row's grip; pasting lines
-// adds one item per line).
+// ListEditor: edit an array of strings (add, remove, reorder by the buttons or by dragging a row by its grip in the
+// row tools; pasting lines adds one item per line).
 import "./list-editor.css";
 import "../../../ui/field.css";
-import { untrack, onCleanup, getOwner, signal, batch, type Accessor } from "../../../core/reactive.ts";
-import { pointerDrag } from "../../../behaviors/drag/index.ts";
+import { untrack, onCleanup, getOwner, type Accessor } from "../../../core/reactive.ts";
 import { frame } from "../../../motion/env.ts";
 import { h } from "../../../dom/h.ts";
 import { For } from "../../../dom/for.ts";
@@ -23,8 +22,8 @@ export interface ListEditorProps extends ControlProps<string[]> {
   unique?: boolean | undefined;
   /** Text of the add button (default "Add"). @tr Ekle düğmesinin metni (varsayılan "Add"). */
   addLabel?: string | undefined;
-  /** Accessible names: `item` (`(position) => text`, default "Item 2"), `moveUp`, `moveDown`, `remove`. @tr Erişilebilir adlar: `item` (`(position) => text`, varsayılan "Item 2"), `moveUp`, `moveDown`, `remove`. */
-  labels?: { item?: ((position: number) => string) | undefined; moveUp?: string | undefined; moveDown?: string | undefined; remove?: string | undefined } | undefined;
+  /** Accessible names: `item` (`(position) => text`, default "Item 2"), `drag` (the grip's tooltip), `moveUp`, `moveDown`, `remove`. @tr Erişilebilir adlar: `item` (`(position) => text`, varsayılan "Item 2"), `drag` (tutamağın ipucu), `moveUp`, `moveDown`, `remove`. */
+  labels?: { item?: ((position: number) => string) | undefined; drag?: string | undefined; moveUp?: string | undefined; moveDown?: string | undefined; remove?: string | undefined } | undefined;
   /** Reordering: the move up / down buttons and the drag grip of each row; `false` removes them. @tr Sıralama: yukarı / aşağı taşıma düğmeleri ve her satırın sürükleme tutamağı; `false` kaldırır. */
   sortable?: boolean | undefined;
   /** The remove button of a row: `false` removes it (clearing a row's text still removes it). @tr Satırın kaldırma düğmesi: `false` kaldırır (satırın metnini silmek yine kaldırır). */
@@ -44,36 +43,6 @@ export function ListEditor(props: ListEditorProps): unknown {
   const list = () => get() ?? [];
   const rows = rowList(list, set, props);
   const { idx, ro, full } = rows;
-  // drag to reorder: while a row is dragged the rows show the order it would make (`shown`); the value is set once, on drop
-  const dragFrom = signal<number | null>(null), dragTo = signal(0);
-  const shown = (): readonly string[] => {
-    const l = list(), f = dragFrom();
-    if (f == null) return l;
-    const c = [...l]; const [x] = c.splice(f, 1); c.splice(dragTo(), 0, x!); return c;
-  };
-  const canDrag = (): boolean => !ro() && props.sortable !== false && list().length > 1;
-  const grab = (e: PointerEvent, i: Accessor<number>): void => {
-    if (e.button !== 0 || !canDrag()) return;
-    const ol = (e.currentTarget as HTMLElement).closest("ol");
-    if (!ol) return;
-    e.preventDefault();
-    const from = i.peek();
-    pointerDrag(e, {
-      threshold: 2,
-      onStart: () => batch(() => { dragFrom.set(from); dragTo.set(from); }),
-      onMove: (p) => {
-        // the new place: how many of the other rows have their middle above the pointer
-        const at = untrack(dragTo);
-        let to = 0;
-        Array.from(ol.children).forEach((row, k) => { if (k !== at) { const b = row.getBoundingClientRect(); if (p.clientY > b.top + b.height / 2) to++; } });
-        if (to !== at) dragTo.set(to);
-      },
-      onEnd: (_p, cancelled) => {
-        const f = untrack(dragFrom), next = untrack(shown);
-        batch(() => { dragFrom.set(null); if (!cancelled && f != null && f !== untrack(dragTo)) set([...next]); });
-      },
-    });
-  };
   const add = (items: string[]) => {
     let cur = [...untrack(list)];
     for (const s of items) if (props.unique === false || !cur.includes(s)) cur.push(s);
@@ -97,12 +66,11 @@ export function ListEditor(props: ListEditorProps): unknown {
     onPaste: (e: ClipboardEvent) => { const lines = splitLines(e.clipboardData?.getData("text")); if (lines.length > 1) { e.preventDefault(); add(lines); draft.value = ""; } },
   });
   return h("div", { class: () => cx("m-list-editor", props.class), role: "group", "aria-labelledby": labelledBy(props) },
-    h("ol", { class: () => cx("m-list-items", dragFrom() != null && "is-sorting") }, h(For, { each: idx, children: (i: Accessor<number>) => h("li", { class: () => cx("m-list-row", dragFrom() != null && i() === dragTo() && "is-dragging") },
-      // the grip: pointer only (the ↑ ↓ buttons are the keyboard's way), hidden from screen readers
-      () => (canDrag() ? h("span", { class: "m-list-grip", "aria-hidden": "true", onPointerdown: (e: PointerEvent) => grab(e, i) }) : null),
+    // the rows are drawn in rows.shown() order: while one is dragged (its RowTools grip), the order the drop would make
+    h("ol", { class: () => cx("m-list-items", rows.sorting() && "is-sorting"), "data-m-rows": "" }, h(For, { each: idx, children: (i: Accessor<number>) => h("li", { class: () => cx("m-list-row", rows.dragging(i()) && "is-dragging"), "data-m-row": "" },
       outsideField(() => h(TextInput, {
         "aria-label": live(() => props.labels?.item?.(i() + 1) ?? t`Item ${i() + 1}`), readonly: live(ro),
-        value: live(() => shown()[i()] ?? ""), setValue: (v: string) => { const cur = [...untrack(list)]; cur[i.peek()] = v; set(cur); },
+        value: live(() => rows.shown()[i()] ?? ""), setValue: (v: string) => { const cur = [...untrack(list)]; cur[i.peek()] = v; set(cur); },
         onBlur: () => { if (!String(untrack(list)[i.peek()] ?? "").trim()) rows.remove(i.peek()); },
         onPaste: (e: ClipboardEvent) => {
           const lines = splitLines(e.clipboardData?.getData("text"));
@@ -111,7 +79,7 @@ export function ListEditor(props: ListEditorProps): unknown {
       })),
       () => (ro() || (props.sortable === false && props.removable === false) ? null : h(RowTools, rowToolsProps(rows, i, {
         sortable: props.sortable, removable: props.removable,
-        labels: { up: props.labels?.moveUp, down: props.labels?.moveDown, remove: props.labels?.remove },
+        labels: { drag: props.labels?.drag, up: props.labels?.moveUp, down: props.labels?.moveDown, remove: props.labels?.remove },
         icons: props.icons,
       })))) })),
     () => (ro() || props.addable === false ? null : h("div", { class: "m-list-add" }, draftInput,

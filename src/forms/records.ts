@@ -93,7 +93,7 @@ export function RecordListEditor(props: RecordListEditorProps): unknown {
     Object.assign(p, f["props"] ?? {});
     if (INLINE_LABEL.has(Comp)) p["label"] = f.label;
     return untrack(() => Comp(extend(p, {
-      value: () => list()[i()]?.[f.name],
+      value: () => rows.shown()[i()]?.[f.name],
       options: () => (f.options ? schemaOptions(f) : undefined),
       readonly: () => ro() || !!f.readonly,
       disabled: () => !!props.disabled || !!f.disabled,
@@ -102,16 +102,17 @@ export function RecordListEditor(props: RecordListEditorProps): unknown {
   };
 
   const error = (i: Accessor<number>, f: SchemaField) => computed(() => {
-    const row = list()[i()] ?? {};
+    const row = rows.shown()[i()] ?? {};
     const v = row[f.name];
     const empty = v == null || v === "" || (Array.isArray(v) && !v.length);
     return empty && !f.required ? null : sch().validateField(f.name, v, row);
   });
 
   return h("div", { class: cx("m-records", props.class), role: "group", "aria-labelledby": labelledBy(props) },
-    h("ol", { class: "m-records-items" }, h(For, { each: idx, children: (i: Accessor<number>) => h("li", { class: "m-records-row" },
+    // rows in rows.shown() order: while one is dragged by its RowTools grip, the order the drop would make
+    h("ol", { class: () => cx("m-records-items", rows.sorting() && "is-sorting"), "data-m-rows": "" }, h(For, { each: idx, children: (i: Accessor<number>) => h("li", { class: () => cx("m-records-row", rows.dragging(i()) && "is-dragging"), "data-m-row": "" },
       h("div", { class: () => cx("m-form-grid", `m-cols-${cols()}`) }, sch().fields.filter((f) => !f.hidden && f.type !== "hidden").map((f) => {
-        const on = computed(() => !f.when || f.when(list()[i()] ?? {}));
+        const on = computed(() => !f.when || f.when(rows.shown()[i()] ?? {}));
         const err = error(i, f);
         return () => (on() ? untrack(() => h(Field, { label: INLINE_LABEL.has(inputFor(f)!) ? null : f.label, required: f.required, compact: true, error: live(() => err()) }, control(f, i))) : null);
       })),

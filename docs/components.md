@@ -1595,7 +1595,7 @@ Full page: src/components/navigation/link-card/docs.md
 
 ## ListEditor
 
-Edit an array of strings in place: type and press Enter to add, edit any row, move rows up and down (or drag a row by its grip), remove them. Pasting several lines adds one item per line; duplicates are skipped unless `unique={false}`; `max` caps the list.
+Edit an array of strings in place: type and press Enter to add, edit any row, move rows up and down (or drag a row by the grip in its row tools), remove them. Pasting several lines adds one item per line; duplicates are skipped unless `unique={false}`; `max` caps the list.
 
 Composed of: [TextInput](#textinput), [RowTools](#rowtools), [Button](#button)
 
@@ -2326,13 +2326,14 @@ Full page: src/components/landing/roadmap/docs.md
 
 ## RowTools
 
-The tools at the end of a row in an editable list: move up, move down, remove. Give it the row's `index` and the list's `count` and the arrows switch off on the first and the last row.
+The tools at the end of a row in an editable list: a drag grip, move up, move down, remove. Give it the row's `index` and the list's `count` and the arrows switch off on the first and the last row. With `onReorder(from, to)` the grip reorders a plain list: the row follows the pointer, the rows between slide aside, and `onReorder` is called once on drop (Escape cancels); RowTools finds its row (`[data-m-row]`, else the nearest `li`). The row editors (ListEditor, RecordListEditor) pass `onGrab` instead and drive their own drag, which shows the new order in the rows.
 
 Composed of: [IconButton](#iconbutton)
 
 ```tsx
 <RowTools index={i} count={() => rows().length} onUp={() => move(i, -1)} onDown={() => move(i, 1)} onRemove={() => remove(i)} />
 <RowTools actions={["remove"]} onRemove={() => remove(i)} danger />
+<RowTools index={i} count={() => rows().length} onReorder={(from, to) => reorder(from, to)} … />   // drag, up, down, remove
 ```
 
 Full page: src/components/forms/row-tools/docs.md
