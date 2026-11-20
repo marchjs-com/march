@@ -352,6 +352,14 @@
    ],
    "hash": "a381bd405c1554b56b8ff63129fb1b50"
   },
+  "Disclosure": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/disclosure",
+    "examples/showcase/public/components/disclosure/ide.json"
+   ],
+   "hash": "147468f2ab777dd192c217c64b47d015"
+  },
   "DockLayout": {
    "frozen": "2026-11-20",
    "paths": [
