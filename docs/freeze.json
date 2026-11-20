@@ -1,5 +1,13 @@
 {
  "components": {
+  "Alert": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/feedback/alert",
+    "examples/showcase/public/components/alert/ide.json"
+   ],
+   "hash": "5bcc8e743dd961b657481ad0fe5a6deb"
+  },
   "Badge": {
    "frozen": "2026-11-20",
    "paths": [
