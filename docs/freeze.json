@@ -536,6 +536,14 @@
    ],
    "hash": "d6b09c41cc080363189f8c3ec9de0be7"
   },
+  "Segmented": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/segmented",
+    "examples/showcase/public/components/segmented/ide.json"
+   ],
+   "hash": "5ca2b76ecc6964834f7f80ee15a05045"
+  },
   "Skeleton": {
    "frozen": "2026-11-20",
    "paths": [
