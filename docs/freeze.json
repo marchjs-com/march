@@ -608,6 +608,14 @@
    ],
    "hash": "938e1ef81ec1c14e97f7a64b862c226e"
   },
+  "Textarea": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/textarea",
+    "examples/showcase/public/components/textarea/ide.json"
+   ],
+   "hash": "7c7bf0316f87e554756938da9ec28746"
+  },
   "TextInput": {
    "frozen": "2026-11-20",
    "paths": [
