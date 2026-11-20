@@ -3,6 +3,7 @@ import { defineMeta } from "../../meta.ts";
 export default defineMeta({
   name: "EasingCurveEditor",
   status: "experimental",
+  frozen: "2026-11-20",
   category: "motion",
   since: "0.1.0",
   summary: "Cubic-bezier easing editor: draggable handles, the engine's named curves as presets, live preview on the motion engine clock, registers the curve by name (defineEasing).",

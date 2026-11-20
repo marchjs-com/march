@@ -80,6 +80,14 @@
    ],
    "hash": "a219211283c7f8dd604e6ff300c90584"
   },
+  "EasingCurveEditor": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/motion/easing-curve-editor",
+    "examples/showcase/public/components/easing/ide.json"
+   ],
+   "hash": "5491a9f0f276d113ef4ce2c2e97c9e61"
+  },
   "FontPicker": {
    "frozen": "2026-11-20",
    "paths": [
