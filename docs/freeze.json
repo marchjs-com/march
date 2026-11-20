@@ -232,6 +232,14 @@
    ],
    "hash": "be207d2725e85146f49435113eba093d"
   },
+  "FileUpload": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/file-upload",
+    "examples/showcase/public/components/file-upload/ide.json"
+   ],
+   "hash": "bab2ece960e6d191996648f62831a4fc"
+  },
   "FontPicker": {
    "frozen": "2026-11-20",
    "paths": [
