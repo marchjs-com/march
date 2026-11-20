@@ -320,6 +320,14 @@
    ],
    "hash": "ecd623f8219c7cd9a9623243c95de1c0"
   },
+  "Tree": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/tree",
+    "examples/showcase/public/components/data-tree/ide.json"
+   ],
+   "hash": "6c930fdd4447fe3efb58bbb9d664a21c"
+  },
   "TreeEditor": {
    "frozen": "2026-11-20",
    "paths": [
