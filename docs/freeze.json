@@ -64,6 +64,14 @@
    ],
    "hash": "fc217194a760323cb0b540189ac2a934"
   },
+  "BeforeAfter": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/before-after",
+    "examples/showcase/public/components/before-after/ide.json"
+   ],
+   "hash": "71e9278b2ba1c3d0718c0dc302d8b699"
+  },
   "BottomNav": {
    "frozen": "2026-11-20",
    "paths": [
