@@ -144,6 +144,14 @@
    ],
    "hash": "c770cde5d7b8652f22e3577577b137b3"
   },
+  "ErrorBox": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/feedback/error-box",
+    "examples/showcase/public/components/error-box/ide.json"
+   ],
+   "hash": "be207d2725e85146f49435113eba093d"
+  },
   "FontPicker": {
    "frozen": "2026-11-20",
    "paths": [
