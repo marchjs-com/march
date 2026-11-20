@@ -360,6 +360,14 @@
    ],
    "hash": "d6b09c41cc080363189f8c3ec9de0be7"
   },
+  "Skeleton": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/feedback/skeleton",
+    "examples/showcase/public/components/skeleton/ide.json"
+   ],
+   "hash": "9bbb0e68edab4bbaf9c8b00957878d17"
+  },
   "StatTile": {
    "frozen": "2026-11-20",
    "paths": [
