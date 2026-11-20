@@ -1200,6 +1200,14 @@
    ],
    "hash": "2fe4c93292e03a6aa728170e60c2d412"
   },
+  "SiteSection": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/site-section",
+    "examples/showcase/public/components/site-section/ide.json"
+   ],
+   "hash": "f50760c773d068ec90268926dffe00ee"
+  },
   "Skeleton": {
    "frozen": "2026-11-20",
    "paths": [
