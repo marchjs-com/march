@@ -1048,6 +1048,14 @@
    ],
    "hash": "4ca8a8bf7fc71c91bb159a595d635906"
   },
+  "VerifiedMark": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/social/verified-mark",
+    "examples/showcase/public/components/verified-mark/ide.json"
+   ],
+   "hash": "cc7e2333f506538dac056bed8252a63a"
+  },
   "Wizard": {
    "frozen": "2026-11-20",
    "paths": [
