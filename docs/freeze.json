@@ -216,6 +216,14 @@
    ],
    "hash": "a96b0f17d0d6a1a21970a16f828c7807"
   },
+  "TreeEditor": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/tree-editor",
+    "examples/showcase/public/components/editors-tree/ide.json"
+   ],
+   "hash": "3beadd78e8398aafcfc6eb7314ec78a2"
+  },
   "TreeView": {
    "frozen": "2026-11-20",
    "paths": [
