@@ -144,6 +144,14 @@
    ],
    "hash": "1449a656cbb1e817dda77ab0ab37e7bc"
   },
+  "IconTile": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/icon-tile",
+    "examples/showcase/public/components/icon-tile/ide.json"
+   ],
+   "hash": "2e8058fc0c05a35eecb7605f8c96f3c7"
+  },
   "ImageCropper": {
    "frozen": "2026-11-20",
    "paths": [
