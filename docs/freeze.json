@@ -1192,6 +1192,14 @@
    ],
    "hash": "9cac1693ec54614d12a1730d76663922"
   },
+  "SiteNav": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/site-nav",
+    "examples/showcase/public/components/site-nav/ide.json"
+   ],
+   "hash": "2fe4c93292e03a6aa728170e60c2d412"
+  },
   "Skeleton": {
    "frozen": "2026-11-20",
    "paths": [
