@@ -512,6 +512,14 @@
    ],
    "hash": "563e034dcb97f4672e49d957d72276bd"
   },
+  "SearchBox": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/search-box",
+    "examples/showcase/public/components/search-box/ide.json"
+   ],
+   "hash": "b8efc28c9f62e4bcaa54fdbf778fd5e8"
+  },
   "Secret": {
    "frozen": "2026-11-20",
    "paths": [
