@@ -1008,6 +1008,14 @@
    ],
    "hash": "30f587e754396774b92f9d8b8b43bca8"
   },
+  "Spacer": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/spacer",
+    "examples/showcase/public/components/spacer/ide.json"
+   ],
+   "hash": "7a84a76fa30464a7272ff23fb8a67422"
+  },
   "Spinner": {
    "frozen": "2026-11-20",
    "paths": [
