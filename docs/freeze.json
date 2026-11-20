@@ -264,6 +264,14 @@
    ],
    "hash": "a96b0f17d0d6a1a21970a16f828c7807"
   },
+  "Tooltip": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/overlays/tooltip",
+    "examples/showcase/public/components/tooltip/ide.json"
+   ],
+   "hash": "ecd623f8219c7cd9a9623243c95de1c0"
+  },
   "TreeEditor": {
    "frozen": "2026-11-20",
    "paths": [
