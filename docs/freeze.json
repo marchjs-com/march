@@ -112,6 +112,14 @@
    ],
    "hash": "1449a656cbb1e817dda77ab0ab37e7bc"
   },
+  "ImageCropper": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/image-cropper",
+    "examples/showcase/public/components/image-cropper/ide.json"
+   ],
+   "hash": "3969ae0c6e7bd5f3012011a4a1e49e41"
+  },
   "Kbd": {
    "frozen": "2026-11-20",
    "paths": [
