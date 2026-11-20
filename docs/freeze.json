@@ -448,6 +448,14 @@
    ],
    "hash": "0a8a38d57a81c8c8c06be492bf523cfa"
   },
+  "NavSidebar": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/nav-sidebar",
+    "examples/showcase/public/components/nav-sidebar/ide.json"
+   ],
+   "hash": "cd324d70916618dff560c451b63f65f0"
+  },
   "NumberInput": {
    "frozen": "2026-11-20",
    "paths": [
