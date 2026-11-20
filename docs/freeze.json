@@ -328,6 +328,14 @@
    ],
    "hash": "a219211283c7f8dd604e6ff300c90584"
   },
+  "DevicePicker": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/device-picker",
+    "examples/showcase/public/components/device-picker/ide.json"
+   ],
+   "hash": "5db6247270761965a16e769dbb33fbad"
+  },
   "Dialog": {
    "frozen": "2026-11-20",
    "paths": [
