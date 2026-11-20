@@ -272,6 +272,14 @@
    ],
    "hash": "96b4676a2663936c2771d3679aa0ffb8"
   },
+  "LiveStatus": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/feedback/live-status",
+    "examples/showcase/public/components/live-status/ide.json"
+   ],
+   "hash": "f37e7ea524bda81c9b9d4f9396837b01"
+  },
   "MadeWithMarch": {
    "frozen": "2026-11-20",
    "paths": [
