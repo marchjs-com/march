@@ -128,6 +128,14 @@
    ],
    "hash": "fec20acd3eed36d571b2b548c0219b84"
   },
+  "Empty": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/feedback/empty",
+    "examples/showcase/public/components/empty/ide.json"
+   ],
+   "hash": "c770cde5d7b8652f22e3577577b137b3"
+  },
   "FontPicker": {
    "frozen": "2026-11-20",
    "paths": [
