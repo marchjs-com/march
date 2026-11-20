@@ -1256,6 +1256,14 @@
    ],
    "hash": "ea8eea9bcab52677672ff4918fdf551f"
   },
+  "StatsBand": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/stats-band",
+    "examples/showcase/public/components/stats-band/ide.json"
+   ],
+   "hash": "f95d2bad9626289f177d18607d5f488c"
+  },
   "StatTile": {
    "frozen": "2026-11-20",
    "paths": [
