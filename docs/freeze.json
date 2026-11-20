@@ -544,6 +544,14 @@
    ],
    "hash": "4ca6d1384ae4369e00cb93447d380129"
   },
+  "HonestCompare": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/honest-compare",
+    "examples/showcase/public/components/honest-compare/ide.json"
+   ],
+   "hash": "6e186860030d6ed3532071249a24aae4"
+  },
   "IconButton": {
    "frozen": "2026-11-20",
    "paths": [
