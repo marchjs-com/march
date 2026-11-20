@@ -320,6 +320,14 @@
    ],
    "hash": "a381bd405c1554b56b8ff63129fb1b50"
   },
+  "DockLayout": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/dock-layout",
+    "examples/showcase/public/components/dock-layout/ide.json"
+   ],
+   "hash": "d1ead25def3743509ed5f2799a6fee2f"
+  },
   "Drawer": {
    "frozen": "2026-11-20",
    "paths": [
