@@ -440,6 +440,14 @@
    ],
    "hash": "21024992bd95aa0d4bacb6ead4fff148"
   },
+  "Media": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/media/media",
+    "examples/showcase/public/components/media/ide.json"
+   ],
+   "hash": "e423857656b8de6f9421207663c3b430"
+  },
   "Menu": {
    "frozen": "2026-11-20",
    "paths": [
