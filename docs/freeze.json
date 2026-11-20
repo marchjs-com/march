@@ -472,6 +472,14 @@
    ],
    "hash": "a8ed12fee60fc72a375277150b519df5"
   },
+  "PageDots": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/navigation/page-dots",
+    "examples/showcase/public/components/page-dots/ide.json"
+   ],
+   "hash": "8b82f39f949aaecbfa0f02bfe0ed7c06"
+  },
   "PasswordInput": {
    "frozen": "2026-11-20",
    "paths": [
