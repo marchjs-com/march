@@ -744,6 +744,14 @@
    ],
    "hash": "6846a26a4f8e9be48b5f073d6f8ad9ad"
   },
+  "ReplyQuote": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/social/reply-quote",
+    "examples/showcase/public/components/reply-quote/ide.json"
+   ],
+   "hash": "f462ceeeb0b025aaf225b135dd713633"
+  },
   "RichTextEditor": {
    "frozen": "2026-11-20",
    "paths": [
