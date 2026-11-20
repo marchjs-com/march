@@ -1,5 +1,13 @@
 {
  "components": {
+  "Badge": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/badge",
+    "examples/showcase/public/components/badge/ide.json"
+   ],
+   "hash": "fc217194a760323cb0b540189ac2a934"
+  },
   "Button": {
    "frozen": "2026-11-20",
    "paths": [
