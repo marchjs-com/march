@@ -1152,6 +1152,14 @@
    ],
    "hash": "a482a3857e5f152141f37b2377110c12"
   },
+  "ThemeMenu": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/theme-menu",
+    "examples/showcase/public/components/theme-menu/ide.json"
+   ],
+   "hash": "9c9b534278c8fc713b8147ba49e59d59"
+  },
   "ThreadNav": {
    "frozen": "2026-11-20",
    "paths": [
