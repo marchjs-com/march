@@ -904,6 +904,14 @@
    ],
    "hash": "9d5415b40a57d09bab21eb2b33784682"
   },
+  "StoryViewer": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/story-viewer",
+    "examples/showcase/public/components/story-viewer/ide.json"
+   ],
+   "hash": "010db9f3f1c92ed826718159684c98fe"
+  },
   "Swatch": {
    "frozen": "2026-11-20",
    "paths": [
