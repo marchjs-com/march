@@ -48,6 +48,14 @@
    ],
    "hash": "203bc9b7bd0f84fe0f5ad034ccc57700"
   },
+  "CodeEditor": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/code-editor",
+    "examples/showcase/public/components/editors-code/ide.json"
+   ],
+   "hash": "e8c06fd4aee0af96d11da14613343e4d"
+  },
   "CodeView": {
    "frozen": "2026-11-20",
    "paths": [
