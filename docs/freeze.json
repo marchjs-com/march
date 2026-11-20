@@ -720,6 +720,14 @@
    ],
    "hash": "6e14f5bc54e85d859df2c17db9c7b3bf"
   },
+  "ThreadNav": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/navigation/thread-nav",
+    "examples/showcase/public/components/thread-nav/ide.json"
+   ],
+   "hash": "f5258c338800b3246c9961b445c08098"
+  },
   "TimeInput": {
    "frozen": "2026-11-20",
    "paths": [
