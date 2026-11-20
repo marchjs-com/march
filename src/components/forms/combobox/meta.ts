@@ -3,6 +3,7 @@ import { defineMeta } from "../../meta.ts";
 export default defineMeta({
   name: "Combobox",
   status: "stable",
+  frozen: "2026-11-20",
   since: "0.1.0",
   summary: "Typeahead over static options or an async search (debounced, keyboard, aria-activedescendant).",
   category: "forms",

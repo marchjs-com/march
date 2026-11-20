@@ -144,6 +144,14 @@
    ],
    "hash": "d3bf416eb2f27c7ac51a5ca7a278071a"
   },
+  "Combobox": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/combobox",
+    "examples/showcase/public/components/combobox/ide.json"
+   ],
+   "hash": "084888f7eba04815e15d172e9934f968"
+  },
   "CopyButton": {
    "frozen": "2026-11-20",
    "paths": [
