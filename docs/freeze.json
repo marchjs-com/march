@@ -88,6 +88,14 @@
    ],
    "hash": "4540e19c54c041cce5d40995e0a71341"
   },
+  "ChatComposer": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/chat-composer",
+    "examples/showcase/public/components/chat-composer/ide.json"
+   ],
+   "hash": "ba7190ffc473872680ce5a7a7c2e5b19"
+  },
   "Checkbox": {
    "frozen": "2026-11-20",
    "paths": [
