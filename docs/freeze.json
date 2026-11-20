@@ -80,6 +80,14 @@
    ],
    "hash": "a219211283c7f8dd604e6ff300c90584"
   },
+  "FontPicker": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/font-picker",
+    "examples/showcase/public/components/font/ide.json"
+   ],
+   "hash": "e125a6e093c93a6fd89e4c16770093e2"
+  },
   "Gantt": {
    "frozen": "2026-11-20",
    "paths": [
