@@ -3,6 +3,7 @@ import { defineMeta } from "../../meta.ts";
 export default defineMeta({
   name: "ContextMenu",
   status: "experimental",
+  frozen: "2026-11-20",
   category: "overlays",
   entry: "march/context-menu",
   since: "0.1.0",
