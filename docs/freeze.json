@@ -88,6 +88,14 @@
    ],
    "hash": "0960edf9e8a1bb10c2800f8b3d32b59f"
   },
+  "ChoicePicker": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/choice-picker",
+    "examples/showcase/public/components/choice-picker/ide.json"
+   ],
+   "hash": "14e59ba76b7da31c906b1c6075deea9d"
+  },
   "ClampText": {
    "frozen": "2026-11-20",
    "paths": [
