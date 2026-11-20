@@ -624,6 +624,14 @@
    ],
    "hash": "cd324d70916618dff560c451b63f65f0"
   },
+  "NetworkThrottle": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/network-throttle",
+    "examples/showcase/public/components/network-throttle/ide.json"
+   ],
+   "hash": "da33b39f3c1bb5843bf99e64407f5427"
+  },
   "NumberInput": {
    "frozen": "2026-11-20",
    "paths": [
