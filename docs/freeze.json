@@ -184,6 +184,14 @@
    ],
    "hash": "420b2c5935da67c25897a8c872a7685d"
   },
+  "DateTimeInput": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/date-time-input",
+    "examples/showcase/public/components/date-time/ide.json"
+   ],
+   "hash": "853701168396d378d3eb8e6406f8402e"
+  },
   "Debugger": {
    "frozen": "2026-11-20",
    "paths": [
