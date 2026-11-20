@@ -88,6 +88,14 @@
    ],
    "hash": "66bfdac17a8333ffcf9b745570499203"
   },
+  "BranchingStory": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/branching-story",
+    "examples/showcase/public/components/branching-story/ide.json"
+   ],
+   "hash": "fe6c87424d059326614464e6388cd7fd"
+  },
   "Breadcrumbs": {
    "frozen": "2026-11-20",
    "paths": [
