@@ -176,6 +176,14 @@
    ],
    "hash": "4beadd8df2c82f48aee1415d88e8313a"
   },
+  "RichTextEditor": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/rich-text-editor",
+    "examples/showcase/public/components/rich-text/ide.json"
+   ],
+   "hash": "3ee53b1554c490f0d0519eedfd78fc5f"
+  },
   "Scheduler": {
    "frozen": "2026-11-20",
    "paths": [

@@ -3,6 +3,7 @@ import { defineMeta } from "../../meta.ts";
 export default defineMeta({
   name: "RichTextEditor",
   status: "experimental",
+  frozen: "2026-11-20",
   category: "composite",
   since: "0.1.0",
   summary: "Contenteditable rich text with Markdown in / out: toolbar, links, lists, headings, quotes, @mentions, :emoji, clean paste, own undo history.",
