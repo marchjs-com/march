@@ -24,6 +24,14 @@
    ],
    "hash": "e20be0b352f1222fb4fff01e53afd220"
   },
+  "AppUI": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/app-ui",
+    "examples/showcase/public/components/app-ui/ide.json"
+   ],
+   "hash": "8c2f73da6ab44dcd56b937ef918cbdfe"
+  },
   "Avatar": {
    "frozen": "2026-11-20",
    "paths": [
