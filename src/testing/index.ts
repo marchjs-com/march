@@ -63,6 +63,8 @@ export interface TestScreen {
   all(sel: string): Element[];
   click(target: Target): Promise<Element>;
   type(target: Target, value: unknown): Promise<Element>;
+  /** Focus an element (by text, label or selector): its focus handlers run even when the page has no focus (a test run in a background tab). */
+  focus(target: Target): Promise<Element>;
   press(key: string, target?: Element | null): Promise<void>;
   submit(sel?: string): Promise<void>;
   /** Click the primary button of the open dialog. */
@@ -70,6 +72,16 @@ export interface TestScreen {
   cancel(): Promise<void>;
   fetchCalls(): MockCall[];
   dispose(): void;
+}
+
+/** Focus `el`; a page without focus (a background tab) moves the focus but fires no focus events: they are sent here. */
+function focusOn(el: HTMLElement): void {
+  const doc = el.ownerDocument;
+  const was = doc.activeElement;
+  el.focus?.();
+  if (doc.hasFocus?.() !== false || doc.activeElement !== el || was === el) return;
+  el.dispatchEvent(new FocusEvent("focus"));
+  el.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
 }
 
 /**
@@ -123,10 +135,17 @@ export function renderTest(fn: () => unknown, opts: RenderTestOptions = {}): Tes
       await s.flush();
       return el;
     },
+    async focus(target) {
+      const el = (typeof target === "string" ? (fieldFor(target) ?? byText(target)[0] ?? root().querySelector(target)) : target) as HTMLElement | null;
+      if (!el) throw new Error(`March testing: nothing to focus for "${String(target)}".`);
+      focusOn(el);
+      await s.flush();
+      return el;
+    },
     async type(target, value) {
       const el = (typeof target === "string" ? (fieldFor(target) ?? root().querySelector(target)) : target) as HTMLInputElement | null;
       if (!el) throw new Error(`March testing: no field "${String(target)}".`);
-      el.focus?.();
+      focusOn(el);
       el.value = String(value);
       el.dispatchEvent(new Event("input", { bubbles: true }));
       el.dispatchEvent(new Event("change", { bubbles: true }));

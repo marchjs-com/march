@@ -1,0 +1,11 @@
+import { installDom } from "./src/testing/dom.ts";
+installDom({ url: "http://localhost/" });
+const { h, render } = await import("./src/index.ts");
+const { KeyframeTimeline } = await import("./src/components/composite/keyframe-timeline/index.ts");
+const MODEL = { duration: 1000, tracks: [{ id: "a", target: "logo", prop: "x", keys: [{ at: 0, value: 0 }, { at: 1000, value: 100, easing: "linear" }] }] };
+const box = document.createElement("div"); document.body.append(box);
+render(() => h(KeyframeTimeline, { value: MODEL, inspector: true }), box);
+await new Promise((r) => setTimeout(r, 50));
+const k = box.querySelector(".m-kt-key"); k.focus(); k.dispatchEvent(new FocusEvent("focus")); k.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+await new Promise((r) => setTimeout(r, 50));
+console.log("inspector:", !!box.querySelector(".m-kt-inspector"), "empty:", !!box.querySelector(".m-kt-empty"));

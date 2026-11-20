@@ -111,8 +111,8 @@ export function Secret(props: SecretProps): Element {
     h("span", { class: "m-secret-text" }, text),
     props.toggle === false ? null : h(IconButton, {
       class: "m-secret-eye", size: sm ? "xs" : "sm", pressed: revealed, icon: () => (revealed() ? eyeOff : eye),
-      // a toggle: one fixed name, the state is aria-pressed (as every pressed IconButton in March)
-      label: () => L().show ?? t`Show`, onClick: flip,
+      // the name says what a press does (Show / Hide: `labels.show`, `labels.hide`), aria-pressed whether it is shown
+      label: () => (revealed() ? L().hide ?? t`Hide` : L().show ?? t`Show`), onClick: flip,
     }),
     props.copy ? h(CopyButton, {
       class: "m-secret-copy", text: value, iconOnly: true, label: () => L().copy ?? t`Copy`, copiedLabel: () => L().copied ?? t`Copied`, ...(props.onCopy ? { onCopy: props.onCopy } : {}),
