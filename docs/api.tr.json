@@ -84,6 +84,7 @@
   "fillPath": "\":param\" yer tutucularını doldurur: fillPath(\"/users/:id\", { id: 7 }) → \"/users/7\".",
   "Link": "`<Link href=\"/users\" exact prefetch=\"hover\">Users</Link>` — istemci tarafı gezinme, aria-current, önyükleme.",
   "matchRoute": "Bir yolla eşleşen rotayı ve parametrelerini bulur (en iyi skor önce).",
+  "memoryHistory": "Yönlendiriciye sayfanınki yerine kendi adresini verir: önizleme, test ya da başka bir uygulamanın içindeki bir parça için; sayfanın adresi, başlığı ve geri tuşu değişmez.",
   "navigate": "Bir yola gider (yalnızca aynı kaynak). Ayrılma korumaları iptal edebilir.",
   "navigating": "Tembel bir sayfa veya koruma çözülürken true.",
   "navigationSignal": "Geçerli gezinmenin sinyali: başka bir gezinme başlar başlamaz iptal edilir (sayfanın başlattığı fetch'lere verin).",

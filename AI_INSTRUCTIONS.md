@@ -132,7 +132,7 @@ base comes from `<base href>`, the base `march build` writes, or the entry scrip
 and mean "under the base"; never write the base yourself, never a `#/` link, never a root-absolute file path. Public
 files (`public/media/a.jpg`): `appUrl("media/a.jpg")` from `march/base` (a bare relative path resolves against
 the route's address). Where the address cannot change (`file://`, a sandboxed iframe) the router uses `#/x` by
-itself. `march build` with `seo: { prerender: true }` writes `<route>/index.html` per page and `404.html` for routes
+itself. A router that is not the page's (a preview, a test, a widget): `createRouter({ routes, history: memoryHistory() })`. `march build` with `seo: { prerender: true }` writes `<route>/index.html` per page and `404.html` for routes
 with params, so the same `dist/` works on Cloudflare Pages, Netlify, GitHub Pages, S3, in a sub-folder and from files.
 Per host: `docs/hosting.md`.
 

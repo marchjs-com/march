@@ -22,6 +22,7 @@ import { lazy } from "../dom/lazy.ts";
 import { preloadChunks, loaderKey, saveData, whenIdle, runLoad, prefetchCommon } from "../dom/preload.ts";
 import { onVisible } from "../core/util.ts";
 import { appBase } from "../base/index.ts";
+import type { MemoryHistory } from "./memory.ts";
 
 // ------------------------------------------------------------------ types
 export type Component = (props: Record<string, unknown>) => unknown;
@@ -45,6 +46,8 @@ export interface RouterOptions {
    * iframe) the router falls back to hash addresses (#/users/7) on its own, with the same routes. "hash": always #/….
    */
   mode?: "history" | "hash";
+  /** An address of the router's own instead of the page's: `memoryHistory()` (march/router). @tr Sayfanınki yerine yönlendiricinin kendi adresi: `memoryHistory()` (march/router). */
+  history?: MemoryHistory;
   /**
    * The base path every route lives under (default "auto": a <base href>, else the base `march build` wrote into
    * index.html, else the folder of the entry script — see appBase() in march). Or a path: "/app".
@@ -86,7 +89,7 @@ interface Level { key: string; comp: Component; to?: RouteTarget; page?: boolean
 interface View { to?: RouteTarget; levels: Level[]; error?: unknown }
 /** What a named outlet (or the modal outlet) shows. */
 export interface Slot { key: string; comp: Component; to: RouteTarget }
-export interface RouterState { loading?: Renderable; skeleton?: Renderable; routes: CompiledRoute[]; mode: "history" | "hash"; base: string; fallback?: boolean; onPop?: () => void; opts: RouterOptions; cache: Map<string, Promise<PageModule | null>>; seq: number; view: Sig<View | null>; redirects: CompiledRoute[]; outlets: Map<string, CompiledRoute[]>; dispose: () => void }
+export interface RouterState { loading?: Renderable; skeleton?: Renderable; routes: CompiledRoute[]; mode: "history" | "hash"; base: string; h?: MemoryHistory | null; fallback?: boolean; onPop?: () => void; opts: RouterOptions; cache: Map<string, Promise<PageModule | null>>; seq: number; view: Sig<View | null>; redirects: CompiledRoute[]; outlets: Map<string, CompiledRoute[]>; dispose: () => void }
 
 const S = {
   router: null as RouterState | null,
@@ -176,6 +179,10 @@ const table = (t: RouteTable | RouteDef[]): CompiledRoute[] => (Array.isArray(t)
 /** The route matching a link's path (its query and hash dropped). */
 const matchTo = (r: RouterState, to: string): ReturnType<typeof matchRoute> => matchRoute(r.routes, String(to).split(/[?#]/)[0] ?? "/");
 
+// the address: the page's, or the router's own (history: memoryHistory())
+const hist = (): History | MemoryHistory => S.router?.h ?? globalThis.history;
+const loc = (): { pathname: string; search: string; hash: string; href: string } => S.router?.h?.location ?? globalThis.location;
+
 /** Create the app router: routes (path → loader or { component, layouts, meta }), hash or history mode, outlets, title, guards. */
 export function createRouter(opts: RouterOptions): { navigate: typeof navigate; back: typeof back; routes: CompiledRoute[]; dispose: () => void } {
   // Object form: a function value is a LOADER (`() => import("./page.jsx")`); use { component } for a direct component.
@@ -183,22 +190,27 @@ export function createRouter(opts: RouterOptions): { navigate: typeof navigate; 
   S.router?.dispose();
   const routes = table(opts.routes);
   const redirects = Object.entries(opts.redirects ?? {}).map(([from, to]) => compile({ path: from, meta: { to } }));
-  const base = resolveBase(opts.base);
+  // an address of its own (memoryHistory): hash-style routes on it, no base, nothing of the page's touched
+  const h = opts.history ?? null;
+  const base = h ? "" : resolveBase(opts.base);
   // history mode where the address cannot change (file://, a sandboxed iframe): hash addresses, same routes
-  const fallback = (opts.mode ?? "history") === "history" && !historyUsable();
-  const mode = fallback ? "hash" : opts.mode ?? "history";
+  const fallback = !h && (opts.mode ?? "history") === "history" && !historyUsable();
+  const mode = h || fallback ? "hash" : opts.mode ?? "history";
   const outlets = new Map(Object.entries(opts.outlets ?? {}).map(([name, tbl]) => [name, table(tbl)]));
-  const r: RouterState = { routes, mode, base, fallback, opts, cache: new Map(), seq: 0, view: sig<View | null>(null), redirects, outlets, dispose: () => {} };
+  const r: RouterState = { routes, mode, base, fallback, opts, cache: new Map(), seq: 0, view: sig<View | null>(null), redirects, outlets, dispose: () => {}, h };
   S.router = r;
   if (mode === "history") restoreAddress(base);
   const onPop = (): void => { void sync({ pop: true }); };
   const onUnload = (e: BeforeUnloadEvent): void => { if ([...leaveGuards].some((g) => g() === false)) { e.preventDefault(); e.returnValue = ""; } };
-  globalThis.addEventListener?.("popstate", onPop);
-  globalThis.addEventListener?.("beforeunload", onUnload);
-  if (mode === "hash") globalThis.addEventListener?.("hashchange", onPop);
+  if (h) h.onPop = onPop;
+  else {
+    globalThis.addEventListener?.("popstate", onPop);
+    globalThis.addEventListener?.("beforeunload", onUnload);
+    if (mode === "hash") globalThis.addEventListener?.("hashchange", onPop);
+  }
   r.onPop = onPop;
   r.dispose = () => { globalThis.removeEventListener?.("popstate", onPop); globalThis.removeEventListener?.("hashchange", onPop); globalThis.removeEventListener?.("beforeunload", onUnload); };
-  if (globalThis.history && "scrollRestoration" in globalThis.history && opts.scroll !== false) globalThis.history.scrollRestoration = "manual";
+  if (!h && globalThis.history && "scrollRestoration" in globalThis.history && opts.scroll !== false) globalThis.history.scrollRestoration = "manual";
   void sync({ initial: true });
   return { navigate, back, routes, dispose: r.dispose };
 }
@@ -231,7 +243,7 @@ function restoreAddress(base: string): void {
 }
 
 function currentLocation(): { p: string; search: string; hash: string } {
-  const l = globalThis.location;
+  const l = loc();
   const r = S.router;
   if (!l) return { p: "/", search: "", hash: "" };
   if (r?.mode === "hash") {
@@ -279,16 +291,16 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
   if (!r) return;
   let { p, search, hash } = currentLocation();
   // modal route: the URL is the modal's, the page behind stays the one it was opened from (history state mBg)
-  const st = globalThis.history?.state as { mModal?: boolean; mBg?: string } | null;
+  const st = hist()?.state as { mModal?: boolean; mBg?: string } | null;
   let modalTo: string | null = null;
   if (st?.mModal && st.mBg) {
     // a direct visit / reload of a modal URL shows the page in full (and forgets the modal state)
-    if (initial) globalThis.history.replaceState({ ...st, mModal: undefined, mBg: undefined }, "");
+    if (initial) hist().replaceState({ ...st, mModal: undefined, mBg: undefined }, "");
     else { modalTo = `${p}${search}`; const u = new URL(st.mBg, "http://x"); p = u.pathname; search = u.search; }
   }
   S.modalTo.set(modalTo);
   // leave confirmation on back/forward: restore the URL when a guard says no
-  if (pop && leaveGuards.size && !(await allowLeave())) { if (lastUrl) globalThis.history.pushState(globalThis.history.state, "", lastUrl); return; }
+  if (pop && leaveGuards.size && !(await allowLeave())) { if (lastUrl) hist().pushState(hist().state, "", lastUrl); return; }
   const redirect = matchRoute(r.redirects, p);
   if (redirect) { const to = String(redirect.route.meta?.["to"] ?? "/"); await navigate(fillPath(to, redirect.params) as Href, { replace: true }); return; }
   const m = matchRoute(r.routes, p);
@@ -296,7 +308,7 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
   const view = r.view.peek();
   if (!initial && m && cur && view?.levels.length && !view.error && cur.route === m.route && JSON.stringify(cur.params) === JSON.stringify(m.params)) {
     setLoc(p, search, hash);
-    lastUrl = globalThis.location?.href ?? "";
+    lastUrl = loc()?.href ?? "";
     return;
   }
   const seq = ++r.seq;
@@ -348,9 +360,10 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
       const comp = mod?.default ?? mod?.component ?? m.route.component;
       page ??= { to, levels: [...layoutLevels(layouts, to), { key: pageKey(m.route, m.params), comp: comp ?? (() => null), page: true, to }] };
       const title = r.opts.title?.(to) ?? (typeof mod?.title === "function" ? mod.title(to) : mod?.title) ?? m.route.title;
-      setMeta({ ...(title ? { title } : {}), ...(typeof meta["description"] === "string" ? { description: meta["description"] } : {}) });
-      headHandler?.(to, mod?.head ?? m.route.head, title ?? undefined);
-    } else headHandler?.(null, null, undefined);
+      // an address of its own: the page's title and head are not this router's
+      if (!r.h) setMeta({ ...(title ? { title } : {}), ...(typeof meta["description"] === "string" ? { description: meta["description"] } : {}) });
+      if (!r.h) headHandler?.(to, mod?.head ?? m.route.head, title ?? undefined);
+    } else if (!r.h) headHandler?.(null, null, undefined);
     const apply = (): void => batch(() => {
       setLoc(p, search, hash);
       S.match.set(m ? { route: m.route, params: m.params, path: p, meta } : null);
@@ -361,7 +374,7 @@ async function sync({ pop = false, initial = false }: { pop?: boolean; initial?:
     // a kept page (keep: true, only its params changed) is not swapped: no page transition, the scroll stays
     const kept = m != null && depth >= nextKeys.length;
     if (navWrapper && !initial && !kept) await navWrapper(apply, { pop }); else apply();
-    lastUrl = globalThis.location?.href ?? "";
+    lastUrl = loc()?.href ?? "";
     if (r.opts.scroll !== false && !kept) restoreScroll(pop);
     // after the first page: the routes linked from it, and the shared "common" chunk most pages import (march build)
     if (initial && r.opts.prefetch !== "none") whenIdle(() => { void import("./extras.ts").then((m) => m.prefetchLinks()); prefetchCommon(); }, 3000);
@@ -446,6 +459,7 @@ async function allowLeave(): Promise<boolean> {
 const SCROLL_KEY = "m.scroll";
 function scrollStore(): Record<string, [number, number]> { try { return JSON.parse(globalThis.sessionStorage?.getItem(SCROLL_KEY) ?? "{}") as Record<string, [number, number]>; } catch { return {}; } }
 function saveScroll(): void {
+  if (S.router?.h) return;
   try {
     const k = (globalThis.history?.state as { mKey?: string } | null)?.mKey;
     if (!k) return;
@@ -455,6 +469,7 @@ function saveScroll(): void {
   } catch { /* storage blocked */ }
 }
 function restoreScroll(pop: boolean): void {
+  if (S.router?.h) return;
   const k = (globalThis.history?.state as { mKey?: string } | null)?.mKey;
   const pos = pop && k ? scrollStore()[k] : undefined;
   const go = (): void => globalThis.scrollTo?.(pos?.[0] ?? 0, pos?.[1] ?? 0);
@@ -472,22 +487,22 @@ export async function navigate(to: Href, { replace = false, state = null, force 
   if (!force && !samePage && leaveGuards.size && !(await allowLeave())) return;
   saveScroll();
   // a modal keeps the page it was opened from (or that page's own background, when one modal opens another)
-  const curState = globalThis.history?.state as { mModal?: boolean; mBg?: string } | null;
+  const curState = hist()?.state as { mModal?: boolean; mBg?: string } | null;
   const bg = curState?.mModal && curState.mBg ? curState.mBg : `${untrack(() => S.path())}${untrack(() => S.search())}`;
   const st = { ...(state ?? {}), mKey: Math.random().toString(36).slice(2), ...(modal ? { mModal: true, mBg: bg } : {}) };
-  const write = (): void => globalThis.history[replace ? "replaceState" : "pushState"](st, "", r.mode === "hash" ? `#${s}` : r.base + s);
+  const write = (): void => hist()[replace ? "replaceState" : "pushState"](st, "", r.mode === "hash" ? `#${s}` : r.base + s);
   // a sandbox that refuses only the first real change of address: hash addresses from now on, same routes (a refusal
   // in hash mode throws again)
   try { write(); } catch { r.mode = "hash"; r.fallback = true; globalThis.addEventListener("hashchange", r.onPop!); write(); }
   return sync();
 }
 /** Go back one entry in history. */
-export const back = (): void => globalThis.history.back();
+export const back = (): void => hist().back();
 
 /** Close the modal route: back in history when the modal was pushed, else go to the page behind it. */
 export function closeModal(): void {
-  const st = globalThis.history?.state as { mModal?: boolean; mBg?: string } | null;
-  if (st?.mModal) globalThis.history.back(); else if (st?.mBg) void navigate(st.mBg as Href, { replace: true });
+  const st = hist()?.state as { mModal?: boolean; mBg?: string } | null;
+  if (st?.mModal) hist().back(); else if (st?.mBg) void navigate(st.mBg as Href, { replace: true });
 }
 /** Show a path in a named outlet (it becomes part of the URL: ?~name=/path). null closes it. */
 export function openOutlet(name: string, to: string | null, { replace = false }: { replace?: boolean } = {}): Promise<void> {

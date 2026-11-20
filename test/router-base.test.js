@@ -144,3 +144,35 @@ test("route keep: moving between params of a kept page skips the page transition
   assert.equal(wraps, first + 1, "another page: transition");
   R._resetRouter(); dom.cleanup();
 });
+
+test("memoryHistory: the router keeps its own address; the page's address, history and title never change", async () => {
+  const dom = installDom({ url: "http://h.test/showcase/navigation/routing" });
+  B._resetAppBase();
+  const R = await import("../src/router/index.ts");
+  R._resetRouter();
+  const title = document.title, before = history.length;
+  R.createRouter({ routes: ROUTES, history: R.memoryHistory(), title: (to) => `T ${to.path}` });
+  await tick();
+  assert.equal(R.path(), "/", "it starts at / (or at its start), not at the page's address");
+  await R.navigate("/motion");
+  await R.navigate("/users/7?tab=posts");
+  assert.equal(R.path(), "/users/7");
+  assert.equal(R.query().tab, "posts");
+  assert.equal(location.pathname, "/showcase/navigation/routing", "the page's address stays");
+  assert.equal(history.length, before, "no entry in the page's history");
+  assert.equal(document.title, title, "nor its title");
+  R.back();
+  await tick(30);
+  assert.equal(R.path(), "/motion", "back walks the router's own list");
+  await R.navigate("/motion/svg", { replace: true });
+  R.back();
+  await tick(30);
+  assert.equal(R.path(), "/", "a replaced entry is not a new one");
+  assert.equal(R.hrefOf("/motion"), "#/motion", "links point at the route, not at a page address");
+  R._resetRouter();
+  R.createRouter({ routes: ROUTES, history: R.memoryHistory("/users/3") });
+  await tick();
+  assert.equal(R.path(), "/users/3", "memoryHistory(start): the first address");
+  R._resetRouter();
+  dom.cleanup();
+});

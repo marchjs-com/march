@@ -8,7 +8,11 @@ iframe. Nothing in the app names an absolute path: routes, links and public file
 createRouter({ routes })                              // mode "history" and base "auto" are the defaults
 createRouter({ routes, mode: "history", base: "auto" })   // the same, spelled out
 createRouter({ routes, base: "/app" })                // a fixed base
+createRouter({ routes, history: memoryHistory() })    // an address of its own: the page's address, title and back button stay
 ```
+
+`history: memoryHistory(start = "/")` is for a router that is not the page's: a preview (MarchIDE uses it), a test, a widget inside another
+app. Links and `navigate()` work as usual; `back()` walks the router's own list.
 
 ## How the base is found
 
