@@ -8,6 +8,14 @@
    ],
    "hash": "5bcc8e743dd961b657481ad0fe5a6deb"
   },
+  "Avatar": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/social/avatar",
+    "examples/showcase/public/components/avatar/ide.json"
+   ],
+   "hash": "d952fa12abb683b03cb45f27c4a59abb"
+  },
   "Badge": {
    "frozen": "2026-11-20",
    "paths": [
