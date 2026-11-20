@@ -952,6 +952,14 @@
    ],
    "hash": "ecf150bc147fb68f32f452be9533c58e"
   },
+  "Presentation": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/presentation",
+    "examples/showcase/public/components/presentation/ide.json"
+   ],
+   "hash": "2845e7f06d578b29b4930419463f9699"
+  },
   "ProfileHeader": {
    "frozen": "2026-11-20",
    "paths": [
