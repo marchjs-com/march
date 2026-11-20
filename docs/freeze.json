@@ -464,6 +464,14 @@
    ],
    "hash": "0912b56a198a174b2b3a00fc4766f793"
   },
+  "RadioGroup": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/radio-group",
+    "examples/showcase/public/components/radio-group/ide.json"
+   ],
+   "hash": "fa0eb5bbb93f741274d1b3df0512fcf8"
+  },
   "RichTextEditor": {
    "frozen": "2026-11-20",
    "paths": [
