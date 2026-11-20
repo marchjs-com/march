@@ -48,6 +48,14 @@
    ],
    "hash": "203bc9b7bd0f84fe0f5ad034ccc57700"
   },
+  "CodeView": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/typography/code-view",
+    "examples/showcase/public/components/code-view/ide.json"
+   ],
+   "hash": "a58240fce3e786f5d9f82b2b5291baf7"
+  },
   "Gantt": {
    "frozen": "2026-11-20",
    "paths": [
