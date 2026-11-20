@@ -2,6 +2,31 @@
 
 All notable changes to March. Versions follow [semver](https://semver.org/).
 
+## 0.3.0 — 2026-11-21
+
+### New
+- `march/router`: `memoryHistory()`: a router with an address of its own (`createRouter({ routes, history: memoryHistory() })`);
+  the page's address, title, scroll and back button stay. For previews, tests and widgets inside another app.
+- `march/i18n`: `removeMessages(locale, keys)` takes keys out of a locale and returns them (`messages()` puts them back).
+- `march/lazy`: one load event for every network load (`beginLoad`, `onLoad`).
+- `march/testing`: `focus()`.
+- Secret (a value shown only on request), TimeInput clock dial (`picker="clock"`, `hour12`), RowTools and ListEditor
+  drag to reorder (`onReorder`), Carousel `swipe` (`"touch"` · `true`: the mouse drags too · `false`), Segmented `size`,
+  ToastHost `fallback` (shows nothing while another ToastHost is on screen), `confirm("text")`, LikeButton `icon` takes
+  any icon.
+
+### Types
+- Callback props are `Handler<[…]>`: a handler typed with your own item type (`(t: MyTask) => …`) or one that returns a
+  value fits.
+- `JSX.Element` is `Node`; `on:` handlers get their event (`on:touchstart` a TouchEvent); components take `sx`; chart
+  `format` functions take typed parameters.
+
+### Fixes
+- Code freeze: 199 components reviewed (70+ fixes) and frozen.
+- Drawer snap points follow the layer it opens in; ContextMenu opens at the pointer inside an OverlayScope; Stepper and
+  PullToRefresh keep their size in a shrink-to-fit box; SectionTimeline's horizontal names stand upright; TimeRuler
+  labels never overlap; ReactionPicker draws emoji with the system emoji font.
+
 ## 0.2.0 — 2026-11-19
 
 ### march/db, march/vault, march/ai

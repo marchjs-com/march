@@ -1,0 +1,51 @@
+# cdn.marchjs.com: every merge to main that passes ci is published as a new version, and latest/ moves to it.
+# The version: package.json's when it is not out yet (a PR raised it), else the next patch (tools/cdn-version.js). The
+# merge commit is tagged v<version>. Secrets: CLOUDFLARE_API_TOKEN (Edit Cloudflare Workers) and CLOUDFLARE_ACCOUNT_ID.
+name: cdn
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+# one release at a time, in merge order (a version number is chosen from what is already out)
+concurrency:
+  group: cdn
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  publish:
+    # after a successful ci run of a push to main (not a pull request), or by hand
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: choose the version
+        id: v
+        run: node tools/cdn-version.js >> "$GITHUB_OUTPUT"
+      - name: build and publish
+        run: node tools/cdn-deploy.js
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: check it is out
+        run: |
+          v="${{ steps.v.outputs.version }}"
+          for i in 1 2 3 4 5 6; do
+            got=$(curl -fsS "https://cdn.marchjs.com/versions.json?$(date +%s)" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).latest))') || true
+            [ "$got" = "$v" ] && curl -fsSI "https://cdn.marchjs.com/$v/march.js" > /dev/null && { echo "cdn.marchjs.com/$v is out (latest)"; exit 0; }
+            sleep 10
+          done
+          echo "cdn.marchjs.com does not show $v yet (latest: $got)"; exit 1
+      - name: tag the release
+        run: |
+          v="v${{ steps.v.outputs.version }}"
+          git tag "$v"
+          git push origin "$v"

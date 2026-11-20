@@ -1,0 +1,15 @@
+// cdn.marchjs.com (see cdn/README.md). Publish with: node tools/cdn-deploy.js
+{
+  "name": "marchjs-cdn",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": false,
+  "routes": [{ "pattern": "cdn.marchjs.com", "custom_domain": true }],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // only a version's entry file runs the Worker (the usage note); every other file is served by the assets layer
+    "run_worker_first": ["/*/march.js"]
+  },
+  "analytics_engine_datasets": [{ "binding": "USAGE", "dataset": "marchjs_cdn_usage" }]
+}
