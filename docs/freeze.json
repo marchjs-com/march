@@ -88,6 +88,14 @@
    ],
    "hash": "d3bf416eb2f27c7ac51a5ca7a278071a"
   },
+  "CopyButton": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/actions/copy-button",
+    "examples/showcase/public/components/copy-button/ide.json"
+   ],
+   "hash": "a255c2105493d803c96f7b47a0491855"
+  },
   "Debugger": {
    "frozen": "2026-11-20",
    "paths": [
