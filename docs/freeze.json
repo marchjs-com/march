@@ -48,6 +48,14 @@
    ],
    "hash": "a152fb6a0ff62f1710a346339750845c"
   },
+  "Menu": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/actions/menu",
+    "examples/showcase/public/components/menu/ide.json"
+   ],
+   "hash": "4beadd8df2c82f48aee1415d88e8313a"
+  },
   "Scheduler": {
    "frozen": "2026-11-20",
    "paths": [
