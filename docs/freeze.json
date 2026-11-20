@@ -488,6 +488,14 @@
    ],
    "hash": "5c2ee142d1de5b645eac276367432868"
   },
+  "LikeButton": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/social/like-button",
+    "examples/showcase/public/components/like-button/ide.json"
+   ],
+   "hash": "498819f5ca67af035b94f68ec885ae01"
+  },
   "LinkCard": {
    "frozen": "2026-11-20",
    "paths": [
