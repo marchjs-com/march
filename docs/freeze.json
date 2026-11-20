@@ -360,6 +360,14 @@
    ],
    "hash": "bab2ece960e6d191996648f62831a4fc"
   },
+  "FollowButton": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/social/follow-button",
+    "examples/showcase/public/components/follow-button/ide.json"
+   ],
+   "hash": "2da40d22637bf0fd6bf4eeb2566bd9a4"
+  },
   "FontPicker": {
    "frozen": "2026-11-20",
    "paths": [
