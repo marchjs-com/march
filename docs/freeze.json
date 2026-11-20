@@ -1,5 +1,13 @@
 {
  "components": {
+  "Button": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/actions/button",
+    "examples/showcase/public/components/button/ide.json"
+   ],
+   "hash": "c889eec3614824d0c6bd535332f3d8f9"
+  },
   "Gantt": {
    "frozen": "2026-11-20",
    "paths": [
