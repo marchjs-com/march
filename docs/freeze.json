@@ -528,6 +528,14 @@
    ],
    "hash": "3969ae0c6e7bd5f3012011a4a1e49e41"
   },
+  "Joined": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/joined",
+    "examples/showcase/public/components/joined/ide.json"
+   ],
+   "hash": "63ee55ba0f2d2eb7fc71a783a793ff8b"
+  },
   "JsonEditor": {
    "frozen": "2026-11-20",
    "paths": [
