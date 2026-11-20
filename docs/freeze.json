@@ -48,6 +48,14 @@
    ],
    "hash": "4b0a553c5a019eaa5084346af77029fd"
   },
+  "Breadcrumbs": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/navigation/breadcrumbs",
+    "examples/showcase/public/components/breadcrumbs/ide.json"
+   ],
+   "hash": "78a03a0193eca91584c703a9aa6f6aa7"
+  },
   "Button": {
    "frozen": "2026-11-20",
    "paths": [
