@@ -3,6 +3,7 @@ import { defineMeta } from "../../meta.ts";
 export default defineMeta({
   name: "LiveFeed",
   status: "experimental",
+  frozen: "2026-11-20",
   category: "landing",
   since: "0.1.0",
   summary: "Living wall: new activity slides in, the oldest leaves; pulls from next() on the motion clock while visible, pauses on hover, focus or the Pause button.",

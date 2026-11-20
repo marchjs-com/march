@@ -704,6 +704,14 @@
    ],
    "hash": "3110e4f653c8eca09881fda2f4be14bc"
   },
+  "LiveFeed": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/live-feed",
+    "examples/showcase/public/components/live-feed/ide.json"
+   ],
+   "hash": "b508f8508ed95ad295f8a8eb48fd134f"
+  },
   "LiveStatus": {
    "frozen": "2026-11-20",
    "paths": [
