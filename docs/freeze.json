@@ -56,6 +56,14 @@
    ],
    "hash": "4b0a553c5a019eaa5084346af77029fd"
   },
+  "BottomRightControls": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/bottom-right-controls",
+    "examples/showcase/public/components/bottom-right-controls/ide.json"
+   ],
+   "hash": "66bfdac17a8333ffcf9b745570499203"
+  },
   "Breadcrumbs": {
    "frozen": "2026-11-20",
    "paths": [
