@@ -15,6 +15,14 @@
     "examples/showcase/public/components/scheduler/ide.json"
    ],
    "hash": "9bbc568781f8a24cdd729313bd3c2d8c"
+  },
+  "TreeView": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/tree-view",
+    "examples/showcase/public/components/tree-view/ide.json"
+   ],
+   "hash": "714c677b90717bff5d33f40cb34b1fc4"
   }
  },
  "log": []
