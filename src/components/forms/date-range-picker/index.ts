@@ -62,7 +62,7 @@ export function DateRangePicker(props: DateRangePickerProps): unknown {
   });
   const field = useField();
   const range = (k: keyof DateRange, v: IsoDate | null) => { const cur = untrack(get) ?? { from: null, to: null }; set({ ...cur, [k]: v }); };
-  return h("div", { class: () => cx("m-daterange", props.class), role: "group", "aria-labelledby": field?.labelId ?? props.labelledby ?? null },
+  return h("div", { class: () => cx("m-daterange", props.class), role: "group", "aria-labelledby": props.labelledby ?? field?.labelId ?? null },
     () => (presets().length ? h(Segmented, {
       id: props.id ?? field?.id, "aria-label": live(() => props.labels?.range ?? t`Date range`),
       options: live(() => [...presets().map((p) => ({ value: p.id, label: p.label })), ...(props.custom === false ? [] : [{ value: "custom", label: props.labels?.custom ?? t`Custom` }])]),

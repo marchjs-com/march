@@ -10,7 +10,7 @@ test("JsonView: typed values, open depth, toggle, circular reference", () => {
   const value = { a: 1, s: "x", n: null, list: [true, 2], deep: { k: { z: 1 } } };
   value.self = value;
   const m = mount(() => h(JsonView, { value, open: 1 }));
-  const root = m.el.querySelector(".m-json [role=tree]");
+  const root = m.el.querySelector(".m-json .m-json-root");
   assert.ok(root.querySelector(".m-json-number") && root.querySelector(".m-json-string") && root.querySelector(".m-json-null"));
   const toggles = [...root.querySelectorAll(".m-json-toggle")];
   assert.equal(toggles[0].getAttribute("aria-expanded"), "true", "depth 0 open");
@@ -29,7 +29,7 @@ test("JsonView: own texts, no arrow, own arrow, accessible name", () => {
   value.self = value;
   const m = mount(() => [h(JsonView, { value, labels: { items: "entries", keys: "fields", circular: "(loop)" }, arrow: false, label: "Order" }), h(JsonView, { value, arrow: (open) => h("i", {}, () => (open() ? "-" : "+")) })]);
   const [a, b] = m.el.querySelectorAll(".m-json");
-  assert.equal(a.querySelector("[role=tree]").getAttribute("aria-label"), "Order");
+  assert.equal(a.querySelector(".m-json-root").getAttribute("aria-label"), "Order");
   assert.match(a.textContent, /2 entries/);
   assert.match(a.textContent, /1 fields/);
   assert.match(a.textContent, /\(loop\)/);

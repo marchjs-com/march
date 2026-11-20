@@ -37,6 +37,8 @@ export const throttled = (p: NetProfile = S.profile): boolean => !!(p.offline ||
 export const getThrottle = (): NetProfile => S.profile;
 /** Set the network (`{}` or null: no limit). */
 export function setThrottle(p: NetProfile | null): void { S.profile = { ...(p ?? {}) }; notify(); }
+/** The scope the throttle is limited to now (null: every call of the page). */
+export const getThrottleScope = (): CallScope | null => S.scope;
 /** Limit it to the calls in a scope (null: every call of the page). */
 export function setThrottleScope(scope: CallScope | null): void { S.scope = scope; }
 /** The preset the network matches (or null: your own). */

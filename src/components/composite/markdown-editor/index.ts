@@ -97,7 +97,8 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
   const preview = h("div", {
     id: `${id}-preview`, class: "m-markdown m-mde-preview", role: "region", tabindex: "0", "aria-label": () => L().preview ?? t`Preview`,
     onScroll: () => sync(preview, area),
-  }, () => markdownNodes(get())) as HTMLElement;
+  // parsed only while it is shown: typing in the write (or rich) view does not render a hidden preview each key
+  }, () => (view() === "preview" || view() === "split" ? markdownNodes(get()) : null)) as HTMLElement;
 
   /** Apply an edit as one native undo step (execCommand keeps the textarea's undo stack; setRangeText where it is missing). */
   const apply = (r: md.Edit | null): boolean => {
@@ -180,7 +181,8 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
       if (v === "write") return area;
       if (v === "preview") return preview;
       if (v === "split") return h(Splitter, { start: area, end: preview, initial: props.split ?? 0.5, min: 0.2, label: L().resize ?? t`Resize the panes`, class: "m-mde-split" });
-      return h(RichView, { value: get(), onChange: (x: string) => set(x), readonly: live(() => props.readonly), disabled: live(() => props.disabled), rows: props.rows ?? 10, toolbar: undefined, counter: false });
+      // live: a value from outside reaches the rich view; its own edits come back equal to what it emitted (no reload)
+      return h(RichView, { value: live(() => get()), onChange: (x: string) => set(x), readonly: live(() => props.readonly), disabled: live(() => props.disabled), rows: props.rows ?? 10, toolbar: undefined, counter: false });
     });
   };
   const counts = () => md.stats(get());

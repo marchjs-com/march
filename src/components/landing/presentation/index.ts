@@ -128,9 +128,10 @@ export function Presentation(props: PresentationProps): Element {
   const pos = computed<Pos>(() => ({ i: index(), s: step() }));
 
   const sync = props.sync === false ? null : channel<Pos>(`m.deck.${props.sync ?? "deck"}`, { crossTab: true });
-  let remote = false;
+  let remote = false, asked = -1; // asked: the slide go() moved to (any other change of index came from outside)
   const go = (p: Pos): void => {
     const i = clamp(p.i, 0, n - 1), s = clamp(p.s, 0, steps(list[i]).length);
+    asked = i;
     if (i !== index()) setIndex(i);
     step.set(s);
     if (sync && !remote) sync.emit({ i, s });
@@ -146,6 +147,9 @@ export function Presentation(props: PresentationProps): Element {
   effect(() => {
     const { i, s } = pos();
     untrack(() => {
+      // the bound index changed from outside (the URL, the back button): the slide opens with no fragments shown
+      if (shown >= 0 && i !== shown && i !== asked && s) { step.set(0); return; }
+      if (i !== shown) asked = -1;
       list.forEach((el, k) => { const on = k === i; el.classList.toggle("is-current", on); el.toggleAttribute("inert", !on); el.setAttribute("aria-hidden", on ? "false" : "true"); });
       steps(list[i]).forEach((el, k) => {
         const vis = k < s;

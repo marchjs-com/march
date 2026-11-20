@@ -115,7 +115,11 @@ function body(props: StoryViewerProps): Element {
     if (n >= groups().length) { void close(); return; }
     gi.set(n); ii.set(0); slide(dir);
   };
+  let closing = false;
   const close = async (from = 0): Promise<void> => {
+    // a swipe and the button (or Esc) during the close animation must not close twice
+    if (closing) return;
+    closing = true;
     await animate(stage, [{ transform: `translateY(${from}px) scale(${1 - from / 1600})`, opacity: 1 }, { transform: "translateY(70%) scale(.8)", opacity: 0 }], { duration: 240, easing: "easeInCubic", fill: "forwards" }).finished;
     props.onClose();
   };

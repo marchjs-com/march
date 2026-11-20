@@ -187,20 +187,30 @@ export function ColorPicker(props: ColorPickerProps): unknown {
     const r = recent();
     return r.length && (props.recent ?? 8) ? [...own, { label: L().recent ?? t`Recent`, colors: r }] : own;
   };
-  const swatch = (color: string, label: string): Element =>
-    h(Swatch, { class: "m-cp-swatch", color, label, selected: () => same(color), disabled: ro, onClick: () => pick(resolve(color)) }) as Element;
-  const same = (color: string): boolean => { const a = C.parse(resolve(color)), b = rgba(); return !!a && Math.abs(a.r - b.r) < 1.5 && Math.abs(a.g - b.g) < 1.5 && Math.abs(a.b - b.b) < 1.5 && Math.abs(a.a - b.a) < 0.02; };
+  // a swatch's colour is resolved once (a theme token read from the root's style), not on every move of the thumb
+  const swatch = (color: string, label: string): Element => {
+    let rgb: C.Rgba | null | undefined;
+    const target = (): C.Rgba | null => {
+      if (rgb !== undefined) return rgb;
+      const p = C.parse(resolve(color));
+      if (p || root?.isConnected) rgb = p; // a token before the root is on the page: asked again later
+      return p;
+    };
+    return h(Swatch, { class: "m-cp-swatch", color, label, selected: () => same(target()), disabled: ro, onClick: () => pick(resolve(color)) }) as Element;
+  };
+  const same = (a: C.Rgba | null): boolean => { const b = rgba(); return !!a && Math.abs(a.r - b.r) < 1.5 && Math.abs(a.g - b.g) < 1.5 && Math.abs(a.b - b.b) < 1.5 && Math.abs(a.a - b.a) < 0.02; };
   const contrastRow = (): unknown => {
     if (props.contrast === false) return null;
-    // a Badge per ground: the color written on a white / black Swatch, the ratio and its WCAG grade
+    // a Badge per ground: the color written on a white / black Swatch, the ratio and its WCAG grade; built once, its
+    // text and class follow the color
     const on = (bg: C.Rgba, name: () => string): unknown => {
-      const r = C.contrastOf(rgba(), bg), grade = r >= 7 ? "AAA" : r >= 4.5 ? "AA" : r >= 3 ? "AA+" : "—";
+      const r = computed(() => C.contrastOf(rgba(), bg));
       return h(Badge, {
-        class: cx("m-cp-contrast", r >= 4.5 ? "is-pass" : r >= 3 ? "is-large" : "is-fail"),
+        class: () => cx("m-cp-contrast", r() >= 4.5 ? "is-pass" : r() >= 3 ? "is-large" : "is-fail"),
         dot: h(Swatch, { class: "m-cp-contrast-chip", color: bg === WHITE ? "white" : "black", size: "sm", shape: "circle", checker: false }, "Aa") as Node,
-      }, `${name()} ${r.toFixed(2)} `, h("b", { title: r >= 3 && r < 4.5 ? t`Enough for large text only` : null }, grade));
+      }, () => `${name()} ${r().toFixed(2)} `, h("b", { title: () => (r() >= 3 && r() < 4.5 ? t`Enough for large text only` : null) }, () => (r() >= 7 ? "AAA" : r() >= 4.5 ? "AA" : r() >= 3 ? "AA+" : "—")));
     };
-    return h("div", { class: "m-cp-contrasts", "aria-label": () => L().contrast ?? t`Contrast`, role: "group" }, () => [on(WHITE, () => L().onWhite ?? t`on white`), on(BLACK, () => L().onBlack ?? t`on black`)]);
+    return h("div", { class: "m-cp-contrasts", "aria-label": () => L().contrast ?? t`Contrast`, role: "group" }, on(WHITE, () => L().onWhite ?? t`on white`), on(BLACK, () => L().onBlack ?? t`on black`));
   };
   const swatchName = (token: string): string => ({ "brand-orange": t`Excitement orange`, "brand-blue": t`Activity blue`, "brand-green": t`Friendship green`, "brand-purple": t`Communication purple` } as Record<string, string>)[token] ?? token;
 

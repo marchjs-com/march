@@ -40,28 +40,39 @@ export function Tree(props: TreeProps): Element {
     // toggle="chevron": the arrow opens / closes, the rest of the row only selects
     const onClick = (e: MouseEvent): void => { if (byArrow && has && (e.target as Element).closest?.("[data-chev]")) { toggle(node.id); return; } act(); };
     const own = props.chevron;
-    return h("li", { role: "treeitem", class: "m-tree-li", "aria-expanded": () => (has ? String(isOpen()) : null), "aria-selected": () => String(val(props.selected) === node.id), "aria-level": String(level) },
+    // the treeitem (the li, which holds its group) is what takes focus, so the focused element carries the tree's state
+    return h("li", {
+      role: "treeitem", class: "m-tree-li", tabindex: "-1", "aria-expanded": () => (has ? String(isOpen()) : null), "aria-selected": () => String(val(props.selected) === node.id), "aria-level": String(level),
+      onKeydown: (e: KeyboardEvent) => {
+        const at = e.currentTarget as HTMLElement;
+        if (e.target !== at) return; // a nested item's keys bubble through its parents
+        const items = [...(at.closest(".m-tree")?.querySelectorAll<HTMLElement>(".m-tree-li") ?? [])].filter((r) => r.offsetParent !== null || !r.parentElement?.closest("[hidden]"));
+        if (roving(e, items, { wrap: false })) return; // ↑ ↓ Home End among the visible items
+        const k = treeKey(e.key, { kids: has, open: has && isOpen() }, isRtl(at));
+        if (!k) return;
+        e.preventDefault();
+        if (k === "open" || k === "close") toggle(node.id, k === "open");
+        else if (k === "child") items[items.indexOf(at) + 1]?.focus();
+        else if (k === "parent") at.parentElement?.closest<HTMLElement>(".m-tree-li")?.focus();
+        else act();
+      },
+    },
       treeRow({
         prefix: "m-tree", kids: has, open: isOpen, chevron: typeof own === "function" ? () => own(node, isOpen) : own,
         icon: icon(node.icon, "m-tree-icon"), label: h(OverflowText, { class: "m-tree-label" }, node.label), meta: node.meta, chevronAttrs: { "data-chev": "" },
-      }, {
-        interactive: true, active: () => val(props.selected) === node.id, tabindex: "-1", "data-level": String(level), onClick,
-        onKeydown: (e: KeyboardEvent) => {
-          const at = e.currentTarget as HTMLElement;
-          const rows = [...(at.closest(".m-tree")?.querySelectorAll<HTMLElement>(".m-tree-row") ?? [])].filter((r) => r.offsetParent !== null || !r.closest("[hidden]"));
-          if (roving(e, rows, { wrap: false })) return; // ↑ ↓ Home End among the visible rows
-          const k = treeKey(e.key, { kids: has, open: has && isOpen() }, isRtl(at));
-          if (!k) return;
-          e.preventDefault();
-          if (k === "open" || k === "close") toggle(node.id, k === "open");
-          else if (k === "child") rows[rows.indexOf(at) + 1]?.focus();
-          else if (k === "parent") at.closest(".m-tree-group")?.closest(".m-tree-li")?.querySelector<HTMLElement>(".m-tree-row")?.focus();
-          else act();
-        },
-      }),
+      }, { interactive: true, active: () => val(props.selected) === node.id, "data-level": String(level), onClick }),
       has && h("ul", { role: "group", class: "m-tree-group", hidden: () => !isOpen() }, node.children?.map((c) => row(c, level + 1))));
   };
-  const root = h("ul", { role: "tree", class: () => cx("m-tree", val(props.class)), "aria-label": props.label ?? t`Tree` }, props.nodes.map((n) => row(n, 1)));
-  queueMicrotask(() => { const first = (root as HTMLElement).querySelector<HTMLElement>(".m-tree-row"); if (first) first.tabIndex = 0; });
+  const root = h("ul", {
+    role: "tree", class: () => cx("m-tree", val(props.class)), "aria-label": props.label ?? t`Tree`,
+    // roving tab stop: Tab comes back to the item that last had focus, not to the first one
+    onFocusin: (e: FocusEvent) => {
+      const r = e.target as HTMLElement;
+      if (!r.classList?.contains("m-tree-li") || r.closest(".m-tree") !== root || r.tabIndex === 0) return;
+      for (const x of (root as HTMLElement).querySelectorAll<HTMLElement>(".m-tree-li[tabindex='0']")) if (x.closest(".m-tree") === root) x.tabIndex = -1;
+      r.tabIndex = 0;
+    },
+  }, props.nodes.map((n) => row(n, 1)));
+  queueMicrotask(() => { const first = (root as HTMLElement).querySelector<HTMLElement>(".m-tree-li"); if (first) first.tabIndex = 0; });
   return root;
 }

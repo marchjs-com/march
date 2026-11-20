@@ -57,7 +57,8 @@ export function ThemeEditor(props: ThemeEditorProps): Element {
   const applied = signal(false);
   let previous = "";
 
-  const put = (d: M.ThemeDraft): void => { draft.set(d); set(d); if (untrack(applied)) registerDraft(d); };
+  // while applied, a rename (a new id) switches the app to the new id too: the old id would keep the old colors
+  const put = (d: M.ThemeDraft): void => { const was = draft.peek().id; draft.set(d); set(d); if (untrack(applied)) (d.id === was ? registerDraft : applyDraft)(d); };
   effect(() => { const v = get(); if (v && v !== untrack(draft)) { draft.set(v); } });
   const change = (label: string, fn: (d: M.ThemeDraft) => M.ThemeDraft, merge?: string): void => {
     if (ro()) return;

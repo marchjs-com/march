@@ -501,22 +501,26 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const revealAt = signal<{ at: number; n: number } | null>(null);
   let reveals = 0;
   const reveal = (at: number): void => { revealAt.set({ at, n: ++reveals }); queueMicrotask(() => deco.querySelector?.(".m-ced-at")?.scrollIntoView?.({ block: "nearest", inline: "nearest" })); };
-  const decorate = (): unknown => {
-    const src = text(), [a, b] = sel(), on = focused(), unitLen = props.tabSize ?? 2;
-    const ranges: [number, number, string][] = [];
-    if (flag(props.guides)) {
-      for (let ls = 0; ls <= src.length;) {
-        const nl = src.indexOf("\n", ls), end = nl < 0 ? src.length : nl;
-        let i = ls;
-        while (i < end) {
-          if (src[i] === "\t") { ranges.push([i, i + 1, "m-ced-guide"]); i++; continue; }
-          let j = i; while (j < end && j - i < unitLen && src[j] === " ") j++;
-          if (j - i === unitLen && j < end) { ranges.push([i, j, "m-ced-guide"]); i = j; } else break;
-        }
-        if (nl < 0) break;
-        ls = nl + 1;
+  // the indent guides depend on the text alone: worked out once per text, not on every caret move
+  const guides = computed((): readonly [number, number, string][] => {
+    const src = text(), unitLen = props.tabSize ?? 2, out: [number, number, string][] = [];
+    if (!flag(props.guides)) return out;
+    for (let ls = 0; ls <= src.length;) {
+      const nl = src.indexOf("\n", ls), end = nl < 0 ? src.length : nl;
+      let i = ls;
+      while (i < end) {
+        if (src[i] === "\t") { out.push([i, i + 1, "m-ced-guide"]); i++; continue; }
+        let j = i; while (j < end && j - i < unitLen && src[j] === " ") j++;
+        if (j - i === unitLen && j < end) { out.push([i, j, "m-ced-guide"]); i = j; } else break;
       }
+      if (nl < 0) break;
+      ls = nl + 1;
     }
+    return out;
+  });
+  const decorate = (): unknown => {
+    const src = text(), [a, b] = sel(), on = focused();
+    const ranges: [number, number, string][] = [...guides()];
     if (on && flag(props.occurrences)) for (const [x, y] of occurrences(src, a, b)) ranges.push([x, y, "m-ced-occ"]);
     // the references being listed (Shift+F12): written places stronger
     for (const r of refs()?.items ?? []) ranges.push([r.from, r.to, r.write ? "m-ced-ref is-write" : "m-ced-ref"]);
@@ -1477,8 +1481,13 @@ export function CodeEditor(props: CodeEditorProps): Element {
 
   // the gutter's press area, over the text field's start: the line under the pointer (its number's place)
   const lineAt = (y: number): number => {
-    let n = 1;
-    for (const el of code.querySelectorAll<HTMLElement>(".m-ced-ln")) { if (el.getBoundingClientRect().top <= y + 1) n = Number(el.dataset["line"]); else break; }
+    // the numbers stand top to bottom: a binary search reads a few boxes, not one per line above the pointer
+    const els = code.querySelectorAll<HTMLElement>(".m-ced-ln");
+    let lo = 0, hi = els.length - 1, n = 1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1, el = els[mid]!;
+      if (el.getBoundingClientRect().top <= y + 1) { n = Number(el.dataset["line"]); lo = mid + 1; } else hi = mid - 1;
+    }
     return n;
   };
   let hover: Element | null = null;
@@ -1595,16 +1604,20 @@ export function CodeEditor(props: CodeEditorProps): Element {
   // ---- sticky scroll: the lines that open the blocks around the first line on screen (up to 3, innermost last)
   const stuck = signal<readonly { at: number; n: number; text: string }[]>([]);
   let stickyQueued = false;
+  // where each line starts, once per text (the view's and the model's): a place's line is a binary search
+  const starts = (v: string): number[] => { const out = [0]; for (let i = v.indexOf("\n"); i >= 0; i = v.indexOf("\n", i + 1)) out.push(i + 1); return out; };
+  const viewStarts = computed(() => starts(text()));
+  const modelStarts = computed(() => starts(get()));
+  const lineOfPos = (list: readonly number[], pos: number): number => { let lo = 0, hi = list.length - 1; while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (list[mid]! <= pos) lo = mid; else hi = mid - 1; } return lo + 1; };
   const updateSticky = (): void => {
     stickyQueued = false;
     if (!gutter() || val(props.stickyScroll) === false || area.scrollTop < 4) { if (stuck.peek().length) stuck.set([]); return; }
     const top = area.scrollTop;
     let first = 1;
     for (const el of code.querySelectorAll<HTMLElement>(".m-ced-ln")) { if (el.offsetTop + 2 >= top) { first = Number(el.dataset["vline"] ?? el.dataset["line"]); break; } }
-    const v = text(), lines = v.split("\n");
-    let topAt = 0;
-    for (let i = 0; i < first - 1 && i < lines.length; i++) topAt += lines[i]!.length + 1;
-    const lineAtPos = (pos: number): number => v.slice(0, pos).split("\n").length;
+    const v = text(), vs = viewStarts();
+    const topAt = first - 1 < vs.length ? vs[first - 1]! : v.length + 1;
+    const lineAtPos = (pos: number): number => lineOfPos(vs, pos);
     const seen = new Set<number>(), out: { at: number; n: number; text: string }[] = [];
     const opens = [...brackets().mate].filter(([o, c]) => o < c && o < topAt && c >= topAt && "{([".includes(v[o] ?? "")).sort((x, y) => x[0] - y[0]);
     for (const [o] of opens) {
@@ -1614,7 +1627,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
       const ls = v.lastIndexOf("\n", o - 1) + 1, le = v.indexOf("\n", o);
       const text = v.slice(ls, le < 0 ? v.length : le);
       if (!text.trim()) continue;
-      out.push({ at: ls, n: untrack(get).slice(0, toModel(ls)).split("\n").length, text: text.length > 160 ? `${text.slice(0, 159)}…` : text });
+      out.push({ at: ls, n: lineOfPos(untrack(modelStarts), toModel(ls)), text: text.length > 160 ? `${text.slice(0, 159)}…` : text });
     }
     const keep = out.slice(-3);
     const cur = stuck.peek();
@@ -1634,7 +1647,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     if (px) area.style.setProperty("--m-ced-size", `${px}px`); else area.style.removeProperty("--m-ced-size");
     if (lh) area.style.setProperty("--m-ced-lh", String(lh)); else area.style.removeProperty("--m-ced-lh");
   });
-  onCleanup(() => { globalThis.document?.removeEventListener?.("selectionchange", onSelChange); clearTimeout(hoverTimer); clearTimeout(hideTimer); clearTimeout(noteTimer); });
+  onCleanup(() => { globalThis.document?.documentElement?.style.removeProperty("--m-ced-room"); globalThis.document?.removeEventListener?.("selectionchange", onSelChange); clearTimeout(hoverTimer); clearTimeout(hideTimer); clearTimeout(noteTimer); });
   return h(EditorFrame, {
     class: () => cx("m-ced", gutter() && "is-gutter", val(props.palette) !== "theme" && "is-ide", val(props.class)), disabled: () => !!props.disabled, readonly: () => !!props.readonly,
     foot, showFoot: props.message !== false,

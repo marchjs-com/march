@@ -29,8 +29,8 @@ children or drag and drop use TreeView.
 
 ## Accessibility
 
-`role="tree"` with `treeitem`, `group`, `aria-level`, `aria-expanded` and `aria-selected`. One row is in the Tab order
-(roving focus): ↑ ↓ Home End move among visible rows, → opens (then goes to the first child), ← closes (then goes to the parent; the two swap in right-to-left), Enter or Space selects. The chevron turns
+`role="tree"` with `treeitem`, `group`, `aria-level`, `aria-expanded` and `aria-selected`. Focus is on the
+`treeitem` itself (its row shows the ring); one item is in the Tab order (roving focus, it returns to the last one): ↑ ↓ Home End move among visible rows, → opens (then goes to the first child), ← closes (then goes to the parent; the two swap in right-to-left), Enter or Space selects. The chevron turns
 on the motion engine's duration tokens and the indent uses logical properties (RTL mirrors).
 
 ## Composed of

@@ -269,10 +269,21 @@ export function Window(props: WindowProps): unknown {
   snapPreview) as HTMLElement;
 
   // measure once the frame is in its area, and keep it inside when the area changes size
-  queueMicrotask(() => { if (root?.isConnected) place(); });
-  let unobserve: (() => void) | null = null;
-  queueMicrotask(() => { const a = area(); if (a) unobserve = observeSize(a, () => { if (geo.peek()) geo.set(fit(geo.peek()!)); }); });
-  onCleanup(() => unobserve?.());
+  // (a window put into the document later is placed when it is first laid out)
+  let unobserve: (() => void) | null = null, waiting: ResizeObserver | null = null, gone = false;
+  const connect = (): void => {
+    if (gone || !root) return;
+    if (!root.isConnected) {
+      const RO = globalThis.ResizeObserver;
+      if (RO && !waiting) { waiting = new RO(() => { if (root?.isConnected) { waiting?.disconnect(); waiting = null; connect(); } }); waiting.observe(root); }
+      return;
+    }
+    place();
+    const a = area();
+    if (a && !unobserve) unobserve = observeSize(a, () => { if (geo.peek()) geo.set(fit(geo.peek()!)); });
+  };
+  queueMicrotask(connect);
+  onCleanup(() => { gone = true; unobserve?.(); waiting?.disconnect(); });
   untrack(() => props.ref?.(api));
   return frame;
 }

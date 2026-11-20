@@ -96,7 +96,8 @@ export function ActivityBar(props: ActivityBarProps): Element {
         if (!root) return;
         slide ??= slidingIndicator(ind, root, { axis: () => (horizontal() ? "x" : "y"), sizeVar: "--m-ab-size", duration: 260, easing: "easeOutBack", motion: () => motion !== "none" });
         if (motion === "fade") slide.reset(); // appears in place
-        slide.moveTo(id ? root.querySelector<HTMLElement>(`[data-view="${id}"]`) : null);
+        // compared as text, not put into a selector (an id may hold quotes or brackets)
+        slide.moveTo(id ? [...root.querySelectorAll<HTMLElement>("[data-view]")].find((el) => el.getAttribute("data-view") === id) ?? null : null);
       });
     });
   }

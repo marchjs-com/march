@@ -135,7 +135,14 @@ export function ChatBubble(props: ChatBubbleProps): Element {
       () => (text() ? h("span", { class: "m-msg-text" }, text()) : null),
       h("span", { class: "m-msg-meta" },
         () => (val(props.edited) ? h("span", { class: "m-msg-edited" }, L("edited", t`edited`)) : null),
-        () => { const tm = val(props.time); return tm ? h("time", { dateTime: new Date(tm).toISOString() }, props.formatTime ? props.formatTime(new Date(tm)) : applyPipe("time", tm)) : null; },
+        () => {
+          const tm = val(props.time);
+          if (!tm) return null;
+          // a time that is not a date is shown as given (no datetime attribute, nothing thrown)
+          const at = new Date(tm);
+          if (Number.isNaN(at.getTime())) return h("time", {}, String(tm));
+          return h("time", { dateTime: at.toISOString() }, props.formatTime ? props.formatTime(at) : applyPipe("time", tm));
+        },
         ticks)),
     () => {
       const rs = val(props.reactions);

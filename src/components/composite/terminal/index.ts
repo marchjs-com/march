@@ -157,10 +157,14 @@ export function Terminal(props: TerminalProps): Element {
   const busy = signal(false);
   let ctl: AbortController | null = null;
   let search: { q: string; hit: number } | null = null;
+  // a pasted block runs line by line; Ctrl+C (or cancel) bumps this and the lines left are dropped
+  let pasteRun = 0;
 
   const out = h("div", { class: "m-term-out", role: "log", "aria-live": "polite", "aria-label": () => props.label ?? t`Terminal output` }) as HTMLElement;
   const input = h("input", { class: "m-term-input", name: "command", type: "text", spellcheck: "false", autocomplete: "off", autocapitalize: "off", "aria-label": () => props.labels?.command ?? t`Command` }) as HTMLInputElement;
-  const promptEl = h("span", { class: "m-term-prompt", "aria-hidden": "true" }, () => (search ? `(${searchText()}) ` : val(props.prompt) ?? "$ ")) as HTMLElement;
+  // the Ctrl+R prompt (null: the normal one); a signal, so the live `prompt` binding is never replaced by hand
+  const searching = signal<string | null>(null);
+  const promptEl = h("span", { class: "m-term-prompt", "aria-hidden": "true" }, () => searching() ?? val(props.prompt) ?? "$ ") as HTMLElement;
   // our own cursor: the browser's caret shows only while the input has focus; this one blinks always (solid while typing)
   const measure = h("span", { class: "m-term-measure", "aria-hidden": "true" }) as HTMLElement;
   const caret = h("span", { class: cx("m-term-caret", blink && "is-blinking"), "aria-hidden": "true" }) as HTMLElement;
@@ -302,31 +306,32 @@ export function Terminal(props: TerminalProps): Element {
   const findHistory = (q: string, from: number): number => { for (let i = Math.min(from, hist.length - 1); i >= 0; i--) if (hist[i]!.includes(q)) return i; return -1; };
   const onKey = (e: KeyboardEvent): void => {
     if (search) {
-      if (e.key === "Escape" || (e.ctrlKey && e.key === "g")) { e.preventDefault(); search = null; input.value = draft; promptEl.textContent = val(props.prompt) ?? "$ "; return; }
+      if (e.key === "Escape" || (e.ctrlKey && e.key === "g")) { e.preventDefault(); search = null; input.value = draft; searching.set(null); return; }
       if (e.ctrlKey && e.key === "r") { e.preventDefault(); const i = findHistory(search.q, search.hit - 1); if (i >= 0) { search.hit = i; input.value = hist[i]!; } return; }
-      if (e.key === "Enter") { search = null; promptEl.textContent = val(props.prompt) ?? "$ "; }
+      if (e.key === "Enter") { search = null; searching.set(null); }
     }
-    if (e.ctrlKey && e.key === "c") { if (ctl) { e.preventDefault(); ctl.abort(); } else if (!globalThis.getSelection?.()?.toString()) { e.preventDefault(); append(h("span", {}, h("span", { class: "m-term-prompt" }, val(props.prompt) ?? "$ "), input.value, "^C") as Node, "m-term-echo"); input.value = ""; } return; }
+    if (e.ctrlKey && e.key === "c") { pasteRun++; if (ctl) { e.preventDefault(); ctl.abort(); } else if (!globalThis.getSelection?.()?.toString()) { e.preventDefault(); append(h("span", {}, h("span", { class: "m-term-prompt" }, val(props.prompt) ?? "$ "), input.value, "^C") as Node, "m-term-echo"); input.value = ""; } return; }
     if (e.ctrlKey && e.key === "l") { e.preventDefault(); out.replaceChildren(); return; }
     if (e.ctrlKey && e.key === "u") { e.preventDefault(); input.value = ""; return; }
-    if (e.ctrlKey && e.key === "r") { e.preventDefault(); draft = input.value; search = { q: "", hit: hist.length }; promptEl.textContent = `(${searchText()}) `; input.value = ""; return; }
+    if (e.ctrlKey && e.key === "r") { e.preventDefault(); draft = input.value; search = { q: "", hit: hist.length }; searching.set(`(${searchText()}) `); input.value = ""; return; }
     if (e.key === "Tab") { e.preventDefault(); complete(); return; }
     if (e.key === "ArrowUp") { e.preventDefault(); if (at === hist.length) draft = input.value; if (at > 0) { at--; input.value = hist[at]!; } return; }
     if (e.key === "ArrowDown") { e.preventDefault(); if (at < hist.length) { at++; input.value = at === hist.length ? draft : hist[at]!; } return; }
     if (e.key === "Enter") { e.preventDefault(); if (busy()) return; const v = input.value; input.value = ""; void exec(v); }
   };
   input.addEventListener("keydown", onKey);
-  input.addEventListener("input", () => { if (search) { search.q = input.value; const i = findHistory(search.q, hist.length - 1); search.hit = i; if (i >= 0) promptEl.textContent = `(${searchText()}) ${hist[i]} ← `; } });
+  input.addEventListener("input", () => { if (search) { search.q = input.value; const i = findHistory(search.q, hist.length - 1); search.hit = i; if (i >= 0) searching.set(`(${searchText()}) ${hist[i]} ← `); } });
   // a pasted block of lines runs one by one
   input.addEventListener("paste", (e: ClipboardEvent) => {
     const text = e.clipboardData?.getData("text") ?? "";
     if (!text.includes("\n")) return;
     e.preventDefault();
-    void (async () => { for (const l of text.split(/\r?\n/)) if (l.trim()) await exec(l); })();
+    const run = ++pasteRun;
+    void (async () => { for (const l of text.split(/\r?\n/)) { if (run !== pasteRun) return; if (l.trim()) await exec(l); } })();
   });
 
   const api: TerminalApi = {
-    exec, print, clear: () => out.replaceChildren(), focus: () => input.focus(), history: () => hist.slice(), cancel: () => ctl?.abort(),
+    exec, print, clear: () => out.replaceChildren(), focus: () => input.focus(), history: () => hist.slice(), cancel: () => { pasteRun++; ctl?.abort(); },
     register: (name, cmd) => { own.set(name, cmd); const off = (): void => { if (own.get(name) === cmd) own.delete(name); }; return off; },
   };
   Object.defineProperty(api, "_all", { value: all });

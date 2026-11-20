@@ -184,10 +184,12 @@ export function NavMenu(props: NavMenuProps): Element {
     h(SectionLabel, { class: "m-nav-heading", label }),
     h("ul", { class: "m-nav-list" }, list.map((x) => item(x, where))));
 
+  // the filter's ranking: Enter opens the first row shown, so both rank the same way
+  const rankKey = (x: NavItem): { title: string; keywords: string } => ({ title: titleOf(x), keywords: [x.keywords, x.group].filter(Boolean).join(" ") });
   const body = (): unknown => {
     const query = q();
     if (query.trim()) {
-      const hits = untrack(() => rank(query, items(), (x) => ({ title: titleOf(x), keywords: [x.keywords, x.group].filter(Boolean).join(" ") })));
+      const hits = untrack(() => rank(query, items(), rankKey));
       if (!hits.length) return h(Empty, { size: "sm", class: "m-nav-none", title: () => L("noMatches", t`No matches`) });
       return untrack(() => h("ul", { class: "m-nav-list m-nav-results" }, hits.map((r) => item(r.item, "filter"))));
     }
@@ -230,7 +232,7 @@ export function NavMenu(props: NavMenuProps): Element {
           onKeyDown: (e: KeyboardEvent) => {
             if (e.key === "Escape") q.set("");
             if (e.key !== "Enter" || !q.peek().trim()) return;
-            const first = rank(q.peek(), items.peek(), (x) => ({ title: titleOf(x), keywords: x.keywords }))[0];
+            const first = rank(q.peek(), items.peek(), rankKey)[0];
             if (first?.item.href) { try { void navigate(first.item.href); } catch { /* no router */ } }
           },
         })),

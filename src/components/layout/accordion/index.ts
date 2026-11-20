@@ -34,7 +34,10 @@ export function Accordion(props: AccordionProps): Element {
   const base = uid("m-acc");
   const toggle = (k: string | number): void => { open.update((s) => { const n = props.multiple ? new Set(s) : new Set<string | number>(); if (s.has(k)) n.delete(k); else n.add(k); return n; }); props.onToggle?.(k, open.peek().has(k)); };
   const nav = (e: KeyboardEvent): void => {
-    const btns = [...((e.currentTarget as HTMLElement).closest(".m-accordion")?.querySelectorAll<HTMLButtonElement>(".m-acc-btn:not(:disabled)") ?? [])];
+    // only this accordion's headers: one nested in a panel handles its own keys (and the key would bubble up here too)
+    const root = e.currentTarget as HTMLElement;
+    if (e.defaultPrevented) return;
+    const btns = [...root.querySelectorAll<HTMLButtonElement>(".m-acc-btn:not(:disabled)")].filter((b) => b.closest(".m-accordion") === root);
     if (btns.includes(e.target as HTMLButtonElement)) roving(e, btns); // ↑ ↓ Home End, wrapping (each header stays a Tab stop)
   };
   const chev = (isOpen: () => boolean, it: AccordionItem): unknown => {

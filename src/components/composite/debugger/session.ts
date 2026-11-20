@@ -308,8 +308,10 @@ export function createDebugSession(o: DebugSessionOptions = {}): DebugSession {
           const bp = m && file && r.kind === "" ? bpAt(file.file, m[0]) : undefined;
           if (r && bp?.log && breakpointsActive.peek()) {
             const parts = await Promise.all(bp.log.split(/(\{[^{}]+\})/).map(async (p) => (/^\{[^{}]+\}$/.test(p) ? evalIn(p.slice(1, -1), view(r)).then(text, (e: unknown) => `‹${String((e as Error)?.message ?? e)}›`) : p)));
-            logs.push({ at: r.n, level: "logpoint", text: parts.join(""), file: file!.file, line: m![0] });
-            logs.sort((a, b) => a.at - b.at);
+            // in the order of the steps: after every line kept at this step or before (a binary search, no sort)
+            let lo = 0, hi = logs.length;
+            while (lo < hi) { const mid = (lo + hi) >> 1; if (logs[mid]!.at <= r.n) lo = mid + 1; else hi = mid; }
+            logs.splice(lo, 0, { at: r.n, level: "logpoint", text: parts.join(""), file: file!.file, line: m![0] });
             version.set(version.peek() + 1);
           }
           did = true;

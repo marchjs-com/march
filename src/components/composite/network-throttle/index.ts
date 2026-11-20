@@ -17,7 +17,7 @@ import { Slider } from "../../forms/slider/index.ts";
 import { SectionLabel } from "../../typography/section-label/index.ts";
 import { Empty } from "../../feedback/empty/index.ts";
 import { trash } from "../../../icons/glyphs/trash.ts";
-import { NET_PRESETS, getThrottle, setThrottle, setThrottleScope, presetOf, onThrottle, throttleRequests, clearThrottleRequests, installThrottle, throttled,
+import { NET_PRESETS, getThrottle, setThrottle, setThrottleScope, getThrottleScope, presetOf, onThrottle, throttleRequests, clearThrottleRequests, installThrottle, throttled,
   type NetProfile, type NetPreset, type NetRequest } from "./engine.ts";
 
 export { NET_PRESETS, setThrottle, getThrottle, setThrottleScope, installThrottle, onThrottle, throttleRequests, clearThrottleRequests, throttledFetch, throttledImport, throttledLoad, throttleBypass,
@@ -67,7 +67,8 @@ const fromKbps = (k: number | null | undefined): number => (k == null || k <= 0 
 
 /** The network speed panel (see the module comment). */
 export function NetworkThrottle(props: NetworkThrottleProps): Element {
-  if (props.scope !== undefined) setThrottleScope(props.scope ?? null);
+  // the scope is shared by the window: the one before this panel comes back when it goes
+  if (props.scope !== undefined) { const before = getThrottleScope(); setThrottleScope(props.scope ?? null); onCleanup(() => setThrottleScope(before)); }
   onCleanup(installThrottle());
   const prof = signal<NetProfile>(getThrottle()), reqs = signal<readonly NetRequest[]>(throttleRequests());
   // at most every 40 ms; while a request is on its way (waiting its latency: no event comes) every 200 ms, so its bar grows

@@ -18,6 +18,7 @@ import { ease, defineEasing } from "../../../motion/engine/ease.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
 import { reducedNow } from "../../../motion/engine/prefs.ts";
 import { tokenColor, type ColorToken } from "../../../theme/colors.ts";
+import { whenVisible } from "../../../ui/observe.ts";
 import tr from "./tr.ts";
 
 messages("tr", tr);
@@ -182,8 +183,11 @@ export function EasingCurveEditor(props: EasingCurveEditorProps): unknown {
   const kind = (): string => props.preview ?? "move";
   const stage = h("div", { class: () => cx("m-ec-stage", `is-${kind()}`), "aria-hidden": "true" },
     h("div", { class: "m-ec-lane" }, h("span", { class: "m-ec-ball m-ec-ghost" }), h("span", { class: "m-ec-ball" }))) as HTMLElement;
+  // the loop runs only while the preview is on screen (an editor scrolled away costs no frames)
+  const onScreen = signal(false);
+  whenVisible(stage, (v) => onScreen.set(v));
   effect(() => {
-    if (kind() === "none") return;
+    if (kind() === "none" || !onScreen()) return;
     const D = Math.max(200, props.duration ?? 900), cycle = D * 2 + 700;
     const off = onFrame((time) => {
       if (!root) return;

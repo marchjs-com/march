@@ -118,7 +118,7 @@ function build(props: WizardProps, steps: readonly WizardStep[], carried: Values
     const go = (i: number) => { index.set(i); stepError.set(null); props.onStep?.(i); globalThis.document?.getElementById(`${id}-title`)?.focus?.(); };
     const next = () => { if (check(index.peek())) { if (index.peek() < steps.length - 1) go(index.peek() + 1); else form.submit(); } };
     const back = () => { if (index.peek() > 0) go(index.peek() - 1); };
-    const api: WizardApi = { index: () => index(), next, back, go: (i) => { if (i < index.peek() || [...Array(i).keys()].every(check)) go(i); } };
+    const api: WizardApi = { index: () => index(), next, back, go: (i) => { if (!Number.isInteger(i) || i < 0 || i >= steps.length) return; if (i < index.peek() || [...Array(i).keys()].every(check)) go(i); } };
     props.onReady?.(form, api);
     const current = computed(() => index());
     const titleOf = (s: WizardStep, i: number): string => s.title ?? props.labels?.step?.(i) ?? t`Step ${i + 1}`;

@@ -55,7 +55,9 @@
   --m-surface-2: color-mix(in srgb, var(--m-text) var(--m-mix-surface), var(--m-surface));
   --m-surface-3: color-mix(in srgb, var(--m-text) calc(var(--m-mix-surface) * 2), var(--m-surface));
   --m-text-2: color-mix(in srgb, var(--m-text) 70%, var(--m-muted));
-  --m-faint: color-mix(in srgb, var(--m-muted) 72%, var(--m-surface));
+  /* faint text (hints, meta, counts, section labels) is still text: lighter than muted it fell under WCAG AA 4.5:1 on
+     the surface (2.9:1), so it is muted itself; a theme may set its own */
+  --m-faint: var(--m-muted);
   --m-border-strong: color-mix(in srgb, var(--m-text) 16%, var(--m-border));
   --m-border-subtle: color-mix(in srgb, var(--m-border) 60%, var(--m-surface));
   --m-primary-hover: color-mix(in srgb, var(--m-primary) 82%, var(--m-text));

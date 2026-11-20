@@ -183,8 +183,10 @@ export function OptionList<T = string>(props: OptionListProps<T>): Element {
     const sync = (): void => { const i = active(); if (field) { if (i >= 0 && i < count()) field.setAttribute("aria-activedescendant", `${id}-${i}`); else field.removeAttribute("aria-activedescendant"); } };
     effect(() => { items(); const n = count(); untrack(() => { if (active.peek() >= n) active.set(n ? 0 : -1); }); });
     effect(sync);
-    if (!attach()) queueMicrotask(attach);
-    if (getOwner()) onCleanup(() => { off?.(); field?.removeAttribute("aria-activedescendant"); });
+    // a list removed before the microtask runs must not listen to the field afterwards
+    let gone = false;
+    if (!attach()) queueMicrotask(() => { if (!gone) attach(); });
+    if (getOwner()) onCleanup(() => { gone = true; off?.(); field?.removeAttribute("aria-activedescendant"); });
   }
   return root;
 }

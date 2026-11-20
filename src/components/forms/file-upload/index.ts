@@ -116,7 +116,8 @@ export function FileUpload<R = unknown>(props: FileUploadProps<R>): unknown {
   };
   const add = (files: File[]) => {
     const errs: string[] = [];
-    let list = multi ? [...untrack(items)] : [];
+    // single: the file shown stays until a new one is accepted (a rejected file leaves it)
+    let list = [...untrack(items)];
     for (const file of files) {
       let msg: string | null = null;
       const lb = props.labels;

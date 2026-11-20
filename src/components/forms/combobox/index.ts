@@ -132,12 +132,12 @@ export function Combobox<T = unknown>(props: ComboboxProps<T>): unknown {
     onKeyDown: (e: KeyboardEvent) => {
       if (nav(e)) return;
       if (e.key === "Escape" && open.peek()) { e.preventDefault(); close(); restore(); }
-      else if (e.key === "Enter" && props.allowCustom && input.value.trim()) {
+      else if (e.key === "Enter" && props.allowCustom && !props.readonly && input.value.trim()) {
         e.preventDefault();
         const v = input.value.trim();
         if (multi) { if (!(untrack(getList) ?? []).includes(v)) set([...(untrack(getList) ?? []), v]); input.value = ""; q.set(""); }
         else { set(v); editing = false; close(); }
-      } else if (e.key === "Backspace" && multi && !input.value) { const cur = untrack(getList) ?? []; if (cur.length) removeAt(cur[cur.length - 1]); }
+      } else if (e.key === "Backspace" && multi && !props.readonly && !input.value) { const cur = untrack(getList) ?? []; if (cur.length) removeAt(cur[cur.length - 1]); }
       else if (e.key === "Tab") close();
     },
     onBlur: (e: FocusEvent) => { close(); if (!props.allowCustom || multi) restore(); props.onBlur?.(e); },

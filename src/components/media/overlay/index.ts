@@ -5,7 +5,7 @@
 // inert and hidden from screen readers (an image with a meaningful `alt` excepted). Position, size and order are CSS
 // variables set through CSSOM (no inline style attribute, CSP safe). Video and canvas code load as separate chunks.
 import "./overlay.css";
-import { signal, getOwner, effect } from "../../../core/reactive.ts";
+import { signal, getOwner, effect, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { listen } from "../../../core/util.ts";
@@ -118,14 +118,20 @@ export function Overlay(props: OverlayProps): Element {
   if (props.blend) set("--m-ov-blend", props.blend);
   effect(() => { const o = val(props.opacity); set("--m-ov-opacity", o == null ? null : String(o)); });
 
+  // what starts later (host listeners, the video / canvas chunk) stops with the owner; without one the video watches the page itself
+  const owned = !!getOwner();
+  const stops: Array<() => void> = [];
+  let gone = false;
+  if (owned) onCleanup(() => { gone = true; for (const f of stops.splice(0)) f(); });
+
   if (kind === "image") root.append(h("img", { class: "m-ov-media", src: () => val(props.src) ?? "", srcset: props.srcset ?? null, sizes: props.sizes ?? null, alt: props.alt ?? "", loading: "lazy", decoding: "async", draggable: "false" }) as Node);
   else if (kind === "svg") root.append((props.svg ?? h("img", { class: "m-ov-media", src: () => val(props.src) ?? "", alt: "", loading: "lazy", decoding: "async" })) as Node);
   else if (kind === "video") {
     const poster = props.poster ? h("img", { class: "m-ov-media m-ov-poster", src: props.poster, alt: "", decoding: "async" }) as HTMLElement : null;
     if (poster) root.append(poster);
-    if (!quietMedia()) void import("./media.ts").then((m) => { if (root.isConnected || !getOwner()) m.mountVideo(root, String(val(props.src) ?? ""), props.poster, poster); });
+    if (!quietMedia()) void import("./media.ts").then((m) => { if (!gone) stops.push(m.mountVideo(root, String(val(props.src) ?? ""), props.poster, poster, !owned)); });
   } else if (kind === "canvas") {
-    void import("./media.ts").then((m) => m.mountCanvas(root, props.draw as DrawFn, !!props.animate && !quietMedia()));
+    void import("./media.ts").then((m) => { if (!gone) stops.push(m.mountCanvas(root, props.draw as DrawFn, !!props.animate && !quietMedia())); });
   }
 
   // the container: positioned, isolated stacking context; pointer position for spotlight / draw
@@ -133,7 +139,7 @@ export function Overlay(props: OverlayProps): Element {
   const pointer = signal<{ x: number; y: number } | null>(null);
   const attach = (): void => {
     host = root.parentElement;
-    if (!host) return;
+    if (!host || gone) return;
     host.classList.add("m-ov-host");
     if (props.effect === "spotlight" || props.draw) {
       const move = (e: PointerEvent): void => {
@@ -142,7 +148,7 @@ export function Overlay(props: OverlayProps): Element {
         (root as HTMLElement & { mPointer?: unknown }).mPointer = { x, y };
       };
       const leave = (): void => { pointer.set(null); (root as HTMLElement & { mPointer?: unknown }).mPointer = null; };
-      listen(host, { pointermove: move, pointerleave: leave });
+      stops.push(listen(host, { pointermove: move, pointerleave: leave })); // the host outlives the layer: removed with it
     }
   };
   queueMicrotask(attach);

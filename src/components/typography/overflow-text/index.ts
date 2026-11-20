@@ -100,10 +100,13 @@ export function OverflowText(props: OverflowTextProps): Element {
   // measuring reads the layout and then writes (the overflow class): every instance's read comes first, then the
   // writes (one batch, see later()), so many titles shown at once (a dock's tabs) lay the page out once, not once each
   const read = (): (() => void) => {
-    if (fill && unit) { const w = unit.getBoundingClientRect().width; if (w > 0) twin(Math.min(24, Math.max(1, Math.ceil(root.clientWidth / w)))); }
+    // fill: how many copies the width needs is read here; they are added in the write, and a new measure follows
+    let copies = twins.length;
+    if (fill && unit) { const w = unit.getBoundingClientRect().width; if (w > 0) copies = Math.min(24, Math.max(1, Math.ceil(root.clientWidth / w))); }
     const d = Math.max(0, Math.ceil(item.scrollWidth - root.clientWidth));
     const next = d > 1 ? d : 0, text = (unit ?? item).textContent ?? "";
     return () => {
+      if (copies !== twins.length) { twin(copies); measure(); return; }
       if (Math.abs(next - dist.peek()) > 1 || (next === 0) !== (dist.peek() === 0)) dist.set(next);
       label.set(text);
     };

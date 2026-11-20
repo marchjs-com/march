@@ -32,7 +32,8 @@ toast("Saved", { icon: false, closeLabel: "Close the message" });
 
 ## Accessibility
 
-The stack is a polite live region: a new toast is read once; danger toasts are `role="alert"`. Each has a "Dismiss"
+The stack is a polite live region: a new toast is read once (the toasts add no live region of their own); danger
+toasts are `role="alert"`. Auto-dismiss timers pause while the pointer or the focus is on the stack. Each has a "Dismiss"
 button (translated) and the action button, both reachable with Tab; the toast does not take focus. On narrow screens
 the stack spans the width.
 

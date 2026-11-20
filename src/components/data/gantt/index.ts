@@ -2,7 +2,7 @@
 // or resize a bar, drag its knob to set progress, a today line and day / week / month scales. Successors that would
 // start before their predecessor ends are pushed later (`cascade`). Dates via core/date + Intl, drags via behaviors/drag.
 import "./gantt.css";
-import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, locale, dir } from "../../../core/i18n.ts";
 import { val, cx, uid, setStyle, later, clamp, type MaybeFn, type ClassProp } from "../../../core/util.ts";
@@ -190,7 +190,7 @@ export function Gantt(props: GanttProps): Element {
     // pushed successors slide to their new place (they were re-rendered at it)
     if (motion) later(() => {
       for (const [tid] of changed) {
-        const el = canvas.querySelector<HTMLElement>(`[data-task="${tid}"]`);
+        const el = barOf(tid);
         if (el) void animate(el, tid === task.id ? [{ transform: "scaleY(1.18)" }, { transform: "none" }] : [{ opacity: .4 }, { opacity: 1 }], { duration: 320, easing: "easeOutBack" });
       }
     }, 0);
@@ -241,8 +241,10 @@ export function Gantt(props: GanttProps): Element {
     commit(task, e.shiftKey ? { end: addDays(task.end, Math.max(d, -diffDays(task.start, task.end))) } : { start: addDays(task.start, d), end: addDays(task.end, d) });
     later(() => focusTask(task.id), 0);
   };
+  // the bar of a task, by comparing ids (an id is data: no selector built from it)
+  const barOf = (tid: string): HTMLElement | undefined => [...canvas.querySelectorAll<HTMLElement>("[data-task]")].find((x) => x.dataset["task"] === tid);
   const focusTask = (tid: string): void => {
-    const el = canvas.querySelector<HTMLElement>(`[data-task="${tid}"]`);
+    const el = barOf(tid);
     el?.focus({ preventScroll: true });
     el?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
   };
@@ -333,12 +335,15 @@ export function Gantt(props: GanttProps): Element {
     side, canvas) as HTMLElement;
   setStyle(scroller, { height: `${props.height ?? 420}px`, "--m-gantt-name-w": `${side ? NAME_W : 0}px` });
   // scroll so today sits near the start; a scale change fades the canvas in
-  let first = true;
+  let first = true, alive = true;
+  // the retries below run from a timer (no owner): stop them once the chart is gone
+  onCleanup(() => { alive = false; });
   effect(() => {
     scale();
     later(() => {
       // the chart may still be sliding into place (lazy demo, tab): retry until it can scroll
       const toToday = (tries: number): void => {
+        if (!alive) return;
         if (scroller.scrollWidth <= scroller.clientWidth && tries) { later(() => toToday(tries - 1), 100); return; }
         // today about a third into the visible timeline (the names column covers the start of the canvas)
         const sideW = side?.offsetWidth ?? 0;

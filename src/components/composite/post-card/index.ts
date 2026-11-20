@@ -161,7 +161,7 @@ export function PostCard(props: PostCardProps): Element {
           untrack(post).place ? h("span", { class: "m-post-place" }, props.placeIcon === false ? null : own(props.placeIcon, mapPin), untrack(post).place) : null),
       });
     },
-    props.menu?.length ? h(Menu, { icon: props.menuIcon ?? moreVertical, label: () => L().options ?? t`Post options`, variant: "ghost", size: "sm", class: "m-post-more", items: props.menu, args: [post()] }) : null),
+    props.menu?.length ? h(Menu, { icon: props.menuIcon ?? moreVertical, label: () => L().options ?? t`Post options`, variant: "ghost", size: "sm", class: "m-post-more", items: props.menu, args: () => [post()] }) : null),
   () => {
     const items = media();
     if (!items?.length) return null;

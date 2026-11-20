@@ -56,12 +56,13 @@ export const toneIcon = (tone: string | null | undefined): IconDef => TONE_ICON[
 export function Alert(props: AlertProps): () => unknown {
   const shown = signal(true);
   return () => shown() && untrack(() => {
-    const tone = val(props.tone) ?? "info";
+    const tone = (): string => val(props.tone) ?? "info";
     const below = props.actionPlacement === "below";
     const actions = props.action != null && h("div", { class: cx("m-alert-action", below && "m-alert-action-below") }, actionsOf(() => props.action));
     const part = props.partClass ?? {};
-    return h("div", { class: () => cx("m-alert", `m-alert-${val(props.tone) ?? "info"}`, props.variant === "raised" && "m-alert-raised", val(props.class)), role: props.role ?? (tone === "danger" || tone === "warn" ? "alert" : "status") },
-      icon(props.icon === undefined ? toneIcon(tone) : props.icon, cx("m-alert-icon", part.icon)),
+    return h("div", { class: () => cx("m-alert", `m-alert-${val(props.tone) ?? "info"}`, props.variant === "raised" && "m-alert-raised", val(props.class)), role: () => props.role ?? (tone() === "danger" || tone() === "warn" ? "alert" : "status") },
+      // role and icon follow a live tone
+      props.icon === undefined ? () => icon(toneIcon(tone()), cx("m-alert-icon", part.icon)) : icon(props.icon, cx("m-alert-icon", part.icon)),
       h("div", { class: "m-alert-main" },
         props.title != null && h("strong", { class: "m-alert-title" }, () => val(props.title)),
         h("div", { class: cx("m-alert-body", part.body) }, props.body ?? props.children),

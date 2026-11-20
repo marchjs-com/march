@@ -2,7 +2,7 @@
 // Imperative helpers return promises: confirm() → boolean, prompt() → string|null, askReason() → string|{category,text}|null,
 // openDialog((close) => content) → whatever close(value) received (undefined when dismissed).
 import "./dialog.css";
-import { signal, createRoot, onCleanup, untrack, type Signal } from "../../../core/reactive.ts";
+import { signal, effect, createRoot, onCleanup, untrack, type Signal } from "../../../core/reactive.ts";
 import { h, lazyChildren } from "../../../dom/h.ts";
 import { Portal, openLayer } from "../../../dom/portal.ts";
 import { overlayScopeFor } from "../../layout/overlay-scope/index.ts";
@@ -102,6 +102,11 @@ export function frame(o: FrameOptions): HTMLElement {
   }),
   h("div", { class: "m-dialog-body", ref: (x: HTMLElement) => { body = x; } }, o.children),
   o.footer != null && h(PanelHeader, { as: "footer", class: "m-dialog-foot" }, o.footer))) as HTMLElement;
+  // a live size swaps only its own class (a drawer panel keeps the classes it adds itself)
+  if (!drawer) {
+    let sized = `m-dialog-${untrack(() => val(o.size)) ?? "md"}`;
+    effect(() => { const next = `m-dialog-${val(o.size) ?? "md"}`; if (next !== sized && panel) { panel.classList.replace(sized, next); sized = next; } });
+  }
   queueMicrotask(() => {
     if (!panel?.isConnected) return;
     (panel.querySelector<HTMLElement>("[data-autofocus]") ?? (body && focusables(body)[0]) ?? focusables(panel)[0] ?? panel).focus();

@@ -218,19 +218,23 @@ export function KeyframeTimeline(props: KeyframeTimelineProps): unknown {
           h(Field, { id: `${id}-val`, compact: true, class: "m-kt-field", label: () => `${L().value ?? t`Value`} (${tk.prop}${M.PROP_UNIT[tk.prop] ? `, ${M.PROP_UNIT[tk.prop]}` : ""})` },
             h(NumberInput, { id: `${id}-val`, min: lo, max: hi, step: fine ? 0.05 : 1, value: live(() => get().tracks[s.track]?.keys[s.key]?.value ?? 0), readonly: live(() => !!props.readonly), onChange: (n: number | null) => { if (n != null) setKey(s.track, s.key, { value: clamp(n, lo, hi) }); } })),
           ro() ? null : h(IconButton, { icon: glyph(trash), label: () => L().remove ?? t`Delete keyframe`, size: "sm", variant: "danger", disabled: () => (get().tracks[s.track]?.keys.length ?? 0) <= 1, onClick: () => removeKey(s.track, s.key) })),
-        h(EasingCurveEditor, { value: k.easing ?? "in-out", onChange: (v: string) => setKey(s.track, s.key, { easing: v }), preview: "none", duration: 600, compact: true, readonly: live(() => props.readonly), class: "m-kt-ease", "aria-label": L().easing ?? t`Easing into this keyframe` }));
+        h(EasingCurveEditor, { value: live(() => get().tracks[s.track]?.keys[s.key]?.easing ?? k.easing ?? "in-out"), onChange: (v: string) => setKey(s.track, s.key, { easing: v }), preview: "none", duration: 600, compact: true, readonly: live(() => props.readonly), class: "m-kt-ease", "aria-label": L().easing ?? t`Easing into this keyframe` }));
     });
   };
 
   // ------------------------------------------------------------------ stage and transport
-  const stage = () => (props.stage === false ? null : h("div", { class: "m-kt-stage", "aria-hidden": "true" }, () => targets().map((name, i) => {
-    const el = (props.renderTarget?.(name) ?? h("div", { class: "m-kt-target" }, name)) as HTMLElement;
-    el.classList.add("m-kt-actor");
-    el.setAttribute("data-m-color", BRAND_COLORS[i % 4]!);
-    targetEls.set(name, el);
-    queueMicrotask(() => paint(now.peek()));
-    return el;
-  })));
+  const stage = () => (props.stage === false ? null : h("div", { class: "m-kt-stage", "aria-hidden": "true" }, () => {
+    // the actors are drawn again for the new targets: a target that is gone must not be kept (nor painted)
+    targetEls.clear();
+    return targets().map((name, i) => {
+      const el = (props.renderTarget?.(name) ?? h("div", { class: "m-kt-target" }, name)) as HTMLElement;
+      el.classList.add("m-kt-actor");
+      el.setAttribute("data-m-color", BRAND_COLORS[i % 4]!);
+      targetEls.set(name, el);
+      queueMicrotask(() => paint(now.peek()));
+      return el;
+    });
+  }));
   const transport = props.transport === false ? null : h(Toolbar, { class: "m-kt-transport", label: () => L().playback ?? t`Playback` },
     bar("play") && h(IconButton, { label: () => (playing() ? L().pause ?? t`Pause` : L().play ?? t`Play`), variant: "solid", shape: "round", size: "lg", class: "m-kt-play", "aria-keyshortcuts": "Space", onClick: toggle, icon: () => glyph(playing() ? pauseIcon : playIcon) }),
     bar("start") && h(IconButton, { icon: glyph(skipBack), label: () => L().start ?? t`Back to start`, size: "sm", class: "m-kt-start", onClick: () => seek(0) }),

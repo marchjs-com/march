@@ -1,4 +1,5 @@
-// JsonView: collapsible read-only JSON tree (march/ui). Folder: src/components/data/json-view/.
+// JsonView: collapsible read-only JSON tree (march/ui). Folder: src/components/data/json-view/. Nested lists whose
+// objects and arrays are disclosure buttons (aria-expanded), not an ARIA tree: Tab and Enter / Space work as for buttons.
 import "./json-view.css";
 import { signal, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
@@ -42,7 +43,7 @@ function jsonNode(key: string | number | null, value: unknown, depth: number, o:
       o.arrow === false ? null : typeof o.arrow === "function" ? h(Chevron, { class: "m-json-arrow", open: false, motion: false, icon: () => (o.arrow as (open: () => boolean) => unknown)(open) }) : h(Chevron, { class: "m-json-chev" }),
       keyEl, h("span", { class: "m-json-punct" }, ob),
       () => (open() ? null : h("span", { class: "m-json-more" }, ` ${entries.length} ${arr ? o.labels?.items ?? t`items` : o.labels?.keys ?? t`keys`} ${cb}`))),
-    () => open() && [h("ul", { class: "m-json-list", role: "group" }, kids()), h("span", { class: "m-json-punct" }, cb)]);
+    () => open() && [h("ul", { class: "m-json-list" }, kids()), h("span", { class: "m-json-punct" }, cb)]);
 }
 export interface JsonViewProps {
   /** The value to show as a tree (any JSON-like value). @tr Ağaç olarak gösterilecek değer (JSON benzeri herhangi bir değer). */
@@ -63,5 +64,5 @@ export interface JsonViewProps {
 /** Collapsible read-only JSON tree: `<JsonView value={obj} open={1} />` (open = initially expanded depth). */
 export function JsonView(props: JsonViewProps): Element {
   return h("div", { class: () => cx("m-json", val(props.class)) },
-    h("ul", { class: "m-json-list m-json-root", role: "tree", "aria-label": () => val(props.label) ?? null }, () => { const v = val(props.value); return untrack(() => jsonNode(null, v, 0, { openDepth: props.open ?? 1, labels: props.labels, arrow: props.arrow, describe: props.describe }, new Set())); }));
+    h("ul", { class: "m-json-list m-json-root", "aria-label": () => val(props.label) ?? null }, () => { const v = val(props.value); return untrack(() => jsonNode(null, v, 0, { openDepth: props.open ?? 1, labels: props.labels, arrow: props.arrow, describe: props.describe }, new Set())); }));
 }

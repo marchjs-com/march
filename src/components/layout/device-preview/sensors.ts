@@ -6,6 +6,7 @@
 //   const s = deviceSensors(window, { scope, dpr: () => 3 }); s.shake(); s.online.set(false); s.dispose()
 import { signal, effect, untrack, createRoot, type Signal } from "../../../core/reactive.ts";
 import { overrideGetter, type CallScope } from "../../../ui/call-scope.ts";
+import { t } from "../../../core/i18n.ts";
 
 export interface Tilt { alpha: number; beta: number; gamma: number }
 export interface Battery { level: number; charging: boolean }
@@ -73,7 +74,7 @@ function sensorsIn(win: Window & typeof globalThis, o: SensorOptions, disposeRoo
   let lastB = untrack(battery);
   onChange(battery, (b) => {
     if (b.level !== lastB.level) { fire(bm, new Ev("levelchange")); say("levelchange", `${Math.round(b.level * 100)}%`); }
-    if (b.charging !== lastB.charging) { fire(bm, new Ev("chargingchange")); say("chargingchange", b.charging ? "şarjda" : "pilde"); }
+    if (b.charging !== lastB.charging) { fire(bm, new Ev("chargingchange")); say("chargingchange", b.charging ? t`charging` : t`on battery`); }
     lastB = b;
   });
   const orientationEvent = (t: Tilt): Event => {
@@ -82,7 +83,7 @@ function sensorsIn(win: Window & typeof globalThis, o: SensorOptions, disposeRoo
   };
   onChange(tilt, (t) => { fire(win, orientationEvent(t)); say("deviceorientation", `α ${Math.round(t.alpha)}° β ${Math.round(t.beta)}° γ ${Math.round(t.gamma)}°`); });
 
-  let shaking: ReturnType<typeof setTimeout> | undefined;
+  let shaking: ReturnType<typeof setTimeout> | undefined, gone = false;
   const motion = (x: number, y: number, z: number, i: number): Event => {
     const init = { acceleration: { x, y, z }, accelerationIncludingGravity: { x, y: y + 9.81, z }, rotationRate: { alpha: x * 8, beta: y * 8, gamma: z * 4 }, interval: i };
     const C = (win as unknown as { DeviceMotionEvent?: typeof DeviceMotionEvent }).DeviceMotionEvent;
@@ -93,7 +94,7 @@ function sensorsIn(win: Window & typeof globalThis, o: SensorOptions, disposeRoo
     shake(ms = 900) {
       clearTimeout(shaking);
       const t0 = Date.now(), step = 16;
-      say("devicemotion", "salla");
+      say("devicemotion", t`shake`);
       const tick = (): void => {
         const t = (Date.now() - t0) / ms;
         if (t >= 1) { fire(win, motion(0, 0, 0, step)); return; }
@@ -107,8 +108,9 @@ function sensorsIn(win: Window & typeof globalThis, o: SensorOptions, disposeRoo
       fire(win, new Ev("orientationchange"));
       if (so) fire(so, new Ev("change"));
       fire(win, new Ev("resize"));
-      say("orientationchange", l ? "yatay" : "dikey");
+      say("orientationchange", l ? t`landscape` : t`portrait`);
     },
-    dispose() { clearTimeout(shaking); disposeRoot(); for (const u of undo.reverse()) u(); },
+    // once: a framed page's sensors are let go by its unbind and by the preview's cleanup
+    dispose() { if (gone) return; gone = true; clearTimeout(shaking); disposeRoot(); for (const u of undo.reverse()) u(); },
   };
 }

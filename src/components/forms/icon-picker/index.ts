@@ -157,7 +157,8 @@ export function IconPicker(props: IconPickerProps): unknown {
   const grid = (close: (refocus?: boolean) => void): unknown => {
     if (!shown().length && !ready()) return h("div", { class: "m-ipk-loading" }, h(Spinner, { size: "sm", label: () => t`Loading icons` }));
     if (!shown().length) return h(Empty, { size: "sm", title: () => t`No icon matches` });
-    return h("div", { class: "m-ipk-grid", role: "listbox", "aria-label": () => val(props.label) ?? t`Icon`, onScroll: more },
+    // a group of toggle buttons (aria-pressed), not a listbox: its children are buttons, not options
+    return h("div", { class: "m-ipk-grid", role: "group", "aria-label": () => val(props.label) ?? t`Icon`, onScroll: more },
       props.none === false ? null : h(IconButton, { class: "m-ipk-item m-ipk-off", label: () => t`No icon`, pressed: () => value() === null, onClick: () => { pick(null); close(true); } }, h("span", { class: "m-ipk-none", "aria-hidden": "true" })),
       () => shown().slice(0, limit()).map(({ v, n, d }) => h(IconButton, { class: "m-ipk-item", icon: d, label: words(n), pressed: () => value() === v, onClick: () => { pick(v); close(true); } })));
   };

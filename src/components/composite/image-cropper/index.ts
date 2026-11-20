@@ -192,7 +192,7 @@ export function ImageCropper(props: ImageCropperProps): unknown {
     viewport,
     h("p", { id: `${id}-keys`, class: cx("m-crop-keys", props.hint === false && "m-sr-only") }, () => L().hint ?? t`Drag to move, wheel or + − to zoom, [ ] to turn by 1°, R by 90°, F to mirror.`),
     h("div", { class: "m-crop-controls" },
-      () => (aspects().length ? h(Segmented, { class: "m-crop-aspects", "aria-label": L().aspect ?? t`Aspect ratio`, options: aspects().map((a) => ({ value: a.value ?? "free", label: a.label })), value: st.peek().aspect ?? "free", onChange: (v: number | string | null) => change({ aspect: typeof v === "number" ? v : null }) }) : null),
+      () => (aspects().length ? h(Segmented, { class: "m-crop-aspects", "aria-label": L().aspect ?? t`Aspect ratio`, options: aspects().map((a) => ({ value: a.value ?? "free", label: a.label })), value: live(() => st().aspect ?? "free"), onChange: (v: number | string | null) => change({ aspect: typeof v === "number" ? v : null }) }) : null),
       tools === false || (tools && tools !== true && !tools.length) ? null : h(Toolbar, { class: "m-crop-row" },
         has(tools, "rotateLeft") && h(IconButton, { icon: glyph(rotateCcw), label: () => L().rotateLeft ?? t`Rotate left`, size: "sm", disabled: ro, onClick: () => change({ rotate: st.peek().rotate - 90 }) }),
         has(tools, "rotateRight") && h(IconButton, { icon: glyph(rotateCw), label: () => L().rotateRight ?? t`Rotate right`, size: "sm", disabled: ro, onClick: () => change({ rotate: st.peek().rotate + 90 }) }),

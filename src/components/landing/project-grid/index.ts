@@ -93,7 +93,8 @@ export function ProjectGrid(props: ProjectGridProps): Element {
     if (!leaving.length || still()) { apply(); return; }
     // hold the faded state until the cards are hidden, then drop the animation (no flash in between)
     const out = animate(leaving, { opacity: [1, 0], transform: ["scale(1)", "scale(.94)"] }, { duration: 180, easing: "in", fill: "forwards" });
-    void out.finished.then(() => { apply(); out.cancel(); });
+    // a newer choice made meanwhile has placed the cards already: only drop the fade
+    void out.finished.then(() => { if (filter.peek() === c) apply(); out.cancel(); });
   };
   const chips = props.filters !== false && cats.length > 1
     ? h("div", { class: "m-pg-filters", role: "group", "aria-label": props.filtersLabel ?? t`Filter projects` },

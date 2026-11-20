@@ -307,7 +307,9 @@ export function Scheduler(props: SchedulerProps): Element {
   const [weekdayShort, weekdayNarrow] = [(): string[] => weekdayNames(loc(), fd(), "short"), (): string[] => weekdayNames(loc(), fd(), "narrow")];
   const focusDay = signal<IsoDate | null>(null);
   const Month = (): Element => {
-    const ds = days(), list = norm(), td = today(), month = cur().slice(0, 7), fdOn = focusDay() ?? cur();
+    const ds = days(), list = norm(), td = today(), month = cur().slice(0, 7), fdKeep = focusDay();
+    // the roving day stays where the keys left it, unless the period changed under it (else no day could take Tab)
+    const fdOn = fdKeep != null && ds.includes(fdKeep) ? fdKeep : cur();
     const grid = h("div", { class: "m-sch-month-grid" }) as HTMLElement;
     const weeks = Array.from({ length: 6 }, (_, w) => ds.slice(w * 7, w * 7 + 7));
     weeks.forEach((wk, w) => {

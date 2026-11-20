@@ -144,6 +144,8 @@ export function BottomNav(props: BottomNavProps): Element {
   };
   // with a menu, a long press runs the default action (onCreate) at once, as on a phone
   const hold = (e: PointerEvent): void => {
+    // a long press whose click never came (the pointer left, a touch turned into a context menu) must not eat this one
+    held = false;
     if (!actions().length || !props.onCreate || e.button !== 0) return;
     clearTimeout(timer);
     timer = setTimeout(() => { held = true; bounce(); props.onCreate?.(); }, 520);

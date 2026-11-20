@@ -39,7 +39,11 @@ export function ScrollProgress(props: ScrollProgressProps): Element {
   }) as HTMLElement;
   let el: Element | null = null;
   const owner = getOwner();
+  // removed before the microtask ran: nothing to start (its cleanup could no longer be registered)
+  let gone = false;
+  if (owner) onCleanup(() => { gone = true; });
   queueMicrotask(() => {
+    if (gone) return;
     el = props.target?.() ?? null;
     // the motion core's scrollIndicator draws the bar; the percentage follows for assistive technology
     const src: ScrollSource = el ? { track: el, range: [0.12, 0.88] } : {};

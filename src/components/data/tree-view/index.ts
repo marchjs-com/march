@@ -342,8 +342,9 @@ export function TreeView(props: TreeViewProps): Element {
     clearTimeout(typedAt);
     typed += fold(ch);
     typedAt = later(() => { typed = ""; }, 600);
+    // one key looks from the next row; a longer prefix may stay on the current one
     const list = flat(), from = untrack(cursor);
-    for (let k = 1; k <= list.length; k++) { const i = (from + (typed.length > 1 ? 0 : k)) % list.length; if (fold((list[i] as Row).node.label).startsWith(typed)) { focusRow(i); return; } }
+    for (let k = 1; k <= list.length; k++) { const i = (from + k - (typed.length > 1 ? 1 : 0)) % list.length; if (fold((list[i] as Row).node.label).startsWith(typed)) { focusRow(i); return; } }
   };
   const siblingMove = (r: Row, delta: number): void => {
     const list = untrack(flat), siblings = list.filter((x) => x.parent === r.parent && x.depth === r.depth);

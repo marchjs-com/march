@@ -143,7 +143,8 @@ export function JsonEditor(props: JsonEditorProps): unknown {
   const body = () => {
     if (!showTree()) return [area, bar];
     return untrack(() => h(Tree, {
-      value: status.peek().value, onChange: (v: unknown) => { const s = JSON.stringify(v, null, props.indent ?? 2); text.set(s); lastEmitted = v; set(v); },
+      // live: a new value from outside while the tree is shown reaches it (its own edits come back the same)
+      value: live(() => status().value), onChange: (v: unknown) => { const s = JSON.stringify(v, null, props.indent ?? 2); text.set(s); lastEmitted = v; set(v); },
       // live: switching read-only or disabled reaches the tree at once
       schema: live(() => props.schema), readonly: live(() => props.readonly), disabled: live(() => props.disabled), expand: props.expand, label: L().treeName ?? t`JSON tree`,
       validate: props.validate ? (v: unknown) => { const m = props.validate!(v); return m ? [{ path: [], message: m }] : []; } : undefined,

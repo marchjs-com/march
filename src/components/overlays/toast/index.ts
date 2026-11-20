@@ -51,7 +51,13 @@ export interface Toast {
 }
 
 const list = signal<ToastItem[]>([], { name: "toasts" });
-const timers = new Map<number, ReturnType<typeof setTimeout>>();
+// auto-dismiss timers: time left, and the running timeout (none while paused: a pointer or focus is in the stack)
+interface Timer { left: number; at: number; run: ReturnType<typeof setTimeout> | undefined }
+const timers = new Map<number, Timer>();
+let paused = false;
+const startTimer = (id: number, t: Timer): void => { t.at = Date.now(); t.run = setTimeout(() => toast.dismiss(id), Math.max(0, t.left)); };
+const pauseTimers = (): void => { if (paused) return; paused = true; for (const t of timers.values()) { clearTimeout(t.run); t.run = undefined; t.left -= Date.now() - t.at; } };
+const resumeTimers = (): void => { if (!paused) return; paused = false; for (const [id, t] of timers) startTimer(id, t); };
 let hosts = 0, autoHost: unknown = null, seq = 0;
 const MAX = 5;
 
@@ -63,11 +69,11 @@ export const toast: Toast = Object.assign((message: unknown, opts: ToastOptions 
   if (!hosts && !autoHost && globalThis.document?.body) autoHost = createRoot(() => h(Portal, { layer: "toast", children: h(ToastHost, {}) }), null) ?? true;
   list.update((l) => [...l, item].slice(-MAX));
   const ms = opts.timeout ?? (opts.action || kind === "danger" ? 8000 : 4000);
-  if (ms > 0) timers.set(id, setTimeout(() => toast.dismiss(id), ms));
+  if (ms > 0) { const tm: Timer = { left: ms, at: Date.now(), run: undefined }; timers.set(id, tm); if (!paused) startTimer(id, tm); }
   return id;
 }, {
   dismiss(id: number): void {
-    clearTimeout(timers.get(id));
+    clearTimeout(timers.get(id)?.run);
     timers.delete(id);
     list.update((l) => l.filter((x) => x.id !== id));
   },
@@ -83,8 +89,16 @@ export function ToastHost(props: {
   class?: ClassProp;
 } = {}): Element {
   hosts++;
-  onCleanup(() => { hosts--; });
-  return h("div", { class: () => cx("m-toasts", props.position && props.position !== "bottom-end" && `m-toasts-${props.position}`, val(props.class)), "aria-live": "polite", "aria-relevant": "additions" },
+  onCleanup(() => { hosts--; resumeTimers(); });
+  // the stack is the one live region (polite); toasts wait while the pointer or the focus is on them (WCAG 2.2.1)
+  let hover = false, focus = false;
+  const sync = (): void => { if (hover || focus) pauseTimers(); else resumeTimers(); };
+  return h("div", {
+    class: () => cx("m-toasts", props.position && props.position !== "bottom-end" && `m-toasts-${props.position}`, val(props.class)), "aria-live": "polite", "aria-relevant": "additions",
+    onMouseenter: () => { hover = true; sync(); }, onMouseleave: () => { hover = false; sync(); },
+    onFocusin: () => { focus = true; sync(); },
+    onFocusout: (e: FocusEvent) => { if (!(e.currentTarget as Element).contains(e.relatedTarget as Node | null)) { focus = false; sync(); } },
+  },
     h(For<ToastItem>, { each: list, key: "id", children: (item) => {
       const x = item.peek();
       const act = x.action;
@@ -93,7 +107,8 @@ export function ToastHost(props: {
       // the toast's colour token: a scope around the Alert that takes no box (its module of common props stays out of
       // start-up)
       const alert = h(Alert, {
-        tone: x.kind, variant: "raised", role: x.kind === "danger" ? "alert" : "status",
+        // the stack already speaks (polite): a toast adds no second live region, except danger (assertive)
+        tone: x.kind, variant: "raised", role: x.kind === "danger" ? "alert" : "none",
         class: cx(`m-toast m-toast-${x.kind}`, x.motion === "fade" && "m-toast-fade", x.motion === "none" && "m-toast-still", x.class),
         partClass: { icon: "m-toast-icon", body: "m-toast-msg", dismiss: "m-toast-close" },
         icon: own === false ? null : own == null || own === true ? undefined : own, body: () => val(x.message),

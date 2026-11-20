@@ -252,6 +252,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
   const flyAt = (depth: number): string | undefined => fly()[depth];
   const flyMode = (): boolean => props.subMenus === "flyout" && !rail() && !globalThis.matchMedia?.("(max-width: 900px)").matches;
   let flyTimer: ReturnType<typeof setTimeout> | undefined;
+  onCleanup(() => clearTimeout(flyTimer));
   /** pinCurrent: the current page's branch (it and the items above it) opens in the list instead of flying out. */
   const pinned = (id: string): boolean => { if (!val(props.pinCurrent)) return false; const a = active(); return a === id || (!!a && under(id, a)); };
   // a page chosen with pinCurrent opens its branch again, even if it was closed by hand before

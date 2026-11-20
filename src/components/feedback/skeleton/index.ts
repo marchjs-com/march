@@ -30,6 +30,6 @@ export function Skeleton(props: SkeletonProps): Element {
   if (props.shape === "circle") return h("div", { class: () => cx("m-skel", "m-skel-circle", props.height && props.height !== "md" && `m-skel-circle-${props.height}`, tint, val(props.class)), "aria-hidden": "true" });
   if (props.block) return h("div", { class: () => cx("m-skel", "m-skel-block", `m-skel-${props.height ?? "md"}`, tint, val(props.class)), "aria-hidden": "true" });
   const n = props.lines ?? 3;
-  return h("div", { class: () => cx("m-skel-lines", tint, val(props.class)), "aria-busy": "true", "aria-label": () => props.label ?? t`Loading` },
+  return h("div", { class: () => cx("m-skel-lines", tint, val(props.class)), role: "status", "aria-busy": "true", "aria-label": () => props.label ?? t`Loading` },
     Array.from({ length: n }, (_, i) => h("span", { class: cx("m-skel", "m-skel-line", i === n - 1 && n > 1 && props.shortLast !== false && "m-skel-short") })));
 }

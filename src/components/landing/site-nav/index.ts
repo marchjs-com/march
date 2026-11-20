@@ -4,7 +4,7 @@
 // (motion engine, mirrored in RTL) and rests on the current one. On narrow screens the links move into a Drawer.
 import "./site-nav.css";
 import { h } from "../../../dom/h.ts";
-import { signal } from "../../../core/reactive.ts";
+import { signal, effect } from "../../../core/reactive.ts";
 import { t } from "../../../core/i18n.ts";
 import { cx, val, listen, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { owned } from "../../../ui/observe.ts";
@@ -133,8 +133,8 @@ export function SiteNav(props: SiteNavProps): Element {
     links.length ? h("nav", { class: "m-snav-nav", "aria-label": L.main ?? t`Main` }, list) : null,
     h("div", { class: "m-snav-actions" }, props.actions ?? null),
     links.length && props.menu !== false ? h(IconButton, { class: "m-snav-menu", icon: props.menuIcon ?? menu, label: () => L.openMenu ?? t`Open menu`, onClick: openMenu }) : null)) as HTMLElement;
-  // rest on the current link once laid out
-  queueMicrotask(() => { if (nav.isConnected) moveTo(current()); });
+  // rest on the current link once laid out, and again whenever a live `active` moves (a scroll spy, a route change)
+  effect(() => { const a = current(); queueMicrotask(() => { if (!gone && nav.isConnected) moveTo(a); }); });
   owned(() => { gone = true; offList(); offScroll(); });
   return nav;
 }

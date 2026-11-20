@@ -17,10 +17,10 @@ test("Tree: ARIA, expand / collapse with keys and clicks, selection", () => {
   const a = [...tree.children].find((x) => x.getAttribute("role") === "treeitem");
   assert.equal(a.getAttribute("aria-expanded"), "false");
   const row = a.querySelector(".m-tree-row");
-  key(row, "ArrowRight");
+  key(a, "ArrowRight");
   assert.equal(a.getAttribute("aria-expanded"), "true");
   assert.equal(a.querySelector("[role=group]").hidden, false);
-  key(row, "ArrowLeft");
+  key(a, "ArrowLeft");
   assert.equal(a.getAttribute("aria-expanded"), "false");
   row.click();
   assert.equal(sel(), "a");
@@ -38,7 +38,7 @@ test("Tree: no chevron, own chevron that follows open, selection colour", () => 
   assert.equal(a.getAttribute("data-m-color"), "brand-purple");
   const own = b.querySelector(".m-tree-chev.is-own");
   assert.equal(own.textContent, "+");
-  key(b.querySelector(".m-tree-row"), "ArrowRight");
+  key(b.querySelector("[role=treeitem]"), "ArrowRight");
   assert.equal(own.textContent, "-");
   assert.ok(c.querySelector(".m-tree-chev .m-svg"), "the default arrow stays");
   assert.equal(c.getAttribute("data-m-color"), null);
@@ -48,13 +48,13 @@ test("Tree: no chevron, own chevron that follows open, selection colour", () => 
 test("Tree: rows are ListRows with a Chevron; → enters an open node, ← leaves to the parent", () => {
   const nodes = [{ id: "a", label: "a", children: [{ id: "a1", label: "a1" }] }, { id: "b", label: "b" }];
   const m = mount(() => h(Tree, { nodes, expanded: ["a"] }));
-  const rows = [...m.el.querySelectorAll(".m-tree-row")];
+  const rows = [...m.el.querySelectorAll(".m-tree-row")], items = [...m.el.querySelectorAll("[role=treeitem]")];
   assert.ok(rows[0].classList.contains("m-listrow") && rows[0].querySelector(".m-tree-chev.m-chevron.is-open"));
   assert.ok(rows[1].querySelector(".m-tree-chev.is-leaf"), "a leaf keeps the arrow's box");
-  rows[0].focus(); key(rows[0], "ArrowRight");
-  assert.equal(document.activeElement, rows[1], "→ on an open node goes to its first child");
-  key(rows[1], "ArrowLeft");
-  assert.equal(document.activeElement, rows[0], "← on a leaf goes to its parent");
+  items[0].focus(); key(items[0], "ArrowRight");
+  assert.equal(document.activeElement, items[1], "→ on an open node goes to its first child (focus is on the treeitem)");
+  key(items[1], "ArrowLeft");
+  assert.equal(document.activeElement, items[0], "← on a leaf goes to its parent");
   m.dispose();
 });
 

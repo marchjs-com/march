@@ -155,6 +155,7 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
   const content = new Map<SlotName, Signal<unknown>>();
   const els = new Map<SlotName | "main", HTMLElement>();
   for (const s of SLOTS) content.set(s, signal<unknown>(pick(s)));
+  const overrides = new Map<SlotName, { value: unknown }[]>();
   const running = new Map<string, () => void>();
   const runningNames = signal<readonly string[]>([]);
   const sync = (): void => { runningNames.set([...running.keys()]); };
@@ -170,10 +171,18 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
       return off;
     },
     set: (slot, value) => {
-      const s = content.get(slot)!;
-      const prev = s();
+      // a stack per slot: the newest set shows; taking any one off (in any order) shows the newest left, else the layout's own
+      const s = content.get(slot)!, stack = overrides.get(slot) ?? [];
+      overrides.set(slot, stack);
+      const mine = { value };
+      stack.push(mine);
       s.set(value);
-      const restore = (): void => { s.set(prev); };
+      const restore = (): void => {
+        const i = stack.indexOf(mine);
+        if (i < 0) return;
+        stack.splice(i, 1);
+        s.set(stack.length ? stack[stack.length - 1]!.value : pick(slot));
+      };
       onCleanup(restore);
       return restore;
     },

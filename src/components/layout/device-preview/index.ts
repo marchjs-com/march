@@ -45,6 +45,8 @@ messages("tr", {
   "Pinch in": "Kıstır (uzaklaş)", "Pinch out": "Aç (yakınlaş)", "Rotate": "Döndür", "Two-finger scroll": "İki parmakla kaydır",
   "Three-finger swipe left": "Üç parmakla sola", "Three-finger swipe right": "Üç parmakla sağa", "Three-finger swipe up": "Üç parmakla yukarı",
   "Turn (alpha)": "Döndür (alfa)", "Forward / back (beta)": "İleri / geri (beta)", "Left / right (gamma)": "Sola / sağa (gama)", "Level": "Doluluk",
+  // the event ticker's details (sensors.ts)
+  "charging": "şarjda", "on battery": "pilde", "shake": "salla", "landscape": "yatay", "portrait": "dikey",
 });
 
 // the rail's own glyphs (24-grid strokes, as March's icons)
@@ -160,11 +162,15 @@ export function DevicePreview(props: DevicePreviewProps): Element {
   // the event ticker
   let seq = 0;
   const log = signal<{ id: number; name: string; detail?: string | undefined }[]>([]);
+  // the ticker's timers end with the preview
+  const timers = new Set<ReturnType<typeof setTimeout>>();
+  onCleanup(() => { for (const tm of timers) clearTimeout(tm); timers.clear(); });
   const say = (name: string, detail?: string): void => {
     props.onEvent?.(name, detail);
     const id = ++seq;
     log.set([...log.peek().slice(-3), { id, name, detail }]);
-    setTimeout(() => log.set(log.peek().filter((x) => x.id !== id)), 2600);
+    const tm = setTimeout(() => { timers.delete(tm); log.set(log.peek().filter((x) => x.id !== id)); }, 2600);
+    timers.add(tm);
   };
 
   const frame = props.src != null ? previewFrame(props.src, label, "m-device-frame") : null;

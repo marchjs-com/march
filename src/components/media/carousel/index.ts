@@ -1,6 +1,7 @@
 // Carousel (march/ui).
 import "./carousel.css";
 import { signal } from "../../../core/reactive.ts";
+import { owned } from "../../../ui/observe.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -47,20 +48,29 @@ export function Carousel(props: CarouselProps): Element {
     const left = Math.abs(track.scrollLeft || 0), w = slides[0]?.offsetWidth || 1;
     index.set(Math.round(left / (w + 16)));
   };
-  const goTo = (i: number): void => { const s = track?.children[i] as HTMLElement | undefined; if (s && track) track.scrollTo({ left: s.offsetLeft - track.offsetLeft, behavior: props.smooth === false ? "auto" : "smooth" }); };
+  // measured from the first slide, so right-to-left (negative scrollLeft) lands on the slide too
+  const goTo = (i: number): void => { const s = track?.children[i] as HTMLElement | undefined, s0 = track?.children[0] as HTMLElement | undefined; if (s && s0 && track) track.scrollTo({ left: s.offsetLeft - s0.offsetLeft, behavior: props.smooth === false ? "auto" : "smooth" }); };
   const ownDot = typeof props.dots === "function" ? props.dots : null;
   const last = (): number => count() - (props.perView ?? 1);
   // previous / next: raised round IconButtons at the sides
   const arrow = (dir: "prev" | "next", own: unknown, def: IconDef, name: () => string, off: () => boolean, to: () => number): unknown =>
     h(IconButton, { variant: "raised", shape: "round", class: `m-carousel-btn m-carousel-${dir}`, label: name, title: false, disabled: off, onClick: () => goTo(to()), icon: ownIcon(own, def, "m-carousel-icon") });
   queueMicrotask(update);
+  // slides added or removed later: the count (arrows, dots) follows
+  const watch = (el: HTMLElement): void => {
+    const MO = globalThis.MutationObserver;
+    if (!MO) return;
+    const mo = new MO(update);
+    mo.observe(el, { childList: true });
+    owned(() => mo.disconnect());
+  };
   // a text or number slide (children={["Bir", "İki"]}) gets a plain slide box of its own
   const slide = (x: unknown): unknown => (typeof x === "string" || typeof x === "number" ? h("div", { class: "m-carousel-text" }, String(x)) : x);
   // (JSX may hand them in nested, <Carousel>{list}</Carousel> is [[…]], or as a getter)
   const slidesOf = (c: unknown): unknown => (typeof c === "function" ? () => slidesOf((c as () => unknown)()) : Array.isArray(c) ? c.flat(Infinity).map(slide) : slide(c));
   const slides = slidesOf(props.children);
   return h("section", { class: () => cx("m-carousel", `m-carousel-${props.perView ?? 1}`, props.smooth === false && "is-instant", val(props.class)), "aria-roledescription": "carousel", "aria-label": () => val(props.label) ?? t`Carousel` },
-    h("div", { class: "m-carousel-track", ref: (el: HTMLElement) => { track = el; }, onScroll: update, tabindex: "0" }, slides),
+    h("div", { class: "m-carousel-track", ref: (el: HTMLElement) => { track = el; watch(el); }, onScroll: update, tabindex: "0" }, slides),
     props.arrows !== false && arrow("prev", props.prevIcon, chevronLeft, () => props.labels?.previous ?? t`Previous`, () => index() <= 0, () => index() - 1),
     props.arrows !== false && arrow("next", props.nextIcon, chevronRight, () => props.labels?.next ?? t`Next`, () => index() >= last(), () => index() + 1),
     props.dots !== false && h(PageDots, { class: "m-carousel-dots", count: () => Math.max(0, last() + 1), value: index, onChange: goTo,

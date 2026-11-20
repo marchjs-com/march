@@ -6,7 +6,7 @@ import "./horizontal-scroll.css";
 import { h } from "../../../dom/h.ts";
 import { signal } from "../../../core/reactive.ts";
 import { cx, val, setStyle, clamp, isRtl, type ClassProp } from "../../../ui/util.ts";
-import { owned, observeSize } from "../../../ui/observe.ts";
+import { owned, observeSize, whenMedia } from "../../../ui/observe.ts";
 import { Progress } from "../../feedback/progress/index.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { onScrollProgress } from "../../../motion/scroll-fx.ts";
@@ -26,14 +26,15 @@ export interface HorizontalScrollProps {
   children?: unknown;
 }
 
-const native = (): boolean => reducedMotion() || !!globalThis.matchMedia?.("(hover: none)").matches;
-
 /** `<HorizontalScroll label="Case studies"><Card/><Card/><Card/></HorizontalScroll>` */
 export function HorizontalScroll(props: HorizontalScrollProps): Element {
   // a text panel (a string or number child: the panel titles as data) is drawn as a plain card
   const kids = Array.isArray(props.children) ? props.children : [props.children];
   const panels = kids.map((c) => (typeof c === "string" || typeof c === "number" ? h("div", { class: "m-hs-text" }, String(c)) : c));
   const track = h("div", { class: "m-hs-track" }, panels) as HTMLElement;
+  // touch screens: a live media query (read on every scroll frame, so not a new matchMedia per frame)
+  const touch = whenMedia("(hover: none)");
+  const native = (): boolean => reducedMotion() || touch();
   const done = signal(0); // 0..1 of the pinned passage: the Progress line under the panels shows it
   const pin = h("div", { class: "m-hs-pin" }, h("div", { class: "m-hs-view" }, track),
     props.progress === false ? null : h(Progress, { variant: "line", decorative: true, smooth: false, value: done, max: 1, class: "m-hs-bar" })) as HTMLElement;

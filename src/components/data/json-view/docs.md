@@ -16,7 +16,7 @@ and a circular reference is marked instead of looping.
 | `open` | number | `1` | depth expanded at start |
 | `labels` | `{ items?, keys?, circular? }` | "items", "keys", "[circular]" | your own texts |
 | `arrow` | boolean / `(open) => node` | `true` | the open / close arrow, off, or your own (`open()` is live) |
-| `label` | string / accessor | — | accessible name of the tree |
+| `label` | string / accessor | — | accessible name of the root list |
 | `describe` | `(value) => string \| null` | — | your text for a value that is not JSON (a function, an element, a signal): shown as a leaf; null leaves it to JsonView. Pass a function value as `() => fn` (a function `value` is read as an accessor) |
 | `class` | class | — | extra class on the root |
 
@@ -27,8 +27,8 @@ and a circular reference is marked instead of looping.
 
 ## Accessibility
 
-`role="tree"` with nested groups; every object and array is a button with `aria-expanded`, so Tab and Enter / Space
-open and close it.
+Nested lists (the root list is named by `label`); every object and array is a disclosure button with
+`aria-expanded`, so Tab and Enter / Space open and close it. It is not an ARIA tree (no arrow-key model to learn).
 
 ## Composed of
 

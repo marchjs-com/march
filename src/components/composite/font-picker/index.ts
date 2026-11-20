@@ -319,8 +319,10 @@ export function FontPicker(props: FontPickerProps): unknown {
   // ------------------------------------------------------------------ a row
   const row = (item: () => Row): unknown => {
     const r = untrack(item);
+    // a group heading among the options: not an option itself (the list is flat and windowed, so it cannot wrap its
+    // options in a role=group; the heading stays a plain label between them)
     if ("head" in r) return h(SectionLabel, {
-      class: "m-fp-group", size: "sm", count: () => { const x = item(); return "head" in x ? formatCount(x.count, "full") : null; },
+      role: "presentation", class: "m-fp-group", size: "sm", count: () => { const x = item(); return "head" in x ? formatCount(x.count, "full") : null; },
       // the fonts of this very device, where the browser can list them (it asks the visitor first)
       actions: r.key !== "system" || !localFonts ? undefined : () => (props.deviceFonts === false ? null : h(IconButton, {
         class: "m-fp-device", size: "xs", icon: monitor, pressed: () => !!device(), label: () => L().deviceFonts ?? t`Fonts on this device`, onClick: () => void askDevice(),

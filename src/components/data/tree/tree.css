@@ -8,6 +8,9 @@
 .m-tree-row.m-listrow:not(.is-active):hover { color: var(--m-text); }
 .m-tree-row.m-listrow.is-active, .m-tree-row.m-listrow.is-active:hover { background: var(--m-accent-soft, var(--m-primary-soft)); font-weight: 500; }
 .m-tree-row > .m-listrow-lead { display: inline-flex; align-items: center; gap: .375rem; }
+/* the item (li) takes focus: its own row shows the ring */
+.m-tree-li { outline: none; }
+.m-tree-li:focus-visible > .m-tree-row { outline: 2px solid var(--m-focus); outline-offset: -2px; }
 .m-tree-chev { color: var(--m-faint); }
 .m-tree-chev.is-own { inline-size: auto; min-inline-size: .875rem; block-size: auto; }
 .m-tree-meta { color: var(--m-faint); font-variant-numeric: tabular-nums; }

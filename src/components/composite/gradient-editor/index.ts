@@ -78,8 +78,11 @@ export function GradientEditor(props: GradientEditorProps): unknown {
   const css = computed(() => G.gradientCss(grad()));
   // the stop handles are re-drawn only when a stop is added or removed (a drag keeps its pointer capture)
   const count = computed(() => grad().stops.length);
+  // bumped when the whole gradient is replaced (a new value from outside, a preset): the stop's color picker, which is
+  // not redrawn while its own stop is edited, is drawn again with the new color
+  const replaced = signal(0);
 
-  effect(() => { const v = get(); if (!v || v === last) return; const g = G.parseGradient(v); if (g) { last = v; untrack(() => { grad.set(g); sel.set(Math.min(sel.peek(), g.stops.length - 1)); }); } });
+  effect(() => { const v = get(); if (!v || v === last) return; const g = G.parseGradient(v); if (g) { last = v; untrack(() => { grad.set(g); sel.set(Math.min(sel.peek(), g.stops.length - 1)); replaced.set(replaced.peek() + 1); }); } });
   const paint = (): void => { const g = grad(); if (root) setStyle(root, { "--m-ge-bg": css(), "--m-ge-bar": G.gradientCss({ ...g, type: "linear", angle: 90 }), "--m-ge-angle": `${g.angle}deg` }); };
   effect(paint);
   const update = (next: G.Gradient): void => { if (ro()) return; grad.set(next); last = G.gradientCss(next); set(last); };
@@ -174,7 +177,7 @@ export function GradientEditor(props: GradientEditorProps): unknown {
     // theme tokens resolve against the editor's own element: painted once it is in place
     const fill = signal<string | null>(null);
     queueMicrotask(() => fill.set(presetCss(p)));
-    return h(Swatch, { class: "m-ge-preset", color: fill, label: () => L().preset?.(p.label) ?? t`Preset: ${p.label}`, title: p.label, disabled: ro, onClick: () => { const g = G.parseGradient(presetCss(p)); if (g) { update(g); sel.set(0); } } }) as Element;
+    return h(Swatch, { class: "m-ge-preset", color: fill, label: () => L().preset?.(p.label) ?? t`Preset: ${p.label}`, title: p.label, disabled: ro, onClick: () => { const g = G.parseGradient(presetCss(p)); if (g) { update(g); sel.set(0); replaced.set(replaced.peek() + 1); } } }) as Element;
   };
 
   const types = (): readonly G.GradientType[] => props.types?.length ? props.types : ["linear", "radial", "conic"];
@@ -183,7 +186,7 @@ export function GradientEditor(props: GradientEditorProps): unknown {
   return h(Card, { as: "div", class: () => cx("m-ge", ro() && "is-readonly", val(props.class)), role: "group", "aria-label": () => c["aria-label"]() ?? L().editor ?? t`Gradient editor`, ref: (el: HTMLElement) => { root = el; untrack(paint); } },
     () => (props.preview === false ? null : h("div", { class: cx("m-ge-preview", CHECKER), role: "img", "aria-label": () => L().preview?.(css()) ?? t`Gradient preview: ${css()}` })),
     h(Stack, { class: "m-ge-row", direction: "row", wrap: true, align: "center", justify: "between", gap: 3 },
-      () => (types().length > 1 ? h(Segmented, { class: "m-ge-types", "aria-label": L().type ?? t`Gradient type`, options: types().map((x) => ({ value: x, label: TYPE_LABEL[x]() })), value: grad.peek().type, onChange: (x: G.GradientType | null) => { if (x) update({ ...grad.peek(), type: x }); } }) : null),
+      () => (types().length > 1 ? h(Segmented, { class: "m-ge-types", "aria-label": L().type ?? t`Gradient type`, options: types().map((x) => ({ value: x, label: TYPE_LABEL[x]() })), value: live(() => grad().type), onChange: (x: G.GradientType | null) => { if (x) update({ ...grad.peek(), type: x }); } }) : null),
       () => (grad().type === "radial" || (props.dial === false && !angles().length) ? null : h("div", { class: "m-ge-angle" },
         props.dial === false ? null : dial,
         angles().length ? h("div", { class: "m-ge-angles", role: "group", "aria-label": () => L().quickAngles ?? t`Quick angles` }, angles().map((a) => h(IconButton, {
@@ -194,6 +197,7 @@ export function GradientEditor(props: GradientEditorProps): unknown {
     ),
     h("div", { class: "m-ge-stops" }, bar, () => (props.hint === false ? null : h("p", { class: "m-ge-hint" }, () => L().hint ?? t`Click the bar to add a stop; drag a stop down or press Delete to remove it.`))),
     () => {
+      replaced();
       const i = sel(), s = untrack(() => grad().stops[i]);
       if (!s) return null;
       return h("div", { class: "m-ge-stop-editor", role: "group", "aria-label": L().stop?.(i + 1, s.color) ?? t`Stop ${i + 1}` },

@@ -400,6 +400,8 @@ export function DockLayout(props: DockLayoutProps): Element {
 
   // ---------------------------------------------------------------- drag and drop
   let shieldEl: HTMLElement | null = null;
+  /** Ends the drag under way (the window listeners go with the panel too). */
+  let endDrag: (() => void) | null = null;
   /** A clear shield while dragging, so iframes do not swallow the pointer. */
   function shield(on: boolean, cursor = ""): void {
     root.classList.toggle("is-dragging", on);
@@ -445,6 +447,7 @@ export function DockLayout(props: DockLayoutProps): Element {
       paint(m.clientX, m.clientY);
     };
     const stop = (drop: boolean): void => {
+      if (endDrag === cancel) endDrag = null;
       removeEventListener("pointermove", move); removeEventListener("pointerup", up); removeEventListener("pointercancel", cancel); removeEventListener("keydown", key, true);
       if (!on) return;
       shield(false); ghost?.close(); zones.remove(); preview.remove(); mark.remove();
@@ -460,6 +463,7 @@ export function DockLayout(props: DockLayoutProps): Element {
     const up = (): void => stop(true), cancel = (): void => stop(false);
     const key = (k: KeyboardEvent): void => { if (k.key === "Escape") { k.preventDefault(); k.stopPropagation(); stop(false); } };
     addEventListener("pointermove", move); addEventListener("pointerup", up); addEventListener("pointercancel", cancel); addEventListener("keydown", key, true);
+    endDrag = cancel;
   }
   const runIn = <T>(fn: () => T): T => createRoot(() => fn(), owner);
 
@@ -606,7 +610,7 @@ export function DockLayout(props: DockLayoutProps): Element {
   const stopSize = observeSize(root, () => { syncNarrow(); render(); });
   const onHide = (): void => { if (saveT) persist(true); };
   addEventListener("pagehide", onHide);
-  onCleanup(() => { stopSize(); shield(false); removeEventListener("pagehide", onHide); onHide(); });
+  onCleanup(() => { endDrag?.(); stopSize(); shield(false); removeEventListener("pagehide", onHide); onHide(); });
 
   const prefix = props.commands === false ? null : (props.commands ?? "dock");
   if (prefix) {

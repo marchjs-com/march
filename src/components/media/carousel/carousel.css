@@ -17,3 +17,5 @@
 .m-carousel-prev { inset-inline-start: -.75rem; } .m-carousel-next { inset-inline-end: -.75rem; }
 .m-carousel-dots { margin-top: var(--m-space-3); }
 .m-carousel-icon { display: inline-flex; }
+/* right-to-left: previous sits at the right, so the arrows point the other way */
+:dir(rtl) .m-carousel-btn .m-svg { transform: scaleX(-1); }

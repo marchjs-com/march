@@ -4,7 +4,7 @@
 // registered with the DirtyState manager (leave warning, saveAll). Rows show what differs from the saved values and can
 // be reset one by one.
 import "./property-grid.css";
-import { signal, computed, untrack, onCleanup, getOwner, runWithOwner, reactive, type Signal } from "../../../core/reactive.ts";
+import { signal, computed, untrack, onCleanup, getOwner, createRoot, reactive, type Signal } from "../../../core/reactive.ts";
 import { load as loadStored, save as store } from "../../../core/util.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
@@ -155,6 +155,8 @@ export function PropertyGrid(props: PropertyGridProps): Element {
   const list = computed(() => val(props.properties) ?? []);
   const visible = computed(() => { const v = get(); return list().filter((p) => !p.hidden?.(v)); });
   const changes = computed(() => { const v = get(), s = saved(); return list().filter((p) => !deepEqual(v[p.key], s[p.key])).map((p) => p.key); });
+  // every row and group asks "is this key changed?" on each edit: a set answers without scanning the list
+  const changedSet = computed(() => new Set(changes()));
   const labelOf = (p: PropertySpec): string => val(p.label) ?? p.key;
   const title = (): string => val(props.label) ?? t`Properties`;
   const L = (): NonNullable<PropertyGridProps["labels"]> => props.labels ?? {};
@@ -190,7 +192,7 @@ export function PropertyGrid(props: PropertyGridProps): Element {
   const errors = computed(() => { const v = get(); const out: Record<string, string> = {}; for (const p of list()) { const e = p.validate?.(v[p.key], v); if (e) out[p.key] = e; } return out; });
   const row = (p: PropertySpec): Element => {
     const id = `${base}-${p.key}`, labelId = `${id}-l`, descId = `${id}-d`, errId = `${id}-e`;
-    const changed = (): boolean => changes().includes(p.key);
+    const changed = (): boolean => changedSet().has(p.key);
     const Comp = p.control ?? CONTROLS[p.type ?? "text"] ?? TextInput;
     const cp: Record<string, unknown> = { id, labelledby: labelId, options: p.options, min: p.min, max: p.max, step: p.step, placeholder: p.placeholder, suffix: p.unit };
     for (const k of Object.keys(cp)) if (cp[k] === undefined) delete cp[k];
@@ -223,12 +225,21 @@ export function PropertyGrid(props: PropertyGridProps): Element {
         label: () => resetName(p), title: () => L().resetTitle ?? t`Reset to saved`, onClick: () => resetKeys([p.key], resetName(p)),
       }));
   };
-  // rows are built once and kept; search and `hidden` only show / hide them
-  const rows = new Map<string, Element>();
+  // rows are built once per spec and kept; search and `hidden` only show / hide them; a new spec for a key builds its
+  // row again (the old one is disposed)
+  const rows = new Map<string, { spec: PropertySpec; el: Element; dispose: () => void }>();
   // built under the grid itself, not under the section that first shows them: a section drawn again (a row shown or
   // hidden, a group opened) would otherwise take the kept rows' labels, marks and editors with it
   const owner = getOwner();
-  const rowOf = (p: PropertySpec): Element => { let r = rows.get(p.key); if (!r) rows.set(p.key, (r = runWithOwner(owner, () => row(p)))); return r; };
+  const rowOf = (p: PropertySpec): Element => {
+    const r = rows.get(p.key);
+    if (r?.spec === p) return r.el;
+    r?.dispose();
+    const next = createRoot((dispose) => ({ spec: p, el: row(p), dispose }), owner);
+    rows.set(p.key, next);
+    return next.el;
+  };
+  onCleanup(() => { for (const r of rows.values()) r.dispose(); rows.clear(); });
   // equal sets are the same value: a value change that hides or shows nothing must not touch the rows (a slider
   // being dragged stays the same node, keeps focus and pointer capture)
   const matches = computed(() => {
@@ -264,7 +275,7 @@ export function PropertyGrid(props: PropertyGridProps): Element {
   const body = (): unknown => grouped().map((g) => untrack(() => {
     const items = g.items.map((p) => { const el = rowOf(p); return () => (matches().has(p.key) ? el : null); });
     const shown = computed((): boolean => g.items.some((p) => matches().has(p.key)));
-    const changedIn = (): number => g.items.filter((p) => changes().includes(p.key)).length;
+    const changedIn = (): number => g.items.filter((p) => changedSet().has(p.key)).length;
     const head = [h(SectionLabel, { as: "span", size: "md", class: "m-pg-group-name" }, g.name || (L().general ?? t`General`)),
       props.changeMarks === false ? null : () => (changedIn() ? h(Badge, { class: "m-pg-count", size: "xs", tone: "primary", variant: "solid", count: changedIn(), ariaLabel: L().changedCount?.(changedIn()) ?? t`${changedIn()} changed` }) : null)];
     const content = h("div", { class: "m-pg-rows" }, items);

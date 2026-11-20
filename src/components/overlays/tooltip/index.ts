@@ -2,11 +2,12 @@
 // Folder: src/components/overlays/tooltip/.
 import "../../actions/menu/menu.css";
 import "./tooltip.css";
-import { signal, untrack } from "../../../core/reactive.ts";
+import { signal, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { floating, type Placement } from "../../../ui/popover.ts";
 import { val, uid, cx, debounce, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { describedBy } from "./tip.ts";
 
 export interface TooltipProps {
   /** The hint text. @tr İpucu metni. */
@@ -34,6 +35,7 @@ export function Tooltip(props: TooltipProps): unknown[] {
   const off = (): boolean => !!val(props.disabled);
   const open = debounce(() => { if (!off()) show.set(true); }, props.delay ?? 300);
   const hide = (): void => { open.cancel(); show.set(false); };
+  onCleanup(() => open.cancel());
   const wrap = h("span", {
     class: "m-tip-anchor", ref: (x: HTMLElement) => { anchor = x; },
     onMouseenter: open, onMouseleave: hide, onFocusin: () => { if (!off()) show.set(true); }, onFocusout: hide,
@@ -42,7 +44,7 @@ export function Tooltip(props: TooltipProps): unknown[] {
   const target = (): Element => (anchor as HTMLElement).firstElementChild ?? (anchor as HTMLElement);
   return [wrap, () => {
     const on = show() && !off();
-    untrack(() => (on ? target().setAttribute("aria-describedby", id) : target().removeAttribute("aria-describedby")));
+    untrack(() => describedBy(target(), id, on));
     return on && untrack(() => {
       const color = colorAttr(props.color), motion = props.motion;
       return floating({

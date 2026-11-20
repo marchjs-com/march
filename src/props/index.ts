@@ -184,12 +184,15 @@ export function withParts<T>(parts: PartsMap | (() => PartsMap | null | undefine
     _builtin("m:parts", { raw: (c, raw) => {
       const find = useContext(Parts), now = find && untrack(() => find(c as Comp));
       if (!now) return raw;
-      const out = { ...raw };
+      // the props as given, getters kept (a spread would read a live prop such as bind:value once and freeze it)
+      const own = Object.getOwnPropertyDescriptors(raw);
+      for (const d of Object.values(own)) d.configurable = true;
+      const out = Object.defineProperties({}, own) as typeof raw;
       for (const key of Object.keys(now)) {
-        const given = raw[key];
-        const value = (): unknown => { const p = find!(c as Comp); return p && key in p ? p[key] : isReactive(given) ? (given as () => unknown)() : given; };
+        // the given prop read when needed (a getter stays a live read)
+        const value = (): unknown => { const p = find!(c as Comp); if (p && key in p) return p[key]; const given = raw[key]; return isReactive(given) ? (given as () => unknown)() : given; };
         // listeners and children are read once by a component; everything else stays live
-        out[key] = key === "children" || /^on[A-Z:]/.test(key) ? now[key] : reactive(value);
+        Object.defineProperty(out, key, { value: key === "children" || /^on[A-Z:]/.test(key) ? now[key] : reactive(value), enumerable: true, configurable: true, writable: true });
       }
       return out;
     } });

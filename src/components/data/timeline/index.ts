@@ -35,7 +35,7 @@ export function Timeline(props: TimelineProps): Element {
       props.dot === false ? null : typeof props.dot === "function" ? h("span", { class: "m-tl-dot is-own", "aria-hidden": "true" }, props.dot(x, i))
         : withColor(h(StatusDot, { class: "m-tl-dot", hollow: true, tone: TONES.includes(x.tone as StatusDotTone) ? x.tone as StatusDotTone : "neutral" }, icon(x.icon)), x.color),
       h("div", { class: "m-tl-main" },
-        x.time != null && h("time", { class: "m-tl-time", datetime: toDate(x.time)?.toISOString?.() ?? null }, () => time(val(x.time))),
+        x.time != null && h("time", { class: "m-tl-time", datetime: () => toDate(val(x.time))?.toISOString?.() ?? null }, () => time(val(x.time))),
         x.title != null && h("div", { class: "m-tl-title" }, () => val(x.title)),
         x.body != null && h("div", { class: "m-tl-body" }, typeof x.body === "function" && !x.body.length ? (x.body as () => unknown)() : x.body)))));
 }

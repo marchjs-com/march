@@ -113,16 +113,20 @@ export function BranchingStory(props: BranchingStoryProps): Element {
   // no passages yet (a raw component): the start passage reads as missing, not an error
   const passages = props.passages ?? {}, start = props.start ?? "";
   const path = signal<string[]>(untrack(() => val(props.path)) ?? [start]);
-  if (props.path !== undefined) effect(() => { const p = val(props.path); if (p?.length) path.set(p); });
   const all = storyEndings(passages, start);
   const found = signal<ReadonlySet<string>>(new Set());
+  // an ending counts as found however it was reached (a choice, a rewind, or a path given from outside)
+  const see = (p: string[]): void => {
+    const id = p[p.length - 1];
+    if (id != null && passages[id] && !passages[id]!.choices?.length && !found.peek().has(id)) found.set(new Set([...found.peek(), id]));
+  };
+  if (props.path !== undefined) effect(() => { const p = val(props.path); if (p?.length) { path.set(p); untrack(() => see(p)); } });
   const current = computed(() => { const p = path(); return p[p.length - 1] ?? start; });
   let forward = true;
   const go = (next: string[]): void => {
     forward = next.length >= path.peek().length;
     path.set(next);
-    const id = next[next.length - 1]!;
-    if (!passages[id]?.choices?.length && !found.peek().has(id)) found.set(new Set([...found.peek(), id]));
+    see(next);
     props.onChange?.(next);
   };
 

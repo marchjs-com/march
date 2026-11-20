@@ -38,7 +38,8 @@ export function Segmented<T = unknown>(props: SegmentedProps<T>): unknown {
   const slide = props.indicator === "slide";
   const thumb = slide ? h("span", { class: "m-segment-thumb", "aria-hidden": "true" }) as HTMLElement : null;
   let root: HTMLElement;
-  const onKeyDown = (e: KeyboardEvent) => { const target = roving(e, [...root.querySelectorAll("button")].filter((b) => !b.disabled), { horizontal: true }); if (target) target.click(); };
+  const onKeyDown = (e: KeyboardEvent) => { // ← → (mirrored right to left) and ↑ ↓ both move and select, as in a radio group
+    const target = roving(e, [...root.querySelectorAll("button")].filter((b) => !b.disabled), { horizontal: e.key === "ArrowLeft" || e.key === "ArrowRight" }); if (target) target.click(); };
   root = h("div", { role: "radiogroup", class: cx("m-segmented", slide && "m-segmented-slide", props.class), "aria-labelledby": labelledBy(props), "aria-label": c["aria-label"], "aria-invalid": c["aria-invalid"], onKeyDown },
     thumb,
     () => {
@@ -56,8 +57,10 @@ export function Segmented<T = unknown>(props: SegmentedProps<T>): unknown {
     const ind = slidingIndicator(thumb, root);
     const place = (move: boolean): void => {
       const on = root.querySelector<HTMLElement>('[aria-checked="true"]');
-      if (on) setStyle(thumb, { top: `${on.offsetTop}px`, height: `${on.offsetHeight}px` });
+      // read every size before anything is written (one layout, not two)
+      const top = on?.offsetTop, height = on?.offsetHeight;
       ind.moveTo(on, !move);
+      if (on) setStyle(thumb, { top: `${top}px`, height: `${height}px` });
     };
     effect(() => { get(); normOptions(props.options); queueMicrotask(() => place(true)); });
     observeSize(root, () => place(false));

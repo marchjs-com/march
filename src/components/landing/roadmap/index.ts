@@ -58,7 +58,9 @@ export function Roadmap(props: RoadmapProps): Element {
     if (fill) owned(scrollIndicator(fill, { track: root, range, vertical: true }));
     owned(onScrollProgress({ track: root, range }, (p) => {
       const r = root.getBoundingClientRect(), edge = r.top + p * r.height;
-      for (const li of tl.children as HTMLCollectionOf<HTMLElement>) li.classList.toggle("is-passed", li.getBoundingClientRect().top + 10 <= edge);
+      // read every entry first, then write: a class toggle between two reads would force a layout per entry
+      const lis = [...tl.children] as HTMLElement[], tops = lis.map((li) => li.getBoundingClientRect().top);
+      lis.forEach((li, i) => li.classList.toggle("is-passed", tops[i]! + 10 <= edge));
     }));
   }
   if (props.reveal !== false) owned(revealOnScroll(tl, { effect: "start", stagger: 90, distance: 20, ...props.reveal }));

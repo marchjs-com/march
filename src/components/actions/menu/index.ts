@@ -183,7 +183,8 @@ export interface DropdownProps extends PopoverButtonProps {
 export function Dropdown(props: DropdownProps): unknown[] {
   return popButton(props, "dialog", (p) => h(PopoverPanel, {
     anchor: p.anchor, open: p.open, onOpenChange: (on: boolean, why: string) => { if (!on) p.close(why === "escape"); },
-    role: null, id: p.id, placement: props.placement, autoFocus: false, panelClass: cx("m-dropdown", props.panelClass), panelProps: { ref: p.ref },
+    // a dialog, as the trigger's aria-haspopup says, named by the trigger's label
+    role: "dialog", label: () => val(props.label) ?? undefined, id: p.id, placement: props.placement, autoFocus: false, panelClass: cx("m-dropdown", props.panelClass), panelProps: { ref: p.ref },
     children: () => (typeof props.children === "function" && props.children.length ? (props.children as (close: (refocus?: boolean) => void) => unknown)(p.close) : props.children),
   }));
 }

@@ -151,28 +151,36 @@ export function VirtualList<T>(props: VirtualListProps<T>): Element {
 
   root = h("div", {
     class: () => cx("m-vlist", props.scroll === "parent" ? "m-vlist-parent" : "m-vlist-self", val(props.class)),
-    role: "list", "aria-label": () => val(props.label) ?? null,
+    role: "list",
   }, props.header ?? null, h("div", { class: "m-vlist-win", ref: (x: HTMLElement) => { win = x; } }), props.footer ?? null) as HTMLElement;
   // the root is a list for its rows only: header and footer sit outside it
   root.removeAttribute("role");
   win.setAttribute("role", props.role ?? "list");
   if (props.id) win.id = props.id;
-  const lbl = val(props.label); if (lbl) win.setAttribute("aria-label", lbl);
+  // the name is the rows' container's (live: the label may be an accessor)
+  effect(() => { const lbl = val(props.label); if (lbl) win.setAttribute("aria-label", lbl); else win.removeAttribute("aria-label"); });
 
   effect(() => {
     const next = val(props.items);
     untrack(() => {
-      if (next !== items) { items = next; dirty = true; if (endAt > items.length) endAt = -1; }
+      if (next !== items) {
+        items = next; dirty = true; if (endAt > items.length) endAt = -1;
+        // forget the heights of keys that left (a long feed would keep every measured row)
+        if (heights.size > items.length) { const live = new Set(items.map((it, i) => keyOf(it, i))); for (const k of heights.keys()) if (!live.has(k)) heights.delete(k); }
+      }
       // rows already drawn follow their item at once (same key, new object)
       for (let i = range.peek()[0]; i < Math.min(range.peek()[1], items.length); i++) { const r = rows.get(keyOf(items[i] as T, i)); r?.item.set(items[i] as T); }
       schedule();
     });
   });
   effect(() => { range(); untrack(draw); });
+  // set up after mount (the scroll parent is known then); the microtask has no owner: the cleanup below removes it
+  let disposed = false, unlisten: (() => void) | null = null;
   queueMicrotask(() => {
+    if (disposed) return;
     scroller = props.scroll === "parent" ? scrollParent(root) : root;
     const target = scroller === document.scrollingElement || scroller === document.documentElement ? window : scroller;
-    listen(target, { scroll: schedule }, { passive: true });
+    unlisten = listen(target, { scroll: schedule }, { passive: true });
     ro?.observe(scroller === document.documentElement ? document.body : scroller);
     update();
   });
@@ -190,6 +198,6 @@ export function VirtualList<T>(props: VirtualListProps<T>): Element {
       if (at !== now) { sc.scrollTop = at; schedule(); }
     },
   });
-  onCleanup(() => { cancel?.(); ro?.disconnect(); for (const r of rows.values()) r.dispose(); rows.clear(); });
+  onCleanup(() => { disposed = true; unlisten?.(); cancel?.(); ro?.disconnect(); for (const r of rows.values()) r.dispose(); rows.clear(); });
   return root;
 }

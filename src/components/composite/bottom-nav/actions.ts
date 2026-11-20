@@ -89,7 +89,9 @@ export function openCreateMenu(button: HTMLElement, actions: readonly BottomNavA
     onKeyDown: (e: KeyboardEvent) => {
       if (e.key === "Escape") { e.preventDefault(); finish(); button.focus(); return; }
       // the stack grows upward (the first action is nearest to the button), so its arrows run the other way; Tab stays inside
-      const stack = !fan, up = e.key === "ArrowUp" || e.key === "ArrowLeft", down = e.key === "ArrowDown" || e.key === "ArrowRight" || (e.key === "Tab" && !e.shiftKey);
+      // right to left the fan starts on the right, so Left goes forward
+      const back = rtl && fan ? "ArrowRight" : "ArrowLeft", fwd = rtl && fan ? "ArrowLeft" : "ArrowRight";
+      const stack = !fan, up = e.key === "ArrowUp" || e.key === back, down = e.key === "ArrowDown" || e.key === fwd || (e.key === "Tab" && !e.shiftKey);
       const order = stack && (e.key === "ArrowUp" || e.key === "ArrowDown") ? [...enabled()].reverse() : enabled();
       if (up || down || e.key === "Tab") { e.preventDefault(); const i = order.indexOf(globalThis.document.activeElement as HTMLElement); order[(i + (down ? 1 : -1) + order.length) % order.length]?.focus(); }
       else roving(e, enabled());
@@ -97,7 +99,7 @@ export function openCreateMenu(button: HTMLElement, actions: readonly BottomNavA
   }, items) as HTMLElement;
   // fan and stack sit above the button
   setStyle(panel, { left: `${cx0}px`, bottom: `${gapFromBottom + (fan ? 8 : 0)}px` });
-  const scrim = h("div", { class: "m-bnav-scrim", "aria-hidden": "true", onClick: finish }) as HTMLElement;
+  const scrim = h("div", { class: "m-bnav-scrim", "aria-hidden": "true", onClick: () => { finish(); button.focus(); } }) as HTMLElement;
   const root = h("div", { class: cx("m-bnav-menu", `is-${o.look}`) }, scrim, panel) as HTMLElement;
   close = openLayer("menu", root, scope);
 

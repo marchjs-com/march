@@ -294,6 +294,8 @@ export function TreeEditor(props: TreeEditorProps): unknown {
   };
   const row = (r: Row, cur: () => Row = () => r): Element => {
     const err = (): string | undefined => errorAt().get(r.ptr);
+    // a key may hold spaces: the id is encoded, or aria-describedby would read it as several ids
+    const errId = `${id}-e${encodeURIComponent(r.ptr)}`;
     const container = r.kind === "object" || r.kind === "array";
     // the row every tree is made of (data/tree/row.ts): arrow in the lead, key + type + value as the label, the
     // problem as the second line, the row actions in the trail
@@ -301,7 +303,7 @@ export function TreeEditor(props: TreeEditorProps): unknown {
       prefix: "m-tre", kids: container, open: r.open, turn: "spring", chevronSize: "sm", chevronAttrs: { onClick: container ? () => toggleOpen(r) : null },
       icon: h("span", { class: "m-tre-guides", "aria-hidden": "true" }),
       label: [keyCell(r), typeMenuOf(r), valueCell(r, cur)],
-      sub: () => (err() ? h("span", { class: "m-tre-error", id: `${id}-e${r.ptr}` }, err()) : null),
+      sub: () => (err() ? h("span", { class: "m-tre-error", id: errId }, err()) : null),
       tools: ro() || !hasPart(props.actions) ? null : h("span", { class: "m-tre-actions" },
         can("add") ? h(IconButton, { icon: glyph(plus), size: "sm", tabindex: "-1", class: "m-tre-add", label: container ? L().addInside ?? t`Add inside` : L().addAfter ?? t`Add after`, onClick: () => add(r) }) : null,
         r.path.length && can("duplicate") ? h(IconButton, { icon: glyph(copy), size: "sm", tabindex: "-1", class: "m-tre-dup", label: L().duplicate ?? t`Duplicate`, onClick: () => duplicate(r) }) : null,
@@ -309,7 +311,7 @@ export function TreeEditor(props: TreeEditorProps): unknown {
     }, {
       role: "treeitem", size: "sm", overflow: "wrap", class: () => cx("m-tre-row", `is-${r.kind}`, err() && "is-invalid", flash() === r.ptr && "is-flash", active() === r.ptr && "is-current"),
       "data-ptr": r.ptr, "aria-level": String(r.depth + 1), "aria-expanded": container ? String(r.open) : null, "aria-selected": () => String(active() === r.ptr),
-      "aria-invalid": () => (err() ? "true" : null), "aria-describedby": () => (err() ? `${id}-e${r.ptr}` : null),
+      "aria-invalid": () => (err() ? "true" : null), "aria-describedby": () => (err() ? errId : null),
       tabindex: () => (active() === r.ptr || (!active() && !r.path.length) ? "0" : "-1"), style: { "--m-tre-depth": String(r.depth) },
       onKeyDown: (e: KeyboardEvent) => keydown(e, r), onFocus: () => active.set(r.ptr),
     });

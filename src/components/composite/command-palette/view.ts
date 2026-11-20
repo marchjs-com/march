@@ -10,6 +10,7 @@ import { Dialog } from "../../../ui/dialog.ts";
 import { rank } from "../../../ui/fold.ts";
 import { pages, commands, type Command } from "../../../ui/registry.ts";
 import { val, cx, uid, debounce, type MaybeFn } from "../../../ui/util.ts";
+import { live } from "../../../forms/util.ts";
 import { sparkles } from "../../../icons/glyphs/sparkles.ts";
 import { ListRow } from "../../data/list-row/index.ts";
 import { Empty } from "../../feedback/empty/index.ts";
@@ -135,7 +136,9 @@ export function PaletteView(props: CommandPaletteProps): unknown {
 
   const ownEmpty = props.empty;
   return h(Dialog, {
-    open: () => isOpen(), onClose: () => isOpen.set(false), label: L().dialog ?? t`Command palette`, size: "md", class: cx("m-palette", val(props.class)),
+    open: () => isOpen(), onClose: () => isOpen.set(false),
+    // live(): the name is read each time the palette opens, so it follows `labels`
+    label: live(() => L().dialog ?? t`Command palette`), size: "md", class: cx("m-palette", val(props.class)),
     children: [
       h(SearchBox, {
         class: "m-pal-search", inputClass: "m-pal-input", variant: "plain", icon: false, clear: false, debounce: 0, value: q, inputRef: (x: HTMLInputElement) => x.setAttribute("data-autofocus", ""),

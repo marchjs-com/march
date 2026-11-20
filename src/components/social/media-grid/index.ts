@@ -2,7 +2,7 @@
 // by side, 3 → one large and two stacked, 4 → 2×2, more → 2×2 with "+N" on the last tile. Every tile is a button
 // (open in a lightbox); a Skeleton shimmers until the image arrives, then it fades in. With onDoubleTap a single tap
 // waits a moment so a double tap (like) never also opens the photo.
-import { signal } from "../../../core/reactive.ts";
+import { signal, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, clamp, later, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -56,6 +56,8 @@ const DOUBLE = 230;
 /** `<MediaGrid items={post.media} onOpen={(i) => openLightbox(post.media, i)} onDoubleTap={like} />` */
 export function MediaGrid(props: MediaGridProps): Element {
   let pending: ReturnType<typeof setTimeout> | null = null, last = -1, lastAt = 0;
+  // a single tap still waiting when the grid goes away does not open anything
+  onCleanup(() => { if (pending) clearTimeout(pending); });
   const tap = (i: number, el: HTMLElement, viaKey: boolean): void => {
     if (!props.onDoubleTap || viaKey) { props.onOpen?.(i, el); return; }
     const now = Date.now();

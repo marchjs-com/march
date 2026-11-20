@@ -5,7 +5,7 @@
 //   2–6 short labels           → Segmented
 //   otherwise                  → chips
 import "./choice-picker.css";
-import { untrack } from "../../../core/reactive.ts";
+import { computed, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { extend, normOptions, type ControlProps, type Option, type OptionsProp } from "../../../forms/util.ts";
 import { Segmented } from "../segmented/index.ts";
@@ -34,21 +34,24 @@ export function pickerKind(options: readonly Option[], kind: PickerKind | "auto"
 
 /** Single choice that never needs a drop-down for a few values: `<ChoicePicker bind:value={$x} options={…} />`. */
 export function ChoicePicker<T = unknown>(props: ChoicePickerProps<T>): unknown {
-  return () => {
+  // a computed owned by this component, not a bare thunk: the part is drawn inside this scope, so context (m:parts)
+  // reaches it, and the previous part is disposed on a rebuild
+  return computed(() => {
     const opts = normOptions(props.options);
     const kind = pickerKind(opts, props.kind ?? "auto");
     // rebuild only when the options or the kind change, never on a value change
     return untrack(() => draw(props, opts, kind));
-  };
+  });
 }
 
 function draw<T>(props: ChoicePickerProps<T>, opts: Option[], kind: PickerKind): unknown {
-  if (kind === "segmented") return Segmented(props);
-  if (kind === "combobox") return Combobox(props as never);
+  // drawn with h (the same props object: its getters stay live) so m:parts reach the part
+  if (kind === "segmented") return h(Segmented, props);
+  if (kind === "combobox") return h(Combobox, props as never);
   const visual = kind === "cards" || kind === "grid";
   const mapped = visual ? opts.map((o) => ({ ...o, icon: typeof o["preview"] === "function" ? (o["preview"] as () => unknown)() : o["preview"], hint: undefined })) : opts;
   const group: RadioGroupProps<T> = extend(props as RadioGroupProps<T>, {
     options: () => mapped, variant: () => (visual ? "card" : "chip"), inline: () => true, size: () => "sm",
   });
-  return h("div", { class: `m-picker m-picker-${kind}` }, RadioGroup(group));
+  return h("div", { class: `m-picker m-picker-${kind}` }, h(RadioGroup, group));
 }

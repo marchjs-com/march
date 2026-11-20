@@ -6,6 +6,14 @@ import { signal, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { floating, type Placement } from "../../../ui/popover.ts";
 import { uid, debounce } from "../../../ui/util.ts";
 
+/** Add / remove the hint's id in `aria-describedby`, keeping the ids already there (a field's help or error text). */
+export function describedBy(el: Element, id: string, on: boolean): void {
+  const ids = (el.getAttribute("aria-describedby") ?? "").split(/\s+/).filter((x) => x && x !== id);
+  if (on) ids.push(id);
+  if (ids.length) el.setAttribute("aria-describedby", ids.join(" "));
+  else el.removeAttribute("aria-describedby");
+}
+
 /**
  * Shows `text()` above `el` on hover (after `delay` ms) and at once on keyboard focus, linked with aria-describedby;
  * Escape hides it. Cleans up with the current owner.
@@ -21,8 +29,8 @@ export function tip(el: Element, text: () => string, o: { placement?: Placement;
   onCleanup(() => { hide(); for (const [n, f] of on) el.removeEventListener(n, f); });
   effect(() => {
     const t = text();
-    if (!show() || !t) { el.removeAttribute("aria-describedby"); return; }
-    el.setAttribute("aria-describedby", id);
+    if (!show() || !t) { describedBy(el, id, false); return; }
+    describedBy(el, id, true);
     untrack(() => floating({ anchor: el as HTMLElement, placement: o.placement ?? "top", role: "tooltip", id, onClose: hide, children: () => text(), class: "m-tooltip" }));
   });
 }

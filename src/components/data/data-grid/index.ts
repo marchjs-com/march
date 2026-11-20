@@ -274,13 +274,14 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
   // ------------------------------------------------------------------ cells
   const headerCell = (col: TableColumn<R>, c: number, pin: string | null): HTMLElement => {
     const key = String(col.key);
-    const grouped = groupKeys().includes(key);
+    // read live: the header is not rebuilt when the grouping changes (it is not part of the painted layout)
+    const grouped = (): boolean => groupKeys().includes(key);
     const items: MenuItem[] = [
       { label: () => lb("sortAsc"), onSelect: () => table.setSort([{ key, dir: "asc" }]) },
       { label: () => lb("sortDesc"), onSelect: () => table.setSort([{ key, dir: "desc" }]) },
       { label: () => lb("clearSort"), hidden: () => !table.sortDir(key), onSelect: () => table.setSort(table.sort().filter((s) => s.key !== key)) },
       "-",
-      { label: () => (grouped ? lb("ungroup") : lb("group")), hidden: () => defs.get(key)?.groupable === false, onSelect: () => setGroups(grouped ? groupKeys().filter((k) => k !== key) : [...groupKeys(), key]) },
+      { label: () => (grouped() ? lb("ungroup") : lb("group")), hidden: () => defs.get(key)?.groupable === false, onSelect: () => setGroups(grouped() ? groupKeys().filter((k) => k !== key) : [...groupKeys(), key]) },
       { label: () => lb("pinStart"), hidden: () => pin === "left", onSelect: () => table.pin(key, "left") },
       { label: () => lb("pinEnd"), hidden: () => pin === "right", onSelect: () => table.pin(key, "right") },
       { label: () => lb("unpin"), hidden: () => !pin, onSelect: () => table.pin(key, null) },

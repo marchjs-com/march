@@ -120,11 +120,11 @@ export function CodeInput(props: CodeInputProps): unknown {
         if (v && i < n - 1) boxes[i + 1]!.focus();
       },
       onKeyDown: (e: KeyboardEvent) => {
-        if (e.key === "Backspace" && !cells.peek()[i] && i > 0) { e.preventDefault(); const arr = [...cells.peek()]; arr[i - 1] = ""; write(arr); boxes[i - 1]!.focus(); }
+        if (e.key === "Backspace" && !props.readonly && !cells.peek()[i] && i > 0) { e.preventDefault(); const arr = [...cells.peek()]; arr[i - 1] = ""; write(arr); boxes[i - 1]!.focus(); }
         else if (e.key === "ArrowLeft" && i > 0) { e.preventDefault(); boxes[i - 1]!.focus(); }
         else if (e.key === "ArrowRight" && i < n - 1) { e.preventDefault(); boxes[i + 1]!.focus(); }
       },
-      onPaste: (e: ClipboardEvent) => { const text = e.clipboardData?.getData("text") ?? ""; if (text) { e.preventDefault(); fill(i, text); } },
+      onPaste: (e: ClipboardEvent) => { const text = e.clipboardData?.getData("text") ?? ""; if (text && !props.readonly) { e.preventDefault(); fill(i, text); } },
     }) as HTMLInputElement;
     syncValue(el, () => cells()[i]);
     boxes.push(el);

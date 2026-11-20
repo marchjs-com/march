@@ -61,6 +61,12 @@ export function ReactionPicker(props: ReactionPickerProps): Element {
   root = h("div", {
     class: () => cx("m-react", `m-react-${val(props.layout) ?? "row"}`, val(props.class)),
     role: "toolbar", "aria-label": () => val(props.label) ?? t`Reactions`, onKeydown: key,
+    // the one Tab stop follows the focus (Tab back in returns to the emoji left last)
+    onFocusin: (e: FocusEvent) => {
+      const list = items();
+      if (!list.includes(e.target as HTMLButtonElement)) return;
+      for (const b of list) b.tabIndex = b === e.target ? 0 : -1;
+    },
   }, () => {
     const list = val(props.emojis) ?? (val(props.layout) === "grid" ? EMOJI_SET : QUICK_REACTIONS);
     const sel = val(props.selected);

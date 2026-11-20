@@ -2,8 +2,9 @@
 import type { DrawFn } from "./index.ts";
 import { frameLoop } from "../../../motion/env.ts";
 
-/** Muted, looping, inline, control-less video that plays only while visible. */
-export function mountVideo(root: HTMLElement, src: string, poster: string | undefined, posterEl: HTMLElement | null): void {
+/** Muted, looping, inline, control-less video that plays only while visible. Returns stop; `watch`: also stop by itself
+ *  when the overlay leaves the document (no owner to say so). */
+export function mountVideo(root: HTMLElement, src: string, poster: string | undefined, posterEl: HTMLElement | null, watch = true): () => void {
   const v = document.createElement("video");
   v.className = "m-ov-media";
   v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true; v.autoplay = false; v.controls = false;
@@ -16,12 +17,13 @@ export function mountVideo(root: HTMLElement, src: string, poster: string | unde
   v.addEventListener("playing", () => posterEl?.remove(), { once: true });
   const IO = globalThis.IntersectionObserver;
   const play = (): void => { void v.play().catch(() => { /* blocked or no codec: the poster stays */ }); };
-  if (!IO) { play(); return; }
-  const io = new IO((es) => { for (const e of es) if (e.isIntersecting) play(); else v.pause(); }, { threshold: 0.05 });
-  io.observe(root);
+  const io = IO ? new IO((es) => { for (const e of es) if (e.isIntersecting) play(); else v.pause(); }, { threshold: 0.05 }) : null;
+  if (io) io.observe(root); else play();
+  let mo: MutationObserver | null = null;
+  const stop = (): void => { io?.disconnect(); mo?.disconnect(); v.pause(); v.removeAttribute("src"); v.load(); };
   // stop when the overlay leaves the document
-  const mo = new MutationObserver(() => { if (!root.isConnected) { io.disconnect(); mo.disconnect(); v.pause(); v.removeAttribute("src"); v.load(); } });
-  mo.observe(document.body, { childList: true, subtree: true });
+  if (watch && globalThis.MutationObserver) { mo = new MutationObserver(() => { if (!root.isConnected) stop(); }); mo.observe(document.body, { childList: true, subtree: true }); }
+  return stop;
 }
 
 const themeColors = (el: Element): { primary: string; text: string; surface: string; bg: string; cat: string[] } => {
@@ -30,13 +32,13 @@ const themeColors = (el: Element): { primary: string; text: string; surface: str
   return { primary: v("--m-primary"), text: v("--m-text"), surface: v("--m-surface"), bg: v("--m-bg"), cat: [1, 2, 3, 4, 5, 6, 7, 8].map((i) => v(`--m-cat-${i}`)) };
 };
 
-/** A canvas sized to the overlay (devicePixelRatio), redrawn on resize, every frame while visible when `animate`. */
-export function mountCanvas(root: HTMLElement, draw: DrawFn, animate: boolean): void {
+/** A canvas sized to the overlay (devicePixelRatio), redrawn on resize, every frame while visible when `animate`. Returns stop. */
+export function mountCanvas(root: HTMLElement, draw: DrawFn, animate: boolean): () => void {
   const c = document.createElement("canvas");
   c.className = "m-ov-media";
   root.append(c);
   const ctx = c.getContext("2d");
-  if (!ctx) return;
+  if (!ctx) return () => {};
   // the engine's clock drives the loop: global speed, "pause all" and off-screen stop reach the canvas too
   let w = 0, h = 0, dpr = 1, visible = true, time = 0, stop: (() => void) | null = null;
   // a twin: the copy of this canvas in a painted theme wave's veil (march/motion themeWave), drawn by the same
@@ -79,10 +81,9 @@ export function mountCanvas(root: HTMLElement, draw: DrawFn, animate: boolean): 
   const ro = new ResizeObserver(resize);
   ro.observe(root);
   const IO = globalThis.IntersectionObserver;
-  if (IO) {
-    const io = new IO((es) => { visible = es.some((e) => e.isIntersecting); if (visible) run(); }, { threshold: 0 });
-    io.observe(root);
-  }
+  const io = IO ? new IO((es) => { visible = es.some((e) => e.isIntersecting); if (visible) run(); }, { threshold: 0 }) : null;
+  io?.observe(root);
   // the first size comes from the observer, after the browser's own layout: measuring here would force a layout while
   // the page is still being built (a stall when a page with a canvas opens)
+  return () => { ro.disconnect(); io?.disconnect(); stop?.(); stop = null; twin = null; };
 }

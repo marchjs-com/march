@@ -4,7 +4,7 @@ import "./kanban.css";
 import { signal, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { setStyle } from "../../../core/util.ts";
+import { setStyle, later } from "../../../core/util.ts";
 import { owned } from "../../../ui/observe.ts";
 import { draggable } from "../../../behaviors/drag/index.ts";
 import { dragGhost, type DragGhost } from "../../../behaviors/drag/ghost.ts";
@@ -71,7 +71,12 @@ export function Kanban<T>(props: KanbanProps<T>): Element {
       onKeydown: (e: KeyboardEvent) => {
         if (!e.altKey || (e.key !== "ArrowLeft" && e.key !== "ArrowRight")) return;
         const to = cols[ci + (e.key === "ArrowRight" ? 1 : -1)];
-        if (to) { e.preventDefault(); props.onMove?.(it, col.id, to.id); }
+        if (!to) return;
+        e.preventDefault();
+        const key = keyOf(it);
+        props.onMove?.(it, col.id, to.id);
+        // the board is drawn again for the new columns: keep the focus on the moved card
+        later(() => { for (const c of root.querySelectorAll<HTMLElement>(".m-kanban-card")) if (c.dataset["key"] === key) { if (!c.contains(root.ownerDocument.activeElement)) c.focus(); break; } }, 0);
       },
     }, cardOf(it)))))));
   }) as HTMLElement;

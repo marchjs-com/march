@@ -83,19 +83,25 @@ export function AppUI(props: AppUIProps): Element {
   onCleanup(() => kit.dispose());
   onKit?.(kit);
   // the file panels keep their content function: a panel is built once (DockLayout), the view inside follows the types
-  const views = new Map<string, () => unknown>();
-  const all = computed((): DockPanel[] => [
+  const views = new Map<string, { file: AppFile; view: () => unknown }>();
+  const all = computed((): DockPanel[] => {
     // read from props each time: a reactive list (a signal, a computed) is a live getter prop
-    ...(val(props.panels) ?? []).map((p): DockPanel => {
-      if (!p.file) return p as DockPanel;
-      const f = p.file;
-      let view = views.get(p.id);
-      if (!view) { view = fileView(kit, f); views.set(p.id, view); }
-      const draw = view;
-      return { ...p, content: () => h("div", { class: "m-app-file" }, draw) } as DockPanel;
-    }),
-    ...kit.panels(),
-  ]);
+    const list = val(props.panels) ?? [];
+    // a closed file's view goes (the map does not grow; the same id opened again with another file gets its own view)
+    const ids = new Set(list.map((p) => p.id));
+    for (const id of views.keys()) if (!ids.has(id)) views.delete(id);
+    return [
+      ...list.map((p): DockPanel => {
+        if (!p.file) return p as DockPanel;
+        const f = p.file;
+        let v = views.get(p.id);
+        if (!v || v.file !== f) { v = { file: f, view: fileView(kit, f) }; views.set(p.id, v); }
+        const draw = v.view;
+        return { ...p, content: () => h("div", { class: "m-app-file" }, draw) } as DockPanel;
+      }),
+      ...kit.panels(),
+    ];
+  });
   const menu = layoutLabel === false ? null : h(Menu, {
     label: () => val(layoutLabel as MaybeFn<string | undefined>) || t`Layout`, icon: ownIcon(layoutIcon, columns), size: "sm", class: "m-app-layout", panelClass: "m-app-menu", placement: "bottom-end",
     items: () => dock?.layoutMenu() ?? [],

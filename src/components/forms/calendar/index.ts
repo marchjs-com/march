@@ -5,6 +5,7 @@ import { signal, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, locale } from "../../../core/i18n.ts";
 import { model, cx, uid, type ControlProps } from "../../../forms/util.ts";
+import { isRtl } from "../../../core/util.ts";
 import { colorAttr } from "../../../theme/colors.ts";
 import { utcDate as utc, isIso, todayIso, addMonths, firstDayOf, monthGrid, weekdayNames, dateFormat as dtf, type IsoDate } from "../../../core/date.ts";
 import { dayGridKey } from "../../../ui/date-grid.ts";
@@ -73,11 +74,14 @@ export function Calendar(props: CalendarProps): unknown {
   const pick = (iso: string) => { if (disabled(iso)) return; set(iso); props.onPick?.(iso); };
   const onKeyDown = (e: KeyboardEvent) => {
     const f = focus.peek(), k = e.key;
-    const next = dayGridKey(e, f, props.firstDay ?? firstDayOf(loc()));
+    // right to left the columns are mirrored: ← moves to the next day
+    const next = dayGridKey(e, f, props.firstDay ?? firstDayOf(loc()), isRtl(e.currentTarget as Element) ? -1 : 1);
     if (next != null) { e.preventDefault(); go(next, true); }
     else if (k === "Enter" || k === " ") { e.preventDefault(); pick(f); }
     else if (k === "Escape" && props.onEscape) { e.preventDefault(); props.onEscape(); }
   };
+  // a value set from outside in another month brings that month into view (a pick is always in the shown month)
+  effect(() => { const v = get(); untrack(() => { if (isIso(v) && v.slice(0, 7) !== focus.peek().slice(0, 7)) focus.set(clampIso(v, props.min, props.max)); }); });
   const grid = h("div", {
     role: "grid", class: "m-cal-grid", "aria-labelledby": titleId, onKeyDown,
     onClick: (e: MouseEvent) => { const b = (e.target as Element).closest?.("[data-date]"); if (b) { focus.set(b.getAttribute("data-date")!); pick(b.getAttribute("data-date")!); } },

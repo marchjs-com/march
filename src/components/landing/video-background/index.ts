@@ -5,7 +5,7 @@ import "./video-background.css";
 import { h } from "../../../dom/h.ts";
 import { signal } from "../../../core/reactive.ts";
 import { t } from "../../../core/i18n.ts";
-import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
+import { cx, val, listen, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { Overlay, quietMedia, type OverlayProps } from "../../../ui/overlay.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { play } from "../../../icons/glyphs/play.ts";
@@ -49,6 +49,8 @@ export function VideoBackground(props: VideoBackgroundProps): Element {
       if (!v) return;
       if (v.paused) { void v.play().catch(() => undefined); paused.set(false); } else { v.pause(); paused.set(true); }
     };
+    // the Overlay plays the video again when it scrolls back into view: a pause chosen here stays (WCAG 2.2.2)
+    listen(root, { play: (e: Event) => { if (paused.peek()) (e.target as HTMLVideoElement).pause?.(); } }, true);
     root.append(h(IconButton, {
       class: "m-vbg-toggle", size: "sm", shape: "round", inverse: true, onClick: toggle,
       icon: () => (paused() ? props.icons?.play ?? play : props.icons?.pause ?? pause),

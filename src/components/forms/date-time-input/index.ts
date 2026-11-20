@@ -31,7 +31,8 @@ export function DateTimeInput(props: DateTimeInputProps): unknown {
   effect(() => {
     const d = toDate(get());
     untrack(() => {
-      if (!d) { if (date.peek() && time.peek()) { date.set(null); time.set(""); } return; }
+      // a cleared value clears a shown date even when its time was emptied (a date the user just removed keeps the time)
+      if (!d) { if (date.peek()) { date.set(null); time.set(""); } return; }
       date.set(isoOf(d.getFullYear(), d.getMonth() + 1, d.getDate()));
       time.set(`${pad(d.getHours())}:${pad(d.getMinutes())}`);
     });

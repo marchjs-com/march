@@ -118,7 +118,9 @@
 .m-ai-bar { flex: none; display: flex; align-items: center; gap: var(--m-space-1); padding: var(--m-space-1) var(--m-space-2); border-block-end: 1px solid var(--m-border); }
 .m-ai-model { min-inline-size: 0; max-inline-size: 18rem; }
 .m-ai-usage { color: var(--m-muted); font: var(--m-text-xs) var(--m-font-mono); white-space: nowrap; }
-.m-ai-list { flex: 1 1 auto; min-block-size: 0; overflow: auto; display: flex; flex-direction: column; gap: var(--m-space-3); padding: var(--m-space-3); }
+.m-ai-list { flex: 1 1 auto; min-block-size: 0; overflow: auto; padding: var(--m-space-3); }
+/* the content box (stickToBottom follows its growth while the answer streams in) */
+.m-ai-list-body { display: flex; flex-direction: column; gap: var(--m-space-3); }
 .m-ai-start { display: grid; gap: var(--m-space-2); }
 .m-ai-quick { display: flex; flex-wrap: wrap; gap: var(--m-space-1); }
 .m-ai-msg { display: grid; gap: var(--m-space-2); max-inline-size: 100%; }

@@ -7,6 +7,7 @@ import { If, Else } from "../../../dom/flow.ts";
 import { For } from "../../../dom/for.ts";
 import { t, locale } from "../../../core/i18n.ts";
 import { glyph } from "../../../ui/util.ts";
+import { stickToBottom, type StickControls } from "../../../ui/observe.ts";
 import { Button } from "../../actions/button/index.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { PasswordInput } from "../../forms/password-input/index.ts";
@@ -444,7 +445,7 @@ const k = (n: number): string => (n >= 1000 ? `${(n / 1000).toFixed(n >= 10_000 
 export function AiChatPanel(props: AiChatProps) {
   const msgs = signal<Msg[]>([]), input = signal(""), busy = signal(false), consentFor = signal<string | null>(null);
   const settings = signal<AiSettings>({ models: {}, consent: {}, active: {} }), configured = signal<string[]>([]), withCode = signal(true);
-  let stop: AbortController | null = null, pending: [string, string | undefined] | null = null, list!: HTMLElement;
+  let stop: AbortController | null = null, pending: [string, string | undefined] | null = null, listEl: HTMLElement | undefined, body: HTMLElement | undefined, stick: StickControls | null = null;
   const load = async (): Promise<void> => {
     if (props.vault.state() !== "unlocked") return;
     const [c, s] = await Promise.all([props.keys.configured(), props.keys.settings()]);
@@ -454,7 +455,12 @@ export function AiChatPanel(props: AiChatProps) {
   const current = computed(() => { const s = settings(), c = configured(); const id = s.provider && c.includes(s.provider) ? s.provider : c[0]; return id ? { id, model: s.models[id] ?? providerOf(id).models[0] ?? "" } : null; });
   const choices = computed(() => configured().map((id) => ({ value: id, label: `${providerOf(id).name.replace(/ \(.*\)$/, "")} · ${settings().models[id] ?? ""}` })));
   const total = computed(() => msgs().reduce((a, m) => ({ input: a.input + (m.usage?.input ?? 0), output: a.output + (m.usage?.output ?? 0) }), { input: 0, output: 0 }));
-  const scroll = (): void => { if (list) list.scrollTop = list.scrollHeight; };
+  // pinned to the end while the answer streams in (the content box is followed: one scroll a frame, after layout); a
+  // reader who scrolled up to read stays there. Sending a message brings the end back.
+  // made once both boxes of a drawing exist (whichever ref comes last; the list is drawn again after a lock)
+  const pin = (): void => { if (listEl && body) { stick = stickToBottom(listEl, { follow: body }); listEl = body = undefined; } };
+  const toEnd = (): void => { stick?.toBottom(); };
+  const follow = (): void => { if (!globalThis.ResizeObserver && stick?.pinned()) stick.toBottom(); };
   const ctxText = (): string => {
     const c = props.context?.() ?? {};
     const parts: string[] = [];
@@ -480,6 +486,7 @@ export function AiChatPanel(props: AiChatProps) {
     const user: Msg = { role: "user", content: ctx ? `${ctx}\n\n${text}` : text, shown: label ?? text };
     const answer: Msg = { role: "assistant", content: "", done: false };
     msgs.set([...untrack(msgs), user, answer]);
+    queueMicrotask(toEnd);
     input.set(""); busy.set(true);
     stop = new AbortController();
     const ref = props.reference ? await props.reference(`${text}\n${ctx}`, props.context?.() ?? {}).catch(() => "") : "";
@@ -491,16 +498,15 @@ export function AiChatPanel(props: AiChatProps) {
     stop = new AbortController();
     const put = (m: Partial<Msg>): void => { const all = [...untrack(msgs)]; all[at] = { ...all[at]!, ...m }; msgs.set(all); };
     const was = untrack(msgs)[at]?.usage;
-    queueMicrotask(scroll);
     try {
       const base = await systemText();
       const r = await chat({ provider: cur.id, key, model: cur.model, maxTokens: MAX_ANSWER, system: `${base ? `${base}\n\n` : ""}The user's interface language: ${untrack(locale)}; answer in it unless the user writes in another one.`, messages, signal: stop.signal,
-        onText: (_, all) => { put({ content: before + all }); scroll(); } });
+        onText: (_, all) => { put({ content: before + all }); follow(); } });
       const usage = was ? { input: was.input + r.usage.input, output: was.output + r.usage.output, ...((was.cached ?? 0) + (r.usage.cached ?? 0) ? { cached: (was.cached ?? 0) + (r.usage.cached ?? 0) } : {}) } : r.usage;
       put({ content: before + r.text, usage, model: r.model, done: true, cut: isCut(r.stop) });
     } catch (e) {
       put({ error: e instanceof AiError && e.code === "abort" ? t("Stopped.") : errText(e), done: true });
-    } finally { busy.set(false); stop = null; queueMicrotask(scroll); }
+    } finally { busy.set(false); stop = null; queueMicrotask(follow); }
   };
   /** An answer cut at the length limit goes on in the same message (the model is told where it stopped). */
   const goOn = async (at: number): Promise<void> => {
@@ -562,7 +568,8 @@ export function AiChatPanel(props: AiChatProps) {
                 </If>
                 <IconButton icon={refresh} label={t("New chat")} disabled={() => busy() || !msgs().length} onClick={() => msgs.set([])} />
               </div>
-              <div class="m-ai-list" ref={(el: Element) => { list = el as HTMLElement; }} aria-live="polite">
+              <div class="m-ai-list" ref={(el: Element) => { listEl = el as HTMLElement; pin(); }} aria-live="polite">
+                <div class="m-ai-list-body" ref={(el: Element) => { body = el as HTMLElement; pin(); }}>
                 <If when={() => !msgs().length}>
                   <div class="m-ai-start">
                     <p class="m-vault-note">{t("Ask about the open file, or start with:")}</p>
@@ -594,6 +601,7 @@ export function AiChatPanel(props: AiChatProps) {
                     </If>
                   </div>
                 )}</For>
+                </div>
               </div>
               <If when={() => consentFor()}>
                 <Alert tone="info" title={() => t`Send to ${providerOf(consentFor()!).name}?`}

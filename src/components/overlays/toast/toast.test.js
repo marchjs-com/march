@@ -13,7 +13,7 @@ test("toast: shown in a polite live region; action runs and dismisses; at most f
   const host = document.querySelector(".m-toasts");
   assert.equal(host.getAttribute("aria-live"), "polite");
   const el = host.querySelector(".m-toast-success");
-  assert.equal(el.getAttribute("role"), "status");
+  assert.equal(el.getAttribute("role"), "none", "the stack is the only polite live region");
   el.querySelector(".m-toast-action").click();
   await tick();
   assert.equal(ran, 1);
@@ -56,4 +56,16 @@ test("toast: a failing action shows its own error text; ToastHost takes position
   assert.ok(own.classList.contains("m-toasts-top-center") && own.classList.contains("mine"));
   assert.equal(std.getAttribute("class"), "m-toasts");
   dispose();
+});
+
+test("toast: timers pause while the pointer or focus is on the stack", async () => {
+  toast("P", { timeout: 30 });
+  await tick();
+  const host = document.querySelector(".m-toasts");
+  host.dispatchEvent(new globalThis.Event("mouseenter"));
+  await new Promise((r) => setTimeout(r, 60));
+  assert.equal(toast.list().length, 1, "paused under the pointer");
+  host.dispatchEvent(new globalThis.Event("mouseleave"));
+  await new Promise((r) => setTimeout(r, 60));
+  assert.equal(toast.list().length, 0, "runs out after the pointer leaves");
 });
