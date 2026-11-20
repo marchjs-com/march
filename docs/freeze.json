@@ -600,6 +600,14 @@
    ],
    "hash": "d6b09c41cc080363189f8c3ec9de0be7"
   },
+  "SectionTimeline": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/navigation/section-timeline",
+    "examples/showcase/public/components/section-timeline/ide.json"
+   ],
+   "hash": "cad3a2ac6d1d0c52e345143a898a1e3b"
+  },
   "Segmented": {
    "frozen": "2026-11-20",
    "paths": [
