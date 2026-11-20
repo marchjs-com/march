@@ -760,6 +760,14 @@
    ],
    "hash": "af7be07164109cdff05fd21c48ee03bc"
   },
+  "OverlayScope": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/overlay-scope",
+    "examples/showcase/public/components/overlay-scope/ide.json"
+   ],
+   "hash": "7e9a50583ac77dec76022e3b80133d30"
+  },
   "PageDots": {
    "frozen": "2026-11-20",
    "paths": [
