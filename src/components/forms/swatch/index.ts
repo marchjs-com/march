@@ -53,7 +53,9 @@ export function Swatch(props: SwatchProps): Element {
   const said = props.selected === undefined ? null : role ? (CHECKED.includes(role) ? "aria-checked" : "aria-selected") : button ? "aria-pressed" : null;
   const el = h(button ? "button" : "span", {
     ...(button ? { type: "button", disabled: () => !!val(props.disabled), onClick: props.onClick, title: label } : {}),
-    ...(!button && !role ? { role: () => (label() ? "img" : null), "aria-hidden": () => (label() ? null : "true") } : {}),
+    // a bare swatch is a picture (named) or decoration (hidden); one holding content (ColorInput's native picker lies
+    // in it) is neither: its content must stay reachable
+    ...(!button && !role ? (props.children != null ? {} : { role: () => (label() ? "img" : null), "aria-hidden": () => (label() ? null : "true") }) : {}),
     "aria-label": label,
     ...(said ? { [said]: () => String(on()) } : {}),
     ...rest(props, ["color", "selected", "label", "size", "shape", "checker", "mark", "onClick", "disabled"]),

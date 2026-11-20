@@ -45,6 +45,7 @@ export function DateTimeInput(props: DateTimeInputProps): unknown {
   };
   const field = useField();
   return h("span", { class: () => cx("m-datetime", props.class) },
-    h(DatePicker, { ...props.picker, id: props.id ?? field?.id, value: live(() => date()), setValue: (v) => { date.set(v); emit(); }, min: props.min, max: props.max, disabled: live(() => props.disabled), readonly: live(() => props.readonly), onBlur: props.onBlur, firstDay: props.firstDay }),
+    // the date part: the Field's label names it; outside a Field its own name (aria-label, else "Date"), as the time part has timeLabel
+    h(DatePicker, { ...props.picker, id: props.id ?? field?.id, "aria-label": live(() => props["aria-label"] ?? (field ? null : t`Date`)), value: live(() => date()), setValue: (v) => { date.set(v); emit(); }, min: props.min, max: props.max, disabled: live(() => props.disabled), readonly: live(() => props.readonly), onBlur: props.onBlur, firstDay: props.firstDay }),
     h(TimeInput, { id: uid("m-time"), "aria-label": live(() => props.timeLabel ?? t`Time`), value: live(() => time()), setValue: (v) => { time.set(v); emit(); }, disabled: live(() => props.disabled), readonly: live(() => props.readonly) }));
 }

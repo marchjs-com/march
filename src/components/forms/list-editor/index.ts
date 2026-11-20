@@ -5,7 +5,7 @@ import { untrack, type Accessor } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { For } from "../../../dom/for.ts";
 import { t } from "../../../core/i18n.ts";
-import { model, cx, live, labelledBy, type ControlProps } from "../../../forms/util.ts";
+import { model, cx, live, labelledBy, useField, type ControlProps } from "../../../forms/util.ts";
 import { splitLines, rowList, rowToolsProps, outsideField } from "../../../forms/rows.ts";
 import { Button } from "../../actions/button/index.ts";
 import { RowTools } from "../row-tools/index.ts";
@@ -49,8 +49,10 @@ export function ListEditor(props: ListEditorProps): unknown {
   };
   // the draft line is the field's control (id, aria-invalid, aria-describedby come from the enclosing <Field>)
   let draft!: HTMLInputElement;
+  const inField = !!useField();
   const draftInput = h(TextInput, {
-    id: props.id, placeholder: live(() => props.placeholder ?? t`Add an item`), disabled: live(() => ro() || full()), invalid: live(() => props.invalid), describedby: live(() => props.describedby),
+    // inside a Field its label names the draft line; alone it is named by aria-label, else by what it does
+    id: props.id, "aria-label": live(() => props["aria-label"] ?? (inField ? null : props.placeholder ?? t`Add an item`)), placeholder: live(() => props.placeholder ?? t`Add an item`), disabled: live(() => ro() || full()), invalid: live(() => props.invalid), describedby: live(() => props.describedby),
     onBlur: props.onBlur, ref: (el: HTMLInputElement) => { draft = el; },
     onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter") { e.preventDefault(); const v = draft.value.trim(); if (v) { add([v]); draft.value = ""; } } },
     onPaste: (e: ClipboardEvent) => { const lines = splitLines(e.clipboardData?.getData("text")); if (lines.length > 1) { e.preventDefault(); add(lines); draft.value = ""; } },

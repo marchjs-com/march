@@ -144,6 +144,8 @@ export function ctl(props: CommonProps, extra: Record<string, unknown> = {}): Ct
     "aria-invalid": () => (props.invalid ?? fc?.invalid?.() ? "true" : null),
     "aria-describedby": () => props.describedby ?? (fc?.describedby?.() || null),
     "aria-label": () => props["aria-label"] ?? props.ariaLabel ?? null,
+    // a name from elsewhere on the page (only when given: inside a Field its <label for> names the control)
+    "aria-labelledby": () => props.labelledby ?? null,
     onBlur: props.onBlur,
     onFocus: props.onFocus,
     ...extra,

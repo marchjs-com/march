@@ -91,7 +91,8 @@ export function markdownNodes(source: unknown, opts: MarkdownOptions = {}): Elem
       const start = ordered ? parseInt(m[1]!, 10) : null;
       out.push(h(ordered ? "ol" : "ul", { start: start && start !== 1 ? start : null }, items.map((it) => {
         const task = /^\[([ xX])\]\s+(.*)$/.exec(it);
-        return task ? h("li", { class: "m-task" }, h("input", { type: "checkbox", disabled: true, checked: task[1] !== " " }), " ", inline(task[2]!, opts)) : h("li", null, inline(it, opts));
+        // a task item: its text is the checkbox's label (a screen reader says "Salon, checkbox, checked")
+        return task ? h("li", { class: "m-task" }, h("label", null, h("input", { type: "checkbox", disabled: true, checked: task[1] !== " " }), " ", inline(task[2]!, opts))) : h("li", null, inline(it, opts));
       })));
       continue;
     }

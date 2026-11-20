@@ -175,7 +175,10 @@ const live = reactive as <T>(fn: () => T) => T;
 export function Tabs(props: TabsProps): Element {
   const base = uid("m-tabs");
   const list = computed(() => {
-    const src = props.tabs !== undefined ? val(props.tabs) : ([] as unknown[]).concat(props.children ?? []).flat() as TabSpec[];
+    // <Tab> children as written: a list, or a function (`{days.map((d) => <Tab …/>)}` compiles to a live child): read
+    // here, so a list that changes is followed
+    const kids = (x: unknown): unknown[] => (Array.isArray(x) ? x.flatMap(kids) : typeof x === "function" ? kids((x as () => unknown)()) : x == null ? [] : [x]);
+    const src = props.tabs !== undefined ? val(props.tabs) : kids(props.children) as TabSpec[];
     return (src ?? []).filter((x) => x && ((x as Partial<TabDescriptor>).__tab || x.id != null) && !val(x.hidden));
   });
   const local = signal<string | null>(null);

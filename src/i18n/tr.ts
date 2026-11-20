@@ -333,7 +333,7 @@ const tr: Record<string, string> = {
   "System theme": "Sistem teması",
   "This field is required": "Bu alan zorunlu",
   "This month": "Bu ay",
-  "Time": "Saat",
+  "Time": "Saat", "Date": "Tarih",
   "To": "Bitiş",
   "Today": "Bugün",
   "Type to search": "Aramak için yaz",

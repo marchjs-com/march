@@ -210,6 +210,11 @@ export function PropertyGrid(props: PropertyGridProps): Element {
       : [];
     const field = fields.length === 1 ? fields[0]! : null;
     if (field && !field.id) field.id = `${id}-f`;
+    // no form field but one control (a Switch, a single button): it is named by the row's label too
+    if (!field && control instanceof Element) {
+      const one = [control, ...control.querySelectorAll("button, [role=switch], [role=checkbox], [tabindex]")].filter((e) => e.matches("button, [role=switch], [role=checkbox], [tabindex]"));
+      if (one.length === 1 && !one[0]!.hasAttribute("aria-label") && !one[0]!.hasAttribute("aria-labelledby")) one[0]!.setAttribute("aria-labelledby", labelId);
+    }
     const label = h("div", { class: "m-pg-label" },
       h(field ? "label" : "span", { id: labelId, ...(field ? { for: field.id } : {}), class: "m-pg-name", title: () => (p.description ? null : labelOf(p)) }, () => labelOf(p)),
       props.changeMarks === false ? null : () => (changed() ? h(StatusDot, { class: "m-pg-dot", tone: "primary", size: "xs", title: L().changed ?? t`Changed`, label: L().changed ?? t`changed` }) : null),
