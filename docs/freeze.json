@@ -560,6 +560,14 @@
    ],
    "hash": "e423857656b8de6f9421207663c3b430"
   },
+  "MediaGrid": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/social/media-grid",
+    "examples/showcase/public/components/media-grid/ide.json"
+   ],
+   "hash": "40f16b20a81737228dddfee10c42f19d"
+  },
   "Menu": {
    "frozen": "2026-11-20",
    "paths": [
