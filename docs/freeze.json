@@ -992,6 +992,14 @@
    ],
    "hash": "df103e211fc0d26bbe0fdaae4911bc37"
   },
+  "ProjectGrid": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/project-grid",
+    "examples/showcase/public/components/project-grid/ide.json"
+   ],
+   "hash": "d961384e9628715c33d6060f92c4faec"
+  },
   "PropertyGrid": {
    "frozen": "2026-11-20",
    "paths": [
