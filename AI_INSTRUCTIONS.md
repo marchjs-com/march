@@ -725,15 +725,23 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | Badge | stable | Small status label in a tone, a dot badge, or a count badge (hidden at 0, 120 → 99+) with an accessible label; a pulsing dot, a mini size and a clickable (button) form. | StatusDot |
+| BarChart | experimental | Bar chart: grouped or stacked series, vertical or horizontal, bars that glide to new values, keyboard bars, tooltip, legend and a data table for screen readers. | — |
+| BarList | experimental | Ranked horizontal bars with labels for top-N lists (pages, countries, products): sorted, limited, formatted; rows become buttons with onSelect. | OverflowText |
 | Card | stable | Surface with an optional header (title, subtitle, actions), a body and a footer; action() objects in the header render as buttons. | PanelHeader |
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | SearchBox, Button, Chip, Menu, Checkbox, Chevron, Badge, ResizeHandle, Empty, LiveStatus, FilterControl, CellEditor |
 | Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | ListRow, ResizeHandle, Badge, LiveStatus |
+| Heatmap | experimental | Heatmap: a grid of intensities (day × hour) or a calendar of weeks, in tones of the theme accent; keyboard cells, tooltip and a data table for screen readers. | — |
 | IconTile | stable | An icon in a tinted rounded square: a tone or any theme colour token; soft, outline or solid; square or round. | — |
 | JsonView | stable | Collapsible read-only JSON tree: typed colours, item / key counts when closed, circular references marked. | Chevron |
 | Kanban | stable | Board of columns with toned headers, counts and cards you move by drag and drop or Alt+← / Alt+→. | PanelHeader, StatusDot, Badge |
 | KeyValue | stable | Definition list for detail views: label / value rows in 1–4 columns, hints, hidden rows and a placeholder for empty values. | StatTile |
+| LineChart | experimental | Line and area charts (AreaChart in the same folder): time, number or category x axis, several series, drag to zoom, keyboard points, tooltip, legend and a data table for screen readers. | — |
 | ListRow | experimental | The row lists are made of: lead (icon, avatar, dot, thumbnail) + title + sub text + trail and actions; a link, a button or a plain element that takes any role, ARIA and tabindex; active, selected, disabled; long text scrolls, is cut or wraps. | OverflowText |
+| PieChart | experimental | Pie or donut chart: shares of a whole, the total in the donut hole, slices that turn to new angles, keyboard slices, tooltip, legend and a data table for screen readers. | — |
+| ProgressRing | experimental | A score ring 0–100 (or 0–max) with the number in the middle: low / mid / high levels from thresholds, one theme color or several (gradient, segments, flowing). | — |
 | Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | PanelHeader, PeriodNav, Button, Segmented, ResizeHandle, LiveStatus |
+| Sparkline | experimental | A tiny trend line without axes, for table cells, list rows and KPI boxes: optional area and last-point dot; screen readers hear a summary of the values. | — |
+| Stat | experimental | KPI box: label, formatted value, the change against the previous period with an arrow (green or red, inverted for costs) and an optional sparkline. | StatTile, Sparkline |
 | StatTile | experimental | A value with its label and an optional hint: plain, soft tile or card; a button with onClick, a link with href, dt / dd inside a dl; the value may be a node (a rolling Counter). | — |
 | TimeRuler | experimental | The ruler above a timeline: ticks, time labels and a playhead; read-only, or draggable with a slider playhead (onSeek). Own tick distances, labels, head and colour. | — |
 | Timeline | stable | Ordered list of events with toned dots, optional icons, formatted times (Date / epoch / ISO) or plain text, titles and bodies. | StatusDot |

@@ -1,0 +1,5 @@
+/* PieChart: slices in the series colors with a hairline between them; the total in the donut hole. */
+.m-chart-slice { fill: var(--m-c); stroke: var(--m-chart-bg); stroke-width: 1; transition: opacity var(--m-chart-dur); }
+.m-chart-plot:hover .m-chart-slice:not(.m-chart-active) { opacity: 0.6; }
+.m-chart-center { font-size: 18px; font-weight: 600; fill: var(--m-chart-text); }
+@media (prefers-reduced-motion: reduce) { .m-chart-slice { transition: none; } }

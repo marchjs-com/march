@@ -1,0 +1,5 @@
+/* BarChart: bars in the series color; the others fade while one is hovered; the band behind the active category. */
+.m-chart-bar { fill: var(--m-c); transition: opacity var(--m-chart-dur); }
+.m-chart-plot:hover .m-chart-bar:not(.m-chart-active) { opacity: 0.6; }
+.m-chart-band { fill: var(--m-chart-grid); opacity: 0.5; }
+@media (prefers-reduced-motion: reduce) { .m-chart-bar { transition: none; } }

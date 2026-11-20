@@ -1,0 +1,9 @@
+/* Heatmap: a cell takes the tone of its level (--m-heat-0 … --m-heat-4, accent based, in src/charts/charts.css). */
+.m-heat-cell { fill: var(--m-heat-0); }
+.m-heat-1 { fill: var(--m-heat-1); }
+.m-heat-2 { fill: var(--m-heat-2); }
+.m-heat-3 { fill: var(--m-heat-3); }
+.m-heat-4 { fill: var(--m-heat-4); }
+/* animate: cells fade to their new level (Heatmap sets the easing and its length) */
+.m-heat-anim .m-heat-cell { transition: fill var(--m-heat-dur) var(--m-heat-ease, ease-out); }
+@media (prefers-reduced-motion: reduce) { .m-heat-anim .m-heat-cell { transition: none; } }

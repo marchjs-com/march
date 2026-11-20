@@ -94,15 +94,23 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Component | Status | What | Composed of |
 |---|---|---|---|
 | Badge | stable | Small status label in a tone, a dot badge, or a count badge (hidden at 0, 120 → 99+) with an accessible label; a pulsing dot, a mini size and a clickable (button) form. | [StatusDot](#statusdot) |
+| BarChart | experimental | Bar chart: grouped or stacked series, vertical or horizontal, bars that glide to new values, keyboard bars, tooltip, legend and a data table for screen readers. | — |
+| BarList | experimental | Ranked horizontal bars with labels for top-N lists (pages, countries, products): sorted, limited, formatted; rows become buttons with onSelect. | [OverflowText](#overflowtext) |
 | Card | stable | Surface with an optional header (title, subtitle, actions), a body and a footer; action() objects in the header render as buttons. | [PanelHeader](#panelheader) |
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | [SearchBox](#searchbox), [Button](#button), [Chip](#chip), [Menu](#menu), [Checkbox](#checkbox), [Chevron](#chevron), [Badge](#badge), [ResizeHandle](#resizehandle), [Empty](#empty), [LiveStatus](#livestatus), FilterControl, CellEditor |
 | Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | [ListRow](#listrow), [ResizeHandle](#resizehandle), [Badge](#badge), [LiveStatus](#livestatus) |
+| Heatmap | experimental | Heatmap: a grid of intensities (day × hour) or a calendar of weeks, in tones of the theme accent; keyboard cells, tooltip and a data table for screen readers. | — |
 | IconTile | stable | An icon in a tinted rounded square: a tone or any theme colour token; soft, outline or solid; square or round. | — |
 | JsonView | stable | Collapsible read-only JSON tree: typed colours, item / key counts when closed, circular references marked. | [Chevron](#chevron) |
 | Kanban | stable | Board of columns with toned headers, counts and cards you move by drag and drop or Alt+← / Alt+→. | [PanelHeader](#panelheader), [StatusDot](#statusdot), [Badge](#badge) |
 | KeyValue | stable | Definition list for detail views: label / value rows in 1–4 columns, hints, hidden rows and a placeholder for empty values. | [StatTile](#stattile) |
+| LineChart | experimental | Line and area charts (AreaChart in the same folder): time, number or category x axis, several series, drag to zoom, keyboard points, tooltip, legend and a data table for screen readers. | — |
 | ListRow | experimental | The row lists are made of: lead (icon, avatar, dot, thumbnail) + title + sub text + trail and actions; a link, a button or a plain element that takes any role, ARIA and tabindex; active, selected, disabled; long text scrolls, is cut or wraps. | [OverflowText](#overflowtext) |
+| PieChart | experimental | Pie or donut chart: shares of a whole, the total in the donut hole, slices that turn to new angles, keyboard slices, tooltip, legend and a data table for screen readers. | — |
+| ProgressRing | experimental | A score ring 0–100 (or 0–max) with the number in the middle: low / mid / high levels from thresholds, one theme color or several (gradient, segments, flowing). | — |
 | Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | [PanelHeader](#panelheader), [PeriodNav](#periodnav), [Button](#button), [Segmented](#segmented), [ResizeHandle](#resizehandle), [LiveStatus](#livestatus) |
+| Sparkline | experimental | A tiny trend line without axes, for table cells, list rows and KPI boxes: optional area and last-point dot; screen readers hear a summary of the values. | — |
+| Stat | experimental | KPI box: label, formatted value, the change against the previous period with an arrow (green or red, inverted for costs) and an optional sparkline. | [StatTile](#stattile), [Sparkline](#sparkline) |
 | StatTile | experimental | A value with its label and an optional hint: plain, soft tile or card; a button with onClick, a link with href, dt / dd inside a dl; the value may be a node (a rolling Counter). | — |
 | TimeRuler | experimental | The ruler above a timeline: ticks, time labels and a playhead; read-only, or draggable with a slider playhead (onSeek). Own tick distances, labels, head and colour. | — |
 | Timeline | stable | Ordered list of events with toned dots, optional icons, formatted times (Date / epoch / ISO) or plain text, titles and bodies. | [StatusDot](#statusdot) |
@@ -373,6 +381,33 @@ Composed of: [StatusDot](#statusdot)
 ```
 
 Full page: src/components/data/badge/docs.md
+
+## BarChart
+
+Bars from rows of objects: one series, several side by side (grouped) or on top of each other (`stacked`), standing up or lying down (`horizontal`). Data may be a signal or a function; with `animate` the bars glide to new values while the axes take the new scale at once.
+
+```tsx
+<BarChart data={$week} x="day" y={["shop", "online"]} series={{ shop: "Shop", online: "Online" }}
+  format={["money", "USD"]} animate title="Weekly sales" />
+<BarChart data={$week} x="day" y={["shop", "online"]} stacked horizontal height={220} />
+<BarChart data={langs} x="name" y="users" legend={false} onSelect={(p) => open(p.datum)} />
+```
+
+Full page: src/components/data/bar-chart/docs.md
+
+## BarList
+
+Ranked horizontal bars with their labels and values: top pages, countries, products, songs. Rows are sorted largest first (unless `sort={false}`), can be cut to the first N (`limit`) and become buttons with `onSelect`. A long label scrolls into view when it does not fit (OverflowText). Data may be a signal or a function.
+
+Composed of: [OverflowText](#overflowtext)
+
+```tsx
+<BarList data={$songs} x="title" y="plays" title="Most played" />
+<BarList data={countries} limit={5} format="compact" color={2} onSelect={(r) => open(r.datum)} />
+<BarList data={tasks} sort={false} max={100} format={(v) => `${v}%`} />
+```
+
+Full page: src/components/data/bar-list/docs.md
 
 ## BeforeAfter
 
@@ -1267,6 +1302,18 @@ A responsive grid that never overflows horizontally. Fixed columns (`cols`, 1–
 
 Full page: src/components/layout/grid/docs.md
 
+## Heatmap
+
+Intensities on a grid: `x` picks the column, `y` the row and `value` the number (duplicates are summed); cells take `levels` tones of the theme accent. With `calendar` the columns are weeks and the rows weekdays, the way a habit or a contribution graph reads. Data may be a signal or a function; with `animate` cells fade to their new tone.
+
+```tsx
+<Heatmap data={visits} x="hour" y="day" value="people" yFormat={(d) => DAYS[d]} title="Café traffic" />
+<Heatmap data={pages} x="date" value="pages" calendar={{ weeks: 16 }} end="2026-11-20" levels={4} />
+<Heatmap data={errors} x="service" y="region" value="count" cell={20} max={50} onSelect={(c) => open(c)} />
+```
+
+Full page: src/components/data/heatmap/docs.md
+
 ## Hero
 
 The first screen of a website in seven looks that share one structure: an eyebrow pill, a large title whose `highlight` gets the brand gradient, a lead, actions and a note. The stage changes by variant: `centered` (soft grid and spotlight), `split` (media at the end), `video` (VideoBackground), `mesh` (gradient mesh, spotlight, grain), `aurora` (drifting colour), `product` (a product frame that tilts in 3D and flattens as you scroll) and `parallax` (layered depth).
@@ -1519,6 +1566,19 @@ Composed of: [CountRoll](#countroll), [Button](#button)
 ```
 
 Full page: src/components/social/like-button/docs.md
+
+## LineChart
+
+Line and area charts from rows of objects. `x` picks the x value (dates give a time axis, numbers a linear one, anything else categories), `y` one series or a list of them. `AreaChart` (same folder) fills under the lines and can stack them. Data may be a signal or a function: the chart follows it and its container's width. Long series are downsampled (LTTB).
+
+```tsx
+<LineChart data={$days} x="day" y={["income", "spend"]} series={{ income: "Income", spend: "Spending" }}
+  format={["money", "USD"]} xFormat="date" zoom title="Income and spending" />
+<AreaChart data={$days} x="day" y={["web", "app"]} stacked height={200} />
+<LineChart data={temps} x="hour" y="c" zero={false} legend={false} onSelect={(p) => open(p.datum)} />
+```
+
+Full page: src/components/data/line-chart/docs.md
 
 ## LinkCard
 
@@ -1987,6 +2047,18 @@ The image element behind every "cover", "logo" or "media" slot. Such a slot take
 
 Full page: src/components/media/picture/docs.md
 
+## PieChart
+
+Shares of a whole as a pie or a donut. `x` names each slice, `y` gives its value; the donut hole shows the formatted total unless `center` says otherwise. Data may be a signal or a function; with `animate` the slices turn to their new angles and a new slice opens from its edge.
+
+```tsx
+<PieChart data={$budget} x="label" y="value" donut format={["money", "USD"]} legend="right" title="Budget" />
+<PieChart data={votes} donut={0.8} center="128 votes" legend="bottom" animate />
+<PieChart data={traffic} padAngle={0.03} legend={false} onSelect={(p) => filter(p.label)} />
+```
+
+Full page: src/components/data/pie-chart/docs.md
+
 ## Popover
 
 A trigger and a floating panel next to it: filters, a column picker, a link form, a date panel, a list of choices. The panel is placed beside the trigger (and flips at the screen edge), closes on a press outside or Escape, takes focus when it opens and gives it back to the trigger. The open state is its own or yours.
@@ -2072,6 +2144,18 @@ A progress bar with a label and the percentage, or an indeterminate one while th
 ```
 
 Full page: src/components/feedback/progress/docs.md
+
+## ProgressRing
+
+A score ring with the number in the middle: a health score, a goal, a sleep score. `value` runs from 0 to `max` (default 100); the ring takes the low / mid / high level color from `thresholds` (percent limits, default 50 and 80), or one theme `color`. With `colors` it carries several colors: the four HADİ colors ("brand", the HADİ theme's default) or your own list, as a gradient, equal segments or flowing around the ring.
+
+```tsx
+<ProgressRing value={$sleep} label="Sleep score" />
+<ProgressRing value={7} max={10} size={88} thickness={10} color="brand-blue" format={(v) => `${v}/10`} />
+<ProgressRing value={64} colors="brand" paint="segments" label="Week" />
+```
+
+Full page: src/components/data/progress-ring/docs.md
 
 ## ProjectDetail
 
@@ -2485,6 +2569,18 @@ A flexible gap in a row: everything after it moves to the end of the row (the lo
 
 Full page: src/components/layout/spacer/docs.md
 
+## Sparkline
+
+A tiny trend line without axes: in a table cell, a list row or a KPI box (Stat uses it). `data` is a list of numbers, or objects read through `y`; it may be a signal or a function and the line follows it. Long series are downsampled (LTTB).
+
+```tsx
+<Sparkline data={$prices} area />
+<Sparkline data={rows} y="visits" width={160} height={40} color={2} dot={false} title="Visits" />
+<Sparkline data={latency} zero format={(v) => `${v} ms`} title="Latency" />
+```
+
+Full page: src/components/data/sparkline/docs.md
+
 ## Spinner
 
 A ring that turns while something loads. Three sizes; in a multicolour theme (HADİ) it carries the brand colours, `colors` picks them (a list of colour tokens) or keeps it to one.
@@ -2518,6 +2614,20 @@ Layout primitives. `Stack` lays children out in a column or a row with a gap fro
 ```
 
 Full page: src/components/layout/stack/docs.md
+
+## Stat
+
+A KPI box: the label, the formatted value and its change against the previous period. The change is a fraction (`delta={0.12}` → "+12 %") or computed from `previous`; it shows with an arrow, green when it is good and red when it is bad (`invert` for costs, where a decrease is good). `spark` adds a trend line under the value.
+
+Composed of: [StatTile](#stattile), [Sparkline](#sparkline)
+
+```tsx
+<Stat icon={wallet} label="Monthly income" value={$income} previous={$lastMonth} format={["money", "USD"]} spark={$days} hint="vs last month" />
+<Stat label="Orders" value={1284} delta={0.068} />
+<Stat label="Wait" value={4.2} delta={-0.12} invert format={(v) => `${v} min`} />
+```
+
+Full page: src/components/data/stat/docs.md
 
 ## StatTile
 

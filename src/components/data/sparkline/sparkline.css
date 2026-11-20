@@ -1,0 +1,3 @@
+/* Sparkline: an inline image on the text line; a thinner stroke than a chart's line. */
+.m-sparkline { display: inline-block; vertical-align: middle; overflow: visible; }
+.m-sparkline .m-chart-line { stroke-width: 1.5; }

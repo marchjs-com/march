@@ -64,6 +64,22 @@
    ],
    "hash": "fc217194a760323cb0b540189ac2a934"
   },
+  "BarChart": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/bar-chart",
+    "examples/showcase/public/components/bar-chart/ide.json"
+   ],
+   "hash": "41bd7e1b54387c3eecb9a1e0c7656f24"
+  },
+  "BarList": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/bar-list",
+    "examples/showcase/public/components/bar-list/ide.json"
+   ],
+   "hash": "e34fe6810d3dba0ce296aa8108736208"
+  },
   "BeforeAfter": {
    "frozen": "2026-11-20",
    "paths": [
@@ -544,6 +560,14 @@
    ],
    "hash": "3fd09c542d72c755fb86b3fb0bec05b9"
   },
+  "Heatmap": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/heatmap",
+    "examples/showcase/public/components/heatmap/ide.json"
+   ],
+   "hash": "da659b0440c69e0050b58bd55e43a935"
+  },
   "Hero": {
    "frozen": "2026-11-20",
    "paths": [
@@ -679,6 +703,14 @@
     "examples/showcase/public/components/like-button/ide.json"
    ],
    "hash": "498819f5ca67af035b94f68ec885ae01"
+  },
+  "LineChart": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/line-chart",
+    "examples/showcase/public/components/line-chart/ide.json"
+   ],
+   "hash": "414d096b2f3ddbe4c91cfcb6e882ec66"
   },
   "LinkCard": {
    "frozen": "2026-11-20",
@@ -944,6 +976,14 @@
    ],
    "hash": "39a1a35172113e39bb96b8405ddafd4b"
   },
+  "PieChart": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/pie-chart",
+    "examples/showcase/public/components/pie-chart/ide.json"
+   ],
+   "hash": "7be698d4e7f52ab214f34d17c6b1b012"
+  },
   "Popover": {
    "frozen": "2026-11-20",
    "paths": [
@@ -991,6 +1031,14 @@
     "examples/showcase/public/components/progress/ide.json"
    ],
    "hash": "0912b56a198a174b2b3a00fc4766f793"
+  },
+  "ProgressRing": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/progress-ring",
+    "examples/showcase/public/components/progress-ring/ide.json"
+   ],
+   "hash": "50913c0b70a012449d6099c3b65d75dc"
   },
   "ProjectDetail": {
    "frozen": "2026-11-20",
@@ -1232,6 +1280,14 @@
    ],
    "hash": "7a84a76fa30464a7272ff23fb8a67422"
   },
+  "Sparkline": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/sparkline",
+    "examples/showcase/public/components/sparkline/ide.json"
+   ],
+   "hash": "085f2f4fbb4af7b63176db6628ee0611"
+  },
   "Spinner": {
    "frozen": "2026-11-20",
    "paths": [
@@ -1255,6 +1311,14 @@
     "examples/showcase/public/components/stack/ide.json"
    ],
    "hash": "ea8eea9bcab52677672ff4918fdf551f"
+  },
+  "Stat": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/stat",
+    "examples/showcase/public/components/stat/ide.json"
+   ],
+   "hash": "e77bc162746329b376db24e491ccace3"
   },
   "StatsBand": {
    "frozen": "2026-11-20",
