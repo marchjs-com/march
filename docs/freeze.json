@@ -96,6 +96,14 @@
    ],
    "hash": "ba7190ffc473872680ce5a7a7c2e5b19"
   },
+  "ChatThread": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/chat-thread",
+    "examples/showcase/public/components/chat-thread/ide.json"
+   ],
+   "hash": "b79bb7465a688c537cd7130f97901a8f"
+  },
   "Checkbox": {
    "frozen": "2026-11-20",
    "paths": [
