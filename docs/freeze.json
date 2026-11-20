@@ -128,6 +128,14 @@
    ],
    "hash": "e125a6e093c93a6fd89e4c16770093e2"
   },
+  "FormatToolbar": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/format-toolbar",
+    "examples/showcase/public/components/format-toolbar/ide.json"
+   ],
+   "hash": "c7f1a35ed76ebb0de7cfd42d5670f1ea"
+  },
   "Gantt": {
    "frozen": "2026-11-20",
    "paths": [
