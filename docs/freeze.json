@@ -344,6 +344,14 @@
    ],
    "hash": "be207d2725e85146f49435113eba093d"
   },
+  "Feed": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/feed",
+    "examples/showcase/public/components/feed/ide.json"
+   ],
+   "hash": "d47e5be2ca332495e62fae3f18c16b9e"
+  },
   "FileUpload": {
    "frozen": "2026-11-20",
    "paths": [
