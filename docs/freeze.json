@@ -104,6 +104,14 @@
    ],
    "hash": "a255c2105493d803c96f7b47a0491855"
   },
+  "DataGrid": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/data-grid",
+    "examples/showcase/public/components/data-grid/ide.json"
+   ],
+   "hash": "71e9b8c77f946124564780e34543b86b"
+  },
   "Debugger": {
    "frozen": "2026-11-20",
    "paths": [
