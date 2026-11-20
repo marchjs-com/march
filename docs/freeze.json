@@ -168,6 +168,14 @@
    ],
    "hash": "689c4148984785297dc0d91174c230b2"
   },
+  "JsonView": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/json-view",
+    "examples/showcase/public/components/json-view/ide.json"
+   ],
+   "hash": "1ef41075f6fe9640513ea2682a28de01"
+  },
   "Kbd": {
    "frozen": "2026-11-20",
    "paths": [
