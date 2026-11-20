@@ -528,6 +528,14 @@
    ],
    "hash": "0cdfb42ffcd43c5f179ebcda54d53d9f"
   },
+  "OptionList": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/option-list",
+    "examples/showcase/public/components/option-list/ide.json"
+   ],
+   "hash": "fdd58479a44bbb93e3c3bcaff2b5e9e8"
+  },
   "OverflowText": {
    "frozen": "2026-11-20",
    "paths": [
