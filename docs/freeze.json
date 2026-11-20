@@ -112,6 +112,14 @@
    ],
    "hash": "5491a9f0f276d113ef4ce2c2e97c9e61"
   },
+  "EditorFrame": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/editor-frame",
+    "examples/showcase/public/components/editor-frame/ide.json"
+   ],
+   "hash": "fec20acd3eed36d571b2b548c0219b84"
+  },
   "FontPicker": {
    "frozen": "2026-11-20",
    "paths": [
