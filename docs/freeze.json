@@ -592,6 +592,14 @@
    ],
    "hash": "1cd8aa351b0943d4b1290dbf7181bd87"
   },
+  "Swatch": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/swatch",
+    "examples/showcase/public/components/swatch/ide.json"
+   ],
+   "hash": "347baeb2cddcecfd51c72843ed400206"
+  },
   "Terminal": {
    "frozen": "2026-11-20",
    "paths": [
