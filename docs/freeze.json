@@ -816,6 +816,14 @@
    ],
    "hash": "14fc80e551bb26d9754d47a2725f3d16"
   },
+  "NotForYou": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/not-for-you",
+    "examples/showcase/public/components/not-for-you/ide.json"
+   ],
+   "hash": "9d8de6288c5e273b9f382a156df20884"
+  },
   "NumberInput": {
    "frozen": "2026-11-20",
    "paths": [
