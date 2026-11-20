@@ -32,6 +32,14 @@
    ],
    "hash": "f65192e20c21dc0de073009e4c8bca9f"
   },
+  "Calendar": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/calendar",
+    "examples/showcase/public/components/calendar/ide.json"
+   ],
+   "hash": "d453858a9a17682edc97916a766192dd"
+  },
   "Card": {
    "frozen": "2026-11-20",
    "paths": [
