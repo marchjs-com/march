@@ -4,7 +4,10 @@
 .m-react-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(2.5rem, 1fr)); gap: .125rem; padding: .5rem; border-radius: var(--m-radius-4); width: 100%; box-sizing: border-box;
   max-height: 13rem; overflow-y: auto; box-shadow: none; transform-origin: 50% 100%; }
 .m-react-e { display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer;
-  font-size: 1.5rem; line-height: 1; transition: transform var(--m-dur) var(--m-ease-spring), background-color var(--m-dur) var(--m-ease); }
+  font-size: 1.5rem; line-height: 1; transition: transform var(--m-dur) var(--m-ease-spring), background-color var(--m-dur) var(--m-ease);
+  /* the system's colour emoji font by name: the browser draws each emoji at once, without first searching the page's
+     fonts for it (that search made a full grid slow to appear) */
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif; }
 .m-react-e span { display: inline-block; transition: transform var(--m-dur) var(--m-ease-spring); }
 .m-react-e:hover span, .m-react-e:focus-visible span { transform: translateY(-3px) scale(1.22); }
 .m-react-e:active span { transform: scale(.9); }

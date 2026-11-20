@@ -17,7 +17,7 @@ import type { IconProp } from "../../../icons/types.ts";
 /** Default quick-reaction row: the six emoji shown under a message. */
 export const QUICK_REACTIONS: readonly string[] = ["❤️", "😂", "😮", "😢", "🙏", "👍"];
 /** Default emoji grid of the panel (ChatComposer emoji button). */
-export const EMOJI_SET: readonly string[] = ["😀", "😂", "🥹", "😍", "🤩", "😎", "🤔", "😴", "😮", "😢", "😡", "🥳", "👍", "👏", "🙏", "💪", "🤝", "👋", "❤️", "🧡", "💙", "💚", "💜", "🔥", "✨", "🎉", "☕", "🍕", "⚽", "🚴", "🏃", "📸", "🎶", "📚", "🌊", "🌲"];
+export const EMOJI_SET: readonly string[] = ["😀", "😂", "🥰", "😍", "🤩", "😎", "🤔", "😴", "😮", "😢", "😡", "🥳", "👍", "👏", "🙏", "💪", "🤝", "👋", "❤️", "🧡", "💙", "💚", "💜", "🔥", "✨", "🎉", "☕", "🍕", "⚽", "🚴", "🏃", "📸", "🎶", "📚", "🌊", "🌲"];
 
 export interface ReactionPickerProps {
   /** Called with the chosen emoji. @tr Seçilen emojiyle çağrılır. */

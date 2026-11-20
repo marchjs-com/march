@@ -1094,7 +1094,7 @@
     "src/components/social/reaction-picker",
     "examples/showcase/public/components/reaction-picker/ide.json"
    ],
-   "hash": "0f85b2e7b25b2dd86a769d9719fa6c9e"
+   "hash": "ddf03040c6de58b997d8c615dfa043e0"
   },
   "ReplyQuote": {
    "frozen": "2026-11-20",
@@ -2547,6 +2547,12 @@
    "name": "Toast",
    "what": "refresh",
    "reason": "Önizleme düzeltmeleri: ToastHost fallback, Drawer durma noktaları katmana göre, ContextMenu imleçte açılır, Stepper/PullToRefresh boyutu, SectionTimeline yatay adlar dik, Carousel swipe seçeneği, kod renklendirmede JSX metni; örnekler"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ReactionPicker",
+   "what": "refresh",
+   "reason": "Emoji hücreleri sistemin renkli emoji yazı tipiyle çizilir (hızlı ilk çizim); Windows 10'da olmayan emoji değiştirildi"
   }
  ]
 }
