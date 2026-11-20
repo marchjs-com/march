@@ -120,6 +120,14 @@
    ],
    "hash": "3969ae0c6e7bd5f3012011a4a1e49e41"
   },
+  "JsonEditor": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/json-editor",
+    "examples/showcase/public/components/json/ide.json"
+   ],
+   "hash": "689c4148984785297dc0d91174c230b2"
+  },
   "Kbd": {
    "frozen": "2026-11-20",
    "paths": [
