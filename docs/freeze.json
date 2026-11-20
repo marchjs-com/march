@@ -80,6 +80,14 @@
    ],
    "hash": "1f7c77610ad393c41da8623d57c8e076"
   },
+  "ChatBubble": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/social/chat-bubble",
+    "examples/showcase/public/components/chat-bubble/ide.json"
+   ],
+   "hash": "4540e19c54c041cce5d40995e0a71341"
+  },
   "Checkbox": {
    "frozen": "2026-11-20",
    "paths": [
