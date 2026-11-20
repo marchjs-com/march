@@ -72,6 +72,14 @@
    ],
    "hash": "e6f9590f30af6586d582fbdc1d7c58c9"
   },
+  "LinkCard": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/navigation/link-card",
+    "examples/showcase/public/components/link-card/ide.json"
+   ],
+   "hash": "6ce5a61684035d2a786e37b0f734e83a"
+  },
   "MadeWithMarch": {
    "frozen": "2026-11-20",
    "paths": [
