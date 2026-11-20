@@ -336,6 +336,14 @@
    ],
    "hash": "5db6247270761965a16e769dbb33fbad"
   },
+  "DevicePreview": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/device-preview",
+    "examples/showcase/public/components/device-preview/ide.json"
+   ],
+   "hash": "c7a71c23654d42d36e23888b77747d4b"
+  },
   "Dialog": {
    "frozen": "2026-11-20",
    "paths": [
