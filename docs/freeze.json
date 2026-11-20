@@ -8,6 +8,14 @@
    ],
    "hash": "c889eec3614824d0c6bd535332f3d8f9"
   },
+  "ButtonGroup": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/actions/button-group",
+    "examples/showcase/public/components/button-group/ide.json"
+   ],
+   "hash": "f65192e20c21dc0de073009e4c8bca9f"
+  },
   "Gantt": {
    "frozen": "2026-11-20",
    "paths": [
