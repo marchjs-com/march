@@ -648,6 +648,14 @@
    ],
    "hash": "feff941f58d1b1d9d3b5cc78e786baf1"
   },
+  "Toggle": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/toggle",
+    "examples/showcase/public/components/toggle/ide.json"
+   ],
+   "hash": "c9b2e39685df8188b323d2515a55ca55"
+  },
   "Tooltip": {
    "frozen": "2026-11-20",
    "paths": [
