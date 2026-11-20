@@ -366,7 +366,7 @@
     "src/components/forms/date-picker",
     "examples/showcase/public/components/date/ide.json"
    ],
-   "hash": "f28d342b3ad8d2e2693377999e74b18c"
+   "hash": "00c25a9f1f44f8b2cc1bb0195fdfac18"
   },
   "DateRangePicker": {
    "frozen": "2026-11-20",
@@ -1653,6 +1653,18 @@
    "name": "ListEditor",
    "what": "refresh",
    "reason": "Satırlar tutamağından sürüklenerek sıralanır (fare, dokunma, kalem); Escape geri alır"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "DatePicker",
+   "what": "refresh",
+   "reason": "FlightSearch: alanlar aynı hizada, bilgi satırı altta"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "DatePicker",
+   "what": "refresh",
+   "reason": "FlightSearch: alanlar aynı hizada, bilgi satırı altta"
   }
  ]
 }

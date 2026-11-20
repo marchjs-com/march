@@ -1595,7 +1595,7 @@ Full page: src/components/navigation/link-card/docs.md
 
 ## ListEditor
 
-Edit an array of strings in place: type and press Enter to add, edit any row, move rows up and down, remove them. Pasting several lines adds one item per line; duplicates are skipped unless `unique={false}`; `max` caps the list.
+Edit an array of strings in place: type and press Enter to add, edit any row, move rows up and down (or drag a row by its grip), remove them. Pasting several lines adds one item per line; duplicates are skipped unless `unique={false}`; `max` caps the list.
 
 Composed of: [TextInput](#textinput), [RowTools](#rowtools), [Button](#button)
 
