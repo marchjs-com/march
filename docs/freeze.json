@@ -464,6 +464,14 @@
    ],
    "hash": "0cdfb42ffcd43c5f179ebcda54d53d9f"
   },
+  "OverflowText": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/typography/overflow-text",
+    "examples/showcase/public/components/overflow-text/ide.json"
+   ],
+   "hash": "a8ed12fee60fc72a375277150b519df5"
+  },
   "PasswordInput": {
    "frozen": "2026-11-20",
    "paths": [
