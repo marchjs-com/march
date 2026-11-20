@@ -496,6 +496,14 @@
    ],
    "hash": "1265aa45d790b52949fcc238bf84d8f2"
   },
+  "PeriodNav": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/navigation/period-nav",
+    "examples/showcase/public/components/period-nav/ide.json"
+   ],
+   "hash": "acfd4296f7e11f6435f6d278abe77626"
+  },
   "PhoneInput": {
    "frozen": "2026-11-20",
    "paths": [
