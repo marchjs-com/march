@@ -16,6 +16,14 @@
    ],
    "hash": "fc217194a760323cb0b540189ac2a934"
   },
+  "BottomNav": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/bottom-nav",
+    "examples/showcase/public/components/bottom-nav/ide.json"
+   ],
+   "hash": "4b0a553c5a019eaa5084346af77029fd"
+  },
   "Button": {
    "frozen": "2026-11-20",
    "paths": [
