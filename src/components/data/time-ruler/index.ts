@@ -9,6 +9,7 @@ import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, clamp, isRtl, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import { track, arrowStep } from "../../../behaviors/drag/index.ts";
+import { frame } from "../../../motion/env.ts";
 import tr from "./tr.ts";
 
 messages("tr", tr);
@@ -82,7 +83,7 @@ export function TimeRuler(props: TimeRulerProps): Element {
 
   // labels that would collide (a narrow ruler, long labels) step aside: the first and the last stay, the others show
   // where they fit; a label past the ruler's end is drawn before its tick
-  const later = (fn: () => void): void => { if (typeof requestAnimationFrame === "function") requestAnimationFrame(fn); };
+  const later = (fn: () => void): void => { frame(() => fn()); };
   function fit(): void {
     const labels = Array.from(rail.querySelectorAll<HTMLElement>(".m-time-ruler-label"));
     if (!labels.length || !root.isConnected) return;
