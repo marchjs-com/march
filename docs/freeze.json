@@ -368,6 +368,14 @@
    ],
    "hash": "9bbb0e68edab4bbaf9c8b00957878d17"
   },
+  "Spinner": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/feedback/spinner",
+    "examples/showcase/public/components/spinner/ide.json"
+   ],
+   "hash": "0d3b62b6664d6602fa71aeed5d4a8009"
+  },
   "StatTile": {
    "frozen": "2026-11-20",
    "paths": [
