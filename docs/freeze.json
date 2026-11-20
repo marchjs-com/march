@@ -904,6 +904,14 @@
    ],
    "hash": "f817fd013562dc2e5cac3401afce8615"
   },
+  "StatusBar": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/status-bar",
+    "examples/showcase/public/components/status-bar/ide.json"
+   ],
+   "hash": "13eda72375e6f3bc1c9e6bc768ae5f15"
+  },
   "StatusDot": {
    "frozen": "2026-11-20",
    "paths": [
