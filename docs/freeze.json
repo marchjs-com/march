@@ -312,6 +312,14 @@
    ],
    "hash": "4beadd8df2c82f48aee1415d88e8313a"
   },
+  "Progress": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/feedback/progress",
+    "examples/showcase/public/components/progress/ide.json"
+   ],
+   "hash": "0912b56a198a174b2b3a00fc4766f793"
+  },
   "RichTextEditor": {
    "frozen": "2026-11-20",
    "paths": [
