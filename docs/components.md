@@ -86,7 +86,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Swatch | experimental | A sample of a colour, gradient or theme token: a button with a selected state, or a picture; sizes, shapes, a selected mark, and the shared checkerboard (CHECKER) under transparent colours. | — |
 | TextInput | stable | Single-line text with prefix / suffix; EmailInput and UrlInput set the keyboard, autocomplete and trimming. | — |
 | Textarea | stable | Multi-line text that grows with its content. | — |
-| TimeInput | stable | Native time field ("HH:MM", seconds with step), with min / max. | — |
+| TimeInput | stable | Time field ("HH:MM", seconds with step), with min / max; picker="clock" adds a clock dial: the hour on a clock face, then the minutes. | [IconButton](#iconbutton), [Popover](#popover) |
 | Toggle | stable | On / off switch (role="switch") whose thumb slides toward the inline end and mirrors in RTL. | — |
 
 ### Data display — `march/data`
@@ -2886,10 +2886,14 @@ Full page: src/components/navigation/thread-nav/docs.md
 
 ## TimeInput
 
-The browser's own time field: the value is `"HH:MM"` (`"HH:MM:SS"` with a step under a minute), in the user's 12- or 24-hour display.
+The browser's own time field: the value is `"HH:MM"` (`"HH:MM:SS"` with a step under a minute), in the user's 12- or 24-hour display. With `picker="clock"` a clock button beside it opens a clock dial, as on Android: press or drag on the face to pick the hour (24-hour clocks: 1–12 outside, 13–00 inside), it turns to the minutes, and the minute you pick closes it. 12-hour clocks get an AM / PM switch.
+
+Composed of: [IconButton](#iconbutton), [Popover](#popover)
 
 ```tsx
 <Field label="Start"><TimeInput bind:value={$start} min="09:00" max="18:00" /></Field>
+<Field label="Alarm"><TimeInput bind:value={$alarm} picker="clock" hour12 /></Field>
+<TimeInput bind:value={$slot} picker="clock" step={900} min="08:00" max="20:00" labels={{ choose: "Pick a slot" }} />
 ```
 
 Full page: src/components/forms/time-input/docs.md

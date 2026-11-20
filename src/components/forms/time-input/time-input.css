@@ -1,2 +1,42 @@
 /* March — TimeInput. Imported by its component module; tokens.css provides the variables. */
 .m-time { max-width: 9rem; }
+
+/* picker="clock": the field with a clock button; the browser's own picker icon gives way to it */
+.m-time-pick { max-width: 11rem; }
+.m-time-pick .m-time { max-width: none; }
+.m-time-pick .m-time::-webkit-calendar-picker-indicator { display: none; }
+
+/* the dial: the chosen time on top (its hour and minute parts switch the face), the clock face under it */
+.m-clock-pop .m-popover-body { padding: var(--m-space-3); }
+.m-clock { display: grid; justify-items: center; gap: var(--m-space-3); --m-clock-size: 15.5rem; --m-clock-outer: 6.5rem; --m-clock-inner: 4.25rem; --m-clock-num: 2rem; }
+.m-clock-head { display: flex; align-items: center; justify-content: center; gap: var(--m-space-1); }
+.m-clock-part { min-inline-size: 3.5rem; padding: var(--m-space-1) var(--m-space-2); border: 0; border-radius: var(--m-radius-2); background: var(--m-surface-2); color: var(--m-text);
+  font: inherit; font-size: 2rem; font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; cursor: pointer; transition: background var(--m-dur), color var(--m-dur); }
+.m-clock-part.is-on { background: var(--m-accent-soft, var(--m-primary-soft)); color: var(--m-accent-text, var(--m-primary-text)); }
+.m-clock-part:focus-visible, .m-clock-period:focus-visible, .m-clock-face:focus-visible { outline: 2px solid var(--m-accent, var(--m-primary)); outline-offset: 2px; }
+.m-clock-colon { font-size: 2rem; font-weight: 600; color: var(--m-muted); }
+.m-clock-periods { display: grid; margin-inline-start: var(--m-space-2); border: 1px solid var(--m-border); border-radius: var(--m-radius-2); overflow: hidden; }
+.m-clock-period { padding: var(--m-space-1) var(--m-space-2); border: 0; background: none; color: var(--m-muted); font: inherit; font-size: var(--m-text-sm); font-weight: 600; cursor: pointer; }
+.m-clock-period + .m-clock-period { border-block-start: 1px solid var(--m-border); }
+.m-clock-period.is-on { background: var(--m-accent-soft, var(--m-primary-soft)); color: var(--m-accent-text, var(--m-primary-text)); }
+
+.m-clock-face { position: relative; inline-size: var(--m-clock-size); block-size: var(--m-clock-size); border-radius: 50%; background: var(--m-surface-2);
+  touch-action: none; user-select: none; cursor: pointer; }
+.m-clock-center { position: absolute; inset-inline-start: 50%; inset-block-start: 50%; inline-size: .5rem; block-size: .5rem; margin: -.25rem; border-radius: 50%; background: var(--m-accent, var(--m-primary)); }
+/* the hand: from the centre to the chosen number (inner ring: shorter), a round knob under the number */
+.m-clock-hand { position: absolute; inset-inline-start: 50%; inset-block-end: 50%; inline-size: 2px; margin-inline-start: -1px; block-size: var(--m-clock-outer);
+  background: var(--m-accent, var(--m-primary)); transform-origin: 50% 100%; rotate: var(--m-clock-a, 0deg); transition: rotate var(--m-dur-slow) var(--m-ease-out), block-size var(--m-dur-slow) var(--m-ease-out); }
+.m-clock-hand.is-inner { block-size: var(--m-clock-inner); }
+.m-clock-hand::after { content: ""; position: absolute; inset-inline-start: 50%; inset-block-start: 0; inline-size: var(--m-clock-num); block-size: var(--m-clock-num);
+  margin-inline-start: calc(var(--m-clock-num) / -2); margin-block-start: calc(var(--m-clock-num) / -2); border-radius: 50%; background: var(--m-accent, var(--m-primary)); }
+/* a minute between the marks: a small knob with a dot */
+.m-clock-hand.is-between::after { inline-size: .625rem; block-size: .625rem; margin-inline-start: -.3125rem; margin-block-start: -.3125rem; }
+.m-clock-nums { position: absolute; inset: 0; pointer-events: none; }
+.m-clock-num { position: absolute; inset-inline-start: 50%; inset-block-start: 50%; display: grid; place-items: center; inline-size: var(--m-clock-num); block-size: var(--m-clock-num);
+  margin: calc(var(--m-clock-num) / -2); border-radius: 50%; color: var(--m-text); font-size: var(--m-text-md); font-variant-numeric: tabular-nums;
+  transform: rotate(var(--m-clock-a)) translateY(calc(var(--m-clock-outer) * -1)) rotate(calc(var(--m-clock-a) * -1)); transition: color var(--m-dur); }
+.m-clock-num.is-inner { font-size: var(--m-text-sm); color: var(--m-muted); transform: rotate(var(--m-clock-a)) translateY(calc(var(--m-clock-inner) * -1)) rotate(calc(var(--m-clock-a) * -1)); }
+.m-clock-num.is-on { color: var(--m-on-accent, var(--m-on-primary-fill)); font-weight: 600; }
+.m-clock-num.is-off { opacity: .35; }
+:dir(rtl) .m-clock-face { direction: ltr; } /* a clock turns the same way in every writing direction */
+@media (prefers-reduced-motion: reduce) { .m-clock-hand, .m-clock-part, .m-clock-num { transition: none; } }

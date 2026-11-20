@@ -717,7 +717,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Swatch | experimental | A sample of a colour, gradient or theme token: a button with a selected state, or a picture; sizes, shapes, a selected mark, and the shared checkerboard (CHECKER) under transparent colours. | — |
 | TextInput | stable | Single-line text with prefix / suffix; EmailInput and UrlInput set the keyboard, autocomplete and trimming. | — |
 | Textarea | stable | Multi-line text that grows with its content. | — |
-| TimeInput | stable | Native time field ("HH:MM", seconds with step), with min / max. | — |
+| TimeInput | stable | Time field ("HH:MM", seconds with step), with min / max; picker="clock" adds a clock dial: the hour on a clock face, then the minutes. | IconButton, Popover |
 | Toggle | stable | On / off switch (role="switch") whose thumb slides toward the inline end and mirrors in RTL. | — |
 
 ### Data display — `march/data`

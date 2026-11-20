@@ -1470,7 +1470,7 @@
     "src/components/forms/time-input",
     "examples/showcase/public/components/time/ide.json"
    ],
-   "hash": "d8305d31f1e62145d51c9cb09cd39462"
+   "hash": "186088f64ff3c34fee75e1eb22645eb4"
   },
   "Timeline": {
    "frozen": "2026-11-20",
@@ -1665,6 +1665,12 @@
    "name": "DatePicker",
    "what": "refresh",
    "reason": "FlightSearch: alanlar aynı hizada, bilgi satırı altta"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "TimeInput",
+   "what": "refresh",
+   "reason": "picker=\"clock\": saat kadranı (önce saat, sonra dakika; 24 saatte iki halka, 12 saatte ÖÖ / ÖS)"
   }
  ]
 }
