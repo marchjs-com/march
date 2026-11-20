@@ -176,6 +176,14 @@
    ],
    "hash": "a255c2105493d803c96f7b47a0491855"
   },
+  "CornerMark": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/media/corner-mark",
+    "examples/showcase/public/components/corner-mark/ide.json"
+   ],
+   "hash": "3e8ff9cb99be03e642fb2ad063a7352b"
+  },
   "DataGrid": {
    "frozen": "2026-11-20",
    "paths": [
