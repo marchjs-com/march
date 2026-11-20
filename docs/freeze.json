@@ -464,6 +464,14 @@
    ],
    "hash": "25eba74693df590087bc14b7292247dd"
   },
+  "Faq": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/faq",
+    "examples/showcase/public/components/faq/ide.json"
+   ],
+   "hash": "be93f5a6f5a94a21f6ac880c7007bcd8"
+  },
   "FeatureGrid": {
    "frozen": "2026-11-20",
    "paths": [
