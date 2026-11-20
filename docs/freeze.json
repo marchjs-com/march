@@ -280,6 +280,14 @@
    ],
    "hash": "f37e7ea524bda81c9b9d4f9396837b01"
   },
+  "Loader": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/feedback/loader",
+    "examples/showcase/public/components/loader/ide.json"
+   ],
+   "hash": "f21f3a9dbd113c08a1f5306424b39335"
+  },
   "MadeWithMarch": {
    "frozen": "2026-11-20",
    "paths": [
