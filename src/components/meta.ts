@@ -9,6 +9,9 @@ export interface ComponentMeta {
   /** Exported component name. */
   name: string;
   status: Stability;
+  /** Code freeze: the date it was frozen (docs/freeze.md). Its files are recorded in docs/freeze.json; changing them
+   *  lifts the freeze first (node tools/freeze.mjs thaw / refresh). */
+  frozen?: string;
   /** Version it appeared in. */
   since: string;
   /** One line for catalogues. */

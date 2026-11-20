@@ -193,7 +193,9 @@ export function Terminal(props: TerminalProps): Element {
     row.appendChild(node);
     out.appendChild(row);
     while (out.childElementCount > max) out.firstElementChild!.remove();
-    scrollDown();
+    // the growth is followed by `follow` (one scroll a frame, after layout, only while pinned): a line printed while the
+    // reader has scrolled up does not pull them down, and many lines at once do not lay the page out once each
+    if (!globalThis.ResizeObserver && stick.pinned()) scrollDown();
     return row;
   };
   const textNode = (v: unknown, opts: PrintOptions = {}): Node => {

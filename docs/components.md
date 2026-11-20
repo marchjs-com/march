@@ -931,12 +931,16 @@ Full page: src/components/composite/debugger/docs.md
 
 ## DevicePicker
 
-
+Choose a device to preview on: the whole DevicePreview catalog — phones, tablets and desktop screens, in sections by kind, each a roomy grid that takes the height it needs (the list never scrolls by itself) — each device with a silhouette in its proportions, its CSS size, pixel ratio and whether it is a touch screen. Search by name or size ("390", "ipad"), filter by group, switch portrait / landscape, and make your own devices (name, width × height, pixel ratio, kind, touch), saved in this browser; a device of yours has a remove button.
 
 Composed of: [SearchBox](#searchbox), [Segmented](#segmented), [ListRow](#listrow), [SectionLabel](#sectionlabel), [Empty](#empty), Field, [TextInput](#textinput), [NumberInput](#numberinput), [Toggle](#toggle), [Button](#button), [IconButton](#iconbutton)
 
 ```tsx
+import { DevicePicker, DevicePreview } from "march/layout";
 
+const $device = signal("iphone-15"), $land = signal(false)
+<DevicePicker value={$device} landscape={$land} fit />
+<DevicePreview device={$device} landscape={$land} controls>…</DevicePreview>
 ```
 
 Full page: src/components/layout/device-picker/docs.md

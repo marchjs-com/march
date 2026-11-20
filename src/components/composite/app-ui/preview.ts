@@ -144,6 +144,7 @@ export function AppPreview(props: AppPreviewProps): Element {
   const langs = (): readonly AppPreviewLanguage[] => val(props.languages) ?? [];
   const langName = (): string => langs().find((x) => x.value === language())?.label ?? (language() || t`Default language`);
   // each picker is built once (untracked): only turning it on or off draws it again
+  const deviceOpen = signal(false);
   const bar = (): unknown => (!anything() ? null : h("div", { class: "m-app-pv-bar", role: "toolbar", "aria-label": () => val(props.label) ?? t`Preview tools` },
     props.tools ?? null,
     h("span", { class: "m-app-pv-fill" }),
@@ -152,11 +153,12 @@ export function AppPreview(props: AppPreviewProps): Element {
       trigger: [h("span", { class: "m-app-pv-lang-icon", "aria-hidden": "true" }, icon(globe)), h("span", {}, langName)],
       items: () => langs().map((x) => ({ label: x.label, checked: () => language() === x.value, radio: true, onSelect: () => language.set(x.value) })),
     })) : null),
-    () => (on("device") ? untrack(() => h(Popover, { placement: "bottom-end", label: () => t`Device`, class: "m-app-pv-device", panelClass: "m-app-pv-device-panel", onOpenChange: (open: boolean) => { if (open) setTimeout(fitDevicePanel, 0); },
+    () => (on("device") ? untrack(() => h(Popover, { open: deviceOpen, placement: "bottom-end", label: () => t`Device`, class: "m-app-pv-device", panelClass: "m-app-pv-device-panel", onOpenChange: (open: boolean) => { if (open) setTimeout(fitDevicePanel, 0); },
       // the icon in Button's own icon slot: its gap and its centre line, as every toolbar button
       trigger: h(Button, { size: "sm", variant: "ghost", class: "m-app-pv-tool", "aria-label": () => `${t`Screen size`}: ${spec()?.name ?? t`Fit`}`,
         icon: () => (spec() && (spec()!.kind ?? "phone") === "phone" ? phone : monitor) }, () => spec()?.name ?? t`Fit`),
-      children: () => h(DevicePicker, { value: device, landscape: rotate, fit: true, devices: () => val(props.devices) }) })) : null),
+      // a device picked closes the panel (the preview shows it at once); turning it or adding your own keeps it open
+      children: () => h(DevicePicker, { value: device, landscape: rotate, fit: true, devices: () => val(props.devices), onChange: () => deviceOpen.set(false) }) })) : null),
     () => (on("network") ? untrack(() => h(Popover, { placement: "bottom-end", label: () => t`Network speed`, title: () => t`Network speed`, class: "m-app-pv-net", panelClass: "m-app-pv-net-panel",
       trigger: h(Button, { size: "sm", variant: "ghost", icon: gauge, class: () => cx("m-app-pv-tool m-app-pv-net-btn", netOn() && "is-on"), "aria-label": () => `${t`Network speed`}: ${net()}` },
         h("span", {}, net),

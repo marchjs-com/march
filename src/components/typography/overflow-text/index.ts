@@ -51,6 +51,15 @@ export interface OverflowTextProps {
   [attr: string]: unknown;
 }
 
+// the measures asked for in one turn: all read, then all written
+const reads = new Set<() => () => void>();
+let queued = false;
+const later = (r: () => () => void): void => {
+  reads.add(r);
+  if (queued) return;
+  queued = true;
+  queueMicrotask(() => { queued = false; const list = [...reads]; reads.clear(); for (const w of list.map((f) => f())) w(); });
+};
 const HOST = "a, button, li, label, summary, [tabindex], [role=option], [role=menuitem], [role=tab]";
 type Anim = { cancel(): void };
 
@@ -88,13 +97,18 @@ export function OverflowText(props: OverflowTextProps): Element {
     title: () => (dist() > 0 && reducedMotion() ? label() : null),
   }, track) as HTMLElement;
 
-  const measure = (): void => {
+  // measuring reads the layout and then writes (the overflow class): every instance's read comes first, then the
+  // writes (one batch, see later()), so many titles shown at once (a dock's tabs) lay the page out once, not once each
+  const read = (): (() => void) => {
     if (fill && unit) { const w = unit.getBoundingClientRect().width; if (w > 0) twin(Math.min(24, Math.max(1, Math.ceil(root.clientWidth / w)))); }
     const d = Math.max(0, Math.ceil(item.scrollWidth - root.clientWidth));
-    const next = d > 1 ? d : 0;
-    if (Math.abs(next - dist.peek()) > 1 || (next === 0) !== (dist.peek() === 0)) dist.set(next);
-    label.set((unit ?? item).textContent ?? "");
+    const next = d > 1 ? d : 0, text = (unit ?? item).textContent ?? "";
+    return () => {
+      if (Math.abs(next - dist.peek()) > 1 || (next === 0) !== (dist.peek() === 0)) dist.set(next);
+      label.set(text);
+    };
   };
+  const measure = (): void => later(read);
 
   const engaged = computed(() => (!!val(props.play) || triggers.has("always") || triggers.has("visible") || (triggers.has("hover") && hovered()) || (triggers.has("focus") && focused())) && visible());
   const wanted = computed(() => dist() > 0 && engaged() && !val(props.disabled) && !reducedMotion());
@@ -191,7 +205,8 @@ export function OverflowText(props: OverflowTextProps): Element {
     const IO = globalThis.IntersectionObserver;
     if (triggers.has("visible") && IO) { const io = new IO((es) => visible.set(es.some((e) => e.isIntersecting))); io.observe(root); offs.push(() => io.disconnect()); }
     else if (triggers.has("visible")) visible.set(true);
-    measure();
+    // a ResizeObserver reports the first size by itself (after layout): measured then, not here
+    if (!RO) measure();
   };
   offs.push(frame(connect));
   if (getOwner()) onCleanup(() => { stop(); for (const f of offs) f(); });

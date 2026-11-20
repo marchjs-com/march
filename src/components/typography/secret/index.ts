@@ -114,6 +114,6 @@ export function Secret(props: SecretProps): Element {
       label: () => (revealed() ? L().hide ?? t`Hide` : L().show ?? t`Show`), onClick: flip,
     }),
     props.copy ? h(CopyButton, {
-      class: "m-secret-copy", text: value, iconOnly: true, label: () => L().copy ?? t`Copy`, copiedLabel: () => L().copied ?? t`Copied`, onCopy: props.onCopy,
+      class: "m-secret-copy", text: value, iconOnly: true, label: () => L().copy ?? t`Copy`, copiedLabel: () => L().copied ?? t`Copied`, ...(props.onCopy ? { onCopy: props.onCopy } : {}),
     }) : null);
 }
