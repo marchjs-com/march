@@ -904,6 +904,14 @@
    ],
    "hash": "f462ceeeb0b025aaf225b135dd713633"
   },
+  "ResizeHandle": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/resize-handle",
+    "examples/showcase/public/components/resize-handle/ide.json"
+   ],
+   "hash": "8a44301e3b277e9df29df1df25ea274f"
+  },
   "RichTextEditor": {
    "frozen": "2026-11-20",
    "paths": [
