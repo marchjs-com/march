@@ -112,6 +112,14 @@
    ],
    "hash": "f817fd013562dc2e5cac3401afce8615"
   },
+  "Timeline": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/timeline",
+    "examples/showcase/public/components/timeline/ide.json"
+   ],
+   "hash": "a96b0f17d0d6a1a21970a16f828c7807"
+  },
   "TreeView": {
    "frozen": "2026-11-20",
    "paths": [
