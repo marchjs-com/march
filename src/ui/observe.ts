@@ -6,6 +6,7 @@
 //   scrollIntoArea(row, scroller)       bring the active row into its own scroll area (the page never scrolls)
 //   whenMedia("(max-width: 900px)")     a media query as a live boolean (a component's breakpoint without the Viewport manager)
 import { getOwner, onCleanup, signal } from "../core/reactive.ts";
+import type { Handler } from "../core/util.ts";
 
 /** Register a cleanup with the current owner when there is one; returns the same function (call it to stop earlier). */
 export function owned<F extends () => void>(stop: F): F {
@@ -52,7 +53,7 @@ export interface StickOptions {
   /** An element whose growth keeps the end in view while pinned (the content box of a log). Default: nothing follows by itself. */
   follow?: Element | null | undefined;
   /** Called when the pinned state changes (the reader scrolled away / came back). */
-  onChange?: ((pinned: boolean) => void) | undefined;
+  onChange?: Handler<[pinned: boolean]> | undefined;
 }
 /** What stickToBottom() returns. */
 export interface StickControls {

@@ -17,6 +17,7 @@ import { Breadcrumbs, type Crumb } from "../../navigation/breadcrumbs/index.ts";
 import { Button } from "../../actions/button/index.ts";
 import { Kbd } from "../../typography/kbd/index.ts";
 import tr from "./tr.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", tr);
 
@@ -46,7 +47,7 @@ export interface BranchingStoryProps {
   /** The path (passage ids from the start), to restore or drive it from outside. @tr Yol (baştan itibaren pasaj kimlikleri); dışarıdan geri yüklemek ya da yönetmek için. */
   path?: MaybeFn<string[]> | undefined;
   /** Called with the new path after every choice or rewind. @tr Her seçimden ya da geri sarmadan sonra yeni yolla çağrılır. */
-  onChange?: ((path: string[]) => void) | undefined;
+  onChange?: Handler<[path: string[]]> | undefined;
   /** Show the trail of choices (default true). @tr Seçimlerin izini gösterir (varsayılan true). */
   trail?: boolean | undefined;
   /** Count the endings found (default true). @tr Bulunan sonları sayar (varsayılan true). */
@@ -78,7 +79,7 @@ export interface BranchingStoryProps {
   /** Number keys 1–9 pick a choice, and each choice shows its number (default true). @tr 1–9 sayı tuşları bir seçeneği seçer ve her seçenek kendi numarasını gösterir (varsayılan true). */
   keys?: boolean | undefined;
   /** Draw the content of a choice button yourself (the button, its key and its motion stay). @tr Bir seçenek düğmesinin içeriğini kendiniz çizin (düğme, tuşu ve hareketi kalır). */
-  renderChoice?: ((choice: StoryChoice, index: number) => unknown) | undefined;
+  renderChoice?: Handler<[choice: StoryChoice, index: number]> | undefined;
   /**
    * How the page changes: "turn" (default: a 3D page turn), "slide", "fade", "none", or your own keyframes for the
    * leaving and the entering passage; `side` is 1 forward and -1 back (already mirrored in RTL).

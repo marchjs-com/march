@@ -11,7 +11,7 @@ import { type ColorToken } from "../../../theme/colors.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { moveCursor } from "../../../behaviors/list-nav/index.ts";
 import "./reaction-picker.css";
-import { isRtl } from "../../../core/util.ts";
+import { isRtl, type Handler } from "../../../core/util.ts";
 import type { IconProp } from "../../../icons/types.ts";
 
 /** Default quick-reaction row: the six emoji shown under a message. */
@@ -29,7 +29,7 @@ export interface ReactionPickerProps {
   /** row: a pill (reactions) · grid: a panel (emoji keyboard). Default row. @tr row: bir hap (tepkiler) · grid: bir panel (emoji klavyesi). Varsayılan row. */
   layout?: MaybeFn<"row" | "grid" | undefined>;
   /** A "+" at the end of a row (more emoji). @tr Satırın sonunda bir "+" (daha fazla emoji). */
-  onMore?: (() => void) | undefined;
+  onMore?: Handler<[]> | undefined;
   /** Pop-in animation when it appears. Default true. @tr Belirirken açılma animasyonu. Varsayılan true. */
   pop?: boolean | undefined;
   /** Accessible name of the picker (default "Reactions"). @tr Seçicinin erişilebilir adı (varsayılan "Tepkiler"). */

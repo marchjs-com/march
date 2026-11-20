@@ -8,7 +8,7 @@ import { t } from "../../../core/i18n.ts";
 import { applyPipe } from "../../../core/pipes.ts";
 import { model, ctl, cx, uid, type ControlProps } from "../../../forms/util.ts";
 import { Progress } from "../../../ui/progress.ts";
-import { clamp } from "../../../core/util.ts";
+import { clamp, type Handler } from "../../../core/util.ts";
 import { ownPart } from "../../../ui/parts.ts";
 import { errorText } from "../../../ui/format.ts";
 import { Button } from "../../actions/button/index.ts";
@@ -43,7 +43,7 @@ export interface FileUploadProps<R = unknown> extends ControlProps<unknown> {
   /** Drop zone text. @tr Bırakma alanının metni. */
   label?: unknown;
   /** Called with the message and the file when a file is rejected or its upload fails. @tr Bir dosya reddedilince ya da yüklemesi başarısız olunca mesaj ve dosyayla çağrılır. */
-  onError?: ((message: string, file: File) => void) | undefined;
+  onError?: Handler<[message: string, file: File]> | undefined;
   /** The small line under the drop text ("image/* · max 5 MB"): `false` removes it, a node / text / `() => node` replaces it. @tr Bırakma metninin altındaki küçük satır ("image/* · max 5 MB"): `false` kaldırır, düğüm / metin / `() => node` onun yerine geçer. */
   hint?: unknown;
   /** Image thumbnails and audio players of the chosen files: `false` shows only names. @tr Seçilen dosyaların resim küçük görselleri ve ses oynatıcıları: `false` yalnız adları gösterir. */

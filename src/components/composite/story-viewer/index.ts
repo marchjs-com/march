@@ -22,7 +22,7 @@ import { StoryProgress } from "../../social/story-progress/index.ts";
 import { LikeButton } from "../../social/like-button/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import "./story-viewer.css";
-import { isRtl } from "../../../core/util.ts";
+import { isRtl, type Handler } from "../../../core/util.ts";
 import { swipeable } from "../../../behaviors/swipe/index.ts";
 
 export interface StoryItem { id: string; src: string; alt?: string | undefined; time?: Date | string | number | undefined; caption?: string | undefined; /** ms. */ duration?: number | undefined }
@@ -40,11 +40,11 @@ export interface StoryViewerProps {
   /** Default time per story (ms). Default 6000. @tr Hikâye başına varsayılan süre (ms). Varsayılan 6000. */
   duration?: MaybeFn<number | undefined>;
   /** Called when a story is shown, with its group and item (mark it seen). @tr Bir hikâye gösterildiğinde grubu ve öğesiyle çağrılır (görüldü olarak işaretle). */
-  onSeen?: ((group: StoryGroup, item: StoryItem) => void) | undefined;
+  onSeen?: Handler<[group: StoryGroup, item: StoryItem]> | undefined;
   /** Shows the reply field. @tr Yanıt alanını gösterir. */
-  onReply?: ((group: StoryGroup, item: StoryItem, text: string) => void) | undefined;
+  onReply?: Handler<[group: StoryGroup, item: StoryItem, text: string]> | undefined;
   /** Shows the heart. @tr Kalbi gösterir. */
-  onLike?: ((group: StoryGroup, item: StoryItem, liked: boolean) => void) | undefined;
+  onLike?: Handler<[group: StoryGroup, item: StoryItem, liked: boolean]> | undefined;
   /** Liked state of a story. @tr Bir hikâyenin beğenilme durumu. */
   liked?: ((group: StoryGroup, item: StoryItem) => boolean) | undefined;
   /** The progress bars on top: default true. @tr Üstteki ilerleme çubukları: varsayılan true. */

@@ -13,6 +13,7 @@ import { TabList, type TabSpec } from "../tabs/index.ts";
 import { labelWithKey } from "../../../ui/keys.ts";
 import { slidingIndicator } from "../../../motion/engine/parts.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", { "Views": "Görünümler" });
 
@@ -27,7 +28,7 @@ export interface ActivityItem {
   position?: "start" | "end";
   shortcut?: string;
   /** A plain action instead of a view (it is not selected). */
-  onSelect?: () => unknown;
+  onSelect?: Handler<[]> | undefined;
   /** Items under this one (`subItems`): `{ id, label, short, icon }`. */
   children?: readonly ActivityItem[];
 }
@@ -37,7 +38,7 @@ export interface ActivityBarProps {
   /** The active view id, or null when the side view is collapsed. @tr Etkin görünümün id'si; yan görünüm kapalıyken null. */
   value: MaybeFn<string | null | undefined>;
   /** Called with the new id when a view is chosen (null when it collapses). @tr Bir görünüm seçilince yeni id ile (kapanınca null ile) çağrılır. */
-  onChange: (id: string | null) => void;
+  onChange: Handler<[id: string | null]>;
   /** Choosing the active view again collapses it (default true). @tr Etkin görünümü yeniden seçmek onu kapatır (varsayılan true). */
   collapsible?: boolean;
   /** vertical (default) or horizontal; live: the bar turns, the indicator moves to the other edge and keys follow the axis. @tr vertical (varsayılan) ya da horizontal; canlıdır: çubuk döner, gösterge öbür kenara geçer, tuşlar yeni ekseni izler. */
@@ -61,7 +62,7 @@ export interface ActivityBarProps {
   /** The id of the child that is current (marked among the children). @tr Geçerli alt öğenin id'si (alt öğeler arasında işaretlenir). */
   subValue?: MaybeFn<string | null | undefined>;
   /** Called when a child is chosen (default: `onChange` with the child's id). @tr Bir alt öğe seçilince çağrılır (varsayılan: alt öğenin id'siyle `onChange`). */
-  onSubSelect?: ((child: ActivityItem, parent: ActivityItem) => void) | undefined;
+  onSubSelect?: Handler<[child: ActivityItem, parent: ActivityItem]> | undefined;
   /** Extra class on the bar. @tr Çubuğa eklenen sınıf. */
   class?: ClassProp;
 }

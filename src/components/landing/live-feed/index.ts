@@ -22,6 +22,7 @@ import { flip } from "../../../motion/flip.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { FEED_ENTER, FEED_LEAVE, feedMotion, type FeedEnter, type FeedLeave, type FeedMotion } from "./presets.ts";
 import tr from "./tr.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export { FEED_ENTER, FEED_LEAVE, type FeedEnter, type FeedLeave, type FeedMotion };
 
@@ -67,7 +68,7 @@ export interface LiveFeedProps {
   /** Pause while the pointer or keyboard focus is inside the feed (default true). @tr İşaretçi ya da klavye odağı akışın içindeyken duraklar (varsayılan true). */
   pauseOnHover?: boolean | undefined;
   /** Draw an item yourself: the content of its row / card (the feed keeps the list item, its motion and the glow). @tr Bir öğeyi kendiniz çizin: satırının / kartının içeriği (akış liste öğesini, hareketini ve parıltıyı korur). */
-  renderItem?: ((item: FeedItem) => unknown) | undefined;
+  renderItem?: Handler<[item: FeedItem]> | undefined;
   /** How a new item arrives: flip (default), slide, fade, pop, drop, zoom, blur, swing, unfold, glide, spin, "none", or your own keyframes. @tr Yeni bir öğenin nasıl geldiği: flip (varsayılan), slide, fade, pop, drop, zoom, blur, swing, unfold, glide, spin, "none" ya da kendi keyframe'leriniz. */
   enter?: FeedEnter | "none" | FeedMotion | undefined;
   /** How the oldest item leaves: blur (default), fade, shrink, fall, slide, dissolve, fold, "none", or your own keyframes. @tr En eski öğenin nasıl ayrıldığı: blur (varsayılan), fade, shrink, fall, slide, dissolve, fold, "none" ya da kendi keyframe'leriniz. */

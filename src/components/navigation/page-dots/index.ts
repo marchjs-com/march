@@ -8,6 +8,7 @@ import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, clamp, isRtl, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import tr from "./tr.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", tr);
 
@@ -17,7 +18,7 @@ export interface PageDotsProps {
   /** Current page, 0-based. @tr Geçerli sayfa, 0'dan başlar. */
   value?: MaybeFn<number | undefined>;
   /** Makes the dots buttons: called with the page a dot stands for. @tr Noktaları düğme yapar: bir noktanın temsil ettiği sayfayla çağrılır. */
-  onChange?: ((index: number) => void) | undefined;
+  onChange?: Handler<[index: number]> | undefined;
   /** Called like `onChange` (`bind:value` uses it); makes the dots buttons. @tr `onChange` gibi çağrılır (`bind:value` bunu kullanır); noktaları düğme yapar. */
   setValue?: ((index: number) => void) | undefined;
   /** Own names: the group, a dot (`page(n)`, n from 1) and the position text of read-only dots. @tr Kendi adların: grup, bir nokta (`page(n)`, n 1'den başlar) ve salt okunur noktaların konum metni. */

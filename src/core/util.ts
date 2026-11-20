@@ -4,6 +4,12 @@ import { onCleanup, getOwner } from "./reactive.ts";
 
 /** A value or an accessor for it (signal, getter thunk, zero-arg function). */
 export type MaybeFn<T> = T | (() => T);
+/**
+ * A callback prop: `Handler<[task: GanttTask]>` is `(task: GanttTask) => unknown`, and a handler typed for your own item
+ * (`(t: MyTask) => …`, MyTask a GanttTask with more fields) or one that returns a value fits it too (as event handlers in
+ * React's types).
+ */
+export type Handler<A extends readonly unknown[]> = { bivarianceHack(...args: A): unknown }["bivarianceHack"];
 /** Class input accepted by cx(): strings, arrays, `{ name: bool }` objects and falsy values. */
 export type ClassValue = string | false | null | undefined | readonly ClassValue[] | { readonly [name: string]: unknown };
 /** A `class` prop: a class value or an accessor for one. */

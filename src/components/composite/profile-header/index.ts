@@ -21,6 +21,7 @@ import { CountRoll } from "../../social/count-roll/index.ts";
 import "./profile-header.css";
 import { withColor } from "../../../theme/colors.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface ProfileUser {
   name: string;
@@ -53,15 +54,15 @@ export interface ProfileHeaderProps {
   /** The follow state for the FollowButton (default "follow"); following adds one to the followers. @tr FollowButton'ın takip durumu (varsayılan "follow"); "following" takipçilere bir ekler. */
   follow?: MaybeFn<FollowState | undefined>;
   /** Called with the next follow state; without it there is no follow button. @tr Yeni takip durumuyla çağrılır; verilmezse takip düğmesi olmaz. */
-  onFollow?: ((next: FollowState) => void) | undefined;
+  onFollow?: Handler<[next: FollowState]> | undefined;
   /** Called by the Message button; without it there is no Message button. @tr Message düğmesi tarafından çağrılır; verilmezse Message düğmesi olmaz. */
-  onMessage?: (() => void) | undefined;
+  onMessage?: Handler<[]> | undefined;
   /** Called by the Edit profile button of your own profile (`self`). @tr Kendi profilindeki (`self`) Edit profile düğmesi tarafından çağrılır. */
-  onEdit?: (() => void) | undefined;
+  onEdit?: Handler<[]> | undefined;
   /** Makes the stats buttons; called with posts, followers or following. @tr İstatistikleri düğme yapar; posts, followers ya da following ile çağrılır. */
-  onStat?: ((which: "posts" | "followers" | "following") => void) | undefined;
+  onStat?: Handler<[which: "posts" | "followers" | "following"]> | undefined;
   /** Makes the avatar a button (its story ring opens the stories). @tr Avatarı bir düğme yapar (hikâye halkası hikâyeleri açar). */
-  onAvatar?: (() => void) | undefined;
+  onAvatar?: Handler<[]> | undefined;
   /** ⋯ menu items. @tr ⋯ menüsünün öğeleri. */
   menu?: readonly MenuItem[] | undefined;
   /** Cover height: sm 120 · md 168 · lg 216 px. Default md. @tr Kapak yüksekliği: sm 120 · md 168 · lg 216 px. Varsayılan md. */

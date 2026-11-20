@@ -16,7 +16,7 @@ import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
-import { isRtl } from "../../../core/util.ts";
+import { isRtl, type Handler } from "../../../core/util.ts";
 import type { IconProp } from "../../../icons/types.ts";
 
 /** A tab: `content` is a node or a function rendering the panel (called when the tab becomes active). */
@@ -65,7 +65,7 @@ export interface TabListLook {
   /** "auto" (default): the arrow keys select; "manual": they only move focus (Enter / Space select). @tr "auto" (varsayılan): ok tuşları seçer; "manual": yalnız odağı taşır (Enter / Space seçer). */
   activation?: "auto" | "manual" | undefined;
   /** Called by the close mark of a `closable` tab and by the Delete key. @tr `closable` bir sekmenin kapatma işareti ve Delete tuşu tarafından çağrılır. */
-  onClose?: ((id: string) => void) | undefined;
+  onClose?: Handler<[id: string]> | undefined;
   /** Your own close mark (an icon or a short text). @tr Kendi kapatma işaretin (bir ikon ya da kısa metin). */
   closeIcon?: IconProp;
   /** Texts: tooltip of the close mark, accessible name of the "changed" dot. @tr Metinler: kapatma işaretinin ipucu, "değişti" noktasının erişilebilir adı. */
@@ -144,7 +144,7 @@ export interface TabsProps extends TabListLook {
   /** Controlled active id (`bind:value` works). @tr Denetimli etkin id (`bind:value` çalışır). */
   value?: MaybeFn<string | null | undefined>;
   /** Called with the new id when the active tab changes. @tr Etkin sekme değişince yeni id ile çağrılır. */
-  onChange?: (id: string) => void;
+  onChange?: Handler<[id: string]> | undefined;
   /** Called with the new id like `onChange` (`bind:value` uses it). @tr `onChange` gibi yeni id ile çağrılır (`bind:value` bunu kullanır). */
   setValue?: (id: string) => void;
   /** Keep the active tab in this query parameter. @tr Etkin sekmeyi bu sorgu parametresinde tutar. */

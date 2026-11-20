@@ -5,6 +5,7 @@ import { effect } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { model, ctl, cx, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { textAttrs, type TextAttrProps } from "../../../forms/affix.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface TextareaProps extends ControlProps<string>, TextAttrProps {
   /** Starting height in lines (default 3). @tr Satır cinsinden başlangıç yüksekliği (varsayılan 3). */
@@ -16,7 +17,7 @@ export interface TextareaProps extends ControlProps<string>, TextAttrProps {
   /** The Tab key indents instead of leaving the field: `true` (two spaces) or the number of spaces. Escape, then Tab, leaves. @tr Tab tuşu alandan çıkmak yerine girinti yapar: `true` (iki boşluk) ya da boşluk sayısı. Önce Escape, sonra Tab alandan çıkar. */
   tabIndent?: boolean | number | undefined;
   /** Key handler of the textarea. @tr Metin alanının tuş işleyicisi. */
-  onKeyDown?: ((e: KeyboardEvent) => void) | undefined;
+  onKeyDown?: Handler<[e: KeyboardEvent]> | undefined;
   /** Called with the textarea element. @tr Metin alanı öğesiyle çağrılır. */
   ref?: ((el: HTMLTextAreaElement) => void) | undefined;
 }

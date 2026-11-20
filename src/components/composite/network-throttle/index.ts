@@ -17,6 +17,7 @@ import { Slider } from "../../forms/slider/index.ts";
 import { SectionLabel } from "../../typography/section-label/index.ts";
 import { Empty } from "../../feedback/empty/index.ts";
 import { trash } from "../../../icons/glyphs/trash.ts";
+import type { Handler } from "../../../core/util.ts";
 import { NET_PRESETS, getThrottle, setThrottle, setThrottleScope, getThrottleScope, presetOf, onThrottle, throttleRequests, clearThrottleRequests, installThrottle, throttled,
   type NetProfile, type NetPreset, type NetRequest } from "./engine.ts";
 
@@ -35,7 +36,7 @@ export interface NetworkThrottleProps {
   /** The network, kept in a signal of yours too (two-way). @tr Ağ, senin bir sinyalinde de tutulur (iki yönlü). */
   value?: Signal<NetProfile> | undefined;
   /** Called with the new network. @tr Yeni ağla çağrılır. */
-  onChange?: ((p: NetProfile) => void) | undefined;
+  onChange?: Handler<[p: NetProfile]> | undefined;
   /** The ready-made networks (default NET_PRESETS). @tr Hazır ağlar (varsayılan NET_PRESETS). */
   presets?: MaybeFn<readonly NetPreset[] | undefined>;
   /** The speed gauge (default true). @tr Hız göstergesi (varsayılan true). */

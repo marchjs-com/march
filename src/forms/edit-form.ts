@@ -15,6 +15,7 @@ import { Badge } from "../components/data/badge/index.ts";
 import { Skeleton } from "../components/feedback/skeleton/index.ts";
 import { ErrorBox } from "../components/feedback/error-box/index.ts";
 import { PanelHeader } from "../components/layout/panel-header/index.ts";
+import type { Handler } from "../core/util.ts";
 
 /** A reason from the reason prompt: the text, or `{ category, text }` when purposes are offered. */
 export type ReasonValue = string | { category: string; text: string };
@@ -57,7 +58,7 @@ export interface EditFormProps<V = Values> extends FieldsLayout {
   /** false = no toast. @tr false = bildirim yok. */
   successMessage?: string | false | undefined;
   /** Called with save()'s result and the values after a successful save. @tr Başarılı kayıttan sonra save() sonucu ve değerlerle çağrılır. */
-  onSaved?: ((result: unknown, values: V) => void) | undefined;
+  onSaved?: Handler<[result: unknown, values: V]> | undefined;
   /** Shows the values without editing and hides the action bar. @tr Değerleri düzenlemeden gösterir, işlem çubuğunu gizler. */
   readonly?: boolean | null | undefined;
   /** Extra buttons in the action bar. @tr İşlem çubuğuna eklenen düğmeler. */

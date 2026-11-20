@@ -14,6 +14,7 @@ import { nextFrame } from "../../../motion/engine/clock.ts";
 import { dockLens } from "../../../ui/dock-lens.ts";
 import { reducedMotion } from "../../../motion/env.ts";
 import tr from "./tr.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", tr);
 
@@ -62,11 +63,11 @@ export interface SectionTimelineProps {
    * another, a wave across the distance: its whole length in ms (default 480), or false for all at once. @tr Okunan bölüm değişince eski ile yeni arasındaki noktalar rengini sırayla alır, mesafe boyunca bir dalga: toplam süresi ms (varsayılan 480), ya da hepsi birden için false. */
   wave?: MaybeFn<number | false | undefined>;
   /** Called with the index of the section being read (-1 above the first). @tr Okunan bölümün sırasıyla çağrılır (ilkinin üstünde -1). */
-  onChange?: ((index: number) => void) | undefined;
+  onChange?: Handler<[index: number]> | undefined;
   /** Own names: the group. @tr Kendi adların: grup. */
   labels?: { group?: string | undefined } | undefined;
   /** Own content of a name: `(item, index) => content`. @tr Bir adın kendi içeriği: `(item, index) => content`. */
-  label?: ((item: SectionTimelineItem, index: number) => unknown) | undefined;
+  label?: Handler<[item: SectionTimelineItem, index: number]> | undefined;
   /** Extra class on the root. @tr Köke eklenen sınıf. */
   class?: ClassProp;
 }

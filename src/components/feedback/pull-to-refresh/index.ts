@@ -14,18 +14,19 @@ import { setStyle } from "../../../motion/env.ts";
 import { swipeable, rubberBand } from "../../../behaviors/swipe/index.ts";
 import "./pull-to-refresh.css";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export type PullPhase = "idle" | "pull" | "ready" | "refreshing";
 
 export interface PullToRefreshProps {
   /** Runs when released past the threshold; the indicator spins until the returned promise settles (none: a short spin). @tr Eşiğin ötesinde bırakılınca çalışır; gösterge, dönen söz (promise) sonuçlanana dek döner (verilmezse kısa bir dönüş). */
-  onRefresh?: (() => unknown) | undefined;
+  onRefresh?: Handler<[]> | undefined;
   /** Pull distance (px) that triggers a refresh. Default 72. @tr Yenilemeyi tetikleyen çekme mesafesi (px). Varsayılan 72. */
   threshold?: number | undefined;
   /** Pulling and the Refresh button do nothing. @tr Çekme ve Refresh düğmesi hiçbir şey yapmaz. */
   disabled?: MaybeFn<boolean | undefined>;
   /** Called on every phase change (idle → pull → ready → refreshing → idle). @tr Her evre değişiminde çağrılır (idle → pull → ready → refreshing → idle). */
-  onPhase?: ((phase: PullPhase) => void) | undefined;
+  onPhase?: Handler<[phase: PullPhase]> | undefined;
   /** The texts: the three announced states and the keyboard button. Defaults are translated. @tr Metinler: duyurulan üç durum ve klavye düğmesi. Varsayılanlar çevrilir. */
   labels?: { pull?: string; release?: string; refreshing?: string; refresh?: string } | undefined;
   /** The round indicator: true (default), false, or `(phase) => content` drawn inside it (re-run on every phase). @tr Yuvarlak gösterge: true (varsayılan), false ya da içinde çizilen `(phase) => içerik` (her evrede yeniden çalışır). */

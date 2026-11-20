@@ -10,6 +10,7 @@ import { cx, val, rest, icon, glyph, type ClassProp, type MaybeFn } from "../../
 import { type ColorToken } from "../../../theme/colors.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
+import type { Handler } from "../../../core/util.ts";
 
 /** Props of <PanelHeader>. Unknown props (events, aria, role, tabindex, id) go to the root element. */
 export interface PanelHeaderProps {
@@ -32,7 +33,7 @@ export interface PanelHeaderProps {
   /** The end side: buttons, menus (nodes or an accessor). @tr Son taraf: düğmeler, menüler (düğümler ya da bir erişimci). */
   actions?: MaybeFn<unknown> | undefined;
   /** Shows the close button and runs on it. @tr Kapat düğmesini gösterir ve ona basılınca çağrılır. */
-  onClose?: ((e: MouseEvent) => void) | undefined;
+  onClose?: Handler<[e: MouseEvent]> | undefined;
   /** The close button: shown when `onClose` is given (default), false for none, or your own icon for it. @tr Kapat düğmesi: `onClose` verilince gösterilir (varsayılan), false ile hiç, ya da onun için kendi ikonunuz. */
   close?: boolean | unknown | undefined;
   /** Accessible name and tooltip of the close button (default "Close"). @tr Kapat düğmesinin erişilebilir adı ve ipucu (varsayılan "Kapat"). */

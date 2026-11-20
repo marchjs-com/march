@@ -4,7 +4,7 @@
 //                       convention (click = only this, Ctrl/⌘ = toggle, Shift = range from the anchor).
 //   moveCursor()      — next index for a navigation key in a list or a wrapped grid (arrows, Home/End, PageUp/Down).
 import { signal, batch, untrack, effect, type Signal } from "./reactive.ts";
-import { val, type MaybeFn } from "./util.ts";
+import { val, type MaybeFn, type Handler } from "./util.ts";
 
 export type SelectionMode = "none" | "single" | "multiple";
 
@@ -18,7 +18,7 @@ export interface SelectionOptions<K, T = K> {
   store?: Signal<Map<K, T>> | undefined;
   initial?: Iterable<T> | undefined;
   /** Called after every change with the selected keys. */
-  onChange?: ((keys: K[]) => void) | undefined;
+  onChange?: Handler<[keys: K[]]> | undefined;
 }
 
 /** What a pointer / key gesture does to the selection. */

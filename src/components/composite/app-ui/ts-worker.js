@@ -15,6 +15,40 @@ declare module "hadi-march";
 declare module "hadi-march/*";
 declare namespace JSX { interface IntrinsicElements { [name: string]: any } interface Element {} interface ElementChildrenAttribute { children: {} } }
 `;
+// March's own types, when the app serves them (march-types.json beside the lib files: tools/gen-ide-types.mjs): a
+// virtual node_modules/march (its package.json exports point at every subpath's declarations, a component by its
+// folder name too) plus files outside it that join the program (the app's own declarations, e.g. MarchIDE's
+// march/testing). Then march imports are their real types, March's JSX types check props, and the catch-alls above go.
+// An icon pack's declarations are read when code imports it (march-icons/<id>.d.ts).
+let types = null; // path → text, or {} when the app serves none
+const dirs = new Set(); // the folders of its paths
+const TYPES_ROOT = "/node_modules/march/";
+const ENV_TYPED = `declare module "hadi-march";
+declare module "hadi-march/*";
+`;
+function loadTypes() {
+  if (types) return types;
+  types = {};
+  try { const x = new XMLHttpRequest(); x.open("GET", libUrl + "march-types.json", false); x.send(); if (x.status === 200) types = JSON.parse(x.responseText); } catch { types = {}; }
+  for (const k of Object.keys(types)) for (let i = k.indexOf("/", 1); i > 0; i = k.indexOf("/", i + 1)) dirs.add(k.slice(0, i));
+  return types;
+}
+const typed = () => Object.keys(loadTypes()).length > 0;
+const PACK = /^\/node_modules\/march\/src\/icons\/packs\/([\w-]+)\/index\.d\.ts$/;
+function typeFile(p) {
+  const t = loadTypes();
+  if (p in t) return t[p];
+  const m = PACK.exec(p);
+  if (!m) return undefined;
+  const key = `march-icons/${m[1]}.d.ts`;
+  if (!libs.has(key)) { let text; try { const x = new XMLHttpRequest(); x.open("GET", libUrl + key, false); x.send(); text = x.status === 200 ? x.responseText : undefined; } catch { text = undefined; } libs.set(key, text); }
+  return libs.get(key);
+}
+// with March's types a page's own declaration of a march module (an older env: declare module "march/icons" { … })
+// would hide the real one: such files stay out
+const shadows = (p, text) => /\.d\.ts$/.test(p) && /declare module ["']march(\/[^"']*)?["']/.test(text);
+const envText = () => (typed() ? ENV_TYPED : ENV_TEXT);
+
 const OPTIONS = () => ({
   target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler,
   jsx: ts.JsxEmit.Preserve, strict: true, noEmit: true, skipLibCheck: true, allowJs: true, checkJs: false, allowImportingTsExtensions: true,
@@ -33,21 +67,29 @@ function readLib(name) {
 
 function start() {
   const host = {
-    getScriptFileNames: () => [ENV, ...files.keys()],
+    getScriptFileNames: () => {
+      const own = [...files.keys()];
+      if (!typed()) return [ENV, ...own];
+      const extra = Object.keys(types).filter((k) => !k.startsWith(TYPES_ROOT));
+      return [ENV, `${TYPES_ROOT}types/jsx.d.ts`, ...extra, ...own.filter((p) => !shadows(p, files.get(p).text))];
+    },
     getScriptVersion: (p) => String(files.get(p)?.version ?? 0),
     getScriptSnapshot: (p) => {
-      if (p === ENV) return ts.ScriptSnapshot.fromString(ENV_TEXT);
+      if (p === ENV) return ts.ScriptSnapshot.fromString(envText());
       const f = files.get(p);
       if (f) return ts.ScriptSnapshot.fromString(f.text);
+      const tf = typeFile(p);
+      if (tf !== undefined) return ts.ScriptSnapshot.fromString(tf);
       if (/lib\.[\w.]*d\.ts$/.test(p)) { const t = readLib(p); return t === undefined ? undefined : ts.ScriptSnapshot.fromString(t); }
       return undefined;
     },
     getCurrentDirectory: () => "/",
     getCompilationSettings: OPTIONS,
     getDefaultLibFileName: () => "/lib/lib.es2022.d.ts",
-    fileExists: (p) => p === ENV || files.has(p) || (/lib\.[\w.]*d\.ts$/.test(p) && readLib(p) !== undefined),
-    readFile: (p) => (p === ENV ? ENV_TEXT : files.get(p)?.text ?? (/lib\.[\w.]*d\.ts$/.test(p) ? readLib(p) : undefined)),
-    directoryExists: () => true,
+    fileExists: (p) => p === ENV || files.has(p) || typeFile(p) !== undefined || (/lib\.[\w.]*d\.ts$/.test(p) && readLib(p) !== undefined),
+    readFile: (p) => (p === ENV ? envText() : files.get(p)?.text ?? typeFile(p) ?? (/lib\.[\w.]*d\.ts$/.test(p) ? readLib(p) : undefined)),
+    // inside node_modules only march's folders are there (other packages: none)
+    directoryExists: (p) => !p.startsWith("/node_modules") || (typed() && (dirs.has(p.replace(/\/$/, "")) || /^\/node_modules\/march\/src\/icons\/packs\/[\w-]+$/.test(p))),
     getDirectories: () => [],
   };
   LS = ts.createLanguageService(host, ts.createDocumentRegistry());

@@ -12,6 +12,7 @@ import { floating, type Placement } from "../../../ui/popover.ts";
 import { focusFirst } from "../../../ui/focus.ts";
 import { Button } from "../../actions/button/index.ts";
 import { PanelHeader } from "../../layout/panel-header/index.ts";
+import type { Handler } from "../../../core/util.ts";
 
 /** Why a popover opened or closed. */
 export type PopoverReason = "trigger" | "outside" | "escape" | "close" | "api";
@@ -30,7 +31,7 @@ export interface PopoverProps {
   /** Own state: open at first. @tr Kendi durumu: başta açık. */
   defaultOpen?: boolean | undefined;
   /** Called when it opens or closes, with why: trigger, outside, escape, close or api. @tr Açılınca ya da kapanınca nedeniyle çağrılır: trigger, outside, escape, close ya da api. */
-  onOpenChange?: ((open: boolean, why: PopoverReason) => void) | undefined;
+  onOpenChange?: Handler<[open: boolean, why: PopoverReason]> | undefined;
   /** Side of the panel (default bottom-start); it flips when there is no room. @tr Panelin yönü (varsayılan bottom-start); yer yoksa ters yöne geçer. */
   placement?: Placement | undefined;
   /** A small header in the panel (PanelHeader). @tr Panelde küçük bir başlık (PanelHeader). */

@@ -45,7 +45,9 @@ export type SeriesSpec<D> = string | number | (Getter<D> & { key?: string });
 /** Series labels: aligned with `y`, keyed by series key, or one label for a single series. */
 export type SeriesLabels = readonly string[] | Readonly<Record<string, string>> | string;
 /** Formatter spec: pipe name, `[pipe, ...args]` or a function. */
-export type FormatSpec = string | readonly [string, ...unknown[]] | ((v: unknown) => unknown);
+// a format function takes the value as the chart has it ((ms: number) => string): its parameter is any, so a typed one fits
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type FormatSpec = string | readonly [string, ...unknown[]] | ((v: any) => unknown);
 export type Formatter = (v: unknown) => unknown;
 /** Series as used by the charts. */
 export interface Series<D> { key: string; label: string; get: Getter<D>; index: number }
@@ -85,7 +87,7 @@ export const rowsOf = <D>(v: DataProp<D>): D[] => {
 
 /** `"key"` → d => d.key; function → itself; undefined → fallback. */
 export function accessor<D>(spec: Field<D> | null | undefined, fallback: Getter<D> = (d) => d): Getter<D> {
-  if (typeof spec === "function") return spec;
+  if (typeof spec === "function") return spec as Formatter;
   if (spec == null) return fallback;
   return (d) => (d as Record<string | number, unknown> | null | undefined)?.[spec];
 }

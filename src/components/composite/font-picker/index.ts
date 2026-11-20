@@ -8,7 +8,7 @@ import "./font-picker.css";
 import { signal, computed, effect, untrack, batch, onCleanup, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
-import { cx, uid, val, setStyle, type ClassProp } from "../../../core/util.ts";
+import { cx, uid, val, setStyle, type ClassProp, type Handler } from "../../../core/util.ts";
 import { model, ctl, live, listNav, type ControlProps } from "../../../forms/util.ts";
 import { formatCount } from "../../../ui/format.ts";
 import { persisted } from "../../../managers/storage/index.ts";
@@ -82,7 +82,7 @@ export interface FontPickerProps extends ControlProps<string> {
   /** Ask before the first request to the font source (it sees the visitor's address); the answer is remembered. Default false. @tr Yazı tipi kaynağına ilk istekten önce sor (kaynak ziyaretçinin adresini görür); yanıt hatırlanır. Varsayılan false. */
   askConsent?: boolean | undefined;
   /** Every pick and every change of weight / italic, with the CSS to use the font. @tr Her seçimde ve her kalınlık / italik değişikliğinde, yazı tipini kullanmak için CSS ile çağrılır. */
-  onPick?: ((choice: FontChoice) => void) | undefined;
+  onPick?: Handler<[choice: FontChoice]> | undefined;
   /** Weight chosen at first (default 400; the family's nearest weight is used). @tr Başta seçili kalınlık (varsayılan 400; ailenin en yakın kalınlığı kullanılır). */
   weight?: number | undefined;
   /** Italic at first. @tr Başta italik. */
@@ -94,7 +94,7 @@ export interface FontPickerProps extends ControlProps<string> {
   /** The sample text of the specimen (and of the rows with `preview="sample"`). @tr Örnek gösterimin örnek metni (ve `preview="sample"` satırlarının). */
   sample?: string | undefined;
   /** The sample text was edited. @tr Örnek metin düzenlenince çağrılır. */
-  onSample?: ((text: string) => void) | undefined;
+  onSample?: Handler<[text: string]> | undefined;
   /** Category shown at first / followed when it changes ("all" by default). @tr Başta gösterilen / değişince izlenen kategori (varsayılan "all"). */
   category?: FontCategory | "all" | undefined;
   /** Order: "popular" (default), "name", "newest". @tr Sıralama: "popular" (varsayılan), "name", "newest". */
@@ -112,7 +112,7 @@ export interface FontPickerProps extends ControlProps<string> {
   /** Favourites: the star on each row, the Favourites group and the "only favourites" filter (default true). @tr Favoriler: her satırdaki yıldız, Favoriler grubu ve "yalnız favoriler" süzgeci (varsayılan true). */
   favorites?: boolean | undefined;
   /** A star was pressed. @tr Bir yıldıza basılınca çağrılır. */
-  onFavorite?: ((family: string, on: boolean) => void) | undefined;
+  onFavorite?: Handler<[family: string, on: boolean]> | undefined;
   /** Recent picks kept in their own group (default 5; 0: none). @tr Kendi grubunda tutulan son seçimler (varsayılan 5; 0: yok). */
   recent?: number | undefined;
   /** The specimen: the chosen font with your sample text, size, weight, italic and the CSS (default true). @tr Örnek gösterim: seçilen yazı tipi örnek metnin, boyut, kalınlık, italik ve CSS ile (varsayılan true). */
@@ -136,7 +136,7 @@ export interface FontPickerProps extends ControlProps<string> {
   /** Open state of the popover / dialog (yours); without it the picker keeps its own. @tr Popover / pencerenin açık durumu (senin); verilmezse seçici kendisininkini tutar. */
   open?: boolean | Signal<boolean> | undefined;
   /** Called when the popover / dialog opens or closes. @tr Popover / pencere açılınca ya da kapanınca çağrılır. */
-  onOpenChange?: ((open: boolean) => void) | undefined;
+  onOpenChange?: Handler<[open: boolean]> | undefined;
   /** Your own button: a node, or `(api) => node` with `api.toggle()`, `api.font()`. Default: a button with the name in its type. @tr Kendi düğmen: bir düğüm ya da `api.toggle()`, `api.font()` ile `(api) => node`. Varsayılan: adı kendi yazı tipiyle yazılı bir düğme. */
   trigger?: unknown | ((api: { toggle(): void; open(): void; close(): void; font(): FontFamily | undefined }) => unknown) | undefined;
   /** Size of the default button. @tr Varsayılan düğmenin boyutu. */

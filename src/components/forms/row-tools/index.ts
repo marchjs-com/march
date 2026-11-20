@@ -15,6 +15,7 @@ import { ownPart } from "../../../ui/parts.ts";
 import tr from "./tr.ts";
 import { withColor } from "../../../theme/colors.ts";
 import { pointerDrag } from "../../../behaviors/drag/index.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", tr);
 
@@ -26,17 +27,17 @@ export interface RowToolsProps {
   /** Which tools, in this order (default: up, down, remove; "drag" adds a drag grip, with `onGrab`); also a string of names ("drag up down"). @tr Hangi araçlar, bu sırayla (varsayılan: up, down, remove; "drag" bir sürükleme tutamağı ekler, `onGrab` ile); adlar bir metin olarak da verilebilir ("drag up down"). */
   actions?: readonly RowAction[] | string | undefined;
   /** Called when "Move up" is clicked. @tr "Move up" tıklanınca çağrılır. */
-  onUp?: (() => void) | undefined;
+  onUp?: Handler<[]> | undefined;
   /** Called when "Move down" is clicked. @tr "Move down" tıklanınca çağrılır. */
-  onDown?: (() => void) | undefined;
+  onDown?: Handler<[]> | undefined;
   /** Called when "Remove" is clicked. @tr "Remove" tıklanınca çağrılır. */
-  onRemove?: (() => void) | undefined;
+  onRemove?: Handler<[]> | undefined;
   /** Called with the pointerdown on the drag grip: start the drag there (the row editors' `rows.grab`, or your own `pointerDrag`). @tr Sürükleme tutamağına basılınca pointerdown ile çağrılır: sürüklemeyi orada başlatın (satır düzenleyicilerinin `rows.grab`'ı ya da kendi `pointerDrag`'iniz). */
-  onGrab?: ((e: PointerEvent) => void) | undefined;
+  onGrab?: Handler<[e: PointerEvent]> | undefined;
   /** Drag to reorder a plain list: called once on drop with the row's old and new position. RowTools finds its row (the nearest `[data-m-row]`, else `li`) among its siblings, lifts it under the pointer and slides the others aside; Escape cancels. With it the default tools are drag, up, down, remove. @tr Düz bir listeyi sürükleyerek sıralar: bırakınca satırın eski ve yeni sırasıyla bir kez çağrılır. RowTools satırını (en yakın `[data-m-row]`, yoksa `li`) kardeşleri arasında bulur, işaretçinin altında kaldırır, ötekileri kenara kaydırır; Escape vazgeçer. Verilince varsayılan araçlar: drag, up, down, remove. */
-  onReorder?: ((from: number, to: number) => void) | undefined;
+  onReorder?: Handler<[from: number, to: number]> | undefined;
   /** One handler for every tool (called besides onUp / onDown / onRemove). @tr Tüm araçlar için tek işleyici (onUp / onDown / onRemove'a ek olarak çağrılır). */
-  onAction?: ((action: RowAction) => void) | undefined;
+  onAction?: Handler<[action: RowAction]> | undefined;
   /** Position of the row: "up" is off on the first row. @tr Satırın sırası: ilk satırda "up" kapalıdır. */
   index?: MaybeFn<number | undefined>;
   /** Rows in the list: "down" is off on the last row. @tr Listedeki satır sayısı: son satırda "down" kapalıdır. */

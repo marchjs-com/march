@@ -6,7 +6,7 @@ import "./tree-view.css";
 import { signal, computed, effect, untrack, batch, createRoot, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, dir } from "../../../core/i18n.ts";
-import { val, cx, uid, setStyle, later, clamp, type MaybeFn, type ClassProp } from "../../../core/util.ts";
+import { val, cx, uid, setStyle, later, clamp, type MaybeFn, type ClassProp, type Handler } from "../../../core/util.ts";
 import { fold } from "../../../core/text.ts";
 import { createAxis, createViewport } from "../../../core/virtual.ts";
 import { createSelection, moveCursor, type SelectionMode } from "../../../core/selection.ts";
@@ -68,11 +68,11 @@ export interface TreeViewProps {
   /** Initially selected ids. @tr Başta seçili kimlikler. */
   selected?: readonly string[] | undefined;
   /** Called with the selected ids and nodes when the selection changes. @tr Seçim değişince seçili kimlikler ve düğümlerle çağrılır. */
-  onSelect?: ((ids: string[], nodes: TreeViewNode[]) => void) | undefined;
+  onSelect?: Handler<[ids: string[], nodes: TreeViewNode[]]> | undefined;
   /** Initially open ids. @tr Başta açık kimlikler. */
   expanded?: readonly string[] | undefined;
   /** Called when a node opens or closes. @tr Bir düğüm açılınca ya da kapanınca çağrılır. */
-  onExpand?: ((id: string, open: boolean) => void) | undefined;
+  onExpand?: Handler<[id: string, open: boolean]> | undefined;
   /** Search text: shows the hits and the path to them, highlighted. @tr Arama metni: eşleşmeleri ve onlara giden yolu vurgulayarak gösterir. */
   search?: MaybeFn<string | null | undefined>;
   /** Drag and drop to reorder / reparent (Alt+↑ / Alt+↓ moves among siblings from the keyboard). @tr Sürükle bırakla yeniden sıralama / taşıma (klavyeden Alt+↑ / Alt+↓ kardeşler arasında taşır). */
@@ -80,9 +80,9 @@ export interface TreeViewProps {
   /** Decides whether the dragged ids may land at this target and position. @tr Sürüklenen kimliklerin bu hedefe ve konuma bırakılıp bırakılamayacağına karar verir. */
   canDrop?: ((ids: string[], target: TreeViewNode, position: DropPosition) => boolean) | undefined;
   /** After a move; the tree already shows it (pass `nodes` as an accessor to own the data instead). @tr Bir taşımadan sonra; ağaç bunu zaten gösterir (verinin sahibi olmak için `nodes`'u erişimci olarak verin). */
-  onMove?: ((ids: string[], targetId: string, position: DropPosition) => void) | undefined;
+  onMove?: Handler<[ids: string[], targetId: string, position: DropPosition]> | undefined;
   /** Enter / double-click on a leaf. @tr Bir yaprakta Enter / çift tıklama. */
-  onActivate?: ((node: TreeViewNode) => void) | undefined;
+  onActivate?: Handler<[node: TreeViewNode]> | undefined;
   /** Px height of the scroll area (default 360). @tr Kaydırma alanının yüksekliği, px (varsayılan 360). */
   height?: number | undefined;
   /** Row height, px (default 32). @tr Satır yüksekliği, px (varsayılan 32). */

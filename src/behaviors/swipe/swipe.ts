@@ -3,7 +3,7 @@
 // decides; the other axis is left to the page's own scrolling), a veto before the gesture is claimed, velocity from the
 // last 100 ms for flings, rubber-band resistance past a limit, tap and hold for presses that never became a swipe, and
 // the click that ends a mouse swipe is swallowed. Listens on the element itself (pointer capture once claimed).
-import { clamp, isRtl, listen } from "../../core/util.ts";
+import { clamp, isRtl, listen, type Handler } from "../../core/util.ts";
 import { getOwner, onCleanup } from "../../core/reactive.ts";
 
 export type SwipeAxis = "x" | "y";
@@ -31,16 +31,16 @@ export interface SwipeOptions {
   onPress?: ((e: PointerEvent) => boolean | void) | undefined;
   /** Called once the axis is decided, with the movement so far; return false to leave the gesture to the page. */
   accept?: ((p: { dx: number; dy: number; axis: SwipeAxis; event: PointerEvent }) => boolean) | undefined;
-  onStart?: ((p: SwipePoint) => void) | undefined;
-  onMove?: ((p: SwipePoint) => void) | undefined;
+  onStart?: Handler<[p: SwipePoint]> | undefined;
+  onMove?: Handler<[p: SwipePoint]> | undefined;
   /** `cancelled`: pointercancel. `p` carries the release velocity (for flings). */
-  onEnd?: ((p: SwipePoint, cancelled: boolean) => void) | undefined;
+  onEnd?: Handler<[p: SwipePoint, cancelled: boolean]> | undefined;
   /** A press released without swiping (and without a hold when `holdMs` is set). */
-  onTap?: ((e: PointerEvent) => void) | undefined;
+  onTap?: Handler<[e: PointerEvent]> | undefined;
   /** Hold: after `holdMs` without a swipe, `onHold` runs; `onRelease` when that press ends (or turns into a swipe). */
   holdMs?: number | undefined;
-  onHold?: (() => void) | undefined;
-  onRelease?: (() => void) | undefined;
+  onHold?: Handler<[]> | undefined;
+  onRelease?: Handler<[]> | undefined;
   /** Mouse button (default 0); touch and pen always count. */
   button?: number | undefined;
   disabled?: (() => boolean) | undefined;

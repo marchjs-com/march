@@ -7,7 +7,7 @@ import { t } from "../../../core/i18n.ts";
 import { model, ctl, cx, uid, syncValue, labelledBy, useField, itemColor, type ControlProps } from "../../../forms/util.ts";
 import { inputOf } from "../../../forms/affix.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
-import { clamp } from "../../../core/util.ts";
+import { clamp, type Handler } from "../../../core/util.ts";
 import { ownPart } from "../../../ui/parts.ts";
 
 export interface CodeInputProps extends ControlProps<string> {
@@ -44,7 +44,7 @@ export interface CodeInputProps extends ControlProps<string> {
   /** Accessible name of a box: `(position, length) => text` (default "Character 2 of 6"). @tr Bir kutunun erişilebilir adı: `(position, length) => text` (varsayılan "Character 2 of 6"). */
   boxLabel?: ((position: number, length: number) => string) | undefined;
   /** Called once with the code when every box is filled. @tr Tüm kutular dolunca kodla bir kez çağrılır. */
-  onComplete?: ((code: string) => void) | undefined;
+  onComplete?: Handler<[code: string]> | undefined;
   /** Focuses the first box on mount. @tr Açılışta ilk kutuya odaklanır. */
   autofocus?: boolean | undefined;
 }

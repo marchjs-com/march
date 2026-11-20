@@ -5,7 +5,7 @@
 // be reset one by one.
 import "./property-grid.css";
 import { signal, computed, untrack, onCleanup, getOwner, createRoot, reactive, type Signal } from "../../../core/reactive.ts";
-import { load as loadStored, save as store } from "../../../core/util.ts";
+import { load as loadStored, save as store, type Handler } from "../../../core/util.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -89,11 +89,11 @@ export interface PropertyGridProps {
   /** Called with the new object on every edit (pairs with `value`). @tr Her düzenlemede yeni nesneyle çağrılır (`value` ile birlikte). */
   setValue?: (v: Values) => void;
   /** Called with the new object on every edit. @tr Her düzenlemede yeni nesneyle çağrılır. */
-  onChange?: (v: Values) => void;
+  onChange?: Handler<[v: Values]> | undefined;
   /** Saved values to compare with (default: the value at start, then whatever onSave saved). @tr Karşılaştırılacak kayıtlı değerler (varsayılan: başlangıçtaki değer, sonra onSave'in kaydettiği). */
   saved?: MaybeFn<Values | undefined>;
   /** Saves the values; shows the Save button, and DirtyState's `saveAll()` runs it too. @tr Değerleri kaydeder; Save düğmesini gösterir, DirtyState'in `saveAll()`'ı da onu çalıştırır. */
-  onSave?: ((values: Values) => unknown) | undefined;
+  onSave?: Handler<[values: Values]> | undefined;
   /** Accessible name and the DirtyState / undo label ("Button properties"). @tr Erişilebilir ad ve DirtyState / geri alma etiketi ("Button properties"). */
   label?: MaybeFn<string | undefined>;
   /** Undo history (default: the app's undoStack()); false: none. @tr Geri alma geçmişi (varsayılan: uygulamanın undoStack()'i); false: yok. */

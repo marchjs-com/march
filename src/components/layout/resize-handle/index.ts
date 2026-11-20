@@ -10,6 +10,7 @@ import { onCleanup, getOwner } from "../../../core/reactive.ts";
 import { cx, val, rest, isRtl, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import { resizeHandle, type ResizeHandleOptions } from "../../../behaviors/resize-handle/index.ts";
+import type { Handler } from "../../../core/util.ts";
 
 /** Where the handle sits on its (positioned) parent; "between": in the flow, between two flex items. */
 export type ResizeEdge = "end" | "start" | "top" | "bottom" | "top-start" | "top-end" | "bottom-start" | "bottom-end" | "between";
@@ -29,7 +30,7 @@ export interface ResizeHandleProps extends Partial<Omit<ResizeHandleOptions, "va
   /** No pointer, no focus. @tr İşaretçi yok, odak yok. */
   disabled?: MaybeFn<boolean | undefined>;
   /** Without `value` + `set`: arrow keys call this with a step in px along x (RTL mirrored) and y; Shift = 4 steps. @tr `value` + `set` yokken: ok tuşları bunu x (RTL'de aynalanır) ve y boyunca px adımla çağırır; Shift = 4 adım. */
-  onStep?: ((dx: number, dy: number, e: KeyboardEvent) => void) | undefined;
+  onStep?: Handler<[dx: number, dy: number, e: KeyboardEvent]> | undefined;
   /** Called with the element. @tr Öğeyle çağrılır. */
   ref?: ((el: HTMLElement) => void) | undefined;
   /** Extra class on the handle. @tr Tutamaca eklenen sınıf. */

@@ -9,7 +9,7 @@ import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { For } from "../../../dom/for.ts";
 import { t, dir } from "../../../core/i18n.ts";
-import { cx, uid, val, later, type ClassProp } from "../../../core/util.ts";
+import { cx, uid, val, later, type ClassProp, type Handler } from "../../../core/util.ts";
 import { fold } from "../../../core/text.ts";
 import { glyph } from "../../../ui/util.ts";
 import { hasPart } from "../../../ui/parts.ts";
@@ -48,7 +48,7 @@ export interface TreeEditorProps extends ControlProps<unknown> {
   /** Accessible name of the tree. @tr Ağacın erişilebilir adı. */
   label?: string | undefined;
   /** Called with every validation result. @tr Her doğrulama sonucuyla çağrılır. */
-  onValidate?: ((errors: readonly J.JsonError[]) => void) | undefined;
+  onValidate?: Handler<[errors: readonly J.JsonError[]]> | undefined;
   /** The "Valid" / "N problems" status in the bar (default true). @tr Çubuktaki "Valid" / "N problems" durumu (varsayılan true). */
   status?: boolean | undefined;
   /** The type badge of each row (default true; T on a row still opens the type menu). @tr Her satırın tür rozeti (varsayılan true; bir satırda T yine tür menüsünü açar). */

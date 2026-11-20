@@ -19,6 +19,7 @@ import { Empty } from "../components/feedback/empty/index.ts";
 import { Pagination, type PaginationProps } from "../components/navigation/pagination/index.ts";
 import type { BreadcrumbsProps } from "../components/navigation/breadcrumbs/index.ts";
 import { arrowLeft } from "../icons/glyphs/arrowLeft.ts";
+import type { Handler } from "../core/util.ts";
 
 // The trail of a page is the Breadcrumbs component (menus, overflow): it comes in its own chunk, only for pages with a trail.
 const Crumbs = /* @__PURE__ */ lazy<BreadcrumbsProps>(() => import("../components/navigation/breadcrumbs/index.ts"), { pick: "Breadcrumbs", placeholder: "none", height: "1.875rem" });
@@ -137,7 +138,7 @@ export interface ListDetailProps {
   /** Truthy when an item is selected (narrow screens then show the detail). @tr Bir öğe seçiliyken doğru (truthy) olur (dar ekranlar o zaman ayrıntıyı gösterir). */
   selected: MaybeFn<unknown>;
   /** Called by the Back button of the detail pane; without it there is no Back button. @tr Ayrıntı bölmesindeki Geri düğmesi bunu çağırır; verilmezse Geri düğmesi olmaz. */
-  onBack?: () => void;
+  onBack?: Handler<[]> | undefined;
   /** Shown in the detail pane when nothing is selected. @tr Hiçbir şey seçili değilken ayrıntı bölmesinde gösterilir. */
   empty?: unknown;
   /** aria-label of the list pane. @tr Liste bölmesinin aria-label'ı. */
@@ -170,21 +171,21 @@ export interface PagerProps {
   /** Items per page. @tr Sayfa başına öğe sayısı. */
   size?: MaybeFn<number | null | undefined>;
   /** Called with the new page (1-based). @tr Yeni sayfa numarasıyla (1'den başlar) çağrılır. */
-  onPage?: (page: number) => void;
+  onPage?: Handler<[page: number]> | undefined;
   /** Set by `bind:page`. @tr `bind:page` tarafından verilir. */
   setPage?: (page: number) => void;
   /** Page size choices; a size picker appears when given. @tr Sayfa boyutu seçenekleri; verilirse bir boyut seçici görünür. */
   sizes?: readonly number[];
   /** Called with the picked page size. @tr Seçilen sayfa boyutuyla çağrılır. */
-  onSize?: (size: number) => void;
+  onSize?: Handler<[size: number]> | undefined;
   /** Cursor mode. @tr İmleç modu. */
   hasPrev?: MaybeFn<boolean>;
   /** Cursor mode: whether a next page exists. @tr İmleç modu: sonraki sayfa var mı. */
   hasNext?: MaybeFn<boolean>;
   /** Cursor mode: called by the previous button. @tr İmleç modu: önceki düğmesi çağırır. */
-  onPrev?: () => void;
+  onPrev?: Handler<[]> | undefined;
   /** Cursor mode: called by the next button. @tr İmleç modu: sonraki düğmesi çağırır. */
-  onNext?: () => void;
+  onNext?: Handler<[]> | undefined;
   /** Extra CSS classes on the root. @tr Köke eklenen ek CSS sınıfları. */
   class?: ClassProp;
 }

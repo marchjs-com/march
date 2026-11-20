@@ -14,6 +14,7 @@
 // The page's Content-Security-Policy must allow the providers' origins in connect-src (PROVIDERS[i].origin).
 import type { Vault } from "../vault/index.ts";
 import { trackLoad } from "../dom/loads.ts";
+import type { Handler } from "../core/util.ts";
 
 export type AiKind = "anthropic" | "openai" | "gemini";
 export interface AiProvider {
@@ -111,7 +112,7 @@ export interface ChatRequest {
   /** Stops the request (a Stop button). */
   signal?: AbortSignal;
   /** Each piece of the answer as it arrives, and the answer so far. */
-  onText?: (delta: string, text: string) => void;
+  onText?: Handler<[delta: string, text: string]> | undefined;
 }
 export interface ChatResult { text: string; usage: Usage; model: string; stop?: string }
 /** Why a request failed, in the user's terms: the key ("auth"), the limit ("rate"), the balance ("quota"), the network, the request ("bad"), the provider ("server"), stopped ("abort"). */

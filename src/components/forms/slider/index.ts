@@ -4,6 +4,7 @@ import { h } from "../../../dom/h.ts";
 import { model, ctl, cx, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { inputOf } from "../../../forms/affix.ts";
 import { colorAttr } from "../../../theme/colors.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface SliderProps extends ControlProps<number> {
   /** Smallest value (default 0). @tr En küçük değer (varsayılan 0). */
@@ -25,7 +26,7 @@ export interface SliderProps extends ControlProps<number> {
   /** Spoken value (`aria-valuetext`), e.g. `(v) => v + " degrees"`. @tr Seslendirilen değer (`aria-valuetext`), ör. `(v) => v + " degrees"`. */
   valueText?: ((v: number) => string) | undefined;
   /** Called once when a change is finished (pointer released, key pressed), after `onChange`. @tr Bir değişiklik bitince (işaretçi bırakılınca, tuşa basılınca) `onChange`'den sonra bir kez çağrılır. */
-  onCommit?: ((v: number) => void) | undefined;
+  onCommit?: Handler<[v: number]> | undefined;
 }
 
 /** Range slider with the current value shown. Props: min, max, step, format(v), track (your own track). */

@@ -14,6 +14,7 @@ import { setStyle } from "../../../motion/env.ts";
 import { openCreateMenu, type BottomNavAction, type CreateMenuLook } from "./actions.ts";
 import "./bottom-nav.css";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export type { BottomNavAction, CreateMenuLook };
 
@@ -39,9 +40,9 @@ export interface BottomNavProps {
   /** Active item id. @tr Etkin öğenin id'si. */
   value: MaybeFn<string | null | undefined>;
   /** Called with the id of the tab a person picked. @tr Seçilen sekmenin id'siyle çağrılır. */
-  onChange?: ((id: string) => void) | undefined;
+  onChange?: Handler<[id: string]> | undefined;
   /** Shows the raised Create button in the middle. With `createActions` it runs on a long press (the default action). @tr Ortada yükseltilmiş Create düğmesini gösterir. `createActions` ile birlikte uzun basışta çalışır (varsayılan eylem). */
-  onCreate?: (() => void) | undefined;
+  onCreate?: Handler<[]> | undefined;
   /** The Create button opens a menu of these actions (new post, story, live…). Live. @tr Create düğmesi bu eylemlerin menüsünü açar (yeni gönderi, hikâye, canlı yayın…). Canlı. */
   createActions?: MaybeFn<readonly BottomNavAction[] | null | undefined>;
   /** Look of the Create menu: "fan" (round buttons on an arc, default), "stack" (pills above the button) or "sheet" (a list from the bottom). @tr Create menüsünün görünümü: "fan" (yay üzerinde yuvarlak düğmeler, varsayılan), "stack" (düğmenin üstünde hap şeklinde) ya da "sheet" (alttan açılan liste). */
@@ -51,7 +52,7 @@ export interface BottomNavProps {
   /** The grab handle on top of the "sheet" menu. Default true. @tr "sheet" menüsünün üstündeki tutamaç. Varsayılan true. */
   createHandle?: boolean | undefined;
   /** Called with the action a person picked (after its own `run`). @tr Seçilen eylemle (kendi `run`'ından sonra) çağrılır. */
-  onAction?: ((id: string) => void) | undefined;
+  onAction?: Handler<[id: string]> | undefined;
   /** Accessible name of the Create button (default "Create"). @tr Create düğmesinin erişilebilir adı (varsayılan "Create"). */
   createLabel?: MaybeFn<string | undefined>;
   /** Own icon of the Create button (default: a plus). @tr Create düğmesinin kendi ikonu (varsayılan: artı). */

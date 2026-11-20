@@ -7,6 +7,7 @@ import { cx } from "../../../ui/util.ts";
 import { whenMedia } from "../../../ui/observe.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import type { Drawer, DrawerProps } from "../../overlays/drawer/index.ts";
+import type { Handler } from "../../../core/util.ts";
 
 /** Under this width the menu is a drawer (app-shell.css moves the menu button into the header at the same width). */
 export const NAV_NARROW = "(max-width: 900px)";
@@ -24,7 +25,7 @@ export interface NavDrawerOptions {
   /** The edge the drawer comes from (default "start"). */
   side?: "start" | "end" | "bottom" | undefined;
   /** After the menu has moved into the drawer (bring the current row into view). */
-  onShow?: () => void;
+  onShow?: Handler<[]> | undefined;
 }
 export interface NavDrawer {
   /** The drawer is open (only shown under the breakpoint). */

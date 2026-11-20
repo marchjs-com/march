@@ -14,6 +14,7 @@ import { moveCursor, listNav } from "../../../behaviors/list-nav/index.ts";
 import { SectionLabel } from "../../typography/section-label/index.ts";
 import { ListRow } from "../../data/list-row/index.ts";
 import { check as checkIcon } from "../../../icons/glyphs/check.ts";
+import type { Handler } from "../../../core/util.ts";
 
 /** One choice. */
 export interface OptionItem<T = string> {
@@ -40,7 +41,7 @@ export interface OptionListProps<T = string> {
   /** Writes the chosen value back (set by `bind:value`). @tr Seçilen değeri geri yazar (`bind:value` bunu verir). */
   setValue?: ((v: never) => void) | undefined;
   /** A row was chosen (click, Enter, Space). @tr Bir satır seçildi (tıklama, Enter, Space). */
-  onPick?: ((value: T, item: OptionItem<T>, e: Event | null) => void) | undefined;
+  onPick?: Handler<[value: T, item: OptionItem<T>, e: Event | null]> | undefined;
   /** Several values can be chosen (listbox). @tr Birden çok değer seçilebilir (listbox). */
   multiple?: boolean | undefined;
   /** "radio" (default): one of many · "listbox": options, one or many · "menu": commands (checked when a value is given). @tr "radio" (varsayılan): birden biri · "listbox": seçenekler, bir ya da çok · "menu": komutlar (değer verilince işaretli). */

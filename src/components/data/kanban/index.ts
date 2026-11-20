@@ -4,7 +4,7 @@ import "./kanban.css";
 import { signal, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { setStyle, later } from "../../../core/util.ts";
+import { setStyle, later, type Handler } from "../../../core/util.ts";
 import { owned } from "../../../ui/observe.ts";
 import { draggable } from "../../../behaviors/drag/index.ts";
 import { dragGhost, type DragGhost } from "../../../behaviors/drag/ghost.ts";
@@ -31,11 +31,11 @@ export interface KanbanProps<T> {
   /** Stable key of an item (keeps cards in place across updates; default: its `id`). @tr Bir ögenin kalıcı anahtarı (güncellemelerde kartları yerinde tutar; varsayılan: `id`'si). */
   itemKey?: ((item: T) => string) | undefined;
   /** Called when a card is dropped on another column (drag and drop; keyboard: Alt+← / Alt+→ on a focused card). @tr Bir kart başka bir sütuna bırakılınca çağrılır (sürükle bırak; klavye: odaklı kartta Alt+← / Alt+→). */
-  onMove?: (item: T, from: string, to: string) => void;
+  onMove?: Handler<[item: T, from: string, to: string]> | undefined;
   /** The dot before a column title: true (default), false, or `(column) => node`. @tr Sütun başlığının önündeki nokta: true (varsayılan), false ya da `(column) => node`. */
-  dot?: boolean | ((column: KanbanColumn<T>) => unknown) | undefined;
+  dot?: boolean | Handler<[column: KanbanColumn<T>]> | undefined;
   /** The card count of a column: true (default), false, or `(column) => node`. @tr Sütunun kart sayısı: true (varsayılan), false ya da `(column) => node`. */
-  count?: boolean | ((column: KanbanColumn<T>) => unknown) | undefined;
+  count?: boolean | Handler<[column: KanbanColumn<T>]> | undefined;
   /** Cards scale in when they appear (default true). @tr Kartlar belirirken büyüyerek gelir (varsayılan true). */
   animate?: boolean | undefined;
   /** Extra CSS classes on the board. @tr Panoya eklenen CSS sınıfları. */

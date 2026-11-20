@@ -27,6 +27,8 @@ export interface SegmentedProps<T = unknown> extends ControlProps<T | null> {
   options?: OptionsProp;
   /** How the chosen segment is marked: "fill" (default: it is raised in place) or "slide" (one thumb glides to it). @tr Seçili parçanın işareti: "fill" (varsayılan: yerinde kabarır) ya da "slide" (tek bir başparmak ona kayar). */
   indicator?: "fill" | "slide" | undefined;
+  /** "md" (default) or "sm": a smaller row for toolbars and chart headers. @tr "md" (varsayılan) ya da "sm": araç çubukları ve grafik başlıkları için daha küçük bir sıra. */
+  size?: "sm" | "md" | undefined;
 }
 
 /** Segmented control (a compact single choice). Arrow keys move and select. */
@@ -40,7 +42,7 @@ export function Segmented<T = unknown>(props: SegmentedProps<T>): unknown {
   let root: HTMLElement;
   const onKeyDown = (e: KeyboardEvent) => { // ← → (mirrored right to left) and ↑ ↓ both move and select, as in a radio group
     const target = roving(e, [...root.querySelectorAll("button")].filter((b) => !b.disabled), { horizontal: e.key === "ArrowLeft" || e.key === "ArrowRight" }); if (target) target.click(); };
-  root = h("div", { role: "radiogroup", class: cx("m-segmented", slide && "m-segmented-slide", props.class), "aria-labelledby": labelledBy(props), "aria-label": c["aria-label"], "aria-invalid": c["aria-invalid"], onKeyDown },
+  root = h("div", { role: "radiogroup", class: cx("m-segmented", slide && "m-segmented-slide", props.size === "sm" && "m-segmented-sm", props.class), "aria-labelledby": labelledBy(props), "aria-label": c["aria-label"], "aria-invalid": c["aria-invalid"], onKeyDown },
     thumb,
     () => {
       const opts = normOptions(props.options);

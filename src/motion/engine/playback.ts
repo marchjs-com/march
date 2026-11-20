@@ -15,7 +15,7 @@ import { driverFor, type Driver } from "./drivers.ts";
 import { getKeyframes, type KeyframesDef, type Timing } from "./keyframes.ts";
 import { isVisible, watchVisibility } from "./visibility.ts";
 import { ours, setRate } from "./native.ts";
-import { clamp } from "../../core/util.ts";
+import { clamp, type Handler } from "../../core/util.ts";
 
 export type { Timing };
 export type Target = unknown;
@@ -34,8 +34,8 @@ export interface AnimateOptions extends Timing {
   /** Root for selector targets. */
   root?: ParentNode;
   /** Called every frame while it runs (after values are written). */
-  onUpdate?: (progress: number, time: number) => void;
-  onComplete?: () => void;
+  onUpdate?: Handler<[progress: number, time: number]> | undefined;
+  onComplete?: Handler<[]> | undefined;
 }
 export interface StepOptions extends AnimateOptions {
   /** Start: ms, "+=100" / "-=100" after the previous end, "<" with the previous start ("<+=50"), ">" at the previous end, a label, "label+=100". */

@@ -7,6 +7,7 @@
 import { signal, effect, untrack, createRoot, type Signal } from "../../../core/reactive.ts";
 import { overrideGetter, type CallScope } from "../../../ui/call-scope.ts";
 import { t } from "../../../core/i18n.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface Tilt { alpha: number; beta: number; gamma: number }
 export interface Battery { level: number; charging: boolean }
@@ -34,7 +35,7 @@ export interface SensorOptions {
   /** Landscape now. */
   landscape?: () => boolean;
   /** Called with each event fired (its name and a short detail): a log, a ticker. */
-  onEvent?: (name: string, detail?: string) => void;
+  onEvent?: Handler<[name: string, detail?: string]> | undefined;
   /** Signals to keep the state in (a page loaded again in a frame keeps the device's state). */
   state?: Partial<Pick<DeviceSensors, "online" | "battery" | "hidden" | "tilt">>;
 }
@@ -50,7 +51,7 @@ function sensorsIn(win: Window & typeof globalThis, o: SensorOptions, disposeRoo
   const online = o.state?.online ?? signal(true), battery = o.state?.battery ?? signal<Battery>({ level: 0.82, charging: false }), hidden = o.state?.hidden ?? signal(false);
   const tilt = o.state?.tilt ?? signal<Tilt>({ alpha: 0, beta: 0, gamma: 0 });
   const land = (): boolean => o.landscape?.() ?? false;
-  const say = (n: string, d?: string): void => o.onEvent?.(n, d);
+  const say = (n: string, d?: string): void => void o.onEvent?.(n, d);
   const fire = (target: EventTarget | null | undefined, e: Event): void => { target?.dispatchEvent(e); };
   const scope = o.scope;
   // the battery manager the code gets

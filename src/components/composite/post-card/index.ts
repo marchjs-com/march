@@ -29,6 +29,7 @@ import { animate } from "../../../motion/animate.ts";
 import "./post-card.css";
 import { withColor } from "../../../theme/colors.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface PostAuthor { name: string; handle?: string | undefined; avatar?: string | undefined; verified?: boolean | undefined }
 export interface Post {
@@ -63,15 +64,15 @@ export interface PostCardProps {
   /** The post: author, time, place, text, media and counts (or an accessor). @tr Gönderi: yazar, zaman, yer, metin, medya ve sayılar (ya da bir erişimci). */
   post: MaybeFn<Post>;
   /** Called with the next like state; update the post (optimistic). @tr Yeni beğeni durumuyla çağrılır; gönderiyi güncelle (iyimser). */
-  onLike?: ((next: boolean, post: Post) => void) | undefined;
+  onLike?: Handler<[next: boolean, post: Post]> | undefined;
   /** Called by the comment button and the "View all N comments" line. @tr Yorum düğmesi ve "View all N comments" satırı tarafından çağrılır. */
-  onComment?: ((post: Post) => void) | undefined;
+  onComment?: Handler<[post: Post]> | undefined;
   /** Called by the share button. @tr Paylaş düğmesi tarafından çağrılır. */
-  onShare?: ((post: Post) => void) | undefined;
+  onShare?: Handler<[post: Post]> | undefined;
   /** Called when a photo is opened, with its index and tile (open a MediaLightbox from it). @tr Bir fotoğraf açıldığında sırası ve karosuyla çağrılır (oradan bir MediaLightbox aç). */
-  onOpenMedia?: ((index: number, el: HTMLElement, post: Post) => void) | undefined;
+  onOpenMedia?: Handler<[index: number, el: HTMLElement, post: Post]> | undefined;
   /** Makes the author a button (to the profile); called with the post. @tr Yazarı bir düğme yapar (profile gider); gönderiyle çağrılır. */
-  onAuthor?: ((post: Post) => void) | undefined;
+  onAuthor?: Handler<[post: Post]> | undefined;
   /** ⋯ menu items (args: [post]). @tr ⋯ menüsünün öğeleri (argümanlar: [post]). */
   menu?: readonly MenuItem[] | undefined;
   /** card: framed · flat: no frame (a feed with dividers). Default card. @tr card: çerçeveli · flat: çerçevesiz (ayırıcılı bir akış). Varsayılan card. */
@@ -120,7 +121,7 @@ export function PostCard(props: PostCardProps): Element {
   const caption = computed(() => `${post().author.handle ?? post().author.name}\u0000${post().text ?? ""}`);
   const head = computed(() => { const p = post(); return `${p.author.name}\u0000${p.author.avatar ?? ""}\u0000${p.author.verified ? 1 : 0}\u0000${String(p.time)}\u0000${p.place ?? ""}`; });
   let big: HTMLElement | undefined, stage!: HTMLElement;
-  const like = (next: boolean): void => props.onLike?.(next, post());
+  const like = (next: boolean): void => void props.onLike?.(next, post());
   const doubleTap = (): void => {
     if (!post().liked) like(true);
     if (!big) return;

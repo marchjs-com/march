@@ -10,7 +10,7 @@ import "./code-editor.css";
 import { signal, computed, effect, untrack, batch, onCleanup, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
-import { uid, clamp } from "../../../core/util.ts";
+import { uid, clamp, type Handler } from "../../../core/util.ts";
 import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { model, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { tokenize, type Token } from "../../../ui/highlight.ts";
@@ -165,7 +165,7 @@ export interface CodeEditorProps extends ControlProps<string> {
   /** The foot line: what the owner says about the code (a text or a node; reactive). `false`: no foot bar. @tr Alt satır: sahibinin kod hakkında söylediği (metin ya da düğüm; reaktif). `false`: alt çubuk yok. */
   message?: MaybeFn<unknown>;
   /** Pressing the foot line's message (it becomes a button): e.g. open the list of problems. @tr Alt satırdaki mesaja basınca (mesaj düğme olur): ör. sorunlar listesini aç. */
-  onMessage?: (() => void) | undefined;
+  onMessage?: Handler<[]> | undefined;
   /**
    * Put the caret (or a selection) there, focused and in view: a new object each time (`{ from, to? }`, the text's
    * offsets). @tr İmleci (ya da seçimi) oraya koy, odaklı ve görünür: her seferinde yeni bir nesne (`{ from, to? }`, metnin konumları).
@@ -186,7 +186,7 @@ export interface CodeEditorProps extends ControlProps<string> {
   /** Spaces of one indent (default 2). @tr Bir girintinin boşluk sayısı (varsayılan 2). */
   tabSize?: number | undefined;
   /** Ctrl+S (⌘S): the owner saves (the browser's own "save page" does not open). @tr Ctrl+S (⌘S): sahibi kaydeder (tarayıcının kendi "sayfayı kaydet" penceresi açılmaz). */
-  onSave?: ((value: string) => void) | undefined;
+  onSave?: Handler<[value: string]> | undefined;
   /** The shortcuts button in the foot line: a menu of every key (default true). @tr Alt satırdaki kısayollar düğmesi: her tuşun menüsü (varsayılan true). */
   shortcuts?: boolean | undefined;
   /** More rows for the shortcuts menu: the app's keys (a debugger's F5…), shown under the editor's. @tr Kısayollar menüsüne ek satırlar: uygulamanın tuşları (hata ayıklayıcının F5'i…), düzenleyicininkilerin altında. */
@@ -220,13 +220,13 @@ export interface CodeEditorProps extends ControlProps<string> {
   /** The chosen chip (default: the first); `onSourceChange` tells the owner (to keep it). @tr Seçili çip (varsayılan: ilki); `onSourceChange` sahibine bildirir (tutması için). */
   source?: MaybeFn<string | undefined>;
   /** Called with the chip a person picked. @tr Seçilen çiple çağrılır. */
-  onSourceChange?: ((value: string) => void) | undefined;
+  onSourceChange?: Handler<[value: string]> | undefined;
   /** Enter writes a new line (default true); false: one line of code, Enter does nothing. @tr Enter yeni satır yazar (varsayılan true); false: tek satır kod, Enter bir şey yapmaz. */
   multiline?: boolean | undefined;
   /** How a "flash" mark shows: "glow" (default) or "none" / false. @tr "flash" işaretinin görünüşü: "glow" (varsayılan) ya da "none" / false. */
   flash?: "glow" | "none" | false | undefined;
   /** Called when focus leaves the editor (the owner may tidy the code). @tr Odak düzenleyiciden çıkınca çağrılır (sahibi kodu düzenleyebilir). */
-  onBlur?: ((e: FocusEvent) => void) | undefined;
+  onBlur?: Handler<[e: FocusEvent]> | undefined;
   /** The textarea (to focus it, to read the selection). @tr textarea öğesi (odaklamak, seçimi okumak için). */
   inputRef?: ((el: HTMLTextAreaElement) => void) | undefined;
   /** Line numbers in a gutter at the start of each line (wrapped lines keep one number). @tr Her satırın başında oluktaki satır numaraları (kaydırılan satırlar tek numara tutar). */
@@ -236,7 +236,7 @@ export interface CodeEditorProps extends ControlProps<string> {
   /** A line lit across the editor (a debugger's paused line): a number or `{ line, kind }`; scrolled into view when it changes. @tr Düzenleyici boyunca vurgulu satır (hata ayıklayıcının durduğu satır): bir sayı ya da `{ line, kind }`; değişince görünüme kaydırılır. */
   activeLine?: MaybeFn<CodeActiveLine | number | null | undefined>;
   /** A press on the gutter at a line, or F9 at the caret's line (toggle a breakpoint…). @tr Bir satırda oluğa basış ya da imlecin satırında F9 (kesme noktası aç / kapa…). */
-  onGutter?: ((line: number, e: MouseEvent | KeyboardEvent) => void) | undefined;
+  onGutter?: Handler<[line: number, e: MouseEvent | KeyboardEvent]> | undefined;
   /**
    * Syntax colours: "ide" (default: an IDE's palette from the theme's category colours — keywords, types, functions,
    * members, strings, numbers each their own, light and dark) or "theme" (the CodeView colours).
@@ -282,7 +282,7 @@ export interface CodeEditorProps extends ControlProps<string> {
   /** Text size in px; Ctrl + = / Ctrl + - / Ctrl + 0 change it (`onFontSizeChange` keeps it). Default: the theme's small text. @tr px cinsinden yazı boyutu; Ctrl + = / Ctrl + - / Ctrl + 0 değiştirir (`onFontSizeChange` tutar). Varsayılan: temanın küçük metni. */
   fontSize?: MaybeFn<number | undefined>;
   /** Called with the new text size (px; undefined after Ctrl + 0). @tr Yeni yazı boyutuyla çağrılır (px; Ctrl + 0 sonrası undefined). */
-  onFontSizeChange?: ((px: number | undefined) => void) | undefined;
+  onFontSizeChange?: Handler<[px: number | undefined]> | undefined;
   /** Line height (default 1.7). @tr Satır yüksekliği (varsayılan 1.7). */
   lineHeight?: MaybeFn<number | undefined>;
   /** F12 or Ctrl + click: where the name at a place is defined in this text (the range is selected and scrolled to). @tr F12 ya da Ctrl + tıklama: bir yerdeki adın bu metinde tanımlandığı yer (aralık seçilir ve oraya kaydırılır). */

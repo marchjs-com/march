@@ -13,6 +13,7 @@ import { COLOR_TOKENS, type ColorToken } from "../theme/colors.ts";
 import { OptionList } from "../components/forms/option-list/index.ts";
 import { Swatch } from "../components/forms/swatch/index.ts";
 import { ThemeSwatch, colorTheme, restyleInstantly } from "./theme.ts";
+import type { Handler } from "../core/util.ts";
 
 const KEY = "m.accent";
 /** The current app accent ("primary" = the theme's own). */
@@ -47,7 +48,7 @@ export interface AccentPickerProps {
   /** An accent of its own instead of the page's (a preview, with data-m-accent on it): shows `value`, calls `onChange`. @tr Sayfanınki yerine kendine ait bir vurgu rengi (data-m-accent taşıyan bir önizleme): `value` gösterilir, `onChange` çağrılır. */
   value?: MaybeFn<ColorToken | undefined>;
   /** Called with the picked color; when given, the picker leaves the page's accent alone. @tr Seçilen renkle çağrılır; verilirse seçici sayfanın vurgu rengine dokunmaz. */
-  onChange?: ((c: ColorToken) => void) | undefined;
+  onChange?: Handler<[c: ColorToken]> | undefined;
   /** The theme the "theme's own" swatch shows (default the page's). @tr "Temanın kendi" örneğinin gösterdiği tema (varsayılan sayfanınki). */
   theme?: MaybeFn<string | undefined>;
   /** Light or dark of that swatch (default the page's). @tr O örneğin açık ya da koyu hali (varsayılan sayfanınki). */

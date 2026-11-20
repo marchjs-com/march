@@ -2,7 +2,7 @@
 // move inside it (ArrowLeft / ArrowRight swap in RTL). The FocusManager's focus.roving() and focus:roving are this.
 //   const stop = rovingFocus(toolbar, { orientation: "horizontal" })     <div use:rovingFocus={[rovingFocus, { … }]}>
 import { roving as rovingKey } from "../../ui/focus.ts";
-import { isRtl } from "../../core/util.ts";
+import { isRtl, type Handler } from "../../core/util.ts";
 
 /** Options of rovingFocus(). */
 export interface RovingOptions {
@@ -11,7 +11,7 @@ export interface RovingOptions {
   /** Which children take part (default: the container's focusables). */
   selector?: string;
   /** Called with the newly active item. */
-  onMove?: (el: HTMLElement) => void;
+  onMove?: Handler<[el: HTMLElement]> | undefined;
 }
 
 const ITEMS = "button,input,select,textarea,a[href],[tabindex],[data-roving]";

@@ -12,6 +12,7 @@ import type { ColorToken } from "../../../theme/colors.ts";
 import { palette as paletteIcon } from "../../../icons/glyphs/palette.ts";
 import { SectionLabel } from "../../typography/section-label/index.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 /** Props of <ThemeMenu>. */
 export interface ThemeMenuProps {
@@ -42,7 +43,7 @@ export interface ThemeMenuProps {
    */
   value?: MaybeFn<string | undefined>;
   /** Called with the chosen theme id (with `value`). @tr Seçilen tema id'siyle çağrılır (`value` ile). */
-  onChange?: ((id: string) => void) | undefined;
+  onChange?: Handler<[id: string]> | undefined;
   /** With `value`: a first entry "Page theme" (the value `""`): the preview follows the page's theme. @tr `value` ile: ilk girdi "Page theme" (değer `""`): önizleme sayfanın temasını izler. */
   page?: boolean | undefined;
   /** Light or dark the swatches and cards are drawn in (with `value`: the preview's mode; default the page's). @tr Renk örnekleri ve kartların çizildiği açık ya da koyu kip (`value` ile: önizlemenin kipi; varsayılan sayfanınki). */

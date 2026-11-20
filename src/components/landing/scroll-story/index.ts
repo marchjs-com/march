@@ -12,6 +12,7 @@ import { owned, observeSize } from "../../../ui/observe.ts";
 import { swapTransition } from "../../../motion/engine/parts.ts";
 import { PageDots } from "../../navigation/page-dots/index.ts";
 import { onScrollProgress } from "../../../motion/scroll-fx.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface StoryStep {
   title: unknown;
@@ -29,7 +30,7 @@ export interface ScrollStoryProps {
   /** Tint the section with the active step's colour (default true). @tr Bölümü etkin adımın rengiyle boyar (varsayılan true). */
   theme?: boolean | undefined;
   /** Called when the active step changes. @tr Etkin adım değişince çağrılır. */
-  onStep?: ((index: number) => void) | undefined;
+  onStep?: Handler<[index: number]> | undefined;
   /** The dots under the pinned picture (default true). @tr Sabitlenmiş görselin altındaki noktalar (varsayılan true). */
   dots?: boolean | undefined;
   /** The step number above each title: true (default: "01"), false, or `(index) => node`. @tr Her başlığın üstündeki adım numarası: true (varsayılan: "01"), false ya da `(index) => node`. */

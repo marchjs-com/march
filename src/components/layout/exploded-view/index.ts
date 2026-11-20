@@ -13,6 +13,7 @@ import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { model } from "../../../forms/util.ts";
 import { observeSize } from "../../../ui/observe.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", { "Shadow": "Gölge", "Surface": "Zemin", "Content": "İçerik", "Focus ring": "Odak halkası", "Exploded view": "Parçalarına ayrılmış görünüm" });
 
@@ -52,7 +53,7 @@ export interface ExplodedViewProps {
   /** How it moves: "smooth" (default), "spring" or "none" / false. @tr Hareket biçimi: "smooth" (varsayılan), "spring" ya da "none" / false. */
   motion?: "smooth" | "spring" | "none" | false | undefined;
   /** A plate was pressed while apart (the press does not reach the content). @tr Ayrıkken bir plakaya basıldı (basış içeriğe ulaşmaz). */
-  onPick?: ((id: string, el: Element) => void) | undefined;
+  onPick?: Handler<[id: string, el: Element]> | undefined;
   /** The plate shown as chosen (reactive): an `id`. @tr Seçili gösterilen plaka (reaktif): bir `id`. */
   active?: MaybeFn<string | null | undefined>;
   /** Accessible name of the group while apart (default "Exploded view", translated). @tr Ayrıkken grubun erişilebilir adı (varsayılan "Exploded view", çevrilir). */

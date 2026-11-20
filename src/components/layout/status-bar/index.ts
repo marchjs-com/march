@@ -15,6 +15,7 @@ import { StatusDot } from "../../feedback/status-dot/index.ts";
 import { PlainListRow } from "../../data/list-row/core.ts";
 import { more } from "../../../icons/glyphs/more.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", { "Status bar": "Durum çubuğu", "More status": "Diğer durum bilgileri" });
 
@@ -29,7 +30,7 @@ export interface StatusItem {
   /** Tooltip / accessible description. */
   title?: MaybeFn<string | undefined>;
   /** Makes it a button. */
-  onSelect?: () => unknown;
+  onSelect?: Handler<[]> | undefined;
   /** A command id: makes it a button that runs the command (text and icon default to the command's). */
   command?: string;
   /** Higher stays longer when space runs out (default 0). */

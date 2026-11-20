@@ -17,6 +17,7 @@ import { slidingIndicator } from "../../../motion/engine/parts.ts";
 import { onScrollProgress } from "../../../motion/scroll-fx.ts";
 import { scrollHider } from "../../../behaviors/hide-on-scroll/index.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface SiteNavLink { label: unknown; href: string; active?: MaybeFn<boolean | undefined> }
 export interface SiteNavProps {
@@ -39,7 +40,7 @@ export interface SiteNavProps {
   /** Sticky (default) or static. @tr Yapışkan (varsayılan) ya da sabit değil (static). */
   sticky?: boolean | undefined;
   /** Called when a link is chosen (desktop or drawer). @tr Bir bağlantı seçilince çağrılır (masaüstü ya da çekmece). */
-  onNavigate?: (href: string) => void | undefined;
+  onNavigate?: Handler<[href: string]> | undefined;
   /** The pill that slides under the hovered link and rests on the current one (default true). @tr Üzerine gelinen bağlantının altına kayan ve geçerli olanın altında duran hap (varsayılan true). */
   pill?: boolean | undefined;
   /** Colour of the pill (default: a soft neutral). @tr Hapın rengi (varsayılan: yumuşak bir nötr). */

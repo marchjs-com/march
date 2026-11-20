@@ -6,7 +6,7 @@
 // step (Shift ×4), Page Up / Down a big step, Home / End go to min / max, Enter or a double click resets. ARIA:
 // role="separator", the orientation, aria-valuemin / max / now kept current, focusable unless the element says
 // otherwise (a grid that manages focus itself sets tabindex="-1").
-import { clamp, listen, isRtl } from "../../core/util.ts";
+import { clamp, listen, isRtl, type Handler } from "../../core/util.ts";
 import { pointerDrag } from "../drag/drag.ts";
 
 /** Options of resizeHandle(). */
@@ -32,9 +32,9 @@ export interface ResizeHandleOptions {
   /** Enter and double click (default: none). @tr Enter ve çift tıklama (varsayılan: yok). */
   reset?: (() => void) | undefined;
   /** Called when a drag starts. @tr Sürükleme başlayınca çağrılır. */
-  onStart?: (() => void) | undefined;
+  onStart?: Handler<[]> | undefined;
   /** Called when a drag ends; `cancelled` is true after Escape. @tr Sürükleme bitince çağrılır; Escape ile bitince `cancelled` true olur. */
-  onEnd?: ((cancelled: boolean) => void) | undefined;
+  onEnd?: Handler<[cancelled: boolean]> | undefined;
 }
 
 /** Make `el` a resize separator. Returns the cleanup (also run with the current owner). */

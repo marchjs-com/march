@@ -5,7 +5,7 @@ import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { colorAttr, colorList, paintOf, type ColorToken, type MultiColors } from "../../../theme/colors.ts";
-import { clamp, setStyle } from "../../../core/util.ts";
+import { clamp, setStyle, type Handler } from "../../../core/util.ts";
 
 export interface ProgressProps {
   /** Theme color token (see ColorToken): "brand-blue", "success", "cat-3"… Default: the theme's primary. @tr Tema renk belirteci (bkz. ColorToken): "brand-blue", "success", "cat-3"… Varsayılan: temanın birincil rengi. */
@@ -63,7 +63,7 @@ export interface ProgressProps {
   /** Restarts the timed fill when it changes (the id of what the part stands for). @tr Değişince zamanlı dolumu yeniden başlatır (parçanın temsil ettiği şeyin id'si). */
   run?: MaybeFn<unknown>;
   /** The timed fill of the current part is complete. @tr Geçerli parçanın zamanlı dolumu tamamlandı. */
-  onDone?: (() => void) | undefined;
+  onDone?: Handler<[]> | undefined;
   /** Text read instead of the number (`aria-valuetext`): `(value, max) => "Story 2 of 5"`. @tr Sayı yerine okunan metin (`aria-valuetext`): `(value, max) => "Story 2 of 5"`. */
   valueText?: ((value: number, max: number) => string) | undefined;
   /** Extra classes on the progress element. @tr İlerleme öğesine eklenen sınıflar. */

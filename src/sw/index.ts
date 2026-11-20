@@ -4,14 +4,15 @@
 // Chunks are cached the first time they arrive (cache-first; hashed names never change), the page is network-first
 // with an offline fallback, old versions are deleted when a new one activates. CSP: needs only worker-src/script-src 'self'.
 import { signal } from "../core/reactive.ts";
+import type { Handler } from "../core/util.ts";
 
 export interface ServiceWorkerOptions {
   /** URL of the worker, relative to the page (default "sw.js" next to index.html). */
   url?: string;
   /** Called when a new version is installed and waiting; call applyUpdate() to switch. */
-  onUpdate?: (reg: ServiceWorkerRegistration) => void;
+  onUpdate?: Handler<[reg: ServiceWorkerRegistration]> | undefined;
   /** Called once the worker controls the page (first visit: after activation). */
-  onReady?: (reg: ServiceWorkerRegistration) => void;
+  onReady?: Handler<[reg: ServiceWorkerRegistration]> | undefined;
 }
 
 /** "unsupported" | "installing" | "ready" | "update" (a new version waits) | "blocked" (CSP Trusted Types) | "error". */

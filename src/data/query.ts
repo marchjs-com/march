@@ -7,6 +7,7 @@
 //   const save = mutation((u) => api.save(u), { invalidates: ["users"] });  await save(u); save.pending()
 import { signal, effect, untrack, onCleanup, batch, getOwner, type Signal } from "../core/reactive.ts";
 import { beginLoad } from "../dom/loads.ts";
+import type { Handler } from "../core/util.ts";
 
 export interface DataDefaults {
   retry: number;
@@ -70,7 +71,7 @@ export interface QueryOptions<T> {
   /** Keep showing old data (refreshing) when the key changes. */
   keep?: boolean;
   enabled?: () => boolean;
-  onError?: (e: unknown) => void;
+  onError?: Handler<[e: unknown]> | undefined;
 }
 export type QueryState = "loading" | "error" | "ready";
 /** A reactive query: call it for the data (undefined until the first result unless `initial` is given). */
@@ -195,8 +196,8 @@ export interface MutationOptions<V, R> {
   invalidates?: readonly QueryKey[];
   /** Apply an optimistic change; may return an undo function (called on error). */
   optimistic?: (vars: V) => void | (() => void);
-  onSuccess?: (result: R, vars: V) => unknown;
-  onError?: (e: unknown, vars: V) => void;
+  onSuccess?: Handler<[result: R, vars: V]> | undefined;
+  onError?: Handler<[e: unknown, vars: V]> | undefined;
 }
 /** A write operation: call it with variables; `pending()`, `error()` and `result()` are reactive. */
 export interface Mutation<V, R> {

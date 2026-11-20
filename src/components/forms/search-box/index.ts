@@ -14,6 +14,7 @@ import { isIconDef } from "../../../icons/svg.ts";
 import { Kbd } from "../../typography/kbd/index.ts";
 import { search as searchIcon } from "../../../icons/glyphs/search.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface SearchBoxProps {
   /** A signal (two-way), or a value / accessor to follow. `bind:value` works too. @tr Sinyal (iki yönlü) ya da izlenecek değer / erişimci. `bind:value` da çalışır. */
@@ -21,11 +22,11 @@ export interface SearchBoxProps {
   /** Writes the text back (set by `bind:value`). @tr Metni geri yazar (`bind:value` bunu verir). */
   setValue?: (v: string) => void;
   /** The debounced value (also at once on Enter and on clear). @tr Gecikmeli (debounce) değer (Enter'da ve temizlemede hemen). */
-  onSearch?: (q: string) => void;
+  onSearch?: Handler<[q: string]> | undefined;
   /** Called with the text when Enter is pressed. @tr Enter'a basılınca metinle çağrılır. */
-  onEnter?: (q: string) => void;
+  onEnter?: Handler<[q: string]> | undefined;
   /** Every keystroke, before the debounce. @tr Her tuş vuruşu, gecikmeden önce. */
-  onInput?: ((q: string) => void) | undefined;
+  onInput?: Handler<[q: string]> | undefined;
   /** ms (default 250); 0: every keystroke is written at once. @tr ms (varsayılan 250); 0: her tuş vuruşu hemen yazılır. */
   debounce?: number;
   /** `true`: "/" focuses the box; or another combo. The hint is shown at the end of the field. @tr `true`: "/" kutuya odaklanır; ya da başka bir tuş birleşimi. İpucu alanın sonunda gösterilir. */
@@ -51,7 +52,7 @@ export interface SearchBoxProps {
   /** Called with the input element (focus it, measure it). @tr Girdi öğesiyle çağrılır (odaklamak, ölçmek için). */
   inputRef?: ((el: HTMLInputElement) => void) | undefined;
   /** Keys of the input, before the box's own Escape / Enter; `preventDefault()` skips those. @tr Girdinin tuşları, kutunun kendi Escape / Enter işlemlerinden önce; `preventDefault()` onları atlar. */
-  onKeyDown?: ((e: KeyboardEvent) => void) | undefined;
+  onKeyDown?: Handler<[e: KeyboardEvent]> | undefined;
   /** Combobox: id of the list this box filters (sets role="combobox" and aria-controls). @tr Combobox: bu kutunun süzdüğü listenin id'si (role="combobox" ve aria-controls verir). */
   controls?: string | undefined;
   /** Combobox: id of the highlighted option. @tr Combobox: vurgulanan seçeneğin id'si. */

@@ -1,6 +1,6 @@
 // ThemeEditor types: props, tabs and the context its lazy parts get (type-only: no code).
 import type { Accessor, Signal } from "../../../core/reactive.ts";
-import type { ClassProp } from "../../../core/util.ts";
+import type { ClassProp, Handler } from "../../../core/util.ts";
 import type * as M from "./model.ts";
 
 export type ThemeEditorTab = "colors" | "type" | "shape" | "style" | "motion" | "export";
@@ -10,7 +10,7 @@ export interface ThemeEditorProps {
   /** Called with the new draft on every change (pairs with `value`). @tr Her değişiklikte yeni taslakla çağrılır (`value` ile birlikte). */
   setValue?: ((v: M.ThemeDraft) => void) | undefined;
   /** Called with the new draft on every change. @tr Her değişiklikte yeni taslakla çağrılır. */
-  onChange?: ((v: M.ThemeDraft) => void) | undefined;
+  onChange?: Handler<[v: M.ThemeDraft]> | undefined;
   /** Preset to start from when there is no value (default "hadi"); "scratch" starts from one accent color. @tr Değer yokken başlanacak hazır tema (varsayılan "hadi"); "scratch" tek bir vurgu renginden başlar. */
   base?: string | undefined;
   /** Tabs shown (default all). @tr Gösterilen sekmeler (varsayılan hepsi). */
@@ -24,7 +24,7 @@ export interface ThemeEditorProps {
   /** Warn before leaving with unsaved changes (default true). @tr Kaydedilmemiş değişikliklerle ayrılmadan önce uyarır (varsayılan true). */
   warnUnsaved?: boolean | undefined;
   /** Called with the theme when it is saved. @tr Tema kaydedildiğinde temayla çağrılır. */
-  onSave?: ((d: M.ThemeDraft) => void) | undefined;
+  onSave?: Handler<[d: M.ThemeDraft]> | undefined;
   /** Look only: the controls cannot change the theme. @tr Yalnız bakılır: denetimler temayı değiştiremez. */
   readonly?: boolean | undefined;
   /** The "Start from" row of base themes (default true). @tr Hazır temaların "Start from" satırı (varsayılan true). */

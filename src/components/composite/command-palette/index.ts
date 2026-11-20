@@ -16,6 +16,7 @@ import { Kbd } from "../../typography/kbd/index.ts";
 import { isOpen } from "./state.ts";
 import type { Command } from "../../../ui/registry.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export { registerCommands, registerPages } from "../../../ui/registry.ts";
 export type { Command, CommandEntry, PageEntry } from "../../../ui/registry.ts";
@@ -85,7 +86,7 @@ export interface CommandPaletteProps {
   /** Extra commands for this palette only. @tr Yalnız bu palete ait ek komutlar. */
   commands?: readonly Command[] | null | undefined;
   /** Called with the entry that ran. @tr Çalışan girdiyle çağrılır. */
-  onRun?: (entry: PaletteEntry) => void;
+  onRun?: Handler<[entry: PaletteEntry]> | undefined;
   /** Own texts (dialog and field names, empty state, key hint, the Ask row). @tr Kendi metinlerin (pencere ve alan adları, boş durum, tuş ipucu, Ask satırı). */
   labels?: MaybeFn<CommandPaletteLabels | undefined>;
   /** The key hint under the list: true (default), false, or your own content. @tr Listenin altındaki tuş ipucu: true (varsayılan), false ya da kendi içeriğin. */

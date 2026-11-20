@@ -15,6 +15,7 @@ import { alertCircle } from "../../../icons/glyphs/alertCircle.ts";
 import { actionsOf, type ActionsProp, type Tone } from "../../../ui/display-base.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface AlertProps {
   /** Meaning, colours and icon: info (default), success, warn, danger or neutral. @tr Anlam, renk ve ikon: info (varsayılan), success, warn, danger ya da neutral. */
@@ -36,7 +37,7 @@ export interface AlertProps {
   /** Glyph or node inside the dismiss button (default: the × glyph). @tr Kapatma düğmesindeki glif ya da düğüm (varsayılan: × glifi). */
   dismissIcon?: IconProp;
   /** Called after the alert is dismissed. @tr Uyarı kapatıldıktan sonra çağrılır. */
-  onDismiss?: () => void;
+  onDismiss?: Handler<[]> | undefined;
   /** "soft" (default: the tone's tinted fill) or "raised": a floating message (a toast) on the surface of a layer with a shadow; the tone colours the icon alone. @tr "soft" (varsayılan: tonun renkli dolgusu) ya da "raised": bir katmanın yüzeyinde gölgeli, yüzen mesaj (bildirim); ton yalnız ikonu renklendirir. */
   variant?: "soft" | "raised" | undefined;
   /** The ARIA role instead of the tone's ("alert" for danger and warn, "status" otherwise). @tr Tonunki yerine ARIA rolü (danger ve warn için "alert", diğerlerinde "status"). */

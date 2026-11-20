@@ -11,6 +11,7 @@ import { type ColorToken } from "../../../theme/colors.ts";
 import { track, arrowStep } from "../../../behaviors/drag/index.ts";
 import { frame } from "../../../motion/env.ts";
 import tr from "./tr.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", tr);
 
@@ -43,9 +44,9 @@ export interface TimeRulerProps {
   /** Playhead position, ms; null / undefined: no playhead. @tr Oynatma imlecinin konumu, ms; null / undefined: imleç yok. */
   value?: MaybeFn<number | null | undefined>;
   /** Makes the ruler draggable and the playhead a slider: called with the time to jump to. @tr Cetveli sürüklenebilir, imleci kaydırıcı yapar: atlanacak zamanla çağrılır. */
-  onSeek?: ((ms: number) => void) | undefined;
+  onSeek?: Handler<[ms: number]> | undefined;
   /** A drag or a key press starts (pause playback here). @tr Bir sürükleme ya da tuş basışı başlar (oynatmayı burada duraklatın). */
-  onSeekStart?: (() => void) | undefined;
+  onSeekStart?: Handler<[]> | undefined;
   /** Minor tick distance, ms (default: picked for the duration). @tr Küçük çentik aralığı, ms (varsayılan: süreye göre seçilir). */
   step?: MaybeFn<number | undefined>;
   /** Labelled tick distance, ms (default: picked for the duration). @tr Etiketli çentik aralığı, ms (varsayılan: süreye göre seçilir). */
@@ -79,7 +80,7 @@ export function TimeRuler(props: TimeRulerProps): Element {
   const fmt = (ms: number): unknown => (props.format ? props.format(ms) : `${Math.round(ms) / 1000}s`);
   const now = (): number | null => { const v = val(props.value); return v == null ? null : clamp(v, 0, D()); };
   const seekable = !!props.onSeek;
-  const seek = (ms: number): void => props.onSeek?.(clamp(ms, 0, untrack(D)));
+  const seek = (ms: number): void => void props.onSeek?.(clamp(ms, 0, untrack(D)));
 
   // labels that would collide (a narrow ruler, long labels) step aside: the first and the last stay, the others show
   // where they fit; a label past the ruler's end is drawn before its tick

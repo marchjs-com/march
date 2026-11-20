@@ -11,6 +11,7 @@ import { ClampText } from "../../typography/clamp-text/index.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import tr from "./tr.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", tr);
 
@@ -26,7 +27,7 @@ export interface ReplyQuoteProps {
   /** The bar at the start edge (default true). @tr Baş kenardaki çubuk (varsayılan true). */
   bar?: MaybeFn<boolean | undefined>;
   /** Shows the cancel button and runs on it. @tr Vazgeç düğmesini gösterir ve ona basılınca çağrılır. */
-  onClose?: (() => void) | undefined;
+  onClose?: Handler<[]> | undefined;
   /** The cancel button: shown when `onClose` is given (default), false for none, or your own icon for it. @tr Vazgeç düğmesi: `onClose` verilince gösterilir (varsayılan), false ile hiç, ya da onun için kendi ikonunuz. */
   close?: boolean | unknown | undefined;
   /** Accessible name of the cancel button (default "Cancel reply"). @tr Vazgeç düğmesinin erişilebilir adı (varsayılan "Yanıtı iptal et"). */
@@ -34,7 +35,7 @@ export interface ReplyQuoteProps {
   /** After the text, before the cancel button: a thumbnail of a quoted photo, your own control. @tr Metinden sonra, vazgeç düğmesinden önce: alıntılanan fotoğrafın küçük resmi, kendi denetiminiz. */
   trail?: unknown;
   /** Makes the quote a button (jump to the quoted message). @tr Alıntıyı bir düğme yapar (alıntılanan mesaja gitmek için). */
-  onClick?: ((e: MouseEvent) => void) | undefined;
+  onClick?: Handler<[e: MouseEvent]> | undefined;
   /** Extra class on the box. @tr Kutuya eklenen sınıf. */
   class?: ClassProp;
   /** Other attributes (`id`, `data-*`, `ref`, `aria-*`) go to the box. */

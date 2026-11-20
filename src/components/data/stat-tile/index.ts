@@ -8,6 +8,7 @@ import { h } from "../../../dom/h.ts";
 import { routerLink } from "../../../dom/link.ts";
 import { cx, val, rest, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface StatTileProps {
   /** The figure: text, a number or a node (`<Counter value={n} />`). @tr Rakam: metin, sayı ya da bir düğüm (`<Counter value={n} />`). */
@@ -25,7 +26,7 @@ export interface StatTileProps {
   /** Which line comes first: "value" (default) or "label". @tr Hangi satır önce gelir: "value" (varsayılan) ya da "label". */
   order?: MaybeFn<"value" | "label" | undefined>;
   /** Makes it a button. @tr Onu bir düğme yapar. */
-  onClick?: ((e: MouseEvent) => void) | undefined;
+  onClick?: Handler<[e: MouseEvent]> | undefined;
   /** Makes it a link (the router's Link when the app has a router). @tr Onu bir bağlantı yapar (uygulamada router varsa router'ın Link'i). */
   href?: MaybeFn<string | undefined>;
   /** A button or link tile cannot be used: dimmed and not clickable. @tr Düğme ya da bağlantı olan karo kullanılamaz: soluklaşır, tıklanmaz. */

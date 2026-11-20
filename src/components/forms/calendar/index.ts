@@ -5,7 +5,7 @@ import { signal, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, locale } from "../../../core/i18n.ts";
 import { model, cx, uid, type ControlProps } from "../../../forms/util.ts";
-import { isRtl } from "../../../core/util.ts";
+import { isRtl, type Handler } from "../../../core/util.ts";
 import { colorAttr } from "../../../theme/colors.ts";
 import { utcDate as utc, isIso, todayIso, addMonths, firstDayOf, monthGrid, weekdayNames, dateFormat as dtf, type IsoDate } from "../../../core/date.ts";
 import { dayGridKey } from "../../../ui/date-grid.ts";
@@ -32,9 +32,9 @@ export interface CalendarProps extends ControlProps<IsoDate | null> {
   /** Returns `true` for a day that can't be picked. @tr Seçilemeyecek bir gün için `true` döndürür. */
   isDisabled?: ((iso: IsoDate) => boolean) | undefined;
   /** Called with the ISO date when a day is picked. @tr Bir gün seçildiğinde ISO tarihle çağrılır. */
-  onPick?: ((iso: IsoDate) => void) | undefined;
+  onPick?: Handler<[iso: IsoDate]> | undefined;
   /** Called when Escape is pressed in the grid. @tr Izgarada Escape'e basılınca çağrılır. */
-  onEscape?: (() => void) | undefined;
+  onEscape?: Handler<[]> | undefined;
   /** Start of a highlighted range (ISO). @tr Vurgulanan aralığın başlangıcı (ISO). */
   rangeFrom?: IsoDate | null | undefined;
   /** End of a highlighted range (ISO). @tr Vurgulanan aralığın sonu (ISO). */

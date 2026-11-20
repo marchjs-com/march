@@ -16,6 +16,7 @@ import { isPlain, deepEqual } from "../core/equal.ts";
 import { errorText } from "../ui/format.ts";
 import { Button } from "../components/actions/button/index.ts";
 import { Alert } from "../components/feedback/alert/index.ts";
+import type { Handler } from "../core/util.ts";
 
 /** When fields validate: on blur (default), on every change, or only on submit. */
 export type ValidateOn = "blur" | "change" | "submit";
@@ -28,7 +29,7 @@ export interface FormOptions<V> {
   onSubmit?: { bivarianceHack(values: V, form: FormController<V>): unknown }["bivarianceHack"] | undefined;
   validateOn?: ValidateOn | undefined;
   onChange?: { bivarianceHack(name: FieldName<V>, value: V[FieldName<V>], values: V): void }["bivarianceHack"] | undefined;
-  onInvalid?: ((errors: Record<string, string>) => void) | undefined;
+  onInvalid?: Handler<[errors: Record<string, string>]> | undefined;
 }
 
 /** Props from `form.register(name)` for a plain element. */
@@ -339,7 +340,7 @@ export interface FormProps<V = Values> extends FieldsLayout {
   /** Initial values. @tr Başlangıç değerleri. */
   initial?: Initial<V>;
   /** Called with the values when the valid form is submitted. @tr Geçerli form gönderilince değerlerle çağrılır. */
-  onSubmit?: ((values: V, form: FormController<V>) => unknown) | undefined;
+  onSubmit?: Handler<[values: V, form: FormController<V>]> | undefined;
   /** When fields are validated: "blur" (default), "change" or "submit". @tr Alanların ne zaman doğrulanacağı: "blur" (varsayılan), "change" ya da "submit". */
   validateOn?: ValidateOn | undefined;
   /** Called with `(name, value, values)` when a field changes. @tr Bir alan değişince `(name, value, values)` ile çağrılır. */
@@ -363,7 +364,7 @@ export interface FormProps<V = Values> extends FieldsLayout {
   /** Makes every field read-only and hides the submit bar. @tr Tüm alanları yalnız okunur yapar, gönder çubuğunu gizler. */
   readonly?: boolean | null | undefined;
   /** Called once with the form controller. @tr Form denetleyicisiyle bir kez çağrılır. */
-  onReady?: ((form: FormController<V>) => void) | undefined;
+  onReady?: Handler<[form: FormController<V>]> | undefined;
   /** Extra buttons before cancel / submit. @tr İptal / gönder düğmelerinden önce ek düğmeler. */
   extraActions?: unknown;
   /** Extra CSS classes on the form. @tr Forma eklenen CSS sınıfları. */

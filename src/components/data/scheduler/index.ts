@@ -6,7 +6,7 @@ import "./scheduler.css";
 import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, locale, dir } from "../../../core/i18n.ts";
-import { val, cx, uid, setStyle, later, clamp, type MaybeFn, type ClassProp } from "../../../core/util.ts";
+import { val, cx, uid, setStyle, later, clamp, type MaybeFn, type ClassProp, type Handler } from "../../../core/util.ts";
 import {
   todayIso, addDays, addMonths, diffDays, startOfWeek, daysFrom, monthGrid, firstDayOf, dateFormat, utcDate, formatMinutes, weekdayNames,
   splitDateTime, joinDateTime, snapMinutes, isWeekend, localeDir, type IsoDate,
@@ -78,17 +78,17 @@ export interface SchedulerProps {
   /** The view: "month", "week" (default) or "day". @tr Görünüm: "month", "week" (varsayılan) ya da "day". */
   view?: MaybeFn<SchedulerView | undefined>;
   /** Called when the user switches the view. @tr Kullanıcı görünümü değiştirince çağrılır. */
-  onView?: ((view: SchedulerView) => void) | undefined;
+  onView?: Handler<[view: SchedulerView]> | undefined;
   /** The date in view (ISO). @tr Görünümdeki tarih (ISO). */
   date?: MaybeFn<IsoDate | undefined>;
   /** Called with the new date when the user moves to another period. @tr Kullanıcı başka bir döneme geçince yeni tarihle çağrılır. */
-  onDate?: ((date: IsoDate) => void) | undefined;
+  onDate?: Handler<[date: IsoDate]> | undefined;
   /** After a drag (move / resize) or a keyboard move; the calendar already shows it. @tr Bir sürüklemeden (taşıma / boyutlandırma) ya da klavyeyle taşımadan sonra; takvim bunu zaten gösterir. */
-  onChange?: ((event: SchedulerEvent, next: SchedulerRange) => void) | undefined;
+  onChange?: Handler<[event: SchedulerEvent, next: SchedulerRange]> | undefined;
   /** Drag on an empty slot (or click a free day in month view). @tr Boş bir aralıkta sürükleme (ya da ay görünümünde boş bir güne tıklama). */
-  onCreate?: ((range: SchedulerRange) => void) | undefined;
+  onCreate?: Handler<[range: SchedulerRange]> | undefined;
   /** Click / Enter on an event. @tr Bir etkinliğe tıklama / Enter. */
-  onSelect?: ((event: SchedulerEvent) => void) | undefined;
+  onSelect?: Handler<[event: SchedulerEvent]> | undefined;
   /** Snap in minutes (default 15). @tr Dakika cinsinden yaslama adımı (varsayılan 15). */
   step?: MaybeFn<number | undefined>;
   /** Px per hour in week / day view (default 48). @tr Hafta / gün görünümünde saat başına px (varsayılan 48). */
@@ -114,7 +114,7 @@ export interface SchedulerProps {
   /** The hint under the calendar: true (default: the text in `labels`), false, or your own node. @tr Takvimin altındaki ipucu: true (varsayılan: `labels`'taki metin), false ya da kendi düğümünüz. */
   help?: unknown;
   /** Content of an event: `(event, { view, time }) => node` (default: title, time and place). @tr Bir etkinliğin içeriği: `(event, { view, time }) => node` (varsayılan: başlık, saat ve yer). */
-  renderEvent?: ((event: SchedulerEvent, info: { view: SchedulerView; time: string }) => unknown) | undefined;
+  renderEvent?: Handler<[event: SchedulerEvent, info: { view: SchedulerView; time: string }]> | undefined;
   /** Your own texts (see SchedulerLabels). @tr Kendi metinleriniz (bkz. SchedulerLabels). */
   labels?: Partial<SchedulerLabels> | undefined;
   /** Slide, view-change and settle animations (default true). @tr Kayma, görünüm değişimi ve yerine oturma animasyonları (varsayılan true). */

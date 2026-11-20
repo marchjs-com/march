@@ -57,7 +57,7 @@ All dialogs trap Tab, close on Esc and (when `dismissable`, the default) on an o
 
 | Function | Resolves |
 |---|---|
-| `confirm({ title, message, danger, ok, cancel })` | `true` / `false` |
+| `confirm("Delete it?")` · `confirm({ title, message, danger, ok, cancel })` | `true` / `false` |
 | `prompt({ title, message, label, value, placeholder, validate, ok, multiline })` | string / `null`; `validate(v)` returns an error or null |
 | `askReason({ title, message, min = 10, danger, ok, purposes })` | string / `null`; with `purposes: [{ value, label }]` → `{ category, text }` / `null` |
 | `openDialog((close) => content, { title, size: "sm"\|"md"\|"lg"\|"full", dismissable, footer: (close) => nodes })` | value passed to `close(v)` (undefined when dismissed) |

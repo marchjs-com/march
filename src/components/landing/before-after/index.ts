@@ -13,6 +13,7 @@ import { track, arrowStep } from "../../../behaviors/drag/index.ts";
 import { animateValue } from "../../../motion/engine/value.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import tr from "./tr.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", tr);
 
@@ -28,7 +29,7 @@ export interface BeforeAfterProps {
   /** Divider position, 0–100 from the start (default 50). @tr Ayırıcının konumu, baştan itibaren 0–100 (varsayılan 50). */
   value?: MaybeFn<number> | undefined;
   /** Called with the new position after a drag or key press. @tr Sürükleme ya da tuşa basma sonrasında yeni konumla çağrılır. */
-  onChange?: ((v: number) => void) | undefined;
+  onChange?: Handler<[v: number]> | undefined;
   /** `horizontal`: the divider is vertical and moves across (default) · `vertical`: it moves down. @tr `horizontal`: ayırıcı dikeydir ve yatayda kayar (varsayılan) · `vertical`: aşağı doğru kayar. */
   orientation?: "horizontal" | "vertical" | undefined;
   /** The divider follows the pointer while it is over the area (no press needed). @tr Ayırıcı, işaretçi alanın üzerindeyken onu izler (basmak gerekmez). */

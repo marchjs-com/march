@@ -11,6 +11,7 @@ import { Skeleton } from "../../../ui/feedback.ts";
 import { Picture } from "../../media/picture/index.ts";
 import { CornerMark } from "../../media/corner-mark/index.ts";
 import "./media-grid.css";
+import type { Handler } from "../../../core/util.ts";
 
 export interface MediaItem {
   src: string;
@@ -34,9 +35,9 @@ export interface MediaGridProps {
   /** Space between tiles: none · thin (2px) · gap. Default thin. @tr Kutular arası boşluk: none · thin (2px) · gap. Varsayılan thin. */
   gap?: MaybeFn<"none" | "thin" | "gap" | undefined>;
   /** A tile was pressed (open a lightbox at that index). @tr Bir kutuya basıldı (o sıradan bir ışık kutusu açın). */
-  onOpen?: ((index: number, el: HTMLElement) => void) | undefined;
+  onOpen?: Handler<[index: number, el: HTMLElement]> | undefined;
   /** Double tap on a tile (like). Single taps then wait 230 ms. @tr Bir kutuya çift dokunma (beğeni). Tek dokunuşlar o zaman 230 ms bekler. */
-  onDoubleTap?: ((index: number, el: HTMLElement) => void) | undefined;
+  onDoubleTap?: Handler<[index: number, el: HTMLElement]> | undefined;
   /** Accessible name of the group. Default "N photos". @tr Grubun erişilebilir adı. Varsayılan "N fotoğraf". */
   label?: MaybeFn<string | undefined>;
   /** Accessible name of a tile: `(index, total, item) => "…"`. Default: the alt text and "Photo 2 of 5". @tr Bir kutunun erişilebilir adı: `(index, total, item) => "…"`. Varsayılan: alt metin ve "Fotoğraf 2 / 5". */

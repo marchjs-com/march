@@ -7,7 +7,7 @@
 import { signal, effect, untrack, onCleanup, createRoot, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { val, cx, listen, setStyle, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { clamp } from "../../../core/util.ts";
+import { clamp, type Handler } from "../../../core/util.ts";
 import { measure } from "../../../motion/engine/clock.ts";
 import "./virtual-list.css";
 
@@ -27,7 +27,7 @@ export interface VirtualListProps<T> {
   /** self: the list scrolls (give it a height) · parent: the nearest scrolling ancestor. Default self. @tr self: liste kendisi kayar (ona yükseklik verin) · parent: en yakın kayan üst öge. Varsayılan self. */
   scroll?: "self" | "parent" | undefined;
   /** Called once per item count when the viewport is within `endDistance` of the end (infinite scroll). @tr Görünür alan sona `endDistance` kadar yaklaşınca, öge sayısı başına bir kez çağrılır (sonsuz kaydırma). */
-  onEndReached?: (() => void) | undefined;
+  onEndReached?: Handler<[]> | undefined;
   /** Distance from the end that calls `onEndReached`. Default 800 px. @tr `onEndReached`'i tetikleyen sona uzaklık. Varsayılan 800 px. */
   endDistance?: number | undefined;
   /** Before the rows (inside the scroll area). @tr Satırlardan önce (kaydırma alanının içinde). */

@@ -22,7 +22,7 @@ export const FieldContext: { id: symbol; defaultValue: FieldCtx | null } = { id:
 
 /** A class prop: the same as every ui component (strings, arrays, { name: bool }, accessors). */
 export type { ClassProp } from "../core/util.ts";
-import type { ClassProp } from "../core/util.ts";
+import type { ClassProp, Handler } from "../core/util.ts";
 
 /** Props every control understands (id / aria wiring, state, focus handlers). */
 export interface CommonProps {
@@ -49,9 +49,9 @@ export interface CommonProps {
   /** Same as `aria-label`. @tr `aria-label` ile aynı. */
   ariaLabel?: string | null | undefined;
   /** Called when the control loses focus. @tr Denetim odağı kaybedince çağrılır. */
-  onBlur?: ((e: FocusEvent) => void) | undefined;
+  onBlur?: Handler<[e: FocusEvent]> | undefined;
   /** Called when the control gets focus. @tr Denetim odak alınca çağrılır. */
-  onFocus?: ((e: FocusEvent) => void) | undefined;
+  onFocus?: Handler<[e: FocusEvent]> | undefined;
   /** The schema field (set when rendered by <Field>). @tr Şema alanı (<Field> ile çizilince verilir). */
   field?: Field | undefined;
 }
@@ -66,7 +66,7 @@ export interface ControlProps<T> extends CommonProps {
   /** Writes the value back (set by `bind:value`). @tr Değeri geri yazar (`bind:value` bunu verir). */
   setValue?: ((v: T) => void) | undefined;
   /** Called with the new value on every change. @tr Her değişiklikte yeni değerle çağrılır. */
-  onChange?: ((v: T) => void) | undefined;
+  onChange?: Handler<[v: T]> | undefined;
 }
 
 /**

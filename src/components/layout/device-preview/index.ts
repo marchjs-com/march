@@ -31,6 +31,7 @@ import type { CallScope } from "../../../ui/call-scope.ts";
 import { DEVICES, deviceById, isTouch, dprOf, type DeviceSpec } from "./devices.ts";
 import { deviceSensors, type DeviceSensors, type Battery, type Tilt } from "./sensors.ts";
 import { touchSim, type Gesture, type TouchSim } from "./touch.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export { DEVICES, customDevices, addDevice, removeDevice, allDevices, deviceById, type DeviceSpec, type DeviceKind } from "./devices.ts";
 export { deviceSensors, type DeviceSensors, type Battery, type Tilt, type SensorOptions } from "./sensors.ts";
@@ -103,7 +104,7 @@ export interface DevicePreviewProps {
   /** Whose calls see the device's values (navigator.onLine, document.hidden, devicePixelRatio…) when it shares the page with them (no `src`); default every call. @tr Cihazın değerlerini (navigator.onLine, document.hidden, devicePixelRatio…) kimin çağrıları görür, sayfayı onlarla paylaşırken (`src` yok); varsayılan her çağrı. */
   scope?: CallScope | undefined;
   /** Called with each device event fired (its name and a short detail). @tr Atılan her cihaz olayıyla çağrılır (adı ve kısa bir ayrıntı). */
-  onEvent?: ((name: string, detail?: string) => void) | undefined;
+  onEvent?: Handler<[name: string, detail?: string]> | undefined;
   /** Receives the device's API (play a gesture, shake, its sensors). @tr Cihazın API'sini alır (hareket oynat, salla, algılayıcıları). */
   ref?: ((api: DeviceApi) => void) | undefined;
   /** Extra class on the root. @tr Köke eklenen sınıf. */

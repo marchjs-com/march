@@ -13,6 +13,7 @@ import { Select } from "../../forms/select/index.ts";
 import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { more } from "../../../icons/glyphs/more.ts";
+import type { Handler } from "../../../core/util.ts";
 
 // a live prop for h(Component, …): it becomes a getter
 const live = reactive as <T>(fn: () => T) => T;
@@ -26,7 +27,7 @@ export interface PaginationProps {
   /** Page count; or give `total` (+ `size`) and it is worked out. @tr Sayfa sayısı; ya da `total` (+ `size`) ver, hesaplanır. */
   pages?: MaybeFn<number | null | undefined>;
   /** Called with the chosen page. @tr Seçilen sayfayla çağrılır. */
-  onPage?: (p: number) => void;
+  onPage?: Handler<[p: number]> | undefined;
   /** Called with the chosen page like `onPage` (`bind:page` uses it). @tr `onPage` gibi seçilen sayfayla çağrılır (`bind:page` bunu kullanır). */
   setPage?: (p: number) => void;
   /** Pages shown on each side of the current one (default 1). @tr Geçerli sayfanın her iki yanında gösterilen sayfa sayısı (varsayılan 1). */
@@ -40,15 +41,15 @@ export interface PaginationProps {
   /** Simple variant: the choices of a "rows per page" select. @tr Simple görünüm: "sayfa başına satır" seçicisinin seçenekleri. */
   sizes?: readonly number[] | undefined;
   /** Called with the new size from the rows-per-page select. @tr Sayfa başına satır seçicisinde yeni boyutla çağrılır. */
-  onSize?: ((size: number) => void) | undefined;
+  onSize?: Handler<[size: number]> | undefined;
   /** Cursor mode (simple variant, no page count): whether there is a previous / next page. @tr İmleç modu (simple görünüm, sayfa sayısı yok): önceki sayfa var mı. */
   hasPrev?: MaybeFn<boolean | null | undefined>;
   /** Cursor mode: whether there is a next page. @tr İmleç modu: sonraki sayfa var mı. */
   hasNext?: MaybeFn<boolean | null | undefined>;
   /** Cursor mode: called instead of `onPage`. @tr İmleç modu: `onPage` yerine çağrılır (önceki sayfa). */
-  onPrev?: (() => void) | undefined;
+  onPrev?: Handler<[]> | undefined;
   /** Cursor mode: called instead of `onPage` for the next page. @tr İmleç modu: sonraki sayfa için `onPage` yerine çağrılır. */
-  onNext?: (() => void) | undefined;
+  onNext?: Handler<[]> | undefined;
   /** Simple variant: the "1–20 of 134" text (shown when `total` is given). false: none; a function: your own text. @tr Simple görünüm: "1–20 of 134" metni (`total` verilince gösterilir). false: yok; fonksiyon: kendi metnin. */
   info?: boolean | ((range: PageRange) => unknown) | undefined;
   /** Simple variant: the "Page 2 of 7" text between the buttons (shown when the page count is known). false: none; a function: your own text. @tr Simple görünüm: düğmeler arasındaki "Page 2 of 7" metni (sayfa sayısı biliniyorsa gösterilir). false: yok; fonksiyon: kendi metnin. */
@@ -80,7 +81,7 @@ export function Pagination(props: PaginationProps): Element {
   const pages = (): number | null => { const n = val(props.pages), all = total(); return n != null ? Math.max(1, Number(n)) : all != null ? Math.max(1, Math.ceil(all / size())) : null; };
   const noPrev = (): boolean => { const has = val(props.hasPrev); return has != null ? !has : page() <= 1; };
   const noNext = (): boolean => { const has = val(props.hasNext), n = pages(); return has != null ? !has : n != null && page() >= n; };
-  const back = (): void => (props.onPrev ? props.onPrev() : go(page() - 1)), forth = (): void => (props.onNext ? props.onNext() : go(page() + 1));
+  const back = (): void => void (props.onPrev ? props.onPrev() : go(page() - 1)), forth = (): void => void (props.onNext ? props.onNext() : go(page() + 1));
   const prevName = (): string => val(props.labels?.previous) ?? t`Previous`, nextName = (): string => val(props.labels?.next) ?? t`Next`;
   const controls = props.controls !== false, pageName = props.labels?.page;
   const own = (x: unknown, fallback: IconDef): unknown => ownIcon(x ?? undefined, fallback, "m-page-own");

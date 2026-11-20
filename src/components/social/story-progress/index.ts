@@ -9,6 +9,7 @@ import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { Progress } from "../../feedback/progress/index.ts";
 import "./story-progress.css";
+import type { Handler } from "../../../core/util.ts";
 
 export interface StoryProgressProps {
   /** Number of segments (stories). @tr Parça (hikâye) sayısı. */
@@ -22,7 +23,7 @@ export interface StoryProgressProps {
   /** Restarts the current fill when it changes (the story id): the same index in another group starts over. @tr Değişince şu anki dolmayı yeniden başlatır (hikâye id'si): başka bir gruptaki aynı sıra baştan başlar. */
   run?: MaybeFn<unknown>;
   /** Called when the current segment is full. @tr Şu anki parça dolunca çağrılır. */
-  onDone?: (() => void) | undefined;
+  onDone?: Handler<[]> | undefined;
   /** Your own screen-reader text: `(index, count) => "…"` (index 0-based). Default "Story 2 of 5". @tr Kendi ekran okuyucu metniniz: `(index, count) => "…"` (index 0'dan başlar). Varsayılan "Hikâye 2 / 5". */
   label?: ((index: number, count: number) => string) | undefined;
   /** Fill color. Default: white on the photo. @tr Dolgu rengi. Varsayılan: fotoğraf üstünde beyaz. */

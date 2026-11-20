@@ -5,6 +5,7 @@ import { h } from "../../../dom/h.ts";
 import { model, ctl, cx, uid, val, extend, syncValue, type ControlProps } from "../../../forms/util.ts";
 import type { MaybeFn } from "../../../ui/util.ts";
 import { affix, textAttrs, inputOf, type AffixProps, type TextAttrProps } from "../../../forms/affix.ts";
+import type { Handler } from "../../../core/util.ts";
 export { affix, type AffixProps, type TextAttrProps };
 
 export interface TextInputProps extends ControlProps<string>, TextAttrProps, AffixProps {
@@ -13,9 +14,9 @@ export interface TextInputProps extends ControlProps<string>, TextAttrProps, Aff
   /** Rewrites the typed text before it becomes the value (e.g. `(v) => v.trim()`). @tr Yazılan metni değer olmadan önce dönüştürür (ör. `(v) => v.trim()`). */
   transform?: ((v: string) => string) | undefined;
   /** Key handler of the input. @tr Girdinin tuş işleyicisi. */
-  onKeyDown?: ((e: KeyboardEvent) => void) | undefined;
+  onKeyDown?: Handler<[e: KeyboardEvent]> | undefined;
   /** Paste handler (e.g. split pasted lines into items; `preventDefault()` keeps the text out of the input). @tr Yapıştırma işleyicisi (ör. yapıştırılan satırları öğelere bölmek; `preventDefault()` metni girdiye almaz). */
-  onPaste?: ((e: ClipboardEvent) => void) | undefined;
+  onPaste?: Handler<[e: ClipboardEvent]> | undefined;
   /**
    * An error text of the input itself, for an input without a `<Field>`: while it has text the input is invalid and the
    * text is shown under it (`role="alert"`, linked with `aria-describedby`). Pass `null` / `""` while there is no error.

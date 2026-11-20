@@ -17,6 +17,7 @@ import { Reveal, type RevealOptions } from "../reveal/index.ts";
 import { SectionHead } from "../section-head/index.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import type { Project, ProjectCover } from "../project-grid/index.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface ProjectDetails extends Project {
   role?: unknown;
@@ -31,7 +32,7 @@ export interface ProjectDetailProps {
   /** The project to show: title, cover, facts (role, client, year, services), `body`, `gallery` and `links`. @tr Gösterilecek proje: başlık, kapak, bilgiler (rol, müşteri, yıl, hizmetler), `body`, `gallery` ve `links`. */
   project: ProjectDetails;
   /** Back to the list (shows the back button). @tr Listeye döner (geri düğmesini gösterir). */
-  onBack?: (() => void) | undefined;
+  onBack?: Handler<[]> | undefined;
   /** The next project (a card at the end); without `onOpen` the card is a plain link to its `href`. @tr Sonraki proje (sonda bir kart); `onOpen` olmadan kart, `href` adresine giden düz bir bağlantıdır. */
   next?: { project: Project; onOpen?: ((p: Project, cover: Element) => void) | undefined } | undefined;
   /** Shared element name of the cover (default `project-<id>`, the name ProjectGrid gives its covers). @tr Kapağın paylaşılan öğe adı (varsayılan `project-<id>`, ProjectGrid'in kapaklarına verdiği ad). */

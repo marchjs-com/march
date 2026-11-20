@@ -13,7 +13,7 @@ import { type ColorToken } from "../../../theme/colors.ts";
 import { animate } from "../../../motion/animate.ts";
 import { reducedMotion } from "../../../motion/env.ts";
 import { nextFrame } from "../../../motion/engine/index.ts";
-import { isRtl } from "../../../core/util.ts";
+import { isRtl, type Handler } from "../../../core/util.ts";
 import type { IconProp } from "../../../icons/types.ts";
 
 export interface StepperProps {
@@ -22,7 +22,7 @@ export interface StepperProps {
   /** Current step (0-based). @tr Geçerli adım (0'dan başlar). */
   current: MaybeFn<number>;
   /** Called with the step to go to (a step click, Back / Next). @tr Gidilecek adımla çağrılır (adıma tıklama, Back / Next). */
-  onSelect?: ((i: number) => void) | undefined;
+  onSelect?: Handler<[i: number]> | undefined;
   /** Content per step: a list, or a function of the index. @tr Adım başına içerik: bir liste ya da dizinin fonksiyonu. */
   panels?: readonly unknown[] | ((i: number) => unknown) | undefined;
   /** Show Back / Next buttons under the panel. Default: when there are panels and onSelect. @tr Panelin altında Back / Next düğmeleri gösterir. Varsayılan: panel ve onSelect varken. */
@@ -30,7 +30,7 @@ export interface StepperProps {
   /** Label of the last step's button. Default "Finish". @tr Son adımın düğme etiketi. Varsayılan "Finish". */
   finishLabel?: MaybeFn<string | undefined>;
   /** Called on the last step's button. @tr Son adımın düğmesinde çağrılır. */
-  onFinish?: (() => void) | undefined;
+  onFinish?: Handler<[]> | undefined;
   /** Steps in a column beside the panel (live: the same stepper turns). @tr Adımlar panelin yanında bir sütunda (canlı: aynı stepper döner). */
   vertical?: MaybeFn<boolean | undefined>;
   /** Morph between steps (default true): the highlight stretches and the panels blur into each other; false = at once. @tr Adımlar arasında biçim değişimi (varsayılan true): vurgu uzar, paneller birbirine bulanarak geçer; false = anında. */
@@ -111,7 +111,7 @@ export function Stepper(props: StepperProps): Element {
   onCleanup(() => { frame = null; });
 
   const withNav = props.nav ?? (!!props.panels && !!props.onSelect);
-  const go = (i: number): void => props.onSelect?.(clamp(i, 0, n - 1));
+  const go = (i: number): void => void props.onSelect?.(clamp(i, 0, n - 1));
   const counter = props.counter, stepName = props.labels?.step;
   const el = h("div", { ref: (x: HTMLElement) => { root = x; }, class: () => cx("m-stepper", vertical() && "m-stepper-v", val(props.class)) },
     props.highlight !== false && h("span", { class: "m-stepper-blob", "aria-hidden": "true", ref: (x: HTMLElement) => { blob = x; } }),

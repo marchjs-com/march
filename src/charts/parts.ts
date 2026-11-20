@@ -2,6 +2,7 @@
 import { signal, read, untrack, type Signal } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { nextId, seriesClass, colorStyle, toggleIn, attr, each, type Box, type ChartBaseProps, type Size } from "./util.ts";
+import type { Handler } from "../core/util.ts";
 
 /** Tooltip position (CSS px relative to the wrapper) and lazily rendered content. */
 export interface TipAt { x: number; y: number; left: boolean; content: () => unknown }
@@ -17,7 +18,7 @@ export interface FrameOptions<R> {
   size: Size;
   body: unknown[];
   empty?: () => boolean;
-  onKeyDown?: (e: KeyboardEvent) => void;
+  onKeyDown?: Handler<[e: KeyboardEvent]> | undefined;
   svgRef?: (el: Element) => void;
   tip?: TipState;
   legend?: { items: () => readonly LegendItem[]; hidden: Signal<Set<string>> };

@@ -10,6 +10,7 @@ import { Button } from "../../actions/button/index.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { eye } from "../../../icons/glyphs/eye.ts";
 import { eyeOff } from "../../../icons/glyphs/eyeOff.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface PasswordInputProps extends ControlProps<string>, TextAttrProps {
   /**
@@ -22,7 +23,7 @@ export interface PasswordInputProps extends ControlProps<string>, TextAttrProps 
   /** Texts: `show` / `hide` (the text button's words), `showPassword` / `hidePassword` (the button's accessible name and hint). @tr Metinler: `show` / `hide` (metin düğmesinin sözleri), `showPassword` / `hidePassword` (düğmenin erişilebilir adı ve ipucu). */
   labels?: { show?: unknown; hide?: unknown; showPassword?: string | undefined; hidePassword?: string | undefined } | undefined;
   /** Called when the password is shown (`true`) or hidden again (`false`). @tr Parola gösterilince (`true`) ya da yeniden gizlenince (`false`) çağrılır. */
-  onToggle?: ((shown: boolean) => void) | undefined;
+  onToggle?: Handler<[shown: boolean]> | undefined;
 }
 
 /** Password with a show / hide toggle. `autocomplete` defaults to "current-password" (use "new-password" on sign-up). */

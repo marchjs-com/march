@@ -22,6 +22,7 @@ import { OverflowText } from "../components/typography/overflow-text/index.ts";
 import { Alert } from "../components/feedback/alert/index.ts";
 import { restyleInstantly, restyleAhead } from "./restyle.ts";
 import { trackLoad } from "../dom/loads.ts";
+import type { Handler } from "../core/util.ts";
 
 // a live prop for h(Component, …): it becomes a getter
 const live = reactive as <T>(fn: () => T) => T;
@@ -212,7 +213,7 @@ export interface ThemeToggleProps {
   /** A mode of its own instead of the page's (a preview drawn light or dark): shows `value`, calls `onChange`. @tr Sayfanınki yerine kendine ait bir mod (açık ya da koyu çizilen bir önizleme): `value` gösterilir, `onChange` çağrılır. */
   value?: MaybeFn<ThemeMode | undefined>;
   /** Called with the next mode (system → light → dark); when given, the page's mode is left alone. @tr Sıradaki modla çağrılır (system → light → dark); verilirse sayfanın moduna dokunulmaz. */
-  onChange?: ((mode: ThemeMode) => void) | undefined;
+  onChange?: Handler<[mode: ThemeMode]> | undefined;
   /** Extra CSS classes on the button. @tr Düğmeye eklenen ek CSS sınıfları. */
   class?: ClassProp;
 }
@@ -234,7 +235,7 @@ export interface LocaleSelectProps {
   /** aria-label of the select (default "Language"). @tr Seçim kutusunun aria-label'ı (varsayılan "Language"). */
   label?: MaybeFn<string | undefined>;
   /** Called with the picked locale after it is set. @tr Seçilen dil ayarlandıktan sonra onunla çağrılır. */
-  onChange?: (locale: string) => void;
+  onChange?: Handler<[locale: string]> | undefined;
   /** Extra CSS classes on the select. @tr Seçim kutusuna eklenen ek CSS sınıfları. */
   class?: ClassProp;
 }
@@ -257,7 +258,7 @@ export interface UpdateBannerProps {
   /** The reload button's text (default "Reload"). @tr Yenile düğmesinin metni (varsayılan "Reload"). */
   reloadText?: MaybeFn<string | undefined>;
   /** Called by the reload button instead of reloading the page. @tr Sayfayı yenilemek yerine yenile düğmesi bunu çağırır. */
-  onReload?: () => void;
+  onReload?: Handler<[]> | undefined;
   /** Extra CSS classes on the banner. @tr Banda eklenen ek CSS sınıfları. */
   class?: ClassProp;
 }

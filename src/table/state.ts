@@ -9,7 +9,7 @@ import type { Schema } from "../schema/index.ts";
 import { fold, prop, valueOf, optionsOf, optionLabels, filterFn, isEmptyFilter, describeFilter, sortRows, encodeFilter, decodeFilter } from "./filters.ts";
 import type { Column, ColumnInput, TableColumn, FilterOption, Pin, Row, SortDir, SortSpec } from "./filters.ts";
 import { toCSV, toJSON, download, type CSVOptions, type JSONOptions } from "./export.ts";
-import { clamp, uid, load, save, debounce } from "../core/util.ts";
+import { clamp, uid, load, save, debounce, type Handler } from "../core/util.ts";
 import { createSelection } from "../core/selection.ts";
 
 type MaybeFn<T> = T | (() => T);
@@ -129,7 +129,7 @@ export interface TableOptions<R = Row> {
   /** Row count above which `virtual: "auto"` turns on (default 2000). @tr `virtual: "auto"`'nun devreye girdiği satır sayısı (varsayılan 2000). */
   virtualThreshold?: number | undefined;
   /** Saves an inline edit; a thrown error keeps the editor open with its message. @tr Satır içi düzenlemeyi kaydeder; fırlatılan hata düzenleyiciyi iletisiyle açık tutar. */
-  onEdit?: ((row: R, key: string, value: unknown) => unknown) | undefined;
+  onEdit?: Handler<[row: R, key: string, value: unknown]> | undefined;
   /** Server mode: loads every matching row for export (default: the current page). @tr Sunucu modu: dışa aktarım için eşleşen tüm satırları yükler (varsayılan: geçerli sayfa). */
   exportAll?: ((params: TableQuery) => Promise<readonly R[]> | readonly R[]) | undefined;
   /** Name of exported files, without extension (default "export"). @tr Dışa aktarılan dosyaların uzantısız adı (varsayılan "export"). */

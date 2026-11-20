@@ -13,6 +13,7 @@ import { errorText } from "../../../ui/format.ts";
 import { Chip } from "../../actions/chip/index.ts";
 import { OptionList, type OptionItem } from "../option-list/index.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface ComboboxProps<T = unknown> extends ControlProps<T | null | T[]> {
   /** Static options: [value] or [{ value, label, hint, disabled }], or a comma-separated text ("Kadıköy, Beşiktaş"). @tr Sabit seçenekler: [value] ya da [{ value, label, hint, disabled }], ya da virgülle ayrılmış bir metin ("Kadıköy, Beşiktaş"). */
@@ -36,7 +37,7 @@ export interface ComboboxProps<T = unknown> extends ControlProps<T | null | T[]>
   /** Array value, chips. @tr Değer dizi olur, seçilenler chip olarak görünür. */
   multiple?: boolean | undefined;
   /** Called with the option when one is chosen. @tr Bir seçenek seçilince o seçenekle çağrılır. */
-  onSelect?: ((o: Option) => void) | undefined;
+  onSelect?: Handler<[o: Option]> | undefined;
   /** Texts the list and the chips write themselves (defaults: "Searching…", "Type to search", "No results", "Search failed: …", "Remove …"). @tr Liste ve chip'lerin kendi yazdığı metinler (varsayılanlar: "Searching…", "Type to search", "No results", "Search failed: …", "Remove …"). */
   labels?: {
     searching?: unknown; typeToSearch?: unknown; noResults?: unknown;

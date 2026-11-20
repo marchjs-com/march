@@ -8,7 +8,7 @@ import { animate, timeline, type AnimateOptions, type KeyframesInput, type Playb
 import { measure } from "./engine/clock.ts";
 import { pausedNow } from "./engine/config.ts";
 import { reducedNow } from "./engine/prefs.ts";
-import { clamp, listen } from "../core/util.ts";
+import { clamp, listen, type Handler } from "../core/util.ts";
 
 export interface ScrollSource {
   /** The scrolling element (default: the page). */
@@ -87,7 +87,7 @@ export interface StickyRevealOptions extends ScrollSource {
   /** The step elements inside the sticky stage (default "[data-step]"). */
   steps?: string;
   /** Called with the active step index. */
-  onStep?: (i: number) => void;
+  onStep?: Handler<[i: number]> | undefined;
 }
 
 /**

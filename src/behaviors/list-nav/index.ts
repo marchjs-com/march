@@ -6,7 +6,7 @@
 //                                                                 the field, `active` is the highlighted option
 // DataGrid, TreeView, Combobox / Select pickers and CommandPalette use these; for moving real focus among buttons use
 // roving-focus.
-import { clamp } from "../../core/util.ts";
+import { clamp, type Handler } from "../../core/util.ts";
 import type { Signal } from "../../core/reactive.ts";
 
 export interface CursorInput {
@@ -50,14 +50,14 @@ export interface ListNavOptions {
   /** Enter on the highlighted option. */
   onPick: (i: number) => void;
   /** ArrowUp / ArrowDown while closed (a combobox opens). */
-  onOpen?: (() => void) | undefined;
+  onOpen?: Handler<[]> | undefined;
   isOpen?: (() => boolean) | undefined;
   /** ArrowDown on the last option goes to the first and back (default true). */
   loop?: boolean | undefined;
   /** Options per Page Up / Page Down (default 10). */
   page?: number | undefined;
   /** Called with the new index after a move (scroll it into view, announce it…). */
-  onMove?: ((i: number) => void) | undefined;
+  onMove?: Handler<[i: number]> | undefined;
 }
 
 /**

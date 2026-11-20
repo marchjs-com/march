@@ -10,7 +10,7 @@ import { locale } from "../../../core/i18n.ts";
 import { rowsOf, accessor, formatter, num, useSize, attr, textWidth, each,
   type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps, type Getter, type TooltipProp, f1 } from "../../../charts/util.ts";
 import { Frame, tooltipState, showTip, tipBody, thin } from "../../../charts/parts.ts";
-import { clamp } from "../../../core/util.ts";
+import { clamp, type Handler } from "../../../core/util.ts";
 import { ease, cssOf } from "../../../motion/engine/ease.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
@@ -53,7 +53,7 @@ export interface HeatmapProps<D = unknown> extends ChartBaseProps {
   /** `true` (default), `false`, or `(point) => content` for custom tooltip content. @tr `true` (varsayılan), `false` ya da özel araç ipucu içeriği için `(point) => content`. */
   tooltip?: TooltipProp<HeatPoint>;
   /** Called with the point on click, or Enter / Space on the focused one. @tr Tıklanınca ya da odaktaki öğede Enter / Space'e basılınca noktayla çağrılır. */
-  onSelect?: ((p: HeatPoint) => void) | undefined;
+  onSelect?: Handler<[p: HeatPoint]> | undefined;
   /** When the values change the cells fade to their new colors: `true` (a spring) or an easing name ("out", "spring-wobbly"…); default off. @tr Değerler değişince hücreler yeni renklerine geçer: `true` (yay) ya da bir easing adı ("out", "spring-wobbly"…); varsayılan kapalı. */
   animate?: Opt<boolean | string>;
 }

@@ -17,7 +17,7 @@ import { CopyButton } from "../../actions/copy-button/index.ts";
 import { eye } from "../../../icons/glyphs/eye.ts";
 import { eyeOff } from "../../../icons/glyphs/eyeOff.ts";
 import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
-import { clamp } from "../../../core/util.ts";
+import { clamp, type Handler } from "../../../core/util.ts";
 
 /** A hidden range: `[start, end]` by character index, end not included; negative counts from the end; no end = to the end. */
 export type SecretRegion = readonly [start: number, end?: number];
@@ -50,13 +50,13 @@ export interface SecretProps {
   /** Writes `revealed` back (set by `bind:revealed`). @tr `revealed` değerini geri yazar (`bind:revealed` bunu verir). */
   setRevealed?: ((v: boolean) => void) | undefined;
   /** Called when the eye button shows or hides it. @tr Göz düğmesi değeri gösterince ya da gizleyince çağrılır. */
-  onRevealChange?: ((revealed: boolean) => void) | undefined;
+  onRevealChange?: Handler<[revealed: boolean]> | undefined;
   /** The eye button (default true); false: the value stays as `revealed` says. @tr Göz düğmesi (varsayılan true); false: değer `revealed` neyse öyle kalır. */
   toggle?: boolean | undefined;
   /** A button that copies the real value, hidden or not (default false). @tr Gizli olsun olmasın gerçek değeri kopyalayan düğme (varsayılan false). */
   copy?: boolean | undefined;
   /** Called after the value is copied. @tr Değer kopyalandıktan sonra çağrılır. */
-  onCopy?: (() => void) | undefined;
+  onCopy?: Handler<[]> | undefined;
   /** Monospace text (default true). @tr Eş aralıklı yazı (varsayılan true). */
   mono?: boolean | undefined;
   /** Size of the text and its buttons: sm · md (default). @tr Metnin ve düğmelerinin boyutu: sm · md (varsayılan). */

@@ -14,6 +14,7 @@ import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { withColor } from "../../../theme/colors.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 /** Texts of a PeriodNav (each a string or an accessor). */
 export interface PeriodNavLabels {
@@ -29,7 +30,7 @@ export interface PeriodNavProps {
   /** Called on the next arrow. @tr Sonraki ok düğmesinde çağrılır. */
   onNext: () => void;
   /** Runs on the middle button ("Today"); the button is shown when this is given. @tr Ortadaki düğmede ("Today") çağrılır; verilince düğme gösterilir. */
-  onToday?: (() => void) | undefined;
+  onToday?: Handler<[]> | undefined;
   /** The today button: `false` removes it; a text, a node or `() => node` is its content (default: the `today` label). @tr Bugün düğmesi: `false` onu kaldırır; metin, düğüm ya da `() => node` içeriği olur (varsayılan: `today` etiketi). */
   today?: unknown;
   /** Between the arrows: the name of the period (a text, a node or an accessor). The today button then follows the next arrow. @tr Oklar arasında: dönemin adı (metin, düğüm ya da erişimci). Bugün düğmesi o zaman sonraki okun ardına geçer. */

@@ -3,7 +3,7 @@
 import "./disclosure.css";
 import { h } from "../../../dom/h.ts";
 import { read } from "../../../core/reactive.ts";
-import { cx, val, type ClassProp } from "../../../core/util.ts";
+import { cx, val, type ClassProp, type Handler } from "../../../core/util.ts";
 import { Chevron } from "../../actions/chevron/index.ts";
 
 export interface DisclosureProps {
@@ -12,7 +12,7 @@ export interface DisclosureProps {
   /** Open at first, or a live accessor (default false). @tr Başta açık mı, ya da canlı bir erişimci (varsayılan false). */
   open?: boolean | (() => boolean);
   /** Called with the new state when it opens or closes. @tr Açılınca ya da kapanınca yeni durumla çağrılır. */
-  onToggle?: (open: boolean) => void;
+  onToggle?: Handler<[open: boolean]> | undefined;
   /** The turning arrow before the title: true (default), false, or your own node. @tr Başlıktan önceki dönen ok: true (varsayılan), false ya da kendi düğümünüz. */
   marker?: boolean | unknown;
   /** Extra class on the root (`.m-disclosure`). @tr Köke (`.m-disclosure`) eklenen sınıf. */

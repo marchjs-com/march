@@ -9,7 +9,7 @@ import "./window.css";
 import { signal, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages, dir } from "../../../core/i18n.ts";
-import { cx, val, uid, clamp, load, save, type ClassProp, type MaybeFn } from "../../../core/util.ts";
+import { cx, val, uid, clamp, load, save, type ClassProp, type MaybeFn, type Handler } from "../../../core/util.ts";
 import { ownIcon } from "../../../ui/parts.ts";
 import { observeSize } from "../../../ui/observe.ts";
 import { colorAttr, type ColorToken, withColor } from "../../../theme/colors.ts";
@@ -62,11 +62,11 @@ export interface WindowProps {
   /** Start state, or a live one with onStateChange. @tr Başlangıç durumu ya da onStateChange ile canlı bir durum. */
   state?: MaybeFn<WindowState | undefined> | undefined;
   /** Called with the new state: normal, minimized, maximized, start, end or bottom. @tr Yeni durumla çağrılır: normal, minimized, maximized, start, end ya da bottom. */
-  onStateChange?: ((s: WindowState) => void) | undefined;
+  onStateChange?: Handler<[s: WindowState]> | undefined;
   /** Shown while true (live); without it the close button removes the window until it is rendered again. @tr true iken gösterilir (canlı); yoksa kapat düğmesi pencereyi yeniden çizilene dek kaldırır. */
   open?: MaybeFn<boolean | undefined> | undefined;
   /** Called when the close button is pressed. @tr Kapat düğmesine basılınca çağrılır. */
-  onClose?: (() => void) | undefined;
+  onClose?: Handler<[]> | undefined;
   /** false hides the minimize button (default true). @tr false küçültme düğmesini gizler (varsayılan true). */
   minimizable?: boolean | undefined;
   /** false hides the maximize button; a double click on the bar no longer fills (default true). @tr false büyütme düğmesini gizler; çubuğa çift tıklama artık doldurmaz (varsayılan true). */

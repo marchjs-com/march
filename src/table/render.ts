@@ -14,7 +14,7 @@ import { t } from "../core/i18n.ts";
 import { createTable, type TableOptions, type TableState, type TableAction, type RowAction, type BulkAction } from "./state.ts";
 import type { Row as DefaultRow, TableColumn } from "./filters.ts";
 import { createVirtual, type Virtual } from "./virtual.ts";
-import { clamp, uid, isRtl } from "../core/util.ts";
+import { clamp, uid, isRtl, type Handler } from "../core/util.ts";
 import { nextFrame } from "../motion/engine/clock.ts";
 import { lazy } from "../dom/lazy.ts";
 import { live } from "../forms/util.ts";
@@ -56,7 +56,7 @@ export interface TableProps<R = DefaultRow> extends TableOptions<R> {
   /** Inline buttons instead of a kebab menu (default: up to 2 actions inline). @tr Üç nokta menüsü yerine satır içi düğmeler (varsayılan: en çok 2 eylem satır içinde). */
   rowActionsInline?: boolean | undefined;
   /** Called when a row is clicked (not on its buttons or fields). @tr Bir satıra tıklanınca çağrılır (düğmelerine ya da alanlarına değil). */
-  onRowClick?: ((row: R, e: Event) => void) | undefined;
+  onRowClick?: Handler<[row: R, e: Event]> | undefined;
   /** Detail content of an expanded row; adds an expand toggle to each row. @tr Açılan satırın ayrıntı içeriği; her satıra bir aç/kapa düğmesi ekler. */
   expand?: ((row: R) => unknown) | undefined;
   /** Shown when there are no rows. @tr Hiç satır yokken gösterilir. */

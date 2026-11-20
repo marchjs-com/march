@@ -5,7 +5,7 @@
 // growth; it draws once a frame, writes only changed values, and comes and goes by one strength.
 import { nextFrame } from "../motion/engine/clock.ts";
 import { reducedMotion } from "../motion/env.ts";
-import { isRtl } from "../core/util.ts";
+import { isRtl, type Handler } from "../core/util.ts";
 
 export interface DockLensOptions {
   /** The list whose children are magnified. */
@@ -19,7 +19,7 @@ export interface DockLensOptions {
   /** The custom property each item's shift is written to (default "--m-lens-shift"). */
   shiftVar?: string;
   /** Called after each drawn frame with each item's shift in px (something outside the list can follow an item). */
-  onDraw?: (shifts: readonly number[]) => void;
+  onDraw?: Handler<[shifts: readonly number[]]> | undefined;
 }
 
 export interface DockLens {

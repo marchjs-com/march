@@ -1,7 +1,7 @@
 // track(): pointer drags measured inside an area, for editors (color areas, sliders, curve handles, timeline heads,
 // crop frames). Built on pointerDrag (capture, Escape, one session per press): positions come as 0–1 fractions of the
 // area (x mirrored in RTL when asked) and as pixels, and onMove runs on the press itself (a click on a track jumps).
-import { clamp, listen } from "../../core/util.ts";
+import { clamp, listen, type Handler } from "../../core/util.ts";
 import { pointerDrag } from "./drag.ts";
 
 export interface TrackPoint {
@@ -22,7 +22,7 @@ export interface TrackOptions {
   /** Called on press; return false to ignore this press. */
   onStart?: (p: TrackPoint) => boolean | void;
   onMove: (p: TrackPoint) => void;
-  onEnd?: (p: TrackPoint) => void;
+  onEnd?: Handler<[p: TrackPoint]> | undefined;
   /** Keep x / y inside 0–1 (default true). */
   clamp?: boolean;
   /** Mirror x in right-to-left text (x = 0 at the right edge). */

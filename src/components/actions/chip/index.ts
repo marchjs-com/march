@@ -10,6 +10,7 @@ import { check } from "../../../icons/glyphs/check.ts";
 import { OverflowText } from "../../../ui/marquee.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface ChipProps {
   /** Colour family: neutral (default), primary, success, warn, danger or info. @tr Renk ailesi: neutral (varsayılan), primary, success, warn, danger ya da info. */
@@ -21,9 +22,9 @@ export interface ChipProps {
   /** The tick of a selected chip: true (default), false (the chip's own icon stays), or your own node / icon. @tr Seçili çipin tiki: true (varsayılan), false (çipin kendi ikonu kalır) ya da kendi düğümün / ikonun. */
   selectedIcon?: IconProp;
   /** Called on click; with `selected` the chip is a toggle button. @tr Tıklayınca çağrılır; `selected` ile çip aç / kapa düğmesi olur. */
-  onClick?: (e: MouseEvent) => void;
+  onClick?: Handler<[e: MouseEvent]> | undefined;
   /** Adds the remove button; called when it is pressed. @tr Kaldırma düğmesini ekler; ona basılınca çağrılır. */
-  onRemove?: () => void;
+  onRemove?: Handler<[]> | undefined;
   /** Accessible name of the remove button (default: "Remove", translated). @tr Kaldırma düğmesinin erişilebilir adı (varsayılan: "Remove", çevrilir). */
   removeLabel?: MaybeFn<string | undefined>;
   /** Icon of the remove button (default: ×): your own node / icon. @tr Kaldırma düğmesinin ikonu (varsayılan: ×): kendi düğümün / ikonun. */

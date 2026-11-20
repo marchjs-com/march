@@ -1,4 +1,4 @@
-// Showcase stage for Segmented: the options (a comma-separated text), the color token and the sliding indicator.
+// Showcase stage for Segmented: the options (a comma-separated text), the color token, the sliding indicator and the size.
 import { Segmented } from "./index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 // unions live outside JSX: the March compiler reads `|` in a JSX expression as a pipe
@@ -12,12 +12,12 @@ export const code = `<Segmented bind:value={$view} aria-label="Görünüm" indic
     { value: "month", label: "Ay", disabled: true, title: "Aylık görünüm bu planda yok" }]} />
 <Segmented bind:value={$unit} options="°C, °F" aria-label="Birim" />   // a comma-separated text`
 
-export default function SegmentedDemo(props: { values: { options: string; color: string; indicator: string } }) {
+export default function SegmentedDemo(props: { values: { options: string; color: string; indicator: string; size: string } }) {
   let $view = "Hafta"
   return <div class="sc-stack">
     {() => {
       const v = { ...props.values }
-      return <Segmented value={$view} onChange={(x: Maybe<string>) => { $view = x ?? "" }} options={v.options} indicator={v.indicator as "fill"} m:color={pick(v.color) as Opt<ColorToken>} aria-label="Dönem" />
+      return <Segmented value={$view} onChange={(x: Maybe<string>) => { $view = x ?? "" }} options={v.options} indicator={v.indicator as "fill"} size={v.size as "md"} m:color={pick(v.color) as Opt<ColorToken>} aria-label="Dönem" />
     }}
     <p class="m-muted">{() => `Seçilen: ${$view || "—"}`}</p>
   </div>

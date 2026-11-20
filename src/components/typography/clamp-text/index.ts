@@ -9,6 +9,7 @@ import { val, cx, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts"
 import { type ColorToken } from "../../../theme/colors.ts";
 import { Button } from "../../actions/button/index.ts";
 import tr from "./tr.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", tr);
 
@@ -26,7 +27,7 @@ export interface ClampTextProps {
   /** First state when uncontrolled (default false). @tr Denetimsizken ilk durum (varsayılan false). */
   defaultOpen?: boolean | undefined;
   /** Called when the text opens or folds. @tr Metin açılınca ya da katlanınca çağrılır. */
-  onOpenChange?: ((open: boolean) => void) | undefined;
+  onOpenChange?: Handler<[open: boolean]> | undefined;
   /** Own texts of the switch (default "more" / "less", translated); a node works too. @tr Düğmenin kendi metinleri (varsayılan "more" / "less", çevrilir); düğüm de olur. */
   labels?: { more?: unknown; less?: unknown } | undefined;
   /** Element of the text: "p" (default), "div" or "span". @tr Metnin öğesi: "p" (varsayılan), "div" ya da "span". */

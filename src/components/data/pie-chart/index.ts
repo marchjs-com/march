@@ -8,7 +8,7 @@ import { applyPipe } from "../../../core/pipes.ts";
 import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, useSize, attr, navIndex, each, tween,
   type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps, type TooltipProp } from "../../../charts/util.ts";
 import { Frame, tooltipState, showTip, tipBody } from "../../../charts/parts.ts";
-import { clamp } from "../../../core/util.ts";
+import { clamp, type Handler } from "../../../core/util.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -36,7 +36,7 @@ export interface PieChartProps<D = unknown> extends ChartBaseProps {
   /** `true` (default), `false`, or `(point) => content` for custom tooltip content. @tr `true` (varsayılan), `false` ya da özel araç ipucu içeriği için `(point) => content`. */
   tooltip?: TooltipProp<PiePoint<D>>;
   /** Called with the point on click, or Enter / Space on the focused one. @tr Tıklanınca ya da odaktaki öğede Enter / Space'e basılınca noktayla çağrılır. */
-  onSelect?: ((p: PiePoint<D>) => void) | undefined;
+  onSelect?: Handler<[p: PiePoint<D>]> | undefined;
   /** When the data changes the slices turn to their new angles (a new one opens from its edge): `true` (a spring) or an easing name ("spring-wobbly", "out"…); default off. @tr Veri değişince dilimler yeni açılarına döner (yeni dilim kenarından açılır): `true` (yay) ya da bir easing adı ("spring-wobbly", "out"…); varsayılan kapalı. */
   animate?: Opt<boolean | string>;
 }

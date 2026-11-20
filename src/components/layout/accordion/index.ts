@@ -7,6 +7,7 @@ import { Chevron } from "../../actions/chevron/index.ts";
 import { PlainListRow } from "../../data/list-row/core.ts";
 import { roving } from "../../../ui/focus.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface AccordionItem { id?: string; title: unknown; subtitle?: unknown; icon?: unknown; content: unknown; disabled?: boolean }
 export interface AccordionProps {
@@ -23,7 +24,7 @@ export interface AccordionProps {
   /** false: panels open and close at once, the arrow does not turn (default true). @tr false: bölümler hemen açılıp kapanır, ok dönmez (varsayılan true). */
   animated?: boolean;
   /** Called when a section opens or closes. @tr Bir bölüm açıldığında ya da kapandığında çağrılır. */
-  onToggle?: (key: string | number, open: boolean) => void;
+  onToggle?: Handler<[key: string | number, open: boolean]> | undefined;
   /** Extra class on the root (`.m-accordion`). @tr Köke (`.m-accordion`) eklenen sınıf. */
   class?: ClassProp;
 }

@@ -21,7 +21,7 @@ import { ReactionPicker } from "../../social/reaction-picker/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import { measure } from "../../../motion/engine/clock.ts";
 import "./chat-thread.css";
-import { isRtl } from "../../../core/util.ts";
+import { isRtl, type Handler } from "../../../core/util.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { dismiss } from "../../../behaviors/dismiss/index.ts";
 import { withColor } from "../../../theme/colors.ts";
@@ -50,11 +50,11 @@ export interface ChatThreadProps {
   /** Group chat: sender names (a HADİ color each) and avatars on runs. @tr Grup sohbeti: gönderen adları (her birine bir HADİ rengi) ve ardışık mesajlarda avatarlar. */
   group?: MaybeFn<boolean | undefined>;
   /** Toggle your reaction (from a chip or the picker). @tr Tepkini aç / kapa (bir çipten ya da seçiciden). */
-  onReact?: ((m: ChatMessage, emoji: string) => void) | undefined;
+  onReact?: Handler<[m: ChatMessage, emoji: string]> | undefined;
   /** Called with a message to answer; shows its Reply action. @tr Yanıtlanacak mesajla çağrılır; verilince mesajın Yanıtla eylemi görünür. */
-  onReply?: ((m: ChatMessage) => void) | undefined;
+  onReply?: Handler<[m: ChatMessage]> | undefined;
   /** Called with a failed message to send again; shows its Retry action. @tr Gönderilemeyen mesajı yeniden göndermek için onunla çağrılır; verilince Yeniden dene eylemi görünür. */
-  onRetry?: ((m: ChatMessage) => void) | undefined;
+  onRetry?: Handler<[m: ChatMessage]> | undefined;
   /** Messages closer than this (minutes) join a run. Default 5. @tr Aralarında bundan (dakika) az süre olan mesajlar bir dizide birleşir. Varsayılan 5. */
   runMinutes?: number | undefined;
   /** Accessible name of the message log (default "Messages"). @tr Mesaj günlüğünün erişilebilir adı (varsayılan "Messages"). */

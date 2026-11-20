@@ -19,6 +19,7 @@ import { animate } from "../../../motion/engine/playback.ts";
 import { still } from "../../../motion/engine/parts.ts";
 import { revealOnScroll, type RevealOptions } from "../reveal/index.ts"; // Reveal: the cards enter one after another
 import { type ColorToken } from "../../../theme/colors.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface ProjectCover extends PictureSource { alt: string; width: number; height: number }
 export interface Project {
@@ -40,7 +41,7 @@ export interface ProjectGridProps {
   /** Columns on wide screens (default 3). @tr Geniş ekranlarda sütun sayısı (varsayılan 3). */
   cols?: 2 | 3 | undefined;
   /** Open a project: receives the cover element (start of a shared element transition). @tr Bir projeyi açar: kapak öğesini alır (paylaşılan öğe geçişinin başlangıcı). */
-  onOpen?: ((p: Project, cover: Element) => void) | undefined;
+  onOpen?: Handler<[p: Project, cover: Element]> | undefined;
   /** Without onOpen: show the cover in the Lightbox (default true). @tr onOpen yoksa kapağı Lightbox içinde gösterir (varsayılan true). */
   lightbox?: boolean | undefined;
   /** Text of the "all" chip (default "All"). @tr "Tümü" çipinin metni (varsayılan "All"). */
@@ -48,7 +49,7 @@ export interface ProjectGridProps {
   /** Accessible name of the filter group (default "Filter projects"). @tr Süzgeç grubunun erişilebilir adı (varsayılan "Filter projects"). */
   filtersLabel?: string | undefined;
   /** The arrow badge on a cover: true (default), false, or `(project) => node`. @tr Kapaktaki ok rozeti: true (varsayılan), false ya da `(project) => node`. */
-  arrow?: boolean | ((p: Project) => unknown) | undefined;
+  arrow?: boolean | Handler<[p: Project]> | undefined;
   /** Animate the filter change (fade out, glide, default true); false swaps the cards at once. @tr Süzgeç değişimini canlandırır (solma, kayma; varsayılan true); false kartları hemen değiştirir. */
   motion?: boolean | undefined;
   /** Entrance of the cards: Reveal options, or false for none (default: up, one after another). @tr Kartların girişi: Reveal seçenekleri ya da hiç giriş olmaması için false (varsayılan: up, art arda). */

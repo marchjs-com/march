@@ -6,6 +6,7 @@ import { routerLink } from "../../../dom/link.ts";
 import { cx, val, rest, icon, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import type { OverflowTextProps } from "../../typography/overflow-text/index.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface ListRowProps {
   /** Lead slot: an icon of march/icons, short text (emoji), or a node (Avatar, StatusDot, an image). @tr Baş yuvası: march/icons'tan bir ikon, kısa metin (emoji) ya da bir düğüm (Avatar, StatusDot, bir görsel). */
@@ -21,7 +22,7 @@ export interface ListRowProps {
   /** Makes the row a link (the router's Link when the app has a router). @tr Satırı bağlantı yapar (uygulamada router varsa router'ın Link'i). */
   href?: MaybeFn<string | undefined>;
   /** Makes the row a button; with `as`, a click listener on that element. @tr Satırı düğme yapar; `as` ile o ögeye bir tıklama dinleyicisi ekler. */
-  onClick?: ((e: MouseEvent) => void) | undefined;
+  onClick?: Handler<[e: MouseEvent]> | undefined;
   /** Element of a row that is not a link or a button (default "div"): "li" for an option, "span" inside your own button, "label", "article" for a tile. "button": a button whose host listens itself (drag handle, pointer and key listeners) instead of `onClick`. @tr Bağlantı ya da düğme olmayan satırın ögesi (varsayılan "div"): seçenek için "li", kendi düğmenizin içinde "span", "label", karo için "article". "button": `onClick` yerine dinleyicileri kendisi kuran bir düğme (sürükleme tutamacı, işaretçi ve tuş dinleyicileri). */
   as?: "div" | "li" | "span" | "label" | "button" | "article" | undefined;
   /** Element of the title (default a span): "h3" … for a tile whose title is a heading. A heading wraps instead of scrolling. @tr Başlığın ögesi (varsayılan span): başlığı bir heading olan karo için "h3" … Heading kaymaz, alt satıra geçer. */

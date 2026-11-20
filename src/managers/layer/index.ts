@@ -12,10 +12,11 @@
 import { signal, computed, getOwner, onCleanup, untrack } from "../../core/reactive.ts";
 import { openLayer, layers, isModalLayer, type LayerKind } from "../../dom/portal.ts";
 import { defineManager, emit } from "../manager.ts";
+import type { Handler } from "../../core/util.ts";
 
 export interface LayerOptions {
   /** Called on Escape while this is the top layer that listens. Return false to keep it open (and let Escape through). */
-  onEscape?: () => unknown;
+  onEscape?: Handler<[]> | undefined;
   /** Lock page scroll while open (default: true for modal kinds — dialog, drawer, palette, lightbox). */
   lockScroll?: boolean;
   /** Name for devtools and the stack listing. */

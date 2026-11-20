@@ -21,6 +21,7 @@ import { still, motionPreset } from "../../../motion/engine/parts.ts";
 import { more } from "../../../icons/glyphs/more.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", { "More": "Daha fazla", "More actions": "Diğer eylemler" });
 
@@ -28,7 +29,7 @@ export interface ToolbarItem {
   id: string;
   label?: MaybeFn<string>;
   icon?: IconProp;
-  onSelect?: () => unknown;
+  onSelect?: Handler<[]> | undefined;
   /** A command id (Command manager): label, icon, shortcut, disabled and run come from it unless given here. */
   command?: string;
   /** A toggle button (aria-pressed). */

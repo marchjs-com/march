@@ -4,7 +4,7 @@
 // pause and speed apply. Deltas include the container's scroll change: positions stay right while it scrolls.
 // `hold`: on touch the drag starts after a long press, so a finger that moves at once still scrolls the page.
 import { onFrame } from "../../motion/engine/clock.ts";
-import { listen, isRtl } from "../../core/util.ts";
+import { listen, isRtl, type Handler } from "../../core/util.ts";
 
 export interface DragPoint {
   /** Pointer movement since the start, plus the scroll container's scroll change (content coordinates). */
@@ -28,12 +28,12 @@ export interface PointerDragOptions {
   scroll?: HTMLElement | null | undefined;
   /** Edge size in px that triggers auto-scroll (default 48). */
   edge?: number | undefined;
-  onStart?: ((p: DragPoint) => void) | undefined;
-  onMove?: ((p: DragPoint) => void) | undefined;
+  onStart?: Handler<[p: DragPoint]> | undefined;
+  onMove?: Handler<[p: DragPoint]> | undefined;
   /** `cancelled`: Escape, pointercancel or `stop()`. Not called when the threshold was never passed. */
-  onEnd?: ((p: DragPoint, cancelled: boolean) => void) | undefined;
+  onEnd?: Handler<[p: DragPoint, cancelled: boolean]> | undefined;
   /** Pointerup before the threshold (a click). */
-  onClick?: ((e: PointerEvent) => void) | undefined;
+  onClick?: Handler<[e: PointerEvent]> | undefined;
 }
 
 /** Start a drag from a pointerdown event. Returns `stop()` (ends it as cancelled). */

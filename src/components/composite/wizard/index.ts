@@ -11,6 +11,7 @@ import { Progress } from "../../../ui/progress.ts";
 import { Steps } from "../../../ui/steps.ts";
 import { Button } from "../../actions/button/index.ts";
 import { Alert } from "../../feedback/alert/index.ts";
+import type { Handler } from "../../../core/util.ts";
 
 const specOf = (s: Schema): SchemaSpec => Object.fromEntries(s.fields.map((f) => [f.name, f]));
 
@@ -40,7 +41,7 @@ export interface WizardProps<V = Values> {
   /** Starting values (an object or a function). @tr Başlangıç değerleri (bir nesne ya da işlev). */
   initial?: Partial<V> | (() => Partial<V>) | undefined;
   /** Runs after the last step validates, with the values and the form. @tr Son adım doğrulandıktan sonra değerler ve formla çalışır. */
-  onSubmit?: ((values: V, form: FormController<V>) => unknown) | undefined;
+  onSubmit?: Handler<[values: V, form: FormController<V>]> | undefined;
   /** Label of the last step's button (default "Finish"). @tr Son adımın düğmesinin etiketi (varsayılan "Finish"). */
   submitLabel?: unknown;
   /** How a step's fields are laid out: "stack" (default) or "grid". @tr Bir adımın alanlarının yerleşimi: "stack" (varsayılan) ya da "grid". */
@@ -50,9 +51,9 @@ export interface WizardProps<V = Values> {
   /** When a field shows its error: "blur" (default), "change" or "submit". @tr Bir alanın hatasını ne zaman gösterdiği: "blur" (varsayılan), "change" ya da "submit". */
   validateOn?: ValidateOn | undefined;
   /** Called with the new step index (0-based) when the step changes. @tr Adım değişince yeni adımın sırasıyla (0'dan başlar) çağrılır. */
-  onStep?: ((index: number) => void) | undefined;
+  onStep?: Handler<[index: number]> | undefined;
   /** Called once with the form and the navigation `{ index, next, back, go }`. @tr Form ve gezinme `{ index, next, back, go }` ile bir kez çağrılır. */
-  onReady?: ((form: FormController<V>, api: WizardApi) => void) | undefined;
+  onReady?: Handler<[form: FormController<V>, api: WizardApi]> | undefined;
   /** An existing useForm() controller. @tr Var olan bir useForm() denetleyicisi. */
   form?: FormController<V> | undefined;
   /** The stage list on top (Steps): default true. @tr Üstteki aşama listesi (Steps): varsayılan true. */

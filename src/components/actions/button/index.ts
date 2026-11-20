@@ -10,6 +10,7 @@ import { val, cx, rest, icon, type MaybeFn, type ClassProp } from "../../../ui/u
 import { Spinner } from "../../feedback/spinner/index.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "dark" | "link";
 export type ButtonSize = "sm" | "md" | "lg";
@@ -143,9 +144,9 @@ export interface ActionButtonProps<A extends unknown[] = unknown[], R = unknown>
   /** Only the icon; the label becomes the aria-label. @tr Yalnız ikon; etiket aria-label olur. */
   iconOnly?: boolean;
   /** Called with the action's result after it ran. @tr Eylem çalıştıktan sonra sonucuyla çağrılır. */
-  onDone?: (result: R | undefined) => void;
+  onDone?: Handler<[result: R | undefined]> | undefined;
   /** Called when the action throws (the action has already shown its toast). @tr Eylem hata fırlatınca çağrılır (eylem bildirimini zaten göstermiştir). */
-  onError?: (error: unknown) => void;
+  onError?: Handler<[error: unknown]> | undefined;
   /** The label, in place of the action's. @tr Eylemin etiketi yerine geçen etiket. */
   children?: unknown;
   /** Other attributes (`role`, `title`, `data-*`, `aria-*`) go to the button. */

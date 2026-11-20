@@ -10,7 +10,7 @@ import { scaleLinear, scaleBand, niceTicks } from "../../../charts/scale.ts";
 import { rowsOf, accessor, formatter, num, seriesOf, seriesClass, colorStyle, useSize, attr, textWidth, navIndex, sameBox, each, tween, type AnimateProp,
   type MaybeReactive, type DataProp, type Field, type SeriesSpec, type SeriesLabels, type FormatSpec, type ChartBaseProps, type ChartPoint, type TooltipProp, type Box, f1 } from "../../../charts/util.ts";
 import { Frame, Axis, Grid, tooltipState, showTip, tipBody, thin, type Tick } from "../../../charts/parts.ts";
-import { clamp } from "../../../core/util.ts";
+import { clamp, type Handler } from "../../../core/util.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -44,7 +44,7 @@ export interface BarChartProps<D = unknown> extends ChartBaseProps {
   /** `true` (default), `false`, or `(point) => content` for custom tooltip content. @tr `true` (varsayılan), `false` ya da özel araç ipucu içeriği için `(point) => content`. */
   tooltip?: TooltipProp<ChartPoint<D>>;
   /** Called with the point on click, or Enter / Space on the focused one. @tr Tıklanınca ya da odaktaki öğede Enter / Space'e basılınca noktayla çağrılır. */
-  onSelect?: ((p: ChartPoint<D>) => void) | undefined;
+  onSelect?: Handler<[p: ChartPoint<D>]> | undefined;
   /** When the data changes the bars glide to their new size, the axes take the new scale at once: `true` (a spring) or an easing name ("spring-wobbly", "out"…); default off. @tr Veri değişince çubuklar yeni boylarına kayar, eksenler yeni ölçeğe hemen geçer: `true` (yay) ya da bir easing adı ("spring-wobbly", "out"…); varsayılan kapalı. */
   animate?: Opt<boolean | string>;
 }

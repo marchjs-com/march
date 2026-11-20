@@ -18,6 +18,7 @@ import { live } from "../../../forms/util.ts";
 import { TextInput } from "../../forms/text-input/index.ts";
 import { Textarea } from "../../forms/textarea/index.ts";
 import { Select } from "../../forms/select/index.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export type DialogSize = "sm" | "md" | "lg" | "full";
 /** Edge a drawer comes from (`start` / `end` follow the writing direction; `left` / `right` are aliases of them). */
@@ -183,8 +184,9 @@ export interface ConfirmOptions {
   /** Look of the dialog itself: size, class, the × button and its name, entrance, where it opens. */
   dialog?: Pick<DialogOptions, "size" | "class" | "target" | "closeButton" | "closeLabel" | "motion"> | undefined;
 }
-/** Ask a yes/no question. Resolves true (ok) or false (cancel, Escape, overlay). */
-export function confirm({ title, message, danger = false, ok, cancel, dialog }: ConfirmOptions = {}): Promise<boolean> {
+/** Ask a yes/no question: `confirm("Delete it?")` or `confirm({ title, message, danger, ok, cancel })`. Resolves true (ok) or false (cancel, Escape, overlay). */
+export function confirm(question: ConfirmOptions | Label = {}): Promise<boolean> {
+  const { title, message, danger = false, ok, cancel, dialog }: ConfirmOptions = typeof question === "object" && question !== null ? question : { title: question };
   return openDialog<boolean>(() => message != null && h("p", { class: "m-dialog-msg" }, () => val(message)), {
     size: "sm", ...dialog, title: title ?? (() => t`Are you sure?`), role: "alertdialog", dismissValue: false,
     footer: (close) => [
@@ -299,7 +301,7 @@ export interface DialogProps {
   /** Shown while true. @tr Doğruyken görünür. */
   open: MaybeFn<boolean | null | undefined>;
   /** Called when it asks to close: Escape, the scrim or × (when dismissable). @tr Kapanmak istediğinde çağrılır: Escape, örtü ya da × (dismissable iken). */
-  onClose?: () => void;
+  onClose?: Handler<[]> | undefined;
   /** The heading; it also names the dialog. @tr Başlık; pencereyi de adlandırır. */
   title?: unknown;
   /** sm, md (default), lg or full. @tr sm, md (varsayılan), lg ya da full. */

@@ -5,6 +5,7 @@
 import "./picture.css";
 import { h } from "../../../dom/h.ts";
 import { val, cx, rest, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import type { Handler } from "../../../core/util.ts";
 
 /** An image described by data: what a `cover` / `image` / `logo` prop takes besides a node. */
 export interface PictureSource {
@@ -42,9 +43,9 @@ export interface PictureProps {
   /** Shown instead of the image when it fails to load: text or a node. @tr Görsel yüklenemezse yerine gösterilir: metin ya da düğüm. */
   fallback?: unknown;
   /** Called when the image has loaded. @tr Görsel yüklenince çağrılır. */
-  onLoad?: ((e: Event) => void) | undefined;
+  onLoad?: Handler<[e: Event]> | undefined;
   /** Called when the image fails to load. @tr Görsel yüklenemeyince çağrılır. */
-  onError?: ((e: Event) => void) | undefined;
+  onError?: Handler<[e: Event]> | undefined;
   /** Extra class on the image. @tr Görsele eklenen sınıf. */
   class?: ClassProp;
   [attr: string]: unknown;

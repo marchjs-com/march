@@ -8,6 +8,7 @@ import { OverflowText } from "../../../ui/marquee.ts";
 import { roving } from "../../../ui/focus.ts";
 import { treeRow, treeKey } from "./row.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface TreeNode { id: string; label: unknown; icon?: unknown; meta?: unknown; children?: readonly TreeNode[] | undefined }
 export interface TreeProps {
@@ -16,7 +17,7 @@ export interface TreeProps {
   /** Id of the selected node. @tr Seçili düğümün kimliği. */
   selected?: MaybeFn<string | null | undefined>;
   /** Called with the node the user selects (click or Enter). @tr Kullanıcının seçtiği düğümle çağrılır (tıklama ya da Enter). */
-  onSelect?: (node: TreeNode) => void;
+  onSelect?: Handler<[node: TreeNode]> | undefined;
   /** Ids of the branches open at start. @tr Başta açık olan dalların kimlikleri. */
   expanded?: readonly string[];
   /** Accessible name (default "Tree"). @tr Erişilebilir ad (varsayılan "Tree"). */

@@ -27,6 +27,7 @@ import { onFrame } from "../../../motion/engine/clock.ts";
 import "./chat-composer.css";
 import { withColor } from "../../../theme/colors.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 /** The texts ChatComposer writes itself; every one is optional (default: the built-in text). */
 export interface ChatComposerLabels {
@@ -40,7 +41,7 @@ export interface ChatComposerProps {
   /** Called with the message text when it is sent. @tr Mesaj gönderilince metniyle çağrılır. */
   onSend: (text: string) => void;
   /** Enables the microphone; called with the recording length (ms). @tr Mikrofonu açar; kaydın süresiyle (ms) çağrılır. */
-  onVoice?: ((ms: number) => void) | undefined;
+  onVoice?: Handler<[ms: number]> | undefined;
   /** Attach menu items (photo, file, location …). @tr Ekleme menüsünün öğeleri (fotoğraf, dosya, konum …). */
   attachments?: readonly MenuItem[] | undefined;
   /** Emoji panel button. Default true. @tr Emoji paneli düğmesi. Varsayılan true. */
@@ -48,9 +49,9 @@ export interface ChatComposerProps {
   /** The message being answered: a reply line above the field; null: none. @tr Yanıtlanan mesaj: alanın üstünde yanıt satırı; null: yok. */
   replyTo?: MaybeFn<{ name: string; text: string } | null | undefined>;
   /** Called when the reply line is closed; it shows a close mark. @tr Yanıt satırı kapatılınca çağrılır; verilince kapatma işareti görünür. */
-  onCancelReply?: (() => void) | undefined;
+  onCancelReply?: Handler<[]> | undefined;
   /** Called while typing (throttled to once a second): send "typing…" to the others. @tr Yazarken çağrılır (saniyede en fazla bir kez): diğerlerine "yazıyor…" gönder. */
-  onTyping?: (() => void) | undefined;
+  onTyping?: Handler<[]> | undefined;
   /** Placeholder of the field (default "Message"). @tr Alanın yer tutucusu (varsayılan "Message"). */
   placeholder?: MaybeFn<string | undefined>;
   /** Not editable, nothing can be sent. @tr Devre dışı: düzenlenemez, bir şey gönderilemez. */

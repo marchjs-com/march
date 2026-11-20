@@ -5,6 +5,7 @@ import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { cx, val, type MaybeFn } from "../../../ui/util.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface ClockDialLabels { hours?: string | undefined; minutes?: string | undefined }
 export interface ClockDialProps {
@@ -13,7 +14,7 @@ export interface ClockDialProps {
   /** Called with the new "HH:MM" on every change. */
   onChange: (v: string) => void;
   /** The minute was picked (pointer up or Enter on the minutes): the picker closes. */
-  onDone?: (() => void) | undefined;
+  onDone?: Handler<[]> | undefined;
   hour12: boolean;
   /** Minute step of the dial (default 1). */
   minuteStep?: number | undefined;

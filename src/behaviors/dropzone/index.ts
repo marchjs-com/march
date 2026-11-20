@@ -4,18 +4,18 @@
 // Enter / leave are counted, so moving over the zone's own children does not flicker the "over" state; only drags that
 // carry files count (a dragged link or text is left alone); `accept` filters like <input accept> and the rest go to
 // onReject. Keyboard and click stay with the component (a dropzone is never the only way to add a file).
-import { listen } from "../../core/util.ts";
+import { listen, type Handler } from "../../core/util.ts";
 
 /** Options of dropzone(). */
 export interface DropzoneOptions {
   /** Files dropped (or pasted) that pass `accept`. */
   onFiles: (files: File[]) => void;
   /** true while files are dragged over the zone. */
-  onOver?: ((over: boolean) => void) | undefined;
+  onOver?: Handler<[over: boolean]> | undefined;
   /** Same syntax as <input accept>: "image/*", ".pdf", "text/csv", comma separated. */
   accept?: string | undefined;
   /** Files refused by `accept`. */
-  onReject?: ((files: File[]) => void) | undefined;
+  onReject?: Handler<[files: File[]]> | undefined;
   /** Only the first file (default false). */
   single?: boolean | undefined;
   /** Also take files pasted while focus is inside the zone (default false). */

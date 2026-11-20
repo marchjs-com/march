@@ -18,6 +18,7 @@ import { pointerDrag } from "../../../behaviors/drag/index.ts";
 import { dragGhost, type DragGhost } from "../../../behaviors/drag/ghost.ts";
 import { NODE_W, type FlowStore, type FlowNodeType } from "../flow-canvas/model.ts";
 import { withColor } from "../../../theme/colors.ts";
+import type { Handler } from "../../../core/util.ts";
 export interface FlowPaletteProps {
   /** The flow store new nodes are added to. @tr Yeni düğümlerin eklendiği akış deposu. */
   flow: FlowStore;
@@ -42,7 +43,7 @@ export interface FlowPaletteProps {
   /** Own texts: the region name, the search box, the screen reader hint of a card, the "no match" text. @tr Kendi metinlerin: bölge adı, arama kutusu, kartın ekran okuyucu ipucu, "eşleşme yok" metni. */
   labels?: { region?: string; search?: string; hint?: string; empty?: string } | undefined;
   /** Called after a node is added. @tr Bir düğüm eklendikten sonra çağrılır. */
-  onAdd?: (id: string, type: FlowNodeType) => void;
+  onAdd?: Handler<[id: string, type: FlowNodeType]> | undefined;
   /** Extra classes on the root. @tr Köke eklenen sınıflar. */
   class?: ClassProp;
 }

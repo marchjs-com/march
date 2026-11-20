@@ -10,6 +10,7 @@ import { cx, val, rest, setStyle, type ClassProp, type MaybeFn } from "../../../
 import { ownIcon } from "../../../ui/parts.ts";
 import { COLOR_TOKENS } from "../../../theme/colors.ts";
 import { check } from "../../../icons/glyphs/check.ts";
+import type { Handler } from "../../../core/util.ts";
 
 /** Class of the shared checkerboard background (shows through transparent colours): `class={CHECKER}`. Tune with `--m-checker-size`. */
 export const CHECKER = "m-checker";
@@ -30,7 +31,7 @@ export interface SwatchProps {
   /** Mark drawn on a selected swatch: `true` (a tick), an own icon / text / node, or `false` (default: the ring only). @tr Seçili renk kutusuna çizilen işaret: `true` (tik), kendi ikon / metin / düğümünüz ya da `false` (varsayılan: yalnız halka). */
   mark?: unknown;
   /** Makes it a button. @tr Onu bir düğme yapar. */
-  onClick?: ((e: MouseEvent) => void) | undefined;
+  onClick?: Handler<[e: MouseEvent]> | undefined;
   /** Disables the clickable swatch. @tr Tıklanabilir renk kutusunu devre dışı bırakır. */
   disabled?: MaybeFn<boolean | undefined>;
   /** Extra CSS classes on the swatch. @tr Renk kutusuna eklenen CSS sınıfları. */

@@ -14,7 +14,7 @@ import { signal, computed, effect, untrack, createRoot, getOwner, onCleanup, typ
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { load, save } from "../../../core/util.ts";
+import { load, save, type Handler } from "../../../core/util.ts";
 import { observeSize } from "../../../ui/observe.ts";
 import { ownIcon } from "../../../ui/parts.ts";
 import { TabList, type TabSpec } from "../../navigation/tabs/index.ts";
@@ -50,7 +50,7 @@ export interface DockPanel extends PanelDef {
   /** Unsaved changes: a dot on the tab. */
   dirty?: MaybeFn<boolean | null | undefined>;
   /** Runs when the panel becomes visible. */
-  onShow?: () => void;
+  onShow?: Handler<[]> | undefined;
   /** The tab cannot be chosen (and its content is not shown while it is). */
   disabled?: MaybeFn<boolean | undefined>;
 }
@@ -106,7 +106,7 @@ export interface DockLayoutProps {
   /** Called once with the layout's API (open, close, focus, load, layoutMenu…). @tr Düzenin API'siyle (open, close, focus, load, layoutMenu…) bir kez çağrılır. */
   api?: ((api: DockApi) => void) | undefined;
   /** Called with the new layout tree after every change. @tr Her değişiklikten sonra yeni düzen ağacıyla çağrılır. */
-  onChange?: ((layout: DockTree) => void) | undefined;
+  onChange?: Handler<[layout: DockTree]> | undefined;
   /** A closable tab's close mark: remove the panel from `panels` here; return false to keep it. @tr Kapatılabilir sekmenin kapatma işareti: paneli burada `panels` içinden çıkar; tutmak için false döndür. */
   onClose?: ((panel: string) => boolean | void | Promise<boolean | void>) | undefined;
   /** The buttons of a group: true (default), false, or the ones to keep. Keyboard and `api` stay. @tr Bir grubun düğmeleri: true (varsayılan), false ya da tutulacak olanlar. Klavye ve `api` kalır. */

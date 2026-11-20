@@ -16,6 +16,7 @@ import { Empty } from "../../feedback/empty/index.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 import { animate } from "../../../motion/animate.ts";
 import "./feed.css";
+import type { Handler } from "../../../core/util.ts";
 
 /** The texts Feed writes itself; every one is optional (default: the built-in text). */
 export interface FeedLabels {
@@ -32,13 +33,13 @@ export interface FeedProps extends Pick<PostCardProps, "onLike" | "onComment" | 
   /** More pages exist (infinite scroll). @tr Daha fazla sayfa var (sonsuz kaydırma). */
   hasMore?: MaybeFn<boolean | undefined>;
   /** Pull to refresh (and the keyboard Refresh button). @tr Çekip yenile (ve klavye için Refresh düğmesi). */
-  onRefresh?: (() => unknown) | undefined;
+  onRefresh?: Handler<[]> | undefined;
   /** Next page; skeleton cards show at the end until it settles. @tr Sonraki sayfa; o bitene dek sonda iskelet kartlar görünür. */
-  onLoadMore?: (() => unknown) | undefined;
+  onLoadMore?: Handler<[]> | undefined;
   /** New posts waiting above: shows the "N new posts" pill. @tr Yukarıda bekleyen yeni gönderiler: "N new posts" hapını gösterir. */
   newCount?: MaybeFn<number | undefined>;
   /** The pill was pressed (merge the new posts); the feed scrolls to the top. @tr Hapa basıldı (yeni gönderileri birleştir); akış en üste kayar. */
-  onShowNew?: (() => void) | undefined;
+  onShowNew?: Handler<[]> | undefined;
   /** card: framed posts with space · flat: edge to edge with dividers. Default card. @tr card: aralıklı, çerçeveli gönderiler · flat: ayraçlarla kenardan kenara. Varsayılan card. */
   variant?: MaybeFn<"card" | "flat" | undefined>;
   /** Shown when there are no posts and nothing loads. @tr Gönderi yokken ve bir şey yüklenmiyorken gösterilir. */

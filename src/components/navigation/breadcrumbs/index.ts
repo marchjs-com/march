@@ -14,6 +14,7 @@ import type { Href } from "../../../router/router.ts";
 import { overflowFit } from "../../../ui/fit.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", { "Path": "Yol", "Hidden path parts": "Gizli yol parçaları", "{0}: go to": "{0}: şuraya git" });
 
@@ -22,7 +23,7 @@ export interface Crumb {
   label: MaybeFn<string>;
   icon?: IconProp;
   href?: Href;
-  onSelect?: () => unknown;
+  onSelect?: Handler<[]> | undefined;
   /** Items beside this one: the crumb opens a menu of them. */
   siblings?: MaybeFn<readonly CrumbSibling[] | undefined>;
 }
@@ -34,7 +35,7 @@ export interface CrumbSibling {
   /** A second, quieter line under the label. */
   sub?: string | undefined;
   href?: Href | undefined;
-  onSelect?: (() => unknown) | undefined;
+  onSelect?: Handler<[]> | undefined;
   /** The one the path goes through now: marked in the menu. */
   current?: boolean | undefined;
 }

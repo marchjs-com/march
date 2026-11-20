@@ -19,6 +19,7 @@ import { IconButton } from "../../actions/icon-button/index.ts";
 import { Empty } from "../../feedback/empty/index.ts";
 import { Spinner } from "../../feedback/spinner/index.ts";
 import tr from "./tr.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", tr);
 
@@ -42,7 +43,7 @@ export interface IconPickerProps {
   /** The chosen icon's name (a signal, a value or an accessor); null: none. @tr Seçilen ikonun adı (sinyal, değer ya da erişimci); null: yok. */
   value?: Signal<string | null> | MaybeFn<string | null | undefined>;
   /** Called with the chosen icon's name (null for none). @tr Seçilen ikonun adıyla çağrılır (yoksa null). */
-  onChange?: ((name: string | null) => void) | undefined;
+  onChange?: Handler<[name: string | null]> | undefined;
   /** The icons to choose from (default every built-in icon). @tr Seçilebilecek ikonlar (varsayılan: tüm yerleşik ikonlar). */
   icons?: Readonly<Record<string, IconDef>> | undefined;
   /** More icon sets, chosen above the grid and loaded when first chosen (or when the value names one). @tr Izgaranın üstünden seçilen, ilk seçildiğinde (ya da değer onlardan birini adlandırınca) yüklenen ek ikon setleri. */

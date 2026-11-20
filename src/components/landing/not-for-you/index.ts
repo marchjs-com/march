@@ -10,6 +10,7 @@ import { cx, val, type ClassProp } from "../../../ui/util.ts";
 import { ListRow } from "../../data/list-row/index.ts";
 import { CheckMark } from "../../feedback/check-mark/index.ts";
 import tr from "./tr.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", tr);
 
@@ -37,7 +38,7 @@ export interface NotForYouProps {
   /** `cards` (default) · `list`: plain lines with a rule between them. @tr `cards` (varsayılan) · `list`: aralarında çizgi olan yalın satırlar. */
   variant?: "cards" | "list" | undefined;
   /** Called with the indexes of the struck-out lines. @tr Üstü çizilen satırların sıralarıyla çağrılır. */
-  onCheck?: ((marked: number[]) => void) | undefined;
+  onCheck?: Handler<[marked: number[]]> | undefined;
   /** The label on every checkable card (default "That's me"); false: no label. @tr İşaretlenebilir her karttaki etiket (varsayılan "That's me"); false: etiket yok. */
   meLabel?: unknown | undefined;
   /** Small text under the label before a tap (default "Not you? Tap it!"); false: none. @tr Dokunmadan önce etiketin altındaki küçük metin (varsayılan "Not you? Tap it!"); false: yok. */

@@ -5,6 +5,7 @@ import { computed, read } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, attr, each, type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps, f1 } from "../../../charts/util.ts";
 import { OverflowText } from "../../../ui/marquee.ts";
+import type { Handler } from "../../../core/util.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -36,7 +37,7 @@ export interface BarListProps<D = unknown> {
   /** Extra CSS classes on the root. @tr Köke eklenen ek CSS sınıfları. */
   class?: Opt<string>;
   /** Makes rows buttons; called with the clicked row and its rank. @tr Satırları düğme yapar; tıklanan satır ve sırasıyla çağrılır. */
-  onSelect?: ((item: BarListItem<D> & { rank: number }) => void) | undefined;
+  onSelect?: Handler<[item: BarListItem<D> & { rank: number }]> | undefined;
 }
 
 /** Ranked horizontal bars with labels ("top N" lists). Rows are buttons when `onSelect` is set. */

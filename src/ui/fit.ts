@@ -5,6 +5,7 @@
 //   const fit = overflowFit({ items, measure, priority, reserve })      the whole loop: measure once, refit on resize
 import { signal, effect, untrack } from "../core/reactive.ts";
 import { observeSize } from "./observe.ts";
+import type { Handler } from "../core/util.ts";
 
 /**
  * Which items fit in `available` px. Items drop lowest `priority` first (ties: the last one first); while any item is
@@ -42,7 +43,7 @@ export interface OverflowFitOptions {
   /** Last word on the result before it is shown (e.g. drop a separator left at an edge). */
   adjust?: (next: boolean[]) => void;
   /** After the visible set changed. */
-  onChange?: (next: boolean[], before: boolean[]) => void;
+  onChange?: Handler<[next: boolean[], before: boolean[]]> | undefined;
 }
 export interface OverflowFit {
   /** One boolean per item (empty until measured: everything shown). */

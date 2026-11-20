@@ -7,7 +7,7 @@ import "../../../css/table.css";
 import { signal, computed, effect, untrack, createRoot, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, dir } from "../../../core/i18n.ts";
-import { val, cx, uid, setStyle, clamp, type MaybeFn, type ClassProp } from "../../../core/util.ts";
+import { val, cx, uid, setStyle, clamp, type MaybeFn, type ClassProp, type Handler } from "../../../core/util.ts";
 import { createAxis, createViewport } from "../../../core/virtual.ts";
 import { moveCursor } from "../../../core/selection.ts";
 import { applyPipe } from "../../../core/pipes.ts";
@@ -136,7 +136,7 @@ export interface DataGridProps<R = Row> {
   /** Column keys to group by (controlled when you also pass onGroupBy). @tr Gruplanacak sütun anahtarları (onGroupBy da verilirse denetimli). */
   groupBy?: MaybeFn<readonly string[] | undefined>;
   /** Called with the new grouping keys; makes `groupBy` controlled. @tr Yeni gruplama anahtarlarıyla çağrılır; `groupBy`'ı denetimli yapar. */
-  onGroupBy?: ((keys: string[]) => void) | undefined;
+  onGroupBy?: Handler<[keys: string[]]> | undefined;
   /** Row checkboxes, Space / Shift+arrows / Ctrl+click selection. @tr Satır onay kutuları; Space / Shift+oklar / Ctrl+tıklama ile seçim. */
   selectable?: boolean | undefined;
   /** Save an edited cell (columns with `editable: true`). Throw to show the message. @tr Düzenlenen hücreyi kaydeder (`editable: true` sütunlar). İletiyi göstermek için hata fırlatın. */
@@ -156,7 +156,7 @@ export interface DataGridProps<R = Row> {
   /** CSV file name (without .csv). @tr CSV dosya adı (.csv olmadan). */
   filename?: string | undefined;
   /** Enter / double-click on a non-editable cell. @tr Düzenlenemeyen bir hücrede Enter / çift tıklama. */
-  onActivate?: ((row: R, key: string) => void) | undefined;
+  onActivate?: Handler<[row: R, key: string]> | undefined;
   /** Accessible name of the grid (default "Data grid"). @tr Izgaranın erişilebilir adı (varsayılan "Data grid"). */
   label?: MaybeFn<string | undefined>;
   /** Extra CSS classes on the grid. @tr Izgaraya eklenen CSS sınıfları. */

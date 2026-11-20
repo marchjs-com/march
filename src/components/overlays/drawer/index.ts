@@ -9,7 +9,7 @@ import { frame, type DialogProps, type DialogOptions } from "../../../ui/dialog.
 import { val, cx, clamp, type MaybeFn } from "../../../ui/util.ts";
 import { animate } from "../../../motion/animate.ts";
 import { setStyle } from "../../../motion/env.ts";
-import { isRtl } from "../../../core/util.ts";
+import { isRtl, type Handler } from "../../../core/util.ts";
 import { swipeable, rubberBand, fling, nearest, type SwipePoint } from "../../../behaviors/swipe/index.ts";
 import "./drawer.css";
 
@@ -30,7 +30,7 @@ export interface DrawerProps extends Omit<DialogProps, "side" | "size" | "motion
   /** Index into snapPoints (controlled). Default 0: it opens at the first listed point. @tr snapPoints içindeki sıra (denetimli). Varsayılan 0: listedeki ilk noktada açılır. */
   snap?: MaybeFn<number | undefined>;
   /** Called with the index of the snap point the panel settles at. @tr Panelin durduğu durma noktasının sırasıyla çağrılır. */
-  onSnap?: ((index: number) => void) | undefined;
+  onSnap?: Handler<[index: number]> | undefined;
   /** The grab handle (default true: on top / bottom sheets and with snap points). Dragging the head still works without it. @tr Tutma çubuğu (varsayılan true: üst / alt sayfalarda ve durma noktalarıyla). Onsuz da başlıktan sürüklenir. */
   handle?: boolean | undefined;
   /** Accessible name of the handle button of a sheet with snap points (default "Resize panel"). @tr Durma noktalı bir sayfanın tutma düğmesinin erişilebilir adı (varsayılan "Resize panel"). */

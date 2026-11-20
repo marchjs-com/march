@@ -19,7 +19,7 @@ import { val, cx, uid, icon, load, save, arr, type MaybeFn, type ClassProp } fro
 import { menu } from "../../../icons/glyphs/menu.ts";
 import { clock } from "../../../icons/glyphs/clock.ts";
 import { panelLeft } from "../../../icons/glyphs/panelLeft.ts";
-import { clamp } from "../../../core/util.ts";
+import { clamp, type Handler } from "../../../core/util.ts";
 import { reducedMotion } from "../../../motion/env.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { Button } from "../../actions/button/index.ts";
@@ -43,7 +43,7 @@ export interface NavSidebarItem {
   sub?: MaybeFn<string | null | undefined>;
   icon?: IconProp;
   href?: Href;
-  onSelect?: () => void;
+  onSelect?: Handler<[]> | undefined;
   /** Count (hidden at 0) or short text. */
   badge?: MaybeFn<number | string | null | undefined>;
   badgeTone?: "danger" | "primary" | "neutral";
@@ -97,7 +97,7 @@ export interface NavSidebarProps {
   /** Widest width the grip allows, px (default 480). @tr Tutamağın izin verdiği en geniş genişlik, px (varsayılan 480). */
   maxWidth?: number;
   /** Called with the new width in px while resizing (and once it ends). @tr Boyutlandırma sırasında (ve bitince bir kez) yeni px genişliğiyle çağrılır. */
-  onResize?: (width: number) => void;
+  onResize?: Handler<[width: number]> | undefined;
   /** Remember the width (default true when resizable): in the sidebar's storage, or under this localStorage key. @tr Genişliği hatırlar (resizable iken varsayılan true): kenar çubuğunun deposunda ya da bu localStorage anahtarı altında. */
   persist?: boolean | string;
   /** Dragging narrower than this (px) switches to the icon rail; dragging wider again restores the labels. @tr Bundan (px) daha dara sürüklemek ikon şeridine geçirir; yeniden genişletmek etiketleri geri getirir. */
@@ -134,7 +134,7 @@ export interface NavSidebarProps {
   /** Narrow screens: whether the drawer is open (controlled; with `onOpenChange`). @tr Dar ekranlar: çekmece açık mı (denetimli; `onOpenChange` ile). */
   open?: MaybeFn<boolean | undefined>;
   /** Called with the drawer's new open state (narrow screens). @tr Çekmecenin yeni açık durumuyla çağrılır (dar ekranlar). */
-  onOpenChange?: (open: boolean) => void;
+  onOpenChange?: Handler<[open: boolean]> | undefined;
   /** Own texts (strings or accessors); defaults are the translated ones. `showUnder` / `hideUnder` name the fold button of a parent item. @tr Kendi metinlerin (metin ya da erişimci); varsayılanlar çevrilmiş olanlar. `showUnder` / `hideUnder` bir üst öğenin katlama düğmesini adlandırır. */
   labels?: {
     search?: MaybeFn<string>; clearSearch?: MaybeFn<string>; noMatches?: MaybeFn<string>; results?: MaybeFn<string>;

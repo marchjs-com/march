@@ -5,7 +5,7 @@ import "./gantt.css";
 import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, locale, dir } from "../../../core/i18n.ts";
-import { val, cx, uid, setStyle, later, clamp, type MaybeFn, type ClassProp } from "../../../core/util.ts";
+import { val, cx, uid, setStyle, later, clamp, type MaybeFn, type ClassProp, type Handler } from "../../../core/util.ts";
 import { todayIso, addDays, diffDays, dateFormat, utcDate, startOfWeek, firstDayOf, startOfMonth, addMonths, type IsoDate } from "../../../core/date.ts";
 import { animate, stagger } from "../../../motion/animate.ts";
 import { pointerDrag } from "../../../behaviors/drag/index.ts";
@@ -68,9 +68,9 @@ export interface GanttProps {
   /** The tasks: id, name, start, end, progress, dependencies. @tr Görevler: kimlik, ad, başlangıç, bitiş, ilerleme, bağımlılıklar. */
   tasks: MaybeFn<readonly GanttTask[]>;
   /** After a move, resize or progress change (and once per task pushed by `cascade`); the chart already shows it. @tr Taşıma, boyutlandırma ya da ilerleme değişikliğinden sonra (ve `cascade`'in ittiği her görev için bir kez); grafik bunu zaten gösterir. */
-  onChange?: ((task: GanttTask) => void) | undefined;
+  onChange?: Handler<[task: GanttTask]> | undefined;
   /** Called when a task is clicked or chosen with Enter. @tr Bir göreve tıklanınca ya da Enter ile seçilince çağrılır. */
-  onSelect?: ((task: GanttTask) => void) | undefined;
+  onSelect?: Handler<[task: GanttTask]> | undefined;
   /** Time scale: "day", "week" (default) or "month". @tr Zaman ölçeği: "day", "week" (varsayılan) ya da "month". */
   scale?: MaybeFn<GanttScale | undefined>;
   /** Push successors later when a predecessor would overlap them (default true). @tr Bir öncül görev ardıllarıyla çakışacaksa ardılları ileri iter (varsayılan true). */
@@ -90,7 +90,7 @@ export interface GanttProps {
   /** The hint under the chart: true (default: the text in `labels`), false, or your own node. @tr Grafiğin altındaki ipucu: true (varsayılan: `labels`'taki metin), false ya da kendi düğümünüz. */
   help?: unknown;
   /** Content of a bar: `(task) => node` (default: the task name). @tr Bir çubuğun içeriği: `(task) => node` (varsayılan: görev adı). */
-  barLabel?: ((task: GanttTask) => unknown) | undefined;
+  barLabel?: Handler<[task: GanttTask]> | undefined;
   /** Your own texts: `{ today, task, days, help, helpReadonly, done, after, moved, pushed }`. @tr Kendi metinleriniz: `{ today, task, days, help, helpReadonly, done, after, moved, pushed }`. */
   labels?: Partial<GanttLabels> | undefined;
   /** Arrow drawing, settle and scale-change animations (default true). @tr Ok çizimi, yerine oturma ve ölçek değişimi animasyonları (varsayılan true). */

@@ -6,7 +6,7 @@
     "src/components/layout/accordion",
     "examples/showcase/public/components/accordion/ide.json"
    ],
-   "hash": "dd7705e7057ee44a3e37973bd3d166cc"
+   "hash": "4d562e29e22099eea7b07cc28f202f41"
   },
   "ActivityBar": {
    "frozen": "2026-11-20",
@@ -14,7 +14,7 @@
     "src/components/navigation/activity-bar",
     "examples/showcase/public/components/activity-bar/ide.json"
    ],
-   "hash": "119559d7e2553fb828008d6001f76bcd"
+   "hash": "51b60b2e791ca10ccf4d33863fc12038"
   },
   "Alert": {
    "frozen": "2026-11-20",
@@ -22,7 +22,7 @@
     "src/components/feedback/alert",
     "examples/showcase/public/components/alert/ide.json"
    ],
-   "hash": "5bcc8e743dd961b657481ad0fe5a6deb"
+   "hash": "9c33d70a9c728b3fa764ebc904611c0c"
   },
   "AppShell": {
    "frozen": "2026-11-20",
@@ -30,7 +30,7 @@
     "src/components/layout/app-shell",
     "examples/showcase/public/components/app-shell/ide.json"
    ],
-   "hash": "e20be0b352f1222fb4fff01e53afd220"
+   "hash": "93eee7c4d48676c5bfdd276a9fb89ae4"
   },
   "AppUI": {
    "frozen": "2026-11-20",
@@ -38,7 +38,7 @@
     "src/components/composite/app-ui",
     "examples/showcase/public/components/app-ui/ide.json"
    ],
-   "hash": "8c2f73da6ab44dcd56b937ef918cbdfe"
+   "hash": "8bb51d6a1c570e78bb63d1e39207ea70"
   },
   "Avatar": {
    "frozen": "2026-11-20",
@@ -62,7 +62,7 @@
     "src/components/data/badge",
     "examples/showcase/public/components/badge/ide.json"
    ],
-   "hash": "fc217194a760323cb0b540189ac2a934"
+   "hash": "9df854122ce0c970bf8aa03609160dce"
   },
   "BarChart": {
    "frozen": "2026-11-20",
@@ -70,7 +70,7 @@
     "src/components/data/bar-chart",
     "examples/showcase/public/components/bar-chart/ide.json"
    ],
-   "hash": "41bd7e1b54387c3eecb9a1e0c7656f24"
+   "hash": "7e8ce7ab49f3706f13d98d801b88c63a"
   },
   "BarList": {
    "frozen": "2026-11-20",
@@ -78,7 +78,7 @@
     "src/components/data/bar-list",
     "examples/showcase/public/components/bar-list/ide.json"
    ],
-   "hash": "e34fe6810d3dba0ce296aa8108736208"
+   "hash": "f91bc1ee077064eb63fe451660e7a1b7"
   },
   "BeforeAfter": {
    "frozen": "2026-11-20",
@@ -86,7 +86,7 @@
     "src/components/landing/before-after",
     "examples/showcase/public/components/before-after/ide.json"
    ],
-   "hash": "71e9278b2ba1c3d0718c0dc302d8b699"
+   "hash": "6ee4d32f8086cd4b4e557a24c7071b24"
   },
   "BottomNav": {
    "frozen": "2026-11-20",
@@ -94,7 +94,7 @@
     "src/components/composite/bottom-nav",
     "examples/showcase/public/components/bottom-nav/ide.json"
    ],
-   "hash": "4b0a553c5a019eaa5084346af77029fd"
+   "hash": "076fa1de5cfdbf4f828f66b6bfd4b911"
   },
   "BottomRightControls": {
    "frozen": "2026-11-20",
@@ -102,7 +102,7 @@
     "src/components/layout/bottom-right-controls",
     "examples/showcase/public/components/bottom-right-controls/ide.json"
    ],
-   "hash": "66bfdac17a8333ffcf9b745570499203"
+   "hash": "f233603c294f93535f951d92608e0f8d"
   },
   "BranchingStory": {
    "frozen": "2026-11-20",
@@ -110,7 +110,7 @@
     "src/components/landing/branching-story",
     "examples/showcase/public/components/branching-story/ide.json"
    ],
-   "hash": "fe6c87424d059326614464e6388cd7fd"
+   "hash": "3a1e33a542c2b8391bacd8aa18abbf62"
   },
   "Breadcrumbs": {
    "frozen": "2026-11-20",
@@ -118,7 +118,7 @@
     "src/components/navigation/breadcrumbs",
     "examples/showcase/public/components/breadcrumbs/ide.json"
    ],
-   "hash": "78a03a0193eca91584c703a9aa6f6aa7"
+   "hash": "c25ea699c4b7b50cb5dec294ec5f53ad"
   },
   "Button": {
    "frozen": "2026-11-20",
@@ -126,7 +126,7 @@
     "src/components/actions/button",
     "examples/showcase/public/components/button/ide.json"
    ],
-   "hash": "c889eec3614824d0c6bd535332f3d8f9"
+   "hash": "114240b2dd87a1674ca376bca755ee74"
   },
   "ButtonGroup": {
    "frozen": "2026-11-20",
@@ -142,7 +142,7 @@
     "src/components/forms/calendar",
     "examples/showcase/public/components/calendar/ide.json"
    ],
-   "hash": "d453858a9a17682edc97916a766192dd"
+   "hash": "badc5a344d3b7824e099d60dcb39a330"
   },
   "Card": {
    "frozen": "2026-11-20",
@@ -166,7 +166,7 @@
     "src/components/social/chat-bubble",
     "examples/showcase/public/components/chat-bubble/ide.json"
    ],
-   "hash": "310407b35c331d643e839da34a082d91"
+   "hash": "a63a12fcb81e365e71ada0aecae82416"
   },
   "ChatComposer": {
    "frozen": "2026-11-20",
@@ -174,7 +174,7 @@
     "src/components/composite/chat-composer",
     "examples/showcase/public/components/chat-composer/ide.json"
    ],
-   "hash": "ba7190ffc473872680ce5a7a7c2e5b19"
+   "hash": "253797b8b2450ec18cfbd6ca263ac5a0"
   },
   "ChatThread": {
    "frozen": "2026-11-20",
@@ -182,7 +182,7 @@
     "src/components/composite/chat-thread",
     "examples/showcase/public/components/chat-thread/ide.json"
    ],
-   "hash": "b79bb7465a688c537cd7130f97901a8f"
+   "hash": "b5a1db6a6b4af357152aa821bc6fe158"
   },
   "Checkbox": {
    "frozen": "2026-11-20",
@@ -190,7 +190,7 @@
     "src/components/forms/checkbox",
     "examples/showcase/public/components/checkbox/ide.json"
    ],
-   "hash": "1051134157d27d37adf8315b259429aa"
+   "hash": "52edc198abd33e78dded5704711fc151"
   },
   "CheckboxGroup": {
    "frozen": "2026-11-20",
@@ -222,7 +222,7 @@
     "src/components/actions/chip",
     "examples/showcase/public/components/chip/ide.json"
    ],
-   "hash": "0960edf9e8a1bb10c2800f8b3d32b59f"
+   "hash": "15fc72bfd7fdc089b0d428f1ce98951d"
   },
   "ChoicePicker": {
    "frozen": "2026-11-20",
@@ -238,7 +238,7 @@
     "src/components/typography/clamp-text",
     "examples/showcase/public/components/clamp-text/ide.json"
    ],
-   "hash": "f19aa8dc37a6b1969fdf66d4199e802c"
+   "hash": "3f2d8f471e7ee07aa3f2ba66a0a61a3f"
   },
   "CodeEditor": {
    "frozen": "2026-11-20",
@@ -246,7 +246,7 @@
     "src/components/composite/code-editor",
     "examples/showcase/public/components/editors-code/ide.json"
    ],
-   "hash": "e8c06fd4aee0af96d11da14613343e4d"
+   "hash": "c56cde364cd2afb45ad347277104d3ad"
   },
   "CodeInput": {
    "frozen": "2026-11-20",
@@ -254,7 +254,7 @@
     "src/components/forms/code-input",
     "examples/showcase/public/components/forms-code/ide.json"
    ],
-   "hash": "f695f9fb2d4c14c6ab1894e1507d442c"
+   "hash": "81d17f29a85a43c6275a9c8a3a1091e8"
   },
   "CodeView": {
    "frozen": "2026-11-20",
@@ -286,7 +286,7 @@
     "src/components/forms/combobox",
     "examples/showcase/public/components/combobox/ide.json"
    ],
-   "hash": "084888f7eba04815e15d172e9934f968"
+   "hash": "98c336b0e6fe6f7cd6603507eacf6ba7"
   },
   "CommandPalette": {
    "frozen": "2026-11-20",
@@ -294,7 +294,7 @@
     "src/components/composite/command-palette",
     "examples/showcase/public/components/command-palette/ide.json"
    ],
-   "hash": "f7ad320c4893d44da1bdb992436c7e21"
+   "hash": "9808169f3513886a4927042d0aa1f446"
   },
   "ConsentBanner": {
    "frozen": "2026-11-20",
@@ -310,7 +310,7 @@
     "src/components/overlays/context-menu",
     "examples/showcase/public/components/context-menu/ide.json"
    ],
-   "hash": "c7e174888c76c8032d7a7e8f1318fa63"
+   "hash": "1acfc2b44d2c4d25405dc1e569d3f5b2"
   },
   "CopyButton": {
    "frozen": "2026-11-20",
@@ -318,7 +318,7 @@
     "src/components/actions/copy-button",
     "examples/showcase/public/components/copy-button/ide.json"
    ],
-   "hash": "a255c2105493d803c96f7b47a0491855"
+   "hash": "e444bee1ee9b63cefb3f72c6337085f4"
   },
   "CornerMark": {
    "frozen": "2026-11-20",
@@ -358,7 +358,7 @@
     "src/components/data/data-grid",
     "examples/showcase/public/components/data-grid/ide.json"
    ],
-   "hash": "71e9b8c77f946124564780e34543b86b"
+   "hash": "b3f58f5da472917c8b4be96607440098"
   },
   "DatePicker": {
    "frozen": "2026-11-20",
@@ -390,7 +390,7 @@
     "src/components/composite/debugger",
     "examples/showcase/public/components/debugger/ide.json"
    ],
-   "hash": "a219211283c7f8dd604e6ff300c90584"
+   "hash": "0d93fedd95a823f297fd6d665078be48"
   },
   "DevicePicker": {
    "frozen": "2026-11-20",
@@ -398,7 +398,7 @@
     "src/components/layout/device-picker",
     "examples/showcase/public/components/device-picker/ide.json"
    ],
-   "hash": "5db6247270761965a16e769dbb33fbad"
+   "hash": "cf82b08cdc0df8154e9117467448909c"
   },
   "DevicePreview": {
    "frozen": "2026-11-20",
@@ -406,7 +406,7 @@
     "src/components/layout/device-preview",
     "examples/showcase/public/components/device-preview/ide.json"
    ],
-   "hash": "7148c8e0f94fb9221b137af3e120cf6c"
+   "hash": "378bccf235d67c9367924c144742a59e"
   },
   "Dialog": {
    "frozen": "2026-11-20",
@@ -414,7 +414,7 @@
     "src/components/overlays/dialog",
     "examples/showcase/public/components/dialog/ide.json"
    ],
-   "hash": "a381bd405c1554b56b8ff63129fb1b50"
+   "hash": "2a15426cafce932d957fa03c836fc783"
   },
   "Disclosure": {
    "frozen": "2026-11-20",
@@ -422,7 +422,7 @@
     "src/components/layout/disclosure",
     "examples/showcase/public/components/disclosure/ide.json"
    ],
-   "hash": "147468f2ab777dd192c217c64b47d015"
+   "hash": "d28d5bd615e31fd6fd61c6c425f6ab87"
   },
   "DockLayout": {
    "frozen": "2026-11-20",
@@ -430,7 +430,7 @@
     "src/components/composite/dock-layout",
     "examples/showcase/public/components/dock-layout/ide.json"
    ],
-   "hash": "d1ead25def3743509ed5f2799a6fee2f"
+   "hash": "d530ee4e52ec2013577fd770f2596ef5"
   },
   "Drawer": {
    "frozen": "2026-11-20",
@@ -438,7 +438,7 @@
     "src/components/overlays/drawer",
     "examples/showcase/public/components/drawer/ide.json"
    ],
-   "hash": "5e7f129272449f102cbad8763151dad4"
+   "hash": "44aeacc12b16a56543c92ca311e1575b"
   },
   "EasingCurveEditor": {
    "frozen": "2026-11-20",
@@ -454,7 +454,7 @@
     "src/components/composite/editor-frame",
     "examples/showcase/public/components/editor-frame/ide.json"
    ],
-   "hash": "fec20acd3eed36d571b2b548c0219b84"
+   "hash": "bf5c5d6f0c1f6ef4d415877895a32fc0"
   },
   "Empty": {
    "frozen": "2026-11-20",
@@ -478,7 +478,7 @@
     "src/components/layout/exploded-view",
     "examples/showcase/public/components/exploded-view/ide.json"
    ],
-   "hash": "25eba74693df590087bc14b7292247dd"
+   "hash": "994038f6832cd8ffc1f32a93e68c8bbb"
   },
   "Faq": {
    "frozen": "2026-11-20",
@@ -502,7 +502,7 @@
     "src/components/composite/feed",
     "examples/showcase/public/components/feed/ide.json"
    ],
-   "hash": "d47e5be2ca332495e62fae3f18c16b9e"
+   "hash": "2a2e12833cf237185d732a2647f8a45e"
   },
   "FileUpload": {
    "frozen": "2026-11-20",
@@ -510,7 +510,7 @@
     "src/components/forms/file-upload",
     "examples/showcase/public/components/file-upload/ide.json"
    ],
-   "hash": "bab2ece960e6d191996648f62831a4fc"
+   "hash": "9c6ebcec2e51629e5e93a4316f87b77a"
   },
   "FollowButton": {
    "frozen": "2026-11-20",
@@ -526,7 +526,7 @@
     "src/components/composite/font-picker",
     "examples/showcase/public/components/font/ide.json"
    ],
-   "hash": "e125a6e093c93a6fd89e4c16770093e2"
+   "hash": "aa3aa185b3907811b604ead50365049f"
   },
   "FormatToolbar": {
    "frozen": "2026-11-20",
@@ -542,7 +542,7 @@
     "src/components/data/gantt",
     "examples/showcase/public/components/gantt/ide.json"
    ],
-   "hash": "5d54f6bb37aa46c88ca0707c04dff68e"
+   "hash": "ff27c8c2ebfca78ea8bd534860deaca2"
   },
   "GradientEditor": {
    "frozen": "2026-11-20",
@@ -558,7 +558,7 @@
     "src/components/layout/grid",
     "examples/showcase/public/components/grid/ide.json"
    ],
-   "hash": "3fd09c542d72c755fb86b3fb0bec05b9"
+   "hash": "8177bcf59c8d5bc6ec46b0bd8cf1a3bb"
   },
   "Heatmap": {
    "frozen": "2026-11-20",
@@ -566,7 +566,7 @@
     "src/components/data/heatmap",
     "examples/showcase/public/components/heatmap/ide.json"
    ],
-   "hash": "da659b0440c69e0050b58bd55e43a935"
+   "hash": "698f48de69982ebcfed01c0892eaa87a"
   },
   "Hero": {
    "frozen": "2026-11-20",
@@ -606,7 +606,7 @@
     "src/components/forms/icon-picker",
     "examples/showcase/public/components/icon-picker/ide.json"
    ],
-   "hash": "2d38f7851031b66230b863e46f679500"
+   "hash": "30f50278f145f8b4ab0819d57fc672b5"
   },
   "IconTile": {
    "frozen": "2026-11-20",
@@ -630,7 +630,7 @@
     "src/components/layout/joined",
     "examples/showcase/public/components/joined/ide.json"
    ],
-   "hash": "63ee55ba0f2d2eb7fc71a783a793ff8b"
+   "hash": "2448f21edbe303fa30b518144ce3325d"
   },
   "JsonEditor": {
    "frozen": "2026-11-20",
@@ -638,7 +638,7 @@
     "src/components/composite/json-editor",
     "examples/showcase/public/components/json/ide.json"
    ],
-   "hash": "689c4148984785297dc0d91174c230b2"
+   "hash": "ab5eea5a33c63ccb068ac8a927108eec"
   },
   "JsonView": {
    "frozen": "2026-11-20",
@@ -646,7 +646,7 @@
     "src/components/data/json-view",
     "examples/showcase/public/components/json-view/ide.json"
    ],
-   "hash": "1ef41075f6fe9640513ea2682a28de01"
+   "hash": "7fbf687ce6f7f38a1693a7237b117b25"
   },
   "Kanban": {
    "frozen": "2026-11-20",
@@ -654,7 +654,7 @@
     "src/components/data/kanban",
     "examples/showcase/public/components/kanban/ide.json"
    ],
-   "hash": "4964c183148e8cd43479ff7fb490ad19"
+   "hash": "3ddce560ca0703e07a2d8074b22575ed"
   },
   "Kbd": {
    "frozen": "2026-11-20",
@@ -678,7 +678,7 @@
     "src/components/data/key-value",
     "examples/showcase/public/components/key-value/ide.json"
    ],
-   "hash": "3d89d5f3ba1602d5c36dabaa5605d1ff"
+   "hash": "39b9de07adc196a6e2927ae042c57b1c"
   },
   "KeyValueEditor": {
    "frozen": "2026-11-20",
@@ -702,7 +702,7 @@
     "src/components/social/like-button",
     "examples/showcase/public/components/like-button/ide.json"
    ],
-   "hash": "498819f5ca67af035b94f68ec885ae01"
+   "hash": "d9580cb281ea7c951960cfd082dc7d77"
   },
   "LineChart": {
    "frozen": "2026-11-20",
@@ -710,7 +710,7 @@
     "src/components/data/line-chart",
     "examples/showcase/public/components/line-chart/ide.json"
    ],
-   "hash": "414d096b2f3ddbe4c91cfcb6e882ec66"
+   "hash": "70e5184888e057b2548729ecc6d73312"
   },
   "LinkCard": {
    "frozen": "2026-11-20",
@@ -734,7 +734,7 @@
     "src/components/data/list-row",
     "examples/showcase/public/components/list-row/ide.json"
    ],
-   "hash": "96b4676a2663936c2771d3679aa0ffb8"
+   "hash": "59bf444659751a6cc00107e2e7f62765"
   },
   "LiveCounter": {
    "frozen": "2026-11-20",
@@ -750,7 +750,7 @@
     "src/components/landing/live-feed",
     "examples/showcase/public/components/live-feed/ide.json"
    ],
-   "hash": "b508f8508ed95ad295f8a8eb48fd134f"
+   "hash": "0675f3c472eae061e03f06718e6746e8"
   },
   "LiveStatus": {
    "frozen": "2026-11-20",
@@ -806,7 +806,7 @@
     "src/components/social/media-grid",
     "examples/showcase/public/components/media-grid/ide.json"
    ],
-   "hash": "40f16b20a81737228dddfee10c42f19d"
+   "hash": "9efda6e1f6766cb051cab72ab10d620c"
   },
   "Menu": {
    "frozen": "2026-11-20",
@@ -830,7 +830,7 @@
     "src/components/navigation/nav-menu",
     "examples/showcase/public/components/nav-menu/ide.json"
    ],
-   "hash": "0a8a38d57a81c8c8c06be492bf523cfa"
+   "hash": "6e008524d3aa6d9657469ec85f759561"
   },
   "NavSidebar": {
    "frozen": "2026-11-20",
@@ -838,7 +838,7 @@
     "src/components/composite/nav-sidebar",
     "examples/showcase/public/components/nav-sidebar/ide.json"
    ],
-   "hash": "cd324d70916618dff560c451b63f65f0"
+   "hash": "fa394095bfa95ad2d8252c5dceca38d2"
   },
   "NetworkThrottle": {
    "frozen": "2026-11-20",
@@ -846,7 +846,7 @@
     "src/components/composite/network-throttle",
     "examples/showcase/public/components/network-throttle/ide.json"
    ],
-   "hash": "da33b39f3c1bb5843bf99e64407f5427"
+   "hash": "0cd8d87a171aeacf452f818e1c209c98"
   },
   "Newsletter": {
    "frozen": "2026-11-20",
@@ -862,7 +862,7 @@
     "src/components/landing/not-for-you",
     "examples/showcase/public/components/not-for-you/ide.json"
    ],
-   "hash": "9d8de6288c5e273b9f382a156df20884"
+   "hash": "ef5a8da2bd330ebdaf8b15605140e1b0"
   },
   "NumberInput": {
    "frozen": "2026-11-20",
@@ -878,7 +878,7 @@
     "src/components/forms/option-list",
     "examples/showcase/public/components/option-list/ide.json"
    ],
-   "hash": "fdd58479a44bbb93e3c3bcaff2b5e9e8"
+   "hash": "71d549d051dd4de23b204e58d6020da4"
   },
   "OverflowText": {
    "frozen": "2026-11-20",
@@ -894,7 +894,7 @@
     "src/components/actions/overflow-toolbar",
     "examples/showcase/public/components/overflow-toolbar/ide.json"
    ],
-   "hash": "8f85f4f6550a4b6043fde09fba83580c"
+   "hash": "ee3d8a49f3b9119dc7244f179ff06140"
   },
   "Overlay": {
    "frozen": "2026-11-20",
@@ -918,7 +918,7 @@
     "src/components/navigation/page-dots",
     "examples/showcase/public/components/page-dots/ide.json"
    ],
-   "hash": "8b82f39f949aaecbfa0f02bfe0ed7c06"
+   "hash": "d063d9a2b3ca41367ab01caecec86639"
   },
   "Pagination": {
    "frozen": "2026-11-20",
@@ -926,7 +926,7 @@
     "src/components/navigation/pagination",
     "examples/showcase/public/components/pagination/ide.json"
    ],
-   "hash": "6e4809db7707a0a74083ac6bc4ce7472"
+   "hash": "429868d7c40005db0bbd9d9fd21635c5"
   },
   "PanelHeader": {
    "frozen": "2026-11-20",
@@ -934,7 +934,7 @@
     "src/components/layout/panel-header",
     "examples/showcase/public/components/panel-header/ide.json"
    ],
-   "hash": "470ffee71d420e8a5a0bb9b897d41d44"
+   "hash": "2c18642dd8b5703982a11dd2e57cfd1d"
   },
   "Parallax": {
    "frozen": "2026-11-20",
@@ -950,7 +950,7 @@
     "src/components/forms/password-input",
     "examples/showcase/public/components/password/ide.json"
    ],
-   "hash": "1265aa45d790b52949fcc238bf84d8f2"
+   "hash": "71813e52208f40651ff0ceb3a7bbf6d5"
   },
   "PeriodNav": {
    "frozen": "2026-11-20",
@@ -958,7 +958,7 @@
     "src/components/navigation/period-nav",
     "examples/showcase/public/components/period-nav/ide.json"
    ],
-   "hash": "acfd4296f7e11f6435f6d278abe77626"
+   "hash": "61414ba77fcb12ce70beba0415cc0b68"
   },
   "PhoneInput": {
    "frozen": "2026-11-20",
@@ -974,7 +974,7 @@
     "src/components/media/picture",
     "examples/showcase/public/components/picture/ide.json"
    ],
-   "hash": "39a1a35172113e39bb96b8405ddafd4b"
+   "hash": "da6c77a1d030dedd224d8fcf272f1af5"
   },
   "PieChart": {
    "frozen": "2026-11-20",
@@ -982,7 +982,7 @@
     "src/components/data/pie-chart",
     "examples/showcase/public/components/pie-chart/ide.json"
    ],
-   "hash": "7be698d4e7f52ab214f34d17c6b1b012"
+   "hash": "b6d4507eb2aa607e223a6f8f8bda4ebf"
   },
   "Popover": {
    "frozen": "2026-11-20",
@@ -990,7 +990,7 @@
     "src/components/overlays/popover",
     "examples/showcase/public/components/popover/ide.json"
    ],
-   "hash": "27d3dbc208030bfadc65fd463b53a0f5"
+   "hash": "8bdfccf1dd5633e03a976eb70f433af3"
   },
   "PostCard": {
    "frozen": "2026-11-20",
@@ -998,7 +998,7 @@
     "src/components/composite/post-card",
     "examples/showcase/public/components/post-card/ide.json"
    ],
-   "hash": "ecf150bc147fb68f32f452be9533c58e"
+   "hash": "181ba29889ccdac9efca6bd7434d9e45"
   },
   "Presentation": {
    "frozen": "2026-11-20",
@@ -1014,7 +1014,7 @@
     "src/components/landing/pricing",
     "examples/showcase/public/components/pricing/ide.json"
    ],
-   "hash": "488e8b9b6d1401c23dfad47cdbce2105"
+   "hash": "4278ced0e36d526dcbe80c7a2221f445"
   },
   "ProfileHeader": {
    "frozen": "2026-11-20",
@@ -1022,7 +1022,7 @@
     "src/components/composite/profile-header",
     "examples/showcase/public/components/profile-header/ide.json"
    ],
-   "hash": "7d65b2ca02a4b985185fed14d4fab3e7"
+   "hash": "48467952babd32952775455603863cb2"
   },
   "Progress": {
    "frozen": "2026-11-20",
@@ -1030,7 +1030,7 @@
     "src/components/feedback/progress",
     "examples/showcase/public/components/progress/ide.json"
    ],
-   "hash": "0912b56a198a174b2b3a00fc4766f793"
+   "hash": "de8a85d83d9f1995e4087a82e0b8d00a"
   },
   "ProgressRing": {
    "frozen": "2026-11-20",
@@ -1046,7 +1046,7 @@
     "src/components/landing/project-detail",
     "examples/showcase/public/components/project-detail/ide.json"
    ],
-   "hash": "df103e211fc0d26bbe0fdaae4911bc37"
+   "hash": "abf30f62573a0e29cf38846b882165b6"
   },
   "ProjectGrid": {
    "frozen": "2026-11-20",
@@ -1054,7 +1054,7 @@
     "src/components/landing/project-grid",
     "examples/showcase/public/components/project-grid/ide.json"
    ],
-   "hash": "d961384e9628715c33d6060f92c4faec"
+   "hash": "98f7806b41e5b85c8ea4d7466144f78b"
   },
   "PropertyGrid": {
    "frozen": "2026-11-20",
@@ -1062,7 +1062,7 @@
     "src/components/composite/property-grid",
     "examples/showcase/public/components/property-grid/ide.json"
    ],
-   "hash": "f69d8137f67a09f760d6e28ccbdb71f2"
+   "hash": "e9a5d82007c5d991aa720a2af7a0b6e2"
   },
   "PullToRefresh": {
    "frozen": "2026-11-20",
@@ -1070,7 +1070,7 @@
     "src/components/feedback/pull-to-refresh",
     "examples/showcase/public/components/pull-to-refresh/ide.json"
    ],
-   "hash": "0752b6b41fa58e474513349b06d8a3e2"
+   "hash": "db5e159a14612f855d610c8e7c89038d"
   },
   "RadioGroup": {
    "frozen": "2026-11-20",
@@ -1086,7 +1086,7 @@
     "src/components/forms/rating",
     "examples/showcase/public/components/rating/ide.json"
    ],
-   "hash": "158ced1b49d38c41d315e5fabd87891b"
+   "hash": "4c0bfde2c71c1bac1a96d5514fb7676e"
   },
   "ReactionPicker": {
    "frozen": "2026-11-20",
@@ -1094,7 +1094,7 @@
     "src/components/social/reaction-picker",
     "examples/showcase/public/components/reaction-picker/ide.json"
    ],
-   "hash": "0fbfa9426c162c1659e8d5929da335b9"
+   "hash": "0f85b2e7b25b2dd86a769d9719fa6c9e"
   },
   "ReplyQuote": {
    "frozen": "2026-11-20",
@@ -1102,7 +1102,7 @@
     "src/components/social/reply-quote",
     "examples/showcase/public/components/reply-quote/ide.json"
    ],
-   "hash": "f462ceeeb0b025aaf225b135dd713633"
+   "hash": "b92040a261b3192807dbeeac0f657c1a"
   },
   "ResizeHandle": {
    "frozen": "2026-11-20",
@@ -1110,7 +1110,7 @@
     "src/components/layout/resize-handle",
     "examples/showcase/public/components/resize-handle/ide.json"
    ],
-   "hash": "8a44301e3b277e9df29df1df25ea274f"
+   "hash": "f2bd11f2c727aedcabfcafa8ced7bddc"
   },
   "Reveal": {
    "frozen": "2026-11-20",
@@ -1126,7 +1126,7 @@
     "src/components/composite/rich-text-editor",
     "examples/showcase/public/components/rich-text/ide.json"
    ],
-   "hash": "3ee53b1554c490f0d0519eedfd78fc5f"
+   "hash": "8ea9325e9124345962567ca72344f3c1"
   },
   "Roadmap": {
    "frozen": "2026-11-20",
@@ -1142,7 +1142,7 @@
     "src/components/forms/row-tools",
     "examples/showcase/public/components/row-tools/ide.json"
    ],
-   "hash": "ab52bd85957af666a321644ef072cbdf"
+   "hash": "a01b4d5da0062a95b0b34bbe7ef51eed"
   },
   "Scheduler": {
    "frozen": "2026-11-20",
@@ -1150,7 +1150,7 @@
     "src/components/data/scheduler",
     "examples/showcase/public/components/scheduler/ide.json"
    ],
-   "hash": "9bbc568781f8a24cdd729313bd3c2d8c"
+   "hash": "240961eaf4b287872440e86da3c4010c"
   },
   "ScrollProgress": {
    "frozen": "2026-11-20",
@@ -1166,7 +1166,7 @@
     "src/components/landing/scroll-story",
     "examples/showcase/public/components/scroll-story/ide.json"
    ],
-   "hash": "0d03d70ca5e41fbb0732729c62e00e05"
+   "hash": "3f999853f4d2823e70cb66818a888d30"
   },
   "ScrollToTop": {
    "frozen": "2026-11-20",
@@ -1182,7 +1182,7 @@
     "src/components/forms/search-box",
     "examples/showcase/public/components/search-box/ide.json"
    ],
-   "hash": "8fd1ca11361e52f671d46537fc928fd5"
+   "hash": "7ab6d17aa9b850919ffcd37e7642143f"
   },
   "Secret": {
    "frozen": "2026-11-20",
@@ -1190,7 +1190,7 @@
     "src/components/typography/secret",
     "examples/showcase/public/components/secret/ide.json"
    ],
-   "hash": "fe3aa723fa25fbb287d75c1c2fc6f9ea"
+   "hash": "5bc6f11a8cc400a1ffd903e98a317318"
   },
   "SectionHead": {
    "frozen": "2026-11-20",
@@ -1214,7 +1214,7 @@
     "src/components/navigation/section-timeline",
     "examples/showcase/public/components/section-timeline/ide.json"
    ],
-   "hash": "cad3a2ac6d1d0c52e345143a898a1e3b"
+   "hash": "b54a676c23024bcf3b41d2bd225a1b0a"
   },
   "Segmented": {
    "frozen": "2026-11-20",
@@ -1222,7 +1222,7 @@
     "src/components/forms/segmented",
     "examples/showcase/public/components/segmented/ide.json"
    ],
-   "hash": "5ca2b76ecc6964834f7f80ee15a05045"
+   "hash": "5f17249289dd99af16514da6013ff084"
   },
   "Select": {
    "frozen": "2026-11-20",
@@ -1246,7 +1246,7 @@
     "src/components/landing/site-nav",
     "examples/showcase/public/components/site-nav/ide.json"
    ],
-   "hash": "2fe4c93292e03a6aa728170e60c2d412"
+   "hash": "24cef699299b983cb6e38b7b7fedd67e"
   },
   "SiteSection": {
    "frozen": "2026-11-20",
@@ -1270,7 +1270,7 @@
     "src/components/forms/slider",
     "examples/showcase/public/components/slider/ide.json"
    ],
-   "hash": "30f587e754396774b92f9d8b8b43bca8"
+   "hash": "18700896556fcfde096c9c6aac306cc0"
   },
   "Spacer": {
    "frozen": "2026-11-20",
@@ -1302,7 +1302,7 @@
     "src/components/layout/splitter",
     "examples/showcase/public/components/splitter/ide.json"
    ],
-   "hash": "e8a4b72164fb8fe53811f2cd342e7e9c"
+   "hash": "27f62eb19b3ec3f6119b642cbe640cd3"
   },
   "Stack": {
    "frozen": "2026-11-20",
@@ -1310,7 +1310,7 @@
     "src/components/layout/stack",
     "examples/showcase/public/components/stack/ide.json"
    ],
-   "hash": "cd023622fd844f3c8623c933dbd8dca1"
+   "hash": "e548209fedd57119452726bcc4e409c0"
   },
   "Stat": {
    "frozen": "2026-11-20",
@@ -1334,7 +1334,7 @@
     "src/components/data/stat-tile",
     "examples/showcase/public/components/stat-tile/ide.json"
    ],
-   "hash": "f817fd013562dc2e5cac3401afce8615"
+   "hash": "42089dd01d8daaa8457b99a0e05e9557"
   },
   "StatusBar": {
    "frozen": "2026-11-20",
@@ -1342,7 +1342,7 @@
     "src/components/layout/status-bar",
     "examples/showcase/public/components/status-bar/ide.json"
    ],
-   "hash": "bcb10698af480ff087420ff064f99e6c"
+   "hash": "17a7cb591de0e5ec5965d5facb910d73"
   },
   "StatusDot": {
    "frozen": "2026-11-20",
@@ -1358,7 +1358,7 @@
     "src/components/navigation/stepper",
     "examples/showcase/public/components/stepper/ide.json"
    ],
-   "hash": "987dbd22f4945908d22cacacd18d9616"
+   "hash": "7de0d45a698fe12aafc22647b0d64649"
   },
   "Steps": {
    "frozen": "2026-11-20",
@@ -1366,7 +1366,7 @@
     "src/components/navigation/steps",
     "examples/showcase/public/components/steps/ide.json"
    ],
-   "hash": "c663db2132501f99038a54ff10ca6e7b"
+   "hash": "10ad4b30657b2b042b34bc88f8bd2a81"
   },
   "StoryProgress": {
    "frozen": "2026-11-20",
@@ -1374,7 +1374,7 @@
     "src/components/social/story-progress",
     "examples/showcase/public/components/story-progress/ide.json"
    ],
-   "hash": "44625f59e6daf248cc91b80248aab1f7"
+   "hash": "6946d2d02f7175b53cae935a0158d9ea"
   },
   "StoryRing": {
    "frozen": "2026-11-20",
@@ -1382,7 +1382,7 @@
     "src/components/social/story-ring",
     "examples/showcase/public/components/story-ring/ide.json"
    ],
-   "hash": "de54ee08c49df63359e089e090b82183"
+   "hash": "b5ea6809af63485ea95933151b76ff5c"
   },
   "StoryViewer": {
    "frozen": "2026-11-20",
@@ -1390,7 +1390,7 @@
     "src/components/composite/story-viewer",
     "examples/showcase/public/components/story-viewer/ide.json"
    ],
-   "hash": "010db9f3f1c92ed826718159684c98fe"
+   "hash": "15d0b2fe5b7c6898671376ee70835c51"
   },
   "Swatch": {
    "frozen": "2026-11-20",
@@ -1398,7 +1398,7 @@
     "src/components/forms/swatch",
     "examples/showcase/public/components/swatch/ide.json"
    ],
-   "hash": "347baeb2cddcecfd51c72843ed400206"
+   "hash": "703359e9027ddee6b964be9c5b708294"
   },
   "Tabs": {
    "frozen": "2026-11-20",
@@ -1406,7 +1406,7 @@
     "src/components/navigation/tabs",
     "examples/showcase/public/components/tabs/ide.json"
    ],
-   "hash": "40987218401ff38b53a59446658368c4"
+   "hash": "be5b5c1e333a037d436cbb1bbf96965f"
   },
   "Terminal": {
    "frozen": "2026-11-20",
@@ -1430,7 +1430,7 @@
     "src/components/forms/textarea",
     "examples/showcase/public/components/textarea/ide.json"
    ],
-   "hash": "7c7bf0316f87e554756938da9ec28746"
+   "hash": "0dcdb1903ec97b44c6e0d5627b048f4a"
   },
   "TextInput": {
    "frozen": "2026-11-20",
@@ -1438,7 +1438,7 @@
     "src/components/forms/text-input",
     "examples/showcase/public/components/text-input/ide.json"
    ],
-   "hash": "6e14f5bc54e85d859df2c17db9c7b3bf"
+   "hash": "b35589ef2754b721229335e17251eb5f"
   },
   "ThemeEditor": {
    "frozen": "2026-11-20",
@@ -1446,7 +1446,7 @@
     "src/components/composite/theme-editor",
     "examples/showcase/public/components/theme-editor/ide.json"
    ],
-   "hash": "a482a3857e5f152141f37b2377110c12"
+   "hash": "a88273a371eeb169d8feb39971f39d10"
   },
   "ThemeMenu": {
    "frozen": "2026-11-20",
@@ -1454,7 +1454,7 @@
     "src/components/composite/theme-menu",
     "examples/showcase/public/components/theme-menu/ide.json"
    ],
-   "hash": "9c9b534278c8fc713b8147ba49e59d59"
+   "hash": "065e59f882443fad0da073e4e689fd66"
   },
   "ThreadNav": {
    "frozen": "2026-11-20",
@@ -1462,7 +1462,7 @@
     "src/components/navigation/thread-nav",
     "examples/showcase/public/components/thread-nav/ide.json"
    ],
-   "hash": "f5258c338800b3246c9961b445c08098"
+   "hash": "014a534c2284f7348d13616c949732dc"
   },
   "TimeInput": {
    "frozen": "2026-11-20",
@@ -1470,7 +1470,7 @@
     "src/components/forms/time-input",
     "examples/showcase/public/components/time/ide.json"
    ],
-   "hash": "186088f64ff3c34fee75e1eb22645eb4"
+   "hash": "165ae1ac48cb3296bc93db50a5adda8c"
   },
   "Timeline": {
    "frozen": "2026-11-20",
@@ -1486,7 +1486,7 @@
     "src/components/data/time-ruler",
     "examples/showcase/public/components/time-ruler/ide.json"
    ],
-   "hash": "0df151dd74d26aa203eb5cc72a131c8a"
+   "hash": "35cafbee511787bf2da76e226b9a96d2"
   },
   "Toast": {
    "frozen": "2026-11-20",
@@ -1518,7 +1518,7 @@
     "src/components/data/tree",
     "examples/showcase/public/components/data-tree/ide.json"
    ],
-   "hash": "6c930fdd4447fe3efb58bbb9d664a21c"
+   "hash": "63f91b7ac14db9ce3e5bd55f0787b380"
   },
   "TreeEditor": {
    "frozen": "2026-11-20",
@@ -1526,7 +1526,7 @@
     "src/components/composite/tree-editor",
     "examples/showcase/public/components/editors-tree/ide.json"
    ],
-   "hash": "3beadd78e8398aafcfc6eb7314ec78a2"
+   "hash": "d958c28e99f0c68d7f3848341021cfc3"
   },
   "TreeView": {
    "frozen": "2026-11-20",
@@ -1534,7 +1534,7 @@
     "src/components/data/tree-view",
     "examples/showcase/public/components/tree-view/ide.json"
    ],
-   "hash": "714c677b90717bff5d33f40cb34b1fc4"
+   "hash": "35ff81bec611a066f8a61f021c2d476e"
   },
   "TypingIndicator": {
    "frozen": "2026-11-20",
@@ -1550,7 +1550,7 @@
     "src/components/actions/undo-redo",
     "examples/showcase/public/components/undo-redo/ide.json"
    ],
-   "hash": "4ca8a8bf7fc71c91bb159a595d635906"
+   "hash": "fcdc92084878f580e5440f69cc4823be"
   },
   "VerifiedMark": {
    "frozen": "2026-11-20",
@@ -1574,7 +1574,7 @@
     "src/components/data/virtual-list",
     "examples/showcase/public/components/virtual-list/ide.json"
    ],
-   "hash": "15399411e35a8987df55389d0d7cc6d3"
+   "hash": "1182bd0796fdbfe03a0123a376bd1ac3"
   },
   "Window": {
    "frozen": "2026-11-20",
@@ -1582,7 +1582,7 @@
     "src/components/layout/window",
     "examples/showcase/public/components/layout-window/ide.json"
    ],
-   "hash": "3343fdbf5c403c53e31353f8cdc8f2bf"
+   "hash": "0d60ed03d526b307a8f84d2a3a8fee5a"
   },
   "Wizard": {
    "frozen": "2026-11-20",
@@ -1590,7 +1590,7 @@
     "src/components/composite/wizard",
     "examples/showcase/public/components/wizard/ide.json"
    ],
-   "hash": "b19bfb66d4247d959ff763a9bd29aee9"
+   "hash": "750f91f504f8f115e1c6023abbe84f02"
   }
  },
  "log": [
@@ -1755,6 +1755,720 @@
    "name": "Window",
    "what": "refresh",
    "reason": "Örnekler March'ta olmayan ikonları Lucide paketinden alır (march/icons/lucide)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Accordion",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ActivityBar",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Alert",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "AppShell",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "AppUI",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Badge",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "BarChart",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "BarList",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "BeforeAfter",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "BottomNav",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "BottomRightControls",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "BranchingStory",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Breadcrumbs",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Button",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Calendar",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ChatBubble",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ChatComposer",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ChatThread",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Checkbox",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Chip",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ClampText",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "CodeEditor",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "CodeInput",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Combobox",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "CommandPalette",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ContextMenu",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "CopyButton",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "DataGrid",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Debugger",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "DevicePicker",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "DevicePreview",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Dialog",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Disclosure",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "DockLayout",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Drawer",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "EditorFrame",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ExplodedView",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Feed",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "FileUpload",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "FontPicker",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Gantt",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Grid",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Heatmap",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "IconPicker",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Joined",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "JsonEditor",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "JsonView",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Kanban",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "KeyValue",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "LikeButton",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "LineChart",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ListRow",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "LiveFeed",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "MediaGrid",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "NavMenu",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "NavSidebar",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "NetworkThrottle",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "NotForYou",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "OptionList",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "OverflowToolbar",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "PageDots",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Pagination",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "PanelHeader",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "PasswordInput",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "PeriodNav",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Picture",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "PieChart",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Popover",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "PostCard",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Pricing",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ProfileHeader",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Progress",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ProjectDetail",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ProjectGrid",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "PropertyGrid",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "PullToRefresh",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Rating",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ReactionPicker",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ReplyQuote",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ResizeHandle",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "RichTextEditor",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "RowTools",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Scheduler",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ScrollStory",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "SearchBox",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Secret",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "SectionTimeline",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Segmented",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "SiteNav",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Slider",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Splitter",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Stack",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "StatTile",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "StatusBar",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Stepper",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Steps",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "StoryProgress",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "StoryRing",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "StoryViewer",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Swatch",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Tabs",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Textarea",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "TextInput",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ThemeEditor",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ThemeMenu",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ThreadNav",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "TimeInput",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "TimeRuler",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Tree",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "TreeEditor",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "TreeView",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "UndoRedo",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "VirtualList",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Window",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Wizard",
+   "what": "refresh",
+   "reason": "MarchIDE gerçek tipler: geri çağırma propları Handler (kendi öğe tipiyle yazılan işleyici uyar), JSX.Element Node, örneklerdeki tip hataları düzeltildi; Segmented size, confirm(metin), LikeButton ikon"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Dialog",
+   "what": "refresh",
+   "reason": "Belgeler: confirm(metin), Segmented size, $ değişkeni için as kalıbı"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ProjectDetail",
+   "what": "refresh",
+   "reason": "Belgeler: confirm(metin), Segmented size, $ değişkeni için as kalıbı"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Segmented",
+   "what": "refresh",
+   "reason": "Belgeler: confirm(metin), Segmented size, $ değişkeni için as kalıbı"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Segmented",
+   "what": "refresh",
+   "reason": "Segmented demo size seçeneğini okur"
   }
  ]
 }

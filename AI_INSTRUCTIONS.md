@@ -257,6 +257,8 @@ type Product = Infer<typeof Product>;    // { title: string; price: number | nul
   `on:click|prevent`, `{x | pipe}` and `<Row {user} />` are March-only syntax: `march check` type-checks them by compiling
   first. In `.tsx` meant for plain `tsc`, write `on:click={(e) => { e.preventDefault(); … }}`, `applyPipe("date", x)`,
   `user={user}`.
+- A `$` variable whose type is wider than its first value: `let $open = null as Project | null` (with
+  `let $open: Project | null = null` TypeScript narrows `$open` to `null` where it is read in the same function).
 - In `.tsx`, generic arrows need a comma: `<T,>(x: T) => x` (or use `function f<T>()`).
 - Register routes for typed hrefs (generated `pages.d.ts` does it): `navigate("/users/42")` ok, `navigate("/nope")` error.
 - Typed i18n catalog: `const tt = typed<typeof en>(); tt("cart.items", { n })` — missing variables are errors.

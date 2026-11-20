@@ -19,14 +19,21 @@ interface MarchDomAttributes {
   className?: Reactive<ClassValue>;
   sx?: Record<string, unknown> | string;
   style?: Reactive<Record<string, string | number | null | undefined>>;
-  ref?: ((el: Element) => void) | { set(el: Element): unknown };
+  // the element of the tag (an <input> gives an HTMLInputElement): a ref typed for it fits
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ref?: ((el: any) => unknown) | { set(el: any): unknown };
   children?: unknown;
   id?: Reactive<string>;
   title?: Reactive<string>;
   hidden?: Reactive<boolean>;
   role?: string;
   tabindex?: Reactive<string | number>;
-  [key: `on:${string}`]: ((e: Event & { currentTarget: Element }) => unknown) | undefined;
+  // any event: its handler may take the specific event (MarchDomEvents types the known ones)
+  [key: `on:${string}`]: { bivarianceHack(e: Event): unknown }["bivarianceHack"] | undefined;
+}
+/** on:click, on:touchstart, on:keydown…: the event of its name (MouseEvent, TouchEvent, KeyboardEvent…). */
+type MarchDomEvents = { [K in keyof HTMLElementEventMap as `on:${K}`]?: (e: HTMLElementEventMap[K] & { currentTarget: Element }) => unknown };
+interface MarchDomAttributes {
   [key: `on${Capitalize<string>}`]: unknown;
   [key: `class:${string}`]: unknown;
   [key: `use:${string}`]: unknown;
@@ -67,12 +74,16 @@ interface MarchDomAttributes {
 
 declare global {
   namespace JSX {
-    type Element = unknown;
+    // what <div /> or <Card /> gives: a node (a prop typed Node takes JSX); a component itself may return anything
+    type Element = Node;
+    type ElementType = keyof IntrinsicElements | ((props: any) => unknown);
     interface ElementChildrenAttribute { children: unknown }
     // directives are accepted on components too (bind:x gives the component x + setX; use:/class:/on: as on elements)
     // props extensions add (ExtensionProps: every component; ComponentExtensions: one March component, by name)
     interface IntrinsicAttributes extends ExtensionProps {
       key?: unknown;
+      /** sx on a component: its token classes on the component's root. */
+      sx?: Record<string, unknown> | string;
       /** This instance takes no extension (false) or only the named ones. */
       "m:extend"?: false | readonly string[];
       [key: `bind:${string}`]: unknown;
@@ -102,6 +113,6 @@ declare global {
       [key: `m:${string}`]: unknown;
     }
     type LibraryManagedAttributes<C, P> = [keyof ComponentExtensions] extends [never] ? P : P & ComponentExtra<C>;
-    type IntrinsicElements = { [K in keyof HTMLElementTagNameMap]: MarchDomAttributes } & { [K in keyof SVGElementTagNameMap]: MarchDomAttributes };
+    type IntrinsicElements = { [K in keyof HTMLElementTagNameMap]: MarchDomAttributes & MarchDomEvents } & { [K in keyof SVGElementTagNameMap]: MarchDomAttributes & MarchDomEvents };
   }
 }

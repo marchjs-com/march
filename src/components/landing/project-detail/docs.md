@@ -5,7 +5,7 @@ marked as the shared element, so a ProjectGrid card can grow into it — the sto
 and the next project.
 
 ```tsx
-let $open: Project | null = null
+let $open = null as Project | null
 const open = (p, cover) => sharedTransition(`project-${p.id}`, cover, () => { $open = p })
 <If when={$open}>{(p) => <ProjectDetail project={p} onBack={() => $open = null} next={{ project: nextOf(p), onOpen: open }} />}
 <Else><ProjectGrid projects={work} onOpen={open} /></Else></If>

@@ -13,6 +13,7 @@ import { t, messages } from "../../core/i18n.ts";
 import { toast, type ToastKind } from "../../ui/toast.ts";
 import { defineManager, emit } from "../manager.ts";
 import { permissions, type RequestResult } from "../permission/index.ts";
+import type { Handler } from "../../core/util.ts";
 
 messages("tr", { Open: "Aç" });
 
@@ -25,7 +26,7 @@ export interface NotifyOptions {
   /** Toast tone. Default "info". */
   kind?: ToastKind;
   /** Runs on a click (system notification) or the toast's action button. */
-  onClick?: () => void;
+  onClick?: Handler<[]> | undefined;
   /** Label of the toast action (default "Open"). */
   actionLabel?: string;
   /** Override the config for this message. */

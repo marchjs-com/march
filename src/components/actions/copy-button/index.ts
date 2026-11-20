@@ -12,6 +12,7 @@ import { IconButton } from "../icon-button/index.ts";
 import { check } from "../../../icons/glyphs/check.ts";
 import { copy as copyIcon } from "../../../icons/glyphs/copy.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface CopyButtonProps {
   /** What is copied (read at click time). @tr Kopyalanan değer (tıklama anında okunur). */
@@ -35,9 +36,9 @@ export interface CopyButtonProps {
   /** Extra classes on the button. @tr Düğmeye eklenen sınıflar. */
   class?: ClassProp;
   /** Called after a successful copy. @tr Başarılı bir kopyalamadan sonra çağrılır. */
-  onCopy?: () => void;
+  onCopy?: Handler<[]> | undefined;
   /** The clipboard refused (no permission, insecure page). @tr Pano reddetti (izin yok, güvensiz sayfa). */
-  onError?: (error: unknown) => void;
+  onError?: Handler<[error: unknown]> | undefined;
 }
 // a live prop for h(Component, …): it becomes a getter
 const live = reactive as <T>(fn: () => T) => T;

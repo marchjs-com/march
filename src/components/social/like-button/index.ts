@@ -6,7 +6,8 @@ import type { CountFormat } from "../../../ui/format.ts";
 import { live } from "../../../forms/util.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, glyph, icon as iconOf, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import type { IconProp } from "../../../icons/types.ts";
 import { heart } from "../../../icons/glyphs/heart.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { Button } from "../../actions/button/index.ts";
@@ -31,8 +32,8 @@ export interface LikeButtonProps {
   colors?: MaybeFn<"brand" | "single" | undefined>;
   /** Accessible name. Default "Like". @tr Erişilebilir ad. Varsayılan "Beğen". */
   label?: MaybeFn<string | undefined>;
-  /** Your own icon instead of the heart: a node, or `(liked) => node`. @tr Kalp yerine kendi ikonunuz: bir düğüm ya da `(liked) => node`. */
-  icon?: Node | ((liked: boolean) => unknown) | undefined;
+  /** Your own icon instead of the heart: an icon (march/icons), a node, or `(liked) => node`. @tr Kalp yerine kendi ikonunuz: bir ikon (march/icons), bir düğüm ya da `(liked) => node`. */
+  icon?: IconProp | ((liked: boolean) => unknown) | undefined;
   /** The pop of the icon on every toggle. Default true. @tr Her geçişte ikonun zıplaması. Varsayılan true. */
   pop?: MaybeFn<boolean | undefined>;
   /** Shape of the burst: `{ count, radius, ring }` (`ring: false` drops the ring). @tr Patlamanın biçimi: `{ count, radius, ring }` (`ring: false` halkayı kaldırır). */
@@ -63,7 +64,7 @@ export function LikeButton(props: LikeButtonProps): Element {
     "aria-label": () => val(props.label) ?? t`Like`,
     onClick: toggle,
     icon: h("span", { class: "m-like-hit", ref: (x: HTMLElement) => { hit = x; } },
-      h("span", { class: "m-like-heart", ref: (x: HTMLElement) => { icon = x; } }, typeof own === "function" ? () => own(!!val(props.liked)) : own ?? glyph(heart))),
+      h("span", { class: "m-like-heart", ref: (x: HTMLElement) => { icon = x; } }, typeof own === "function" ? () => (own as (liked: boolean) => unknown)(!!val(props.liked)) : own != null ? iconOf(own, "m-like-icon") : glyph(heart))),
     children: props.count !== undefined ? h(CountRoll, { value: () => val(props.count) ?? 0, hideZero: true, format: () => val(props.countFormat), class: "m-like-count" }) : null,
   }) as Element;
 }

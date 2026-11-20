@@ -19,7 +19,7 @@ import { Button } from "../../actions/button/index.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { ReplyQuote } from "../reply-quote/index.ts";
 import "./chat-bubble.css";
-import { isRtl } from "../../../core/util.ts";
+import { isRtl, type Handler } from "../../../core/util.ts";
 import { swipeable } from "../../../behaviors/swipe/index.ts";
 import type { IconProp } from "../../../icons/types.ts";
 
@@ -48,13 +48,13 @@ export interface ChatBubbleProps {
   /** Adds the "edited" note next to the time. @tr Saatin yanına "düzenlendi" notunu ekler. */
   edited?: MaybeFn<boolean | undefined>;
   /** A reaction chip was pressed (toggle yours). @tr Bir tepki çipine basıldı (kendi tepkinizi aç/kapat). */
-  onReact?: ((emoji: string) => void) | undefined;
+  onReact?: Handler<[emoji: string]> | undefined;
   /** Shows the React button (opens your picker). @tr Tepki düğmesini gösterir (kendi seçicinizi açar). */
-  onReactMenu?: ((anchor: HTMLElement) => void) | undefined;
+  onReactMenu?: Handler<[anchor: HTMLElement]> | undefined;
   /** Shows the Reply button and enables drag-to-reply. @tr Yanıtla düğmesini gösterir ve sürükleyerek yanıtlamayı açar. */
-  onReply?: (() => void) | undefined;
+  onReply?: Handler<[]> | undefined;
   /** Retry a failed message. @tr Gönderilemeyen mesajı yeniden dener. */
-  onRetry?: (() => void) | undefined;
+  onRetry?: Handler<[]> | undefined;
   /** Your own words for the texts the bubble writes: the tick names, "edited", the retry line, the React / Reply buttons. @tr Balonun yazdığı metinler için kendi sözleriniz: tik adları, "edited", yeniden deneme satırı, Tepki / Yanıtla düğmeleri. */
   labels?: MaybeFn<Partial<Record<MessageStatus | "edited" | "retry" | "react" | "reply", string>> | undefined>;
   /** Delivery ticks: true (default), false, or `(status) => node` for your own mark. @tr İletim tikleri: true (varsayılan), false ya da kendi işaretiniz için `(status) => node`. */

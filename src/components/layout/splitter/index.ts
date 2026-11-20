@@ -5,7 +5,7 @@ import { signal, effect, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { clamp, setStyle } from "../../../core/util.ts";
+import { clamp, setStyle, type Handler } from "../../../core/util.ts";
 import { ResizeHandle } from "../resize-handle/index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { withColor } from "../../../theme/colors.ts";
@@ -20,7 +20,7 @@ export interface SplitterProps {
   /** Controlled share of the first pane (0..1); with `onChange` the parent owns it. @tr İlk bölmenin denetimli payı (0..1); `onChange` ile değeri üst bileşen tutar. */
   value?: MaybeFn<number | undefined>;
   /** Called with the new share while dragging or on the keyboard. @tr Sürüklerken ya da klavyede yeni payla çağrılır. */
-  onChange?: (share: number) => void;
+  onChange?: Handler<[share: number]> | undefined;
   /** "horizontal": panes side by side (default); "vertical": stacked. @tr "horizontal": bölmeler yan yana (varsayılan); "vertical": alt alta. */
   orientation?: "horizontal" | "vertical";
   /** Smallest share of either pane (default 0.15). @tr Her iki bölmenin en küçük payı (varsayılan 0.15). */

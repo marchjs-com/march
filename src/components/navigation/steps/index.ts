@@ -5,6 +5,7 @@ import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts
 import { CheckMark } from "../../feedback/check-mark/index.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import type { Handler } from "../../../core/util.ts";
 
 export interface StepItem { title: unknown; description?: unknown; icon?: unknown }
 export interface StepsProps {
@@ -13,7 +14,7 @@ export interface StepsProps {
   /** Current step (0-based). @tr Geçerli adım (0'dan başlar). */
   current: MaybeFn<number>;
   /** Called with a step's index; when given, each step is a button. @tr Bir adımın dizinini alarak çağrılır; verilince her adım bir düğme olur. */
-  onSelect?: (i: number) => void;
+  onSelect?: Handler<[i: number]> | undefined;
   /** Steps as a vertical list (default false). @tr Adımlar dikey bir liste (varsayılan false). */
   vertical?: boolean;
   /** Mark of a done step: the check (default), your own icon (an IconDef or a short string), or false to keep the number / step icon. @tr Tamamlanan adımın işareti: onay (varsayılan), kendi ikonun (IconDef ya da kısa metin) ya da numarayı / adım ikonunu korumak için false. */

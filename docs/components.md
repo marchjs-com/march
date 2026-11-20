@@ -998,12 +998,12 @@ Full page: src/components/layout/device-preview/docs.md
 
 ## Dialog
 
-A modal window over the page. Declarative: `<Dialog open={…} onClose={…}>`; imperative: `openDialog(render)` and `openDrawer(render)` return a promise that resolves with the value passed to `close(value)`. `confirm`, `prompt` and `askReason` are ready-made dialogs; `closeAll()` and `openDialogs()` manage the stack.
+
 
 Composed of: Portal, [PanelHeader](#panelheader), [IconButton](#iconbutton), [Button](#button), Field, [TextInput](#textinput), [Textarea](#textarea), [Select](#select), [Drawer](#drawer)
 
 ```tsx
-<Dialog open={$open} onClose={() => $open = false} title="Invite" footer={<Button variant="primary">Send</Button>}>…</Dialog>
+
 ```
 
 Full page: src/components/overlays/dialog/docs.md
@@ -2164,7 +2164,7 @@ The page of one project: a back button, a big title, the facts (role, client, ye
 Composed of: [Button](#button), [KeyValue](#keyvalue), [Chip](#chip), openMedia, [Reveal](#reveal), [Picture](#picture), [SectionHead](#sectionhead)
 
 ```tsx
-let $open: Project | null = null
+let $open = null as Project | null
 const open = (p, cover) => sharedTransition(`project-${p.id}`, cover, () => { $open = p })
 <If when={$open}>{(p) => <ProjectDetail project={p} onBack={() => $open = null} next={{ project: nextOf(p), onOpen: open }} />}
 <Else><ProjectGrid projects={work} onOpen={open} /></Else></If>
@@ -2478,10 +2478,10 @@ Full page: src/components/navigation/section-timeline/docs.md
 
 ## Segmented
 
-A compact single choice: joined buttons, the chosen one raised. Use it for 2–6 short options (view modes, units, periods). Arrow keys move and select; only the chosen button is in the Tab order.
+
 
 ```tsx
-<Segmented bind:value={$view} options={[{ value: "list", label: "List" }, { value: "grid", label: "Grid" }]} aria-label="View" />
+
 ```
 
 Full page: src/components/forms/segmented/docs.md

@@ -16,6 +16,7 @@ import { reducedMotion } from "../../../motion/env.ts";
 import { dockLens } from "../../../ui/dock-lens.ts";
 import { SearchBox } from "../../forms/search-box/index.ts";
 import tr from "./tr.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", tr);
 
@@ -43,7 +44,7 @@ export interface ThreadNavProps {
   /** Where you are: the id of a page (or a category, a section). @tr Bulunduğun yer: bir sayfanın (ya da kategorinin, bölümün) id'si. */
   value?: MaybeFn<string | null | undefined>;
   /** A place was chosen (a page, or a category / section without pages): `(item, path)`, path from the section. @tr Bir yer seçildi (bir sayfa ya da sayfasız bir kategori / bölüm): `(item, path)`, yol bölümden başlar. */
-  onNavigate?: ((item: ThreadNavItem, path: readonly ThreadNavItem[]) => void) | undefined;
+  onNavigate?: Handler<[item: ThreadNavItem, path: readonly ThreadNavItem[]]> | undefined;
   /** Fixed at the start edge of the screen (default false: fills its place). @tr Ekranın başlangıç kenarına sabit (varsayılan false: yerini doldurur). */
   fixed?: boolean | undefined;
   /** Magnify the beads near the pointer (default true). @tr Boncukları imlecin yakınında büyüt (varsayılan true). */

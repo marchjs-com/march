@@ -5,6 +5,7 @@ import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import type { Tone } from "../../../ui/display-base.ts";
 import { type ColorToken, withColor } from "../../../theme/colors.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
+import type { Handler } from "../../../core/util.ts";
 
 /** Format a count for badges: 120 → "99+". */
 export const countLabel = (n: number, max = 99): string => (n > max ? `${max}+` : String(n));
@@ -33,7 +34,7 @@ export interface BadgeProps {
   /** Count badges: your own text for the number (default `countLabel`: 120 → "99+"). @tr Sayaç rozeti: sayı için kendi metniniz (varsayılan `countLabel`: 120 → "99+"). */
   format?: ((n: number, max: number) => unknown) | undefined;
   /** A badge that can be pressed: it is drawn as a `<button>` (keyboard, focus ring, hover). @tr Basılabilen rozet: `<button>` olarak çizilir (klavye, odak halkası, üzerine gelme). */
-  onClick?: ((e: MouseEvent) => void) | undefined;
+  onClick?: Handler<[e: MouseEvent]> | undefined;
   /** Clickable badge: a toggle (`aria-pressed` and the pressed look). @tr Tıklanabilir rozet: aç/kapa düğmesi (`aria-pressed` ve basılı görünüm). */
   pressed?: MaybeFn<boolean | null | undefined>;
   /** Clickable badge: cannot be pressed. @tr Tıklanabilir rozet: basılamaz. */

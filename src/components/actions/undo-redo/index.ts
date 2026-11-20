@@ -13,6 +13,7 @@ import { undo as undoIcon } from "../../../icons/glyphs/undo.ts";
 import { redo as redoIcon } from "../../../icons/glyphs/redo.ts";
 import tr from "./tr.ts";
 import { withColor } from "../../../theme/colors.ts";
+import type { Handler } from "../../../core/util.ts";
 
 messages("tr", tr);
 
@@ -37,9 +38,9 @@ export interface UndoRedoProps {
   /** Whether Redo is possible (default: from `history`). @tr Yinelenebilir mi (varsayılan: `history`'den). */
   canRedo?: MaybeFn<boolean | undefined>;
   /** Called by the Undo button (default: `history.undo`). @tr Geri al düğmesi çağırır (varsayılan: `history.undo`). */
-  onUndo?: (() => void) | undefined;
+  onUndo?: Handler<[]> | undefined;
   /** Called by the Redo button (default: `history.redo`). @tr Yinele düğmesi çağırır (varsayılan: `history.redo`). */
-  onRedo?: (() => void) | undefined;
+  onRedo?: Handler<[]> | undefined;
   /** Which buttons, in this order (default: undo, redo). @tr Hangi düğmeler, bu sırayla (varsayılan: undo, redo). */
   actions?: readonly UndoRedoAction[] | undefined;
   /** Own names (default "Undo", "Redo", group "History"; translated). @tr Kendi adların (varsayılan "Undo", "Redo", grup "History"; çevrilir). */

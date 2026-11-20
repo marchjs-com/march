@@ -9,7 +9,7 @@ import { starFilled } from "../../../icons/glyphs/starFilled.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import { roving } from "../../../ui/focus.ts";
 import type { IconDef } from "../../../icons/svg.ts";
-import { isRtl } from "../../../core/util.ts";
+import { isRtl, type Handler } from "../../../core/util.ts";
 
 export interface RatingProps {
   /** The rating, a value or an accessor; a fraction fills that part of a mark (4.5: half of the fifth, 4.3: under a third), so a value glided from 0 fills the stars smoothly. @tr Puan, değer ya da erişimci; kesirli kısım bir işaretin o kadarını doldurur (4.5: beşincinin yarısı, 4.3: üçte birinden azı), böylece 0'dan kaydırılan bir değer yıldızları akıcı doldurur. */
@@ -17,7 +17,7 @@ export interface RatingProps {
   /** Writes the picked rating back (set by `bind:value`). @tr Seçilen puanı geri yazar (`bind:value` bunu verir). */
   setValue?: (v: number) => void;
   /** Called with the picked rating. @tr Seçilen puanla çağrılır. */
-  onChange?: (v: number) => void;
+  onChange?: Handler<[v: number]> | undefined;
   /** Number of marks (default 5). @tr İşaret sayısı (varsayılan 5). */
   max?: number;
   /** Shows the rating without letting it change. @tr Puanı değiştirilemez şekilde gösterir. */

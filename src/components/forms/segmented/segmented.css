@@ -8,6 +8,8 @@
 /* a color token (data-m-color on the control or an ancestor): the selected segment follows it */
 [data-m-color] .m-segment[aria-checked="true"], .m-segmented[data-m-color] .m-segment[aria-checked="true"] { background: var(--m-accent-soft); color: var(--m-accent-text); }
 /* an option with an icon: icon and text in a row (an icon-only segment stays square-ish) */
+.m-segmented-sm { padding: 2px; }
+.m-segmented-sm .m-segment { min-height: 1.5rem; padding: 0 .5rem; font-size: var(--m-text-sm); }
 .m-segment-has-icon { display: inline-flex; align-items: center; justify-content: center; gap: .375rem; }
 .m-segment-icon { display: inline-flex; flex: none; }
 .m-segment-icon .m-svg { width: 1em; height: 1em; }

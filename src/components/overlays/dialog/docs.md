@@ -29,7 +29,7 @@ A modal window over the page. Declarative: `<Dialog open={…} onClose={…}>`; 
 ```
 
 `openDialog(render, { title, size, footer, dismissable, dismissValue, closeButton, closeLabel, motion })`, `openDrawer(render, { side: "left" | "right" | "bottom", … })`,
-`confirm({ title, message, danger, ok, cancel })` → `boolean`, `prompt({ title, label, value, placeholder, validate, multiline, ok, cancel })` → `string | null`,
+`confirm("Delete it?")` or `confirm({ title, message, danger, ok, cancel })` → `boolean`, `prompt({ title, label, value, placeholder, validate, multiline, ok, cancel })` → `string | null`,
 `askReason({ title, min, purposes, ok, cancel, labels, counter })` → the text (or `{ category, text }`) or `null`.
 
 Every text of the ready-made dialogs is yours: `ok` and `cancel` name the buttons; `askReason` also takes
