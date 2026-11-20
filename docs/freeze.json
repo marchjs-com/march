@@ -480,6 +480,14 @@
    ],
    "hash": "8b82f39f949aaecbfa0f02bfe0ed7c06"
   },
+  "Pagination": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/navigation/pagination",
+    "examples/showcase/public/components/pagination/ide.json"
+   ],
+   "hash": "6e4809db7707a0a74083ac6bc4ce7472"
+  },
   "PasswordInput": {
    "frozen": "2026-11-20",
    "paths": [
