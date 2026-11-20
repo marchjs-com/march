@@ -9,5 +9,5 @@ export default defineMeta({
   summary: "Optional credit line \"Developed with MarchJS and 💗\": text, badge or small; the link is one constant (MARCH_URL).",
   composedOf: [],
   behaviors: [],
-  showcase: "/buttons",
+  showcase: "/text",
 });

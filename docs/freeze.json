@@ -238,7 +238,7 @@
     "src/components/typography/clamp-text",
     "examples/showcase/public/components/clamp-text/ide.json"
    ],
-   "hash": "203bc9b7bd0f84fe0f5ad034ccc57700"
+   "hash": "f19aa8dc37a6b1969fdf66d4199e802c"
   },
   "CodeEditor": {
    "frozen": "2026-11-20",
@@ -662,7 +662,7 @@
     "src/components/typography/kbd",
     "examples/showcase/public/components/kbd/ide.json"
    ],
-   "hash": "e6f9590f30af6586d582fbdc1d7c58c9"
+   "hash": "ef717ab6646b2dda01002e2c621ef02d"
   },
   "KeyframeTimeline": {
    "frozen": "2026-11-20",
@@ -782,7 +782,7 @@
     "src/components/actions/made-with-march",
     "examples/showcase/public/components/made-with-march/ide.json"
    ],
-   "hash": "a152fb6a0ff62f1710a346339750845c"
+   "hash": "b020f36de3b3c297f69af2daaeb2d42c"
   },
   "MarkdownEditor": {
    "frozen": "2026-11-20",
@@ -1206,7 +1206,7 @@
     "src/components/typography/section-label",
     "examples/showcase/public/components/section-label/ide.json"
    ],
-   "hash": "d6b09c41cc080363189f8c3ec9de0be7"
+   "hash": "aea1fcbb0be54c313ce01f54cc304587"
   },
   "SectionTimeline": {
    "frozen": "2026-11-20",
@@ -1510,7 +1510,7 @@
     "src/components/overlays/tooltip",
     "examples/showcase/public/components/tooltip/ide.json"
    ],
-   "hash": "ecd623f8219c7cd9a9623243c95de1c0"
+   "hash": "09ef55c0a5b60cc79a71af77b8c1ed5c"
   },
   "Tree": {
    "frozen": "2026-11-20",
@@ -1599,6 +1599,36 @@
    "name": "DevicePreview",
    "what": "refresh",
    "reason": "Eğ paneli popover'dan geniş taşıyordu: Düz tut ortada değildi, kaydırıcı değerleri kesiliyordu"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Tooltip",
+   "what": "refresh",
+   "reason": "Vitrin sayfası /buttons yerine yeni Metin ve ipuçları sayfası (/text)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "MadeWithMarch",
+   "what": "refresh",
+   "reason": "Vitrin sayfası /buttons yerine yeni Metin ve ipuçları sayfası (/text)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Kbd",
+   "what": "refresh",
+   "reason": "Vitrin sayfası /buttons yerine yeni Metin ve ipuçları sayfası (/text)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "SectionLabel",
+   "what": "refresh",
+   "reason": "Vitrin sayfası /buttons yerine yeni Metin ve ipuçları sayfası (/text)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ClampText",
+   "what": "refresh",
+   "reason": "Vitrin sayfası /buttons yerine yeni Metin ve ipuçları sayfası (/text)"
   }
  ]
 }

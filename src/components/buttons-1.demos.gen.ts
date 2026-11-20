@@ -4,6 +4,4 @@ import * as d0 from "./actions/button/demo.tsx";
 import * as p0 from "./actions/button/playground.ts";
 import * as d1 from "./actions/button-group/demo.tsx";
 import * as p1 from "./actions/button-group/playground.ts";
-import * as d2 from "./actions/chevron/demo.tsx";
-import * as p2 from "./actions/chevron/playground.ts";
-export { d0, p0, d1, p1, d2, p2 };
+export { d0, p0, d1, p1 };

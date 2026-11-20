@@ -10,5 +10,5 @@ export default defineMeta({
   composedOf: [],
   behaviors: [],
   hubs: [],
-  showcase: "/buttons",
+  showcase: "/text",
 });

@@ -2,8 +2,6 @@
 export * from "./buttons.kit.gen.ts";
 import * as d0 from "./actions/icon-button/demo.tsx";
 import * as p0 from "./actions/icon-button/playground.ts";
-import * as d1 from "./typography/kbd/demo.tsx";
-import * as p1 from "./typography/kbd/playground.ts";
-import * as d2 from "./actions/made-with-march/demo.tsx";
-import * as p2 from "./actions/made-with-march/playground.ts";
-export { d0, p0, d1, p1, d2, p2 };
+import * as d1 from "./actions/menu/demo.tsx";
+import * as p1 from "./actions/menu/playground.ts";
+export { d0, p0, d1, p1 };
