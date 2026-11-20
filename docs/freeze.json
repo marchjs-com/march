@@ -496,6 +496,14 @@
    ],
    "hash": "a8ed12fee60fc72a375277150b519df5"
   },
+  "Overlay": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/media/overlay",
+    "examples/showcase/public/components/overlay/ide.json"
+   ],
+   "hash": "af7be07164109cdff05fd21c48ee03bc"
+  },
   "PageDots": {
    "frozen": "2026-11-20",
    "paths": [
