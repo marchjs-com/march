@@ -695,6 +695,14 @@
     "examples/showcase/public/components/undo-redo/ide.json"
    ],
    "hash": "4ca8a8bf7fc71c91bb159a595d635906"
+  },
+  "Wizard": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/wizard",
+    "examples/showcase/public/components/wizard/ide.json"
+   ],
+   "hash": "b19bfb66d4247d959ff763a9bd29aee9"
   }
  },
  "log": []
