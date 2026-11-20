@@ -536,6 +536,14 @@
    ],
    "hash": "3fd09c542d72c755fb86b3fb0bec05b9"
   },
+  "Hero": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/hero",
+    "examples/showcase/public/components/hero/ide.json"
+   ],
+   "hash": "4ca6d1384ae4369e00cb93447d380129"
+  },
   "IconButton": {
    "frozen": "2026-11-20",
    "paths": [
