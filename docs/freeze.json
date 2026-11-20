@@ -472,6 +472,14 @@
    ],
    "hash": "fa0eb5bbb93f741274d1b3df0512fcf8"
   },
+  "Rating": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/rating",
+    "examples/showcase/public/components/rating/ide.json"
+   ],
+   "hash": "158ced1b49d38c41d315e5fabd87891b"
+  },
   "RichTextEditor": {
    "frozen": "2026-11-20",
    "paths": [
