@@ -176,6 +176,14 @@
    ],
    "hash": "f28d342b3ad8d2e2693377999e74b18c"
   },
+  "DateRangePicker": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/date-range-picker",
+    "examples/showcase/public/components/date-range/ide.json"
+   ],
+   "hash": "420b2c5935da67c25897a8c872a7685d"
+  },
   "Debugger": {
    "frozen": "2026-11-20",
    "paths": [
