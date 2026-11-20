@@ -176,6 +176,14 @@
    ],
    "hash": "3e7c24ea98390f79e97c570806337910"
   },
+  "ConsentBanner": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/consent-banner",
+    "examples/showcase/public/components/consent-banner/ide.json"
+   ],
+   "hash": "2abccf80934ac0618b5474bc86a2ce33"
+  },
   "CopyButton": {
    "frozen": "2026-11-20",
    "paths": [

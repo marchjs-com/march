@@ -3,6 +3,7 @@ import { defineMeta } from "../../meta.ts";
 export default defineMeta({
   name: "ConsentBanner",
   status: "stable",
+  frozen: "2026-11-20",
   since: "0.1.0",
   summary: "Consent UI of the consent manager: bottom banner, preferences panel (Dialog, bottom sheet on mobile) and ConsentGate placeholders for third-party content.",
   category: "composite",
