@@ -1486,7 +1486,7 @@
     "src/components/data/time-ruler",
     "examples/showcase/public/components/time-ruler/ide.json"
    ],
-   "hash": "feff941f58d1b1d9d3b5cc78e786baf1"
+   "hash": "f21156f1be2fc27eaac5b8f60c79a83b"
   },
   "Toast": {
    "frozen": "2026-11-20",
@@ -1671,6 +1671,12 @@
    "name": "TimeInput",
    "what": "refresh",
    "reason": "picker=\"clock\": saat kadranı (önce saat, sonra dakika; 24 saatte iki halka, 12 saatte ÖÖ / ÖS)"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "TimeRuler",
+   "what": "refresh",
+   "reason": "Etiketler sığmayınca çakışmıyor (düzenli aralıkla seyrelir), sondaki etiket içe döner, etiketli küçük çentik büyükle aynı hizada"
   }
  ]
 }

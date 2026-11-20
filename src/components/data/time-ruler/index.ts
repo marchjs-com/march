@@ -3,7 +3,7 @@
 // slider (arrow keys, Home / End). Tick distances are picked for the duration or given; labels, the playhead, its
 // colour and the names are yours. Rows under the ruler share its scale with `timePercent(ms, duration)`.
 import "./time-ruler.css";
-import { computed, untrack } from "../../../core/reactive.ts";
+import { computed, untrack, onCleanup, getOwner } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, clamp, isRtl, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -80,10 +80,39 @@ export function TimeRuler(props: TimeRulerProps): Element {
   const seekable = !!props.onSeek;
   const seek = (ms: number): void => props.onSeek?.(clamp(ms, 0, untrack(D)));
 
+  // labels that would collide (a narrow ruler, long labels) step aside: the first and the last stay, the others show
+  // where they fit; a label past the ruler's end is drawn before its tick
+  const later = (fn: () => void): void => { if (typeof requestAnimationFrame === "function") requestAnimationFrame(fn); };
+  function fit(): void {
+    const labels = Array.from(rail.querySelectorAll<HTMLElement>(".m-time-ruler-label"));
+    if (!labels.length || !root.isConnected) return;
+    const box = root.getBoundingClientRect();
+    if (!box.width) return;
+    for (const l of labels) l.classList.remove("is-quiet", "is-end");
+    for (const l of labels) { const r = l.getBoundingClientRect(); if (r.right > box.right + 0.5 || r.left < box.left - 0.5) l.classList.add("is-end"); }
+    const rects = new Map(labels.map((l) => [l, l.getBoundingClientRect()] as const));
+    // every k-th label, the smallest k whose labels do not touch (even spacing); the last one too when it fits
+    const apart = (a: DOMRect, b: DOMRect): boolean => a.right + 6 <= b.left || a.left >= b.right + 6;
+    const n = labels.length;
+    let keep: number[] = [0];
+    for (let k = 1; k <= n; k++) {
+      const pick = Array.from({ length: Math.ceil(n / k) }, (_, j) => j * k);
+      if (pick.every((i, j) => j === 0 || apart(rects.get(labels[pick[j - 1]!]!)!, rects.get(labels[i]!)!))) { keep = pick; break; }
+    }
+    const last = n - 1;
+    if (!keep.includes(last) && keep.every((i) => apart(rects.get(labels[i]!)!, rects.get(labels[last]!)!))) keep.push(last);
+    labels.forEach((l, i) => { if (!keep.includes(i)) l.classList.add("is-quiet"); });
+  }
+  let root!: HTMLElement;
   const rail = h("div", { class: "m-time-ruler-rail", "aria-hidden": "true" }, () => {
     const d = D();
-    return ticks().map((k) => h("span", { class: cx("m-time-ruler-tick", k.major && "is-major"), style: { "--m-time-ruler-at": timePercent(k.at, d) } },
-      k.label !== undefined ? k.label : k.major ? fmt(k.at) : null));
+    const out = ticks().map((k) => {
+      const label = k.label !== undefined ? k.label : k.major ? fmt(k.at) : null;
+      return h("span", { class: cx("m-time-ruler-tick", k.major && "is-major", label != null && "is-labelled"), style: { "--m-time-ruler-at": timePercent(k.at, d) } },
+        label != null ? h("span", { class: "m-time-ruler-label" }, label) : null);
+    });
+    later(fit);
+    return out;
   }) as HTMLElement;
   // the head is built once per appearance: a moving value only moves it (it keeps focus and its drag)
   const shown = computed(() => props.head !== false && val(props.value) != null);
@@ -108,7 +137,7 @@ export function TimeRuler(props: TimeRulerProps): Element {
       return el;
     });
   };
-  const root = h("div", {
+  root = h("div", {
     class: () => cx("m-time-ruler", seekable && "is-seekable", val(props.class)), role: seekable ? "group" : null, "aria-label": seekable ? () => props.labels?.ruler ?? t`Time ruler` : null, "aria-hidden": seekable ? null : "true",
   }, rail, head) as HTMLElement;
   // a press anywhere on the rail jumps there; dragging the rail or the head scrubs
@@ -120,5 +149,7 @@ export function TimeRuler(props: TimeRulerProps): Element {
     });
   }
   if (seekable) drag(rail);
+  // a new width: the labels are fitted again
+  if (typeof ResizeObserver === "function") { const ro = new ResizeObserver(() => fit()); ro.observe(root); if (getOwner()) onCleanup(() => ro.disconnect()); }
   return root;
 }
