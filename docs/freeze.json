@@ -1032,6 +1032,14 @@
    ],
    "hash": "714c677b90717bff5d33f40cb34b1fc4"
   },
+  "TypingIndicator": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/social/typing-indicator",
+    "examples/showcase/public/components/typing-indicator/ide.json"
+   ],
+   "hash": "5849bd6b73f020d1f7052eea63f78409"
+  },
   "UndoRedo": {
    "frozen": "2026-11-20",
    "paths": [
