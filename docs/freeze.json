@@ -1024,6 +1024,14 @@
    ],
    "hash": "0d3b62b6664d6602fa71aeed5d4a8009"
   },
+  "Splitter": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/splitter",
+    "examples/showcase/public/components/splitter/ide.json"
+   ],
+   "hash": "e8a4b72164fb8fe53811f2cd342e7e9c"
+  },
   "StatTile": {
    "frozen": "2026-11-20",
    "paths": [
