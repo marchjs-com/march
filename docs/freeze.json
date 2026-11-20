@@ -16,6 +16,14 @@
    ],
    "hash": "d952fa12abb683b03cb45f27c4a59abb"
   },
+  "AvatarGroup": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/social/avatar-group",
+    "examples/showcase/public/components/avatar-group/ide.json"
+   ],
+   "hash": "2d56f1e0fdf4f28e7d665d3578f8a79d"
+  },
   "Badge": {
    "frozen": "2026-11-20",
    "paths": [
