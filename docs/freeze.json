@@ -112,6 +112,14 @@
    ],
    "hash": "e8c06fd4aee0af96d11da14613343e4d"
   },
+  "CodeInput": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/code-input",
+    "examples/showcase/public/components/forms-code/ide.json"
+   ],
+   "hash": "f695f9fb2d4c14c6ab1894e1507d442c"
+  },
   "CodeView": {
    "frozen": "2026-11-20",
    "paths": [
