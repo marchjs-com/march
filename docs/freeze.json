@@ -176,6 +176,14 @@
    ],
    "hash": "1ef41075f6fe9640513ea2682a28de01"
   },
+  "Kanban": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/kanban",
+    "examples/showcase/public/components/kanban/ide.json"
+   ],
+   "hash": "4964c183148e8cd43479ff7fb490ad19"
+  },
   "Kbd": {
    "frozen": "2026-11-20",
    "paths": [
