@@ -287,6 +287,14 @@
     "examples/showcase/public/components/tree-view/ide.json"
    ],
    "hash": "714c677b90717bff5d33f40cb34b1fc4"
+  },
+  "UndoRedo": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/actions/undo-redo",
+    "examples/showcase/public/components/undo-redo/ide.json"
+   ],
+   "hash": "4ca8a8bf7fc71c91bb159a595d635906"
   }
  },
  "log": []
