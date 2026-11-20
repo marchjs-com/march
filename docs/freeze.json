@@ -464,6 +464,14 @@
    ],
    "hash": "25eba74693df590087bc14b7292247dd"
   },
+  "FeatureGrid": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/feature-grid",
+    "examples/showcase/public/components/feature-grid/ide.json"
+   ],
+   "hash": "7be80d0832aa647ca2797488ad43927f"
+  },
   "Feed": {
    "frozen": "2026-11-20",
    "paths": [
