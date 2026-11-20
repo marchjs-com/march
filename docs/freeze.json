@@ -808,6 +808,14 @@
    ],
    "hash": "da33b39f3c1bb5843bf99e64407f5427"
   },
+  "Newsletter": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/newsletter",
+    "examples/showcase/public/components/newsletter/ide.json"
+   ],
+   "hash": "14fc80e551bb26d9754d47a2725f3d16"
+  },
   "NumberInput": {
    "frozen": "2026-11-20",
    "paths": [
