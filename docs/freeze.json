@@ -960,6 +960,14 @@
    ],
    "hash": "2845e7f06d578b29b4930419463f9699"
   },
+  "Pricing": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/pricing",
+    "examples/showcase/public/components/pricing/ide.json"
+   ],
+   "hash": "488e8b9b6d1401c23dfad47cdbce2105"
+  },
   "ProfileHeader": {
    "frozen": "2026-11-20",
    "paths": [
