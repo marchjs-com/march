@@ -207,7 +207,8 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
   const outer = useContext(LayoutContext);
   provide(LayoutContext, api);
 
-  const has = (s: SlotName): boolean => pick(s) != null;
+  // false (a region turned off: `header={cond && <X/>}`) is no region, like null
+  const has = (s: SlotName): boolean => { const v = pick(s); return v != null && v !== false; };
   const framed = pick("framed") ?? SLOTS.some(has);
   const slot = (name: SlotName, tag: string, cls: string): Element | null => {
     if (!has(name)) return null;

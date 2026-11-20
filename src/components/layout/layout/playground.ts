@@ -3,8 +3,8 @@ import { el } from "../../playground-el.ts";
 
 interface Values { header: boolean; nav: boolean; aside: boolean; footer: boolean }
 
-// MarchIDE: each region on is a box of its name
-const box = (name: string) => (on: unknown) => (on ? el("div", "sc-ld-box", name) : undefined);
+// MarchIDE: each region on is a box of its name; off is false (no region), so it also turns off one the code gives
+const box = (name: string) => (on: unknown) => (on ? el("div", "sc-ld-box", name) : false);
 
 export default definePlayground<Values>({
   options: [

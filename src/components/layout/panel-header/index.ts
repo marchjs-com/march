@@ -65,7 +65,9 @@ const USED = ["as", "lead", "icon", "title", "titleAs", "titleId", "subtitle", "
 /** `<PanelHeader icon={cog} title="Settings" subtitle="Workspace" actions={<Button size="sm">Save</Button>} onClose={close} divider />` */
 export function PanelHeader(props: PanelHeaderProps): Element {
   const foot = props.as === "footer";
-  const hasTitles = props.title != null || props.subtitle != null;
+  // a part given as false (`subtitle={cond && "…"}`) is left out, like null
+  const has = (v: unknown): boolean => v != null && v !== false;
+  const hasTitles = props.title != null || has(props.subtitle);
   const own = props.close != null && typeof props.close !== "boolean";
   const pc = (part: "titles" | "title" | "subtitle" | "meta" | "actions"): string => cx(`m-panel-header-${part === "subtitle" ? "sub" : part}`, props.partClass?.[part]);
   const showClose = props.close === false ? false : props.onClose != null || props.close === true || own;
@@ -79,10 +81,10 @@ export function PanelHeader(props: PanelHeaderProps): Element {
   props.icon != null && props.icon !== false ? icon(props.icon, "m-panel-header-icon") : null,
   hasTitles ? h("div", { class: pc("titles") },
     props.title != null ? h(props.titleAs ?? (foot ? "span" : "h3"), { class: pc("title"), id: props.titleId }, () => val(props.title)) : null,
-    props.subtitle != null ? h("p", { class: pc("subtitle") }, () => val(props.subtitle)) : null) : null,
-  props.meta != null ? h("span", { class: pc("meta") }, () => val(props.meta)) : null,
+    has(props.subtitle) ? h("p", { class: pc("subtitle") }, () => val(props.subtitle)) : null) : null,
+  has(props.meta) ? h("span", { class: pc("meta") }, () => val(props.meta)) : null,
   props.children != null ? h("div", { class: "m-panel-header-body" }, props.children) : null,
-  props.actions != null ? h("div", { class: pc("actions") }, () => val(props.actions)) : null,
+  has(props.actions) ? h("div", { class: pc("actions") }, () => val(props.actions)) : null,
   showClose ? h(IconButton, {
     class: "m-panel-header-close", size: () => (val(props.size) === "lg" ? undefined : "sm"), icon: own ? props.close : glyph(xIcon), label: () => val(props.closeLabel) ?? t`Close`,
     onClick: (e: MouseEvent) => { e.stopPropagation(); props.onClose?.(e); }, onPointerDown: (e: Event) => e.stopPropagation(),

@@ -24,7 +24,9 @@ export default definePlayground<Values>({
     { key: "value", label: "Etkin sekme (value)", default: "home", options: [{ value: "home", label: "Akış" }, { value: "explore", label: "Keşfet" }, { value: "me", label: "Profil" }] },
     { key: "count", label: "Sekme sayısı", default: 4, kind: "segmented", options: [{ value: 3, label: "3" }, { value: 4, label: "4" }, { value: 5, label: "5" }, { value: 6, label: "6" }], prop: "items", toCode: itemsCode },
     { key: "create", label: "Ortada Oluştur düğmesi", default: true, prop: "createActions", toCode: (on, v) => (on && v.menu !== "none" ? `{${JSON.stringify(ACTIONS)}}` : null) },
-    { key: "menu", label: "Oluştur menüsü", default: "fan", kind: "cards", options: [{ value: "none", label: "yok (tek eylem)" }, { value: "fan", label: "yelpaze" }, { value: "stack", label: "yığın" }, { value: "sheet", label: "alt sayfa" }], prop: "createMenu", toCode: { none: null, fan: '"fan"', stack: '"stack"', sheet: '"sheet"' } },
+    { key: "menu", label: "Oluştur menüsü", default: "fan", kind: "cards", options: [{ value: "none", label: "yok (tek eylem)" }, { value: "fan", label: "yelpaze" }, { value: "stack", label: "yığın" }, { value: "sheet", label: "alt sayfa" }], prop: "createMenu", toCode: { none: null, fan: '"fan"', stack: '"stack"', sheet: '"sheet"' },
+      // MarchIDE: "none" is an empty action list (the Create button runs onCreate, no menu), also on an instance whose code lists actions
+      toProps: (x, v) => (x === "none" ? (v.create ? { createActions: [] } : {}) : { createMenu: x }) },
     { key: "labels", label: "Etiketler", default: true },
     { key: "badges", label: "Rozetler", default: true, prop: "items", toCode: itemsCode },
     { key: "variant", label: "Görünüm", default: "floating", kind: "cards", options: [{ value: "floating", label: "yüzen" }, { value: "flat", label: "düz" }] },

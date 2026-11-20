@@ -16,6 +16,7 @@ export default definePlayground<Values>({
     { key: "ring", label: "Halka", default: true, visibleWhen: (v) => v.burst, prop: "burstOptions", toCode: { true: null, false: "{{ ring: false }}" }, toProp: (x) => (x ? undefined : { ring: false }) },
     { key: "colors", label: "Parçacık rengi", default: "brand", options: [{ value: "brand", label: "dört HADİ rengi" }, { value: "single", label: "kalp rengi" }], visibleWhen: (v) => v.burst },
     { key: "color", label: "Kalp rengi", default: "brand-pink", options: [{ value: "brand-pink", label: "pembe" }, { value: "brand-orange", label: "turuncu" }, { value: "brand-purple", label: "mor" }, { value: "danger", label: "kırmızı" }], prop: "m:color" },
-    { key: "count", label: "Sayaç", default: true, toProp: (x) => (x ? 128 : undefined), toCode: { true: "{$likes}", false: null } },
+    // off: 0, which the count hides (MarchIDE leaves undefined out, so an instance's own count would stay)
+    { key: "count", label: "Sayaç", default: true, toProp: (x) => (x ? 128 : 0), toCode: { true: "{$likes}", false: null } },
   ],
 });

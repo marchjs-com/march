@@ -9,7 +9,9 @@ export default definePlayground<Values>({
     // a filter chip is a Chip with `selected`: the raw component gets selected={true} for it ("remove" needs onRemove:
     // a function, written in code, demo.tsx draws it)
     { key: "mode", label: "Tür", default: "toggle", prop: "selected", options: [{ value: "static", label: "düz" }, { value: "toggle", label: "süzgeç" }, { value: "remove", label: "kaldırılabilir" }],
-      toCode: { static: null, toggle: "{true}", remove: null } },
+      toCode: { static: null, toggle: "{true}", remove: null },
+      // MarchIDE: "remove" gives the chip a no-op onRemove, so its × shows on the raw component and on an instance
+      toProps: (x) => (x === "toggle" ? { selected: true } : x === "remove" ? { onRemove: () => undefined } : {}) },
     { key: "tone", label: "Ton", default: "neutral", options: ["neutral", "primary", "success", "warn", "danger", "info"] },
     { key: "size", label: "Boyut", default: "md", options: ["sm", "md"] },
     // icon names (MarchIDE's icon picker passes the name on to the raw component); empty: no icon
