@@ -1,5 +1,13 @@
 {
  "components": {
+  "ActivityBar": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/navigation/activity-bar",
+    "examples/showcase/public/components/activity-bar/ide.json"
+   ],
+   "hash": "119559d7e2553fb828008d6001f76bcd"
+  },
   "Alert": {
    "frozen": "2026-11-20",
    "paths": [
