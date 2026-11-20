@@ -160,6 +160,14 @@
    ],
    "hash": "a152fb6a0ff62f1710a346339750845c"
   },
+  "MarkdownEditor": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/composite/markdown-editor",
+    "examples/showcase/public/components/markdown/ide.json"
+   ],
+   "hash": "21024992bd95aa0d4bacb6ead4fff148"
+  },
   "Menu": {
    "frozen": "2026-11-20",
    "paths": [
