@@ -12,8 +12,8 @@
   --m-glow-1: rgb(99 102 241 / .75); --m-glow-2: rgb(168 85 247 / .55); --m-glow-3: rgb(14 165 233 / .45); --m-glow-4: rgb(236 72 153 / .35);
   --m-shadow-rgb: 16 24 40; --m-overlay: rgb(10 14 24 / .42);
   --m-special: #EC4899;
-  --m-primary-text: #4F46E5; --m-info-text: #0369A1; --m-success-text: #15803D; --m-warn-text: #B45309; --m-danger-text: #D42A2F;
-  --m-special-text: #C93D82;
+  --m-primary-text: #4F46E5; --m-info-text: #0369A1; --m-success-text: #147A3A; --m-warn-text: #AB4F09; --m-danger-text: #C9282D;
+  --m-special-text: #B13673;
   --m-on-primary-fill: #FFFFFF;
   --m-on-info-fill: #FFFFFF; --m-on-success-fill: #FFFFFF; --m-on-warn-fill: #FFFFFF; --m-on-danger-fill: #FFFFFF;
   --m-on-special-fill: #FFFFFF;

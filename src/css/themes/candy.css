@@ -12,8 +12,8 @@
   --m-glow-1: color-mix(in srgb, #FF5CAD 70%, transparent); --m-glow-2: color-mix(in srgb, #B07CFF 55%, transparent); --m-glow-3: color-mix(in srgb, #3EC9F0 50%, transparent); --m-glow-4: color-mix(in srgb, #FFC53D 35%, transparent);
   --m-shadow-rgb: 16 24 40; --m-overlay: rgb(10 14 24 / .42);
   --m-special: #7C5CFF;
-  --m-primary-text: #C92F90; --m-info-text: #326FD1; --m-success-text: #1A855B; --m-warn-text: #AA6600; --m-danger-text: #D93654;
-  --m-special-text: #7657F2;
+  --m-primary-text: #B52A82; --m-info-text: #2F68C5; --m-success-text: #177650; --m-warn-text: #985B00; --m-danger-text: #C3314C;
+  --m-special-text: #694ED9;
   --m-on-primary-fill: #FFFFFF;
   --m-on-info-fill: #FFFFFF; --m-on-success-fill: #FFFFFF; --m-on-warn-fill: #FFFFFF; --m-on-danger-fill: #FFFFFF;
   --m-on-special-fill: #FFFFFF;

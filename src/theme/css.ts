@@ -192,8 +192,10 @@ function modeVars(c: ThemeColors, mode: "light" | "dark", st?: ThemeStyle): stri
     `--m-special: ${c.special ?? c.cat[3]};`,
     // text tones: the color shaded until it reads as text on the surface (AA). Fills, lines, icons and indicators use the
     // pure color above; only text uses these.
-    (["primary", "info", "success", "warn", "danger"] as const).map((k) => `--m-${k}-text: ${ensureContrast(c[k], c.surface)};`).join(" "),
-    `--m-special-text: ${ensureContrast(c.special ?? c.cat[3] ?? c.primary, c.surface)};`,
+    // tone text reads on the surface and on its own soft tint (a Badge, an Alert: --m-*-soft is ~11% of the tone over
+    // the surface): AA 4.5:1 on the tint, which is the harder of the two
+    (["primary", "info", "success", "warn", "danger"] as const).map((k) => `--m-${k}-text: ${ensureContrast(c[k], mix(c.surface, c[k], 0.12))};`).join(" "),
+    `--m-special-text: ${ensureContrast(c.special ?? c.cat[3] ?? c.primary, mix(c.surface, c.special ?? c.cat[3] ?? c.primary, 0.12))};`,
     // text on a fill of the pure primary color (selected day, step number…): white when it reaches the brand minimum
     `--m-on-primary-fill: ${onBrandFill(c.primary)};`,
     (["info", "success", "warn", "danger"] as const).map((k) => `--m-on-${k}-fill: ${onBrandFill(c[k])};`).join(" "),

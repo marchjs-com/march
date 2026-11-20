@@ -12,7 +12,7 @@
   --m-glow-1: rgb(242 128 31 / .7); --m-glow-2: rgb(29 154 214 / .6); --m-glow-3: rgb(120 190 58 / .45); --m-glow-4: rgb(163 51 140 / .55);
   --m-shadow-rgb: 16 24 40; --m-overlay: rgb(10 14 24 / .42);
   --m-special: #A3338C;
-  --m-primary-text: #A95A16; --m-info-text: #177BAB; --m-success-text: #4E7C26; --m-warn-text: #8D6E26; --m-danger-text: #D24444;
+  --m-primary-text: #9D5314; --m-info-text: #1674A1; --m-success-text: #487223; --m-warn-text: #826523; --m-danger-text: #BD3D3D;
   --m-special-text: #A3338C;
   --m-on-primary-fill: #FFFFFF;
   --m-on-info-fill: #FFFFFF; --m-on-success-fill: #14181F; --m-on-warn-fill: #14181F; --m-on-danger-fill: #FFFFFF;
@@ -40,8 +40,8 @@
   --m-glow-1: rgb(242 128 31 / .7); --m-glow-2: rgb(29 154 214 / .6); --m-glow-3: rgb(120 190 58 / .45); --m-glow-4: rgb(163 51 140 / .55);
   --m-shadow-rgb: 0 0 0; --m-overlay: rgb(0 0 0 / .62);
   --m-special: #C95BB5;
-  --m-primary-text: #F2801F; --m-info-text: #1D9AD6; --m-success-text: #78BE3A; --m-warn-text: #D9A93A; --m-danger-text: #D96060;
-  --m-special-text: #CC63B9;
+  --m-primary-text: #F2801F; --m-info-text: #289FD8; --m-success-text: #78BE3A; --m-warn-text: #D9A93A; --m-danger-text: #DD7373;
+  --m-special-text: #D174C0;
   --m-on-primary-fill: #FFFFFF;
   --m-on-info-fill: #FFFFFF; --m-on-success-fill: #14181F; --m-on-warn-fill: #14181F; --m-on-danger-fill: #FFFFFF;
   --m-on-special-fill: #FFFFFF;
@@ -71,8 +71,8 @@
   --m-glow-1: rgb(242 128 31 / .7); --m-glow-2: rgb(29 154 214 / .6); --m-glow-3: rgb(120 190 58 / .45); --m-glow-4: rgb(163 51 140 / .55);
   --m-shadow-rgb: 0 0 0; --m-overlay: rgb(0 0 0 / .62);
   --m-special: #C95BB5;
-  --m-primary-text: #F2801F; --m-info-text: #1D9AD6; --m-success-text: #78BE3A; --m-warn-text: #D9A93A; --m-danger-text: #D96060;
-  --m-special-text: #CC63B9;
+  --m-primary-text: #F2801F; --m-info-text: #289FD8; --m-success-text: #78BE3A; --m-warn-text: #D9A93A; --m-danger-text: #DD7373;
+  --m-special-text: #D174C0;
   --m-on-primary-fill: #FFFFFF;
   --m-on-info-fill: #FFFFFF; --m-on-success-fill: #14181F; --m-on-warn-fill: #14181F; --m-on-danger-fill: #FFFFFF;
   --m-on-special-fill: #FFFFFF;

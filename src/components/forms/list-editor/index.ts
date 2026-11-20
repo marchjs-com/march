@@ -1,7 +1,8 @@
 // ListEditor: edit an array of strings (add, remove, reorder; pasting lines adds one item per line).
 import "./list-editor.css";
 import "../../../ui/field.css";
-import { untrack, type Accessor } from "../../../core/reactive.ts";
+import { untrack, onCleanup, getOwner, type Accessor } from "../../../core/reactive.ts";
+import { frame } from "../../../motion/env.ts";
 import { h } from "../../../dom/h.ts";
 import { For } from "../../../dom/for.ts";
 import { t } from "../../../core/i18n.ts";
@@ -50,10 +51,16 @@ export function ListEditor(props: ListEditorProps): unknown {
   // the draft line is the field's control (id, aria-invalid, aria-describedby come from the enclosing <Field>)
   let draft!: HTMLInputElement;
   const inField = !!useField();
+  const offs: (() => void)[] = [];
+  if (getOwner()) onCleanup(() => { for (const f of offs) f(); });
   const draftInput = h(TextInput, {
     // inside a Field its label names the draft line; alone it is named by aria-label, else by what it does
     id: props.id, "aria-label": live(() => props["aria-label"] ?? (inField ? null : props.placeholder ?? t`Add an item`)), placeholder: live(() => props.placeholder ?? t`Add an item`), disabled: live(() => ro() || full()), invalid: live(() => props.invalid), describedby: live(() => props.describedby),
-    onBlur: props.onBlur, ref: (el: HTMLInputElement) => { draft = el; },
+    onBlur: props.onBlur, ref: (el: HTMLInputElement) => {
+      draft = el;
+      // in a Field drawn as a group (its label is not a <label for>) the line has no name of its own: what it does names it
+      if (inField) offs.push(frame(() => { if (!el.labels?.length && !el.hasAttribute("aria-label")) el.setAttribute("aria-label", props.placeholder ?? t`Add an item`); }));
+    },
     onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter") { e.preventDefault(); const v = draft.value.trim(); if (v) { add([v]); draft.value = ""; } } },
     onPaste: (e: ClipboardEvent) => { const lines = splitLines(e.clipboardData?.getData("text")); if (lines.length > 1) { e.preventDefault(); add(lines); draft.value = ""; } },
   });
