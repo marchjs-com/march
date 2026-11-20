@@ -1496,6 +1496,14 @@
    ],
    "hash": "cc7e2333f506538dac056bed8252a63a"
   },
+  "VideoBackground": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/landing/video-background",
+    "examples/showcase/public/components/video-background/ide.json"
+   ],
+   "hash": "4333f87b3941816469f81098e374b3e3"
+  },
   "VirtualList": {
    "frozen": "2026-11-20",
    "paths": [
