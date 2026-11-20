@@ -40,6 +40,14 @@
    ],
    "hash": "1449a656cbb1e817dda77ab0ab37e7bc"
   },
+  "MadeWithMarch": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/actions/made-with-march",
+    "examples/showcase/public/components/made-with-march/ide.json"
+   ],
+   "hash": "a152fb6a0ff62f1710a346339750845c"
+  },
   "Scheduler": {
    "frozen": "2026-11-20",
    "paths": [
