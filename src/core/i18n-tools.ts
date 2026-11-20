@@ -1,7 +1,7 @@
 // i18n tools apps call rarely (diagnostics, set-up, typed catalogs): their own module, so the start-up chunk carries
 // only t, locale, dir, setLocale, loadLocale and messages (core/i18n.ts).
 import { untrack } from "./reactive.ts";
-import { dicts, missingKeys, fallback, t } from "./i18n.ts";
+import { dicts, missingKeys, fallback, t, messages } from "./i18n.ts";
 
 /** Key a tagged template produces (compiler and tests). */
 export const tKey = (strings: readonly string[]): string => strings.reduce((acc, s, i) => acc + s + (i < strings.length - 1 ? `{${i}}` : ""), "");
@@ -28,4 +28,13 @@ type Args<S extends string> = [VarsOf<S>] extends [never] ? [] : [vars: { [K in 
 /** Typed translator for a catalog: keys must exist and every variable must be passed. */
 export function typed<M extends Record<string, string>>(): <K extends keyof M & string>(key: K, ...args: Args<M[K]>) => string {
   return (key, ...args) => t(key, (args[0] ?? {}) as Record<string, unknown>);
+}
+
+/** Take keys out of a locale's messages (their text falls back to the key); returns what was there, to put back with `messages(loc, removed)`. */
+export function removeMessages(loc: string, keys: Iterable<string>): Record<string, string> {
+  const d = dicts.get(loc), out: Record<string, string> = {};
+  if (d) for (const k of keys) if (k in d) { out[k] = d[k]!; delete d[k]; }
+  // what is shown follows (as after messages())
+  messages(loc, {});
+  return out;
 }

@@ -896,6 +896,7 @@
   "dismiss": "`el` (ve `inside`) dışındaki basışları ve Escape tuşunu izler. Durdurma işlevini döndürür (geçerli sahiple de çalışır)."
  },
  "march/i18n": {
+  "removeMessages": "Bir dilin iletilerinden anahtarları çıkarır (metinleri anahtara düşer); çıkanları döndürür, messages(loc, çıkanlar) geri koyar.",
   "dir": "Etkin dilin metin yönü (sinyal).",
   "format": "ICU biçimli bir iletiyi değerlerle biçimlendirir. Kesme işaretleri olduğu gibidir (ICU tırnaklaması yok: Türkçe/İngilizce metinler bunları kullanır). {x}, {n, plural, …} (#, =N ile, offset yok), {s, select, …}, {n, number[, …} desteklenir.",
   "loadLocale": "Tembel bir paket kaydeder: `setLocale(loc)` ilk çağrıldığında yüklenir.",
