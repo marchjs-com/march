@@ -726,7 +726,7 @@
     "src/components/forms/list-editor",
     "examples/showcase/public/components/list-editor/ide.json"
    ],
-   "hash": "b42a590054477d900db2c8ad4c44a916"
+   "hash": "bff13c7a76ae327e515d7608f8173e2a"
   },
   "ListRow": {
    "frozen": "2026-11-20",
@@ -1647,6 +1647,12 @@
    "name": "Checkbox",
    "what": "refresh",
    "reason": "Tek kart görünümü bir satırda en dar boyuna sıkışıp işaret etiketin üstüne biniyordu: okunur bir en az genişlik"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "ListEditor",
+   "what": "refresh",
+   "reason": "Satırlar tutamağından sürüklenerek sıralanır (fare, dokunma, kalem); Escape geri alır"
   }
  ]
 }
