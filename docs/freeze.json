@@ -168,6 +168,14 @@
    ],
    "hash": "71e9b8c77f946124564780e34543b86b"
   },
+  "DatePicker": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/date-picker",
+    "examples/showcase/public/components/date/ide.json"
+   ],
+   "hash": "f28d342b3ad8d2e2693377999e74b18c"
+  },
   "Debugger": {
    "frozen": "2026-11-20",
    "paths": [
