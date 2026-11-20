@@ -520,6 +520,14 @@
    ],
    "hash": "0912b56a198a174b2b3a00fc4766f793"
   },
+  "PullToRefresh": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/feedback/pull-to-refresh",
+    "examples/showcase/public/components/pull-to-refresh/ide.json"
+   ],
+   "hash": "0752b6b41fa58e474513349b06d8a3e2"
+  },
   "RadioGroup": {
    "frozen": "2026-11-20",
    "paths": [
