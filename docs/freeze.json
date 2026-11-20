@@ -664,6 +664,14 @@
    ],
    "hash": "1cd8aa351b0943d4b1290dbf7181bd87"
   },
+  "Stepper": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/navigation/stepper",
+    "examples/showcase/public/components/stepper/ide.json"
+   ],
+   "hash": "987dbd22f4945908d22cacacd18d9616"
+  },
   "Swatch": {
    "frozen": "2026-11-20",
    "paths": [
