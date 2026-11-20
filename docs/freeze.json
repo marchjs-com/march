@@ -248,6 +248,14 @@
    ],
    "hash": "3e8ff9cb99be03e642fb2ad063a7352b"
   },
+  "CountRoll": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/social/count-roll",
+    "examples/showcase/public/components/count-roll/ide.json"
+   ],
+   "hash": "52c4428ceab7cbc2b9874d78b5933d20"
+  },
   "DataGrid": {
    "frozen": "2026-11-20",
    "paths": [
