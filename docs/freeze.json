@@ -560,6 +560,14 @@
    ],
    "hash": "9bbb0e68edab4bbaf9c8b00957878d17"
   },
+  "Slider": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/slider",
+    "examples/showcase/public/components/slider/ide.json"
+   ],
+   "hash": "30f587e754396774b92f9d8b8b43bca8"
+  },
   "Spinner": {
    "frozen": "2026-11-20",
    "paths": [
