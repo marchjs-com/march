@@ -1056,6 +1056,14 @@
    ],
    "hash": "cc7e2333f506538dac056bed8252a63a"
   },
+  "VirtualList": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/data/virtual-list",
+    "examples/showcase/public/components/virtual-list/ide.json"
+   ],
+   "hash": "15399411e35a8987df55389d0d7cc6d3"
+  },
   "Wizard": {
    "frozen": "2026-11-20",
    "paths": [
