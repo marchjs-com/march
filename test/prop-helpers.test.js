@@ -63,3 +63,14 @@ test("iconNameRows: March's names bare, packs' as pack:name; \"lucide:\" narrows
   assert.deepEqual(iconNameRows("icon", "lucide:h", sets).map((r) => r.label), ["lucide:heart", "lucide:heart-crack", "lucide:house"]);
   assert.deepEqual(iconNameRows("icon", "march:ho", sets).map((r) => r.label), ["home"]);
 });
+
+test("tagPlace: an HTML element's prop braces (sx on a <div>) are a place too; its props, generics and comparisons are not", () => {
+  const p = tagPlace(`export function A() {\n  return <div sx={{ te`);
+  assert.equal(p?.at, "code");
+  assert.equal(p?.comp, "div");
+  assert.equal(p?.prop, "sx");
+  assert.equal(tagPlace(`return <div cla`), null, "between an element's props the language service answers");
+  assert.equal(tagPlace(`const xs: Array<string> = [`), null);
+  assert.equal(tagPlace(`if (i<n && `), null);
+  assert.equal(tagPlace(`return <Button sx={{ gap: 2, te`)?.comp, "Button", "components as before");
+});
