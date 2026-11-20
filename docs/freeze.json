@@ -352,6 +352,14 @@
    ],
    "hash": "3d89d5f3ba1602d5c36dabaa5605d1ff"
   },
+  "KeyValueEditor": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/key-value-editor",
+    "examples/showcase/public/components/key-value-editor/ide.json"
+   ],
+   "hash": "5c2ee142d1de5b645eac276367432868"
+  },
   "LinkCard": {
    "frozen": "2026-11-20",
    "paths": [
