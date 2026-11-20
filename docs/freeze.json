@@ -190,7 +190,7 @@
     "src/components/forms/checkbox",
     "examples/showcase/public/components/checkbox/ide.json"
    ],
-   "hash": "59b0245e812e9090105b935bfcbe474e"
+   "hash": "1051134157d27d37adf8315b259429aa"
   },
   "CheckboxGroup": {
    "frozen": "2026-11-20",
@@ -1641,6 +1641,12 @@
    "name": "ChoicePicker",
    "what": "refresh",
    "reason": "Lab'daki renk damlaları dolu ve kutunun ortasında"
+  },
+  {
+   "at": "2026-11-20",
+   "name": "Checkbox",
+   "what": "refresh",
+   "reason": "Tek kart görünümü bir satırda en dar boyuna sıkışıp işaret etiketin üstüne biniyordu: okunur bir en az genişlik"
   }
  ]
 }
