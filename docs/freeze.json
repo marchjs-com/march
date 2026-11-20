@@ -440,6 +440,14 @@
    ],
    "hash": "0cdfb42ffcd43c5f179ebcda54d53d9f"
   },
+  "PasswordInput": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/password-input",
+    "examples/showcase/public/components/password/ide.json"
+   ],
+   "hash": "1265aa45d790b52949fcc238bf84d8f2"
+  },
   "Progress": {
    "frozen": "2026-11-20",
    "paths": [
