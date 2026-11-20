@@ -16,6 +16,14 @@
    ],
    "hash": "5bcc8e743dd961b657481ad0fe5a6deb"
   },
+  "AppShell": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/layout/app-shell",
+    "examples/showcase/public/components/app-shell/ide.json"
+   ],
+   "hash": "e20be0b352f1222fb4fff01e53afd220"
+  },
   "Avatar": {
    "frozen": "2026-11-20",
    "paths": [
