@@ -280,6 +280,14 @@
    ],
    "hash": "1449a656cbb1e817dda77ab0ab37e7bc"
   },
+  "IconPicker": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/forms/icon-picker",
+    "examples/showcase/public/components/icon-picker/ide.json"
+   ],
+   "hash": "2d38f7851031b66230b863e46f679500"
+  },
   "IconTile": {
    "frozen": "2026-11-20",
    "paths": [
