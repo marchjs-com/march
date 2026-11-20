@@ -440,6 +440,14 @@
    ],
    "hash": "9d4088ef8d9d39b56a5787cedc8a2247"
   },
+  "NavMenu": {
+   "frozen": "2026-11-20",
+   "paths": [
+    "src/components/navigation/nav-menu",
+    "examples/showcase/public/components/nav-menu/ide.json"
+   ],
+   "hash": "0a8a38d57a81c8c8c06be492bf523cfa"
+  },
   "NumberInput": {
    "frozen": "2026-11-20",
    "paths": [
