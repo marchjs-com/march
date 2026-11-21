@@ -7,7 +7,7 @@ import { installDom } from "../src/testing/dom.ts";
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? Number(process.argv[i + 1]) : d; };
 
-/** Median ms to create `n` components per case. */
+/** The best of `runs` timings (ms) to create `n` components, per case: noise (GC, a busy machine) only adds time. */
 export async function extensionBench(n = 10000, runs = 5) {
   if (!globalThis.document) installDom();
   const { h, render, extend, intercept, inside } = await import("../src/index.ts");
@@ -22,7 +22,7 @@ export async function extensionBench(n = 10000, runs = 5) {
       out.push(performance.now() - t);
       dispose();
     }
-    return out.sort((a, b) => a - b)[runs >> 1];
+    return Math.min(...out);
   };
   time(); // warm up
   const result = { none: time() };

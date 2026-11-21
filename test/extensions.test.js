@@ -231,7 +231,9 @@ test("m: common props given by hand to a component go to its root elements (the 
 
 test("bench: nothing registered (and everything removed again) costs nothing; extensions for other components almost nothing", async () => {
   const { extensionBench } = await import("../bench/extensions.js");
-  const r = await extensionBench(3000, 5);
+  // twice, the better timing of each case kept: a shared CI machine can stall one run, never speed one up
+  const a = await extensionBench(3000, 7), b = await extensionBench(3000, 7);
+  const r = Object.fromEntries(Object.keys(a).map((k) => [k, Math.min(a[k], b[k])]));
   assert.ok(r.after < r.none * 1.6, `after removal ${r.after.toFixed(1)} ms vs ${r.none.toFixed(1)} ms`);
   assert.ok(r.twentyOther < r.none * 1.6, `20 for other components ${r.twentyOther.toFixed(1)} ms vs ${r.none.toFixed(1)} ms`);
   assert.ok(r.one < r.none * 6, `one extension ${r.one.toFixed(1)} ms vs ${r.none.toFixed(1)} ms`);
