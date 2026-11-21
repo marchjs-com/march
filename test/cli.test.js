@@ -184,7 +184,8 @@ test("march build --stable-names: hash-free names, ?v= versions everywhere, dete
     const files = () => { const out = new Map(); const walk = (d) => { for (const f of readdirSync(d, { withFileTypes: true })) { const p = join(d, f.name); if (f.isDirectory()) walk(p); else out.set(p.slice(dir.length), readFileSync(p, "utf8")); } }; walk(join(dir, "dist")); return out; };
     execFileSync(process.execPath, [CLI, "build"], { cwd: dir, stdio: "pipe" });
     const one = files();
-    for (const p of one.keys()) for (const seg of p.split(/[\/]/).filter(Boolean)) assert.doesNotMatch(seg, /^[_.]/, `${p}: no name starts with _ or .`);
+    // path segments on both separators; the host files (_headers, _redirects) are written for the host on purpose
+    for (const p of one.keys()) for (const seg of p.split(/[\\/]/).filter(Boolean)) if (!/^_(headers|redirects)$/.test(seg)) assert.doesNotMatch(seg, /^[_.]/, `${p}: no name starts with _ or .`);
     for (const p of one.keys()) if (/\.(js|css)$/.test(p)) assert.doesNotMatch(p, /-[A-Z0-9]{8}\.(js|css)$/, `${p} has no hash in its name`);
     const html = one.get([...one.keys()].find((p) => p.endsWith("index.html")));
     assert.match(html, /src="\.\/assets\/main\.js\?v=[A-Z0-9]{6}"/);

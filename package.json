@@ -1,6 +1,6 @@
 {
   "name": "march",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "homepage": "https://github.com/marchjs-com/march",
   "repository": { "type": "git", "url": "git+https://github.com/marchjs-com/march.git" },
   "bugs": { "url": "https://github.com/marchjs-com/march/issues" },
@@ -145,6 +145,7 @@
     "sizes": "node tools/gen-export-sizes.js",
     "build:lib": "node tools/build-lib.js",
     "build:cdn": "node tools/build-cdn.js",
+    "deploy:cdn": "node tools/cdn-deploy.js",
     "build:showcase": "node examples/showcase/build.mjs",
     "build:showcase:release": "node examples/showcase/build.mjs --release",
     "audit:controls": "node tools/control-audit.mjs",

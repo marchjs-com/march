@@ -20,7 +20,7 @@ const rel = (p) => relative(ROOT, p).replace(/\\/g, "/");
 function filesOf(abs) {
   if (!existsSync(abs)) return [];
   if (!statSync(abs).isDirectory()) return [abs];
-  return readdirSync(abs, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))
+  return readdirSync(abs, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name, "en"))
     .flatMap((d) => filesOf(join(abs, d.name)));
 }
 /** The digest of a component's tracked paths: each file's path and text (line ends made LF, so a checkout's
@@ -35,7 +35,7 @@ export function digest(paths) {
 }
 export const readRecord = () => (existsSync(RECORD) ? JSON.parse(readFileSync(RECORD, "utf8")) : { components: {}, log: [] });
 const writeRecord = (r) => {
-  const sorted = Object.fromEntries(Object.entries(r.components).sort(([a], [b]) => a.localeCompare(b)));
+  const sorted = Object.fromEntries(Object.entries(r.components).sort(([a], [b]) => a.localeCompare(b, "en")));
   writeFileSync(RECORD, `${JSON.stringify({ ...r, components: sorted }, null, 1)}\n`);
 };
 

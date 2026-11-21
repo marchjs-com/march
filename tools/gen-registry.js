@@ -49,7 +49,7 @@ export async function components(root = ROOT) {
       out.push({ folder: `${top}/${name}`, category: top, name, meta, files: readdirSync(q), docs: existsSync(join(q, "docs.md")) ? readFileSync(join(q, "docs.md"), "utf8") : "" });
     }
   }
-  out.sort((a, b) => a.name.localeCompare(b.name));
+  out.sort((a, b) => a.name.localeCompare(b.name, "en"));
   return Object.assign(out, { stray });
 }
 
@@ -74,7 +74,7 @@ const exportedNames = (src) => {
 const explicitExports = (root, list, path) => {
   const seen = new Map();
   const lines = [];
-  for (const c of [...list].sort((a, b) => a.folder.localeCompare(b.folder))) {
+  for (const c of [...list].sort((a, b) => a.folder.localeCompare(b.folder, "en"))) {
     const file = join(root, "src/components", c.folder, "index.ts");
     if (!existsSync(file)) continue;
     for (const [name, isType] of exportedNames(readFileSync(file, "utf8"))) {

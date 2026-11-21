@@ -123,7 +123,7 @@ export function packageApis(root = ROOT) {
   const out = [];
   for (const [sub, target] of packageEntries(root)) {
     if (/^\.\/(compiler|esbuild|register|testing)$/.test(sub)) continue;
-    const names = [...runtimeExports(join(root, target))].sort(([a], [b]) => a.localeCompare(b));
+    const names = [...runtimeExports(join(root, target))].sort(([a], [b]) => a.localeCompare(b, "en"));
     out.push({
       subpath: sub === "." ? "march" : `march/${sub.slice(2)}`,
       items: names.map(([name, at]) => {

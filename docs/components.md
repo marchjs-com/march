@@ -551,12 +551,12 @@ Full page: src/components/data/card/docs.md
 
 ## Carousel
 
-
+A row of slides that scrolls and snaps: one to four per view on wide screens (a slide and a peek of the next on phones), previous / next buttons that hide at the ends, and a dot per position. Touch users swipe; the track is keyboard scrollable.
 
 Composed of: [IconButton](#iconbutton), [PageDots](#pagedots)
 
 ```tsx
-
+<Carousel perView={3} label="Features">{items.map((x) => <FeatureCard {...x} />)}</Carousel>
 ```
 
 Full page: src/components/media/carousel/docs.md
@@ -998,12 +998,12 @@ Full page: src/components/layout/device-preview/docs.md
 
 ## Dialog
 
-
+A modal window over the page. Declarative: `<Dialog open={…} onClose={…}>`; imperative: `openDialog(render)` and `openDrawer(render)` return a promise that resolves with the value passed to `close(value)`. `confirm`, `prompt` and `askReason` are ready-made dialogs; `closeAll()` and `openDialogs()` manage the stack.
 
 Composed of: Portal, [PanelHeader](#panelheader), [IconButton](#iconbutton), [Button](#button), Field, [TextInput](#textinput), [Textarea](#textarea), [Select](#select), [Drawer](#drawer)
 
 ```tsx
-
+<Dialog open={$open} onClose={() => $open = false} title="Invite" footer={<Button variant="primary">Send</Button>}>…</Dialog>
 ```
 
 Full page: src/components/overlays/dialog/docs.md
@@ -2478,10 +2478,10 @@ Full page: src/components/navigation/section-timeline/docs.md
 
 ## Segmented
 
-
+A compact single choice: joined buttons, the chosen one raised. Use it for 2–6 short options (view modes, units, periods). Arrow keys move and select; only the chosen button is in the Tab order.
 
 ```tsx
-
+<Segmented bind:value={$view} options={[{ value: "list", label: "List" }, { value: "grid", label: "Grid" }]} aria-label="View" />
 ```
 
 Full page: src/components/forms/segmented/docs.md

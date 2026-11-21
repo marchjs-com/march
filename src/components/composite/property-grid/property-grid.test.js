@@ -4,6 +4,8 @@ import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal } = await import("../../../index.ts");
 const { PropertyGrid } = await import("./index.ts");
+// the undo labels are checked in Turkish, whatever the machine's language
+(await import("../../../core/i18n.ts")).locale.set("tr");
 const { undoStack } = await import("../../../managers/undo/index.ts");
 const { dirtyState } = await import("../../../managers/dirty/index.ts");
 const tick = () => new Promise((r) => setTimeout(r, 0));

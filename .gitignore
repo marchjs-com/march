@@ -7,8 +7,7 @@ dist/
 docs/internal/
 .claude/
 CLAUDE.md
-cdn/
-tools/cdn-deploy.js
+cdn/dist/
 tools/cdn-usage.js
 # generated: the March type check's working copy
 examples/showcase/.march/
