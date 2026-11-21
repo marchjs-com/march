@@ -54,12 +54,21 @@ test("march build --watch: a change is rebuilt (only changed files written), the
   });
   try {
     await until(/watching/);
-    writeFileSync(join(dir, "src/pages/about.jsx"), "export default function About() { return <p>rebuilt-marker</p> }\n");
+    // a change event can come while the write is still under way and the watcher then rebuilds the old bytes (seen on
+    // Linux CI); nothing changes after that, so the page is edited again (new bytes, a new event) until it lands
+    const edit = (n) => writeFileSync(join(dir, "src/pages/about.jsx"), `export default function About() { return <p>rebuilt-marker</p> }\n// edit ${n}\n`);
+    edit(1);
     // (esbuild's watcher may report a rebuild of its own first: wait for the new text to land)
     const chunks = join(dir, "dist/assets/chunks");
     const has = () => readdirSync(chunks).some((f) => { try { return readFileSync(join(chunks, f), "utf8").includes("rebuilt-marker"); } catch { return false; } });
     const t0 = Date.now();
-    while (!has() && Date.now() - t0 < 30000) await new Promise((r) => setTimeout(r, 50));
+    let edits = 1;
+    while (!has() && Date.now() - t0 < 30000) {
+      // after 5 s and 15 s without the new text: edit once more (the watcher must still rebuild it)
+      const next = [0, 5000, 15000][edits];
+      if (next !== undefined && Date.now() - t0 > next) edit(++edits);
+      await new Promise((r) => setTimeout(r, 50));
+    }
     assert.ok(has(), `the edit was rebuilt: ${log}`);
     assert.match(log, /rebuilt dist \(dev\)/);
   } finally {
