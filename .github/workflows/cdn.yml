@@ -1,6 +1,7 @@
 # cdn.marchjs.com: every merge to main that passes ci is published as a new version, and latest/ moves to it.
 # The version: package.json's when it is not out yet (a PR raised it), else the next patch (tools/cdn-version.js). The
-# merge commit is tagged v<version>. Secrets: CLOUDFLARE_API_TOKEN (Edit Cloudflare Workers) and CLOUDFLARE_ACCOUNT_ID.
+# release is tagged v<version> (a commit on top of the merge with the version written in).
+# Secrets: CLOUDFLARE_API_TOKEN (Edit Cloudflare Workers) and CLOUDFLARE_ACCOUNT_ID.
 name: cdn
 on:
   workflow_run:
@@ -44,8 +45,14 @@ jobs:
             sleep 10
           done
           echo "cdn.marchjs.com does not show $v yet (latest: $got)"; exit 1
+      # the tag is a release commit on top of the merge (off main): package.json and src/index.ts carry the version, so
+      # installing github:marchjs-com/march#v<version> gets code that knows its own version
       - name: tag the release
         run: |
           v="v${{ steps.v.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # a PR that raised the version itself leaves nothing to write: the merge commit is the release then
+          git diff --quiet -- package.json src/index.ts || git commit -q -m "Release $v" -- package.json src/index.ts
           git tag "$v"
           git push origin "$v"
