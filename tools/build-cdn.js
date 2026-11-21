@@ -6,11 +6,13 @@
 //   css/…            the stylesheets the package exports as files (tokens.css, themes/…)
 //   importmap.json   { imports: { "march": ".../march.js", "march/ui": ".../ui.js", … } } with absolute URLs
 //   files.json       every file of the version (a deploy uses it to keep the older versions)
+//   data/…           the version's data: API reference, MarchIDE types, components (tools/cdn-data.mjs)
 // and the same files again in cdn/dist/latest/. Usage: node tools/build-cdn.js [--base https://cdn.marchjs.com]
 import { readFileSync, writeFileSync, rmSync, cpSync, readdirSync, statSync, existsSync, renameSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { writeData } from "./cdn-data.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
@@ -61,6 +63,8 @@ rmSync(join(dist, ".css"), { recursive: true, force: true });
 rmSync(all, { force: true });
 // the stylesheets the package exports as files
 cpSync(join(root, "src/css"), join(out, "css"), { recursive: true });
+// the version's data (API reference, MarchIDE types, components) for sites that render March without its sources
+await writeData(out);
 
 const walk = (d) => readdirSync(d).flatMap((n) => { const p = join(d, n); return statSync(p).isDirectory() ? walk(p) : [p]; });
 const url = (name) => `${BASE}/${version}/${name}`;

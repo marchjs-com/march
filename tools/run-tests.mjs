@@ -109,7 +109,9 @@ if (run.length) {
   }
   for (const files of batches) {
     const c = await new Promise((done) => {
-      const p = spawn(process.execPath, ["--import", "./compiler/register.js", "--test", `--test-concurrency=${conc}`, ...files], { cwd: ROOT, env, stdio: "inherit" });
+      // a test that hangs fails after 3 minutes with its own name (the longest real ones, the builds, take under one)
+      // instead of holding the queue and the files behind it
+      const p = spawn(process.execPath, ["--import", "./compiler/register.js", "--test", `--test-concurrency=${conc}`, "--test-timeout=180000", ...files], { cwd: ROOT, env, stdio: "inherit" });
       p.on("exit", (x) => done(x ?? 1));
     });
     if (c) code = c;

@@ -181,12 +181,13 @@ export function collect(root = ROOT) {
   return out;
 }
 
-/** Component metadata (status, since, showcase page) by name, from the component folders. */
-function componentMeta(root) {
+/** Component metadata (status, since, showcase page) by name, from the component folders (`site`: the showcase page that
+ *  draws the component's demo, from the site's sections.gen.ts; without it, the page its meta.ts names). */
+function componentMeta(root, site = true) {
   const out = new Map();
   const base = join(root, "src/components");
   const secFile = join(root, "examples/showcase/src/sections.gen.ts");
-  const sections = existsSync(secFile) ? JSON.parse(/SECTIONS: Section\[\] = (\[.*\]);/s.exec(readFileSync(secFile, "utf8"))?.[1] ?? "[]") : [];
+  const sections = site && existsSync(secFile) ? JSON.parse(/SECTIONS: Section\[\] = (\[.*\]);/s.exec(readFileSync(secFile, "utf8"))?.[1] ?? "[]") : [];
   for (const cat of readdirSync(base, { withFileTypes: true }).filter((d) => d.isDirectory())) {
     for (const d of readdirSync(join(base, cat.name), { withFileTypes: true }).filter((x) => x.isDirectory())) {
       const p = join(base, cat.name, d.name, "meta.ts");
@@ -205,11 +206,16 @@ function componentMeta(root) {
 /** The long-form doc of an export (docs/api/<slug>/<name>.md), or "". */
 export const mdPath = (subpath, name) => `${DOCS}/${slugOf(subpath)}/${name}.md`;
 
-export function generate(root = ROOT) {
+/**
+ * The API reference files. `site: false` (the data published with each version on cdn.marchjs.com, tools/cdn-data.mjs):
+ * from March's sources and docs only; an export's `demo` is the page its component's meta.ts names, or "" (the site adds
+ * its own links).
+ */
+export function generate(root = ROOT, { site = true } = {}) {
   const recs = collect(root);
   const tr = JSON.parse(readFileSync(join(root, "docs/api.tr.json"), "utf8"));
-  const meta = componentMeta(root);
-  const showcasePages = showcaseLinks(root);
+  const meta = componentMeta(root, site);
+  const showcasePages = site ? showcaseLinks(root) : new Map();
   const files = {};
   // groups: subpaths in package order, packed to at least GROUP_BYTES
   const bySub = new Map();
