@@ -9,6 +9,8 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # a normal run takes 2–4 minutes; a hang ends here, not after GitHub's six hours
+    timeout-minutes: 20
     strategy:
       matrix:
         node: [24, 26]
