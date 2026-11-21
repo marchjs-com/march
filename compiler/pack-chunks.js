@@ -94,7 +94,11 @@ function explain(g, t, users, fits, bootFits) {
 
 export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, minSize = 2048, budgetOf, fallback = true, strategy = 0, forceSize = FORCE_SIZE }) {
   const outs = meta.outputs;
+  // gzip size of each output on disk; a fold rewrites only its host, the folded chunk and their importers, so only those
+  // are dropped (`stale`): clearing the whole cache made every round re-read and re-gzip every file (~90% of the packer's
+  // time on a 1000-file build)
   const gzCache = new Map();
+  const stale = (keys) => { for (const k of keys) gzCache.delete(k); };
   const gz = (k) => { if (!gzCache.has(k)) { const f = resolve(cwd, k); gzCache.set(k, existsSync(f) ? gzipSync(readFileSync(f)).length : 0); } return gzCache.get(k); };
   const text = (k) => readFileSync(resolve(cwd, k), "utf8");
   let stubs = 0, folded = 0;
@@ -229,8 +233,8 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
         }
       }
       if (!best && DEBUG && Object.keys(outs[t].inputs ?? {}).some((i) => i.includes(DEBUG))) explain(g, t, users, fits, bootFits);
-      if (!best || !(await fold(t, best, g.importers.get(t) ?? []))) { skip.add(t); continue; }
-      folded++; done = true; gzCache.clear(); break;
+      if (!best || !(await fold(t, best, users))) { skip.add(t); continue; }
+      folded++; done = true; stale([t, best, ...users]); break;
     }
     if (!done) break;
   }
@@ -419,7 +423,7 @@ ${readFileSync(resolve(cwd, c), "utf8")}`;
     };
     for (const u of users) outs[u].imports = dedupe((outs[u].imports ?? []).map((im) => (grp.includes(im.path) ? { ...im, path: key } : im)));
     for (const t of grp) { rmSync(resolve(cwd, t), { force: true }); delete outs[t]; }
-    gzCache.clear();
+    stale([key, ...grp, ...users]);
     return true;
   }
 
