@@ -5,6 +5,8 @@
 //   data/ide/march-types.json, march-icons/<pack>.d.ts      MarchIDE's TypeScript: the package's declarations (gen-ide-types)
 //   data/ide/lib-docs/…                                     MarchIDE's hover docs of the language's built-ins
 //   data/components.json                                    the categories and the components (meta.ts, docs.md)
+//   data/comp/<category>.json                               each component's props table, notes, accessibility (docs.md)
+//   data/stats.json                                         the numbers: components, exports, icons, animations, tests…
 //   data/index.json                                         the files above, with the version
 // tools/build-cdn.js calls writeData(out); alone: node tools/cdn-data.mjs <folder> (default cdn/dist/<version>).
 import { readFileSync, writeFileSync, mkdirSync, cpSync, readdirSync, statSync, rmSync } from "node:fs";
@@ -12,7 +14,8 @@ import { join, relative, resolve, dirname, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 import { generate as apiDocs } from "./api-docs.js";
-import { categories, components } from "./gen-registry.js";
+import { categories, components, generate as registry } from "./gen-registry.js";
+import { homeStats } from "./gen-home-stats.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -35,6 +38,14 @@ export async function writeData(out) {
   const list = await components(ROOT);
   put("components.json", JSON.stringify({ categories: plain(await categories(ROOT)),
     components: list.map((c) => ({ folder: c.folder, category: c.category, name: c.name, meta: plain(c.meta), docs: c.docs })) }));
+
+  // each component's props table, notes and accessibility, per category (the same files the showcase reads)
+  const { files: reg } = await registry(ROOT);
+  for (const [rel, text] of Object.entries(reg)) if (rel.startsWith("examples/showcase/public/comp/")) put(`comp/${basename(rel)}`, text);
+  // the numbers sites show (components per category, exports, icons, animations, managers, themes, tests)
+  const stats = await homeStats(ROOT);
+  delete stats.budget;
+  put("stats.json", `${JSON.stringify(stats, null, 2)}\n`);
 
   const walk = (d) => readdirSync(d).flatMap((n) => { const p = join(d, n); return statSync(p).isDirectory() ? walk(p) : [p]; });
   const pkg = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));

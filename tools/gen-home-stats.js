@@ -53,8 +53,10 @@ export async function homeStats(root = ROOT) {
   const testFiles = [...walk(join(root, "test")), ...walk(join(root, "src"))].filter((p) => /\.test\.(js|ts|mjs)$/.test(p));
   const tests = testFiles.reduce((s, p) => s + [...readFileSync(p, "utf8").matchAll(/(?:^|[^\w.$])(?:test|it)\(\s*["'`]/g)].length, 0);
 
-  const cfg = (await import(pathToFileURL(join(root, "examples/showcase/march.config.js")).href)).default;
-  const b = cfg.budget ?? {};
+  // the site's budgets (its march.config.js), when it is beside the sources
+  const cfgFile = join(root, "examples/showcase/march.config.js");
+  const cfg = existsSync(cfgFile) ? (await import(pathToFileURL(cfgFile).href)).default : null;
+  const b = cfg?.budget ?? {};
 
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 
@@ -71,7 +73,7 @@ export async function homeStats(root = ROOT) {
     themes,
     tests,
     testFiles: testFiles.length,
-    budget: { entry: b.entry ?? 0, boot: b.bootLimit ?? 0, route: b.route ?? 0, partFloor: cfg.chunks?.minSize ?? 0 },
+    ...(cfg ? { budget: { entry: b.entry ?? 0, boot: b.bootLimit ?? 0, route: b.route ?? 0, partFloor: cfg.chunks?.minSize ?? 0 } } : {}),
   };
 }
 
