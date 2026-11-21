@@ -5,6 +5,7 @@ on:
   pull_request:
 permissions:
   contents: read
+# March only: the showcase (marchjs.com) is built and checked in its own repository
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -19,27 +20,3 @@ jobs:
       - run: npm ci
       - run: npm run test:all
       - run: npm run size
-      - name: every showcase menu page opens (headless Chrome)
-        if: matrix.node == 26
-        run: node examples/showcase/build.mjs && node tools/menu-audit.mjs
-  # browser checks on the built showcase: every Playground / options control changes something visible
-  # (tools/control-audit.mjs); RichTextEditor :emoji and @mention insert at the caret (tools/editor-suggest-check.mjs)
-  showcase-controls:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 26
-      - run: npm ci
-      - run: node examples/showcase/build.mjs --release
-      - run: npm run audit:controls
-        env:
-          BROWSER_PATH: /usr/bin/google-chrome
-      - run: npm run check:editor-suggest
-        env:
-          BROWSER_PATH: /usr/bin/google-chrome
-      # every showcase menu page opens (headless Chrome)
-      - run: node tools/menu-audit.mjs
-        env:
-          BROWSER_PATH: /usr/bin/google-chrome
