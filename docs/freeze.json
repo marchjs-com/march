@@ -1062,7 +1062,7 @@
     "src/components/composite/property-grid",
     "examples/showcase/public/components/property-grid/ide.json"
    ],
-   "hash": "e9a5d82007c5d991aa720a2af7a0b6e2"
+   "hash": "f9db718899cf4164c7b7fc679e3815b0"
   },
   "PullToRefresh": {
    "frozen": "2026-11-20",
@@ -2553,6 +2553,12 @@
    "name": "ReactionPicker",
    "what": "refresh",
    "reason": "Emoji hücreleri sistemin renkli emoji yazı tipiyle çizilir (hızlı ilk çizim); Windows 10'da olmayan emoji değiştirildi"
+  },
+  {
+   "at": "2026-11-21",
+   "name": "PropertyGrid",
+   "what": "refresh",
+   "reason": "Testi Türkçe geri alma etiketini dili açıkça seçerek denetler (makinenin diline bakmaz)"
   }
  ]
 }
