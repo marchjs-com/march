@@ -11,14 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     # a normal run takes 2–4 minutes; a hang ends here, not after GitHub's six hours
     timeout-minutes: 20
-    strategy:
-      matrix:
-        node: [24, 26]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          # Node's current LTS
+          node-version: 24
       - run: npm ci
       - run: npm run test:all
       - run: npm run size
