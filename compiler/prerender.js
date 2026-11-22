@@ -13,6 +13,8 @@
 //     site: "https://shop.example",        // absolute origin (+ base) — sitemap, robots Sitemap line, canonical
 //     prerender: true | ["/", "/about"],   // true: every route without params (hash routing: "/" only)
 //     routes: ["/docs/intro"],             // more paths with true (pages under a wildcard route: "/docs/*")
+//     exclude: ["/ide"] | (path) => bool,  // routes left out: no <route>/index.html and no sitemap line; 404.html opens
+//                                          // them (a page whose content is drawn at run time, a file count to keep)
 //     sitemap: true, robots: true | { disallow: ["/admin"] },
 //     head: { jsonLd: … },                 // extra head for every prerendered page (build time only, no runtime cost)
 //     timeout: 5000, keepStyle: false,     // per route; inline style attributes are dropped (strict CSP)
@@ -138,7 +140,8 @@ export async function prerender({ cwd, cfg, esbuild, out, importSeo, log = conso
     mkdirSync(dirname(file), { recursive: true });
     writeFileSync(file, html);
   };
-  let list = Array.isArray(seo.prerender) ? seo.prerender : null;
+  const keep = (l) => excludeRoutes(l, seo.exclude);
+  let list = Array.isArray(seo.prerender) ? keep(seo.prerender) : null;
   const done = [], failed = [], pages = [];
   let runs = 0;
   for (let i = 0; ; i++) {
@@ -177,7 +180,7 @@ export async function prerender({ cwd, cfg, esbuild, out, importSeo, log = conso
       }
       if (!S.router) throw errors[0] ?? new Error("the app did not call createRouter()");
       mode = S.router.mode;
-      if (!list) list = seo.prerender === true || seo.prerender == null ? (mode === "hash" ? ["/"] : [...new Set([...S.router.routes.filter((r) => !r.keys.length && !r.pattern.includes("*")).map((r) => r.pattern), ...(seo.routes ?? [])])]) : ["/"];
+      if (!list) list = seo.prerender === true || seo.prerender == null ? (mode === "hash" ? ["/"] : keep([...new Set([...S.router.routes.filter((r) => !r.keys.length && !r.pattern.includes("*")).map((r) => r.pattern), ...(seo.routes ?? [])])])) : ["/"];
       if (mode === "history") patterns = S.router.routes.map((r) => r.pattern);
       if (route !== list[i]) { i--; continue; }
       // March's boot placeholder (templates, showcase) has nothing to wait for on a prerendered page
@@ -243,6 +246,17 @@ export async function prerender({ cwd, cfg, esbuild, out, importSeo, log = conso
   }
   if (!process.env.MARCH_PRERENDER_KEEP) rmSync(tmp, { recursive: true, force: true });
   return { routes: done, failed, mode };
+}
+
+/**
+ * The routes `seo.exclude` leaves in: a list of paths or a test. The start page ("/") always stays (404.html and the
+ * other pages need its HTML).
+ * @param {readonly string[]} routes
+ * @param {readonly string[] | ((path: string) => boolean) | undefined} exclude
+ */
+export function excludeRoutes(routes, exclude) {
+  const skip = typeof exclude === "function" ? exclude : Array.isArray(exclude) ? ((x) => (p) => x.has(p))(new Set(exclude)) : () => false;
+  return routes.filter((p) => p === "/" || !skip(p));
 }
 
 /** sitemap.xml for absolute `site` and route paths. */

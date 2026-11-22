@@ -75,3 +75,24 @@ test("ts-worker: a statement after a JSX expression with no semicolon still gets
   const r2 = call("complete", { path: "a.tsx", pos: text.indexOf("conso") + 5 });
   assert.ok(r2.items.some((i) => i.label === "console"), "asked again: same answer (the text was put back)");
 });
+
+test("ts-worker: with libs.json beside them the lib files come from it, one request (no file of its own read)", () => {
+  const all = Object.fromEntries(readdirSync(lib).filter((f) => /^lib\..*\.d\.ts$/.test(f)).map((f) => [f, readFileSync(join(lib, f), "utf8")]));
+  const asked = [], got = [];
+  class BundleXHR {
+    open(_m, u) { this.u = u.replace("http://y/", ""); asked.push(this.u); }
+    send() { if (this.u === "libs.json") { this.status = 200; this.responseText = JSON.stringify(all); } else this.status = 404; }
+  }
+  const c = { XMLHttpRequest: BundleXHR, console, URL, postMessage: (m) => got.push(m), importScripts: () => { c.ts = require(join(lib, "typescript.js")); } };
+  c.self = c; c.location = { href: "http://y/ts-worker.js", origin: "http://y" };
+  vm.createContext(c);
+  vm.runInContext(readFileSync(join(here, "ts-worker.js"), "utf8"), c);
+  const send = (type, data = {}) => { got.length = 0; c.onmessage({ data: { id: 1, type, ...data } }); const m = got[0]; if (!m.ok) throw new Error(m.error); return m.value; };
+  send("init", { tsUrl: "http://y/typescript.js", lib: "http://y/" });
+  const text = "const m = new Map<string, number>(); m.";
+  send("update", { path: "a.tsx", text });
+  const r = send("complete", { path: "a.tsx", pos: text.length });
+  assert.ok(r.items.some((i) => i.label === "get"), "Map's methods: lib.es2015.collection.d.ts was read");
+  assert.equal(asked.filter((u) => u === "libs.json").length, 1);
+  assert.deepEqual(asked.filter((u) => /^lib\./.test(u)), [], "no lib file asked on its own");
+});

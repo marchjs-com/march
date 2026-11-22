@@ -365,6 +365,7 @@ export type FakeWindow = EventTarget_ & {
   matchMedia(q: string): MediaQueryStub;
   requestAnimationFrame(f: (t: number) => void): ReturnType<typeof setTimeout>;
   cancelAnimationFrame(id: ReturnType<typeof setTimeout>): void;
+  getComputedStyle(el?: unknown): CSSStyleDeclaration;
 };
 export interface InstalledDom { document: Document_; window: FakeWindow; cleanup: () => void }
 
@@ -388,13 +389,17 @@ export function installDom({ url = "http://localhost/" }: { url?: string } = {})
   const window = new EventTarget_() as FakeWindow;
   Object.assign(window, { document, location, history, localStorage: storage(), sessionStorage: storage(), innerWidth: 1024, innerHeight: 768,
     scrollTo() {}, scrollX: 0, scrollY: 0, matchMedia: (q: string): MediaQueryStub => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {} }),
-    requestAnimationFrame: (f: (t: number) => void) => setTimeout(() => f(Date.now()), 0), cancelAnimationFrame: (id: ReturnType<typeof setTimeout>) => clearTimeout(id) });
+    requestAnimationFrame: (f: (t: number) => void) => setTimeout(() => f(Date.now()), 0), cancelAnimationFrame: (id: ReturnType<typeof setTimeout>) => clearTimeout(id),
+    // no layout here: every computed property is "" (a page that measures on mount still renders; prerender keeps it)
+    getComputedStyle: (): CSSStyleDeclaration => new Proxy({ getPropertyValue: () => "" }, { get: (t, k) => (k in t ? (t as Record<PropertyKey, unknown>)[k] : "") }) as unknown as CSSStyleDeclaration });
   document.defaultView = window;
   const prev: Record<string, PropertyDescriptor | undefined> = {};
   const globals: Record<string, unknown> = { document, window, location, history, localStorage: window.localStorage, sessionStorage: window.sessionStorage,
     Node: Node_, Element: Element_, HTMLElement: Element_, Text: Text_, Comment: Comment_, DocumentFragment: Fragment_, Event: Event_,
     CustomEvent: Event_, KeyboardEvent: Event_, MouseEvent: Event_, InputEvent: Event_, FocusEvent: Event_, matchMedia: window.matchMedia,
     requestAnimationFrame: window.requestAnimationFrame, cancelAnimationFrame: window.cancelAnimationFrame, innerWidth: 1024,
+    // as on window in a browser: a page that scrolls or measures on mount (scrollTo(0, 0), getComputedStyle) still renders
+    scrollTo: window.scrollTo, scrollX: 0, scrollY: 0, getComputedStyle: window.getComputedStyle,
     // window events (popstate, hashchange, resize…) on the global object, as in a browser
     addEventListener: window.addEventListener.bind(window), removeEventListener: window.removeEventListener.bind(window), dispatchEvent: window.dispatchEvent.bind(window) };
   for (const k of Object.keys(globals)) { prev[k] = Object.getOwnPropertyDescriptor(globalThis, k); Object.defineProperty(globalThis, k, { value: globals[k], configurable: true, writable: true }); }

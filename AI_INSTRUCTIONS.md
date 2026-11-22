@@ -342,7 +342,7 @@ useHead(() => ({ title: $product.name, og: { image: $product.photo }, jsonLd: ld
 Order: defaults → route head → `useHead` (later wins; a component's head leaves with it). `march.config.js`
 `seo: { site, prerender: true, sitemap: true, robots: true }` writes each param-less route's HTML at build time plus
 `sitemap.xml` / `robots.txt`; then mount with `hydrate(() => <Router />, el)` from `march/seo/hydrate` instead of
-`render`. Hash routing prerenders only the start page and gets no automatic canonical. Check pages with
+`render`. `exclude: [paths] | (path) => bool` leaves routes out (no HTML, no sitemap line; 404.html opens them). Hash routing prerenders only the start page and gets no automatic canonical. Check pages with
 `march seo check` (title, description, canonical, img alt). Every `<img>` needs `alt` (`alt=""` when decorative).
 Under a Trusted Types CSP use `installSeo({ jsonLd: false })` (run-time script text is blocked) and ship JSON-LD at build time.
 Full reference: `docs/seo.md`.

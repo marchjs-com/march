@@ -1,6 +1,6 @@
 // The TypeScript language service of march-app-ui, in a worker (typeScriptPlugin, ts.ts). A classic worker: it loads the
 // TypeScript compiler (typescript.js, the app serves it) with importScripts and the lib .d.ts files on demand from
-// `libUrl` (synchronous requests are allowed in a worker). The page sends the project's files; the worker answers
+// `libUrl` (libs.json, all of them in one file, or each file; synchronous requests are allowed in a worker). The page sends the project's files; the worker answers
 // suggestions, errors and hover text. Nothing here touches the page.
 /* global ts */
 let LS = null, libUrl = "", policy = null;
@@ -56,11 +56,22 @@ const OPTIONS = () => ({
 });
 const norm = (p) => (p.startsWith("/") ? p : `/${p}`);
 
+// libs.json beside them, when the app serves one: every lib .d.ts in one file ({ "lib.dom.d.ts": text, … }), read once
+// (one request, and one file on the host instead of a hundred); without it each lib file is read on its own
+let bundle; // undefined: not asked yet, null: none
+function libBundle() {
+  if (bundle !== undefined) return bundle;
+  bundle = null;
+  try { const x = new XMLHttpRequest(); x.open("GET", libUrl + "libs.json", false); x.send(); if (x.status === 200) bundle = JSON.parse(x.responseText); } catch { bundle = null; }
+  return bundle;
+}
 function readLib(name) {
   const key = name.replace(/^.*\//, "");
   if (libs.has(key)) return libs.get(key);
   let text;
-  try { const x = new XMLHttpRequest(); x.open("GET", libUrl + key, false); x.send(); text = x.status === 200 ? x.responseText : undefined; } catch { text = undefined; }
+  const all = libBundle();
+  if (all) text = typeof all[key] === "string" ? all[key] : undefined;
+  else try { const x = new XMLHttpRequest(); x.open("GET", libUrl + key, false); x.send(); text = x.status === 200 ? x.responseText : undefined; } catch { text = undefined; }
   libs.set(key, text);
   return text;
 }
