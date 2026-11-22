@@ -1,19 +1,13 @@
-// The showcase home page shows no number typed by hand: every count and size comes from tools/gen-home-stats.js
-// (registry, api-coverage, icon packs, motion catalogues, managers, tests, march.config.js) or from march-report.json.
+// The numbers sites show about March (data/stats.json on cdn.marchjs.com, tools/cdn-data.mjs) come from their sources
+// (tools/gen-home-stats.js: registry, api-coverage, icon packs, motion catalogues, managers, tests), none typed by hand.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-const { generate, homeStats, OUT } = await import("../tools/gen-home-stats.js");
+const { homeStats } = await import("../tools/gen-home-stats.js");
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
-// the test count changes with every branch that adds a test; the build rewrites the file, so a stale count never ships
-const stable = (s) => s.replace(/"tests": \d+,\n\s*"testFiles": \d+,/, "");
-
-test("home-stats.gen.ts is up to date (node tools/gen-home-stats.js)", async () => {
-  assert.equal(stable(readFileSync(join(ROOT, OUT), "utf8")), stable(await generate()));
-});
 
 test("home stats come from their sources", async () => {
   const s = await homeStats();
@@ -23,69 +17,5 @@ test("home stats come from their sources", async () => {
   assert.ok(s.components >= s.registered && s.exports > s.components, "api-coverage counts");
   assert.ok(s.icons.total >= s.icons.builtIn && s.icons.builtIn > 0);
   assert.ok(s.animations.text > 0 && s.animations.pageFx > 0 && s.managers > 0 && s.tests > 0);
-  assert.ok(s.budget.entry > 0 && s.budget.boot > 0 && s.budget.partFloor > 0, "budgets from march.config.js");
-});
-
-/** The home page's own files: pages/home.tsx and its lazy sections in src/home/ (outside pages/: not routes). */
-function homeFiles() {
-  const src = join(ROOT, "examples/showcase/src");
-  const sub = join(src, "home");
-  return [join(src, "pages/home.tsx"), ...(existsSync(sub) ? readdirSync(sub).filter((n) => /\.tsx?$/.test(n)).map((n) => join(sub, n)) : [])];
-}
-
-/** Digits a reader would see: in JSX text or in a string literal. Code (delays, sizes, indexes) is not shown. */
-export function shownDigits(src) {
-  // code samples (code={`…`} / code: `…`) are shown as code: their numbers are code too
-  const code = src.replace(/(code=\{|code:\s*)`[^`]*`/g, "$1``").replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'`\\])\/\/.*$/gm, "$1");
-  const out = [];
-  // JSX text between tags: ">… 90+ bileşen <"
-  for (const m of code.matchAll(/>([^<>{}]*)</g)) if (/\d/.test(m[1]) && !/[=;(]/.test(m[1])) out.push(m[1].trim());
-  // a count passed as a number prop: <Counter to={90} />, <CountRoll value={132} />
-  for (const m of code.matchAll(/\b(to|value|total)=\{\s*(\d[\d_.]*)\s*\}/g)) out.push(`${m[1]}=${m[2]}`);
-  // string and template literals, except module specifiers, class names, CSS values and icon/route keys
-  for (const m of code.matchAll(/(["'`])((?:\\.|(?!\1)[^\\\n])*)\1/g)) {
-    const v = m[2];
-    if (!/\d/.test(v)) continue;
-    if (/^(march|\.\.?\/)/.test(v)) continue; // import
-    if (/^\/[\w/-]*$/.test(v)) continue; // a route path ("/managers-a11y"): an address, not a count
-    if (/^[\w-]+(\s+[\w-]+)*$/.test(v) && /-|^[a-z]/.test(v) && !/\s\d|^\d/.test(v)) continue; // class / token names (sc-h2, m-grid-3)
-    if (/^-?[\d.]+(px|rem|em|ms|s|%|deg|fr|vh|vw)?(\s+-?[\d.]+(px|rem|em|ms|s|%|deg|fr|vh|vw)?)*$/.test(v)) continue; // CSS value
-    if (!/\d/.test(v.replace(/\$\{[^}]*\}/g, ""))) continue; // `${n} KB`, `Tema ${i} / ${n}`: every digit is a live value
-    if (/^(\s*[a-zA-Z-]+\([^()]*\))+\s*$/.test(v)) continue; // CSS function values: "translate(0, 0) scale(1)"
-    if (/^[Mm][\d\s.,MmLlHhVvCcSsQqTtAaZz-]*$/.test(v)) continue; // SVG path data: a drawing, not a count
-    out.push(v);
-  }
-  return out;
-}
-
-test("the home page has no hand-written numbers", () => {
-  for (const f of homeFiles()) {
-    const found = shownDigits(readFileSync(f, "utf8"));
-    assert.deepEqual(found, [], `${f}: numbers typed by hand; take them from HOME_STATS (tools/gen-home-stats.js) or march-report.json`);
-  }
-});
-
-test("shownDigits catches a typed count and lets live values through", () => {
-  assert.deepEqual(shownDigits('<span>90+ bileşen</span>'), ["90+ bileşen"]);
-  assert.deepEqual(shownDigits('label="132 SVG ikon"'), ["132 SVG ikon"]);
-  assert.deepEqual(shownDigits('<Counter to={90} suffix="+" />'), ["to=90"]);
-  assert.deepEqual(shownDigits('<Demo code={`\nlet $n = 0\n`} />'), []);
-  assert.deepEqual(shownDigits('<span>{n}</span> class="sc-h2" delay: 80 `${kb} KB` "1.5rem"'), []);
-  assert.deepEqual(shownDigits('`Tema ${i + 1} / ${n}` "translate(0, 0) scale(1)"'), []);
-  assert.deepEqual(shownDigits('href: "/managers-a11y" label="/ 7 tema"'), ["/ 7 tema"]);
-  assert.deepEqual(shownDigits('`${n} bileşen · 7 tema`'), ["${n} bileşen · 7 tema"]);
-});
-
-test("home timeline (home/toc.tsx): every section head is listed once, in page order, with its own English address", () => {
-  const home = join(ROOT, "examples/showcase/src/home");
-  const read = (f) => readFileSync(join(home, f), "utf8");
-  const toc = read("toc.tsx");
-  const items = [...toc.matchAll(/I\("([^"]+)", "([^"]+)"/g)].map((m) => ({ head: m[1], slug: m[2] }));
-  // the heads in page order: sections.tsx mounts the files, each file mounts its sections in its default export
-  const files = ["features.tsx", "more/ai.tsx", "more/ui.tsx", "more/design.tsx", "more/live.tsx", "more3/visual.tsx", "more2/data.tsx",
-    "more2/motion.tsx", "more2/app.tsx", "more2/dev.tsx", "more3/tools.tsx", "more/people.tsx", "sections.tsx"];
-  const heads = new Set(files.flatMap((f) => [...read(f).matchAll(/<Head id="([^"]+)"/g)].map((m) => m[1])));
-  assert.deepEqual(new Set(items.map((i) => i.head)), heads, "the timeline lists exactly the page's section heads");
-  assert.equal(new Set(items.map((i) => i.slug)).size, items.length, "addresses are unique");
-  for (const i of items) assert.match(i.slug, /^[a-z][a-z0-9-]*$/, `${i.slug}: a short English address`);
+  assert.equal(s.budget, undefined, "budgets are the site's own (its march.config.js)");
 });

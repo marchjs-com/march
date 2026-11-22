@@ -5,13 +5,11 @@ Bir bileşen, MarchIDE sayfasıyla birlikte uçtan uca doğrulanınca **dondurul
 
 ## Ne dondurulur
 
-Her bileşen için iki yol:
+Bileşenin klasörü: `src/components/<kategori>/<klasör>/` (kod, CSS, `meta.ts`, `playground.ts`, `demo.tsx`,
+`docs.md`, testler). MarchIDE sayfasının örnekleri (üç örnek + Lab testi) kendi deposundadır
+(marchjs-com/examples) ve burada kaydedilmez.
 
-1. Bileşenin klasörü: `src/components/<kategori>/<klasör>/` (kod, CSS, `meta.ts`, `playground.ts`, `demo.tsx`,
-   `docs.md`, testler).
-2. MarchIDE sayfasının `ide.json`'u: `examples/showcase/public/components/<slug>/ide.json` (üç örnek + Lab testi).
-
-Kayıt `docs/freeze.json`'dadır: bileşen adı → `frozen` (tarih), `paths` (yukarıdaki iki yol) ve `hash` (dosyaların
+Kayıt `docs/freeze.json`'dadır: bileşen adı → `frozen` (tarih), `paths` (yukarıdaki klasör) ve `hash` (dosyaların
 yolları ve metinlerinin SHA-256 özeti; satır sonları LF'ye çevrilerek: Windows'taki CRLF değişiklik sayılmaz).
 Bileşenin `meta.ts`'i de `frozen: "YYYY-AA-GG"` taşır (katalog ve araçlar bunu okur).
 

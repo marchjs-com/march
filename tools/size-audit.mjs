@@ -3,7 +3,7 @@
 // (dynamic imports stay separate chunks) and the module's gzip size alone (minified, level 9), largest first.
 //   node tools/size-audit.mjs                      core barrel (src/index.ts)
 //   node tools/size-audit.mjs src/router/index.ts 20
-// The showcase entry and routes: node cli/march.js build --dev --analyze [/route] (in examples/showcase).
+// An app's entry and routes: node cli/march.js build --dev --analyze [/route] (in the app's folder).
 import { gzipSync } from "node:zlib";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";

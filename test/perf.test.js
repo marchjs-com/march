@@ -235,12 +235,6 @@ test("route prefetch: Link hover / idle and prefetchLinks use the manifest (idle
   }
 });
 
-test("published showcase: no service worker file and no SW precache (sw only with --serve)", () => {
-  const cfg = readFileSync(resolve("examples/showcase/march.config.js"), "utf8");
-  assert.match(cfg, /sw:\s*process\.env\.MARCH_SHOWCASE_SW === "1"/);
-  assert.doesNotMatch(readFileSync(resolve("examples/showcase/build.mjs"), "utf8").replace(/serve[\s\S]*?MARCH_SHOWCASE_SW/, ""), /MARCH_SHOWCASE_SW\s*=\s*"1"/);
-});
-
 test("rehash after merge: a file name always means the same bytes across builds (no stale stub can load another entry)", async () => {
   const { mergeEntry, rehashOutputs } = await import("../compiler/merge-entry.js");
   const esbuild = await import("esbuild");
@@ -530,11 +524,6 @@ test("budget.maxFiles: every file of the output counts (pages, chunks, public fi
     assert.match(filesOver(dir, 4), /5 files .*budget\.maxFiles 4/);
     assert.equal(filesOver(dir, undefined), null, "no cap without budget.maxFiles");
   } finally { rmSync(dir, { recursive: true, force: true }); }
-});
-
-test("showcase: the published file budget is set under the host's 512 files per version", async () => {
-  const cfg = (await import("../examples/showcase/march.config.js")).default;
-  assert.ok(cfg.budget.maxFiles && cfg.budget.maxFiles <= 480, "budget.maxFiles leaves room under 512");
 });
 
 test("lazy(): a failed load is retried on its own while the skeleton stays", async () => {

@@ -1,5 +1,5 @@
 // Neutral demo data shared by the social component demos (showcase only): communities and handles, never real people.
-// Images are the abstract SVG scenes in examples/showcase/public/media/social/.
+// Images are the abstract SVG scenes the site serves under media/social/.
 import type { MediaItem } from "./media-grid/index.ts";
 import { appUrl } from "../../base/index.ts";
 

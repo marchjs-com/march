@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-// Code freeze of components (docs/freeze.md). A frozen component's files (its folder under src/components and its
-// MarchIDE page's ide.json) are recorded in docs/freeze.json with a digest; its meta.ts says `frozen: "<date>"`.
+// Code freeze of components (docs/freeze.md). A frozen component's files (its folder under src/components) are recorded in docs/freeze.json with a digest; its meta.ts says `frozen: "<date>"`.
 // test/freeze.test.js fails when a frozen component's files change while the record stays as it was.
 //   node tools/freeze.mjs status                          how many are frozen; the ones that are not
 //   node tools/freeze.mjs check                           every frozen component against its record (exit 1 on a change)
@@ -10,7 +9,7 @@
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join, resolve, relative, dirname } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const RECORD = join(ROOT, "docs", "freeze.json");
@@ -55,19 +54,6 @@ export function components() {
   return out;
 }
 
-/** The ide.json of a component's MarchIDE page (its topic in the showcase), if it has one. */
-async function ideOf(name) {
-  await import(pathToFileURL(join(ROOT, "compiler", "register.js")).href);
-  const { IDE_PAGES } = await import(pathToFileURL(join(ROOT, "examples/showcase/src/playground/ide-pages.ts")).href);
-  const { HUBS } = await import(pathToFileURL(join(ROOT, "examples/showcase/src/topics.ts")).href);
-  for (const [hub, topics] of Object.entries(HUBS)) for (const t of topics) {
-    const names = String(t.name ?? t.title).split(" · ");
-    const page = IDE_PAGES[`${hub}/${t.slug}`];
-    if (names.includes(name) && page) return `examples/showcase/public/${page}/ide.json`;
-  }
-  return null;
-}
-
 const setMeta = (meta, date) => {
   let t = readFileSync(meta, "utf8");
   const eol = t.includes("\r\n") ? "\r\n" : "\n";
@@ -105,8 +91,7 @@ async function main(argv) {
       if (cmd === "refresh" && !was) throw new Error(`${c.name} is not frozen`);
       const date = cmd === "refresh" ? was.frozen : today;
       setMeta(c.meta, date);
-      const ide = was?.paths[1] ?? (await ideOf(c.name));
-      const paths = [c.dir, ...(ide ? [ide] : [])];
+      const paths = [c.dir];
       record.components[c.name] = { frozen: date, paths, hash: digest(paths) };
       if (cmd === "refresh") record.log.push({ at: today, name: c.name, what: "refresh", reason });
       console.log(`${cmd === "refresh" ? "refreshed" : "frozen"}: ${c.name} (${paths.join(", ")})`);

@@ -2,7 +2,7 @@
 // Identifiers are English. User-visible text (strings, JSX text, i18n packs) may be in any language; code may not:
 // variables, constants, functions, components, props, types, signals, CSS classes and custom properties, file names,
 // route paths and ids. This reports identifiers that contain Turkish letters (ç ğ ı ö ş ü İ) or common Turkish words.
-//   node tools/lint-identifiers.mjs [dirs…]       (default: src examples/showcase/src tools cli compiler test)
+//   node tools/lint-identifiers.mjs [dirs…]       (default: src tools cli compiler test)
 // test/identifiers.test.js runs it. String CONTENT is not checked, only strings that act as identifiers: JSX
 // class/id/href/for/key/data-* attributes and `path` / `id` / `href` / `key` / `class` object properties.
 import ts from "typescript";
@@ -23,7 +23,7 @@ bildirim bildirimler mesaj mesajlar haber haberler giris cikis yeni eski tarih s
 kartlar bilgi uyari hata basari onay iptal kapat ac goster gizle genislik yukseklik boyut yazi metin resim gorsel
 `.trim().split(/\s+/));
 
-const DEFAULT_DIRS = ["src", "examples/showcase/src", "tools", "cli", "compiler", "test"];
+const DEFAULT_DIRS = ["src", "tools", "cli", "compiler", "test"];
 // generated icon packs (march icons add): their names are the upstream sets' own ("paint-roller", "ac-unit")
 const SKIP = /(^|[\\/])(node_modules|dist|i18n[\\/]tr\.ts|fonts)([\\/]|$)|\.d\.ts$|icons[\\/]packs[\\/][^\\/]+[\\/]index\.js$/;
 

@@ -25,7 +25,7 @@ export async function writeData(out) {
   const put = (rel, text) => { mkdirSync(dirname(join(data, rel)), { recursive: true }); writeFileSync(join(data, rel), text); };
 
   // the API reference: the same files as the showcase's, March's own fields only
-  const { files } = apiDocs(ROOT, { site: false });
+  const { files } = apiDocs(ROOT);
   for (const [rel, text] of Object.entries(files)) put(`api/${basename(rel)}`, text);
 
   // MarchIDE's TypeScript: the declarations (march-types.json, march-icons/ beside it) and the built-ins' hover docs
@@ -39,12 +39,11 @@ export async function writeData(out) {
   put("components.json", JSON.stringify({ categories: plain(await categories(ROOT)),
     components: list.map((c) => ({ folder: c.folder, category: c.category, name: c.name, meta: plain(c.meta), docs: c.docs })) }));
 
-  // each component's props table, notes and accessibility, per category (the same files the showcase reads)
-  const { files: reg } = await registry(ROOT);
-  for (const [rel, text] of Object.entries(reg)) if (rel.startsWith("examples/showcase/public/comp/")) put(`comp/${basename(rel)}`, text);
+  // each component's props table, notes and accessibility, per category (the files the site's component pages read)
+  const { comp } = await registry(ROOT);
+  for (const [rel, text] of Object.entries(comp)) put(rel, text);
   // the numbers sites show (components per category, exports, icons, animations, managers, themes, tests)
   const stats = await homeStats(ROOT);
-  delete stats.budget;
   put("stats.json", `${JSON.stringify(stats, null, 2)}\n`);
 
   const walk = (d) => readdirSync(d).flatMap((n) => { const p = join(d, n); return statSync(p).isDirectory() ? walk(p) : [p]; });

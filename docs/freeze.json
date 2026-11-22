@@ -3,1594 +3,1395 @@
   "Accordion": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/accordion",
-    "examples/showcase/public/components/accordion/ide.json"
+    "src/components/layout/accordion"
    ],
-   "hash": "4d562e29e22099eea7b07cc28f202f41"
+   "hash": "a5048af2cf4477b6254c16d0f68e1af3"
   },
   "ActivityBar": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/navigation/activity-bar",
-    "examples/showcase/public/components/activity-bar/ide.json"
+    "src/components/navigation/activity-bar"
    ],
-   "hash": "51b60b2e791ca10ccf4d33863fc12038"
+   "hash": "b931a4d5ec097d8d1b0b2b9d06fecee7"
   },
   "Alert": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/feedback/alert",
-    "examples/showcase/public/components/alert/ide.json"
+    "src/components/feedback/alert"
    ],
-   "hash": "9c33d70a9c728b3fa764ebc904611c0c"
+   "hash": "2cac92ead1d7fe14b7cba7bb25e7b328"
   },
   "AppShell": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/app-shell",
-    "examples/showcase/public/components/app-shell/ide.json"
+    "src/components/layout/app-shell"
    ],
-   "hash": "93eee7c4d48676c5bfdd276a9fb89ae4"
+   "hash": "b3645daf6e1634ae6469f9872afe9430"
   },
   "AppUI": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/app-ui",
-    "examples/showcase/public/components/app-ui/ide.json"
+    "src/components/composite/app-ui"
    ],
-   "hash": "8bb51d6a1c570e78bb63d1e39207ea70"
+   "hash": "8c45c347d544e4241f45ecafd33a7e52"
   },
   "Avatar": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/social/avatar",
-    "examples/showcase/public/components/avatar/ide.json"
+    "src/components/social/avatar"
    ],
-   "hash": "d952fa12abb683b03cb45f27c4a59abb"
+   "hash": "3017277ea7116571d0eabc78e55c0526"
   },
   "AvatarGroup": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/social/avatar-group",
-    "examples/showcase/public/components/avatar-group/ide.json"
+    "src/components/social/avatar-group"
    ],
-   "hash": "2d56f1e0fdf4f28e7d665d3578f8a79d"
+   "hash": "aff62e9b44aa4b0b1c7194b8c853b2b8"
   },
   "Badge": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/badge",
-    "examples/showcase/public/components/badge/ide.json"
+    "src/components/data/badge"
    ],
-   "hash": "9df854122ce0c970bf8aa03609160dce"
+   "hash": "b5d0bc88e13ebde72be10c07ff117b5c"
   },
   "BarChart": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/bar-chart",
-    "examples/showcase/public/components/bar-chart/ide.json"
+    "src/components/data/bar-chart"
    ],
-   "hash": "7e8ce7ab49f3706f13d98d801b88c63a"
+   "hash": "c1fa5f7d08298b08ab007c1b18601602"
   },
   "BarList": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/bar-list",
-    "examples/showcase/public/components/bar-list/ide.json"
+    "src/components/data/bar-list"
    ],
-   "hash": "f91bc1ee077064eb63fe451660e7a1b7"
+   "hash": "3ef476c2f2c5eee65815c08f8a84d52d"
   },
   "BeforeAfter": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/before-after",
-    "examples/showcase/public/components/before-after/ide.json"
+    "src/components/landing/before-after"
    ],
-   "hash": "6ee4d32f8086cd4b4e557a24c7071b24"
+   "hash": "ae4e6fbab2eb6eaa5e42ff16464f4e1e"
   },
   "BottomNav": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/bottom-nav",
-    "examples/showcase/public/components/bottom-nav/ide.json"
+    "src/components/composite/bottom-nav"
    ],
-   "hash": "bc6372577c38d275e75f4d3b4a0446a2"
+   "hash": "ce9b3bdc4067cbbce630bcb9e151a0e7"
   },
   "BottomRightControls": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/bottom-right-controls",
-    "examples/showcase/public/components/bottom-right-controls/ide.json"
+    "src/components/layout/bottom-right-controls"
    ],
-   "hash": "f233603c294f93535f951d92608e0f8d"
+   "hash": "d186f53485bb44ff4f22e4e10f45da38"
   },
   "BranchingStory": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/branching-story",
-    "examples/showcase/public/components/branching-story/ide.json"
+    "src/components/landing/branching-story"
    ],
-   "hash": "3a1e33a542c2b8391bacd8aa18abbf62"
+   "hash": "3b636e7dc8f636db0304205ad5002757"
   },
   "Breadcrumbs": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/navigation/breadcrumbs",
-    "examples/showcase/public/components/breadcrumbs/ide.json"
+    "src/components/navigation/breadcrumbs"
    ],
-   "hash": "c25ea699c4b7b50cb5dec294ec5f53ad"
+   "hash": "e74aded450f5432535c50fce2f9587d3"
   },
   "Button": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/actions/button",
-    "examples/showcase/public/components/button/ide.json"
+    "src/components/actions/button"
    ],
-   "hash": "114240b2dd87a1674ca376bca755ee74"
+   "hash": "b95fb45cb021e8946caac0a81360aba7"
   },
   "ButtonGroup": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/actions/button-group",
-    "examples/showcase/public/components/button-group/ide.json"
+    "src/components/actions/button-group"
    ],
-   "hash": "f65192e20c21dc0de073009e4c8bca9f"
+   "hash": "e818c97a69d7d60b1c4c9a6cbf3872e8"
   },
   "Calendar": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/calendar",
-    "examples/showcase/public/components/calendar/ide.json"
+    "src/components/forms/calendar"
    ],
-   "hash": "badc5a344d3b7824e099d60dcb39a330"
+   "hash": "7d2e81fd3d7a0b9fed57fd6d6998e4bb"
   },
   "Card": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/card",
-    "examples/showcase/public/components/card/ide.json"
+    "src/components/data/card"
    ],
-   "hash": "d57757d58a8b9647aaaac1c7f4d718a9"
+   "hash": "495cca228350fb2c71ca73fc014e8c88"
   },
   "Carousel": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/media/carousel",
-    "examples/showcase/public/components/carousel/ide.json"
+    "src/components/media/carousel"
    ],
-   "hash": "6c2ee98b0934682047297ada5b52ce82"
+   "hash": "07176cb9b316edb4a5961a25d9ec9c98"
   },
   "ChatBubble": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/social/chat-bubble",
-    "examples/showcase/public/components/chat-bubble/ide.json"
+    "src/components/social/chat-bubble"
    ],
-   "hash": "a63a12fcb81e365e71ada0aecae82416"
+   "hash": "48a9eff0c09b999ec2a9b1e448188e5d"
   },
   "ChatComposer": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/chat-composer",
-    "examples/showcase/public/components/chat-composer/ide.json"
+    "src/components/composite/chat-composer"
    ],
-   "hash": "253797b8b2450ec18cfbd6ca263ac5a0"
+   "hash": "37cf1ba26e7562ba42ba130e54653bcf"
   },
   "ChatThread": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/chat-thread",
-    "examples/showcase/public/components/chat-thread/ide.json"
+    "src/components/composite/chat-thread"
    ],
-   "hash": "b5a1db6a6b4af357152aa821bc6fe158"
+   "hash": "4bffde0c3f442db79727fd8bf9ac748a"
   },
   "Checkbox": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/checkbox",
-    "examples/showcase/public/components/checkbox/ide.json"
+    "src/components/forms/checkbox"
    ],
-   "hash": "52edc198abd33e78dded5704711fc151"
+   "hash": "2d56079ccc796a29e8c17094c9331fe2"
   },
   "CheckboxGroup": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/checkbox-group",
-    "examples/showcase/public/components/checkbox-group/ide.json"
+    "src/components/forms/checkbox-group"
    ],
-   "hash": "0f2f88fc0c5843ad549e63025a5e32c4"
+   "hash": "5b10dfb1a5e37f900c3f710632ef5ad8"
   },
   "CheckMark": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/feedback/check-mark",
-    "examples/showcase/public/components/check-mark/ide.json"
+    "src/components/feedback/check-mark"
    ],
-   "hash": "21a7a84c4a6db082a4e0e8f44af2d460"
+   "hash": "0e039a8c42cbc4e1369a502b201d10bf"
   },
   "Chevron": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/actions/chevron",
-    "examples/showcase/public/components/chevron/ide.json"
+    "src/components/actions/chevron"
    ],
-   "hash": "d63bd43213f86d978632fe1a48662f08"
+   "hash": "ff4836003e58ea51ce8ad912b70ac7fc"
   },
   "Chip": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/actions/chip",
-    "examples/showcase/public/components/chip/ide.json"
+    "src/components/actions/chip"
    ],
-   "hash": "15fc72bfd7fdc089b0d428f1ce98951d"
+   "hash": "19f7dc454bed68ded50013fafcee2fd8"
   },
   "ChoicePicker": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/choice-picker",
-    "examples/showcase/public/components/choice-picker/ide.json"
+    "src/components/forms/choice-picker"
    ],
-   "hash": "0f7c1342d81a62f3746fc017f575de7c"
+   "hash": "0d9dbf561ec21857eb4f26211b2977c6"
   },
   "ClampText": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/typography/clamp-text",
-    "examples/showcase/public/components/clamp-text/ide.json"
+    "src/components/typography/clamp-text"
    ],
-   "hash": "3f2d8f471e7ee07aa3f2ba66a0a61a3f"
+   "hash": "18a5514c1003f18b4a9a410e712e1a97"
   },
   "CodeEditor": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/code-editor",
-    "examples/showcase/public/components/editors-code/ide.json"
+    "src/components/composite/code-editor"
    ],
-   "hash": "c56cde364cd2afb45ad347277104d3ad"
+   "hash": "bcc663092f02e420f0c306209b3b6572"
   },
   "CodeInput": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/code-input",
-    "examples/showcase/public/components/forms-code/ide.json"
+    "src/components/forms/code-input"
    ],
-   "hash": "81d17f29a85a43c6275a9c8a3a1091e8"
+   "hash": "939c5ebd6d42b9fa1b315558b4ea3404"
   },
   "CodeView": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/typography/code-view",
-    "examples/showcase/public/components/code-view/ide.json"
+    "src/components/typography/code-view"
    ],
-   "hash": "103a51dd8cbf3b86c01778b1997f51dc"
+   "hash": "ec345b6a0cb1791c8a0dc7468898091b"
   },
   "ColorInput": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/color-input",
-    "examples/showcase/public/components/color-input/ide.json"
+    "src/components/forms/color-input"
    ],
-   "hash": "0c69b14ae8d08957e31fb64246911db0"
+   "hash": "03b17d71ea2000a33f84854b43b7f379"
   },
   "ColorPicker": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/color-picker",
-    "examples/showcase/public/components/color/ide.json"
+    "src/components/composite/color-picker"
    ],
-   "hash": "d3bf416eb2f27c7ac51a5ca7a278071a"
+   "hash": "0d967909336b1af31cf081cec0b2da35"
   },
   "Combobox": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/combobox",
-    "examples/showcase/public/components/combobox/ide.json"
+    "src/components/forms/combobox"
    ],
-   "hash": "98c336b0e6fe6f7cd6603507eacf6ba7"
+   "hash": "809a61b1d95569e38726b6a860db07c0"
   },
   "CommandPalette": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/command-palette",
-    "examples/showcase/public/components/command-palette/ide.json"
+    "src/components/composite/command-palette"
    ],
-   "hash": "9808169f3513886a4927042d0aa1f446"
+   "hash": "96afd63e7ab84655b3a9f8a4870b84c4"
   },
   "ConsentBanner": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/consent-banner",
-    "examples/showcase/public/components/consent-banner/ide.json"
+    "src/components/composite/consent-banner"
    ],
-   "hash": "2abccf80934ac0618b5474bc86a2ce33"
+   "hash": "cc11d0209107dbf5046b670a77e5d282"
   },
   "ContextMenu": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/overlays/context-menu",
-    "examples/showcase/public/components/context-menu/ide.json"
+    "src/components/overlays/context-menu"
    ],
-   "hash": "c1f43575cf138b5f30dcdebbfeda8341"
+   "hash": "14e8eb01a5f2cccda1245e3e06dccffa"
   },
   "CopyButton": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/actions/copy-button",
-    "examples/showcase/public/components/copy-button/ide.json"
+    "src/components/actions/copy-button"
    ],
-   "hash": "e444bee1ee9b63cefb3f72c6337085f4"
+   "hash": "717617930b1bec720dcad8b315a3bb9c"
   },
   "CornerMark": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/media/corner-mark",
-    "examples/showcase/public/components/corner-mark/ide.json"
+    "src/components/media/corner-mark"
    ],
-   "hash": "3e8ff9cb99be03e642fb2ad063a7352b"
+   "hash": "83fea9efd62d3c8bf3a8f0a5376ff953"
   },
   "Counter": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/counter",
-    "examples/showcase/public/components/counter/ide.json"
+    "src/components/landing/counter"
    ],
-   "hash": "b8aeab62ddbe2c1b021866ce0bb6fc5a"
+   "hash": "0efed5c33222d06c0ad5dc63ce0f4aae"
   },
   "CountRoll": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/social/count-roll",
-    "examples/showcase/public/components/count-roll/ide.json"
+    "src/components/social/count-roll"
    ],
-   "hash": "52c4428ceab7cbc2b9874d78b5933d20"
+   "hash": "122f23a828a4d0ee716ea7897e75f5bd"
   },
   "CtaBand": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/cta-band",
-    "examples/showcase/public/components/cta-band/ide.json"
+    "src/components/landing/cta-band"
    ],
-   "hash": "abdb56d70e8a0caf6723a384ca29625a"
+   "hash": "8ee2aed896102bbffc07029e5b45b9a4"
   },
   "DataGrid": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/data-grid",
-    "examples/showcase/public/components/data-grid/ide.json"
+    "src/components/data/data-grid"
    ],
-   "hash": "b3f58f5da472917c8b4be96607440098"
+   "hash": "bcdb33fcc8adab1aba04be0dca6592a0"
   },
   "DatePicker": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/date-picker",
-    "examples/showcase/public/components/date/ide.json"
+    "src/components/forms/date-picker"
    ],
-   "hash": "00c25a9f1f44f8b2cc1bb0195fdfac18"
+   "hash": "8596058ec4c0247aa1556dcc24e2fb1b"
   },
   "DateRangePicker": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/date-range-picker",
-    "examples/showcase/public/components/date-range/ide.json"
+    "src/components/forms/date-range-picker"
    ],
-   "hash": "420b2c5935da67c25897a8c872a7685d"
+   "hash": "74d70032671cbeb480ead4ed14bb88b6"
   },
   "DateTimeInput": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/date-time-input",
-    "examples/showcase/public/components/date-time/ide.json"
+    "src/components/forms/date-time-input"
    ],
-   "hash": "853701168396d378d3eb8e6406f8402e"
+   "hash": "ad5380ea8b8cdc4bf26793b61765fcfb"
   },
   "Debugger": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/debugger",
-    "examples/showcase/public/components/debugger/ide.json"
+    "src/components/composite/debugger"
    ],
-   "hash": "0d93fedd95a823f297fd6d665078be48"
+   "hash": "acf014e83baec7da9a4fdb28484856b3"
   },
   "DevicePicker": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/device-picker",
-    "examples/showcase/public/components/device-picker/ide.json"
+    "src/components/layout/device-picker"
    ],
-   "hash": "cf82b08cdc0df8154e9117467448909c"
+   "hash": "6f92da18d5281b5ac5789525494a799c"
   },
   "DevicePreview": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/device-preview",
-    "examples/showcase/public/components/device-preview/ide.json"
+    "src/components/layout/device-preview"
    ],
-   "hash": "378bccf235d67c9367924c144742a59e"
+   "hash": "e09e3d8f6212056f988cf39a26fa92c1"
   },
   "Dialog": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/overlays/dialog",
-    "examples/showcase/public/components/dialog/ide.json"
+    "src/components/overlays/dialog"
    ],
-   "hash": "2a15426cafce932d957fa03c836fc783"
+   "hash": "e67dc9481eb228cdd9b537e480314dec"
   },
   "Disclosure": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/disclosure",
-    "examples/showcase/public/components/disclosure/ide.json"
+    "src/components/layout/disclosure"
    ],
-   "hash": "d28d5bd615e31fd6fd61c6c425f6ab87"
+   "hash": "73256693ac608e9485f4c703e69d5c6e"
   },
   "DockLayout": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/dock-layout",
-    "examples/showcase/public/components/dock-layout/ide.json"
+    "src/components/composite/dock-layout"
    ],
-   "hash": "d530ee4e52ec2013577fd770f2596ef5"
+   "hash": "feacdd25c26a378d9222a6172571e79a"
   },
   "Drawer": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/overlays/drawer",
-    "examples/showcase/public/components/drawer/ide.json"
+    "src/components/overlays/drawer"
    ],
-   "hash": "5e9de45b1db7d12b7684b7d8ff9ad7d1"
+   "hash": "32f1b8489a6a460923db9d1fd44a7b28"
   },
   "EasingCurveEditor": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/motion/easing-curve-editor",
-    "examples/showcase/public/components/easing/ide.json"
+    "src/components/motion/easing-curve-editor"
    ],
-   "hash": "5491a9f0f276d113ef4ce2c2e97c9e61"
+   "hash": "ac3e587ae9f11cbf7dcc4630edcb9394"
   },
   "EditorFrame": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/editor-frame",
-    "examples/showcase/public/components/editor-frame/ide.json"
+    "src/components/composite/editor-frame"
    ],
-   "hash": "bf5c5d6f0c1f6ef4d415877895a32fc0"
+   "hash": "416b5d9d5822cc150d0baf5be194f486"
   },
   "Empty": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/feedback/empty",
-    "examples/showcase/public/components/empty/ide.json"
+    "src/components/feedback/empty"
    ],
-   "hash": "c770cde5d7b8652f22e3577577b137b3"
+   "hash": "2a8f03910159be5b03e27615b32a0ec7"
   },
   "ErrorBox": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/feedback/error-box",
-    "examples/showcase/public/components/error-box/ide.json"
+    "src/components/feedback/error-box"
    ],
-   "hash": "be207d2725e85146f49435113eba093d"
+   "hash": "d218971bf23ab6ed9b0842f694e7643c"
   },
   "ExplodedView": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/exploded-view",
-    "examples/showcase/public/components/exploded-view/ide.json"
+    "src/components/layout/exploded-view"
    ],
-   "hash": "994038f6832cd8ffc1f32a93e68c8bbb"
+   "hash": "562e34bcbc34f6f74bd88a0298ff5b98"
   },
   "Faq": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/faq",
-    "examples/showcase/public/components/faq/ide.json"
+    "src/components/landing/faq"
    ],
-   "hash": "be93f5a6f5a94a21f6ac880c7007bcd8"
+   "hash": "9db430e2239f7237eca2a7e371261f3c"
   },
   "FeatureGrid": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/feature-grid",
-    "examples/showcase/public/components/feature-grid/ide.json"
+    "src/components/landing/feature-grid"
    ],
-   "hash": "7be80d0832aa647ca2797488ad43927f"
+   "hash": "340775d5c76f23d0b7c5efd7264684c4"
   },
   "Feed": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/feed",
-    "examples/showcase/public/components/feed/ide.json"
+    "src/components/composite/feed"
    ],
-   "hash": "2a2e12833cf237185d732a2647f8a45e"
+   "hash": "5f3a9c57f740762ef2d49e84ab707bd0"
   },
   "FileUpload": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/file-upload",
-    "examples/showcase/public/components/file-upload/ide.json"
+    "src/components/forms/file-upload"
    ],
-   "hash": "9c6ebcec2e51629e5e93a4316f87b77a"
+   "hash": "0e150ec62033eadf4b8c71a6e9369d56"
   },
   "FollowButton": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/social/follow-button",
-    "examples/showcase/public/components/follow-button/ide.json"
+    "src/components/social/follow-button"
    ],
-   "hash": "2da40d22637bf0fd6bf4eeb2566bd9a4"
+   "hash": "dd6de28cc29a5864223c56bb0d44f0d4"
   },
   "FontPicker": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/font-picker",
-    "examples/showcase/public/components/font/ide.json"
+    "src/components/composite/font-picker"
    ],
-   "hash": "aa3aa185b3907811b604ead50365049f"
+   "hash": "fe0d674efc8a302b94d2f541f726db25"
   },
   "FormatToolbar": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/format-toolbar",
-    "examples/showcase/public/components/format-toolbar/ide.json"
+    "src/components/composite/format-toolbar"
    ],
-   "hash": "c7f1a35ed76ebb0de7cfd42d5670f1ea"
+   "hash": "323f78ffbc03ee2e03b3d1160c67dd3b"
   },
   "Gantt": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/gantt",
-    "examples/showcase/public/components/gantt/ide.json"
+    "src/components/data/gantt"
    ],
-   "hash": "ff27c8c2ebfca78ea8bd534860deaca2"
+   "hash": "2a6e48e5eb38826d1faa0b4a6e4e4673"
   },
   "GradientEditor": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/gradient-editor",
-    "examples/showcase/public/components/gradient/ide.json"
+    "src/components/composite/gradient-editor"
    ],
-   "hash": "d2a4e117661bacce2c7890626d9561f9"
+   "hash": "05c5682aabfc1eb3e1c5acd2ff0a2153"
   },
   "Grid": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/grid",
-    "examples/showcase/public/components/grid/ide.json"
+    "src/components/layout/grid"
    ],
-   "hash": "8177bcf59c8d5bc6ec46b0bd8cf1a3bb"
+   "hash": "4bbf17f15082d75f0df4d1131a4458df"
   },
   "Heatmap": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/heatmap",
-    "examples/showcase/public/components/heatmap/ide.json"
+    "src/components/data/heatmap"
    ],
-   "hash": "698f48de69982ebcfed01c0892eaa87a"
+   "hash": "848c7922b3283378d70a0a072f0ae8fa"
   },
   "Hero": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/hero",
-    "examples/showcase/public/components/hero/ide.json"
+    "src/components/landing/hero"
    ],
-   "hash": "4ca6d1384ae4369e00cb93447d380129"
+   "hash": "403494c488efeb4710c64f886e7fafd8"
   },
   "HonestCompare": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/honest-compare",
-    "examples/showcase/public/components/honest-compare/ide.json"
+    "src/components/landing/honest-compare"
    ],
-   "hash": "6e186860030d6ed3532071249a24aae4"
+   "hash": "8dfb7d230eeaf8bc99b5e3ad02e62cba"
   },
   "HorizontalScroll": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/horizontal-scroll",
-    "examples/showcase/public/components/horizontal-scroll/ide.json"
+    "src/components/landing/horizontal-scroll"
    ],
-   "hash": "ad79feb777ee645187f3493560eefe15"
+   "hash": "bddcb4807737e7fe600df00daaf6a601"
   },
   "IconButton": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/actions/icon-button",
-    "examples/showcase/public/components/icon-button/ide.json"
+    "src/components/actions/icon-button"
    ],
-   "hash": "1449a656cbb1e817dda77ab0ab37e7bc"
+   "hash": "670ab411725e85b1285833496e969ab3"
   },
   "IconPicker": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/icon-picker",
-    "examples/showcase/public/components/icon-picker/ide.json"
+    "src/components/forms/icon-picker"
    ],
-   "hash": "30f50278f145f8b4ab0819d57fc672b5"
+   "hash": "5ab88f6367a3e2b90d23f7cc3bc3fd46"
   },
   "IconTile": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/icon-tile",
-    "examples/showcase/public/components/icon-tile/ide.json"
+    "src/components/data/icon-tile"
    ],
-   "hash": "2e8058fc0c05a35eecb7605f8c96f3c7"
+   "hash": "eff7ff4a10fcef217d8d5b7d35059e5a"
   },
   "ImageCropper": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/image-cropper",
-    "examples/showcase/public/components/image-cropper/ide.json"
+    "src/components/composite/image-cropper"
    ],
-   "hash": "3969ae0c6e7bd5f3012011a4a1e49e41"
+   "hash": "ea836220de9212be16957163a3fc74bd"
   },
   "Joined": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/joined",
-    "examples/showcase/public/components/joined/ide.json"
+    "src/components/layout/joined"
    ],
-   "hash": "2448f21edbe303fa30b518144ce3325d"
+   "hash": "34aa0d0607a6266d0bdf209534fa40b9"
   },
   "JsonEditor": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/json-editor",
-    "examples/showcase/public/components/json/ide.json"
+    "src/components/composite/json-editor"
    ],
-   "hash": "ab5eea5a33c63ccb068ac8a927108eec"
+   "hash": "13f284616e45fe2fb1a213d71a92a577"
   },
   "JsonView": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/json-view",
-    "examples/showcase/public/components/json-view/ide.json"
+    "src/components/data/json-view"
    ],
-   "hash": "7fbf687ce6f7f38a1693a7237b117b25"
+   "hash": "057e5a8af637f49fccc81bcac960b764"
   },
   "Kanban": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/kanban",
-    "examples/showcase/public/components/kanban/ide.json"
+    "src/components/data/kanban"
    ],
-   "hash": "3ddce560ca0703e07a2d8074b22575ed"
+   "hash": "c9012eed3362b2d62a32af4330f9e4f5"
   },
   "Kbd": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/typography/kbd",
-    "examples/showcase/public/components/kbd/ide.json"
+    "src/components/typography/kbd"
    ],
-   "hash": "ef717ab6646b2dda01002e2c621ef02d"
+   "hash": "167f56eb0780914bd5ec60b69d3ea5b2"
   },
   "KeyframeTimeline": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/keyframe-timeline",
-    "examples/showcase/public/components/keyframes/ide.json"
+    "src/components/composite/keyframe-timeline"
    ],
-   "hash": "870578e9ae36f6a678f7abecd7d7c4ba"
+   "hash": "c11c208df366cec32f6fd39b21e7a282"
   },
   "KeyValue": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/key-value",
-    "examples/showcase/public/components/key-value/ide.json"
+    "src/components/data/key-value"
    ],
-   "hash": "39b9de07adc196a6e2927ae042c57b1c"
+   "hash": "2f94cbc6f940d2486838295a249d64f7"
   },
   "KeyValueEditor": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/key-value-editor",
-    "examples/showcase/public/components/key-value-editor/ide.json"
+    "src/components/forms/key-value-editor"
    ],
-   "hash": "5c2ee142d1de5b645eac276367432868"
+   "hash": "e7d7c17170631026cc08d47ea5a85eeb"
   },
   "Layout": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/layout",
-    "examples/showcase/public/components/layout/ide.json"
+    "src/components/layout/layout"
    ],
-   "hash": "cf0f2774c260324593ecd55ea5346fcd"
+   "hash": "c3d34d44fc820b49ac0de4169157a30b"
   },
   "LikeButton": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/social/like-button",
-    "examples/showcase/public/components/like-button/ide.json"
+    "src/components/social/like-button"
    ],
-   "hash": "d9580cb281ea7c951960cfd082dc7d77"
+   "hash": "0cbd8a94b7f46a0dc8ec23dbb2f435d4"
   },
   "LineChart": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/line-chart",
-    "examples/showcase/public/components/line-chart/ide.json"
+    "src/components/data/line-chart"
    ],
-   "hash": "70e5184888e057b2548729ecc6d73312"
+   "hash": "587ae4c3bb02727b9498673ec013c612"
   },
   "LinkCard": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/navigation/link-card",
-    "examples/showcase/public/components/link-card/ide.json"
+    "src/components/navigation/link-card"
    ],
-   "hash": "6ce5a61684035d2a786e37b0f734e83a"
+   "hash": "2f30378cd79e15142928e27f7fd1b5d5"
   },
   "ListEditor": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/list-editor",
-    "examples/showcase/public/components/list-editor/ide.json"
+    "src/components/forms/list-editor"
    ],
-   "hash": "2ec115fe99533a05a74dc2c54382b713"
+   "hash": "875d88eb49ddc9bcb621823b808f55cf"
   },
   "ListRow": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/list-row",
-    "examples/showcase/public/components/list-row/ide.json"
+    "src/components/data/list-row"
    ],
-   "hash": "59bf444659751a6cc00107e2e7f62765"
+   "hash": "82a2d249e7849c4972c7ef2be0292519"
   },
   "LiveCounter": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/live-counter",
-    "examples/showcase/public/components/live-counter/ide.json"
+    "src/components/landing/live-counter"
    ],
-   "hash": "3110e4f653c8eca09881fda2f4be14bc"
+   "hash": "5d24c2bcb5c69edb45dfdf5430e2b5ee"
   },
   "LiveFeed": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/live-feed",
-    "examples/showcase/public/components/live-feed/ide.json"
+    "src/components/landing/live-feed"
    ],
-   "hash": "0675f3c472eae061e03f06718e6746e8"
+   "hash": "ed872d552514c05dab0fda164e0010bb"
   },
   "LiveStatus": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/feedback/live-status",
-    "examples/showcase/public/components/live-status/ide.json"
+    "src/components/feedback/live-status"
    ],
-   "hash": "f37e7ea524bda81c9b9d4f9396837b01"
+   "hash": "a30869560f797de857ce8044e9187f21"
   },
   "Loader": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/feedback/loader",
-    "examples/showcase/public/components/loader/ide.json"
+    "src/components/feedback/loader"
    ],
-   "hash": "f21f3a9dbd113c08a1f5306424b39335"
+   "hash": "25e240626426e6f5ac5af353ecbfc1a2"
   },
   "LogoCloud": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/logo-cloud",
-    "examples/showcase/public/components/logo-cloud/ide.json"
+    "src/components/landing/logo-cloud"
    ],
-   "hash": "6dfc9ba837151e7feec49fb8bfcf9fd8"
+   "hash": "52a4c06e725b5eb80e3384aabf2d20fc"
   },
   "MadeWithMarch": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/actions/made-with-march",
-    "examples/showcase/public/components/made-with-march/ide.json"
+    "src/components/actions/made-with-march"
    ],
-   "hash": "b020f36de3b3c297f69af2daaeb2d42c"
+   "hash": "3dac34e2bd3dea7c57bdd369ebbf4735"
   },
   "MarkdownEditor": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/markdown-editor",
-    "examples/showcase/public/components/markdown/ide.json"
+    "src/components/composite/markdown-editor"
    ],
-   "hash": "21024992bd95aa0d4bacb6ead4fff148"
+   "hash": "057d0cf5a350f70b98192abe9fdc48ff"
   },
   "Media": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/media/media",
-    "examples/showcase/public/components/media/ide.json"
+    "src/components/media/media"
    ],
-   "hash": "e423857656b8de6f9421207663c3b430"
+   "hash": "b3313d63103b8a5e6319d4d34872d880"
   },
   "MediaGrid": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/social/media-grid",
-    "examples/showcase/public/components/media-grid/ide.json"
+    "src/components/social/media-grid"
    ],
-   "hash": "9efda6e1f6766cb051cab72ab10d620c"
+   "hash": "2379e9a48115297fd5383a8e0d160bee"
   },
   "Menu": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/actions/menu",
-    "examples/showcase/public/components/menu/ide.json"
+    "src/components/actions/menu"
    ],
-   "hash": "4beadd8df2c82f48aee1415d88e8313a"
+   "hash": "208c8e285d7ad538eb44df45be434694"
   },
   "MultiSelect": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/multi-select",
-    "examples/showcase/public/components/multi-select/ide.json"
+    "src/components/forms/multi-select"
    ],
-   "hash": "9d4088ef8d9d39b56a5787cedc8a2247"
+   "hash": "14117793edf3c58cda22277ed24e26c8"
   },
   "NavMenu": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/navigation/nav-menu",
-    "examples/showcase/public/components/nav-menu/ide.json"
+    "src/components/navigation/nav-menu"
    ],
-   "hash": "6e008524d3aa6d9657469ec85f759561"
+   "hash": "ca8050ca653a22d1bece0565c95aeeb2"
   },
   "NavSidebar": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/nav-sidebar",
-    "examples/showcase/public/components/nav-sidebar/ide.json"
+    "src/components/composite/nav-sidebar"
    ],
-   "hash": "fa394095bfa95ad2d8252c5dceca38d2"
+   "hash": "1bbf38184168f5452df4764368a47398"
   },
   "NetworkThrottle": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/network-throttle",
-    "examples/showcase/public/components/network-throttle/ide.json"
+    "src/components/composite/network-throttle"
    ],
-   "hash": "0cd8d87a171aeacf452f818e1c209c98"
+   "hash": "03bdb28742e7e74b3cefbaad3c200a32"
   },
   "Newsletter": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/newsletter",
-    "examples/showcase/public/components/newsletter/ide.json"
+    "src/components/landing/newsletter"
    ],
-   "hash": "14fc80e551bb26d9754d47a2725f3d16"
+   "hash": "5972843ece3716bdd88f1c49f44d6732"
   },
   "NotForYou": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/not-for-you",
-    "examples/showcase/public/components/not-for-you/ide.json"
+    "src/components/landing/not-for-you"
    ],
-   "hash": "ef5a8da2bd330ebdaf8b15605140e1b0"
+   "hash": "52b8448dbda40dfeba173389c094a58e"
   },
   "NumberInput": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/number-input",
-    "examples/showcase/public/components/number/ide.json"
+    "src/components/forms/number-input"
    ],
-   "hash": "0cdfb42ffcd43c5f179ebcda54d53d9f"
+   "hash": "3cfae6b9ce25419ad7965600de05eff7"
   },
   "OptionList": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/option-list",
-    "examples/showcase/public/components/option-list/ide.json"
+    "src/components/forms/option-list"
    ],
-   "hash": "71d549d051dd4de23b204e58d6020da4"
+   "hash": "c742fa3f3a451cfa981e4c3d164a8367"
   },
   "OverflowText": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/typography/overflow-text",
-    "examples/showcase/public/components/overflow-text/ide.json"
+    "src/components/typography/overflow-text"
    ],
-   "hash": "e949ed788c5122cf4f279d4ea012eec3"
+   "hash": "0416d8f878ae965c0a8c608e689395b5"
   },
   "OverflowToolbar": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/actions/overflow-toolbar",
-    "examples/showcase/public/components/overflow-toolbar/ide.json"
+    "src/components/actions/overflow-toolbar"
    ],
-   "hash": "ee3d8a49f3b9119dc7244f179ff06140"
+   "hash": "04ec6715fa1cc03fed595d2e08fcda6d"
   },
   "Overlay": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/media/overlay",
-    "examples/showcase/public/components/overlay/ide.json"
+    "src/components/media/overlay"
    ],
-   "hash": "af7be07164109cdff05fd21c48ee03bc"
+   "hash": "ce09319b7e85adb428e6be5ef4c39a3d"
   },
   "OverlayScope": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/overlay-scope",
-    "examples/showcase/public/components/overlay-scope/ide.json"
+    "src/components/layout/overlay-scope"
    ],
-   "hash": "7e9a50583ac77dec76022e3b80133d30"
+   "hash": "998b29f3f28e4c8fa5452cc0c58f76ab"
   },
   "PageDots": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/navigation/page-dots",
-    "examples/showcase/public/components/page-dots/ide.json"
+    "src/components/navigation/page-dots"
    ],
-   "hash": "d063d9a2b3ca41367ab01caecec86639"
+   "hash": "4ade13835303672e8c491c6a340f2d4d"
   },
   "Pagination": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/navigation/pagination",
-    "examples/showcase/public/components/pagination/ide.json"
+    "src/components/navigation/pagination"
    ],
-   "hash": "429868d7c40005db0bbd9d9fd21635c5"
+   "hash": "eb7dbb0ee34a86af526f6100b2b99b26"
   },
   "PanelHeader": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/panel-header",
-    "examples/showcase/public/components/panel-header/ide.json"
+    "src/components/layout/panel-header"
    ],
-   "hash": "2c18642dd8b5703982a11dd2e57cfd1d"
+   "hash": "ddc305017fe32b56e0ad8a590a3e6701"
   },
   "Parallax": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/parallax",
-    "examples/showcase/public/components/parallax/ide.json"
+    "src/components/landing/parallax"
    ],
-   "hash": "60d7a8c08e13ed85600230656897bf79"
+   "hash": "98395661069ca2a83db9c4c63feaf8ca"
   },
   "PasswordInput": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/password-input",
-    "examples/showcase/public/components/password/ide.json"
+    "src/components/forms/password-input"
    ],
-   "hash": "71813e52208f40651ff0ceb3a7bbf6d5"
+   "hash": "67ded0ee0dfe4427994181b352f767f0"
   },
   "PeriodNav": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/navigation/period-nav",
-    "examples/showcase/public/components/period-nav/ide.json"
+    "src/components/navigation/period-nav"
    ],
-   "hash": "61414ba77fcb12ce70beba0415cc0b68"
+   "hash": "27f81517250ad8a194ea18ef68855617"
   },
   "PhoneInput": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/phone-input",
-    "examples/showcase/public/components/phone/ide.json"
+    "src/components/forms/phone-input"
    ],
-   "hash": "e8f50d36c37b2fb2f2ef85b9a7cf6c23"
+   "hash": "290493776e7421db74b671b0ffabd97c"
   },
   "Picture": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/media/picture",
-    "examples/showcase/public/components/picture/ide.json"
+    "src/components/media/picture"
    ],
-   "hash": "da6c77a1d030dedd224d8fcf272f1af5"
+   "hash": "987260ab3714dd27cf13be3310d785d7"
   },
   "PieChart": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/pie-chart",
-    "examples/showcase/public/components/pie-chart/ide.json"
+    "src/components/data/pie-chart"
    ],
-   "hash": "b6d4507eb2aa607e223a6f8f8bda4ebf"
+   "hash": "6b6b81226cd2d8918a604413b87a4c05"
   },
   "Popover": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/overlays/popover",
-    "examples/showcase/public/components/popover/ide.json"
+    "src/components/overlays/popover"
    ],
-   "hash": "8023690bfe335b3ec7e23c97bf5fe5f4"
+   "hash": "af26ab661f283af436955eb0d399bd4d"
   },
   "PostCard": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/post-card",
-    "examples/showcase/public/components/post-card/ide.json"
+    "src/components/composite/post-card"
    ],
-   "hash": "54f32300aa31eb5e6a36f3b0aaee4af0"
+   "hash": "46073255e8545b1f85605e178bb03d7a"
   },
   "Presentation": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/presentation",
-    "examples/showcase/public/components/presentation/ide.json"
+    "src/components/landing/presentation"
    ],
-   "hash": "2845e7f06d578b29b4930419463f9699"
+   "hash": "c4c3520a9f72913cbee79b797b8816a3"
   },
   "Pricing": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/pricing",
-    "examples/showcase/public/components/pricing/ide.json"
+    "src/components/landing/pricing"
    ],
-   "hash": "4278ced0e36d526dcbe80c7a2221f445"
+   "hash": "d1d371158cf94034e3e7d2d1770fe875"
   },
   "ProfileHeader": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/profile-header",
-    "examples/showcase/public/components/profile-header/ide.json"
+    "src/components/composite/profile-header"
    ],
-   "hash": "48467952babd32952775455603863cb2"
+   "hash": "e049d9bf5bfe004da857253b6b8799c7"
   },
   "Progress": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/feedback/progress",
-    "examples/showcase/public/components/progress/ide.json"
+    "src/components/feedback/progress"
    ],
-   "hash": "de8a85d83d9f1995e4087a82e0b8d00a"
+   "hash": "65b5ac4f615f64c87cc055a4bfe3fdca"
   },
   "ProgressRing": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/progress-ring",
-    "examples/showcase/public/components/progress-ring/ide.json"
+    "src/components/data/progress-ring"
    ],
-   "hash": "50913c0b70a012449d6099c3b65d75dc"
+   "hash": "1d93e5960eeaa64add7476d8249d14ad"
   },
   "ProjectDetail": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/project-detail",
-    "examples/showcase/public/components/project-detail/ide.json"
+    "src/components/landing/project-detail"
    ],
-   "hash": "abf30f62573a0e29cf38846b882165b6"
+   "hash": "7b054b4ef8e8d9c7228c7c91f12f657e"
   },
   "ProjectGrid": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/project-grid",
-    "examples/showcase/public/components/project-grid/ide.json"
+    "src/components/landing/project-grid"
    ],
-   "hash": "98f7806b41e5b85c8ea4d7466144f78b"
+   "hash": "5d70e224151f55d0a22f5098348a91b7"
   },
   "PropertyGrid": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/property-grid",
-    "examples/showcase/public/components/property-grid/ide.json"
+    "src/components/composite/property-grid"
    ],
-   "hash": "f9db718899cf4164c7b7fc679e3815b0"
+   "hash": "fcda12c5a7bd854e95b2f63608ffc561"
   },
   "PullToRefresh": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/feedback/pull-to-refresh",
-    "examples/showcase/public/components/pull-to-refresh/ide.json"
+    "src/components/feedback/pull-to-refresh"
    ],
-   "hash": "c4eb1c45489174c6e829268c60f29c2b"
+   "hash": "a92787fa784409e615c0b21c04601d69"
   },
   "RadioGroup": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/radio-group",
-    "examples/showcase/public/components/radio-group/ide.json"
+    "src/components/forms/radio-group"
    ],
-   "hash": "fa0eb5bbb93f741274d1b3df0512fcf8"
+   "hash": "da1ae8607287791af71434fee8ee588b"
   },
   "Rating": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/rating",
-    "examples/showcase/public/components/rating/ide.json"
+    "src/components/forms/rating"
    ],
-   "hash": "4c0bfde2c71c1bac1a96d5514fb7676e"
+   "hash": "b083033547f4063c41816058c03dcef4"
   },
   "ReactionPicker": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/social/reaction-picker",
-    "examples/showcase/public/components/reaction-picker/ide.json"
+    "src/components/social/reaction-picker"
    ],
-   "hash": "ddf03040c6de58b997d8c615dfa043e0"
+   "hash": "eb9be77419ad17096636fed79953410a"
   },
   "ReplyQuote": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/social/reply-quote",
-    "examples/showcase/public/components/reply-quote/ide.json"
+    "src/components/social/reply-quote"
    ],
-   "hash": "b92040a261b3192807dbeeac0f657c1a"
+   "hash": "4e47f36b1a96c5c4083c164756302d2a"
   },
   "ResizeHandle": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/resize-handle",
-    "examples/showcase/public/components/resize-handle/ide.json"
+    "src/components/layout/resize-handle"
    ],
-   "hash": "f2bd11f2c727aedcabfcafa8ced7bddc"
+   "hash": "84dc0460edd4551f54e216b22e5816a7"
   },
   "Reveal": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/reveal",
-    "examples/showcase/public/components/web-reveal/ide.json"
+    "src/components/landing/reveal"
    ],
-   "hash": "129011305aa5e13082a3a2dd9935950f"
+   "hash": "c4d881dd04461895b45f0175dc8f2f55"
   },
   "RichTextEditor": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/rich-text-editor",
-    "examples/showcase/public/components/rich-text/ide.json"
+    "src/components/composite/rich-text-editor"
    ],
-   "hash": "8ea9325e9124345962567ca72344f3c1"
+   "hash": "af8600511f452e6a9ed393e07f88ceb3"
   },
   "Roadmap": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/roadmap",
-    "examples/showcase/public/components/roadmap/ide.json"
+    "src/components/landing/roadmap"
    ],
-   "hash": "4ef9452164cf1558a96acc659c0a9d2d"
+   "hash": "86a97c99676abf9a8a4f20f945751eff"
   },
   "RowTools": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/row-tools",
-    "examples/showcase/public/components/row-tools/ide.json"
+    "src/components/forms/row-tools"
    ],
-   "hash": "a01b4d5da0062a95b0b34bbe7ef51eed"
+   "hash": "a3feea4df42b9d51b60f576c4acb81f3"
   },
   "Scheduler": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/scheduler",
-    "examples/showcase/public/components/scheduler/ide.json"
+    "src/components/data/scheduler"
    ],
-   "hash": "240961eaf4b287872440e86da3c4010c"
+   "hash": "74af4c9ab4beb6ffc3f208a4902b3e84"
   },
   "ScrollProgress": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/scroll-progress",
-    "examples/showcase/public/components/scroll-progress/ide.json"
+    "src/components/landing/scroll-progress"
    ],
-   "hash": "904330ae9f8dbf002b633af6a72f62c0"
+   "hash": "5f05c3ccdd1bc73373a63f14f7bd5967"
   },
   "ScrollStory": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/scroll-story",
-    "examples/showcase/public/components/scroll-story/ide.json"
+    "src/components/landing/scroll-story"
    ],
-   "hash": "3f999853f4d2823e70cb66818a888d30"
+   "hash": "5380472be669e20e96996b7f27477420"
   },
   "ScrollToTop": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/actions/scroll-to-top",
-    "examples/showcase/public/components/scroll-to-top/ide.json"
+    "src/components/actions/scroll-to-top"
    ],
-   "hash": "563e034dcb97f4672e49d957d72276bd"
+   "hash": "8052801b79770bf0cf01ea2d31227f4c"
   },
   "SearchBox": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/search-box",
-    "examples/showcase/public/components/search-box/ide.json"
+    "src/components/forms/search-box"
    ],
-   "hash": "7ab6d17aa9b850919ffcd37e7642143f"
+   "hash": "74f79e45bc6eb8dd426f86f93ae6f0ac"
   },
   "Secret": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/typography/secret",
-    "examples/showcase/public/components/secret/ide.json"
+    "src/components/typography/secret"
    ],
-   "hash": "5bc6f11a8cc400a1ffd903e98a317318"
+   "hash": "f0ff91f1b178af084a772ed596023d98"
   },
   "SectionHead": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/section-head",
-    "examples/showcase/public/components/section-head/ide.json"
+    "src/components/landing/section-head"
    ],
-   "hash": "bb94c5a1fadff4952828012fad42224e"
+   "hash": "881444a4571e25c7f5bdf745f7470969"
   },
   "SectionLabel": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/typography/section-label",
-    "examples/showcase/public/components/section-label/ide.json"
+    "src/components/typography/section-label"
    ],
-   "hash": "aea1fcbb0be54c313ce01f54cc304587"
+   "hash": "37bb1d3df9be381296992ee781345505"
   },
   "SectionTimeline": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/navigation/section-timeline",
-    "examples/showcase/public/components/section-timeline/ide.json"
+    "src/components/navigation/section-timeline"
    ],
-   "hash": "b2ee04f83e501dd4babf8dda3116e7d6"
+   "hash": "78c94b1f08349929637ba0092082588b"
   },
   "Segmented": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/segmented",
-    "examples/showcase/public/components/segmented/ide.json"
+    "src/components/forms/segmented"
    ],
-   "hash": "5f17249289dd99af16514da6013ff084"
+   "hash": "194e89716c3214bb9d6a0d5922aa9473"
   },
   "Select": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/select",
-    "examples/showcase/public/components/select/ide.json"
+    "src/components/forms/select"
    ],
-   "hash": "247d5ccaec7c344a91be97960f869a2f"
+   "hash": "182be854778234e9f3940df768c7363c"
   },
   "SiteFooter": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/site-footer",
-    "examples/showcase/public/components/site-footer/ide.json"
+    "src/components/landing/site-footer"
    ],
-   "hash": "9cac1693ec54614d12a1730d76663922"
+   "hash": "5da49bd9f5b7864bd7ec4e72b5e7aaa9"
   },
   "SiteNav": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/site-nav",
-    "examples/showcase/public/components/site-nav/ide.json"
+    "src/components/landing/site-nav"
    ],
-   "hash": "24cef699299b983cb6e38b7b7fedd67e"
+   "hash": "8a8193865cbfe9f1da0f81f74e3ac736"
   },
   "SiteSection": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/site-section",
-    "examples/showcase/public/components/site-section/ide.json"
+    "src/components/landing/site-section"
    ],
-   "hash": "f50760c773d068ec90268926dffe00ee"
+   "hash": "dd6ddcf95fbd33d697e1c337bc3a1edd"
   },
   "Skeleton": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/feedback/skeleton",
-    "examples/showcase/public/components/skeleton/ide.json"
+    "src/components/feedback/skeleton"
    ],
-   "hash": "9bbb0e68edab4bbaf9c8b00957878d17"
+   "hash": "0149a6efb19932b7cd9eb1355da69d15"
   },
   "Slider": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/slider",
-    "examples/showcase/public/components/slider/ide.json"
+    "src/components/forms/slider"
    ],
-   "hash": "18700896556fcfde096c9c6aac306cc0"
+   "hash": "42af5eace14ad1e21d29f439c5acda77"
   },
   "Spacer": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/spacer",
-    "examples/showcase/public/components/spacer/ide.json"
+    "src/components/layout/spacer"
    ],
-   "hash": "1d5e036cb030f50d40f15c7320d17abf"
+   "hash": "74e1525dea145c3a167d5bb0f6e83b24"
   },
   "Sparkline": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/sparkline",
-    "examples/showcase/public/components/sparkline/ide.json"
+    "src/components/data/sparkline"
    ],
-   "hash": "085f2f4fbb4af7b63176db6628ee0611"
+   "hash": "64b3f8422e325d534e5acff7e4452fcf"
   },
   "Spinner": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/feedback/spinner",
-    "examples/showcase/public/components/spinner/ide.json"
+    "src/components/feedback/spinner"
    ],
-   "hash": "0d3b62b6664d6602fa71aeed5d4a8009"
+   "hash": "318ca9aca62b291917af900291a0b4d8"
   },
   "Splitter": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/splitter",
-    "examples/showcase/public/components/splitter/ide.json"
+    "src/components/layout/splitter"
    ],
-   "hash": "27f62eb19b3ec3f6119b642cbe640cd3"
+   "hash": "712bbbdeeab3043c82483fb233f49bf9"
   },
   "Stack": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/stack",
-    "examples/showcase/public/components/stack/ide.json"
+    "src/components/layout/stack"
    ],
-   "hash": "e548209fedd57119452726bcc4e409c0"
+   "hash": "cbd2f5b70be4819740eaafaa2583f89a"
   },
   "Stat": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/stat",
-    "examples/showcase/public/components/stat/ide.json"
+    "src/components/data/stat"
    ],
-   "hash": "e77bc162746329b376db24e491ccace3"
+   "hash": "976de370b2d7cb944afcdee4a908bd7b"
   },
   "StatsBand": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/stats-band",
-    "examples/showcase/public/components/stats-band/ide.json"
+    "src/components/landing/stats-band"
    ],
-   "hash": "f95d2bad9626289f177d18607d5f488c"
+   "hash": "61f0d29dd3e18349fdad7cd5ea795634"
   },
   "StatTile": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/stat-tile",
-    "examples/showcase/public/components/stat-tile/ide.json"
+    "src/components/data/stat-tile"
    ],
-   "hash": "42089dd01d8daaa8457b99a0e05e9557"
+   "hash": "e62f4cdf9ab96c39f51a047b2cf75e7b"
   },
   "StatusBar": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/status-bar",
-    "examples/showcase/public/components/status-bar/ide.json"
+    "src/components/layout/status-bar"
    ],
-   "hash": "17a7cb591de0e5ec5965d5facb910d73"
+   "hash": "7c1921fb7f79174b1e5c0e27638ec2a1"
   },
   "StatusDot": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/feedback/status-dot",
-    "examples/showcase/public/components/status-dot/ide.json"
+    "src/components/feedback/status-dot"
    ],
-   "hash": "1cd8aa351b0943d4b1290dbf7181bd87"
+   "hash": "2583882f6b1de547e149835e2f077654"
   },
   "Stepper": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/navigation/stepper",
-    "examples/showcase/public/components/stepper/ide.json"
+    "src/components/navigation/stepper"
    ],
-   "hash": "b04b9a59fa6d77a5aaf0aeb38f3d7286"
+   "hash": "0eec219b25bc16edefedeacf6be2ae66"
   },
   "Steps": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/navigation/steps",
-    "examples/showcase/public/components/steps/ide.json"
+    "src/components/navigation/steps"
    ],
-   "hash": "10ad4b30657b2b042b34bc88f8bd2a81"
+   "hash": "b01fa4ec6f8b2ed356f2636e35507376"
   },
   "StoryProgress": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/social/story-progress",
-    "examples/showcase/public/components/story-progress/ide.json"
+    "src/components/social/story-progress"
    ],
-   "hash": "6946d2d02f7175b53cae935a0158d9ea"
+   "hash": "65ef6ea5e78478464d7d5c7566934d10"
   },
   "StoryRing": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/social/story-ring",
-    "examples/showcase/public/components/story-ring/ide.json"
+    "src/components/social/story-ring"
    ],
-   "hash": "b5ea6809af63485ea95933151b76ff5c"
+   "hash": "d460c88a1f82a0409dd8663943abaa09"
   },
   "StoryViewer": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/story-viewer",
-    "examples/showcase/public/components/story-viewer/ide.json"
+    "src/components/composite/story-viewer"
    ],
-   "hash": "206668540ef4fcfe8bee25fc8c05b41b"
+   "hash": "29960d6323a8cf3546947fa351566816"
   },
   "Swatch": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/swatch",
-    "examples/showcase/public/components/swatch/ide.json"
+    "src/components/forms/swatch"
    ],
-   "hash": "703359e9027ddee6b964be9c5b708294"
+   "hash": "6551b0482765f6a7f43709ec8187aec5"
   },
   "Tabs": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/navigation/tabs",
-    "examples/showcase/public/components/tabs/ide.json"
+    "src/components/navigation/tabs"
    ],
-   "hash": "be5b5c1e333a037d436cbb1bbf96965f"
+   "hash": "4c274a70f4861f8d16b0505f1e5728f2"
   },
   "Terminal": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/terminal",
-    "examples/showcase/public/components/terminal/ide.json"
+    "src/components/composite/terminal"
    ],
-   "hash": "938e1ef81ec1c14e97f7a64b862c226e"
+   "hash": "0df84fb41923199a9b4130f2a2e19a1e"
   },
   "Testimonials": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/testimonials",
-    "examples/showcase/public/components/testimonials/ide.json"
+    "src/components/landing/testimonials"
    ],
-   "hash": "bf46854bd7d86acd9dc67bc9705fcc1e"
+   "hash": "2d43583eefc6402fb04bec14762cc668"
   },
   "Textarea": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/textarea",
-    "examples/showcase/public/components/textarea/ide.json"
+    "src/components/forms/textarea"
    ],
-   "hash": "0dcdb1903ec97b44c6e0d5627b048f4a"
+   "hash": "5d244aaf4cc5fb66be05f5f11e6d80e3"
   },
   "TextInput": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/text-input",
-    "examples/showcase/public/components/text-input/ide.json"
+    "src/components/forms/text-input"
    ],
-   "hash": "b35589ef2754b721229335e17251eb5f"
+   "hash": "93d5a28dfa3880b0c050fa88d6679299"
   },
   "ThemeEditor": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/theme-editor",
-    "examples/showcase/public/components/theme-editor/ide.json"
+    "src/components/composite/theme-editor"
    ],
-   "hash": "a88273a371eeb169d8feb39971f39d10"
+   "hash": "13509f6518fead0170ef7068546ebe4e"
   },
   "ThemeMenu": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/theme-menu",
-    "examples/showcase/public/components/theme-menu/ide.json"
+    "src/components/composite/theme-menu"
    ],
-   "hash": "065e59f882443fad0da073e4e689fd66"
+   "hash": "bddbf00729e473e4ae6222d6527109e1"
   },
   "ThreadNav": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/navigation/thread-nav",
-    "examples/showcase/public/components/thread-nav/ide.json"
+    "src/components/navigation/thread-nav"
    ],
-   "hash": "014a534c2284f7348d13616c949732dc"
+   "hash": "9a3a3f9bb8b7f86f81da999b15f5d449"
   },
   "TimeInput": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/time-input",
-    "examples/showcase/public/components/time/ide.json"
+    "src/components/forms/time-input"
    ],
-   "hash": "165ae1ac48cb3296bc93db50a5adda8c"
+   "hash": "0b4cdf0f20493210b78980a84714ffd5"
   },
   "Timeline": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/timeline",
-    "examples/showcase/public/components/timeline/ide.json"
+    "src/components/data/timeline"
    ],
-   "hash": "a96b0f17d0d6a1a21970a16f828c7807"
+   "hash": "5a4eb05575986366c3dcd1bbc1ad589f"
   },
   "TimeRuler": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/time-ruler",
-    "examples/showcase/public/components/time-ruler/ide.json"
+    "src/components/data/time-ruler"
    ],
-   "hash": "35cafbee511787bf2da76e226b9a96d2"
+   "hash": "4636f568cbb5f4135239d547169e4017"
   },
   "Toast": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/overlays/toast",
-    "examples/showcase/public/components/toast/ide.json"
+    "src/components/overlays/toast"
    ],
-   "hash": "c233edff1fd096cdae494cc891dd68f3"
+   "hash": "921b705239ce4f184f1387499f57ee38"
   },
   "Toggle": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/forms/toggle",
-    "examples/showcase/public/components/toggle/ide.json"
+    "src/components/forms/toggle"
    ],
-   "hash": "c9b2e39685df8188b323d2515a55ca55"
+   "hash": "2a2b5b7e879a06ac0a66040d64b1ec60"
   },
   "Tooltip": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/overlays/tooltip",
-    "examples/showcase/public/components/tooltip/ide.json"
+    "src/components/overlays/tooltip"
    ],
-   "hash": "09ef55c0a5b60cc79a71af77b8c1ed5c"
+   "hash": "126d75863b901af5e8eacb779e8115da"
   },
   "Tree": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/tree",
-    "examples/showcase/public/components/data-tree/ide.json"
+    "src/components/data/tree"
    ],
-   "hash": "63f91b7ac14db9ce3e5bd55f0787b380"
+   "hash": "b623515599d3ca19dd39cb38feda0d71"
   },
   "TreeEditor": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/tree-editor",
-    "examples/showcase/public/components/editors-tree/ide.json"
+    "src/components/composite/tree-editor"
    ],
-   "hash": "d958c28e99f0c68d7f3848341021cfc3"
+   "hash": "c7703859cb083ec2c9c1690cba1151d8"
   },
   "TreeView": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/tree-view",
-    "examples/showcase/public/components/tree-view/ide.json"
+    "src/components/data/tree-view"
    ],
-   "hash": "35ff81bec611a066f8a61f021c2d476e"
+   "hash": "1014794df1bdbfd2cf155377f6f9ced8"
   },
   "TypingIndicator": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/social/typing-indicator",
-    "examples/showcase/public/components/typing-indicator/ide.json"
+    "src/components/social/typing-indicator"
    ],
-   "hash": "5849bd6b73f020d1f7052eea63f78409"
+   "hash": "424d95bcf064e119adc15781efced522"
   },
   "UndoRedo": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/actions/undo-redo",
-    "examples/showcase/public/components/undo-redo/ide.json"
+    "src/components/actions/undo-redo"
    ],
-   "hash": "fcdc92084878f580e5440f69cc4823be"
+   "hash": "64b4e780aff9297b0604bc149eab3b5d"
   },
   "VerifiedMark": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/social/verified-mark",
-    "examples/showcase/public/components/verified-mark/ide.json"
+    "src/components/social/verified-mark"
    ],
-   "hash": "cc7e2333f506538dac056bed8252a63a"
+   "hash": "27b212c2b60b08a32452b845ce107e9f"
   },
   "VideoBackground": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/landing/video-background",
-    "examples/showcase/public/components/video-background/ide.json"
+    "src/components/landing/video-background"
    ],
-   "hash": "4333f87b3941816469f81098e374b3e3"
+   "hash": "9d0572798bc89dda624183e9dc4aba22"
   },
   "VirtualList": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/data/virtual-list",
-    "examples/showcase/public/components/virtual-list/ide.json"
+    "src/components/data/virtual-list"
    ],
-   "hash": "1182bd0796fdbfe03a0123a376bd1ac3"
+   "hash": "e8b5f886ed1c6de43a6f1da9e7805efb"
   },
   "Window": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/layout/window",
-    "examples/showcase/public/components/layout-window/ide.json"
+    "src/components/layout/window"
    ],
-   "hash": "0d60ed03d526b307a8f84d2a3a8fee5a"
+   "hash": "8c73743098a16afa3429165164005e23"
   },
   "Wizard": {
    "frozen": "2026-11-20",
    "paths": [
-    "src/components/composite/wizard",
-    "examples/showcase/public/components/wizard/ide.json"
+    "src/components/composite/wizard"
    ],
-   "hash": "750f91f504f8f115e1c6023abbe84f02"
+   "hash": "9ff2fa90b415831701403b6e997dea09"
   }
  },
  "log": [

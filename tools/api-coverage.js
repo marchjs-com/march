@@ -1,19 +1,16 @@
 #!/usr/bin/env node
-// Every exported runtime API is explained in the showcase. One source: the JSDoc summary on the declaration (the same
-// text editors show on hover). This tool writes examples/showcase/src/api.gen.ts — every package.json "exports"
-// subpath, each runtime export with its kind and summary — which the showcase "API başvurusu" renders (İlk Adımlar).
-// The JSDoc stays English. docs/api.tr.json holds the one-line Turkish summary of every export
-// ({ subpath: { name: text } }, keyed by the subpath the export is listed under). The data is written once per language
-// (api.gen.<lang>.<n>.ts); loadApi(lang) loads only that language, and any other language shows the English summaries.
-//   node tools/api-coverage.js            write api.gen.ts (+ its lazy data parts), list exports without a summary
-//   node tools/api-coverage.js --check    exit 1 when api.gen.ts is stale or an export has no (Turkish) summary
+// Every exported runtime API is explained. One source: the JSDoc summary on the declaration (the same text editors
+// show on hover); every package.json "exports" subpath, each runtime export with its kind and summary (the API
+// reference data itself: tools/api-docs.js). The JSDoc stays English. docs/api.tr.json holds the one-line Turkish
+// summary of every export ({ subpath: { name: text } }, keyed by the subpath the export is listed under).
+//   node tools/api-coverage.js            list exports without a summary
+//   node tools/api-coverage.js --check    exit 1 when an export has no (Turkish) summary
 // test/api-coverage.test.js runs the check.
 import { readFileSync, writeFileSync, existsSync, readdirSync, unlinkSync } from "node:fs";
 import { join, resolve, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
-const OUT = "examples/showcase/src/api.gen.ts";
 /** The Turkish summary catalog. */
 export const TR = "docs/api.tr.json";
 /** Languages with their own summaries (English is the JSDoc itself). */
@@ -166,7 +163,7 @@ export function generate(root = ROOT) {
     if (!text) trMissing.push(`${r.subpath} › ${i[0]}`);
     return [i[0], i[1], text || i[2], i[3]];
   }) }));
-  for (const l of LANGS) inLang(l); // fills trMissing (the showcase data itself: tools/api-docs.js)
+  for (const l of LANGS) inLang(l); // fills trMissing (the API reference data itself: tools/api-docs.js)
   // catalog entries for names that are not (or no longer) listed under that subpath
   const listed = new Set(rows.flatMap((r) => r.items.map((i) => `${r.subpath} › ${i[0]}`)));
   const trStale = Object.entries(tr).flatMap(([sub, names]) => Object.keys(names).map((n) => `${sub} › ${n}`)).filter((k) => !listed.has(k));

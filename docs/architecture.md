@@ -59,18 +59,11 @@ src/hubs/<name>/         <name>.ts  index.ts                          (shared en
 src/net/  src/errors/  src/channel/  src/motion/   (modules)
 ```
 
-- Every runtime export of every package subpath has a one-line JSDoc summary. `tools/api-coverage.js` turns them into
-  the showcase API reference (İlk Adımlar › API başvurusu, `examples/showcase/src/api.gen*.ts`, lazy parts);
-  docs/api.tr.json holds the one-line Turkish summary of every export (code names untouched); the reference loads only the
-  active language and shows English for every other one. test/api-coverage.test.js fails when an export has no summary,
-  no Turkish summary, or the reference is stale.
-- Every runtime export also has a small working example there: a click on its card opens the signature (read from the
-  declaration), the example code and the live result, with a Playground when the example gives options. Examples live in
-  `examples/showcase/src/api-examples/<group>.tsx` (layout in `tools/api-examples.js`), generated into ~14 lazy parts of 10–25 KB (`api-examples/gen/part-NN.ex.tsx`; a card loads its part);
-  test/api-examples.test.js fails for an export without one (subpaths still being written: PENDING in the tool).
-  `tools/demo-coverage.mjs` (test/demo-coverage.test.js) checks that every component has a live demo card and a
-  Playground (a page card, a component folder's demo.tsx + playground.ts, or its API example); `tools/api-examples-audit.mjs`
-  opens every example in a headless browser (errors, empty result, overflow).
+- Every runtime export of every package subpath has a one-line JSDoc summary (`tools/api-coverage.js`);
+  docs/api.tr.json holds the one-line Turkish summary of every export (code names untouched). test/api-coverage.test.js
+  fails when an export has no summary or no Turkish summary. `tools/api-docs.js` writes the API reference data
+  (signatures, members, props, long-form docs from docs/api/), which `tools/cdn-data.mjs` publishes with each version
+  on cdn.marchjs.com (`data/api/`); the site's API page (marchjs.com) reads it, with its own live examples.
 - Rarely used pieces of the core sit in their own modules so a lazy page that uses one does not grow the start-up chunk:
   `dom/switch.ts` (Switch, Match), `dom/await.ts`, `dom/dynamic.ts` beside `dom/flow.ts` (If, For, Try), and
   `core/i18n-tools.ts` (missing, unused, setFallbackLocale) beside `core/i18n.ts`.

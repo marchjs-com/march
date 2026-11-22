@@ -1,9 +1,10 @@
 # Component checklist
 
 Every component lives in `src/components/<category>/<name>/` and is done only when all of this holds. `march check component
-<name>` checks the source items (✔ / ✖) and lists the browser items (·), which the showcase, `tools/visual-audit.mjs` and
-`tools/control-audit.mjs` (every option control changes something visible — at once, or on the next interaction the demo marks with `data-audit-try` (a popup trigger and a resize handle are tried by themselves) — and stays the same DOM node while it is used; `npm run audit:controls`, run by CI on the built
-showcase) cover. `test/playground-keys.test.js` (in `npm test`) fails when demo.tsx never reads a Playground key. `node tools/gen-registry.js` writes
+<name>` checks the source items (✔ / ✖) and lists the browser items (·), which the site's component pages and its browser
+checks cover (marchjs.com: every option control changes something visible — at once, or on the next interaction the demo
+marks with `data-audit-try` (a popup trigger and a resize handle are tried by themselves) — and stays the same DOM node
+while it is used). `test/playground-keys.test.js` (in `npm test`) fails when demo.tsx never reads a Playground key. `node tools/gen-registry.js` writes
 the barrel, the registry and the catalogues; `--check` (and `npm test`) fails when they drift.
 
 ## Start
