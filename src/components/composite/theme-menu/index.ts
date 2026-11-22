@@ -1,16 +1,17 @@
 // ThemeMenu (composite: Dropdown, ThemeSwatch, OverflowText): one top-bar menu for the whole look — light / dark /
 // system, the color theme (live swatches) and the accent color. The sections are the ones ThemePicker and AccentPicker
 // show on their own (themeModes, themeList, accentList), so the three stay identical.
+// The panel's sections are their own lazy module (panel.ts: Segmented, OptionList, the theme cards…), loaded as soon as
+// the menu is drawn: a top bar that shows the button does not carry what only the open panel draws.
 import "./theme-menu.css";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
+import { signal } from "../../../core/reactive.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { Dropdown } from "../../../ui/menu.ts";
-import { themeModes, themeList, ThemeSwatch, colorTheme, colorThemes } from "../../../ui/theme.ts";
-import { accentList } from "../../../ui/accent.ts";
+import { ThemeSwatch, colorTheme, colorThemes } from "../../../ui/theme.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { palette as paletteIcon } from "../../../icons/glyphs/palette.ts";
-import { SectionLabel } from "../../typography/section-label/index.ts";
 import type { IconProp } from "../../../icons/types.ts";
 import type { Handler } from "../../../core/util.ts";
 
@@ -57,10 +58,15 @@ export interface ThemeMenuProps {
 }
 
 
+type Panel = typeof import("./panel.ts");
+const panelModule = signal<Panel | null>(null);
+let loading: Promise<void> | null = null;
+/** The panel's sections (one module for every ThemeMenu), loaded once. */
+const loadPanel = (): Promise<void> => (loading ??= import("./panel.ts").then((m) => { panelModule.set(m); }));
+
 /** One menu for appearance, color theme and accent: `<ThemeMenu />` (or `<ThemeMenu themes={false} accents={["primary", "brand-blue"]} />`). */
 export function ThemeMenu(props: ThemeMenuProps = {}): unknown {
-  const heading = (text: () => string): Element | null => props.headings === false ? null
-    : h(SectionLabel, { as: "p", class: "m-theme-menu-heading", "aria-hidden": "true", label: text }) as Element;
+  void loadPanel();
   // current: the trigger is the swatch and the name of the theme in use
   const look = (): "light" | "dark" | null => { const m = val(props.mode); return m === "light" || m === "dark" ? m : null; };
   const own = props.onChange ? { value: (): string => val(props.value) ?? colorTheme(), onPick: props.onChange, mode: look, page: props.page } : undefined;
@@ -72,10 +78,7 @@ export function ThemeMenu(props: ThemeMenuProps = {}): unknown {
     ...(trigger ? { trigger, variant: "secondary" as const } : { icon: props.icon === false ? undefined : props.icon ?? paletteIcon }),
     label: () => val(props.label) ?? t`Appearance`, placement: props.placement ?? "bottom-end", size: props.size, class: cx(props.current && "m-theme-menu-btn", props.size === "sm" && "is-sm", props.class),
     panelClass: cx("m-theme-panel m-theme-menu", props.view === "cards" && "m-theme-menu-cards", props.panelClass),
-    children: [
-      props.modes === false ? null : themeModes(),
-      props.themes === false ? null : [heading(() => val(props.labels?.theme) ?? t`Theme`), themeList(props.view, own)],
-      props.accents === false ? null : [heading(() => val(props.labels?.accent) ?? t`Accent`), accentList(props.accents)],
-    ],
+    // drawn when the panel opens: the sections once their module is here (it usually is by the first click)
+    children: () => { const m = panelModule(); return m ? m.themeMenuSections(props, own) : null; },
   });
 }

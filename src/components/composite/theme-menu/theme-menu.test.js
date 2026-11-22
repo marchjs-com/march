@@ -8,6 +8,8 @@ const U = await import("../../../ui/index.ts");
 
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
+// the panel's sections are a lazy module (panel.ts), loaded when a menu is drawn: here before the first click
+await import("./panel.ts");
 const panel = () => document.querySelector(".m-theme-menu");
 
 test("ThemeMenu: one panel with appearance, themes and accents; sections follow the props; choices apply", async () => {

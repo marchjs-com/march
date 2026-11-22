@@ -10,7 +10,9 @@
 import { signal, untrack } from "../core/reactive.ts";
 import { can as canAccess, type PermCheck } from "../access/index.ts";
 import { t } from "../core/i18n.ts";
-import { confirm, askReason } from "../components/overlays/dialog/index.ts";
+// the confirm / reason dialogs load when an action first asks (always awaited there): a menu, a button or a palette that
+// runs actions does not carry the Dialog component until one needs it
+const dialogs = (): Promise<typeof import("../components/overlays/dialog/index.ts")> => import("../components/overlays/dialog/index.ts");
 import { toast } from "../components/overlays/toast/index.ts";
 import type { MaybeFn } from "./util.ts";
 
@@ -86,10 +88,12 @@ export function action(label: MaybeFn<string>, run: (...args: never[]) => unknow
       const text = typeof opts.confirm === "function" ? opts.confirm(...args) : opts.confirm;
       if (opts.reason) {
         const r: ReasonOptions = typeof opts.reason === "number" ? { min: opts.reason } : opts.reason;
+        const { askReason } = await dialogs();
         const why = await askReason({ title: r.title ?? untrack(a.label), message: typeof text === "string" ? text : undefined, min: r.min ?? 10, danger: !!opts.danger, ok: untrack(a.label) });
         if (why == null) return undefined;
         args = [...args, why];
       } else if (text || opts.danger) {
+        const { confirm } = await dialogs();
         const ok = await confirm({ title: untrack(a.label), message: typeof text === "string" ? text : t`Are you sure?`, danger: !!opts.danger, ok: untrack(a.label) });
         if (!ok) return undefined;
       }

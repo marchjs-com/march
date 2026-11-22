@@ -38,7 +38,7 @@
     "src/components/composite/app-ui",
     "examples/showcase/public/components/app-ui/ide.json"
    ],
-   "hash": "8bb51d6a1c570e78bb63d1e39207ea70"
+   "hash": "9d3d4a0ab75652ff9fec5029a7c4d96d"
   },
   "Avatar": {
    "frozen": "2026-11-20",
@@ -1454,7 +1454,7 @@
     "src/components/composite/theme-menu",
     "examples/showcase/public/components/theme-menu/ide.json"
    ],
-   "hash": "065e59f882443fad0da073e4e689fd66"
+   "hash": "bcb082b3face3279808113e1e7d0529c"
   },
   "ThreadNav": {
    "frozen": "2026-11-20",
@@ -2559,6 +2559,24 @@
    "name": "PropertyGrid",
    "what": "refresh",
    "reason": "Testi Türkçe geri alma etiketini dili açıkça seçerek denetler (makinenin diline bakmaz)"
+  },
+  {
+   "at": "2026-11-22",
+   "name": "ThemeMenu",
+   "what": "refresh",
+   "reason": "size pass: the panel's sections are a lazy module (panel.ts), so start-up does not carry Segmented, OptionList and the motion engine; same behaviour"
+  },
+  {
+   "at": "2026-11-22",
+   "name": "ThemeMenu",
+   "what": "refresh",
+   "reason": "size pass: the panel's sections are a lazy module (panel.ts), so start-up does not carry Segmented, OptionList and the motion engine; same behaviour"
+  },
+  {
+   "at": "2026-11-22",
+   "name": "AppUI",
+   "what": "refresh",
+   "reason": "size pass: AccentPicker moved to ui/accent-picker.ts (import path only)"
   }
  ]
 }
