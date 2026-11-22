@@ -2,7 +2,7 @@
 // Runs the source generators (registry, API reference, icons, themes, CSS tables…) only when their inputs changed.
 // Each generator has a content digest of its inputs (file paths + bytes) and of its own script; the digest after its
 // last run is kept in node_modules/.cache/march/gen.json. Same digest and every output present → skipped.
-//   node tools/gen-all.mjs            run the stale generators (the showcase build calls this, --dev and --release)
+//   node tools/gen-all.mjs            run the stale generators
 //   node tools/gen-all.mjs --force    run all of them
 //   node tools/gen-all.mjs --list     print each generator and whether it is stale, run nothing
 import { createHash } from "node:crypto";
@@ -27,14 +27,11 @@ export const GENERATORS = [
   { name: "themes", script: "tools/gen-themes.js", inputs: ["src/theme/presets.ts", "src/theme/contrast.ts", "src/core/util.ts"], outputs: ["src/css/themes.css", "src/theme/names.ts"] },
   { name: "accent", script: "tools/gen-accent.js", inputs: ["src/css/colors.css"], outputs: ["src/ui/accent.css"] },
   { name: "grid", script: "tools/gen-grid.js", inputs: [], outputs: ["src/components/layout/grid/grid.css"] },
-  { name: "registry", script: "tools/gen-registry.js", inputs: ["src/components", "examples/showcase/src/sections.gen.ts", "examples/showcase/public/api/index.en.json"], outputs: ["src/components/registry.gen.ts", "docs/components.md"] },
+  // the component folders, and every package export (the API page of each card: tools/api-coverage.js)
+  { name: "registry", script: "tools/gen-registry.js", inputs: ["src", "package.json"], outputs: ["src/components/registry.gen.ts", "docs/components.md"] },
   // reads every package export's JSDoc: the whole src/ tree and package.json (which the registry writes)
   { name: "api", script: "tools/api-coverage.js", inputs: ["src", "package.json", "docs/api.tr.json"], outputs: [] },
-  // the API page data (public/api/*.json): JSDoc, Turkish summaries, long-form docs and the examples' demo links
-  // MarchIDE's ide.json texts as t`…`, so the build extracts them for translation
   { name: "icon-names", script: "tools/gen-icon-names.js", inputs: ["src/icons/set.ts", "src/icons/packs"], outputs: ["compiler/icon-names.gen.js", "src/icons/names.gen.ts"] },
-  { name: "ide-texts", script: "tools/gen-ide-texts.js", inputs: ["examples/showcase/public/components"], outputs: ["examples/showcase/src/playground/ide-texts.gen.tsx", "examples/showcase/src/playground/ide-list.gen.ts"] },
-  { name: "api-docs", script: "tools/api-docs.js", inputs: ["src", "package.json", "docs/api.tr.json", "docs/api", "examples/showcase/src/api-examples", "examples/showcase/src/sections.gen.ts"], outputs: ["examples/showcase/public/api/index.en.json"] },
 ];
 
 const SKIP_DIR = new Set(["node_modules", ".git", "dist"]);

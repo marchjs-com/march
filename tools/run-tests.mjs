@@ -5,9 +5,9 @@
 //                                            byte the same as at its last pass is skipped
 //   node tools/run-tests.mjs --changed [ref] only the test files that depend on a file changed since <ref> (default: the
 //                                            merge base with main), uncommitted and untracked files included
-//   node tools/run-tests.mjs --release       every test file, no cache; then the release build of the showcase
-//                                            (10 KB chunk rule, budgets as errors, prerender), npm run size and the
-//                                            headless browser checks (control audit, editor suggestions)
+//   node tools/run-tests.mjs --release       every test file, no cache; then npm run size (the release build's 10 KB
+//                                            chunk rule and budgets are in test/chunks.test.js and test/entry-pages.test.js;
+//                                            the site, marchjs.com, runs its own release build and browser checks)
 //   node tools/run-tests.mjs --all           every test file, no cache, no release steps (CI)
 //   node tools/run-tests.mjs test/x.test.js  these files (no cache)
 //   --no-cache   run every selected file    --list   print the selection, run nothing    --concurrency <n>
@@ -141,10 +141,7 @@ if (run.length) {
 
 if (release && code === 0) {
   const steps = [
-    ["showcase release build", [process.execPath, "examples/showcase/build.mjs", "--release"]],
     ["package size", [process.execPath, "bench/size.js"]],
-    ["controls audit (headless)", [process.execPath, "tools/control-audit.mjs"]],
-    ["editor suggestions (headless)", [process.execPath, "tools/editor-suggest-check.mjs"]],
   ];
   for (const [name, [cmd, ...args]] of steps) {
     const t = performance.now();

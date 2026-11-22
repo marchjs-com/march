@@ -91,7 +91,7 @@ rewrite `/march/*` to `/march/index.html` with an absolute `base: "/march/"`.
 
 **Files (`file://`).** Open `dist/index.html` or any `dist/<route>/index.html`. The router uses `#/` addresses; the
 start page and every prerendered page open directly. (Module scripts from files need a browser that allows them, or a
-local server: `node examples/showcase/build.mjs --serve`.)
+local static server over `dist/`.)
 
 **An iframe / an artifact.** The app runs as on any host. If the frame may not change its address (sandbox without
 `allow-same-origin`), the router keeps the address and uses `#/` ones. If it may, reloading the frame loads the frame's
@@ -101,6 +101,8 @@ address finds its page. Nothing breaks in either case: the worst outcome is the 
 ## Checking a build
 
 ```sh
-node examples/showcase/build.mjs
-node tools/menu-audit.mjs            # every menu page: direct visit, reload, back/forward, under each server mode
+march build                          # release build: 10 KB floor, budgets, every page prerendered
 ```
+
+Then open every page of the menu under each server mode above: a direct visit, a reload, back and forward (the site,
+marchjs.com, does this for its own pages in a headless browser).

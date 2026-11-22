@@ -1,20 +1,31 @@
 #!/usr/bin/env node
-// The showcase API page (#/api, examples/showcase/src/pages/api.tsx) reads its data from here. Everything comes from the
-// TypeScript sources through the compiler (signatures with types, parameters, JSDoc, class members, value types and
-// contents), the Turkish summaries from docs/api.tr.json and the long-form docs from docs/api/<subpath>/<name>.md.
-//   examples/showcase/public/api/index.<lang>.json   the search index: every export (name, kind, summary), one file
-//   examples/showcase/public/api/<group>.json        full docs of a group of subpaths (fetched when one is opened)
-//   node tools/api-docs.js            write them
-//   node tools/api-docs.js --check    exit 1 when stale (test/api-docs.test.js)
+// The API reference data, published with each version on cdn.marchjs.com (tools/cdn-data.mjs → data/api/), which the
+// site's API page reads. Everything comes from the TypeScript sources through the compiler (signatures with types,
+// parameters, JSDoc, class members, value types and contents), the Turkish summaries from docs/api.tr.json and the
+// long-form docs from docs/api/<subpath>/<name>.md.
+//   api/index.<lang>.json   the search index: every export (name, kind, summary), one file per language
+//   api/docs-<n>.json       full docs of a group of subpaths (fetched when one is opened)
+//   node tools/api-docs.js [folder]   write them into <folder>/api (without a folder: only the summary)
+// test/api-docs.test.js holds the doc rules (member summaries, prop texts, long-form docs).
 import ts from "typescript";
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { join, resolve, relative, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { packageApis, packageEntries } from "./api-coverage.js";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
-const OUT = "examples/showcase/public/api";
+const OUT = "api";
 export const DOCS = "docs/api";
+/** Subpaths still being written: their class members are not held to the member-summary rule yet. */
+export const PENDING = new Set([
+  "march/base", "march/icons", "march/icons/packs", "march/landing", "march/motion",
+  "march/router", "march/seo/hydrate", "march/ui",
+  "march/app-ui",
+  "march/db", "march/vault", "march/ai",
+  // large components outside their category barrel (march/components/<category>/<name>)
+  "march/components/composite/theme-editor", "march/components/data/data-grid",
+  "march/components/data/gantt", "march/components/data/scheduler", "march/components/data/tree-view",
+]);
 /** Subpaths whose long-form docs (docs/api/<slug>/<name>.md) are still being written, in groups; the test fails for a
  *  missing doc of any other subpath, and when a listed subpath is already complete. */
 export const MD_PENDING = new Set([
@@ -181,23 +192,17 @@ export function collect(root = ROOT) {
   return out;
 }
 
-/** Component metadata (status, since, showcase page) by name, from the component folders (`site`: the showcase page that
- *  draws the component's demo, from the site's sections.gen.ts; without it, the page its meta.ts names). */
-function componentMeta(root, site = true) {
+/** Component metadata (status, since, showcase page: the page its meta.ts names) by name, from the component folders. */
+function componentMeta(root) {
   const out = new Map();
   const base = join(root, "src/components");
-  const secFile = join(root, "examples/showcase/src/sections.gen.ts");
-  const sections = site && existsSync(secFile) ? JSON.parse(/SECTIONS: Section\[\] = (\[.*\]);/s.exec(readFileSync(secFile, "utf8"))?.[1] ?? "[]") : [];
   for (const cat of readdirSync(base, { withFileTypes: true }).filter((d) => d.isDirectory())) {
     for (const d of readdirSync(join(base, cat.name), { withFileTypes: true }).filter((x) => x.isDirectory())) {
       const p = join(base, cat.name, d.name, "meta.ts");
       if (!existsSync(p)) continue;
       const s = readFileSync(p, "utf8");
       const g = (k) => new RegExp(`${k}:\\s*"([^"]*)"`).exec(s)?.[1] ?? "";
-      // the page that draws the component's own demo (sections.gen.ts, from the page sources) with its anchor
-      const id = `c-${cat.name}-${d.name}`;
-      const own = sections.find((x) => x.id === id);
-      out.set(g("name"), { status: g("status"), since: g("since"), showcase: own ? `${own.path}#${id}` : g("showcase") });
+      out.set(g("name"), { status: g("status"), since: g("since"), showcase: g("showcase") });
     }
   }
   return out;
@@ -207,15 +212,13 @@ function componentMeta(root, site = true) {
 export const mdPath = (subpath, name) => `${DOCS}/${slugOf(subpath)}/${name}.md`;
 
 /**
- * The API reference files. `site: false` (the data published with each version on cdn.marchjs.com, tools/cdn-data.mjs):
- * from March's sources and docs only; an export's `demo` is the page its component's meta.ts names, or "" (the site adds
- * its own links).
+ * The API reference files, from March's sources and docs only; an export's `demo` is the page its component's meta.ts
+ * names, or "" (the site adds its own links).
  */
-export function generate(root = ROOT, { site = true } = {}) {
+export function generate(root = ROOT) {
   const recs = collect(root);
   const tr = JSON.parse(readFileSync(join(root, "docs/api.tr.json"), "utf8"));
-  const meta = componentMeta(root, site);
-  const showcasePages = site ? showcaseLinks(root) : new Map();
+  const meta = componentMeta(root);
   const files = {};
   // groups: subpaths in package order, packed to at least GROUP_BYTES
   const bySub = new Map();
@@ -224,7 +227,7 @@ export function generate(root = ROOT, { site = true } = {}) {
     const md = existsSync(join(root, mdPath(r.subpath, r.name))) ? readFileSync(join(root, mdPath(r.subpath, r.name)), "utf8") : "";
     const doc = { ...r, tr: tr[r.subpath]?.[r.name] ?? "", md, ...(r.props ? { props: r.props.map(({ src, ...p }) => (p.tr ? p : (({ tr, ...q }) => q)(p))) } : {}),
       status: r.deprecated ? "deprecated" : r.experimental ? "experimental" : m?.status || "stable", since: r.since || m?.since || "0.1.0",
-      demo: m?.showcase || showcasePages.get(r.name) || "" };
+      demo: m?.showcase || "" };
     delete doc.file;
     if (!bySub.has(r.subpath)) bySub.set(r.subpath, []);
     bySub.get(r.subpath).push(doc);
@@ -263,38 +266,10 @@ export function generate(root = ROOT, { site = true } = {}) {
 const clip = (s) => (s.length > 120 ? s.slice(0, 117).replace(/\s+\S*$/, "") + " …" : s);
 const firstSentence = (s) => { const m = /^[\s\S]*?[.!?](?=\s|$)/.exec(s); const t = (m ? m[0] : s).trim(); return t.length > 220 ? t.slice(0, 217).replace(/\s+\S*$/, "") + " …" : t; };
 
-/** Component → showcase page path, from the page cards (examples/showcase/src/pages/<page>.tsx). */
-function showcaseLinks(root) {
-  const out = new Map();
-  const dir = join(root, "examples/showcase/src/pages");
-  const walk = (d, pre) => readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(join(d, e.name), `${pre}${e.name}/`) : e.name.endsWith(".tsx") ? [[join(d, e.name), `/${pre}${e.name.replace(/\.tsx$/, "")}`]] : []));
-  for (const [file, path] of walk(dir, "")) {
-    const src = readFileSync(file, "utf8");
-    for (const m of src.matchAll(/<([A-Z][\w$]*)[\s/>]/g)) if (!out.has(m[1]) && m[1] !== "Demo" && m[1] !== "Section") out.set(m[1], path === "/home" ? "/" : path);
-  }
-  return out;
-}
-
-/** Docs files on disk that are no longer generated. */
-export function stray(files, root = ROOT) {
-  const dir = join(root, OUT);
-  return existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith(".json")).map((f) => `${OUT}/${f}`).filter((rel) => !(rel in files)) : [];
-}
-
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const check = process.argv.includes("--check");
+  const out = process.argv[2] ? resolve(process.argv[2]) : null;
   const { files, recs } = generate();
-  let stale = false;
-  mkdirSync(join(ROOT, OUT), { recursive: true });
-  for (const [rel, text] of Object.entries(files)) {
-    const p = join(ROOT, rel);
-    if ((existsSync(p) ? readFileSync(p, "utf8") : "") === text) continue;
-    stale = true;
-    if (check) console.error(`✖ ${rel} is out of date: run node tools/api-docs.js`);
-    else writeFileSync(p, text);
-  }
-  for (const rel of stray(files)) { stale = true; if (check) console.error(`✖ ${rel} is no longer generated`); else unlinkSync(join(ROOT, rel)); }
+  if (out) for (const [rel, text] of Object.entries(files)) { mkdirSync(dirname(join(out, rel)), { recursive: true }); writeFileSync(join(out, rel), text); }
   const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
-  console.log(`${recs.length} exports; ${Object.keys(files).length} files: ${Object.entries(files).map(([f, t]) => `${f.split("/").pop()} ${kb(t.length)}`).join(", ")}`);
-  if (check && stale) process.exit(1);
+  console.log(`${recs.length} exports; ${Object.keys(files).length} files${out ? ` in ${join(out, OUT)}` : ""}: ${Object.entries(files).map(([f, t]) => `${f.split("/").pop()} ${kb(t.length)}`).join(", ")}`);
 }

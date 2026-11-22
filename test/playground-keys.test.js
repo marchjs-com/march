@@ -1,6 +1,6 @@
 // Every Playground option of a component folder must reach its demo: a key in playground.ts that demo.tsx never reads
-// is a control that changes nothing. (The browser check, tools/control-audit.mjs, also proves the effect is visible;
-// CI runs it on the built showcase.)
+// is a control that changes nothing. (The site's browser check of its component pages also proves the effect is
+// visible.)
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync, existsSync, statSync } from "node:fs";

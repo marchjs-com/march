@@ -12,6 +12,8 @@
 import { readdirSync, readFileSync, writeFileSync, existsSync, statSync, mkdirSync, unlinkSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { packageApis } from "./api-coverage.js";
+import { slugOf } from "./api-docs.js";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const REQUIRED = ["index.ts", "docs.md", "demo.tsx", "playground.ts", "meta.ts"];
@@ -168,14 +170,14 @@ export async function generate(root = ROOT) {
   // The Code-tab snippets are their own lazy module (cards-code.gen.ts), loaded on the first click on a Code tab. A grouped
   // demo module is one loader shared by its cards (L(group, index)); a folder of its own keeps its two imports.
   const groups = [...new Set([...groupOf.values()].map((g) => g.file))];
-  // w: the component's own page: the showcase page that draws its <ComponentDemo> (sections.gen.ts, read from the
-  // page sources, so a moved demo moves the link), else the page named in meta.showcase
-  const secFile = join(root, "examples/showcase/src/sections.gen.ts");
-  const sections = existsSync(secFile) ? JSON.parse(/SECTIONS: Section\[\] = (\[.*\]);/s.exec(readFileSync(secFile, "utf8"))?.[1] ?? "[]") : [];
-  const ownPage = (c) => sections.find((x) => x.id === `c-${c.folder.split("/").join("-")}`)?.path ?? c.meta?.showcase;
-  // a: the API reference page of the component (/api/<a>/<name>): the subpath slug that documents it (API index)
-  const apiFile = join(root, "examples/showcase/public/api/index.en.json");
-  const apiIndex = existsSync(apiFile) ? JSON.parse(readFileSync(apiFile, "utf8")).subpaths : [];
+  // w: the component's own page on the site: src/components/pages.json (folder → the page that draws its demo, kept
+  // while the site reads this file), else the page named in meta.showcase
+  const pagesFile = join(root, "src/components/pages.json");
+  const sitePages = existsSync(pagesFile) ? JSON.parse(readFileSync(pagesFile, "utf8")) : {};
+  const ownPage = (c) => sitePages[c.folder] ?? c.meta?.showcase;
+  // a: the API reference page of the component (/api/<a>/<name>): the subpath slug that documents it (every package
+  // export, tools/api-coverage.js; the same subpaths as the API index of tools/api-docs.js)
+  const apiIndex = packageApis(root).map((a) => ({ slug: slugOf(a.subpath), items: a.items.map((i) => [i.name, i.kind]) }));
   const apiOf = (c) => apiIndex.find((x) => x.items.some((it) => it[0] === nameOf(c) && it[1] === "component"))?.slug ?? apiIndex.find((x) => x.items.some((it) => it[0] === nameOf(c) || it[0] === nameOf(c)[0].toLowerCase() + nameOf(c).slice(1)))?.slug;
   // a component whose export is a function with a small first letter (Toast → toast)
   const apiName = (c) => (apiIndex.some((x) => x.items.some((it) => it[0] === nameOf(c))) ? nameOf(c) : nameOf(c)[0].toLowerCase() + nameOf(c).slice(1));
@@ -212,7 +214,9 @@ export async function generate(root = ROOT) {
     "export const parts: Record<string, () => Promise<unknown>> = {\n" +
     list.filter((c) => partNames.has(nameOf(c)) && !c.meta?.entry).map((c) => `  ${nameOf(c)}: () => import("./${c.folder}/index.ts").then((m) => (m as Record<string, unknown>)[${JSON.stringify(nameOf(c))}]),\n`).join("") + "};\n";
   // The lower tabs of a component card (Özellikler, Erişilebilirlik): docs.md's "## Props" table (and the lines after
-  // it) and "## Accessibility", one JSON per category in the showcase's public folder, fetched when a tab opens.
+  // it) and "## Accessibility", one JSON per category (`comp`, not written here: tools/cdn-data.mjs publishes them as
+  // data/comp/<category>.json, which the site fetches when a tab opens).
+  const comp = {};
   const mdSection = (md, title) => md.match(new RegExp(`^## ${title}[^\\n]*\\n([\\s\\S]*?)(?=^## |(?![\\s\\S]))`, "m"))?.[1].trim() ?? "";
   const cells = (line) => line.trim().replace(/^\||\|$/g, "").split(/(?<!\\)\|/).map((x) => x.trim().replace(/\\\|/g, "|"));
   const propsOf = (md) => {
@@ -235,7 +239,7 @@ export async function generate(root = ROOT) {
     const { props, notes } = propsOf(c.docs);
     (docsByCat[c.category] ??= {})[c.folder] = { props, notes, a11y: mdSection(c.docs, "Accessibility") };
   }
-  for (const [cat, all] of Object.entries(docsByCat)) files[`examples/showcase/public/comp/${cat}.json`] = JSON.stringify(all) + "\n";
+  for (const [cat, all] of Object.entries(docsByCat)) comp[`comp/${cat}.json`] = JSON.stringify(all) + "\n";
   files["src/components/cards-code.gen.ts"] = HEAD + `export const code: Record<string, string> = {\n` +
     list.map((c) => `  ${JSON.stringify(c.folder)}: ${JSON.stringify(firstCode(c.docs))},\n`).join("") + `};\n`;
 
@@ -271,7 +275,7 @@ export async function generate(root = ROOT) {
     }
   }
   if (changed) files["package.json"] = JSON.stringify(pkg, null, 2) + "\n";
-  return { files, list };
+  return { files, list, comp };
 }
 
 /** Exported names of march, march/ui, march/router and march/table (a part named in composedOf may still live there while folders move). */

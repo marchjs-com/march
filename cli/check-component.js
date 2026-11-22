@@ -1,6 +1,6 @@
 // `march check component <name>`: the per-component checklist (docs/component-checklist.md) that can be checked from
-// the source. Browser checks (RTL mirror, keyboard walk, contrast, overflow at 320–1440 px) run in
-// tools/visual-audit.mjs; this command lists them as "browser" items so nothing is forgotten.
+// the source. Browser checks (RTL mirror, keyboard walk, contrast, overflow at 320–1440 px) run on the component's page
+// on the site (marchjs.com); this command lists them as "browser" items so nothing is forgotten.
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -73,7 +73,7 @@ export async function checkComponent(root, folder, { runTests = true } = {}) {
     const r = spawnSync(process.execPath, ["--import", pathToFileURL(join(root, "compiler/register.js")).href, "--test", join(dir, `${name}.test.js`)], { cwd: root, encoding: "utf8" });
     add("tests pass", r.status === 0, r.status === 0 ? undefined : (r.stdout + r.stderr).split("\n").filter((l) => /✖|Error/.test(l)).slice(0, 3).join(" | "));
   }
-  // browser checks (tools/visual-audit.mjs and the showcase): listed, not run here
+  // browser checks (the site's component pages): listed, not run here
   for (const b of ["theme + accent in light and dark", "RTL mirror", "keyboard only", "reduced motion", "overflow 320–1440 px", "lazy + placeholder", "budget"]) add(`browser: ${b}`, null);
   return { ok: results.every((r) => r.ok !== false), results };
 }
