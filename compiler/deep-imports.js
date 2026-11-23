@@ -43,12 +43,29 @@ export function deepImports(code, barrels) {
   // only real import statements are rewritten: the same text inside a string or template literal (a code sample in a
   // demo) or a comment is content and stays as written
   const live = statementStarts(code);
-  return rewrite(code, barrels, live);
+  return rewriteDynamic(rewrite(code, barrels, live), barrels);
+}
+
+/**
+ * A lazy import of one name from a barrel loads the module that defines it, as a static named import does:
+ *   import("march/forms").then((m) => m.Calendar)               → import("<march>/…/calendar/index.ts").then((m) => m.Calendar)
+ *   import("march/charts").then((m) => ({ default: m.BarChart }))  (the same, for lazy(); any one key)
+ * so the lazy part is that one component, never the whole category. Code inside strings and comments stays.
+ */
+function rewriteDynamic(code, barrels) {
+  if (!code.includes("import(")) return code;
+  const live = statementStarts(code, true);
+  return code.replace(/import\(\s*(["'])(march(?:\/[\w-]+)?)\1\s*\)(\s*\.then\(\s*\(?\s*([\w$]+)\s*\)?\s*=>\s*(?:\(\s*\{\s*[\w$]+:\s*)?\4\.([\w$]+))/g, (all, q, spec, rest, m, name, at) => {
+    const index = barrels[spec];
+    if (!index || !live.has(at)) return all;
+    const target = exportMap(index).get(name);
+    return target && target !== index ? `import(${JSON.stringify(target.split("\\").join("/"))})${rest}` : all;
+  });
 }
 
 // Offsets where an `import` keyword starts a statement in code: after a line break, `;` or `}` (or at the start),
-// outside strings, template literals, comments and regular expressions.
-function statementStarts(code) {
+// outside strings, template literals, comments and regular expressions. `calls`: the offsets of `import(` calls instead.
+function statementStarts(code, calls = false) {
   const out = new Set();
   const n = code.length;
   const tpl = []; // brace depth at each open `${`
@@ -74,7 +91,8 @@ function statementStarts(code) {
     }
     if (c === "{") depth++;
     else if (c === "}") depth--;
-    if (c === "i" && (prev === ";" || prev === "}" || prev === "\n") && code.startsWith("import", i) && !/[\w$]/.test(code[i + 6] ?? "")) out.add(i);
+    if (calls) { if (c === "i" && code.startsWith("import(", i) && !/[\w$.]/.test(code[i - 1] ?? "")) out.add(i); }
+    else if (c === "i" && (prev === ";" || prev === "}" || prev === "\n") && code.startsWith("import", i) && !/[\w$]/.test(code[i + 6] ?? "")) out.add(i);
     if (c === "\n") prev = "\n";
     else if (!/\s/.test(c)) { const w = /[\w$]/.test(c); word = w ? (prev === "a" && /[\w$]/.test(code[i - 1]) ? word + c : c) : ""; prev = w ? "a" : c; }
     i++;

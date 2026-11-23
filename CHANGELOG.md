@@ -2,6 +2,14 @@
 
 All notable changes to March. Versions follow [semver](https://semver.org/).
 
+## Unreleased
+
+### New
+- The compiler resolves every package entry without side effects (`march/landing`, `march/composite`,
+  `march/behaviors/drag`…) like the core subpaths: a named import goes straight to the defining module, so a page that
+  uses one block no longer reaches the whole category. A lazy import of one name does the same:
+  `import("march/forms").then((m) => m.Calendar)` (or `({ default: m.Calendar })` for `lazy()`) loads Calendar alone.
+
 ## 0.3.0 — 2026-11-21
 
 ### New
