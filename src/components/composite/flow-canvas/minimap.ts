@@ -49,7 +49,7 @@ export function Minimap(props: MinimapProps): Element {
   return h("svg", {
     class: "m-flow-minimap", width: String(MW), height: String(MH), viewBox: `0 0 ${MW} ${MH}`, role: "img", tabindex: "0",
     "aria-label": () => props.label?.() ?? t`Minimap: click to move the view`,
-    onPointerdown: (e: PointerEvent) => {
+    onPointerDown: (e: PointerEvent) => {
       e.stopPropagation();
       const svg = e.currentTarget as SVGSVGElement;
       moveTo(svg, e.clientX, e.clientY);

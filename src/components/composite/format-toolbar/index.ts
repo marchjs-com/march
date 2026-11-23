@@ -28,6 +28,7 @@ import { terminal } from "../../../icons/glyphs/terminal.ts";
 import { undo } from "../../../icons/glyphs/undo.ts";
 import { redo } from "../../../icons/glyphs/redo.ts";
 import tr from "./tr.ts";
+import { keepFocus } from "../../../ui/behave.ts";
 
 messages("tr", tr);
 
@@ -115,7 +116,7 @@ export function FormatToolbar<T extends FormatTool = FormatTool>(props: FormatTo
       ...(on ? { pressed: on } : null), "aria-keyshortcuts": key,
       disabled: () => off(tool),
       // keep the text selection: the button never takes focus on pointer down
-      onMouseDown: (e: MouseEvent) => e.preventDefault(), onClick: () => props.onTool?.(tool),
+      onMouseDown: keepFocus, onClick: () => props.onTool?.(tool),
     }) as Element;
   };
   const bar = h(Toolbar, {

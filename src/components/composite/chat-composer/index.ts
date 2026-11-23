@@ -145,7 +145,7 @@ export function ChatComposer(props: ChatComposerProps): Element {
   return h("form", {
     class: () => cx("m-compose", rec() && "is-recording", val(props.class)),
     onSubmit: (e: Event) => { e.preventDefault(); submit(); },
-    onKeydown: (e: KeyboardEvent) => { if (e.key === "Escape" && rec()) { e.preventDefault(); stopRec(false); } },
+    onKeyDown: (e: KeyboardEvent) => { if (e.key === "Escape" && rec()) { e.preventDefault(); stopRec(false); } },
   },
   () => {
     const r = val(props.replyTo);

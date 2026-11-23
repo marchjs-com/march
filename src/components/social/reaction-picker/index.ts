@@ -60,9 +60,9 @@ export function ReactionPicker(props: ReactionPickerProps): Element {
   };
   root = h("div", {
     class: () => cx("m-react", `m-react-${val(props.layout) ?? "row"}`, val(props.class)),
-    role: "toolbar", "aria-label": () => val(props.label) ?? t`Reactions`, onKeydown: key,
+    role: "toolbar", "aria-label": () => val(props.label) ?? t`Reactions`, onKeyDown: key,
     // the one Tab stop follows the focus (Tab back in returns to the emoji left last)
-    onFocusin: (e: FocusEvent) => {
+    onFocusIn: (e: FocusEvent) => {
       const list = items();
       if (!list.includes(e.target as HTMLButtonElement)) return;
       for (const b of list) b.tabIndex = b === e.target ? 0 : -1;

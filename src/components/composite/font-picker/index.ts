@@ -9,6 +9,7 @@ import { signal, computed, effect, untrack, batch, onCleanup, type Signal } from
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { cx, uid, val, setStyle, type ClassProp, type Handler } from "../../../core/util.ts";
+import { locked } from "../../../ui/behave.ts";
 import { model, ctl, live, listNav, type ControlProps } from "../../../forms/util.ts";
 import { formatCount } from "../../../ui/format.ts";
 import { persisted } from "../../../managers/storage/index.ts";
@@ -176,7 +177,7 @@ export function FontPicker(props: FontPickerProps): unknown {
   const [get, set] = model(props, "");
   const id = uid("m-fp"), listId = `${id}-list`;
   const c = ctl(props);
-  const ro = (): boolean => !!(props.readonly || props.disabled);
+  const ro = (): boolean => locked(props);
   const L = (): FontPickerLabels => props.labels ?? {};
   const view = untrack(() => props.view ?? "popover");
   const store = <T>(name: string, initial: T): Signal<T> => (props.storageKey === false ? signal<T>(initial) : persisted<T>(`${props.storageKey ?? "fonts"}.${name}`, initial));

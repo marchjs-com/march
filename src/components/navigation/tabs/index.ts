@@ -112,7 +112,7 @@ export function TabList(props: TabListProps): Element {
   return h("div", {
     class: () => cx(look() && "m-tabs-bar", val(props.variant) === "pill" && "m-tabs-bar-pill", val(props.class)), role: "tablist",
     "aria-orientation": () => (vertical() ? "vertical" : props.orientation !== undefined ? "horizontal" : null), "aria-label": () => val(props.label) ?? null, ref: (x: HTMLElement) => { bar = x; },
-    onKeydown: (e: KeyboardEvent) => {
+    onKeyDown: (e: KeyboardEvent) => {
       const id = (e.target as HTMLElement).dataset?.["tab"];
       if (e.key === "Delete" && id != null && closes(untrack(list).find((x) => x.id === id))) { e.preventDefault(); props.onClose?.(id); return; }
       const el = roving(e, tabEls(), { horizontal: !vertical() });
@@ -132,7 +132,7 @@ export function TabList(props: TabListProps): Element {
     x.dirty !== undefined && (() => (val(x.dirty) ? h(StatusDot, { class: "m-tab-dirty", tone: "primary", size: "sm", label: () => val(props.labels?.dirty) ?? t`unsaved changes` }) : null)),
     x.closable !== undefined && (() => (closes(x) ? h("span", {
       class: "m-tab-close", "aria-hidden": "true", title: () => val(props.labels?.close) ?? t`Close`,
-      onPointerdown: (e: Event) => e.stopPropagation(), onClick: (e: Event) => { e.stopPropagation(); props.onClose?.(x.id); },
+      onPointerDown: (e: Event) => e.stopPropagation(), onClick: (e: Event) => { e.stopPropagation(); props.onClose?.(x.id); },
     }, ownIcon(props.closeIcon ?? undefined, xIcon, "m-tab-close-own")) : null)));
     return props.wrap ? props.wrap(btn, x) : btn;
   })));

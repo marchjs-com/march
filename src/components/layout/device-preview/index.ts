@@ -32,6 +32,8 @@ import { DEVICES, deviceById, isTouch, dprOf, type DeviceSpec } from "./devices.
 import { deviceSensors, type DeviceSensors, type Battery, type Tilt } from "./sensors.ts";
 import { touchSim, type Gesture, type TouchSim } from "./touch.ts";
 import type { Handler } from "../../../core/util.ts";
+import { on as listen } from "../../../core/util.ts";
+import { keepFocus } from "../../../ui/behave.ts";
 
 export { DEVICES, customDevices, addDevice, removeDevice, allDevices, deviceById, type DeviceSpec, type DeviceKind } from "./devices.ts";
 export { deviceSensors, type DeviceSensors, type Battery, type Tilt, type SensorOptions } from "./sensors.ts";
@@ -202,7 +204,7 @@ export function DevicePreview(props: DevicePreviewProps): Element {
   };
   const key = (k: string, cls = "", lbl?: unknown): Element => h("span", { class: cx("m-device-key", cls), "data-key": k, role: "button", "aria-label": k === " " ? "space" : k }, lbl ?? (() => (shift() ? k.toLocaleUpperCase("tr") : k)));
   const keyboard = h("div", { class: "m-device-kb", "aria-hidden": "true", hidden: () => !kbShown(),
-    onMousedown: (e: MouseEvent) => e.preventDefault(), onPointerdown: (e: PointerEvent) => e.preventDefault(),
+    onMouseDown: keepFocus, onPointerDown: (e: PointerEvent) => e.preventDefault(),
     onClick: (e: MouseEvent) => {
       const k = (e.target as Element).closest?.("[data-key]")?.getAttribute("data-key");
       if (k == null) return;
@@ -269,8 +271,8 @@ export function DevicePreview(props: DevicePreviewProps): Element {
       sens = sensors;
       const fin = (e: FocusEvent): void => { setField(isField(e.target as Element)); };
       const fout = (): void => { setTimeout(() => setField(isField(doc.activeElement)), 0); };
-      doc.addEventListener("focusin", fin); doc.addEventListener("focusout", fout);
-      unbind = () => { s.dispose(); sensors.dispose(); cls(); doc.removeEventListener("focusin", fin); doc.removeEventListener("focusout", fout); };
+      const offs = [listen(doc, "focusin", fin), listen(doc, "focusout", fout)];
+      unbind = () => { s.dispose(); sensors.dispose(); cls(); for (const f of offs) f(); };
     };
     frame.addEventListener("load", attach);
     onCleanup(() => unbind?.());

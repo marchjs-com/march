@@ -15,6 +15,7 @@ import { SectionLabel } from "../../typography/section-label/index.ts";
 import { ListRow } from "../../data/list-row/index.ts";
 import { check as checkIcon } from "../../../icons/glyphs/check.ts";
 import type { Handler } from "../../../core/util.ts";
+import { keepFocus } from "../../../ui/behave.ts";
 
 /** One choice. */
 export interface OptionItem<T = string> {
@@ -125,7 +126,7 @@ export function OptionList<T = string>(props: OptionListProps<T>): Element {
       size: () => (val(props.size) === "sm" ? "sm" : "md"), disabled: !!it.disabled, onClick: (e: MouseEvent) => pick(i, e),
       // ListRow says the choice by the role: aria-checked (radio, menuitemradio) or aria-selected (option); a command has no state
       ...(rowRole === "menuitem" ? {} : { selected }),
-      ...(byField ? { id: `${id}-${i}`, onPointerMove: () => { if (!it.disabled && active.peek() !== i) active.set(i); }, onMouseDown: (e: Event) => e.preventDefault() }
+      ...(byField ? { id: `${id}-${i}`, onPointerMove: () => { if (!it.disabled && active.peek() !== i) active.set(i); }, onMouseDown: keepFocus }
         : { tabindex: () => (tabStop() === i ? "0" : "-1") }),
       ...(props.renderOption ? { children: props.renderOption(it, { selected, active: isActive, index: i }), trail: tick ?? undefined } : { lead: it.icon ?? undefined, title: it.label, sub: it.hint ?? undefined, trail }),
     }) as Element;
@@ -153,7 +154,7 @@ export function OptionList<T = string>(props: OptionListProps<T>): Element {
   root = h("div", {
     id, role: listRole, "aria-label": () => val(props.label) ?? null, "aria-multiselectable": props.multiple && listRole === "listbox" ? "true" : null,
     "aria-orientation": listRole === "menu" || cols > 1 ? null : "vertical", class: () => cx("m-option-list", val(props.size) === "sm" && "m-option-list-sm", cols > 1 && "m-option-list-grid", cols > 1 && `m-option-list-cols-${Math.min(cols, 6)}`, props.inline && "m-option-list-inline", val(props.class)),
-    onKeydown: byField ? null : (e: KeyboardEvent) => {
+    onKeyDown: byField ? null : (e: KeyboardEvent) => {
       // list-nav gives the next index; rows that are disabled are stepped over
       const list = rows(), from = list.indexOf(e.target as HTMLElement);
       if (from < 0) return;

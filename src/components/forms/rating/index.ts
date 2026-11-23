@@ -53,13 +53,13 @@ export function Rating(props: RatingProps): Element {
       style: () => { const part = shown() - (n - 1); return { "--m-rating-part": !filled() && part > 0 ? part.toFixed(3) : null }; },
       "aria-checked": () => String(Math.round(Number(val(props.value) ?? 0)) === n), "aria-label": () => props.starLabel?.(n, max) ?? t`${n} of ${max}`,
       tabindex: () => (Math.max(1, Math.round(Number(val(props.value) ?? 0))) === n ? "0" : "-1"), disabled: () => !!props.readonly,
-      onClick: () => set(n), onMouseenter: () => !props.readonly && hover.set(n),
+      onClick: () => set(n), onPointerEnter: () => !props.readonly && hover.set(n),
     }, h("span", { class: "m-rating-off" }, mark(props.icon, star, n)), h("span", { class: "m-rating-on" }, mark(props.iconOn ?? props.icon, starFilled, n)));
   });
   return h("span", { class: () => cx("m-rating", `m-rating-${props.size ?? "md"}`, props.readonly && "is-readonly", props.animate === false && "is-still", hover() != null && "is-hovering", val(props.class)), role: "radiogroup",
-    "aria-label": () => val(props.label) ?? t`Rating`, onMouseleave: () => hover.set(null),
+    "aria-label": () => val(props.label) ?? t`Rating`, onPointerLeave: () => hover.set(null),
     // radio group keys: arrows (RTL mirrored), Home / End, no wrap; the value follows focus
-    onKeydown: (e: KeyboardEvent) => {
+    onKeyDown: (e: KeyboardEvent) => {
       if (props.readonly) return;
       const g = e.currentTarget as HTMLElement, stars = [...g.querySelectorAll<HTMLElement>(".m-rating-star")];
       const to = roving(e, stars, { horizontal: e.key === "ArrowLeft" || e.key === "ArrowRight", wrap: false, rtl: isRtl(g) });

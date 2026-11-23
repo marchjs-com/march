@@ -44,7 +44,7 @@ export function Tree(props: TreeProps): Element {
     // the treeitem (the li, which holds its group) is what takes focus, so the focused element carries the tree's state
     return h("li", {
       role: "treeitem", class: "m-tree-li", tabindex: "-1", "aria-expanded": () => (has ? String(isOpen()) : null), "aria-selected": () => String(val(props.selected) === node.id), "aria-level": String(level),
-      onKeydown: (e: KeyboardEvent) => {
+      onKeyDown: (e: KeyboardEvent) => {
         const at = e.currentTarget as HTMLElement;
         if (e.target !== at) return; // a nested item's keys bubble through its parents
         const items = [...(at.closest(".m-tree")?.querySelectorAll<HTMLElement>(".m-tree-li") ?? [])].filter((r) => r.offsetParent !== null || !r.parentElement?.closest("[hidden]"));
@@ -67,7 +67,7 @@ export function Tree(props: TreeProps): Element {
   const root = h("ul", {
     role: "tree", class: () => cx("m-tree", val(props.class)), "aria-label": props.label ?? t`Tree`,
     // roving tab stop: Tab comes back to the item that last had focus, not to the first one
-    onFocusin: (e: FocusEvent) => {
+    onFocusIn: (e: FocusEvent) => {
       const r = e.target as HTMLElement;
       if (!r.classList?.contains("m-tree-li") || r.closest(".m-tree") !== root || r.tabIndex === 0) return;
       for (const x of (root as HTMLElement).querySelectorAll<HTMLElement>(".m-tree-li[tabindex='0']")) if (x.closest(".m-tree") === root) x.tabIndex = -1;

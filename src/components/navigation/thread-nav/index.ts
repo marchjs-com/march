@@ -17,6 +17,8 @@ import { dockLens } from "../../../ui/dock-lens.ts";
 import { SearchBox } from "../../forms/search-box/index.ts";
 import tr from "./tr.ts";
 import type { Handler } from "../../../core/util.ts";
+import { on as listen } from "../../../core/util.ts";
+import { isActivateKey } from "../../../ui/behave.ts";
 
 messages("tr", tr);
 
@@ -171,7 +173,7 @@ export function ThreadNav(props: ThreadNavProps): unknown {
   const beadOf = (i: number): HTMLElement | null => (list?.children[i]?.firstElementChild as HTMLElement | null) ?? null;
   const onRailKey = (e: KeyboardEvent): void => {
     const n = untrack(items).length, cur = list ? [...list.children].findIndex((li) => li.contains(doc?.activeElement ?? null)) : -1;
-    if (e.key === "ArrowRight" || e.key === "Enter" || e.key === " ") {
+    if (e.key === "ArrowRight" || isActivateKey(e)) {
       if (cur < 0) return;
       e.preventDefault();
       if (!untrack(items)[cur]?.children?.length) { const it = untrack(items)[cur]; if (it) choose(it); return; }
@@ -274,8 +276,8 @@ export function ThreadNav(props: ThreadNavProps): unknown {
 
   // close on a press outside (the rail and the capsule are inside)
   const outside = (e: PointerEvent): void => { if (openAt.peek() >= 0 && root && !root.contains(e.target as Node)) close(); };
-  doc?.addEventListener("pointerdown", outside, true);
-  onCleanup(() => { alive = false; lens.dispose(); doc?.removeEventListener("pointerdown", outside, true); });
+  listen(doc, "pointerdown", outside, true);
+  onCleanup(() => { alive = false; lens.dispose(); });
 
   const railDrop = h("span", { class: "m-thn-drop", "aria-hidden": "true", "data-m-color": () => colorAttr(here(0)?.color) }) as HTMLElement;
 
@@ -304,8 +306,8 @@ export function ThreadNav(props: ThreadNavProps): unknown {
     onPointerEnter: () => { if (on()) lens.enter(); },
     onPointerMove: (e: PointerEvent) => { if (on()) { lens.enter(); lens.at(e.clientY); } },
     onPointerLeave: () => lens.at(null),
-    onFocusin: (e: FocusEvent) => { const li = (e.target as Element).closest("li"); if (li && list && on()) lens.atItem([...list.children].indexOf(li)); },
-    onFocusout: () => lens.at(null),
+    onFocusIn: (e: FocusEvent) => { const li = (e.target as Element).closest("li"); if (li && list && on()) lens.atItem([...list.children].indexOf(li)); },
+    onFocusOut: () => lens.at(null),
   }, () => {
     const secs = items();
     return untrack(() => secs.map((s, i) => h("li", {

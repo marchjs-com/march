@@ -221,11 +221,11 @@ export function SectionTimeline(props: SectionTimelineProps): unknown {
     onPointerEnter: () => { if (on()) lens.enter(); },
     onPointerMove: (e: PointerEvent) => { if (!on()) return; lens.enter(); lens.at(untrack(vertical) ? e.clientY : e.clientX); },
     onPointerLeave: () => lens.at(null),
-    onFocusin: (e: FocusEvent) => {
+    onFocusIn: (e: FocusEvent) => {
       const li = (e.target as Element).closest("li");
       if (li && list && on()) lens.atItem([...list.children].indexOf(li));
     },
-    onFocusout: () => lens.at(null),
+    onFocusOut: () => lens.at(null),
     onKeyDown,
   }, () => {
     const list = items();

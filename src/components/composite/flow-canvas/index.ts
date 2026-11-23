@@ -46,6 +46,7 @@ import {
 import { Minimap } from "./minimap.ts";
 import { pointerDrag } from "../../../behaviors/drag/index.ts";
 import { isRtl } from "../../../core/util.ts";
+import { isActivateKey } from "../../../ui/behave.ts";
 export * from "./model.ts";
 export { Minimap } from "./minimap.ts";
 
@@ -393,8 +394,8 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
         "data-ref": ref, "data-side": side,
         "aria-label": () => { const name = val(port.label) ?? port.id; return side === "in" ? L().input?.(name) ?? t`Input ${name}` : L().output?.(name) ?? t`Output ${name}`; },
         "aria-pressed": () => String(pending()?.ref === ref),
-        onPointerdown: (e: PointerEvent) => startConnect(e, ref, side),
-        onKeydown: (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); portActivate(ref, side); } },
+        onPointerDown: (e: PointerEvent) => startConnect(e, ref, side),
+        onKeyDown: (e: KeyboardEvent) => { if (isActivateKey(e)) { e.preventDefault(); e.stopPropagation(); portActivate(ref, side); } },
       }),
       port.label != null && h(OverflowText, { class: "m-flow-portlabel", fade: false }, () => val(port.label)));
   }
@@ -428,14 +429,14 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
       "aria-label": () => `${title()}${status() !== "idle" ? ` · ${statusText(status())}` : ""}`,
       "aria-selected": () => String(isSel()),
       style: () => ({ "inset-inline-start": `${n.x()}px`, "inset-block-start": `${n.y()}px` }),
-      onPointerdown: (e: PointerEvent) => {
+      onPointerDown: (e: PointerEvent) => {
         if (e.button !== 0 || editable(e.target) || (e.target as Element).closest(".m-flow-port")) return;
         e.stopPropagation();
         if (e.shiftKey || isMod(e)) { toggleSel(n.id, true); return; }
         if (!sel.peek().has(n.id)) sel.set(new Set([n.id]));
         dragNodes(e, selectedNodes());
       },
-      onKeydown: (e: KeyboardEvent) => { if (e.target === el && e.key === "Enter") { e.preventDefault(); toggleSel(n.id, e.shiftKey); } },
+      onKeyDown: (e: KeyboardEvent) => { if (e.target === el && e.key === "Enter") { e.preventDefault(); toggleSel(n.id, e.shiftKey); } },
     },
       h("span", { class: "m-flow-glow", "aria-hidden": "true", ref: (x: HTMLElement) => { glow = x; } }),
       h("div", { class: "m-flow-head" },
@@ -480,7 +481,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
     const liveFlow = (): boolean => count() > 0 || src() === "running";
     let path!: SVGPathElement, flowPath!: SVGPathElement;
     const g = h("g", { class: () => cx("m-flow-edge", isSel() && "is-selected", liveFlow() && "is-live", flow.status().get(endOf(e.to)[0]) === "skipped" && "is-skipped") },
-      h("path", { class: "m-flow-edge-hit", d, onPointerdown: (ev: PointerEvent) => { ev.stopPropagation(); toggleSel(e.id, ev.shiftKey || isMod(ev)); } }),
+      h("path", { class: "m-flow-edge-hit", d, onPointerDown: (ev: PointerEvent) => { ev.stopPropagation(); toggleSel(e.id, ev.shiftKey || isMod(ev)); } }),
       h("path", { class: "m-flow-edge-line", d, ref: (x: SVGPathElement) => { path = x; } }),
       h("path", { class: "m-flow-edge-flow", d, ref: (x: SVGPathElement) => { flowPath = x; } }),
       h("g", { ref: (x: SVGGElement) => dotsLayer.set(e.id, x) }),
@@ -524,7 +525,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
       "aria-label": () => (count() ? `${name()} · ${L().values?.(count()) ?? t`${count()} values`}` : name()),
       "aria-pressed": () => String(sel().has(e.id)),
       style: () => ({ "inset-inline-start": `${mid().x}px`, "inset-block-start": `${mid().y}px` }),
-      onPointerdown: (ev: PointerEvent) => ev.stopPropagation(),
+      onPointerDown: (ev: PointerEvent) => ev.stopPropagation(),
       onClick: (ev: MouseEvent) => toggleSel(e.id, ev.shiftKey || isMod(ev)),
     }, () => (count() > 0 ? String(count()) : null));
   }
@@ -538,14 +539,14 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
       style: () => { const b = box(); return { "inset-inline-start": `${b.x - 20}px`, "inset-block-start": `${b.y - 44}px`, width: `${b.w + 40}px`, height: `${b.h + 64}px` }; },
     }, h("button", {
       type: "button", class: "m-flow-group-label", "aria-pressed": () => String(isSel()),
-      onPointerdown: (e: PointerEvent) => {
+      onPointerDown: (e: PointerEvent) => {
         if (e.button !== 0) return;
         e.stopPropagation();
         if (e.shiftKey || isMod(e)) { toggleSel(g.id, true); return; }
         sel.set(new Set([g.id]));
         dragNodes(e, untrack(group).nodes);
       },
-      onKeydown: (e: KeyboardEvent) => { if (e.key === "Enter") { e.preventDefault(); sel.set(new Set([g.id])); } },
+      onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter") { e.preventDefault(); sel.set(new Set([g.id])); } },
     }, h(OverflowText, {}, () => group().label)));
   }
 
@@ -602,15 +603,15 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
     "aria-roledescription": () => L().editor ?? t`flow editor`,
     "aria-label": () => val(props.label) ?? t`Flow editor`,
     style: () => { const v = vp(), g = Math.max(4, (grid() || 16) * v.zoom); return { "--m-flow-gs": `${g}px`, "--m-flow-gx": `${v.x % g}px`, "--m-flow-gy": `${v.y % g}px` }; },
-    onPointerdown: (e: PointerEvent) => onBackgroundDown(e),
+    onPointerDown: (e: PointerEvent) => onBackgroundDown(e),
     onWheel: (e: WheelEvent) => {
       e.preventDefault();
       if (e.ctrlKey || e.metaKey) { const p = local(e.clientX, e.clientY); zoomAround(p.x, p.y, vp.peek().zoom * Math.exp(-e.deltaY * 0.0022)); return; }
       const v = vp.peek(), s = rtl() ? -1 : 1;
       vp.set({ ...v, x: v.x - e.deltaX * s, y: v.y - e.deltaY });
     },
-    onKeydown: onKey,
-    onKeyup: (e: KeyboardEvent) => { if (e.key === " ") { space = false; root.classList.remove("is-panning"); } },
+    onKeyDown: onKey,
+    onKeyUp: (e: KeyboardEvent) => { if (e.key === " ") { space = false; root.classList.remove("is-panning"); } },
   },
     world,
     () => { const m = marquee(); return m ? h("div", { class: "m-flow-marquee", style: { "inset-inline-start": `${Math.min(m.x0, m.x1)}px`, "inset-block-start": `${Math.min(m.y0, m.y1)}px`, width: `${Math.abs(m.x1 - m.x0)}px`, height: `${Math.abs(m.y1 - m.y0)}px` } }) : null; },

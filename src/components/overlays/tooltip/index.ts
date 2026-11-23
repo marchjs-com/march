@@ -38,8 +38,8 @@ export function Tooltip(props: TooltipProps): unknown[] {
   onCleanup(() => open.cancel());
   const wrap = h("span", {
     class: "m-tip-anchor", ref: (x: HTMLElement) => { anchor = x; },
-    onMouseenter: open, onMouseleave: hide, onFocusin: () => { if (!off()) show.set(true); }, onFocusout: hide,
-    onKeydown: (e: KeyboardEvent) => { if (e.key === "Escape") hide(); },
+    onPointerEnter: open, onPointerLeave: hide, onFocusIn: () => { if (!off()) show.set(true); }, onFocusOut: hide,
+    onKeyDown: (e: KeyboardEvent) => { if (e.key === "Escape") hide(); },
   }, props.children);
   const target = (): Element => (anchor as HTMLElement).firstElementChild ?? (anchor as HTMLElement);
   return [wrap, () => {

@@ -5,6 +5,7 @@ import { model, ctl, cx, syncValue, type ControlProps } from "../../../forms/uti
 import { inputOf } from "../../../forms/affix.ts";
 import { colorAttr } from "../../../theme/colors.ts";
 import type { Handler } from "../../../core/util.ts";
+import { locked } from "../../../ui/behave.ts";
 
 export interface SliderProps extends ControlProps<number> {
   /** Smallest value (default 0). @tr En küçük değer (varsayılan 0). */
@@ -36,7 +37,7 @@ export function Slider(props: SliderProps): unknown {
   const el = h("input", {
     ...ctl(props), type: "range", class: cx("m-slider", track != null && "m-slider-own"), min: () => props.min ?? 0, max: () => props.max ?? 100, step: () => props.step ?? 1,
     "aria-valuetext": () => (props.valueText ? props.valueText(get()) : null),
-    disabled: () => !!(props.disabled || props.readonly), onInput: (e: Event) => set(Number(inputOf(e).value)),
+    disabled: () => locked(props), onInput: (e: Event) => set(Number(inputOf(e).value)),
     onChange: (e: Event) => props.onCommit?.(Number(inputOf(e).value)),
   }) as HTMLInputElement;
   syncValue(el, get);

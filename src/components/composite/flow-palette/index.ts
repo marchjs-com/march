@@ -19,6 +19,7 @@ import { dragGhost, type DragGhost } from "../../../behaviors/drag/ghost.ts";
 import { NODE_W, type FlowStore, type FlowNodeType } from "../flow-canvas/model.ts";
 import { withColor } from "../../../theme/colors.ts";
 import type { Handler } from "../../../core/util.ts";
+import { isActivateKey } from "../../../ui/behave.ts";
 export interface FlowPaletteProps {
   /** The flow store new nodes are added to. @tr Yeni düğümlerin eklendiği akış deposu. */
   flow: FlowStore;
@@ -114,7 +115,7 @@ export function FlowPalette(props: FlowPaletteProps): Element {
       "aria-label": () => `${val(ty.label)}${ty.description ? `. ${val(ty.description)}` : ""}`,
       "aria-describedby": hint,
       onPointerdown: (e: PointerEvent) => { e.preventDefault(); el.focus(); drag(e, ty, el); },
-      onKeydown: (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); add(ty); } },
+      onKeydown: (e: KeyboardEvent) => { if (isActivateKey(e)) { e.preventDefault(); add(ty); } },
       ...(props.renderCard ? { title: h("span", { class: "m-flowpal-own" }, props.renderCard(ty)) } : {
         lead: withColor(h(IconTile, { class: "m-flowpal-icon", icon: ty.icon }), ty.color),
         title: h(OverflowText, { class: "m-flowpal-name" }, () => val(ty.label)),

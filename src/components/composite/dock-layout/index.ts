@@ -14,7 +14,7 @@ import { signal, computed, effect, untrack, createRoot, getOwner, onCleanup, typ
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, uid, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
-import { load, save, type Handler } from "../../../core/util.ts";
+import { load, save, type Handler, on as listen } from "../../../core/util.ts";
 import { observeSize } from "../../../ui/observe.ts";
 import { ownIcon } from "../../../ui/parts.ts";
 import { TabList, type TabSpec } from "../../navigation/tabs/index.ts";
@@ -446,9 +446,10 @@ export function DockLayout(props: DockLayoutProps): Element {
       }
       paint(m.clientX, m.clientY);
     };
+    const offs: Array<() => void> = [];
     const stop = (drop: boolean): void => {
       if (endDrag === cancel) endDrag = null;
-      removeEventListener("pointermove", move); removeEventListener("pointerup", up); removeEventListener("pointercancel", cancel); removeEventListener("keydown", key, true);
+      for (const f of offs.splice(0)) f();
       if (!on) return;
       shield(false); ghost?.close(); zones.remove(); preview.remove(); mark.remove();
       setTimeout(() => { dragged = false; }, 0);
@@ -462,7 +463,7 @@ export function DockLayout(props: DockLayoutProps): Element {
     };
     const up = (): void => stop(true), cancel = (): void => stop(false);
     const key = (k: KeyboardEvent): void => { if (k.key === "Escape") { k.preventDefault(); k.stopPropagation(); stop(false); } };
-    addEventListener("pointermove", move); addEventListener("pointerup", up); addEventListener("pointercancel", cancel); addEventListener("keydown", key, true);
+    offs.push(listen(globalThis, "pointermove", move), listen(globalThis, "pointerup", up), listen(globalThis, "pointercancel", cancel), listen(globalThis, "keydown", key, true));
     endDrag = cancel;
   }
   const runIn = <T>(fn: () => T): T => createRoot(() => fn(), owner);
@@ -609,8 +610,8 @@ export function DockLayout(props: DockLayoutProps): Element {
   })();
   const stopSize = observeSize(root, () => { syncNarrow(); render(); });
   const onHide = (): void => { if (saveT) persist(true); };
-  addEventListener("pagehide", onHide);
-  onCleanup(() => { endDrag?.(); stopSize(); shield(false); removeEventListener("pagehide", onHide); onHide(); });
+  listen(globalThis, "pagehide", onHide);
+  onCleanup(() => { endDrag?.(); stopSize(); shield(false); onHide(); });
 
   const prefix = props.commands === false ? null : (props.commands ?? "dock");
   if (prefix) {

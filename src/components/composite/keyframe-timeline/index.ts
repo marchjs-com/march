@@ -9,6 +9,7 @@ import { h } from "../../../dom/h.ts";
 import { track, arrowStep } from "../../../behaviors/drag/index.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { cx, uid, val, clamp, setStyle, type ClassProp } from "../../../core/util.ts";
+import { locked } from "../../../ui/behave.ts";
 import { glyph } from "../../../ui/util.ts";
 import { model, ctl, live, type ControlProps } from "../../../forms/util.ts";
 import { hasPart } from "../../../ui/parts.ts";
@@ -81,7 +82,7 @@ export function KeyframeTimeline(props: KeyframeTimelineProps): unknown {
   const [get, set] = model<M.TimelineModel>(props, { duration: 2000, tracks: [] });
   const id = uid("m-kt");
   const c = ctl(props);
-  const ro = (): boolean => !!(props.readonly || props.disabled);
+  const ro = (): boolean => locked(props);
   const L = (): NonNullable<KeyframeTimelineProps["labels"]> => props.labels ?? {};
   const keyName = (n: number, target: string, prop: string): string => L().keyframe?.(n, target, prop) ?? t`Keyframe ${n} of ${target} ${prop}`;
   const bar = (k: "play" | "start" | "loop" | "time" | "speed"): boolean => hasPart(props.transport, k);

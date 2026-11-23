@@ -7,6 +7,7 @@ import { signal, computed, effect, untrack, onCleanup } from "../../../core/reac
 import { h } from "../../../dom/h.ts";
 import { t, locale, dir } from "../../../core/i18n.ts";
 import { val, cx, uid, setStyle, later, clamp, type MaybeFn, type ClassProp, type Handler } from "../../../core/util.ts";
+import { isActivateKey } from "../../../ui/behave.ts";
 import {
   todayIso, addDays, addMonths, diffDays, startOfWeek, daysFrom, monthGrid, firstDayOf, dateFormat, utcDate, formatMinutes, weekdayNames,
   splitDateTime, joinDateTime, snapMinutes, isWeekend, localeDir, type IsoDate,
@@ -227,7 +228,7 @@ export function Scheduler(props: SchedulerProps): Element {
     return { start: joinDateTime(addDays(n.sd, dDays), s), end: joinDateTime(addDays(n.sd, dDays), s + dur), allDay: false };
   };
   const evKeys = (n: Norm) => (e: KeyboardEvent): void => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); props.onSelect?.(n.ev); return; }
+    if (isActivateKey(e)) { e.preventDefault(); props.onSelect?.(n.ev); return; }
     if (!e.altKey || !editable()) return;
     const fwd = rtl() ? -1 : 1, st = step();
     const k = e.key, which = e.shiftKey ? "end" : "move";
@@ -246,7 +247,7 @@ export function Scheduler(props: SchedulerProps): Element {
     const block = cls === "m-sch-block";
     const el = h("button", {
       type: "button", class: cx("m-sch-ev", cls, n.allDay && "is-allday"), "data-m-color": colorAttr(n.ev.color ?? "primary"), "data-ev": n.ev.id,
-      "aria-label": evLabel(n), title: evLabel(n), onKeydown: evKeys(n), ...extra,
+      "aria-label": evLabel(n), title: evLabel(n), onKeyDown: evKeys(n), ...extra,
     },
     ...(props.renderEvent ? [h("span", { class: "m-sch-ev-own" }, props.renderEvent(n.ev, { view: untrack(view), time: timeText(n) }))] : [
       h("span", { class: "m-sch-ev-title" }, n.ev.title),
@@ -321,7 +322,7 @@ export function Scheduler(props: SchedulerProps): Element {
           h("button", {
             type: "button", class: "m-sch-daynum", tabindex: d === fdOn ? "0" : "-1", "data-focus": d, "aria-label": dayText(d),
             onClick: () => setView("day", d),
-            onKeydown: (e: KeyboardEvent) => {
+            onKeyDown: (e: KeyboardEvent) => {
               // arrows, Home / End: the day-grid keys Calendar uses (PageUp / PageDown change the period at the root)
               const nd = e.key.startsWith("Page") ? null : dayGridKey(e, d, fd(), rtl() ? -1 : 1);
               if (nd == null) return;
@@ -491,7 +492,7 @@ export function Scheduler(props: SchedulerProps): Element {
   body = h("div", { class: "m-sch-body" }, () => (view() === "month" ? Month() : TimeGrid())) as HTMLElement;
   const root = h("section", {
     class: () => cx("m-sch", val(props.class)), lang: () => val(props.locale) ?? null, dir: () => (val(props.locale) ? (rtl() ? "rtl" : "ltr") : null), "aria-label": () => val(props.label) ?? t`Calendar`, "aria-describedby": props.help === false ? null : `${id}-help`,
-    onKeydown: (e: KeyboardEvent) => {
+    onKeyDown: (e: KeyboardEvent) => {
       if ((e.target as Element).closest(".m-sch-ev")) return;
       if (e.key === "PageUp" || e.key === "PageDown") { e.preventDefault(); shift(e.key === "PageUp" ? -1 : 1); }
     },

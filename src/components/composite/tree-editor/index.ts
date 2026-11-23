@@ -10,6 +10,7 @@ import { h } from "../../../dom/h.ts";
 import { For } from "../../../dom/for.ts";
 import { t, dir } from "../../../core/i18n.ts";
 import { cx, uid, val, later, type ClassProp, type Handler } from "../../../core/util.ts";
+import { locked } from "../../../ui/behave.ts";
 import { fold } from "../../../core/text.ts";
 import { glyph } from "../../../ui/util.ts";
 import { hasPart } from "../../../ui/parts.ts";
@@ -82,7 +83,7 @@ export function TreeEditor(props: TreeEditorProps): unknown {
   const [get, set] = model<unknown>(props, null);
   const id = uid("m-tre");
   const c = ctl(props);
-  const ro = (): boolean => !!(props.readonly || props.disabled);
+  const ro = (): boolean => locked(props);
   const L = (): NonNullable<TreeEditorProps["labels"]> => props.labels ?? {};
   const can = (a: "add" | "duplicate" | "delete"): boolean => hasPart(props.actions, a);
   const rootName = (): string => props.label ?? L().root ?? t`root`;

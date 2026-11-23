@@ -62,10 +62,10 @@ test("toast: timers pause while the pointer or focus is on the stack", async () 
   toast("P", { timeout: 30 });
   await tick();
   const host = document.querySelector(".m-toasts");
-  host.dispatchEvent(new globalThis.Event("mouseenter"));
+  host.dispatchEvent(new globalThis.Event("pointerenter"));
   await new Promise((r) => setTimeout(r, 60));
   assert.equal(toast.list().length, 1, "paused under the pointer");
-  host.dispatchEvent(new globalThis.Event("mouseleave"));
+  host.dispatchEvent(new globalThis.Event("pointerleave"));
   await new Promise((r) => setTimeout(r, 60));
   assert.equal(toast.list().length, 0, "runs out after the pointer leaves");
 });

@@ -49,7 +49,7 @@ export function Accordion(props: AccordionProps): Element {
     // follows the header button's aria-expanded; an own mark is drawn as given and turns half way round
     return h(Chevron, { direction: "down", size: "md", class: cx("m-acc-chev", mine && "is-own"), motion: props.animated === false ? false : undefined, icon: mine ? own : undefined });
   };
-  return h("div", { class: () => cx("m-accordion", `m-accordion-${props.variant ?? "separated"}`, props.animated === false && "is-static", val(props.class)), onKeydown: nav },
+  return h("div", { class: () => cx("m-accordion", `m-accordion-${props.variant ?? "separated"}`, props.animated === false && "is-static", val(props.class)), onKeyDown: nav },
     props.items.map((it, i) => {
       const k = keyOf(it, i), isOpen = (): boolean => open().has(k), id = `${base}-${i}`;
       return h("div", { class: () => cx("m-acc-item", isOpen() && "is-open") },

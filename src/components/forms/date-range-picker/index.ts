@@ -8,6 +8,7 @@ import { todayIso, addDays, type IsoDate } from "../../../core/date.ts";
 import { Segmented } from "../segmented/index.ts";
 import { DatePicker, type DatePickerProps } from "../date-picker/index.ts";
 import { ownPart } from "../../../ui/parts.ts";
+import { locked } from "../../../ui/behave.ts";
 
 /** A date range; either end may be open (null). */
 export interface DateRange { from: IsoDate | null; to: IsoDate | null }
@@ -66,7 +67,7 @@ export function DateRangePicker(props: DateRangePickerProps): unknown {
     () => (presets().length ? h(Segmented, {
       id: props.id ?? field?.id, "aria-label": live(() => props.labels?.range ?? t`Date range`),
       options: live(() => [...presets().map((p) => ({ value: p.id, label: p.label })), ...(props.custom === false ? [] : [{ value: "custom", label: props.labels?.custom ?? t`Custom` }])]),
-      value: live(() => active()), disabled: live(() => props.disabled || props.readonly),
+      value: live(() => active()), disabled: live(() => locked(props)),
       setValue: (id: string | null) => { if (id === "custom") { custom.set(true); return; } custom.set(false); set({ ...presets.peek().find((p) => p.id === id)!.range }); },
     }) : null),
     () => (active() === "custom" || !presets().length ? h("div", { class: "m-daterange-custom" },

@@ -24,7 +24,7 @@ export function tip(el: Element, text: () => string, o: { placement?: Placement;
   const hide = (): void => { open.cancel(); show.set(false); };
   const focus = (): void => { show.set(true); };
   const key = (e: Event): void => { if ((e as KeyboardEvent).key === "Escape") hide(); };
-  const on: [string, (e: Event) => void][] = [["mouseenter", open], ["mouseleave", hide], ["focusin", focus], ["focusout", hide], ["keydown", key]];
+  const on: [string, (e: Event) => void][] = [["pointerenter", open], ["pointerleave", hide], ["focusin", focus], ["focusout", hide], ["keydown", key]];
   for (const [n, f] of on) el.addEventListener(n, f);
   onCleanup(() => { hide(); for (const [n, f] of on) el.removeEventListener(n, f); });
   effect(() => {

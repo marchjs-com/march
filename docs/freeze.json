@@ -5,7 +5,7 @@
    "paths": [
     "src/components/layout/accordion"
    ],
-   "hash": "9df50d7c7c52b67cd0aee711b2f4b773"
+   "hash": "374c840dddb9ce753fb8679edfe36bd0"
   },
   "ActivityBar": {
    "frozen": "2026-11-20",
@@ -33,7 +33,7 @@
    "paths": [
     "src/components/composite/app-ui"
    ],
-   "hash": "e8783ee5730b570a48b7e7ff20bc7277"
+   "hash": "6e8aee1245b44183bdb2cf8efca08a29"
   },
   "Avatar": {
    "frozen": "2026-11-20",
@@ -61,7 +61,7 @@
    "paths": [
     "src/components/data/bar-chart"
    ],
-   "hash": "841cc36fe791528d2f9ed8f08888c804"
+   "hash": "091e70489d461995f9fe286875bb626f"
   },
   "BarList": {
    "frozen": "2026-11-20",
@@ -138,7 +138,7 @@
    "paths": [
     "src/components/media/carousel"
    ],
-   "hash": "8ebce2679c65ac17669bc88e5f418564"
+   "hash": "523233fa730297218fa73e6c84e55a85"
   },
   "ChatBubble": {
    "frozen": "2026-11-20",
@@ -152,7 +152,7 @@
    "paths": [
     "src/components/composite/chat-composer"
    ],
-   "hash": "52fdb63321cb0a8ce1eaf81f125be4b5"
+   "hash": "ead4e898079c3b74b25882929b8cca47"
   },
   "ChatThread": {
    "frozen": "2026-11-20",
@@ -166,14 +166,14 @@
    "paths": [
     "src/components/forms/checkbox"
    ],
-   "hash": "46171a0781a80d38b9275881f927de50"
+   "hash": "cd1a8ee3bbd81f49645ef15e83774bd4"
   },
   "CheckboxGroup": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/checkbox-group"
    ],
-   "hash": "30c6eb78152255e67d9a3622ca9d7602"
+   "hash": "4f983279f2703bef744a6211f73310df"
   },
   "CheckMark": {
    "frozen": "2026-11-20",
@@ -208,14 +208,14 @@
    "paths": [
     "src/components/typography/clamp-text"
    ],
-   "hash": "3f8814d559eedd13bb313c9e7dd443e7"
+   "hash": "fa374bd0a7e765f2dd186332bd79c7dd"
   },
   "CodeEditor": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/code-editor"
    ],
-   "hash": "4ca16a73cdcdd8694d1c6c8fe80cb4bd"
+   "hash": "c3015e2db393e8aa70cee2ee1fbe3b47"
   },
   "CodeInput": {
    "frozen": "2026-11-20",
@@ -236,28 +236,28 @@
    "paths": [
     "src/components/forms/color-input"
    ],
-   "hash": "f0d6ae66f3587f63b8ae6d27f2636bf5"
+   "hash": "30aacadfb8ad5ab7764ba11c0a3122d4"
   },
   "ColorPicker": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/color-picker"
    ],
-   "hash": "0c010b538bede51d8f3035767e1aa0a2"
+   "hash": "ad46bacbc595939669c94422cedc747a"
   },
   "Combobox": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/combobox"
    ],
-   "hash": "eac01ada0a54ea54f1d11a00db7db00a"
+   "hash": "e960d9cbd50ae8a951dc4acaae0eb6d1"
   },
   "CommandPalette": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/command-palette"
    ],
-   "hash": "23d309744b06b472a6e3c984add5611a"
+   "hash": "07a2ddea8f493d48667549f19650d3b3"
   },
   "ConsentBanner": {
    "frozen": "2026-11-20",
@@ -271,7 +271,7 @@
    "paths": [
     "src/components/overlays/context-menu"
    ],
-   "hash": "2c376d58e20f265ce68023f979bf1381"
+   "hash": "5a8e397e95c5769ab6eed87addd0d1ac"
   },
   "CopyButton": {
    "frozen": "2026-11-20",
@@ -313,21 +313,21 @@
    "paths": [
     "src/components/data/data-grid"
    ],
-   "hash": "64df6b95950c3c82633024486e0a0c7f"
+   "hash": "a0a6d681986ccaae0cecadb6a1ff9af9"
   },
   "DatePicker": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/date-picker"
    ],
-   "hash": "47428771cf40687e0bc8f12f64d916b3"
+   "hash": "a79bb06ce53a984f3deb04c4c501d261"
   },
   "DateRangePicker": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/date-range-picker"
    ],
-   "hash": "a3361d30702af4524845e3e759658c1b"
+   "hash": "14b3972b4ae953d1d3d6598f62a06d07"
   },
   "DateTimeInput": {
    "frozen": "2026-11-20",
@@ -355,14 +355,14 @@
    "paths": [
     "src/components/layout/device-preview"
    ],
-   "hash": "fef17361ee1cc4b5a5f64a4df1b62346"
+   "hash": "fa91f0f5e081db2a86a42fc1aef6904f"
   },
   "Dialog": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/overlays/dialog"
    ],
-   "hash": "31fea175ca853c42ae7611502661f9be"
+   "hash": "80cc5a093e6d4f8854c7ddac75402cc9"
   },
   "Disclosure": {
    "frozen": "2026-11-20",
@@ -376,7 +376,7 @@
    "paths": [
     "src/components/composite/dock-layout"
    ],
-   "hash": "3d2457f545eecf3d3ae0ec44ec855271"
+   "hash": "54d23c01736dc96c351875b30fb7d6c5"
   },
   "Drawer": {
    "frozen": "2026-11-20",
@@ -390,7 +390,7 @@
    "paths": [
     "src/components/motion/easing-curve-editor"
    ],
-   "hash": "74da619f0966a4c674c4990cd8a9c1da"
+   "hash": "b43cab01d925f1c97145cde6f086c341"
   },
   "EditorFrame": {
    "frozen": "2026-11-20",
@@ -446,7 +446,7 @@
    "paths": [
     "src/components/forms/file-upload"
    ],
-   "hash": "4c54380671801a06fc67ea0e872e3fca"
+   "hash": "0343a5d888dad6b9ce3613ce48efce3c"
   },
   "FollowButton": {
    "frozen": "2026-11-20",
@@ -460,28 +460,28 @@
    "paths": [
     "src/components/composite/font-picker"
    ],
-   "hash": "9f391dbfcec1ebbf3a2fd55bbed8b3ad"
+   "hash": "bc5d40c6f92ef7e91f5c28b43e80b8f2"
   },
   "FormatToolbar": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/format-toolbar"
    ],
-   "hash": "1bcbe40daf5c6f1a2b094bff4ba4df14"
+   "hash": "3f9c8f22e03e46f822c142b8252ab943"
   },
   "Gantt": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/gantt"
    ],
-   "hash": "ff8be990e1406ab494cff19374758de7"
+   "hash": "fb140d8042eab5c4e93009ca004f3bc2"
   },
   "GradientEditor": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/gradient-editor"
    ],
-   "hash": "b35b073743933b354d2ba0802ca5e962"
+   "hash": "1e007021f0ce3bdcb5bd47e3f72b6a8e"
   },
   "Grid": {
    "frozen": "2026-11-20",
@@ -495,7 +495,7 @@
    "paths": [
     "src/components/data/heatmap"
    ],
-   "hash": "13bf0f6aacad00fccda5e85afa641bb2"
+   "hash": "c73a88bee404c38f9cabf131e6eda812"
   },
   "Hero": {
    "frozen": "2026-11-20",
@@ -544,7 +544,7 @@
    "paths": [
     "src/components/composite/image-cropper"
    ],
-   "hash": "a3eadd438ba8a1788bddf448ed56f754"
+   "hash": "bd5ca3de4b2eddb9cdab5249f01ce1a4"
   },
   "Joined": {
    "frozen": "2026-11-20",
@@ -572,7 +572,7 @@
    "paths": [
     "src/components/data/kanban"
    ],
-   "hash": "dd317158dc900150cdc2dc228f93b977"
+   "hash": "7b3f949f5fa1a8e48a30c262296b13e4"
   },
   "Kbd": {
    "frozen": "2026-11-20",
@@ -586,7 +586,7 @@
    "paths": [
     "src/components/composite/keyframe-timeline"
    ],
-   "hash": "0298943c15bba92277a657964d5ae1a4"
+   "hash": "87a74b89035b2d23cf18574be199b059"
   },
   "KeyValue": {
    "frozen": "2026-11-20",
@@ -607,7 +607,7 @@
    "paths": [
     "src/components/layout/layout"
    ],
-   "hash": "7adaaf6dcb91cc26eb1e4724a187ed0a"
+   "hash": "5442bbe6b731e127c32e9acd064946c5"
   },
   "LikeButton": {
    "frozen": "2026-11-20",
@@ -621,7 +621,7 @@
    "paths": [
     "src/components/data/line-chart"
    ],
-   "hash": "b36de429675ca2d12c818d517ff09ff5"
+   "hash": "ab5cc00503b332784c9aa1a54f7645d4"
   },
   "LinkCard": {
    "frozen": "2026-11-20",
@@ -691,7 +691,7 @@
    "paths": [
     "src/components/composite/markdown-editor"
    ],
-   "hash": "668dec7efa475d615df368a187ba3894"
+   "hash": "37db9ee172770acb5e196e7913762c9b"
   },
   "Media": {
    "frozen": "2026-11-20",
@@ -733,7 +733,7 @@
    "paths": [
     "src/components/composite/nav-sidebar"
    ],
-   "hash": "b6c30950806ff30055ef7d50ce311b1e"
+   "hash": "63de05859667512ae9bb0ca976cc8ef5"
   },
   "NetworkThrottle": {
    "frozen": "2026-11-20",
@@ -768,7 +768,7 @@
    "paths": [
     "src/components/forms/option-list"
    ],
-   "hash": "cac79d298a05b890a36b9f7e63e49c2a"
+   "hash": "ed4a25cf19ad8052a9fcdda30b15bc9a"
   },
   "OverflowText": {
    "frozen": "2026-11-20",
@@ -789,7 +789,7 @@
    "paths": [
     "src/components/media/overlay"
    ],
-   "hash": "415c43317bdb9d9efa36a0006e737018"
+   "hash": "69ccb33265c617a841e7f27c92ae67db"
   },
   "OverlayScope": {
    "frozen": "2026-11-20",
@@ -859,7 +859,7 @@
    "paths": [
     "src/components/data/pie-chart"
    ],
-   "hash": "56622176e7ce6562647de153a8551400"
+   "hash": "672459ddee5af0f38d22b1fb4eb820cf"
   },
   "Popover": {
    "frozen": "2026-11-20",
@@ -943,21 +943,21 @@
    "paths": [
     "src/components/forms/radio-group"
    ],
-   "hash": "ea371f52d1750094dc3cddbba64903dd"
+   "hash": "6e28927741a3adaf73913114bd510f56"
   },
   "Rating": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/rating"
    ],
-   "hash": "5902c278efb76b159cac5038207b6eec"
+   "hash": "fab40991423a13aa425efba3f8d43730"
   },
   "ReactionPicker": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/social/reaction-picker"
    ],
-   "hash": "4ba9fa4c6a200bc4c3fd86e4c005e857"
+   "hash": "476337fca78c28277c1b25d3f5415acd"
   },
   "ReplyQuote": {
    "frozen": "2026-11-20",
@@ -985,7 +985,7 @@
    "paths": [
     "src/components/composite/rich-text-editor"
    ],
-   "hash": "52647c7b127247b09d5fecd4603baf5e"
+   "hash": "ea9a62b7b8a3d52d3be73f7596c04374"
   },
   "Roadmap": {
    "frozen": "2026-11-20",
@@ -999,14 +999,14 @@
    "paths": [
     "src/components/forms/row-tools"
    ],
-   "hash": "a6afc67dea065ff4f69f80d864a466a0"
+   "hash": "ad4d0a254f38c0aaf879bb69a2e6e010"
   },
   "Scheduler": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/scheduler"
    ],
-   "hash": "a2f3596f7d77722ccdd81be38287ba6a"
+   "hash": "6fc7ccb3e1968288119431cca3aed6cc"
   },
   "ScrollProgress": {
    "frozen": "2026-11-20",
@@ -1034,7 +1034,7 @@
    "paths": [
     "src/components/forms/search-box"
    ],
-   "hash": "e04135673dd10868cd0db919aeaa85d0"
+   "hash": "ea08de605da9da801867c1b55fe86107"
   },
   "Secret": {
    "frozen": "2026-11-20",
@@ -1062,21 +1062,21 @@
    "paths": [
     "src/components/navigation/section-timeline"
    ],
-   "hash": "97e95b9784133f562eed8df880d9aa04"
+   "hash": "bd796c8c378b68753f6677bd0d92c5b5"
   },
   "Segmented": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/segmented"
    ],
-   "hash": "33cc6fd8a9cd88032b316f19b4b871f0"
+   "hash": "7c29ace3d62d85905cba987ff4761b96"
   },
   "Select": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/select"
    ],
-   "hash": "2b0982be92f3c2af449ecc6bc02a6986"
+   "hash": "7053c0a33619e716e9bb3956ab7b6de8"
   },
   "SiteFooter": {
    "frozen": "2026-11-20",
@@ -1111,7 +1111,7 @@
    "paths": [
     "src/components/forms/slider"
    ],
-   "hash": "8eee31cb5d825cda140612a5c9f04155"
+   "hash": "a1e4923e3784c1bd55a91fefb304c756"
   },
   "Spacer": {
    "frozen": "2026-11-20",
@@ -1216,7 +1216,7 @@
    "paths": [
     "src/components/composite/story-viewer"
    ],
-   "hash": "00a128e9d77166f8573ce9731026d8a5"
+   "hash": "e2fa839ddae2ca6c3a14b3608094d141"
   },
   "Swatch": {
    "frozen": "2026-11-20",
@@ -1230,7 +1230,7 @@
    "paths": [
     "src/components/navigation/tabs"
    ],
-   "hash": "b0fd07e6eea92f92df4c0f9e9f769050"
+   "hash": "68a7542e057078c8b1b86cf1913bc9bc"
   },
   "Terminal": {
    "frozen": "2026-11-20",
@@ -1279,14 +1279,14 @@
    "paths": [
     "src/components/navigation/thread-nav"
    ],
-   "hash": "3e7c705927cabebeac6b621ec5604e65"
+   "hash": "f9b83bc494a012280d17fb3897b4a2a0"
   },
   "TimeInput": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/time-input"
    ],
-   "hash": "57aaf8a965e173709248c537157e456a"
+   "hash": "6dee72535a43ba9f5c55c1738855e154"
   },
   "Timeline": {
    "frozen": "2026-11-20",
@@ -1300,42 +1300,42 @@
    "paths": [
     "src/components/data/time-ruler"
    ],
-   "hash": "1ba24ff955f75587c2f36ddc696b295b"
+   "hash": "4e437023018933ac8ed3cc172423ffc8"
   },
   "Toast": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/overlays/toast"
    ],
-   "hash": "0381ba7a57ede62d4475bce858a31887"
+   "hash": "71cc158f35aa22ba432553a9038d0194"
   },
   "Toggle": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/toggle"
    ],
-   "hash": "59928e07054c0fa8ee42422b22bbccce"
+   "hash": "d115214529f403e0cd0f06e8c758017a"
   },
   "Tooltip": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/overlays/tooltip"
    ],
-   "hash": "6188f21adc1439a3c25ae93b4fedab69"
+   "hash": "9c66eb11a0d2d0aff0f747e22c95edbb"
   },
   "Tree": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/tree"
    ],
-   "hash": "87d03d194d2ca6143d8a0a6c2f856f21"
+   "hash": "887ca1b4c655a04f0abd38571c648560"
   },
   "TreeEditor": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/tree-editor"
    ],
-   "hash": "611ec9bb3f6e6be258ea0d64794c0bbe"
+   "hash": "ce1dacde2ed77ac0ebe1ca702937c42d"
   },
   "TreeView": {
    "frozen": "2026-11-20",
@@ -3890,6 +3890,354 @@
    "name": "Wizard",
    "what": "refresh",
    "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Accordion",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "AppUI",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "BarChart",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Carousel",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ChatComposer",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Checkbox",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "CheckboxGroup",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ClampText",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "CodeEditor",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ColorInput",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ColorPicker",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Combobox",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "CommandPalette",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ContextMenu",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "DataGrid",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "DatePicker",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "DateRangePicker",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "DevicePreview",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Dialog",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "DockLayout",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "EasingCurveEditor",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "FileUpload",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "FontPicker",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "FormatToolbar",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Gantt",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "GradientEditor",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Heatmap",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ImageCropper",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Kanban",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "KeyframeTimeline",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Layout",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "LineChart",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "MarkdownEditor",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "NavSidebar",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "OptionList",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Overlay",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "PieChart",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "RadioGroup",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Rating",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ReactionPicker",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "RichTextEditor",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "RowTools",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Scheduler",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "SearchBox",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "SectionTimeline",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Segmented",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Select",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Slider",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "StoryViewer",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Tabs",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ThreadNav",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "TimeInput",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "TimeRuler",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Toast",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Toggle",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Tooltip",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Tree",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "TreeEditor",
+   "what": "refresh",
+   "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
   }
  ]
 }

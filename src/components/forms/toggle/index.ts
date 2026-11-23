@@ -3,6 +3,7 @@ import "./toggle.css";
 import { untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { model, ctl, cx, type ControlProps } from "../../../forms/util.ts";
+import { locked } from "../../../ui/behave.ts";
 
 export interface ToggleProps extends Omit<ControlProps<boolean | null>, "setValue" | "onChange"> {
   /** Writes the value back (set by `bind:value`); null only with `tristate`. @tr Değeri geri yazar (`bind:value` bunu verir); null yalnız `tristate` ile. */
@@ -29,7 +30,7 @@ export function Toggle(props: ToggleProps): unknown {
   const btn = h("button", {
     ...ctl(props), type: "button", role: tri ? "checkbox" : "switch", class: cx("m-switch", tri && "m-switch-tri"),
     "aria-checked": () => { const v = get(); return tri && v == null ? "mixed" : String(!!v); },
-    disabled: () => !!(props.disabled || props.readonly), onClick: () => set(next(untrack(get))),
+    disabled: () => locked(props), onClick: () => set(next(untrack(get))),
   }, h("span", { class: "m-switch-thumb", "aria-hidden": "true" }));
   const label = () => props.label ?? props.children;
   return h("label", { class: cx("m-switch-wrap", props.class) }, btn, () => (label() != null ? h("span", { class: "m-check-label" }, label()) : null));

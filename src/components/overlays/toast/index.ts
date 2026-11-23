@@ -106,9 +106,9 @@ export function ToastHost(props: {
   const sync = (): void => { if (hover || focus) pauseTimers(); else resumeTimers(); };
   stack = h("div", {
     class: () => cx("m-toasts", props.position && props.position !== "bottom-end" && `m-toasts-${props.position}`, val(props.class)), "aria-live": "polite", "aria-relevant": "additions",
-    onMouseenter: () => { hover = true; sync(); }, onMouseleave: () => { hover = false; sync(); },
-    onFocusin: () => { focus = true; sync(); },
-    onFocusout: (e: FocusEvent) => { if (!(e.currentTarget as Element).contains(e.relatedTarget as Node | null)) { focus = false; sync(); } },
+    onPointerEnter: () => { hover = true; sync(); }, onPointerLeave: () => { hover = false; sync(); },
+    onFocusIn: () => { focus = true; sync(); },
+    onFocusOut: (e: FocusEvent) => { if (!(e.currentTarget as Element).contains(e.relatedTarget as Node | null)) { focus = false; sync(); } },
   },
     h(For<ToastItem>, { each: auto ? () => { ownHosts(); const l = list(); return [...owners].some(shown) ? [] : l; } : list, key: "id", children: (item) => {
       const x = item.peek();

@@ -13,6 +13,7 @@ import { rowsOf, accessor, formatter, num, seriesOf, seriesClass, colorStyle, xK
   type MaybeReactive, type DataProp, type Field, type SeriesSpec, type SeriesLabels, type FormatSpec, type Formatter, type ChartBaseProps, type ChartPoint, type TooltipProp, type Box, type Series, type XKind, f1 } from "../../../charts/util.ts";
 import { Frame, Axis, Grid, tooltipState, showTip, tipBody, thin, type Tick } from "../../../charts/parts.ts";
 import { clamp, type Handler } from "../../../core/util.ts";
+import { isActivateKey } from "../../../ui/behave.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -208,7 +209,7 @@ function xyChart<D>(props: AreaChartProps<D>, kind: "line" | "area"): Element {
     onDblClick: () => { zoom.set(null); hide(); },
   };
   const onKeyDown = (e: KeyboardEvent): void => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); return select(); }
+    if (isActivateKey(e)) { e.preventDefault(); return select(); }
     if (e.key === "Escape") { if (zoom.peek()) zoom.set(null); return hide(); }
     const [a, b] = range();
     const i = navIndex(e.key, active.peek(), a, b);

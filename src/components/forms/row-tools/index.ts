@@ -103,7 +103,7 @@ export function RowTools(props: RowToolsProps): Element {
     tools(props.actions ?? (props.onReorder ? ["drag", ...DEFAULT] : undefined)).map((a) => a === "drag"
       // the grip: pointer only (hidden from screen readers; the arrows are the keyboard's way), its name as a tooltip
       ? h("span", { class: () => cx("m-row-tool m-row-tool-drag m-row-grip", off(a) && "is-off"), "aria-hidden": "true", title: () => name(a),
-        onPointerdown: (e: PointerEvent) => { if (off(a)) return; if (props.onGrab) props.onGrab(e); else if (props.onReorder) reorder(e); } }, () => (props.icons?.drag != null ? ownPart(props.icons.drag, () => null) : null))
+        onPointerDown: (e: PointerEvent) => { if (off(a)) return; if (props.onGrab) props.onGrab(e); else if (props.onReorder) reorder(e); } }, () => (props.icons?.drag != null ? ownPart(props.icons.drag, () => null) : null))
       : h(IconButton, {
       class: `m-row-tool m-row-tool-${a}`, icon: () => ownPart(props.icons?.[a], () => ICON[a]), label: () => name(a), size: props.size,
       variant: a === "remove" && props.danger ? "danger" : undefined, disabled: () => off(a), onClick: () => run(a) })));

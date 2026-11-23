@@ -6,6 +6,7 @@ import { model, ctl, uid, normOptions, same, labelledBy, useField, type ControlP
 import { inputOf } from "../../../forms/affix.ts";
 import { colorAttr } from "../../../theme/colors.ts";
 import { choiceBox, choiceText, itemColor, groupClass, type ChoiceGroupLook } from "../../../forms/choice.ts";
+import { locked } from "../../../ui/behave.ts";
 export type { ChoiceGroupLook };
 
 export interface CheckboxGroupProps<T = unknown> extends ControlProps<T[]>, ChoiceGroupLook {
@@ -25,7 +26,7 @@ export function CheckboxGroup<T = unknown>(props: CheckboxGroupProps<T>): unknow
     () => normOptions(props.options).map((o, i) => h("label", { class: "m-check", "data-m-color": () => itemColor(props.colors, i) },
       h("input", {
         type: "checkbox", class: "m-check-input", id: i ? `${baseId}-${i}` : baseId, name: props.name, onBlur: props.onBlur,
-        checked: () => (get() ?? []).some((x) => same(x, o.value)), disabled: () => !!(props.disabled || props.readonly || o.disabled),
+        checked: () => (get() ?? []).some((x) => same(x, o.value)), disabled: () => (locked(props) || !!o.disabled),
         onChange: (e: Event) => { const cur = (untrack(get) ?? []).filter((x) => !same(x, o.value)); set(inputOf(e).checked ? [...cur, o.value as T] : cur); },
       }),
       choiceBox("checkbox", props),

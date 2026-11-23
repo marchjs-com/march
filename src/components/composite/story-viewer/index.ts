@@ -187,8 +187,8 @@ function body(props: StoryViewerProps): Element {
     void animate(sent, [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)", offset: 0.2 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }], { duration: 1400 }).finished.then(() => sent.remove());
   };
 
-  return h("div", { class: () => cx("m-story", paused() && "is-paused"), ref: (x: HTMLElement) => { root = x; }, onKeydown: key },
-    h("div", { class: "m-story-stage", ref: (x: HTMLElement) => { stage = x; gesture(x); }, onContextmenu: (e: Event) => e.preventDefault() },
+  return h("div", { class: () => cx("m-story", paused() && "is-paused"), ref: (x: HTMLElement) => { root = x; }, onKeyDown: key },
+    h("div", { class: "m-story-stage", ref: (x: HTMLElement) => { stage = x; gesture(x); }, onContextMenu: (e: Event) => e.preventDefault() },
       () => { const it = item(); return it ? h(Picture, { class: "m-story-media", src: it.src, alt: it.alt ?? "", fit: "cover", loading: "eager", draggable: "false" }) : null; },
       h("div", { class: "m-story-scrim", "aria-hidden": "true" }),
       h("div", { class: "m-story-top" },

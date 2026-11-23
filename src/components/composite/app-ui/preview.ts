@@ -29,6 +29,7 @@ import { gauge } from "../../../icons/glyphs/gauge.ts";
 import { defineIcon } from "../../../icons/svg.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
+import { on as listen } from "../../../core/util.ts";
 
 messages("tr", tr);
 messages("tr", { "Full screen": "Tam ekran", "Exit full screen": "Tam ekrandan çık", "Default language": "Varsayılan Dil",
@@ -126,9 +127,9 @@ export function AppPreview(props: AppPreviewProps): Element {
   const follow = (): void => { full.set(!!root && doc?.fullscreenElement === root); };
   // Esc leaves the cover, unless a menu, a list or a dialog is open (that one closes first)
   const onKey = (e: KeyboardEvent): void => { if (e.key === "Escape" && cover.peek() && !e.defaultPrevented && !doc?.querySelector(".m-layer :is(.m-pop, [role=dialog], [role=menu], [role=listbox])")) { cover.set(false); full.set(false); } };
-  doc?.addEventListener("fullscreenchange", follow);
-  doc?.addEventListener("keydown", onKey);
-  onCleanup(() => { doc?.removeEventListener("fullscreenchange", follow); doc?.removeEventListener("keydown", onKey); if (root && doc?.fullscreenElement === root) void doc.exitFullscreen?.(); });
+  listen(doc, "fullscreenchange", follow);
+  listen(doc, "keydown", onKey);
+  onCleanup(() => { if (root && doc?.fullscreenElement === root) void doc.exitFullscreen?.(); });
   const toggleFull = (): void => {
     if (!root || !doc) return;
     if (cover.peek()) { cover.set(false); full.set(false); return; }

@@ -9,6 +9,7 @@ import { h } from "../../../dom/h.ts";
 import { track, arrowStep } from "../../../behaviors/drag/index.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { cx, uid, val, clamp, setStyle, type ClassProp } from "../../../core/util.ts";
+import { locked } from "../../../ui/behave.ts";
 import { model, ctl, live, type ControlProps } from "../../../forms/util.ts";
 import { Field } from "../../../forms/field.ts";
 import { Button } from "../../actions/button/index.ts";
@@ -99,7 +100,7 @@ export function EasingCurveEditor(props: EasingCurveEditorProps): unknown {
   const [get, set] = model(props, "cubic-bezier(.34, 1.56, .64, 1)");
   const id = uid("m-ec");
   const c = ctl(props);
-  const ro = (): boolean => !!(props.readonly || props.disabled);
+  const ro = (): boolean => locked(props);
   const bz = signal<Bezier>(parseBezier(untrack(get)) ?? [0.34, 1.56, 0.64, 1]);
   const active = signal<0 | 1 | null>(null);
   const css = computed(() => bezierCss(bz()));

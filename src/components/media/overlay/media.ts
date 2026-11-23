@@ -1,6 +1,7 @@
 // Overlay video and canvas: a separate chunk, loaded only when an Overlay has a video or a draw function.
 import type { DrawFn } from "./index.ts";
 import { frameLoop } from "../../../motion/env.ts";
+import { observeSize } from "../../../ui/observe.ts";
 
 /** Muted, looping, inline, control-less video that plays only while visible. Returns stop; `watch`: also stop by itself
  *  when the overlay leaves the document (no owner to say so). */
@@ -78,12 +79,11 @@ export function mountCanvas(root: HTMLElement, draw: DrawFn, animate: boolean): 
     paint();
     run();
   };
-  const ro = new ResizeObserver(resize);
-  ro.observe(root);
+  const unsize = observeSize(root, resize);
   const IO = globalThis.IntersectionObserver;
   const io = IO ? new IO((es) => { visible = es.some((e) => e.isIntersecting); if (visible) run(); }, { threshold: 0 }) : null;
   io?.observe(root);
   // the first size comes from the observer, after the browser's own layout: measuring here would force a layout while
   // the page is still being built (a stall when a page with a canvas opens)
-  return () => { ro.disconnect(); io?.disconnect(); stop?.(); stop = null; twin = null; };
+  return () => { unsize(); io?.disconnect(); stop?.(); stop = null; twin = null; };
 }

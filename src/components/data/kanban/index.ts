@@ -68,7 +68,7 @@ export function Kanban<T>(props: KanbanProps<T>): Element {
     }),
     h("div", { class: "m-kanban-list" }, col.items.map((it) => h("article", {
       class: "m-kanban-card", tabindex: "0", "data-key": keyOf(it), ref: (el: Element) => { cards.set(el, { item: it, from: col.id }); },
-      onKeydown: (e: KeyboardEvent) => {
+      onKeyDown: (e: KeyboardEvent) => {
         if (!e.altKey || (e.key !== "ArrowLeft" && e.key !== "ArrowRight")) return;
         const to = cols[ci + (e.key === "ArrowRight" ? 1 : -1)];
         if (!to) return;

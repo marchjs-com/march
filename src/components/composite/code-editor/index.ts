@@ -10,7 +10,8 @@ import "./code-editor.css";
 import { signal, computed, effect, untrack, batch, onCleanup, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
-import { uid, clamp, type Handler } from "../../../core/util.ts";
+import { uid, clamp, type Handler, on as listen } from "../../../core/util.ts";
+import { locked } from "../../../ui/behave.ts";
 import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { model, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { tokenize, type Token } from "../../../ui/highlight.ts";
@@ -343,7 +344,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     return toView(pos);
   };
   const id = uid("m-ced");
-  const ro = (): boolean => !!(props.readonly || props.disabled);
+  const ro = (): boolean => locked(props);
   const done = signal<{ from: number; to: number; items: readonly CodeSuggestion[]; all?: boolean } | null>(null);
   // the carets besides the text field's own (more carets: Ctrl+D, Alt+click, Ctrl+Alt+Up/Down)
   const extra = signal<readonly (readonly [number, number])[]>([]);
@@ -491,6 +492,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const sel = signal<readonly [number, number]>([0, 0]);
   const focused = signal(false);
   const readSel = (): void => { const a = input.selectionStart ?? 0, b = input.selectionEnd ?? a, p = sel.peek(); if (p[0] !== a || p[1] !== b) sel.set([a, b]); };
+  let offSel = (): void => {}; // the document's selectionchange, followed while the editor has the focus
   const onSelChange = (): void => { if (globalThis.document.activeElement === input) readSel(); };
   // find (Ctrl+F / Ctrl+H) and go to line (Ctrl+G)
   const fs: FindState = { mode: signal<FindMode | null>(null), text: signal(""), with: signal(""), case: signal(false), word: signal(false), regex: signal(false), line: signal("") };
@@ -1323,7 +1325,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
       if (/[(,]$/.test(typed) || sig.peek()) askSignature();
     },
     onKeyUp: (e: KeyboardEvent) => { readSel(); if (sig.peek() && /^(Arrow|Home|End|Page)/.test(e.key)) askSignature(); },
-    onMousedown: (e: MouseEvent) => { altFrom = e.altKey && multiOn() ? primary() : null; },
+    onMouseDown: (e: MouseEvent) => { altFrom = e.altKey && multiOn() ? primary() : null; },
     onClick: (e: MouseEvent) => {
       // Alt+click: one more caret (the one before stays); a plain click: one caret again
       if (altFrom) { const keep = altFrom; altFrom = null; extra.set([...extra.peek(), keep]); }
@@ -1337,7 +1339,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     },
     onPaste,
     // the selection before a typed change; the browser's own undo (its menu, a gesture) goes to the editor's
-    onBeforeinput: (e: InputEvent) => {
+    onBeforeInput: (e: InputEvent) => {
       if (hist && (e.inputType === "historyUndo" || e.inputType === "historyRedo")) { e.preventDefault(); history(e.inputType === "historyUndo"); return; }
       // more carets: the change happens at each of them
       if (extra.peek().length && !ro()) {
@@ -1358,10 +1360,10 @@ export function CodeEditor(props: CodeEditorProps): Element {
         if (p && b <= p.self[1] && (e.inputType !== "deleteContentBackward" || a > p.self[0] || b > a) && (e.inputType !== "insertText" || /^[\w$.:-]+$/.test(e.data ?? ""))) linked = { value: input.value, ...p };
       }
     },
-    onPointermove: onPointerMove,
-    onPointerleave: () => { clearTimeout(hoverTimer); hideTimer = setTimeout(() => hoverDoc.set(null), 250); },
-    onFocus: () => { focused.set(true); readSel(); globalThis.document.addEventListener("selectionchange", onSelChange); },
-    onBlur: (e: FocusEvent) => { close(); ghost.set(null); closeSignature(); focused.set(false); globalThis.document.removeEventListener("selectionchange", onSelChange); props.onBlur?.(e); },
+    onPointerMove: onPointerMove,
+    onPointerLeave: () => { clearTimeout(hoverTimer); hideTimer = setTimeout(() => hoverDoc.set(null), 250); },
+    onFocus: () => { focused.set(true); readSel(); offSel(); offSel = listen(globalThis.document, "selectionchange", onSelChange); },
+    onBlur: (e: FocusEvent) => { close(); ghost.set(null); closeSignature(); focused.set(false); offSel(); props.onBlur?.(e); },
   }) as HTMLTextAreaElement;
   // the text field shows the view (the model with its folds)
   effect(() => { const v = text(); untrack(() => { if (input.value !== v) input.value = v; lastView = v; }); });
@@ -1466,13 +1468,13 @@ export function CodeEditor(props: CodeEditorProps): Element {
   });
   // the group chips over a list with headings (March, Ortak, HTML…): one group's rows, or every row; a press keeps the
   // focus in the text (the list stays open, typing still narrows it)
-  const groupBar = (): unknown => h("div", { class: "m-ced-groups", role: "group", "aria-label": t`Suggestion group`, onPointerdown: (e: Event) => e.preventDefault() },
+  const groupBar = (): unknown => h("div", { class: "m-ced-groups", role: "group", "aria-label": t`Suggestion group`, onPointerDown: (e: Event) => e.preventDefault() },
     ["", ...groupsOf()].map((g) => h(Chip, {
       size: "sm", selected: () => groupPick() === g, children: g || t`All`,
       onClick: () => { groupPick.set(g); active.set(0); },
     })));
   // the chips under the list; a press keeps the focus in the text (the list stays open)
-  const sourceBar = (): unknown => h("div", { class: "m-ced-sources", role: "group", "aria-label": t`Suggestion source`, onPointerdown: (e: Event) => e.preventDefault() },
+  const sourceBar = (): unknown => h("div", { class: "m-ced-sources", role: "group", "aria-label": t`Suggestion source`, onPointerDown: (e: Event) => e.preventDefault() },
     (props.sources ?? []).map((s) => h(Chip, {
       size: "sm", selected: () => chosen() === s.value, children: s.label,
       onClick: () => { chosen.set(s.value); active.set(0); props.onSourceChange?.(s.value); },
@@ -1494,7 +1496,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const unhover = (): void => { hover?.classList.remove("is-hover"); hover = null; };
   const hit = h("span", {
     class: "m-ced-gutter", "aria-hidden": "true",
-    onPointerdown: (e: PointerEvent) => {
+    onPointerDown: (e: PointerEvent) => {
       if (e.button !== 0) return;
       e.preventDefault();
       // a line with a problem: its quick fixes; else the owner's (a breakpoint)
@@ -1504,8 +1506,8 @@ export function CodeEditor(props: CodeEditorProps): Element {
       if (props.fixes && el?.matches(".is-error, .is-warning")) { const v = input.value.split("\n"); let at = 0; for (let i = 0; i < vl - 1; i++) at += v[i]!.length + 1; input.setSelectionRange(at, at); readSel(); void openFixes(at); return; }
       props.onGutter?.(n, e);
     },
-    onPointermove: (e: PointerEvent) => { const el = code.querySelector(`.m-ced-ln[data-line="${lineAt(e.clientY)}"]`); if (el !== hover) { unhover(); hover = el; el?.classList.add("is-hover"); } },
-    onPointerleave: unhover,
+    onPointerMove: (e: PointerEvent) => { const el = code.querySelector(`.m-ced-ln[data-line="${lineAt(e.clientY)}"]`); if (el !== hover) { unhover(); hover = el; el?.classList.add("is-hover"); } },
+    onPointerLeave: unhover,
   });
   // the lit line comes into view when it moves
   effect(() => { const a = gutter() ? lit() : null; if (a) queueMicrotask(() => code.querySelector?.(".m-ced-lit")?.scrollIntoView?.({ block: "nearest" })); });
@@ -1543,7 +1545,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     anchor: () => tipAnchor, open: () => !!(hoverDoc() || note()), onOpenChange: (o: boolean) => { if (!o) { hideHover(); note.set(null); } }, role: null, flush: true, autoFocus: false, panelClass: "m-ced-tip-panel",
     // over the word; under it while the find bar is open (over it, it would cover the bar)
     get placement() { return barOpen.peek() ? "bottom-start" : "top-start"; },
-    children: () => [() => { const d = hoverDoc()?.doc ?? note()?.doc; return d ? h("div", { onPointerenter: () => clearTimeout(hideTimer), onPointerleave: () => { hideTimer = setTimeout(() => hoverDoc.set(null), 250); } }, docView(d, "is-tip")) : null; }],
+    children: () => [() => { const d = hoverDoc()?.doc ?? note()?.doc; return d ? h("div", { onPointerEnter: () => clearTimeout(hideTimer), onPointerLeave: () => { hideTimer = setTimeout(() => hoverDoc.set(null), 250); } }, docView(d, "is-tip")) : null; }],
   });
   const renameAnchor = virtualAnchor(() => { const r = renaming(); return r ? rectAt(r.from) : null; }, () => input);
   const renamePop = h(Popover, {
@@ -1563,7 +1565,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
   const area = h("div", {
     class: () => cx("m-ced-area", hoverDoc() && "is-hovering"),
     // a press on the empty room under the last line: the caret goes to the end (as in an IDE)
-    onPointerdown: (e: PointerEvent) => {
+    onPointerDown: (e: PointerEvent) => {
       if (e.target !== area || e.button !== 0 || props.disabled) return;
       e.preventDefault(); input.focus({ preventScroll: true });
       const end = input.value.length; input.setSelectionRange(end, end); readSel();
@@ -1637,7 +1639,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
   area.addEventListener("scroll", queueSticky, { passive: true });
   effect(() => { text(); untrack(queueSticky); });
   const stickyBar = (): unknown => (stuck().length ? h("div", { class: "m-ced-sticky", "aria-hidden": "true" },
-    stuck().map((s) => h("div", { class: "m-ced-sticky-line", onPointerdown: (e: PointerEvent) => {
+    stuck().map((s) => h("div", { class: "m-ced-sticky-line", onPointerDown: (e: PointerEvent) => {
       e.preventDefault(); input.focus({ preventScroll: true }); input.setSelectionRange(s.at, s.at); readSel();
       const el = code.querySelector<HTMLElement>(`.m-ced-ln[data-line="${s.n}"]`); if (el) area.scrollTop = Math.max(0, el.offsetTop - 4);
     } }, h("span", { class: "m-ced-sticky-n" }, String(s.n)), h("span", { class: "m-ced-sticky-text" }, s.text)))) : null);
@@ -1647,7 +1649,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     if (px) area.style.setProperty("--m-ced-size", `${px}px`); else area.style.removeProperty("--m-ced-size");
     if (lh) area.style.setProperty("--m-ced-lh", String(lh)); else area.style.removeProperty("--m-ced-lh");
   });
-  onCleanup(() => { globalThis.document?.documentElement?.style.removeProperty("--m-ced-room"); globalThis.document?.removeEventListener?.("selectionchange", onSelChange); clearTimeout(hoverTimer); clearTimeout(hideTimer); clearTimeout(noteTimer); });
+  onCleanup(() => { globalThis.document?.documentElement?.style.removeProperty("--m-ced-room"); offSel(); clearTimeout(hoverTimer); clearTimeout(hideTimer); clearTimeout(noteTimer); });
   return h(EditorFrame, {
     class: () => cx("m-ced", gutter() && "is-gutter", val(props.palette) !== "theme" && "is-ide", val(props.class)), disabled: () => !!props.disabled, readonly: () => !!props.readonly,
     foot, showFoot: props.message !== false,
