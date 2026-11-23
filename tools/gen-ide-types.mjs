@@ -3,8 +3,8 @@
 // (TypeScript's declaration emit, in memory), March's JSX types and a package.json whose exports point at them, as one
 // JSON file the worker reads on demand: { "/node_modules/march/<path>": text }. With it `march/ui`, `march/table`…
 // are their real types in the editor (props, hover, completions, errors); without it every march import is `any`.
-//   node tools/gen-ide-types.mjs [out.json]      (default examples/showcase/dist/playground/ts/march-types.json)
-// The build runs it; it writes again only when a source under src/ or types/jsx.d.ts changed (a stamp of their sizes
+//   node tools/gen-ide-types.mjs <out.json>      (tools/cdn-data.mjs: data/ide/march-types.json)
+// It writes again only when a source under src/ or types/jsx.d.ts changed (a stamp of their sizes
 // and times beside the output).
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync, mkdirSync } from "node:fs";
 import { join, relative, resolve, dirname } from "node:path";
@@ -12,7 +12,8 @@ import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const OUT = resolve(process.argv[2] ?? join(ROOT, "examples/showcase/dist/playground/ts/march-types.json"));
+if (!process.argv[2]) { console.error("usage: node tools/gen-ide-types.mjs <out.json>"); process.exit(2); }
+const OUT = resolve(process.argv[2]);
 const BASE = "/node_modules/march/";
 const rel = (p) => relative(ROOT, p).replace(/\\/g, "/");
 
@@ -55,7 +56,7 @@ mkdirSync(join(dirname(OUT), "march-icons"), { recursive: true });
 for (const id of readdirSync(PACKS)) { const p = join(PACKS, id, "index.d.ts"); if (existsSync(p)) writeFileSync(join(dirname(OUT), "march-icons", `${id}.d.ts`), readFileSync(p, "utf8")); }
 files[`${BASE}package.json`] = JSON.stringify({ name: "march", version: pkg.version, type: "module", exports: exportsOut });
 // MarchIDE's march/testing: the package's renderTest and the rest, plus the test runner the IDE adds (test, it, expect;
-// examples/showcase/src/playground/preview-runtime.ts)
+// the site's playground preview runtime)
 files["/march-ide-testing.d.ts"] = `import "march/testing";
 declare module "march/testing" {
   interface IdeMatchers {

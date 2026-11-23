@@ -9,5 +9,3 @@ docs/internal/
 CLAUDE.md
 cdn/dist/
 tools/cdn-usage.js
-# generated: the March type check's working copy
-examples/showcase/.march/

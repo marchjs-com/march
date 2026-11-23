@@ -44,7 +44,7 @@ and reduced-motion rules.
 - Compositor-only properties on the DOM path (dev warning otherwise); `will-change` only while animating.
 - No allocation per frame for JS targets (typed arrays, cached segment index); one clock callback per root playback.
 - `test/motion-engine.test.js` measures a 200-item stagger (start < 50 ms, JS frame for 200 targets < 8 ms);
-  `tools/motion-audit.mjs` checks the showcase in headless Edge (Stop all, global speed, 200-item stagger without long tasks).
+  the site (marchjs.com) checks its pages in a headless browser (Stop all, global speed, 200-item stagger without long tasks).
 
 ## Text animations
 
@@ -116,7 +116,7 @@ Morph, Sayfa geçişi efektleri, Mikro etkileşimler, Kaydırma, Listeler.
   - `spray` without a worklet, `sweep`, `splat` (default 1600 ms): soft mask layers subtracted from a full layer, their
     sizes and places tweened (`paintLayers`, `paintFrames`, `paintMask`): one nozzle from a random place in strokes of
     changing direction; a nozzle sweeping row by row; patches bursting out from the pressed point.
-  The showcase's choice of shape and length is on Motion › Page transitions (Tema geçişleri, `examples/showcase/src/wave.ts`).
+  The site's choice of shape and length is on Motion › Page transitions (Tema geçişleri).
 - `installThemeWave()` puts it around every `setTheme` / `setColorTheme` / `setAccent` (through `setRestyleTransition`
   of march/ui), so ThemeMenu, ThemePicker, ThemeToggle and AccentPicker all spread from the pressed point (the
   focused control for a key press). It returns the function that turns it off.

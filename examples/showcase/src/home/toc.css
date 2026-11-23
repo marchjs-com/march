@@ -1,7 +1,0 @@
-/* The home page's SectionTimeline (toc.tsx): only on a wide screen with a pointer (on narrow screens and touch the
-   address still follows the sections); the page's content leaves it room at the side. */
-.sc-toc.m-stl { display: none; }
-@media (min-width: 75rem) and (hover: hover) {
-  .sc-home-body { padding-inline-end: max(var(--m-space-6), calc((100cqi - 74rem) / 2), 5.5rem); }
-  .sc-toc.m-stl { display: flex; }
-}

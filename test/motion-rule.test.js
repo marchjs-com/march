@@ -18,12 +18,10 @@ const ALLOWED = {
   "src/testing/dom.ts": "test DOM shim",
   "src/router/router.ts": "scroll restoration after a page swap, not an animation",
   "src/ui/popover.ts": "positions a popover once after mount, not an animation",
-  "examples/showcase/src/bench/paint.ts": "benchmark: time to the next paint, a measurement (global speed or stop-all must not change it)",
-  "examples/showcase/src/bench/scenarios/runner.ts": "benchmark: each scenario step starts at a frame and is timed to its paint, a measurement (global speed or stop-all must not change it)",
 };
 
 test("animations go through the motion engine (inventory of raw requestAnimationFrame / el.animate / setInterval)", () => {
-  const files = [...walk(join(ROOT, "src")), ...walk(join(ROOT, "examples/showcase/src"))];
+  const files = walk(join(ROOT, "src"));
   const bad = [];
   for (const f of files) {
     const r = rel(f);

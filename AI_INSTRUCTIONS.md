@@ -424,7 +424,7 @@ Rules:
   controls them too (`cssAnimations(root).pause()`, global speed / pause reach them).
 - Reduced motion: non-`essential` animations jump to their end, endless ones stay still; never bypass it.
 - New targets (Three.js, SVG paths…): `defineDriver(name, { supports, apply, read?, flush? })`, not a custom loop.
-- Check: `node tools/motion-audit.mjs` (headless Edge: Stop all, speed, 200-item stagger: no long task).
+- Check: `test/motion-engine.test.js` (200-item stagger timing); the site checks its pages in a headless browser.
 Reference: docs/motion.md. The showcase page "Animasyon motoru" (/animation) shows every piece.
 
 ### 15a2. Text animations (march/motion/text)

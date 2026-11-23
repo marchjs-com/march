@@ -163,14 +163,6 @@ test("march build: credit: true adds the Built with MarchJS comment; off by defa
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-const ROOT_DIR = fileURLToPath(new URL("..", import.meta.url));
-test("showcase dist: no absolute /assets/ URL anywhere in index.html", { skip: !existsSync(join(ROOT_DIR, "examples/showcase/dist/index.html")) }, () => {
-  assert.doesNotMatch(readFileSync(join(ROOT_DIR, "examples/showcase/dist/index.html"), "utf8"), /"\/assets\//);
-  // the publishing host refuses names starting with _ or .
-  const walk = (d) => readdirSync(d, { withFileTypes: true }).flatMap((f) => (f.isDirectory() ? [f.name, ...walk(join(d, f.name))] : [f.name]));
-  for (const n of walk(join(ROOT_DIR, "examples/showcase/dist"))) assert.doesNotMatch(n, /^[_.]/, n);
-});
-
 test("march build --stable-names: hash-free names, ?v= versions everywhere, deterministic; no name starts with _ or .", () => {
   const dir = mkdtempSync(join(tmpdir(), "march-stable-"));
   try {

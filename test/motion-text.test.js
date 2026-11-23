@@ -161,15 +161,7 @@ test("march/motion/text is a side-effect free package entry", () => {
   assert.ok(!pkg.sideEffects.some((p) => p.includes("motion/text")), "not marked as having side effects");
 });
 
-test("the showcase shows every exported animation (description + cost) and the docs name each one", () => {
-  const page = readFileSync(new URL("../examples/showcase/src/pages/text-motion.tsx", import.meta.url), "utf8");
-  const costs = readFileSync(new URL("../examples/showcase/src/text-costs.gen.ts", import.meta.url), "utf8");
+test("the docs name every exported animation", () => {
   const docs = readFileSync(new URL("../src/motion/text/docs.md", import.meta.url), "utf8");
-  for (const name of ANIMS) {
-    assert.match(page, new RegExp(`(^|[\\s{,])${name}: "`, "m"), `showcase description for ${name}`);
-    assert.match(costs, new RegExp(`^  ${name}: [0-9]+,`, "m"), `cost badge for ${name} (bench/text-size.js --write)`);
-    assert.match(docs, new RegExp(`[^A-Za-z]${name}[^A-Za-z]`), `docs mention ${name}`);
-  }
-  const nav = readFileSync(new URL("../examples/showcase/src/nav-meta.ts", import.meta.url), "utf8");
-  assert.match(nav, /"\/text-motion": \{[^}]*group: "Hareket"/, "listed under Hareket");
+  for (const name of ANIMS) assert.match(docs, new RegExp(`[^A-Za-z]${name}[^A-Za-z]`), `docs mention ${name}`);
 });

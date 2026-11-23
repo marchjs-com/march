@@ -109,7 +109,8 @@ Runtime names and your `src/components/*` are auto-imported. Without the compile
 | `march/fx` | `Particles`, `Aurora`, `Noise`, `spotlight`, `confetti` |
 | `march/testing` | tiny DOM for `node --test`, `renderTest()`, `mockFetch` |
 
-Docs: [`docs/`](docs) · Examples: [`examples/`](examples) (counter, form, router, async, table, charts, **showcase**) ·
+Docs: [`docs/`](docs) · Site and live gallery: [marchjs.com](https://marchjs.com) ([source](https://github.com/marchjs-com/marchjs.com)) ·
+Examples: [marchjs-com/examples](https://github.com/marchjs-com/examples) ·
 Türkçe: [`README.tr.md`](README.tr.md) · Changes: [`CHANGELOG.md`](CHANGELOG.md)
 
 ## Themes
@@ -133,7 +134,7 @@ setTheme("dark");                      // light | dark | system
 Write your own: `defineTheme({ id, name, font, display, radius, light: {...}, dark: {...} })` from `march/theme`,
 write `themeCss(def)` to a .css file at build time, load it, and `registerThemes([{ id, name }])` to offer it in pickers.
 Icons: `march/icons` (160 original SVG icons, each a separate export, rendered with createElementNS) and optional open-source packs, one export per icon: `march/icons/lucide`, `/tabler`, `/heroicons`, `/phosphor`, `/feather`, `/material-symbols`, `/remix`, `/bootstrap`, `/simple-icons` (licenses included; `march icons add` updates them). See [docs/icons.md](docs/icons.md).
-Live gallery of everything: `node examples/showcase/build.mjs --serve`.
+Live gallery of everything: [marchjs.com](https://marchjs.com).
 
 ## Only what you use is bundled
 
