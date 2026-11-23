@@ -1,0 +1,328 @@
+{
+ "//": "CDN size budget (tools/cdn-size.mjs): gzip bytes a page downloads for one entry on top of the core; component: march/components/<category>/<name>; entry: every other entry; core: march itself (its whole closure); limits: an entry past its default, with the reason",
+ "component": 25600,
+ "entry": 61440,
+ "core": 25600,
+ "limits": {
+  "march/app-ui": {
+   "limit": 215040,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/actions/overflow-toolbar": {
+   "limit": 56320,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/actions/scroll-to-top": {
+   "limit": 30720,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/composite/app-ui": {
+   "limit": 215040,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/bottom-nav": {
+   "limit": 35840,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/composite/chat-composer": {
+   "limit": 56320,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/chat-thread": {
+   "limit": 40960,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/composite/code-editor": {
+   "limit": 81920,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/color-picker": {
+   "limit": 46080,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/consent-banner": {
+   "limit": 40960,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/composite/debugger": {
+   "limit": 46080,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/dock-layout": {
+   "limit": 87040,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/feed": {
+   "limit": 71680,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/composite/flow-canvas": {
+   "limit": 81920,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/flow-controls": {
+   "limit": 66560,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/flow-palette": {
+   "limit": 51200,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/font-picker": {
+   "limit": 97280,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/gradient-editor": {
+   "limit": 61440,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/image-cropper": {
+   "limit": 51200,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/json-editor": {
+   "limit": 51200,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/keyframe-timeline": {
+   "limit": 66560,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/markdown-editor": {
+   "limit": 66560,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/nav-sidebar": {
+   "limit": 61440,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/composite/network-throttle": {
+   "limit": 46080,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/post-card": {
+   "limit": 61440,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/composite/profile-header": {
+   "limit": 61440,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/composite/property-grid": {
+   "limit": 92160,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/rich-text-editor": {
+   "limit": 56320,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/story-viewer": {
+   "limit": 56320,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/terminal": {
+   "limit": 30720,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/theme-editor": {
+   "limit": 40960,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/theme-menu": {
+   "limit": 30720,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/composite/tree-editor": {
+   "limit": 51200,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/composite/wizard": {
+   "limit": 81920,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/data/data-grid": {
+   "limit": 102400,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/data/gantt": {
+   "limit": 40960,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/data/kanban": {
+   "limit": 35840,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/data/scheduler": {
+   "limit": 56320,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/data/tree-view": {
+   "limit": 56320,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/forms/choice-picker": {
+   "limit": 51200,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/forms/date-range-picker": {
+   "limit": 46080,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/forms/icon-picker": {
+   "limit": 46080,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/landing/branching-story": {
+   "limit": 56320,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/landing/cta-band": {
+   "limit": 35840,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/landing/faq": {
+   "limit": 76800,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/landing/feature-grid": {
+   "limit": 66560,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/landing/hero": {
+   "limit": 40960,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/landing/live-feed": {
+   "limit": 35840,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/landing/newsletter": {
+   "limit": 40960,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/landing/presentation": {
+   "limit": 46080,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/landing/pricing": {
+   "limit": 51200,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/landing/project-detail": {
+   "limit": 51200,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/landing/project-grid": {
+   "limit": 56320,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/landing/site-footer": {
+   "limit": 71680,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/landing/site-nav": {
+   "limit": 76800,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/landing/stats-band": {
+   "limit": 30720,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/landing/testimonials": {
+   "limit": 51200,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/layout/device-picker": {
+   "limit": 56320,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/layout/device-preview": {
+   "limit": 66560,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/layout/status-bar": {
+   "limit": 56320,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/motion/easing-curve-editor": {
+   "limit": 35840,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/navigation/activity-bar": {
+   "limit": 46080,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/navigation/breadcrumbs": {
+   "limit": 35840,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/navigation/nav-menu": {
+   "limit": 46080,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/navigation/stepper": {
+   "limit": 35840,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/navigation/tabs": {
+   "limit": 40960,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/overlays/drawer": {
+   "limit": 40960,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/social/chat-bubble": {
+   "limit": 30720,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/social/like-button": {
+   "limit": 35840,
+   "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/composite": {
+   "limit": 384000,
+   "why": "a barrel: every component or feature it exports at once (no tree-shaking in a browser); a page that needs one imports march/components/<category>/<name>"
+  },
+  "march/crud": {
+   "limit": 189440,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/flow": {
+   "limit": 97280,
+   "why": "a barrel: every component or feature it exports at once (no tree-shaking in a browser); a page that needs one imports march/components/<category>/<name>"
+  },
+  "march/forms": {
+   "limit": 163840,
+   "why": "a barrel: every component or feature it exports at once (no tree-shaking in a browser); a page that needs one imports march/components/<category>/<name>"
+  },
+  "march/landing": {
+   "limit": 163840,
+   "why": "a barrel: every component or feature it exports at once (no tree-shaking in a browser); a page that needs one imports march/components/<category>/<name>"
+  },
+  "march/layout": {
+   "limit": 112640,
+   "why": "a barrel: every component or feature it exports at once (no tree-shaking in a browser); a page that needs one imports march/components/<category>/<name>"
+  },
+  "march/managers": {
+   "limit": 107520,
+   "why": "a barrel: every component or feature it exports at once (no tree-shaking in a browser); a page that needs one imports march/components/<category>/<name>"
+  },
+  "march/motion": {
+   "limit": 87040,
+   "why": "a barrel: every component or feature it exports at once (no tree-shaking in a browser); a page that needs one imports march/components/<category>/<name>"
+  },
+  "march/navigation": {
+   "limit": 102400,
+   "why": "a barrel: every component or feature it exports at once (no tree-shaking in a browser); a page that needs one imports march/components/<category>/<name>"
+  },
+  "march/table": {
+   "limit": 76800,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/ui": {
+   "limit": 496640,
+   "why": "a barrel: every component or feature it exports at once (no tree-shaking in a browser); a page that needs one imports march/components/<category>/<name>"
+  }
+ }
+}

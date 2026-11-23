@@ -20,3 +20,6 @@ jobs:
       - run: npm ci
       - run: npm run test:all
       - run: npm run size
+      # the CDN build and its size budget (cdn/budget.json): a PR that makes an entry heavier than its limit fails here,
+      # not when the merge is published
+      - run: node tools/build-cdn.js

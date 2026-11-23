@@ -5,6 +5,8 @@
 //   <entry>.css      the stylesheets of one entry (when it has any)
 //   css/…            the stylesheets the package exports as files (tokens.css, themes/…)
 //   importmap.json   { imports: { "march": ".../march.js", "march/ui": ".../ui.js", … } } with absolute URLs
+//   sizes.json       per entry: gzip bytes a page downloads, on top of the core, and its closure (tools/cdn-size.mjs)
+//   components/<category>/<name>.js   one entry per component: a page loads what it uses (a barrel loads all)
 //   files.json       every file of the version (a deploy uses it to keep the older versions)
 //   data/…           the version's data: API reference, MarchIDE types, components (tools/cdn-data.mjs)
 // and the same files again in cdn/dist/latest/. Usage: node tools/build-cdn.js [--base https://cdn.marchjs.com]
@@ -13,6 +15,7 @@ import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 import { writeData } from "./cdn-data.mjs";
+import { measure, check, readBudget } from "./cdn-size.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
@@ -29,6 +32,15 @@ for (const [key, target] of Object.entries(pkg.exports)) {
   const file = typeof target === "string" ? target : target.import ?? target.default;
   if (SKIP.has(key) || typeof file !== "string" || !/\.(ts|js)$/.test(file) || !file.startsWith("./src/")) continue;
   if (key.includes("*")) {
+    // components/<category>/<name>: one entry per component, so a page loads the components it uses and what they share
+    // (march/ui and the other barrels load every component they export: no tree-shaking in a browser)
+    if (key === "./components/*") {
+      const dir = join(root, "src/components");
+      for (const cat of readdirSync(dir).filter((d) => statSync(join(dir, d)).isDirectory()))
+        for (const name of readdirSync(join(dir, cat)).filter((d) => existsSync(join(dir, cat, d, "index.ts"))))
+          entries.push({ spec: `march/components/${cat}/${name}`, in: join(dir, cat, name, "index.ts"), out: `components/${cat}/${name}` });
+      continue;
+    }
     // icons/<pack> and icons/<pack>/pack: one entry per pack there is
     if (!key.startsWith("./icons/")) continue;
     const dir = join(root, "src/icons/packs");
@@ -70,6 +82,15 @@ const walk = (d) => readdirSync(d).flatMap((n) => { const p = join(d, n); return
 const url = (name) => `${BASE}/${version}/${name}`;
 const importmap = { imports: Object.fromEntries(entries.map((e) => [e.spec, url(`${e.out}.js`)])) };
 writeFileSync(join(out, "importmap.json"), `${JSON.stringify(importmap, null, 2)}\n`);
+// sizes.json: what a page downloads per entry (gzip; on top of the core; its closure files, which a site can
+// modulepreload); an entry past its budget (cdn/budget.json, tools/cdn-size.mjs) fails the build before anything is published
+const sizes = measure(out);
+writeFileSync(join(out, "sizes.json"), `${JSON.stringify({ version, ...sizes })}\n`);
+const over = check(sizes, readBudget());
+if (over.length) {
+  for (const o of over) console.error(`✖ cdn size: ${o.spec} ${(o.size / 1024).toFixed(1)} KB > ${(o.limit / 1024).toFixed(1)} KB (cdn/budget.json)`);
+  process.exit(1);
+}
 const files = walk(out).map((f) => relative(out, f).replace(/\\/g, "/")).sort();
 writeFileSync(join(out, "files.json"), `${JSON.stringify({ version, files: [...files, "files.json"] }, null, 2)}\n`);
 // latest: the same files (its importmap points at latest/)
