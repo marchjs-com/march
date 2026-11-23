@@ -192,10 +192,14 @@ test("barrel imports compile to the defining module; the entry does not load pag
   } finally { app.cleanup(); }
 });
 
-test("a category entry (march/landing) compiles like march/ui: the entry does not reach the category's other blocks", async () => {
+test("a category entry (march/landing) compiles like march/ui, static and lazy: the entry does not reach the category's other blocks", async () => {
   const { deepImports } = await import("../compiler/deep-imports.js");
   const landing = resolve("src/components/landing/index.ts");
   assert.match(deepImports(`import { Pricing } from "march/landing";`, { "march/landing": landing }), /import \{ Pricing \} from "[^"]*src\/components\/landing\/pricing\/index\.ts";/);
+  // a lazy import of one name loads the module that defines it; the same text in a string stays
+  const lazyOne = deepImports(`const P = () => import("march/landing").then((m) => ({ default: m.Pricing }))\nconst s = 'import("march/landing").then((m) => m.Pricing)'\n`, { "march/landing": landing });
+  assert.match(lazyOne, /import\("[^"]*src\/components\/landing\/pricing\/index\.ts"\)\.then\(\(m\) => \(\{ default: m\.Pricing \}\)\)/);
+  assert.match(lazyOne, /'import\("march\/landing"\)\.then\(\(m\) => m\.Pricing\)'/, "code inside a string is left as written");
   const app = await buildApp({
     "main.tsx": `import { render } from "march"\nimport { SectionHead } from "march/landing"\nimport { createRouter, Router } from "march/router"\ncreateRouter({ routes: { "/": () => import("./a.tsx") } })\nrender(() => <div><SectionHead title="x" /><Router /></div>, document.body)\n`,
     "a.tsx": `import { Pricing } from "march/landing"\nexport default () => <Pricing plans={[]} />\n`,

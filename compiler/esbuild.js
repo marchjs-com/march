@@ -20,15 +20,24 @@ function iconPackModules() {
   return ids.flatMap((id) => [[`march/icons/${id}`, `src/icons/packs/${id}/index.js`], [`march/icons/${id}/pack`, `src/icons/packs/${id}/pack.js`]]);
 }
 
-// the component entries of the package (the categories, "march/landing", "march/composite"…, and the large components
-// under march/components/…): resolved to this copy, and a named import from a category goes straight to the defining
-// module (deepImports), like the core subpaths. Without it an app that imports march/landing would reach every block of
-// the category, and code splitting places code by the files an entry reaches. Only src/components: those modules have
-// no side effects (a barrel with side effects, march/net or a manager, must stay the module that is imported).
-function componentModules() {
-  let exp = {};
-  try { exp = JSON.parse(readFileSync(join(MARCH_ROOT, "package.json"), "utf8")).exports ?? {}; } catch { /* no package.json */ }
-  return Object.entries(exp).filter(([k, t]) => !k.includes("*") && typeof t === "string" && t.startsWith("./src/components/") && t.endsWith("/index.ts"))
+// every module entry of the package ("march/landing", "march/composite", "march/behaviors/drag"…): resolved to this
+// copy, and a named import from one goes straight to the defining module (deepImports), like the core subpaths.
+// Without it an app that imports one landing block reaches the whole category, and code splitting places code by the
+// files an entry reaches. An entry whose module has side effects (package.json "sideEffects": march/net, the
+// managers…) is left out: importing it must run that module.
+// a "sideEffects" glob ("./src/managers/*/index.ts", "*.css") → a test on a path relative to the package
+// (a pattern without "/" matches the file name at any depth, as in package.json)
+const escRx = (s) => s.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+const globTest = (g) => {
+  const pat = g.replace(/^\.\//, "");
+  const re = new RegExp(`${pat.includes("/") ? "^" : "(^|/)"}${pat.split("*").map(escRx).join("[^/]*")}$`);
+  return (path) => re.test(path);
+};
+function packageModules() {
+  let pkg = {};
+  try { pkg = JSON.parse(readFileSync(join(MARCH_ROOT, "package.json"), "utf8")); } catch { /* no package.json */ }
+  const effects = (Array.isArray(pkg.sideEffects) ? pkg.sideEffects : []).map(globTest);
+  return Object.entries(pkg.exports ?? {}).filter(([k, t]) => k !== "." && !k.includes("*") && typeof t === "string" && t.startsWith("./src/") && t.endsWith(".ts") && !effects.some((test) => test(t.slice(2))))
     .map(([k, t]) => [`march/${k.slice(2)}`, t.slice(2)]);
 }
 
@@ -82,7 +91,7 @@ export function march(opts = {}) {
       if (opts.cssSplit !== false) setupCssSplit(build);
 
       // march/* → files of this March copy
-      const files = Object.fromEntries([...componentModules(), ...MODULES, ["march/icons", "src/icons/index.ts"], ["march/icons/catalog", "src/icons/catalog.ts"], ["march/icons/packs", "src/icons/packs.ts"], ...iconPackModules(), ["march/theme", "src/theme/index.ts"], ["march/seo", "src/seo/index.ts"], ["march/seo/hydrate", "src/seo/hydrate.ts"], ["march/seo/prerendered", "src/seo/prerendered.ts"], ["march/base", "src/base/index.ts"], ["march/testing", "src/testing/index.ts"]].map(([spec, rel]) => [spec, join(MARCH_ROOT, rel)]));
+      const files = Object.fromEntries([...packageModules(), ...MODULES, ["march/icons", "src/icons/index.ts"], ["march/icons/catalog", "src/icons/catalog.ts"], ["march/icons/packs", "src/icons/packs.ts"], ...iconPackModules(), ["march/theme", "src/theme/index.ts"], ["march/seo", "src/seo/index.ts"], ["march/seo/hydrate", "src/seo/hydrate.ts"], ["march/seo/prerendered", "src/seo/prerendered.ts"], ["march/base", "src/base/index.ts"], ["march/testing", "src/testing/index.ts"]].map(([spec, rel]) => [spec, join(MARCH_ROOT, rel)]));
       // named imports from March barrels go straight to the defining module (see deep-imports.js); off with deepImports: false
       const deep = opts.deepImports === false ? (c) => c : (c) => (c.includes("march") ? deepImports(c, files) : c);
       const cwd = build.initialOptions.absWorkingDir ?? process.cwd();
