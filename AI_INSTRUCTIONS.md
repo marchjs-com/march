@@ -200,7 +200,16 @@ Overlays never take input; put content after them. `front` only for foreground e
   A file still under the limit fails the build (`fail: false`: listed, the build passes); `allow` needs a reason.
   `maxBuilds` / `maxSeconds` cap the packing passes. `chunks: false` turns it off. The packer packs to the default
   budgets (`route`, `part`); `budget.routes` / `budget.parts` (`{ limit, why }`, a layout too) only let a row that is big
-  by its own content pass the report.
+  by its own content pass the report. A release build starts from the plan the last one settled on
+  (`node_modules/.cache/march/plan.json`): unchanged code packs in one build instead of several. When nothing it is
+  built from changed (sources, `march.config.js`, `index.html`, `public/`, March's version), `march build --release`
+  keeps the last output and says so; `--force` builds anyway.
+- `cdn: "https://cdn.marchjs.com/<version>"` in `march.config.js`: March is loaded from the CDN, never bundled (the app's
+  own code is). Each `march/*` import goes to the smallest CDN entry that exports the name (`import { Button } from
+  "march/ui"` loads `march/components/actions/button`, not all of march/ui), and that entry's stylesheet is linked and
+  awaited with it; `march/css/*` imports are links to the CDN; themes load from it (`<meta name="march-themes">`). Use a
+  version's folder, not `latest/` (one release per page; a version's files are cached for a year). CSP: allow the CDN in
+  `script-src`, `style-src`, `font-src`, `img-src` and `connect-src` (theme transitions read stylesheets). The prerender still renders with the installed package.
 
 **Don't (security)**
 - Never use `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function`, string `style`.

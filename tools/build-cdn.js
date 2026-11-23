@@ -7,6 +7,7 @@
 //   importmap.json   { imports: { "march": ".../march.js", "march/ui": ".../ui.js", … } } with absolute URLs
 //   sizes.json       per entry: gzip bytes a page downloads, on top of the core, and its closure (tools/cdn-size.mjs)
 //   components/<category>/<name>.js   one entry per component: a page loads what it uses (a barrel loads all)
+//   mod/<path>.js    every module a barrel re-exports from (march/mod/<path>, for apps built with march.config.js › cdn)
 //   files.json       every file of the version (a deploy uses it to keep the older versions)
 //   data/…           the version's data: API reference, MarchIDE types, components (tools/cdn-data.mjs)
 // and the same files again in cdn/dist/latest/. Usage: node tools/build-cdn.js [--base https://cdn.marchjs.com]
@@ -16,6 +17,8 @@ import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 import { writeData } from "./cdn-data.mjs";
 import { measure, check, readBudget } from "./cdn-size.mjs";
+import { exportMap } from "../compiler/deep-imports.js";
+import { march } from "../compiler/esbuild.js";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
@@ -47,6 +50,19 @@ for (const [key, target] of Object.entries(pkg.exports)) {
   entries.push({ spec: key === "." ? "march" : `march/${key.slice(2)}`, in: join(root, file), out: key === "." ? "march" : key.slice(2) });
 }
 
+// march/mod/<path>: every module a barrel re-exports from, as an entry of its own. A browser does not tree-shake, so an
+// app built with `cdn` (compiler/cdn.js) imports each name from the smallest entry that has it: a helper that lives in
+// march/ui only (setTheme, toast…) loads its own module, not the whole barrel
+{
+  const have = new Set(entries.map((e) => e.in));
+  const mods = new Set();
+  for (const e of entries) if (!e.out.startsWith("icons/")) for (const [, def] of exportMap(e.in)) if (!have.has(def) && def.startsWith(join(root, "src")) && /\.(ts|tsx|js)$/.test(def)) mods.add(def);
+  for (const f of [...mods].sort()) {
+    const rel = relative(join(root, "src"), f).split("\\").join("/").replace(/\.(ts|tsx|js)$/, "");
+    entries.push({ spec: `march/mod/${rel}`, in: f, out: `mod/${rel}` });
+  }
+}
+
 rmSync(out, { recursive: true, force: true });
 const loader = { ".woff2": "file", ".woff": "file", ".png": "file", ".svg": "file", ".jpg": "file", ".webp": "file" };
 const banner = { js: `/*! MarchJS v${version} | MIT | marchjs.com */`, css: `/*! MarchJS v${version} | MIT | marchjs.com */` };
@@ -55,6 +71,8 @@ await esbuild.build({
   entryPoints: entries.map((e) => ({ in: e.in, out: e.out })), outdir: out, bundle: true, splitting: true, format: "esm",
   target: "es2022", minify: true, legalComments: "none", banner, loader, chunkNames: "_/[name]-[hash]", assetNames: "_/[name]-[hash]",
   define: { "process.env.NODE_ENV": '"production"' }, logLevel: "warning",
+  // March's own .tsx sources (app-ui's AI panels) compiled by March's compiler, not as React JSX
+  plugins: [march({ filter: /\.tsx$/, cssSplit: false, deepImports: false, prune: false })],
 });
 // march.css: every entry's stylesheets in one file (a JS entry that imports them all; only its CSS is kept)
 const all = join(dist, ".all.js");
@@ -69,6 +87,8 @@ rmSync(join(dist, ".css"), { recursive: true, force: true });
 rmSync(all, { force: true });
 // the stylesheets the package exports as files
 cpSync(join(root, "src/css"), join(out, "css"), { recursive: true });
+// the fonts css/font.css points at (../fonts/…)
+cpSync(join(root, "src/fonts"), join(out, "fonts"), { recursive: true });
 // the version's data (API reference, MarchIDE types, components) for sites that render March without its sources
 await writeData(out);
 

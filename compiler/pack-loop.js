@@ -13,10 +13,10 @@ export const PACK_BUDGET = { maxBuilds: 14, maxSeconds: 600 };
 
 /**
  * @param {{ build: (plan: unknown, strategy: number) => Promise<boolean>, left: () => number, next: (plan: unknown) => unknown,
- *   strategies: number, maxPasses?: number, maxBuilds?: number, maxMs?: number, now?: () => number, log?: (line: string) => void }} o
+ *   strategies: number, start?: unknown, maxPasses?: number, maxBuilds?: number, maxMs?: number, now?: () => number, log?: (line: string) => void }} o
  * @returns {Promise<{ plan: unknown, strategy: number, small: number, builds: number, stopped: string | null }>}
  */
-export async function packLoop({ build, left, next, strategies, maxPasses = 9, maxBuilds = PACK_BUDGET.maxBuilds, maxMs = PACK_BUDGET.maxSeconds * 1000, now = () => Date.now(), log = (l) => console.log(l) }) {
+export async function packLoop({ build, left, next, strategies, start = null, maxPasses = 9, maxBuilds = PACK_BUDGET.maxBuilds, maxMs = PACK_BUDGET.maxSeconds * 1000, now = () => Date.now(), log = (l) => console.log(l) }) {
   const t0 = now();
   let builds = 0, stopped = null, onDisk = { plan: null, strategy: 0 };
   const over = () => {
@@ -34,13 +34,19 @@ export async function packLoop({ build, left, next, strategies, maxPasses = 9, m
     return ok ? small : -1;
   };
   // passes: plan, build, plan again (strategy 0)
-  let plan = null, settled = false, small = -1;
+  // start: the plan the previous build settled on (incremental release builds): when nothing it groups changed, the
+  // planner accepts it after one build instead of rebuilding the plan pass by pass
+  // (start: { plan, strategy, small } — with the packing strategy it chose and what it left: when the plan settles at
+  // once and leaves no more, that strategy is the answer and the search for another is skipped)
+  let plan = start?.plan ?? null, settled = false, small = -1;
+  const first = start?.strategy ?? 0;
   const seen = [];
   for (let pass = 0; pass < maxPasses; pass++) {
-    small = await run(plan, 0, `pass ${pass + 1}`);
+    const st = pass === 0 ? first : 0;
+    small = await run(plan, st, `pass ${pass + 1}`);
     if (small < 0) return { plan, strategy: 0, small: 0, builds, stopped };
     const key = JSON.stringify(plan);
-    if (!seen.some((x) => x.key === key)) seen.push({ plan, n: small, key });
+    if (!seen.some((x) => x.key === key)) seen.push({ plan, n: small, key, s: st });
     const nxt = next(plan);
     if (!nxt) { settled = true; break; }
     // the planner's plans can cycle: a plan seen before ends the passes
@@ -50,8 +56,11 @@ export async function packLoop({ build, left, next, strategies, maxPasses = 9, m
   }
   // the build on disk is the last one; its plan is `plan` (the passes may have ended on a newer, unbuilt plan)
   plan = onDisk.plan;
-  let best = { plan, strategy: 0, n: small };
-  if (small > 0 && !stopped) {
+  let best = { plan, strategy: onDisk.strategy, n: small };
+  // passes that did not settle: an earlier pass may have left fewer small files than the last one
+  if (!settled) for (const x of seen) if (x.n < best.n) best = { plan: x.plan, strategy: x.s, n: x.n };
+  const warm = settled && builds === 1 && start && small <= (start.small ?? 0);
+  if (small > 0 && !stopped && !warm) {
     const plans = settled ? [{ plan, n: small }] : [...seen].sort((a, b) => a.n - b.n).slice(0, 2);
     search: for (const p of plans) for (let s = 0; s < strategies; s++) {
       if (p.plan === onDisk.plan && s === onDisk.strategy) continue; // that build is on disk

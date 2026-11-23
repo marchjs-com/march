@@ -104,7 +104,7 @@ export async function prerender({ cwd, cfg, esbuild, out, importSeo, log = conso
     mainFields: ["module", "main"], conditions: ["import", "default"], alias: cfg.alias ?? {},
     define: { "process.env.NODE_ENV": "\"production\"", ...(cfg.define ?? {}) },
     loader: { ".css": "empty", ".svg": "dataurl", ".png": "empty", ".jpg": "empty", ".webp": "empty", ".woff2": "empty" },
-    plugins: [march({ components: resolve(cwd, cfg.components ?? "src/components"), dev: false, cssSplit: false, i18nOut: join(tmp, "i18n-keys.json") })],
+    plugins: [march({ components: resolve(cwd, cfg.components ?? "src/components"), dev: false, cssSplit: false, i18nOut: join(tmp, "i18n-keys.json"), ...(cfg.cdnData ? { cdn: cfg.cdnData, cdnLocal: true } : {}) })],
   };
   const entry = resolve(cwd, cfg.entry).split("\\").join("/");
   // the test DOM and the app: two files, so the DOM exists before the app's first line runs

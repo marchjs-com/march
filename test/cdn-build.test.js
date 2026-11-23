@@ -13,6 +13,9 @@ test("CDN build: modules, march.css, import map, file list, latest", () => {
   execFileSync(process.execPath, [new URL("tools/build-cdn.js", root).pathname.replace(/^\/(\w:)/, "$1"), "--base", "https://cdn.example"], { stdio: "pipe" });
   for (const f of ["march.js", "ui.js", "app-ui.js", "icons.js", "behaviors/drag.js", "march.css", "css/tokens.css"]) assert.ok(existsSync(at(`${version}/${f}`)), f);
   assert.ok(!existsSync(at(`${version}/testing.js`)) && !existsSync(at(`${version}/compiler.js`)), "node-only entries stay out");
+  // css/font.css points at ../fonts/; a module a barrel re-exports from is an entry of its own (march/mod/<path>)
+  assert.ok(existsSync(at(`${version}/fonts/inter-latin.woff2`)), "the fonts");
+  assert.ok(existsSync(at(`${version}/mod/ui/theme.js`)), "march/mod/ui/theme");
   const css = readFileSync(at(`${version}/march.css`), "utf8");
   assert.match(css, /^\/\*! MarchJS v/);
   assert.match(css, /--m-accent:/, "the tokens are in");

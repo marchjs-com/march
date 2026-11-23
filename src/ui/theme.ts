@@ -80,11 +80,13 @@ const THEME_NAME_KEY = "m.colorTheme";
 const infos = signal<readonly ThemeInfo[]>(THEME_NAMES.map((x) => ({ ...x })));
 const themeName = signal<string>(stored(THEME_NAME_KEY) || DEFAULT_THEME, { name: "colorTheme" });
 let themeBase: string | null = null;
-/** Where the built-in theme stylesheets live (default "themes/" under the app's root, on any route; `march build` copies them there). */
+/** Where the built-in theme stylesheets live (default "themes/" under the app's root, on any route; `march build` copies them
+ * there; an app on the CDN finds them there from `<meta name="march-themes">`, which `march build` writes). */
 export function setThemeBase(url: string): void { themeBase = url.endsWith("/") ? url : `${url}/`; }
+const metaBase = (): string | null => globalThis.document?.querySelector?.<HTMLMetaElement>('meta[name="march-themes"]')?.content || null;
 const hrefOf = (id: string): string => {
   const custom = infos.peek().find((x) => x.id === id)?.href;
-  return new URL(appUrl(custom ?? `${themeBase ?? "themes/"}${id}.css`), "http://localhost/").href;
+  return new URL(appUrl(custom ?? `${themeBase ?? metaBase() ?? "themes/"}${id}.css`), "http://localhost/").href;
 };
 /** Load a theme's stylesheet once (<link rel="stylesheet">, CSP style-src 'self'); resolves when it is ready (or failed). */
 export function loadTheme(id: string): Promise<boolean> {
