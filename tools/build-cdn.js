@@ -50,30 +50,64 @@ for (const [key, target] of Object.entries(pkg.exports)) {
   entries.push({ spec: key === "." ? "march" : `march/${key.slice(2)}`, in: join(root, file), out: key === "." ? "march" : key.slice(2) });
 }
 
-// march/mod/<path>: every module a barrel re-exports from, as an entry of its own. A browser does not tree-shake, so an
-// app built with `cdn` (compiler/cdn.js) imports each name from the smallest entry that has it: a helper that lives in
-// march/ui only (setTheme, toast…) loads its own module, not the whole barrel
+// march/mod/<path>: a module a barrel re-exports from, as an entry of its own, where that saves a page something. A
+// browser does not tree-shake, so an app built with `cdn` (compiler/cdn.js) imports each name from the smallest entry
+// that has it: setTheme, which only march/ui (420 KB) exports, then loads its own module (10 KB). Every entry also
+// splits the shared code finer (more files per page), so a module gets one only when it pays: outside a component's
+// folder (a component's parts come with it), a name of it costs over MOD_MIN elsewhere, and the module itself is at most
+// half that and within the entry budget. The first build measures every candidate; the ones that do not pay are
+// dropped and the build runs again.
+// (measured: at 30 or 60 KB, entries for the motion engine's modules split the code many components share finely enough
+// to push line-chart and roadmap past their budget; at 100 KB the heavy barrels' helpers get one, and no entry grows)
+const MOD_MIN = 100 * 1024;
+const mods = [];
 {
   const have = new Set(entries.map((e) => e.in));
-  const mods = new Set();
-  for (const e of entries) if (!e.out.startsWith("icons/")) for (const [, def] of exportMap(e.in)) if (!have.has(def) && def.startsWith(join(root, "src")) && /\.(ts|tsx|js)$/.test(def)) mods.add(def);
-  for (const f of [...mods].sort()) {
+  const found = new Set();
+  for (const e of entries) if (!e.out.startsWith("icons/")) for (const [, def] of exportMap(e.in)) if (!have.has(def) && def.startsWith(join(root, "src")) && !def.startsWith(join(root, "src", "components")) && /\.(ts|tsx|js)$/.test(def)) found.add(def);
+  for (const f of [...found].sort()) {
     const rel = relative(join(root, "src"), f).split("\\").join("/").replace(/\.(ts|tsx|js)$/, "");
-    entries.push({ spec: `march/mod/${rel}`, in: f, out: `mod/${rel}` });
+    mods.push({ spec: `march/mod/${rel}`, in: f, out: `mod/${rel}` });
   }
 }
 
-rmSync(out, { recursive: true, force: true });
 const loader = { ".woff2": "file", ".woff": "file", ".png": "file", ".svg": "file", ".jpg": "file", ".webp": "file" };
 const banner = { js: `/*! MarchJS v${version} | MIT | marchjs.com */`, css: `/*! MarchJS v${version} | MIT | marchjs.com */` };
 const t0 = performance.now();
-await esbuild.build({
-  entryPoints: entries.map((e) => ({ in: e.in, out: e.out })), outdir: out, bundle: true, splitting: true, format: "esm",
-  target: "es2022", minify: true, legalComments: "none", banner, loader, chunkNames: "_/[name]-[hash]", assetNames: "_/[name]-[hash]",
-  define: { "process.env.NODE_ENV": '"production"' }, logLevel: "warning",
-  // March's own .tsx sources (app-ui's AI panels) compiled by March's compiler, not as React JSX
-  plugins: [march({ filter: /\.tsx$/, cssSplit: false, deepImports: false, prune: false })],
-});
+const url = (name) => `${BASE}/${version}/${name}`;
+/** The modules of `list` in the version folder, with its import map; returns their sizes (tools/cdn-size.mjs). */
+async function compile(list) {
+  rmSync(out, { recursive: true, force: true });
+  await esbuild.build({
+    entryPoints: list.map((e) => ({ in: e.in, out: e.out })), outdir: out, bundle: true, splitting: true, format: "esm",
+    target: "es2022", minify: true, legalComments: "none", banner, loader, chunkNames: "_/[name]-[hash]", assetNames: "_/[name]-[hash]",
+    define: { "process.env.NODE_ENV": '"production"' }, logLevel: "warning",
+    // March's own .tsx sources (app-ui's AI panels) compiled by March's compiler, not as React JSX
+    plugins: [march({ filter: /\.tsx$/, cssSplit: false, deepImports: false, prune: false })],
+  });
+  writeFileSync(join(out, "importmap.json"), `${JSON.stringify({ imports: Object.fromEntries(list.map((e) => [e.spec, url(`${e.out}.js`)])) }, null, 2)}\n`);
+  return measure(out);
+}
+/** The module entries that pay (see above), from a build that had them all. */
+function paying(sizes) {
+  const cost = new Map(); // defining file + name → the smallest other entry's size
+  for (const e of entries) {
+    const n = e.spec === "march" ? 0 : sizes.entries[e.spec]?.added;
+    if (n == null || e.out.startsWith("icons/")) continue;
+    for (const [name, def] of exportMap(e.in)) { const k = `${def}\0${name}`; if (!cost.has(k) || cost.get(k) > n) cost.set(k, n); }
+  }
+  const limit = readBudget().entry;
+  return mods.filter((m) => {
+    const own = sizes.entries[m.spec]?.added ?? Infinity;
+    const elsewhere = Math.max(0, ...[...exportMap(m.in)].map(([name, def]) => cost.get(`${def}\0${name}`) ?? 0));
+    return elsewhere > MOD_MIN && own * 2 <= elsewhere && own <= limit;
+  });
+}
+const first = await compile([...entries, ...mods]);
+const keep = paying(first);
+if (keep.length < mods.length) await compile([...entries, ...keep]);
+console.log(`module entries: ${keep.length} of ${mods.length} pay (march/mod/…)`);
+entries.push(...keep);
 // march.css: every entry's stylesheets in one file (a JS entry that imports them all; only its CSS is kept)
 const all = join(dist, ".all.js");
 // the design tokens first and the sx utilities (an app imports march/css/tokens.css and sx.css itself; a CDN page
@@ -93,7 +127,6 @@ cpSync(join(root, "src/fonts"), join(out, "fonts"), { recursive: true });
 await writeData(out);
 
 const walk = (d) => readdirSync(d).flatMap((n) => { const p = join(d, n); return statSync(p).isDirectory() ? walk(p) : [p]; });
-const url = (name) => `${BASE}/${version}/${name}`;
 const importmap = { imports: Object.fromEntries(entries.map((e) => [e.spec, url(`${e.out}.js`)])) };
 writeFileSync(join(out, "importmap.json"), `${JSON.stringify(importmap, null, 2)}\n`);
 // sizes.json: what a page downloads per entry (gzip; on top of the core; its closure files, which a site can
