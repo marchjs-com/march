@@ -2377,247 +2377,247 @@
    "at": "2026-11-23",
    "name": "ActivityBar",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "BottomNav",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "BranchingStory",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "Button",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "ChatBubble",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "ChatComposer",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "ChatThread",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "CodeEditor",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "DataGrid",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "Drawer",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "Feed",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "FollowButton",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "FormatToolbar",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "Gantt",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "Kbd",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "LiveCounter",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "LiveFeed",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "MarkdownEditor",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "Newsletter",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "OverflowText",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "OverflowToolbar",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "PostCard",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "Presentation",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "Pricing",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "ProjectGrid",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "PullToRefresh",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "ReactionPicker",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "Reveal",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "RichTextEditor",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "Scheduler",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "ScrollToTop",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "StatusBar",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "Stepper",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "StoryRing",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "StoryViewer",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "Tabs",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "ThemeEditor",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "TreeEditor",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "TreeView",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "TypingIndicator",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   },
   {
    "at": "2026-11-23",
    "name": "UndoRedo",
    "what": "refresh",
-   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   }
  ]
 }
