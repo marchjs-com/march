@@ -110,9 +110,13 @@ export function routePaths(meta, cwd, keys) {
 /** A layout module (march gen routes: _layout.tsx): it ships with its routes, so it has the route budget. */
 const LAYOUT = /(^|\/)_?layout\.[cm]?[jt]sx?$/;
 export function sizeReport(m, outdir, budget, routes = {}) {
+  // each file is read and gzipped once: a file is in many rows (shared chunks), and reading it per row made the report
+  // most of a release build's time (Windows file opens)
+  const known = new Map();
+  const gzOf = (f) => { const p = resolve(outdir, f.replace(/\?.*$/, "")); if (!known.has(p)) known.set(p, gz(p)); return known.get(p); };
   const size = (files) => {
     let js = 0, css = 0;
-    for (const f of files) { const n = gz(resolve(outdir, f)); if (/\.css(\?|$)/.test(f)) css += n; else js += n; }
+    for (const f of files) { const n = gzOf(f); if (/\.css(\?|$)/.test(f)) css += n; else js += n; }
     return { js, css };
   };
   // budget.boot: lazy parts the app loads at start-up (shell pieces); a route row then counts only what ITS navigation

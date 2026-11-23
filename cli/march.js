@@ -252,8 +252,10 @@ async function build({ dev = false } = {}) {
       if (flag("--analyze") === true) { console.log("  largest modules in the entry (minified, before gzip):"); for (const t of topInputs(r.metafile, cwd, out, chunks.entryFiles, 40)) console.log(`    ${(t.bytes / 1024).toFixed(1).padStart(6)} KB  ${t.file}`); }
       if (small.length) {
         // chunks.allow: { "chunks/x.js": "why it must stay small" } — a reason is required
-        console.error(`[31m✖[0m ${small.length} file(s) under chunks.minSize (${minSize} B): ${small.map((x) => `${x.file} ${x.bytes} B`).join(", ")}`);
-        process.exitCode = 1;
+        // chunks.fail: false — the floor is an aim, not a gate: what is left is listed and the build passes
+        const soft = cfg.chunks?.fail === false;
+        console.error(`${soft ? "[33m![0m" : "[31m✖[0m"} ${small.length} file(s) under chunks.minSize (${minSize} B): ${small.map((x) => `${x.file} ${x.bytes} B`).join(", ")}`);
+        if (!soft) process.exitCode = 1;
       }
       // budget.maxFiles: every file of the output (a host may cap files per deploy)
       const tooMany = filesOver(out, cfg.budget?.maxFiles);

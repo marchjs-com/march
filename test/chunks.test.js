@@ -48,6 +48,18 @@ test("small pages join a group (or the entry); big pages keep their own chunk; n
   } finally { a.done(); }
 });
 
+test("chunks.fail: false — files left under the floor are listed, the build passes (default: it fails)", () => {
+  const pages = { index: "export default () => <p>home</p>\n", big: big("big", 400), other: big("other", 400) };
+  const strict = app({ chunks: { minSize: 1024 * 1024, maxBuilds: 1 } }, pages);
+  const soft = app({ chunks: { minSize: 1024 * 1024, maxBuilds: 1, fail: false } }, pages);
+  try {
+    assert.ok(strict.err, "a file under the floor fails the build");
+    assert.match(String(strict.err.stderr), /under chunks\.minSize/);
+    assert.equal(soft.err, null, String(soft.err?.stderr ?? ""));
+    assert.ok(soft.report.chunks.under > 0, "still listed in the report");
+  } finally { strict.done(); soft.done(); }
+});
+
 test("smallFiles: under the limit is reported; the entry and its CSS are exempt; chunks.allow lets a named file through", () => {
   const dir = mkdtempSync(join(tmpdir(), "march-small-"));
   try {
