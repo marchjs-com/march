@@ -1,8 +1,7 @@
 // Schema field type → input component. `inputFor(field)` picks `field.control` (a component or a registered name) or
 // the component registered for `field.type`. Add your own with `registerInput("iban", IbanInput)`.
 import { TextInput, Textarea, PasswordInput, EmailInput, UrlInput, PhoneInput, NumberInput, IntInput, MoneyInput, PercentInput, Select, Checkbox, Toggle,
-  CheckboxGroup, RadioGroup, Segmented, Slider, ColorInput, CodeInput } from "./inputs.ts";
-import { Combobox, MultiSelect } from "./pickers.ts";
+  CheckboxGroup, RadioGroup, Segmented, Slider, CodeInput } from "./inputs.ts";
 import { lazy, skeleton } from "../dom/lazy.ts";
 import type { FieldSpec } from "../schema/index.ts";
 
@@ -12,7 +11,7 @@ import type { FieldSpec } from "../schema/index.ts";
  */
 export type InputComponent = { bivarianceHack(props: Record<string, unknown>): unknown }["bivarianceHack"];
 
-// the larger inputs (dates, editors, file upload) load the first time a form shows one: a form of text fields does not
+// the larger inputs (dates, editors, file upload, pickers) load the first time a form shows one: a form of text fields does not
 // download them; an input-sized skeleton holds the place meanwhile
 const later = (load: () => Promise<unknown>, pick: string): InputComponent =>
   lazy(load as () => Promise<Record<string, InputComponent>>, { pick, placeholder: () => skeleton("text") }) as unknown as InputComponent;
@@ -20,6 +19,10 @@ const dates = () => import("./date.ts"), editors = () => import("./editors.ts");
 const DatePicker = later(dates, "DatePicker"), TimeInput = later(dates, "TimeInput"), DateTimeInput = later(dates, "DateTimeInput"), DateRangePicker = later(dates, "DateRangePicker");
 const ListEditor = later(editors, "ListEditor"), KeyValueEditor = later(editors, "KeyValueEditor"), JsonEditor = later(editors, "JsonEditor"), MarkdownEditor = later(editors, "MarkdownEditor");
 const FileUpload = later(() => import("./file.ts"), "FileUpload");
+// the pickers (option lists, search) and the color input too: a form of text fields does not download them
+const pickers = () => import("./pickers.ts");
+const Combobox = later(pickers, "Combobox"), MultiSelect = later(pickers, "MultiSelect");
+const ColorInput = later(() => import("../components/forms/color-input/index.ts"), "ColorInput");
 
 export { IntInput };
 

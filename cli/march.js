@@ -321,7 +321,7 @@ async function build({ dev = false } = {}) {
         const b = cfg.base ?? "/";
         writeFileSync(join(out, "_redirects"), b.startsWith("/") ? `${b.replace(/\/?$/, "/")}*  ${b.replace(/\/?$/, "/")}index.html  200\n` : "/*  /404.html  200\n");
       }
-      if (cfg.sw) writeFileSync(join(out, "sw.js"), swSource({ version: buildVersion(r.metafile), precache: ["./", ...chunks.entryFiles] }));
+      if (cfg.sw) writeFileSync(join(out, "sw.js"), swSource({ version: buildVersion(r.metafile), precache: ["./", ...chunks.entryFiles], ...(cfg.cdnData ? { cdn: cfg.cdnData.base, cdnPrecache: cfg.cdnData.core } : {}) }));
       const rep = sizeReport(chunks, out, cfg.budget, routePaths(r.metafile, cwd, Object.keys(chunks.manifest)));
       printReport(rep);
       const small = minSize ? smallFiles(r.metafile, { cwd, minSize, allow, entryKey: chunks.entryKey, boot: cfg.budget?.boot ?? [], plan }) : [];
@@ -409,7 +409,7 @@ async function buildDev({ watch: watching = false } = {}) {
       flush(r.outputFiles ?? []);
       const chunks = chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry });
       writeHtml(cfg, r.metafile, { dev: false }, chunks.manifest, chunks.entryFiles);
-      if (cfg.sw) writeFileSync(join(out, "sw.js"), swSource({ version: buildVersion(r.metafile), precache: ["./", ...chunks.entryFiles] }));
+      if (cfg.sw) writeFileSync(join(out, "sw.js"), swSource({ version: buildVersion(r.metafile), precache: ["./", ...chunks.entryFiles], ...(cfg.cdnData ? { cdn: cfg.cdnData.base, cdnPrecache: cfg.cdnData.core } : {}) }));
       // budgets: a warning (the release build enforces them on the planned chunks; these unplanned ones are only a hint)
       // (watch: only after the first build — gzip of every file would double each rebuild; --budget for every rebuild)
       if (cfg.budget && flag("--no-budget") !== true && (first || flag("--budget") === true)) {
