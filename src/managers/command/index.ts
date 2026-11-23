@@ -18,7 +18,7 @@ import { signal, computed, effect, untrack, getOwner, onCleanup, DEV, type Acces
 import { registerNamespace } from "../../dom/h.ts";
 import { can as canAccess, type PermCheck } from "../../access/index.ts";
 import { registerCommands, type CommandEntry } from "../../ui/registry.ts";
-import { parseKey } from "../../ui/keys.ts";
+import { parseKey } from "../../ui/key-label.ts";
 import { defineManager, emit } from "../manager.ts";
 
 type Text = string | (() => string);

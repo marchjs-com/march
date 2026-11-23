@@ -1,11 +1,12 @@
 // OverflowText / Marquee (march/ui): text that scrolls only when it does not fit. Triggers: hover, focus, always,
 // visible; modes: bounce, loop, once. Direction-aware (dir="auto", RTL scrolls the other way), fade mask at the
 // logical edges, prefers-reduced-motion respected, screen readers read the text once (copies are aria-hidden).
-// Motion is WAAPI on a transform only; no inline style attribute.
+// The scrolling itself (marquee.ts, WAAPI on a transform) is its own chunk, loaded once a text overflows.
 import "./overflow-text.css";
 import { signal, computed, effect, getOwner, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { reducedMotion, frame, animateEl } from "../../../motion/env.ts";
+import { reducedMotion } from "../../../motion/engine/prefs.ts";
+import type { runMarquee } from "./marquee.ts";
 import { val, cx, on, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { isRtl } from "../../../core/util.ts";
 
@@ -61,7 +62,14 @@ const later = (r: () => () => void): void => {
   queueMicrotask(() => { queued = false; const list = [...reads]; reads.clear(); for (const w of list.map((f) => f())) w(); });
 };
 const HOST = "a, button, li, label, summary, [tabindex], [role=option], [role=menuitem], [role=tab]";
-type Anim = { cancel(): void };
+// wiring waits for layout, not for motion: a plain frame (the motion clock pauses with "pause all")
+const frame = (fn: () => void): (() => void) => {
+  const raf = globalThis.requestAnimationFrame;
+  if (raf) { const id = raf(fn); return () => globalThis.cancelAnimationFrame(id); }
+  const t = setTimeout(fn, 16); return () => clearTimeout(t);
+};
+let marquee: Promise<typeof runMarquee> | null = null;
+const loadMarquee = (): Promise<typeof runMarquee> => (marquee ??= import("./marquee.ts").then((m) => m.runMarquee));
 
 /**
  * `<OverflowText text="A very long title…" />` — scrolls on hover/focus only when clipped.
@@ -116,63 +124,27 @@ export function OverflowText(props: OverflowTextProps): Element {
   const engaged = computed(() => (!!val(props.play) || triggers.has("always") || triggers.has("visible") || (triggers.has("hover") && hovered()) || (triggers.has("focus") && focused())) && visible());
   const wanted = computed(() => dist() > 0 && engaged() && !val(props.disabled) && !reducedMotion());
 
-  let anim: Anim | null = null, fadeAnim: Anim | null = null, timer: ReturnType<typeof setTimeout> | null = null, copies: Element[] = [];
+  let halt: (() => void) | null = null, timer: ReturnType<typeof setTimeout> | null = null, run = 0;
   const stop = (): void => {
+    run++;
     if (timer) { clearTimeout(timer); timer = null; }
-    anim?.cancel(); anim = null;
-    fadeAnim?.cancel(); fadeAnim = null;
-    for (const c of copies) c.remove();
-    copies = [];
+    halt?.(); halt = null;
     running.set(false);
   };
   const start = (): void => {
-    const el = track as HTMLElement & { animate?: (k: Keyframe[], o: KeyframeAnimationOptions) => Anim };
-    if (typeof el.animate !== "function") return;
-    const rtl = isRtl(root);
-    const sign = rtl ? 1 : -1;
-    const speed = Math.max(5, props.speed ?? 40), pause = Math.max(0, props.pause ?? 1000);
-    running.set(true);
-    // The fade follows the text: only the side that hides text fades. Before moving only the end fades (the first letter is
-    // whole), while moving both, at the end of a bounce only the start (the last letter is whole). Two registered custom
-    // properties (marquee.css @property) carry the widths; this animation runs on the root with the same timing.
-    const F = "var(--m-marquee-fade, 14px)";
-    const fadeFrames = (stops: Array<[number, boolean, boolean]>): Keyframe[] => stops.map(([offset, s, e]) => ({ offset, "--m-mq-fs": s ? F : "0px", "--m-mq-fe": e ? F : "0px" } as Keyframe));
-    const fade = (frames: Keyframe[], o: KeyframeAnimationOptions): void => {
-      const r = root as HTMLElement & { animate?: (k: Keyframe[], o: KeyframeAnimationOptions) => Anim };
-      if (props.fade !== false && typeof r.animate === "function") { try { fadeAnim = animateEl(r, frames, o); } catch { fadeAnim = null; } }
-    };
-    if (mode === "loop") {
-      const sep = props.separator === false ? null : h("span", { class: "m-marquee-sep", "aria-hidden": "true" }, props.separator ?? "•");
-      const copy = item.cloneNode(true) as HTMLElement;
-      copy.setAttribute("aria-hidden", "true");
-      copy.setAttribute("inert", "");
-      copies = sep ? [sep, copy] : [copy];
-      track.append(...copies);
-      const span = copy.getBoundingClientRect().left - item.getBoundingClientRect().left;
-      const travel = (Math.abs(span) / speed) * 1000, total = travel + pause;
-      anim = animateEl(el, [
-        { transform: "translateX(0)", offset: 0 },
-        { transform: "translateX(0)", offset: pause / total },
-        { transform: `translateX(${sign * Math.abs(span)}px)`, offset: 1 },
-      ], { duration: total, iterations: Infinity, easing: "linear" });
-      const p = pause / total, e = Math.min(0.03, (1 - p) / 4);
-      fade(fadeFrames([[0, false, true], [p, false, true], [Math.min(1, p + e), true, true], [1, true, true]]), { duration: total, iterations: Infinity });
-      return;
-    }
-    const d = dist.peek(), travel = (d / speed) * 1000, total = 2 * travel + 2 * pause;
-    const end = `translateX(${sign * d}px)`, ease = props.easing ?? "ease-in-out";
-    anim = animateEl(el, [
-      { transform: "translateX(0)", offset: 0 },
-      { transform: "translateX(0)", offset: pause / total, easing: ease },
-      { transform: end, offset: (pause + travel) / total },
-      { transform: end, offset: (2 * pause + travel) / total, easing: ease },
-      { transform: "translateX(0)", offset: 1 },
-    ], { duration: total, iterations: mode === "once" ? 1 : Infinity, fill: "none" });
-    const a = pause / total, b = (pause + travel) / total, c = (2 * pause + travel) / total, e = Math.min(0.03, travel / total / 4);
-    fade(fadeFrames([[0, false, true], [a, false, true], [a + e, true, true], [b - e, true, true], [b, true, false], [c, true, false], [c + e, true, true], [1 - e, true, true], [1, false, true]]),
-      { duration: total, iterations: mode === "once" ? 1 : Infinity, fill: "none" });
-    if (mode === "once" && anim) (anim as Anim & { onfinish?: () => void }).onfinish = () => { anim = null; running.set(false); };
+    if (typeof track.animate !== "function") return;
+    const mine = run;
+    void loadMarquee().then((play) => {
+      if (mine !== run) return; // stopped while the chunk loaded
+      running.set(true);
+      halt = play({
+        root, track, item, mode, rtl: isRtl(root), dist: dist.peek(), speed: props.speed, pause: props.pause, easing: props.easing,
+        separator: props.separator, fade: props.fade, done: () => { halt = null; running.set(false); },
+      });
+    }, () => {});
   };
+  // the moving part is fetched as soon as the text overflows (and may move), so a hover does not wait for it
+  effect(() => { if (dist() > 0 && !val(props.disabled) && !reducedMotion()) void loadMarquee().catch(() => {}); });
 
   effect(() => {
     const go = wanted();

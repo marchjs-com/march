@@ -11,7 +11,7 @@ import {
   todayIso, addDays, addMonths, diffDays, startOfWeek, daysFrom, monthGrid, firstDayOf, dateFormat, utcDate, formatMinutes, weekdayNames,
   splitDateTime, joinDateTime, snapMinutes, isWeekend, localeDir, type IsoDate,
 } from "../../../core/date.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { pointerDrag } from "../../../behaviors/drag/index.ts";
 import { announce } from "../../../managers/announcer/index.ts";
 import { Button } from "../../actions/button/index.ts";
@@ -191,7 +191,7 @@ export function Scheduler(props: SchedulerProps): Element {
   const slide = (dirn: number): void => {
     if (!body || !motion) return;
     const x = dirn * (rtl() ? -1 : 1) * 28;
-    void animate(body, [{ opacity: 0, transform: `translateX(${x}px)` }, { opacity: 1, transform: "none" }], { duration: 260, easing: "easeOutCubic" });
+    void play(body, [{ opacity: 0, transform: `translateX(${x}px)` }, { opacity: 1, transform: "none" }], { duration: 260, easing: "easeOutCubic" });
   };
   const go = (d: IsoDate, dirn = 0): void => { cur.set(d); props.onDate?.(d); if (dirn) slide(dirn); announce(untrack(title)); };
   const shift = (n: number): void => {
@@ -204,7 +204,7 @@ export function Scheduler(props: SchedulerProps): Element {
     view.set(v);
     props.onView?.(v);
     announce(untrack(title));
-    if (body && motion) void animate(body, [{ opacity: 0, transform: "scale(.985)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "easeOutCubic" });
+    if (body && motion) void play(body, [{ opacity: 0, transform: "scale(.985)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "easeOutCubic" });
   };
 
   // ------------------------------------------------------------------ changing events
@@ -213,7 +213,7 @@ export function Scheduler(props: SchedulerProps): Element {
     events.set(untrack(events).map((x) => (x.id === ev.id ? upd : x)));
     props.onChange?.(upd, next);
     if (say) { const m = untrack(norm).find((x) => x.ev.id === ev.id); if (m) status.set(lb("moved")(ev.title, dayText(m.sd), timeText(m))); }
-    later(() => { const el = [...(body?.querySelectorAll<HTMLElement>("[data-ev]") ?? [])].find((x) => x.dataset["ev"] === ev.id); if (el) { el.focus({ preventScroll: true }); if (motion) void animate(el, [{ transform: "scale(1.04)" }, { transform: "none" }], { duration: 320, easing: "easeOutBack" }); } }, 0);
+    later(() => { const el = [...(body?.querySelectorAll<HTMLElement>("[data-ev]") ?? [])].find((x) => x.dataset["ev"] === ev.id); if (el) { el.focus({ preventScroll: true }); if (motion) void play(el, [{ transform: "scale(1.04)" }, { transform: "none" }], { duration: 320, easing: "easeOutBack" }); } }, 0);
   };
   const moveBy = (n: Norm, dDays: number, dMin: number, which: "move" | "start" | "end"): SchedulerRange => {
     if (n.allDay) {
@@ -470,7 +470,7 @@ export function Scheduler(props: SchedulerProps): Element {
       onMove: (p) => { const m = clamp(m0 + snapMinutes((p.dy / H) * 60, st), 0, 1440); a = Math.min(m0, m); b = Math.max(m0 + st, m); draw(); },
       onEnd: (_p, cancelled) => {
         if (cancelled) { draft.remove(); return; }
-        if (motion) void animate(draft, [{ opacity: 1 }, { opacity: 0 }], { duration: 180 }).finished.then(() => draft.remove()); else draft.remove();
+        if (motion) void play(draft, [{ opacity: 1 }, { opacity: 0 }], { duration: 180 }).finished.then(() => draft.remove()); else draft.remove();
         props.onCreate?.({ start: joinDateTime(d, a), end: joinDateTime(d, b), allDay: false });
       },
       onClick: () => props.onCreate?.({ start: joinDateTime(d, m0), end: joinDateTime(d, m0 + 60), allDay: false }),

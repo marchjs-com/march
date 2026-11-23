@@ -7,7 +7,7 @@ import { Portal, type PortalProps } from "../../../dom/portal.ts";
 import { t } from "../../../core/i18n.ts";
 import { frame, type DialogProps, type DialogOptions } from "../../../ui/dialog.ts";
 import { val, cx, clamp, type MaybeFn } from "../../../ui/util.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { setStyle } from "../../../motion/env.ts";
 import { isRtl, type Handler } from "../../../core/util.ts";
 import { swipeable, rubberBand, fling, nearest, type SwipePoint } from "../../../behaviors/swipe/index.ts";
@@ -165,7 +165,7 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
     if (duration <= 0) { run = null; reveal(o); touchPolicy(); return Promise.resolve(); }
     // growing: the body takes the room at once (it slides in filled); shrinking: once the sheet has settled
     if (o <= from) reveal(o);
-    const r = animate(panel, [{ transform: tr(from) }, { transform: tr(o) }], { duration, easing: ease, fill: "none" });
+    const r = play(panel, [{ transform: tr(from) }, { transform: tr(o) }], { duration, easing: ease, fill: "none" });
     run = r;
     touchPolicy();
     if (o > from) void r.finished.then(() => { if (run === r) reveal(o); });
@@ -243,7 +243,7 @@ function sheet(props: DrawerProps, register: (c: Controls) => void): unknown {
   register({
     exit(done) {
       fade?.cancel();
-      if (modal && exitMs > 0) fade = animate(root, [{ opacity: 1 }, { opacity: 0 }], { duration: exitMs, fill: "forwards" });
+      if (modal && exitMs > 0) fade = play(root, [{ opacity: 1 }, { opacity: 0 }], { duration: exitMs, fill: "forwards" });
       if (!size) size = measure();
       void to(size, exitMs).then(done);
     },

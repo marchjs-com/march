@@ -20,7 +20,7 @@ import { createHistory } from "./history.ts";
 import { TextInput } from "../../forms/text-input/index.ts";
 import { virtualAnchor } from "../../../ui/popover.ts";
 import { Popover } from "../../overlays/popover/index.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { measure } from "../../../motion/engine/clock.ts";
 import { EditorFrame } from "../editor-frame/index.ts";
 import { OptionList } from "../../forms/option-list/index.ts";
@@ -574,7 +574,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
   // a new flash mark glows once (motion engine: reduced motion and global speed apply)
   effect(() => {
     get(); marks();
-    queueMicrotask(() => { for (const g of code.querySelectorAll?.(".m-ced-glow") ?? []) if (!g.hasAttribute("data-on")) { g.setAttribute("data-on", ""); animate(g, { opacity: [1, 0] }, { duration: 1100, easing: "easeOutCubic" }); } });
+    queueMicrotask(() => { for (const g of code.querySelectorAll?.(".m-ced-glow") ?? []) if (!g.hasAttribute("data-on")) { g.setAttribute("data-on", ""); play(g, { opacity: [1, 0] }, { duration: 1100, easing: "easeOutCubic" }); } });
   });
 
   // ---- suggestions
@@ -1022,7 +1022,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
     queueMicrotask(() => {
       const f = mode === "line" ? lineField : findField; f?.focus(); f?.select?.();
       // the bar comes in softly (motion engine: reduced motion and the global speed apply)
-      if (!was && bar) animate(bar, { opacity: [0, 1] }, { duration: 140, easing: "easeOutCubic" });
+      if (!was && bar) play(bar, { opacity: [0, 1] }, { duration: 140, easing: "easeOutCubic" });
     });
   };
   const closeFind = (): void => { fs.mode.set(null); current.set(-1); input.focus({ preventScroll: true }); };

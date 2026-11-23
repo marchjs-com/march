@@ -5,7 +5,7 @@ import { h } from "../../../dom/h.ts";
 import { roving } from "../../../ui/focus.ts";
 import { icon, setStyle } from "../../../ui/util.ts";
 import { observeSize } from "../../../ui/observe.ts";
-import { slidingIndicator } from "../../../motion/engine/parts.ts";
+import { slidingIndicator } from "../../../motion/engine/indicator.ts";
 import { model, ctl, cx, normOptions, same, labelledBy, useField, type ControlProps, type OptionsProp } from "../../../forms/util.ts";
 import { colorAttr } from "../../../theme/colors.ts";
 import type { IconProp } from "../../../icons/types.ts";

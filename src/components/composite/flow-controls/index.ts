@@ -20,7 +20,7 @@ import { ListRow } from "../../data/list-row/index.ts";
 import { TimeRuler, timePercent, type TimeTick } from "../../data/time-ruler/index.ts";
 import { Empty } from "../../feedback/empty/index.ts";
 import { Toolbar } from "../../layout/stack/index.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play as playFx } from "../../../motion/play.ts";
 import { still as stillOf } from "../../../motion/engine/parts.ts";
 import { play } from "../../../icons/glyphs/play.ts";
 import { pause } from "../../../icons/glyphs/pause.ts";
@@ -152,12 +152,12 @@ export function FlowTimeline(props: FlowTimelineProps): Element {
           class: "m-flowtl-bar", ref: (x: HTMLElement) => { bar = x; },
           style: () => ({ "inset-inline-start": pct(e().start), "inline-size": `max(4px, calc(${pct(end())} - ${pct(e().start)}))` }),
         })) ) as HTMLElement;
-    if (!still()) animate(el, [{ opacity: 0, transform: "translateY(4px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "out" });
+    if (!still()) playFx(el, [{ opacity: 0, transform: "translateY(4px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "out" });
     // a soft breathing bar while the node runs
     let breath: { cancel(): void } | null = null;
     effect(() => {
       const running = e().status === "running";
-      untrack(() => { breath?.cancel(); breath = running && !still() ? animate(bar, [{ opacity: 1 }, { opacity: 0.55 }, { opacity: 1 }], { duration: 900, iterations: Infinity }) : null; });
+      untrack(() => { breath?.cancel(); breath = running && !still() ? playFx(bar, [{ opacity: 1 }, { opacity: 0.55 }, { opacity: 1 }], { duration: 900, iterations: Infinity }) : null; });
     });
     onCleanup(() => breath?.cancel());
     return el;

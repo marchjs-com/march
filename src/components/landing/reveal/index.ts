@@ -6,9 +6,8 @@ import "./reveal.css";
 import { h } from "../../../dom/h.ts";
 import { cx, val, onVisible, isRtl as rtl, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { owned } from "../../../ui/observe.ts";
-import { animate, stagger as staggerFn } from "../../../motion/engine/playback.ts";
+import { play } from "../../../motion/play.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
-import { scrollTimeline } from "../../../motion/scroll-fx.ts";
 
 export type RevealEffect = "fade" | "up" | "down" | "start" | "end" | "scale" | "blur" | "flip";
 
@@ -85,7 +84,12 @@ export function revealOnScroll(el: Element, raw?: unknown): () => void {
     const { from, to } = framesOf();
     const frames: Record<string, unknown[]> = {};
     for (const k of Object.keys(from)) frames[k] = [from[k], to[k]];
-    return scrollTimeline(list, frames as never, { track: el, range: [0, 0.45], easing: "out", stagger: o.self ? 0 : 60 });
+    // the scroll timeline (motion engine) comes in its own chunk, only for a scrubbed reveal
+    let stop: (() => void) | null = null, gone = false;
+    void import("../../../motion/scroll-fx.ts").then(({ scrollTimeline }) => {
+      if (!gone) stop = scrollTimeline(list, frames as never, { track: el, range: [0, 0.45], easing: "out", stagger: o.self ? 0 : 60 });
+    }, () => {});
+    return () => { gone = true; stop?.(); };
   }
   el.classList.add("is-pending");
   // descendants picked by a selector are hidden by their own class until the reveal
@@ -96,7 +100,8 @@ export function revealOnScroll(el: Element, raw?: unknown): () => void {
     if (!reducedMotion() && list.length) {
       const frames: Record<string, unknown[]> = {};
       for (const k of Object.keys(from)) frames[k] = [from[k], to[k]];
-      animate(list, frames as never, { duration: o.duration ?? 720, delay: o.delay ?? 0, easing: (o.easing ?? "expo") as never, fill: "backwards", stagger: o.self ? 0 : staggerFn(o.stagger ?? 70) });
+      const each = o.self ? 0 : o.stagger ?? 70;
+      list.forEach((t, i) => play(t, frames as never, { duration: o.duration ?? 720, delay: (o.delay ?? 0) + i * each, easing: o.easing ?? "expo", fill: "backwards" }));
     }
     el.classList.remove("is-pending");
     el.classList.add("is-revealed");

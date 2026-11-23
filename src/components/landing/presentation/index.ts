@@ -23,7 +23,8 @@ import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { monitor } from "../../../icons/glyphs/monitor.ts";
 import { maximize } from "../../../icons/glyphs/maximize.ts";
 import { animate } from "../../../motion/engine/playback.ts";
-import { still, swapTransition } from "../../../motion/engine/parts.ts";
+import { still } from "../../../motion/engine/parts.ts";
+import { swapTransition } from "../../../motion/engine/swap.ts";
 import { swipe } from "../../../motion/gestures.ts";
 
 messages("tr", { "Slides": "Slaytlar" });

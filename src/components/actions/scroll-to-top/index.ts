@@ -16,7 +16,7 @@ import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { ownIcon } from "../../../ui/parts.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import { arrowUp } from "../../../icons/glyphs/arrowUp.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { reducedMotion } from "../../../motion/env.ts";
 import { motionPreset } from "../../../motion/engine/parts.ts";
 import { addBottomRightControl } from "../../layout/bottom-right-controls/index.ts";
@@ -100,7 +100,7 @@ export function ScrollToTop(props: ScrollToTopProps = {}): Node {
     if (typeof motion === "function") { motion(btn, on); return; }
     if (motion === "none" || motion === false) return; // the stylesheet shows and hides it at once
     const [off, SHOWN] = motionPreset(motion, FROM[motion]);
-    animate(btn, on ? [off, SHOWN] : [SHOWN, off], { duration: on ? 260 : 180, easing: on ? "easeOutBack" : "easeInCubic", fill: "forwards" });
+    play(btn, on ? [off, SHOWN] : [SHOWN, off], { duration: on ? 260 : 180, easing: on ? "easeOutBack" : "easeInCubic", fill: "forwards" });
   });
   read();
 

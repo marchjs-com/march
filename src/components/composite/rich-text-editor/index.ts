@@ -12,7 +12,7 @@ import { t, messages, dir } from "../../../core/i18n.ts";
 import { cx, uid, on, val, type ClassProp } from "../../../core/util.ts";
 import { fold } from "../../../core/text.ts";
 import { glyph } from "../../../ui/util.ts";
-import { isMod, undoKeys } from "../../../ui/keys.ts";
+import { isMod, undoKeys } from "../../../ui/key-label.ts";
 import { model, ctl, live, type ControlProps } from "../../../forms/util.ts";
 import { Field } from "../../../forms/field.ts";
 import { UrlInput } from "../../forms/text-input/index.ts";

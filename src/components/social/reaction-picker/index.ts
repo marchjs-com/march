@@ -6,7 +6,7 @@ import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { roving } from "../../../ui/focus.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { moveCursor } from "../../../behaviors/list-nav/index.ts";
@@ -79,8 +79,8 @@ export function ReactionPicker(props: ReactionPickerProps): Element {
   }) as HTMLElement;
   if (props.pop !== false) queueMicrotask(() => {
     if (!root.isConnected) return;
-    animate(root, [{ transform: "scale(.94)", opacity: 0 }, { transform: "scale(1)", opacity: 1 }], { duration: 160, easing: "easeOutBack" });
-    items().slice(0, 12).forEach((b, i) => animate(b, [{ transform: "translateY(6px) scale(.6)", opacity: 0 }, { transform: "translateY(0) scale(1)", opacity: 1 }], { duration: 220, delay: 30 + i * 22, easing: "easeOutBack", fill: "backwards" }));
+    play(root, [{ transform: "scale(.94)", opacity: 0 }, { transform: "scale(1)", opacity: 1 }], { duration: 160, easing: "easeOutBack" });
+    items().slice(0, 12).forEach((b, i) => play(b, [{ transform: "translateY(6px) scale(.6)", opacity: 0 }, { transform: "translateY(0) scale(1)", opacity: 1 }], { duration: 220, delay: 30 + i * 22, easing: "easeOutBack", fill: "backwards" }));
   });
   return root;
 }

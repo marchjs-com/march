@@ -13,7 +13,9 @@ const { formatDuration, formatSeconds, formatCount, errorText, hashString, snap 
 const { isMod, labelWithKey, undoKeys } = await import("../src/ui/keys.ts");
 const { owned, observeSize, whenVisible, stickToBottom, scrollIntoArea } = await import("../src/ui/observe.ts");
 const { observeWidth } = await import("../src/ui/fit.ts");
-const { still, motionPreset, slidingIndicator, swapFrames, swapTransition } = await import("../src/motion/engine/parts.ts");
+const { still, motionPreset, swapFrames } = await import("../src/motion/engine/parts.ts");
+const { slidingIndicator } = await import("../src/motion/engine/indicator.ts");
+const { swapTransition } = await import("../src/motion/engine/swap.ts");
 const { setReducedOverride } = await import("../src/motion/engine/prefs.ts");
 const { dragGhost } = await import("../src/behaviors/drag/ghost.ts");
 const { BRAND_COLORS, BRAND_COLORS_ALL, colorList, COLOR_TOKENS } = await import("../src/theme/colors.ts");
@@ -336,18 +338,24 @@ test("slidingIndicator: glides from the old place (stretching from the old size)
   const a = box(div(), { left: 10, top: 0, width: 60, height: 32 }), b = box(div(), { left: 200, top: 0, width: 120, height: 32 });
   const pill = div();
   document.body.append(list, pill);
+  // the glide is a native animation (motion/play.ts): record what is handed to WAAPI
+  const played = [];
+  pill.animate = (frames, opts) => { played.push({ frames, opts }); return { finished: Promise.resolve(), cancel() {}, finish() {}, addEventListener() {}, playbackRate: 1, effect: { getTiming: () => ({ iterations: 1 }) } }; };
   const ind = slidingIndicator(pill, list, { duration: 1 });
   ind.moveTo(a);
   await new Promise((r) => setTimeout(r, 40));
+  played.length = 0;
   ind.moveTo(b);
-  // the test DOM has no WAAPI: the engine writes the frames to the style, so the first frame is visible here
-  assert.equal(pill.style.getPropertyValue("transform"), "translateX(10px) scaleX(0.5)", "starts at the old place, at the old size");
+  assert.equal(played.length, 1);
+  assert.deepEqual(played[0].frames.transform, ["translateX(10px) scaleX(0.5000)", "translateX(200px) scaleX(1)"], "from the old place at the old size to the new place");
+  assert.equal(played[0].opts.duration, 1);
   assert.equal(pill.style.getPropertyValue("width"), "120px", "the final size is set at once");
-  await new Promise((r) => setTimeout(r, 60));
-  assert.equal(pill.style.getPropertyValue("transform"), "translateX(200px) scaleX(1)", "ends at the new place");
+  assert.equal(pill.style.getPropertyValue("transform"), "translateX(200px)", "the end place is written under the animation");
   ind.reset();
+  played.length = 0;
   ind.moveTo(a, true);
   assert.equal(pill.style.getPropertyValue("transform"), "translateX(10px)", "instant: placed, nothing plays");
+  assert.equal(played.length, 0);
 });
 
 test("swapFrames: direction and distance; swapTransition: none / reduced / own function / own frames", async () => {

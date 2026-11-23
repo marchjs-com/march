@@ -1,7 +1,7 @@
 // Kbd (march/ui). Folder: src/components/typography/kbd/.
 import "./kbd.css";
 import { h } from "../../../dom/h.ts";
-import { formatKey } from "../../../ui/keys.ts";
+import { formatKey } from "../../../ui/key-label.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 
 export interface KbdProps {

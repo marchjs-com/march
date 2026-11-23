@@ -9,7 +9,7 @@ import { signal, effect, untrack } from "../../../core/reactive.ts";
 import { cx, val, type ClassProp } from "../../../ui/util.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { owned, observeSize } from "../../../ui/observe.ts";
-import { swapTransition } from "../../../motion/engine/parts.ts";
+import { swapTransition } from "../../../motion/engine/swap.ts";
 import { PageDots } from "../../navigation/page-dots/index.ts";
 import { onScrollProgress } from "../../../motion/scroll-fx.ts";
 import type { Handler } from "../../../core/util.ts";

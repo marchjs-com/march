@@ -9,7 +9,7 @@ import { val, cx, glyph, type MaybeFn, type ClassProp } from "../../../ui/util.t
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { check } from "../../../icons/glyphs/check.ts";
 import { clock } from "../../../icons/glyphs/clock.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { Button } from "../../actions/button/index.ts";
 import { heartBurst } from "../../../motion/burst.ts";
@@ -58,8 +58,8 @@ export function FollowButton(props: FollowButtonProps): Element {
     queueMicrotask(() => {
       const w1 = btn.offsetWidth;
       if (val(props.morph) !== false) {
-        if (w0 && w1 && w0 !== w1 && !val(props.block)) animate(btn, [{ width: `${w0}px` }, { width: `${w1}px` }], { duration: 380, easing: "easeOutBack" });
-        if (ico) animate(ico, [{ transform: "rotate(-90deg) scale(.4)", opacity: 0 }, { transform: "rotate(0deg) scale(1)", opacity: 1 }], { duration: 320, easing: "easeOutBack" });
+        if (w0 && w1 && w0 !== w1 && !val(props.block)) play(btn, [{ width: `${w0}px` }, { width: `${w1}px` }], { duration: 380, easing: "easeOutBack" });
+        if (ico) play(ico, [{ transform: "rotate(-90deg) scale(.4)", opacity: 0 }, { transform: "rotate(0deg) scale(1)", opacity: 1 }], { duration: 320, easing: "easeOutBack" });
       }
       if (next === "following" && val(props.burst) !== false) heartBurst(btn, { count: 8, radius: Math.max(28, w1 * 0.55), ring: false });
     });

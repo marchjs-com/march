@@ -12,11 +12,11 @@ import { Menu, Tooltip, type MenuItem } from "../../../ui/menu.ts";
 import { Button } from "../button/index.ts";
 import { IconButton } from "../icon-button/index.ts";
 import { Divider } from "../../layout/stack/index.ts";
-import { labelWithKey } from "../../../ui/keys.ts";
+import { labelWithKey } from "../../../ui/key-label.ts";
 import { rovingFocus } from "../../../behaviors/roving-focus/index.ts";
 import { overflowFit } from "../../../ui/fit.ts";
 import { commandBinding, type CommandBinding } from "../../../managers/command/ui.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { still, motionPreset } from "../../../motion/engine/parts.ts";
 import { more } from "../../../icons/glyphs/more.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
@@ -91,7 +91,7 @@ export function OverflowToolbar(props: OverflowToolbarProps): Element {
         const el = v && before[i] === false ? row?.children[i] : null;
         if (!el) return;
         if (typeof enter === "function") enter(el);
-        else animate(el, motionPreset(enter === "fade" ? "fade" : "pop"), { duration: 180, easing: "easeOutCubic" });
+        else play(el, motionPreset(enter === "fade" ? "fade" : "pop"), { duration: 180, easing: "easeOutCubic" });
       }));
     },
   });

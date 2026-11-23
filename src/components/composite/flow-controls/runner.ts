@@ -5,7 +5,7 @@
 // Order: sources first; a node runs once every incoming edge has delivered (a value, or "skipped" from a branch that
 // did not fire). A node whose inputs were all skipped is skipped; a failing node skips what follows it.
 import { signal, batch, type Accessor, type Signal } from "../../../core/reactive.ts";
-import { onFrame } from "../../../motion/engine/index.ts";
+import { onFrame } from "../../../motion/engine/clock.ts";
 import { now } from "../../../motion/env.ts";
 import { val } from "../../../core/util.ts";
 import { endOf, emitted, type FlowStore, type NodeStatus } from "../flow-canvas/model.ts";
