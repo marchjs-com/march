@@ -9,5 +9,4 @@ export default defineMeta({
   category: "navigation",
   composedOf: ["Badge", "StatusDot"],
   behaviors: ["roving focus"],
-  showcase: "/navigation",
 });

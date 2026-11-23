@@ -9,6 +9,4 @@ export default defineMeta({
   summary: "Plans with a monthly / yearly switch: prices roll like an odometer, the switch thumb slides, the featured plan glows.",
   composedOf: ["Card", "Badge", "Segmented", "Counter", "CheckMark", "Reveal"],
   behaviors: ["motion engine"],
-  showcase: "/web",
-  demoGroup: "sell",
 });

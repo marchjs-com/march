@@ -9,5 +9,4 @@ export default defineMeta({
   summary: "Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview.",
   composedOf: ["Menu", "Textarea", "ReactionPicker", "IconButton", "StatusDot", "ReplyQuote"],
   behaviors: ["motion engine"],
-  showcase: "/social",
 });

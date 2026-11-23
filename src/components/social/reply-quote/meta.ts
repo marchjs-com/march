@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["ClampText", "IconButton"],
   behaviors: [],
   hubs: [],
-  showcase: "/social",
 });

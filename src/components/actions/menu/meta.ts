@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Button", "IconButton", "Popover", "ListRow", "CheckMark", "Kbd", "Divider"],
   behaviors: ["positioning", "roving focus", "action"],
   hubs: [],
-  showcase: "/buttons",
 });

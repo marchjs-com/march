@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["JsonView", "Window", "Progress", "Spinner"],
   behaviors: ["history (localStorage)", "tab completion", "lazy (JSON output)", "stickToBottom"],
   hubs: [],
-  showcase: "/editors",
 });

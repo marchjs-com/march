@@ -10,6 +10,5 @@ export default defineMeta({
   composedOf: ["SearchBox", "Button", "Chip", "Menu", "Checkbox", "Chevron", "Badge", "ResizeHandle", "Empty", "LiveStatus", "FilterControl", "CellEditor"],
   behaviors: ["virtual", "selection", "group", "drag", "resize-handle"],
   hubs: [],
-  showcase: "/big-data",
   barrel: false,
 });

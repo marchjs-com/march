@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["SearchBox", "OverflowText", "ListRow", "IconTile", "SectionLabel", "Empty"],
   behaviors: ["motion engine", "drag", "drag layer", "fold search"],
   hubs: ["h"],
-  showcase: "/flow",
 });

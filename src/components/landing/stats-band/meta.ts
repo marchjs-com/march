@@ -8,6 +8,4 @@ export default defineMeta({
   since: "0.1.0",
   summary: "Row of big numbers that count up (or roll) when visible, with labels and notes; plain, divided or cards.",
   composedOf: ["Counter", "Reveal", "StatTile"],
-  showcase: "/web",
-  demoGroup: "hero",
 });

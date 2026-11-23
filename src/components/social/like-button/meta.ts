@@ -9,5 +9,4 @@ export default defineMeta({
   summary: "Heart toggle: spring pop, ring and a four-color HADİ particle burst on the motion engine; rolling count; heartBurst() for any element.",
   composedOf: ["CountRoll", "Button"],
   behaviors: ["motion engine"],
-  showcase: "/social",
 });

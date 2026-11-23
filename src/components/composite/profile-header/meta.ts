@@ -9,5 +9,4 @@ export default defineMeta({
   summary: "Profile top: cover (photo or four-color art) with a dim, StoryRing avatar, name / verified / handle / bio, stats with rolling counts, FollowButton, Message and ⋯ Menu.",
   composedOf: ["Card", "StoryRing", "FollowButton", "CountRoll", "Button", "Menu", "Picture", "StatTile", "VerifiedMark"],
   behaviors: ["motion engine"],
-  showcase: "/social",
 });

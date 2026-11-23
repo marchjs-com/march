@@ -10,6 +10,5 @@ export default defineMeta({
   composedOf: ["ColorPicker", "EasingCurveEditor", "Tabs", "Segmented", "Slider", "Select", "FontPicker", "TextInput", "Textarea", "Toggle", "Field", "Button", "UndoRedo", "CopyButton", "Badge", "PanelHeader", "SectionLabel", "ListRow", "Swatch", "Stack", "ThemeSwatch", "CodeView", "Alert", "Card", "Checkbox", "Chip", "Progress", "Avatar"],
   behaviors: [],
   hubs: [],
-  showcase: "/themes",
   barrel: false,
 });

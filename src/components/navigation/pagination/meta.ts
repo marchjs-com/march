@@ -9,5 +9,4 @@ export default defineMeta({
   category: "navigation",
   composedOf: ["Button", "IconButton", "Select"],
   behaviors: [],
-  showcase: "/navigation",
 });

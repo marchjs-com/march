@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["IconButton", "Segmented", "Badge", "SectionLabel", "Slider", "Swatch", "TextInput"],
   behaviors: ["drag", "motion engine color parser", "theme contrast"],
   hubs: [],
-  showcase: "/editors",
 });

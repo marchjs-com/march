@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["StatusDot"],
   behaviors: [],
   hubs: [],
-  showcase: "/data",
 });

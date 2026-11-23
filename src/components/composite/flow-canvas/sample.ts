@@ -1,5 +1,5 @@
-// Sample node types and an order flow for the demos (HADİ store). Not part of the library API: the showcase and the
-// component demos import it from here.
+// Sample node types and an order flow (HADİ store) for the flow components' tests. Not part of the library API (the
+// site has its own copy for its demos).
 import { emit, FLOW_SCHEMA, type FlowDoc, type FlowNodeType } from "./model.ts";
 import { zap } from "../../../icons/glyphs/zap.ts";
 import { globe } from "../../../icons/glyphs/globe.ts";

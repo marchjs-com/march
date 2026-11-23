@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["ListRow", "SearchBox", "PanelHeader", "SectionLabel", "IconButton", "Button", "Badge", "Chevron", "Empty", "ResizeHandle", "Drawer"],
   behaviors: ["roving keys (ui/focus)", "scrollIntoArea"],
   hubs: [],
-  showcase: "/navigation",
 });

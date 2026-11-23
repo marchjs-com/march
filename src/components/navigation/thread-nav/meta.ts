@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["SearchBox"],
   behaviors: [],
   hubs: [],
-  showcase: "/navigation",
 });

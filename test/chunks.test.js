@@ -178,7 +178,7 @@ test("min-chunks: a group taken apart twice is not planned again (the passes set
 
 test("tagLoaders tags bare loaders only: () => import(x).then(…) stays a function returning a promise", () => {
   const root = fileURLToPath(new URL("..", import.meta.url));
-  const file = join(root, "src/components/actions/chip/demo.tsx");
+  const file = join(root, "src/components/actions/chip/meta.ts");
   assert.equal(tagLoaders(`f(() => import("./index.ts"))`, file, root), `f(Object.assign(() => import("./index.ts"), { m: "src/components/actions/chip/index.ts" }))`);
   const chained = `lazy(() => import("./index.ts").then((m) => ({ default: m.Chip })))`;
   assert.equal(tagLoaders(chained, file, root), chained);

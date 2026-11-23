@@ -9,6 +9,4 @@ export default defineMeta({
   summary: "Website top bar: sticky, transparent-to-glass or floating pill, shrinks and hides on scroll, sliding link pill, Drawer menu on phones.",
   composedOf: ["Brand", "IconButton", "openDrawer"],
   behaviors: ["hide-on-scroll", "onScrollProgress", "motion engine"],
-  showcase: "/web",
-  demoGroup: "frame",
 });

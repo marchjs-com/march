@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Tabs", "IconButton", "Button", "ResizeHandle", "Menu", "OverflowText"],
   behaviors: ["drag (dragGhost)", "command manager", "storage (get / set)"],
   hubs: [],
-  showcase: "/ide",
 });

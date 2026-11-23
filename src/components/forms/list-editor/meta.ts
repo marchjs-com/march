@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["TextInput", "RowTools", "Button"],
   behaviors: [],
   hubs: [],
-  showcase: "/forms",
 });

@@ -11,5 +11,4 @@ export default defineMeta({
   composedOf: ["Menu"],
   behaviors: ["positioning", "roving focus"],
   hubs: [],
-  showcase: "/flow",
 });

@@ -9,6 +9,4 @@ export default defineMeta({
   summary: "Animated number: counts up when visible, glides to new values, or rolls each digit like an odometer; Intl formatted.",
   composedOf: ["CountRoll"],
   behaviors: ["motion engine", "onVisible", "Intl.NumberFormat"],
-  showcase: "/web",
-  demoGroup: "hero",
 });

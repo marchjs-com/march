@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Combobox"],
   behaviors: [],
   hubs: [],
-  showcase: "/forms",
 });

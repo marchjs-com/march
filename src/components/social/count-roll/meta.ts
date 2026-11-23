@@ -9,5 +9,4 @@ export default defineMeta({
   summary: "Odometer number: only the changed digits roll (up when it grows, down when it shrinks), compact in the active locale.",
   composedOf: [],
   behaviors: ["motion engine", "pipes (number, compact)"],
-  showcase: "/social",
 });

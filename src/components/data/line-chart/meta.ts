@@ -11,5 +11,4 @@ export default defineMeta({
   composedOf: [],
   behaviors: ["keyboard points", "zoom"],
   hubs: [],
-  showcase: "/charts",
 });

@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Alert", "Button"],
   behaviors: [],
   hubs: [],
-  showcase: "/feedback",
 });

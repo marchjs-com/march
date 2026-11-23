@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Dialog", "SearchBox", "ListRow", "SectionLabel", "Empty", "Kbd", "OverflowText"],
   behaviors: ["list-nav"],
   hubs: [],
-  showcase: "/overlays",
 });

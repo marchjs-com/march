@@ -10,6 +10,5 @@ export default defineMeta({
   composedOf: ["ListRow", "ResizeHandle", "Badge", "LiveStatus"],
   behaviors: ["date", "pointerDrag"],
   hubs: ["j"],
-  showcase: "/big-data",
   barrel: false,
 });

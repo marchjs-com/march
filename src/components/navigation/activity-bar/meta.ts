@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Tabs", "Badge", "Tooltip"],
   behaviors: ["roving focus", "motion engine"],
   hubs: [],
-  showcase: "/ide",
 });

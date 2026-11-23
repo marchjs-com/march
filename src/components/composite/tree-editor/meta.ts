@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Badge", "IconButton", "Toggle", "TextInput", "SearchBox", "OptionList", "UndoRedo", "Empty", "EditorFrame", "Popover"],
   behaviors: ["UndoManager (undoHistory)", "floating (type menu)", "json-path (pointers, schema subset)"],
   hubs: [],
-  showcase: "/editors",
 });

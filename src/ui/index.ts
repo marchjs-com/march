@@ -51,8 +51,8 @@ export { Brand, AuthLayout, UserMenu, IconTile, LinkCard, Spacer } from "./app.t
 export type { BrandProps, AuthLayoutProps, UserMenuProps, IconTileProps, IconTone, LinkCardProps } from "./app.ts";
 // component folders (src/components/*, barrel written by tools/gen-registry.js)
 export * from "../components/index.ts";
-export { defineMeta, definePlayground } from "../components/meta.ts";
-export type { ComponentMeta, PlaygroundOption, PlaygroundSpec, Stability } from "../components/meta.ts";
+export { defineMeta } from "../components/meta.ts";
+export type { ComponentMeta, Stability } from "../components/meta.ts";
 export { OverflowText, Marquee } from "./marquee.ts";
 export { AvatarGroup } from "./avatar-group.ts";
 export { Progress } from "./progress.ts";

@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Steps", "Button"],
   behaviors: ["motion engine"],
   hubs: ["d"],
-  showcase: "/navigation",
 });

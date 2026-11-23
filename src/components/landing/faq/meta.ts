@@ -9,6 +9,4 @@ export default defineMeta({
   summary: "Questions in an Accordion, centered or split with a sticky heading; optional SearchBox with fuzzy, accent-insensitive ranking.",
   composedOf: ["Accordion", "SearchBox", "Empty", "SectionHead"],
   behaviors: ["fold / rank"],
-  showcase: "/web",
-  demoGroup: "proof",
 });

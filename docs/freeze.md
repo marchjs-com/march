@@ -5,9 +5,9 @@ Bir bileşen, MarchIDE sayfasıyla birlikte uçtan uca doğrulanınca **dondurul
 
 ## Ne dondurulur
 
-Bileşenin klasörü: `src/components/<kategori>/<klasör>/` (kod, CSS, `meta.ts`, `playground.ts`, `demo.tsx`,
-`docs.md`, testler). MarchIDE sayfasının örnekleri (üç örnek + Lab testi) kendi deposundadır
-(marchjs-com/examples) ve burada kaydedilmez.
+Bileşenin klasörü: `src/components/<kategori>/<klasör>/` (kod, CSS, `meta.ts`, `docs.md`, testler).
+MarchIDE sayfasının örnekleri (üç örnek + Lab testi) kendi deposundadır (marchjs-com/examples), kartın demosu ve
+Seçenekler paneli sitenindir (marchjs.com: `src/catalog/`); ikisi de burada kaydedilmez.
 
 Kayıt `docs/freeze.json`'dadır: bileşen adı → `frozen` (tarih), `paths` (yukarıdaki klasör) ve `hash` (dosyaların
 yolları ve metinlerinin SHA-256 özeti; satır sonları LF'ye çevrilerek: Windows'taki CRLF değişiklik sayılmaz).
@@ -39,7 +39,7 @@ node tools/freeze.mjs refresh Button --reason "…"  # onaylanmış küçük dü
 
 1. `node tools/freeze.mjs thaw <Ad> --reason "<istenen özellik>"`: `meta.ts`'teki `frozen` silinir, kayıttan çıkar,
    sebep `docs/freeze.json › log`'a eklenir. Bu değişikliği özellik işiyle aynı commit'e koy.
-2. Özelliği yaz; `ide.json` örneklerini, `playground.ts` seçeneklerini ve testleri güncelle.
+2. Özelliği yaz; testleri, `ide.json` örneklerini ve sitedeki kartın `playground.ts` seçeneklerini güncelle.
 3. MarchIDE'de bileşeni baştan doğrula (yukarıdaki liste), sonra `node tools/freeze.mjs freeze <Ad>` ile yeniden dondur.
 
 Ortak bir değişiklik (ör. bütün bileşenlerde bir CSS belirteci adı) birçok donmuş bileşene dokunursa, onaylandıktan

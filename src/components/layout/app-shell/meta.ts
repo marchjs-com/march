@@ -9,5 +9,4 @@ export default defineMeta({
   category: "layout",
   composedOf: ["Layout"],
   behaviors: [],
-  showcase: "/layout",
 });

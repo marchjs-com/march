@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["CopyButton", "Button", "IconButton", "PanelHeader"],
   behaviors: [],
   hubs: [],
-  showcase: "/data",
 });
