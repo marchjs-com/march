@@ -12,7 +12,7 @@
 //   <Outlet name="aside" />          a named outlet, routed by the URL (?~aside=/users/7) — openOutlet("aside", "/users/7")
 //   navigate("/photos/3", { modal: true }) / <Link modal>   the page opens over the current one (<Outlet name="modal">);
 //                                    back closes it; a direct visit or a reload shows it as a full page
-import { provideLink } from "../dom/link.ts";
+import { provideLink, provideQuery } from "../dom/link.ts";
 import "./router.css";
 import { signal, computed, untrack, batch, onCleanup, read, getOwner, context, provide, useContext } from "../core/reactive.ts";
 import { t } from "../core/i18n.ts";
@@ -677,6 +677,7 @@ export function Link(props: {
 }
 const LINK_OWN = new Set(["href", "exact", "activeClass", "children", "replace", "preload", "prefetch", "modal", "outlet"]);
 provideLink(Link as (props: Record<string, unknown>) => unknown);
+provideQuery({ query, setQuery });
 
 /** Reset router state (tests). */
 export function _resetRouter(): void {

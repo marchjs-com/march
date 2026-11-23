@@ -22,7 +22,7 @@ import { IconButton } from "../../actions/icon-button/index.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 import { ReactionPicker } from "../../social/reaction-picker/index.ts";
 import { ReplyQuote } from "../../social/reply-quote/index.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
 import "./chat-composer.css";
 import { withColor } from "../../../theme/colors.ts";
@@ -120,14 +120,14 @@ export function ChatComposer(props: ChatComposerProps): Element {
   // the round button morphs between mic and send
   effect(() => {
     const m = mode();
-    untrack(() => { if (action && moves()) animate(action, [{ transform: "scale(.6) rotate(-30deg)", opacity: 0.4 }, { transform: "scale(1) rotate(0deg)", opacity: 1 }], { duration: 220, easing: "easeOutBack" }); void m; });
+    untrack(() => { if (action && moves()) play(action, [{ transform: "scale(.6) rotate(-30deg)", opacity: 0.4 }, { transform: "scale(1) rotate(0deg)", opacity: 1 }], { duration: 220, easing: "easeOutBack" }); void m; });
   });
   // live waveform while recording
   effect(() => {
     const on = rec();
     untrack(() => {
       for (const r of runs.splice(0)) r.cancel();
-      if (on && moves()) queueMicrotask(() => [...(bars?.children ?? [])].forEach((b, i) => runs.push(animate(b as HTMLElement, [{ transform: "scaleY(.25)" }, { transform: `scaleY(${0.5 + ((i * 37) % 50) / 100})` }, { transform: "scaleY(.3)" }], { duration: 700 + ((i * 53) % 400), delay: i * 40, iterations: Infinity, direction: "alternate", easing: "easeInOutCubic" }))));
+      if (on && moves()) queueMicrotask(() => [...(bars?.children ?? [])].forEach((b, i) => runs.push(play(b as HTMLElement, [{ transform: "scaleY(.25)" }, { transform: `scaleY(${0.5 + ((i * 37) % 50) / 100})` }, { transform: "scaleY(.3)" }], { duration: 700 + ((i * 53) % 400), delay: i * 40, iterations: Infinity, direction: "alternate", easing: "easeInOutCubic" }))));
     });
   });
   onCleanup(() => { stopClock?.(); for (const r of runs) r.cancel(); });
@@ -154,7 +154,7 @@ export function ChatComposer(props: ChatComposerProps): Element {
       class: "m-compose-reply", name: L().replyingTo?.(r.name) ?? t`Replying to ${r.name}`, text: r.text, lines: 1,
       onClose: props.onCancelReply ? () => props.onCancelReply?.() : undefined, closeLabel: () => L().cancelReply,
     }) as HTMLElement;
-    if (moves()) animate(box, [{ transform: "translateY(10px)", opacity: 0 }, { transform: "translateY(0)", opacity: 1 }], { duration: 200, easing: "easeOutCubic" });
+    if (moves()) play(box, [{ transform: "translateY(10px)", opacity: 0 }, { transform: "translateY(0)", opacity: 1 }], { duration: 200, easing: "easeOutCubic" });
     queueMicrotask(() => field?.focus());
     return box;
   },

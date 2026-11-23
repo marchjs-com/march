@@ -5,7 +5,7 @@ import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 import "./typing-indicator.css";
 
@@ -53,7 +53,7 @@ export function TypingIndicator(props: TypingIndicatorProps): Element {
     untrack(() => {
       for (const r of runs.splice(0)) r.cancel();
       const up = kind === "fade" ? "translateY(0)" : "translateY(-3px)";
-      if (on && kind !== "none") dots.forEach((d, i) => runs.push(animate(d, [
+      if (on && kind !== "none") dots.forEach((d, i) => runs.push(play(d, [
         { transform: "translateY(0)", opacity: 0.45 }, { transform: up, opacity: 1, offset: 0.25 }, { transform: "translateY(0)", opacity: 0.45, offset: 0.5 }, { transform: "translateY(0)", opacity: 0.45 },
       ], { duration: 1100, delay: i * 150, iterations: Infinity, easing: "easeInOutCubic" })));
     });

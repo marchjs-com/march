@@ -9,7 +9,7 @@ import { Badge } from "../../../ui/badge.ts";
 import { OverflowText } from "../../../ui/marquee.ts";
 import { colorAttr, tokenColor, COLOR_TOKENS, BRAND_COLORS, type ColorToken } from "../../../theme/colors.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { setStyle } from "../../../motion/env.ts";
 import { openCreateMenu, type BottomNavAction, type CreateMenuLook } from "./actions.ts";
 import "./bottom-nav.css";
@@ -124,7 +124,7 @@ export function BottomNav(props: BottomNavProps): Element {
   let closeMenu: (() => void) | null = null, held = false, timer: ReturnType<typeof setTimeout> | undefined;
   const bounce = (): void => {
     const btn = core?.parentElement;
-    if (btn && moves()) animate(btn, [{ transform: "scale(1)" }, { transform: "scale(1.12)" }, { transform: "scale(1)" }], { duration: 420, fill: "none" });
+    if (btn && moves()) play(btn, [{ transform: "scale(1)" }, { transform: "scale(1.12)" }, { transform: "scale(1)" }], { duration: 420, fill: "none" });
   };
   const press = (e: MouseEvent): void => {
     if (held) { held = false; return; } // a long press already ran the default action
@@ -139,7 +139,7 @@ export function BottomNav(props: BottomNavProps): Element {
       });
       return;
     }
-    if (core && moves()) animate(core, [{ transform: "rotate(0deg)" }, { transform: "rotate(90deg)" }, { transform: "rotate(0deg)" }], { duration: 420, easing: "easeOutBack", fill: "none" });
+    if (core && moves()) play(core, [{ transform: "rotate(0deg)" }, { transform: "rotate(90deg)" }, { transform: "rotate(0deg)" }], { duration: 420, easing: "easeOutBack", fill: "none" });
     bounce();
     props.onCreate?.();
   };
@@ -188,9 +188,9 @@ export function BottomNav(props: BottomNavProps): Element {
       setStyle(bubble, { "--m-bnav-i": String(slotOf(i)) });
       if (before != null && prev !== i && moves()) {
         const dx = before - bubble.getBoundingClientRect().left;
-        if (dx) animate(bubble, [{ transform: `translate3d(${dx}px, 0, 0)` }, { transform: "translate3d(0, 0, 0)" }], { duration: 420, easing: "easeOutBack", fill: "none" });
+        if (dx) play(bubble, [{ transform: `translate3d(${dx}px, 0, 0)` }, { transform: "translate3d(0, 0, 0)" }], { duration: 420, easing: "easeOutBack", fill: "none" });
         const ic = icons[i];
-        if (ic) animate(ic, [{ transform: "scale(0.8)" }, { transform: "scale(1.15)" }, { transform: "scale(1)" }], { duration: 360, easing: "easeOutCubic", fill: "none" });
+        if (ic) play(ic, [{ transform: "scale(0.8)" }, { transform: "scale(1.15)" }, { transform: "scale(1)" }], { duration: 360, easing: "easeOutCubic", fill: "none" });
       }
       prev = i;
     });
@@ -198,7 +198,7 @@ export function BottomNav(props: BottomNavProps): Element {
 
   // ring: a slow turn on the motion engine; decorative, so reduced motion keeps it still
   let spin: { cancel(): void } | null = null, alive = true;
-  if (create) queueMicrotask(() => { if (ring && alive && moves()) spin = animate(ring, [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], { duration: 12000, iterations: Infinity, easing: "linear" }); });
+  if (create) queueMicrotask(() => { if (ring && alive && moves()) spin = play(ring, [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], { duration: 12000, iterations: Infinity, easing: "linear" }); });
   onCleanup(() => { alive = false; spin?.cancel(); });
   return root;
 }

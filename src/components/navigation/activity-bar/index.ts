@@ -10,7 +10,7 @@ import { val, cx, icon, uid, type MaybeFn, type ClassProp } from "../../../ui/ut
 import { Badge } from "../../../ui/badge.ts";
 import { Tooltip } from "../../../ui/menu.ts";
 import { TabList, type TabSpec } from "../tabs/index.ts";
-import { labelWithKey } from "../../../ui/keys.ts";
+import { labelWithKey } from "../../../ui/key-label.ts";
 import { slidingIndicator } from "../../../motion/engine/parts.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import type { Handler } from "../../../core/util.ts";

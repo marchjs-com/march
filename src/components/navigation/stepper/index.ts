@@ -10,9 +10,9 @@ import { val, cx, uid, clamp, setStyle, type MaybeFn, type ClassProp } from "../
 import { Steps, type StepItem } from "../steps/index.ts";
 import { Button } from "../../../ui/button.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { reducedMotion } from "../../../motion/env.ts";
-import { nextFrame } from "../../../motion/engine/index.ts";
+import { nextFrame } from "../../../motion/engine/clock.ts";
 import { isRtl, type Handler } from "../../../core/util.ts";
 import type { IconProp } from "../../../icons/types.ts";
 
@@ -87,7 +87,7 @@ export function Stepper(props: StepperProps): Element {
       const span = { x: x0, y: y0, w: Math.max(from.x + from.w, to.x + to.w) - x0, h: Math.max(from.y + from.h, to.y + to.h) - y0 };
       const k = (b: typeof to) => ({ translate: `${b.x}px ${b.y}px`, width: `${b.w}px`, height: `${b.h}px` });
       place(to);
-      animate(blob, [{ ...k(from), offset: 0 }, { ...k(span), offset: 0.45 }, { ...k(to), offset: 1 }], { duration: 560, easing: "inOut" });
+      play(blob, [{ ...k(from), offset: 0 }, { ...k(span), offset: 0.45 }, { ...k(to), offset: 1 }], { duration: 560, easing: "inOut" });
     }, "write"));
   });
 
@@ -104,9 +104,9 @@ export function Stepper(props: StepperProps): Element {
     frame.appendChild(next);
     const h1 = next.offsetHeight;
     const dir = (i > prev ? 1 : -1) * (rtl() ? -1 : 1);
-    animate(old, [{ opacity: 1, transform: "translateX(0) scale(1)", filter: "blur(0)" }, { opacity: 0, transform: `translateX(${-dir * 32}px) scale(.97)`, filter: "blur(6px)" }], { duration: 280, easing: "in" }).finished.then(() => old.remove());
-    animate(next, [{ opacity: 0, transform: `translateX(${dir * 40}px) scale(.98)`, filter: "blur(6px)" }, { opacity: 1, transform: "translateX(0) scale(1)", filter: "blur(0)" }], { duration: 420, delay: 90, easing: "out" });
-    if (h0 && h1 && h0 !== h1) animate(frame, [{ height: `${h0}px` }, { height: `${h1}px` }], { duration: 420, easing: "inOut" });
+    play(old, [{ opacity: 1, transform: "translateX(0) scale(1)", filter: "blur(0)" }, { opacity: 0, transform: `translateX(${-dir * 32}px) scale(.97)`, filter: "blur(6px)" }], { duration: 280, easing: "in" }).finished.then(() => old.remove());
+    play(next, [{ opacity: 0, transform: `translateX(${dir * 40}px) scale(.98)`, filter: "blur(6px)" }, { opacity: 1, transform: "translateX(0) scale(1)", filter: "blur(0)" }], { duration: 420, delay: 90, easing: "out" });
+    if (h0 && h1 && h0 !== h1) play(frame, [{ height: `${h0}px` }, { height: `${h1}px` }], { duration: 420, easing: "inOut" });
   };
   onCleanup(() => { frame = null; });
 

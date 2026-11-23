@@ -11,7 +11,7 @@ import { For } from "../../../dom/for.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, uid, glyph, clamp, lerp, listen, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { hasPart } from "../../../ui/parts.ts";
-import { isMod } from "../../../ui/keys.ts";
+import { isMod } from "../../../ui/key-label.ts";
 import { snap } from "../../../ui/format.ts";
 import { observeSize } from "../../../ui/observe.ts";
 import { colorAttr, withColor } from "../../../theme/colors.ts";
@@ -31,7 +31,7 @@ import type { MenuItem } from "../../../ui/menu.ts";
 const clipboardManager = () => import("../../../managers/clipboard/index.ts");
 const undoManager = () => import("../../../managers/undo/index.ts");
 const announcer = () => import("../../../managers/announcer/index.ts");
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { animateValue, onFrame, nextFrame } from "../../../motion/engine/index.ts";
 import { still as motionOff } from "../../../motion/engine/parts.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
@@ -354,7 +354,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
   onCleanup(flow.onPulse((edgeId, ms) => {
     const path = paths.get(edgeId), g = dotsLayer.get(edgeId);
     const pill = root?.querySelector<HTMLElement>(`[data-edge-pill="${CSS.escape(edgeId)}"]`);
-    if (pill && !still()) animate(pill, [{ scale: "1" }, { scale: "1.4" }, { scale: "1" }], { duration: 360, easing: "out" });
+    if (pill && !still()) play(pill, [{ scale: "1" }, { scale: "1.4" }, { scale: "1" }], { duration: 360, easing: "out" });
     if (!path || !g || still() || typeof path.getTotalLength !== "function") return;
     const len = path.getTotalLength();
     const doc = globalThis.document;
@@ -460,9 +460,9 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
       untrack(() => {
         pulse?.cancel(); pulse = null;
         if (still()) return;
-        if (s === "running") pulse = animate(glow, [{ opacity: 0.35, transform: "scale(1)" }, { opacity: 1, transform: "scale(1.035)" }, { opacity: 0.35, transform: "scale(1)" }], { duration: 900, iterations: Infinity, easing: "inOut" });
-        else if (s === "error") animate(el, [{ translate: "0" }, { translate: "-7px" }, { translate: "6px" }, { translate: "-4px" }, { translate: "3px" }, { translate: "0" }], { duration: 420, easing: "out" });
-        else if (s === "done") animate(el, [{ scale: "1" }, { scale: "1.03" }, { scale: "1" }], { duration: 280, easing: "out" });
+        if (s === "running") pulse = play(glow, [{ opacity: 0.35, transform: "scale(1)" }, { opacity: 1, transform: "scale(1.035)" }, { opacity: 0.35, transform: "scale(1)" }], { duration: 900, iterations: Infinity, easing: "inOut" });
+        else if (s === "error") play(el, [{ translate: "0" }, { translate: "-7px" }, { translate: "6px" }, { translate: "-4px" }, { translate: "3px" }, { translate: "0" }], { duration: 420, easing: "out" });
+        else if (s === "done") play(el, [{ scale: "1" }, { scale: "1.03" }, { scale: "1" }], { duration: 280, easing: "out" });
       });
     });
     onCleanup(() => pulse?.cancel());
@@ -491,7 +491,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
     queueMicrotask(() => {
       if (still() || typeof path.getTotalLength !== "function" || !path.isConnected) return;
       const len = path.getTotalLength();
-      animate(path, [{ strokeDasharray: `${len}`, strokeDashoffset: `${len}` }, { strokeDasharray: `${len}`, strokeDashoffset: "0" }], { duration: 520, easing: "out" });
+      play(path, [{ strokeDasharray: `${len}`, strokeDashoffset: `${len}` }, { strokeDasharray: `${len}`, strokeDashoffset: "0" }], { duration: 520, easing: "out" });
     });
     // marching dashes while values flow
     let march: { cancel(): void } | null = null;
@@ -499,7 +499,7 @@ export function FlowCanvas(props: FlowCanvasProps): Element {
       const on = liveFlow();
       untrack(() => {
         march?.cancel(); march = null;
-        if (on && !still()) march = animate(flowPath, [{ strokeDashoffset: "24" }, { strokeDashoffset: "0" }], { duration: 640, iterations: Infinity, easing: "linear" });
+        if (on && !still()) march = play(flowPath, [{ strokeDashoffset: "24" }, { strokeDashoffset: "0" }], { duration: 640, iterations: Infinity, easing: "linear" });
       });
     });
     onCleanup(() => march?.cancel());

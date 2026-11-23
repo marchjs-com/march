@@ -5,7 +5,7 @@ import { h } from "../../../dom/h.ts";
 import type { Href } from "../../../router/router.ts";
 import { routerLink } from "../../../dom/link.ts";
 import type { Action } from "../../../ui/action.ts";
-import { labelWithKey } from "../../../ui/keys.ts";
+import { labelWithKey } from "../../../ui/key-label.ts";
 import { val, cx, rest, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { Spinner } from "../../feedback/spinner/index.ts";
 import { type ColorToken } from "../../../theme/colors.ts";

@@ -7,10 +7,10 @@ import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { Menu, Tooltip, type MenuItem } from "../../../ui/menu.ts";
-import { formatKey } from "../../../ui/keys.ts";
+import { formatKey } from "../../../ui/key-label.ts";
 import { overflowFit } from "../../../ui/fit.ts";
 import { commandBinding } from "../../../managers/command/ui.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 import { PlainListRow } from "../../data/list-row/core.ts";
 import { more } from "../../../icons/glyphs/more.ts";
@@ -82,7 +82,7 @@ export function StatusBar(props: StatusBarProps): Element {
       ? h(StatusDot, { class: "m-sbar-dot", size: "sm", tone: () => { const v = tone(); return v === "busy" ? "primary" : v; }, pulse: () => (busy() ? "blink" : false) })
       : h("span", { class: "m-sbar-dot-own", "aria-hidden": "true", ref: (el: HTMLElement) => {
         let run: { cancel(): void } | null = null;
-        effect(() => { run?.cancel(); run = busy() ? animate(el, [{ opacity: 1, transform: "scale(1)" }, { opacity: 0.35, transform: "scale(.6)" }, { opacity: 1, transform: "scale(1)" }], { duration: 1100, iterations: Infinity }) : null; });
+        effect(() => { run?.cancel(); run = busy() ? play(el, [{ opacity: 1, transform: "scale(1)" }, { opacity: 0.35, transform: "scale(.6)" }, { opacity: 1, transform: "scale(1)" }], { duration: 1100, iterations: Infinity }) : null; });
         onCleanup(() => run?.cancel());
       } }, ownDot(tone, x));
     if (x.live) { let first = true; effect(() => { const v = text(); if (first) { first = false; return; } untrack(() => said.set(v)); }); }

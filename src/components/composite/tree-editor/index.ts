@@ -13,7 +13,7 @@ import { cx, uid, val, later, type ClassProp, type Handler } from "../../../core
 import { fold } from "../../../core/text.ts";
 import { glyph } from "../../../ui/util.ts";
 import { hasPart } from "../../../ui/parts.ts";
-import { isMod, undoKeys } from "../../../ui/keys.ts";
+import { isMod, undoKeys } from "../../../ui/key-label.ts";
 import { model, ctl, live, type ControlProps } from "../../../forms/util.ts";
 import { Toggle } from "../../../forms/inputs.ts";
 import { TextInput } from "../../forms/text-input/index.ts";

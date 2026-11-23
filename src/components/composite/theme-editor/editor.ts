@@ -14,7 +14,7 @@ import { UndoRedo } from "../../actions/undo-redo/index.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { PanelHeader } from "../../layout/panel-header/index.ts";
 import { SectionLabel } from "../../typography/section-label/index.ts";
-import { undoKeys } from "../../../ui/keys.ts";
+import { undoKeys } from "../../../ui/key-label.ts";
 import { Tabs } from "../../../ui/tabs.ts";
 import { ThemeSwatch, setColorTheme, colorTheme, theme as appMode } from "../../../ui/theme.ts";
 import { undoHistory } from "../../../managers/undo/history.ts";

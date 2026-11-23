@@ -15,7 +15,7 @@ import { createTable, formatValue, type TableState, type TableOptions } from "..
 import { FilterControl, CellEditor, SortMark, ariaSort } from "../../../table/controls.ts";
 import { valueOf, type Column, type TableColumn, type Row } from "../../../table/filters.ts";
 import { groupRows, aggregates, type Aggregate, type GroupItem, type GroupHeader, type GroupRow, type GroupAggregate } from "../../../data/group.ts";
-import { animate, stagger } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { pointerDrag } from "../../../behaviors/drag/index.ts";
 import { Menu, type MenuItem } from "../../../ui/menu.ts";
 import { Chip } from "../../actions/chip/index.ts";
@@ -258,7 +258,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     if (!cell || !motion) return;
     const f = h("span", { class: "m-dg-flash", "aria-hidden": "true" }) as HTMLElement;
     cell.appendChild(f);
-    void animate(f, [{ opacity: 1 }, { opacity: 0 }], { duration: 700, easing: "ease-out" }).finished.then(() => f.remove());
+    void play(f, [{ opacity: 1 }, { opacity: 0 }], { duration: 700, easing: "ease-out" }).finished.then(() => f.remove());
   };
   const commit = async (move: "down" | "next" | "prev" | null): Promise<void> => {
     const { r, c } = untrack(cursor);
@@ -369,7 +369,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     for (const cell of scroller.querySelectorAll<HTMLElement>(".m-dg-head .m-dg-th, .m-dg-body .m-dg-cell[data-key]")) {
       const d = shift.get(cell.dataset["key"] as string);
       if (d == null) continue;
-      if (Math.abs(d) > 1 && motion) void animate(cell, [{ transform: `translateX(${d}px)` }, { transform: "none" }], { duration: 260, easing: "easeOutCubic" });
+      if (Math.abs(d) > 1 && motion) void play(cell, [{ transform: `translateX(${d}px)` }, { transform: "none" }], { duration: 260, easing: "easeOutCubic" });
     }
   };
   // fit a column to its header and the rendered cells (approximate: character count of the visible text)
@@ -555,8 +555,8 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     }
     // entrance: rows after a sort / group / filter change and rows revealed by opening a group
     if (fresh.length && motion) {
-      const d = stagger(14);
-      fresh.slice(0, 40).forEach((el, i) => void animate(el, [{ opacity: 0, translate: "0 -6px" }, { opacity: 1, translate: "0 0" }], { duration: 240, delay: d(i), easing: "easeOutCubic" }));
+      const d = (i: number): number => i * 14;
+      fresh.slice(0, 40).forEach((el, i) => void play(el, [{ opacity: 0, translate: "0 -6px" }, { opacity: 1, translate: "0 0" }], { duration: 240, delay: d(i), easing: "easeOutCubic" }));
     }
     animateNext = null; justOpened = null;
   }

@@ -4,7 +4,7 @@
 import "./tabs.css";
 import { signal, computed, effect, untrack, reactive } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { query as routeQuery, setQuery } from "../../../router/router.ts";
+import { routerQuery } from "../../../dom/link.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { roving } from "../../../ui/focus.ts";
 import { t } from "../../../core/i18n.ts";
@@ -14,7 +14,7 @@ import { StatusDot } from "../../feedback/status-dot/index.ts";
 import { motionPreset } from "../../../motion/engine/parts.ts";
 import { x as xIcon } from "../../../icons/glyphs/x.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { reducedMotion } from "../../../motion/env.ts";
 import { isRtl, type Handler } from "../../../core/util.ts";
 import type { IconProp } from "../../../icons/types.ts";
@@ -182,9 +182,12 @@ export function Tabs(props: TabsProps): Element {
     return (src ?? []).filter((x) => x && ((x as Partial<TabDescriptor>).__tab || x.id != null) && !val(x.hidden));
   });
   const local = signal<string | null>(null);
+  // `query` uses the app's router when it has one (late binding, dom/link.ts): Tabs does not pull the router in
+  const router = routerQuery();
+  const fromUrl = props.query && !router ? new URLSearchParams(globalThis.location?.search ?? "").get(props.query) : null;
   const current = computed(() => {
     const tabs = list();
-    const want = (props.query && routeQuery()[props.query]) ?? val(props.value) ?? local();
+    const want = (props.query && (router ? router.query()[props.query] : fromUrl)) ?? val(props.value) ?? local();
     return tabs.find((x) => x.id === want && !val(x.disabled))?.id ?? tabs.find((x) => !val(x.disabled))?.id ?? null;
   });
   const select = (id: string | undefined): void => {
@@ -192,7 +195,7 @@ export function Tabs(props: TabsProps): Element {
     local.set(id);
     props.onChange?.(id);
     props.setValue?.(id);
-    if (props.query) { try { void setQuery({ [props.query]: id }); } catch { /* no router: local state only */ } }
+    if (props.query && router) void router.setQuery({ [props.query]: id }).catch(() => {}); // no router: local state only
   };
   const nav = h(TabList, {
     tabs: list, value: current, onSelect: select, controls: `${base}-p`, tabId: (id: string) => `${base}-t-${id}`,
@@ -218,7 +221,7 @@ export function Tabs(props: TabsProps): Element {
         if (prev == null || id == null || prev === id || reducedMotion()) return;
         const dir = ids.indexOf(id) > ids.indexOf(prev) ? 1 : -1;
         if (typeof motion === "function") motion(panel as HTMLElement, dir);
-        else animate(panel as HTMLElement, motion === "slide" ? motionPreset("slide", { x: dir * (isRtl(panel as HTMLElement) ? -1 : 1) * 24, y: 0 }) : motionPreset(motion), { duration: 240, easing: "out" });
+        else play(panel as HTMLElement, motion === "slide" ? motionPreset("slide", { x: dir * (isRtl(panel as HTMLElement) ? -1 : 1) * 24, y: 0 }) : motionPreset(motion), { duration: 240, easing: "out" });
       });
     });
   }

@@ -9,7 +9,7 @@ import { signal, computed, effect, untrack, createRoot, getOwner } from "../../.
 import { t, dir, messages } from "../../../core/i18n.ts";
 import { cx, val, setStyle, listen, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
-import { animate } from "../../../motion/engine/playback.ts";
+import { play } from "../../../motion/play.ts";
 import { still, swapTransition } from "../../../motion/engine/parts.ts";
 import { ListRow } from "../../data/list-row/index.ts";
 import { Badge } from "../../data/badge/index.ts";
@@ -153,7 +153,7 @@ export function BranchingStory(props: BranchingStoryProps): Element {
     if (still(props.transition)) { done(); return; }
     btn.classList.add("is-picked");
     btn.closest(".m-bs-choices")?.classList.add("is-deciding");
-    void animate(btn, { transform: ["scale(1)", "scale(1.04)", "scale(1)"] }, { duration: 320, easing: "out" }).finished.then(done);
+    void play(btn, { transform: ["scale(1)", "scale(1.04)", "scale(1)"] }, { duration: 320, easing: "out" }).finished.then(done);
   };
 
   // each passage has its own scope under the story (not under the effect that draws it): it stays whole while it
@@ -210,7 +210,7 @@ export function BranchingStory(props: BranchingStoryProps): Element {
       void swapTransition(next, old, own ? { enter: own.enter, leave: own.leave } : kind as "turn" | "none", { dir: side, rtl, delay: 120, duration: how.duration ?? 760, easing: (how.easing ?? "expo") as "expo", leaveDuration: 420, leaveEasing: "in" })
         .then(() => drop(old));
       const items = next.querySelectorAll(".m-bs-choices > li");
-      items.forEach((li, i) => animate(li, { opacity: [0, 1], transform: ["translateY(14px)", "translateY(0px)"] }, { duration: 460, delay: 380 + i * 90, easing: "out" }));
+      items.forEach((li, i) => play(li, { opacity: [0, 1], transform: ["translateY(14px)", "translateY(0px)"] }, { duration: 460, delay: 380 + i * 90, easing: "out" }));
     });
   });
 

@@ -7,7 +7,7 @@ import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { plus } from "../../../icons/glyphs/plus.ts";
 import { Avatar } from "../avatar/index.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { withColor } from "../../../theme/colors.ts";
 import { CornerMark } from "../../media/corner-mark/index.ts";
 import "./story-ring.css";
@@ -46,7 +46,7 @@ export interface StoryRingProps {
 /** `<StoryRing name={u.name} src={u.avatar} state={u.seen ? "seen" : "new"} label={u.name} onClick={() => open(u)} />` */
 export function StoryRing(props: StoryRingProps): Element {
   let ring!: HTMLElement;
-  let spin: ReturnType<typeof animate> | null = null;
+  let spin: ReturnType<typeof play> | null = null;
   const state = (): StoryRingState => val(props.state) ?? "new";
   const inner = [
     h("span", { class: "m-sring-frame" },
@@ -59,7 +59,7 @@ export function StoryRing(props: StoryRingProps): Element {
     const on = !!val(props.loading);
     untrack(() => {
       spin?.cancel(); spin = null;
-      if (on) spin = animate(ring, [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], { duration: 1100, iterations: Infinity, easing: "linear", essential: true });
+      if (on) spin = play(ring, [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], { duration: 1100, iterations: Infinity, easing: "linear", essential: true });
     });
   });
   onCleanup(() => spin?.cancel());

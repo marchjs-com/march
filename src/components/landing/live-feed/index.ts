@@ -17,7 +17,7 @@ import { Avatar } from "../../social/avatar/index.ts";
 import { Button } from "../../actions/button/index.ts";
 import { pauseOnHover } from "../../../behaviors/pause-on-hover/index.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
-import { animate } from "../../../motion/engine/playback.ts";
+import { play } from "../../../motion/play.ts";
 import { flip } from "../../../motion/flip.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { FEED_ENTER, FEED_LEAVE, feedMotion, type FeedEnter, type FeedLeave, type FeedMotion } from "./presets.ts";
@@ -142,14 +142,14 @@ export function LiveFeed(props: LiveFeedProps): Element {
     const glow = el.querySelector(".m-lf-glow"), avatar = el.querySelector(".m-lf-avatar, .m-lf-dot");
     if (props.enter !== "none") {
       const inn = feedMotion(FEED_ENTER, props.enter, "flip", ctx);
-      animate(el, inn.keyframes as never, { duration: inn.duration ?? 700, easing: inn.easing ?? "out" });
-      if (avatar) animate(avatar, { transform: ["scale(0) rotate(-40deg)", "scale(1.18) rotate(8deg)", "scale(1) rotate(0deg)"] }, { duration: 760, delay: 160, easing: "out" });
+      play(el, inn.keyframes as never, { duration: inn.duration ?? 700, easing: inn.easing ?? "out" });
+      if (avatar) play(avatar, { transform: ["scale(0) rotate(-40deg)", "scale(1.18) rotate(8deg)", "scale(1) rotate(0deg)"] }, { duration: 760, delay: 160, easing: "out" });
     }
-    if (glow && props.glow !== false) animate(glow, { opacity: [0, 1, 0], transform: ["scale(.96)", "scale(1.02)", "scale(1)"] }, { duration: 2200, easing: "out" });
+    if (glow && props.glow !== false) play(glow, { opacity: [0, 1, 0], transform: ["scale(.96)", "scale(1.02)", "scale(1)"] }, { duration: 2200, easing: "out" });
     if (props.leave === "none") return;
     const out = feedMotion(FEED_LEAVE, props.leave, "blur", ctx);
     for (const old of leaving) {
-      void animate(old, out.keyframes as never, { duration: out.duration ?? 450, easing: out.easing ?? "in", fill: "forwards" })
+      void play(old, out.keyframes as never, { duration: out.duration ?? 450, easing: out.easing ?? "in", fill: "forwards" })
         .finished.then(() => gone(old));
     }
   };

@@ -7,7 +7,7 @@ import { effect } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { cx, val, glyph, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
-import { isMod, labelWithKey } from "../../../ui/keys.ts";
+import { isMod, labelWithKey } from "../../../ui/key-label.ts";
 import { isIconDef, type IconDef } from "../../../icons/svg.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import { rovingFocus } from "../../../behaviors/roving-focus/index.ts";

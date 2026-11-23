@@ -9,7 +9,7 @@ import { ownIcon } from "../../../ui/parts.ts";
 import { Button } from "../../actions/button/index.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import { refresh as refreshIcon } from "../../../icons/glyphs/refresh.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { setStyle } from "../../../motion/env.ts";
 import { swipeable, rubberBand } from "../../../behaviors/swipe/index.ts";
 import "./pull-to-refresh.css";
@@ -68,8 +68,8 @@ export function PullToRefresh(props: PullToRefreshProps): Element {
     const from = pull, k0 = Math.min(1, from / threshold), k1 = Math.min(1, d / threshold);
     paint(d);
     if (!SETTLE) return Promise.resolve();
-    const a = animate(content, [{ transform: `translate3d(0, ${from}px, 0)` }, { transform: `translate3d(0, ${d}px, 0)` }], { duration: SETTLE, easing: "easeOutCubic", fill: "none" });
-    if (ind) animate(ind, [{ transform: `translate3d(0, ${from}px, 0) scale(${0.6 + 0.4 * k0})`, opacity: k0 }, { transform: `translate3d(0, ${d}px, 0) scale(${0.6 + 0.4 * k1})`, opacity: k1 }], { duration: SETTLE, easing: "easeOutCubic", fill: "none" });
+    const a = play(content, [{ transform: `translate3d(0, ${from}px, 0)` }, { transform: `translate3d(0, ${d}px, 0)` }], { duration: SETTLE, easing: "easeOutCubic", fill: "none" });
+    if (ind) play(ind, [{ transform: `translate3d(0, ${from}px, 0) scale(${0.6 + 0.4 * k0})`, opacity: k0 }, { transform: `translate3d(0, ${d}px, 0) scale(${0.6 + 0.4 * k1})`, opacity: k1 }], { duration: SETTLE, easing: "easeOutCubic", fill: "none" });
     settle = a;
     return a.finished;
   };
@@ -79,7 +79,7 @@ export function PullToRefresh(props: PullToRefreshProps): Element {
   const run = async (): Promise<void> => {
     if (phase.peek() === "refreshing") return;
     setPhase("refreshing");
-    if (spin) spinning = animate(spin, [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], { duration: 800, iterations: Infinity, easing: "linear", essential: true });
+    if (spin) spinning = play(spin, [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], { duration: 800, iterations: Infinity, easing: "linear", essential: true });
     void to(threshold * 0.8);
     try { await (props.onRefresh ? props.onRefresh() : new Promise((r) => setTimeout(r, 600))); } catch { /* the caller reports its own errors; the indicator still finishes */ }
     spinning?.cancel(); spinning = null;

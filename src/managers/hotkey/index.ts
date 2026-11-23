@@ -1,5 +1,5 @@
 // HotkeyManager: keyboard shortcuts with scopes, key sequences ("g h"), pause / resume and a reactive list for help
-// screens. Parsing, matching and labels come from ui/keys.ts (mod = ⌘ on macOS, Ctrl elsewhere).
+// screens. Parsing, matching and labels come from ui/key-label.ts (mod = ⌘ on macOS, Ctrl elsewhere).
 //
 //   import { hotkeys } from "march/managers/hotkey";
 //   hotkeys.bind("mod+k", openSearch, { description: "Search", group: "General" })
@@ -11,7 +11,7 @@
 // While a modal layer (dialog, drawer, palette) is open, only bindings with { modal: true } run: the page under it
 // is inert, so its shortcuts are too. Typing in a field skips bindings unless { inInputs: true }.
 import { signal, computed, untrack, getOwner, onCleanup } from "../../core/reactive.ts";
-import { parseKey, matches, formatKey, type ParsedKey } from "../../ui/keys.ts";
+import { parseKey, matches, formatKey, type ParsedKey } from "../../ui/key-label.ts";
 import { layer } from "../layer/index.ts";
 import { defineManager, emit } from "../manager.ts";
 

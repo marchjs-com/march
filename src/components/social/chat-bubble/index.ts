@@ -13,7 +13,7 @@ import { clock } from "../../../icons/glyphs/clock.ts";
 import { alertCircle } from "../../../icons/glyphs/alertCircle.ts";
 import { smile } from "../../../icons/glyphs/smile.ts";
 import { arrowLeft } from "../../../icons/glyphs/arrowLeft.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import { Button } from "../../actions/button/index.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
@@ -104,7 +104,7 @@ export function ChatBubble(props: ChatBubbleProps): Element {
       onEnd: (_p, cancelled) => {
         const fired = !cancelled && d >= TRIGGER, from = d * dirSign();
         setStyle(bub, { transform: null }); setStyle(hint, { opacity: null, transform: null });
-        animate(bub, [{ transform: `translateX(${from}px)` }, { transform: "translateX(0)" }], { duration: 280, easing: "easeOutBack" });
+        play(bub, [{ transform: `translateX(${from}px)` }, { transform: "translateX(0)" }], { duration: 280, easing: "easeOutBack" });
         armed.set(false); d = 0;
         if (fired) props.onReply?.();
       },

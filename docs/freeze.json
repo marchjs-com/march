@@ -12,7 +12,7 @@
    "paths": [
     "src/components/navigation/activity-bar"
    ],
-   "hash": "b931a4d5ec097d8d1b0b2b9d06fecee7"
+   "hash": "f04b182447d7a613eeee4c0d79a42e26"
   },
   "Alert": {
    "frozen": "2026-11-20",
@@ -82,7 +82,7 @@
    "paths": [
     "src/components/composite/bottom-nav"
    ],
-   "hash": "ce9b3bdc4067cbbce630bcb9e151a0e7"
+   "hash": "c646d0ed962289b9b0b2601aa36d8f69"
   },
   "BottomRightControls": {
    "frozen": "2026-11-20",
@@ -96,7 +96,7 @@
    "paths": [
     "src/components/landing/branching-story"
    ],
-   "hash": "3b636e7dc8f636db0304205ad5002757"
+   "hash": "933b29ad444af3fb1be189ccb20d5101"
   },
   "Breadcrumbs": {
    "frozen": "2026-11-20",
@@ -110,7 +110,7 @@
    "paths": [
     "src/components/actions/button"
    ],
-   "hash": "b95fb45cb021e8946caac0a81360aba7"
+   "hash": "12193c447fea9f4d26167faa5ceb9f5f"
   },
   "ButtonGroup": {
    "frozen": "2026-11-20",
@@ -145,21 +145,21 @@
    "paths": [
     "src/components/social/chat-bubble"
    ],
-   "hash": "48a9eff0c09b999ec2a9b1e448188e5d"
+   "hash": "45666d788114ce58b4f49d222fd6b350"
   },
   "ChatComposer": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/chat-composer"
    ],
-   "hash": "37cf1ba26e7562ba42ba130e54653bcf"
+   "hash": "3265bc2a50a96efb0f2cd8be9aaf86d2"
   },
   "ChatThread": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/chat-thread"
    ],
-   "hash": "4bffde0c3f442db79727fd8bf9ac748a"
+   "hash": "8c32ef54e9f208ada5a852ebd8417ba0"
   },
   "Checkbox": {
    "frozen": "2026-11-20",
@@ -215,7 +215,7 @@
    "paths": [
     "src/components/composite/code-editor"
    ],
-   "hash": "bcc663092f02e420f0c306209b3b6572"
+   "hash": "3523dbbefdb6932aad80b306e7bcbdc2"
   },
   "CodeInput": {
    "frozen": "2026-11-20",
@@ -313,7 +313,7 @@
    "paths": [
     "src/components/data/data-grid"
    ],
-   "hash": "bcdb33fcc8adab1aba04be0dca6592a0"
+   "hash": "d0e2515eb6df7fdc7b9eafc74f7e3229"
   },
   "DatePicker": {
    "frozen": "2026-11-20",
@@ -383,7 +383,7 @@
    "paths": [
     "src/components/overlays/drawer"
    ],
-   "hash": "32f1b8489a6a460923db9d1fd44a7b28"
+   "hash": "31a140a642e33337cf81c3101d7a1e52"
   },
   "EasingCurveEditor": {
    "frozen": "2026-11-20",
@@ -439,7 +439,7 @@
    "paths": [
     "src/components/composite/feed"
    ],
-   "hash": "5f3a9c57f740762ef2d49e84ab707bd0"
+   "hash": "da7fc15fc6a92d11f9c9e73664295ca7"
   },
   "FileUpload": {
    "frozen": "2026-11-20",
@@ -453,7 +453,7 @@
    "paths": [
     "src/components/social/follow-button"
    ],
-   "hash": "dd6de28cc29a5864223c56bb0d44f0d4"
+   "hash": "de0537bb12391aedf841d9229a0a975b"
   },
   "FontPicker": {
    "frozen": "2026-11-20",
@@ -467,14 +467,14 @@
    "paths": [
     "src/components/composite/format-toolbar"
    ],
-   "hash": "323f78ffbc03ee2e03b3d1160c67dd3b"
+   "hash": "dc3942bc2ac1d84def1b9c3eebefd8e7"
   },
   "Gantt": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/gantt"
    ],
-   "hash": "2a6e48e5eb38826d1faa0b4a6e4e4673"
+   "hash": "1191c2e7c85c26fc33451f704716e6c0"
   },
   "GradientEditor": {
    "frozen": "2026-11-20",
@@ -579,7 +579,7 @@
    "paths": [
     "src/components/typography/kbd"
    ],
-   "hash": "167f56eb0780914bd5ec60b69d3ea5b2"
+   "hash": "43e70a96491ed8e51fd14fe8870b59ef"
   },
   "KeyframeTimeline": {
    "frozen": "2026-11-20",
@@ -649,14 +649,14 @@
    "paths": [
     "src/components/landing/live-counter"
    ],
-   "hash": "5d24c2bcb5c69edb45dfdf5430e2b5ee"
+   "hash": "1b7610bac8e6e4cc4a6d7b92e80dfce8"
   },
   "LiveFeed": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/live-feed"
    ],
-   "hash": "ed872d552514c05dab0fda164e0010bb"
+   "hash": "8fa18ea003475d0bab1574222a2b62ab"
   },
   "LiveStatus": {
    "frozen": "2026-11-20",
@@ -691,7 +691,7 @@
    "paths": [
     "src/components/composite/markdown-editor"
    ],
-   "hash": "057d0cf5a350f70b98192abe9fdc48ff"
+   "hash": "e8730582e912870f93693d0298838451"
   },
   "Media": {
    "frozen": "2026-11-20",
@@ -747,7 +747,7 @@
    "paths": [
     "src/components/landing/newsletter"
    ],
-   "hash": "5972843ece3716bdd88f1c49f44d6732"
+   "hash": "5ef26db6d7437a6cb8e87413fdb7316d"
   },
   "NotForYou": {
    "frozen": "2026-11-20",
@@ -775,14 +775,14 @@
    "paths": [
     "src/components/typography/overflow-text"
    ],
-   "hash": "0416d8f878ae965c0a8c608e689395b5"
+   "hash": "3c6423dcc9317a24d2bbbea37ce7da4a"
   },
   "OverflowToolbar": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/actions/overflow-toolbar"
    ],
-   "hash": "04ec6715fa1cc03fed595d2e08fcda6d"
+   "hash": "a8e0f94f8302fdc8a7d804a8b1b2a1fd"
   },
   "Overlay": {
    "frozen": "2026-11-20",
@@ -873,21 +873,21 @@
    "paths": [
     "src/components/composite/post-card"
    ],
-   "hash": "46073255e8545b1f85605e178bb03d7a"
+   "hash": "73a1df1655370716267638f8b57b122f"
   },
   "Presentation": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/presentation"
    ],
-   "hash": "c4c3520a9f72913cbee79b797b8816a3"
+   "hash": "3aa41d0344066411604cde2372875b48"
   },
   "Pricing": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/pricing"
    ],
-   "hash": "d1d371158cf94034e3e7d2d1770fe875"
+   "hash": "02f60afce1bd1d3279a0a5e180566db5"
   },
   "ProfileHeader": {
    "frozen": "2026-11-20",
@@ -922,7 +922,7 @@
    "paths": [
     "src/components/landing/project-grid"
    ],
-   "hash": "5d70e224151f55d0a22f5098348a91b7"
+   "hash": "c8da07c5bb1dfce75b6f9cc797f85028"
   },
   "PropertyGrid": {
    "frozen": "2026-11-20",
@@ -936,7 +936,7 @@
    "paths": [
     "src/components/feedback/pull-to-refresh"
    ],
-   "hash": "a92787fa784409e615c0b21c04601d69"
+   "hash": "f4070e849d13ccb35fba20fce4c0ec49"
   },
   "RadioGroup": {
    "frozen": "2026-11-20",
@@ -957,7 +957,7 @@
    "paths": [
     "src/components/social/reaction-picker"
    ],
-   "hash": "eb9be77419ad17096636fed79953410a"
+   "hash": "3f97808166019cace277b6423b600c88"
   },
   "ReplyQuote": {
    "frozen": "2026-11-20",
@@ -978,14 +978,14 @@
    "paths": [
     "src/components/landing/reveal"
    ],
-   "hash": "c4d881dd04461895b45f0175dc8f2f55"
+   "hash": "e41586ece1825e134725f41038e98846"
   },
   "RichTextEditor": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/rich-text-editor"
    ],
-   "hash": "af8600511f452e6a9ed393e07f88ceb3"
+   "hash": "7f6d275ff88aa96dce0189bd498b9d88"
   },
   "Roadmap": {
    "frozen": "2026-11-20",
@@ -1006,7 +1006,7 @@
    "paths": [
     "src/components/data/scheduler"
    ],
-   "hash": "74af4c9ab4beb6ffc3f208a4902b3e84"
+   "hash": "d9c4525e97ae0825bf066a496e8aacc9"
   },
   "ScrollProgress": {
    "frozen": "2026-11-20",
@@ -1027,7 +1027,7 @@
    "paths": [
     "src/components/actions/scroll-to-top"
    ],
-   "hash": "8052801b79770bf0cf01ea2d31227f4c"
+   "hash": "e0940a62e28e1186247a78cee0df074d"
   },
   "SearchBox": {
    "frozen": "2026-11-20",
@@ -1174,7 +1174,7 @@
    "paths": [
     "src/components/layout/status-bar"
    ],
-   "hash": "7c1921fb7f79174b1e5c0e27638ec2a1"
+   "hash": "1342b172d52845948a77c53600a5c5ea"
   },
   "StatusDot": {
    "frozen": "2026-11-20",
@@ -1188,7 +1188,7 @@
    "paths": [
     "src/components/navigation/stepper"
    ],
-   "hash": "0eec219b25bc16edefedeacf6be2ae66"
+   "hash": "177aa49834cb6045679196d91b9f6dc0"
   },
   "Steps": {
    "frozen": "2026-11-20",
@@ -1209,14 +1209,14 @@
    "paths": [
     "src/components/social/story-ring"
    ],
-   "hash": "d460c88a1f82a0409dd8663943abaa09"
+   "hash": "286bbdb2a9bb5083848ca5aace29620c"
   },
   "StoryViewer": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/story-viewer"
    ],
-   "hash": "29960d6323a8cf3546947fa351566816"
+   "hash": "58b4c61bbbf5aaeeb3b801d35590b517"
   },
   "Swatch": {
    "frozen": "2026-11-20",
@@ -1230,7 +1230,7 @@
    "paths": [
     "src/components/navigation/tabs"
    ],
-   "hash": "4c274a70f4861f8d16b0505f1e5728f2"
+   "hash": "0d54fd95cfdd13c66fc3a71da2e0d6dd"
   },
   "Terminal": {
    "frozen": "2026-11-20",
@@ -1265,7 +1265,7 @@
    "paths": [
     "src/components/composite/theme-editor"
    ],
-   "hash": "13509f6518fead0170ef7068546ebe4e"
+   "hash": "981cc13285ef66ab66ab2e0c9974f7da"
   },
   "ThemeMenu": {
    "frozen": "2026-11-20",
@@ -1335,28 +1335,28 @@
    "paths": [
     "src/components/composite/tree-editor"
    ],
-   "hash": "c7703859cb083ec2c9c1690cba1151d8"
+   "hash": "ec7c552825e9c266fbf1f5a05e5fd78e"
   },
   "TreeView": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/tree-view"
    ],
-   "hash": "1014794df1bdbfd2cf155377f6f9ced8"
+   "hash": "2a1495d466ecc45b75389f074179ad7a"
   },
   "TypingIndicator": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/social/typing-indicator"
    ],
-   "hash": "424d95bcf064e119adc15781efced522"
+   "hash": "47411366717fdc547f216e00b93d5656"
   },
   "UndoRedo": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/actions/undo-redo"
    ],
-   "hash": "64b4e780aff9297b0604bc149eab3b5d"
+   "hash": "8a2c53e4fe8d5a071cca6981fd7a7156"
   },
   "VerifiedMark": {
    "frozen": "2026-11-20",
@@ -2372,6 +2372,252 @@
    "name": "ThemeMenu",
    "what": "refresh",
    "reason": "the panel loads lazily (panel.ts) (merged with main)"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ActivityBar",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "BottomNav",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "BranchingStory",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Button",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ChatBubble",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ChatComposer",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ChatThread",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "CodeEditor",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "DataGrid",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Drawer",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Feed",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "FollowButton",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "FormatToolbar",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Gantt",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Kbd",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "LiveCounter",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "LiveFeed",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "MarkdownEditor",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Newsletter",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "OverflowText",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "OverflowToolbar",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "PostCard",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Presentation",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Pricing",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ProjectGrid",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "PullToRefresh",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ReactionPicker",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Reveal",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "RichTextEditor",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Scheduler",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ScrollToTop",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "StatusBar",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Stepper",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "StoryRing",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "StoryViewer",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Tabs",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ThemeEditor",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "TreeEditor",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "TreeView",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "TypingIndicator",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "UndoRedo",
+   "what": "refresh",
+   "reason": "Shared size change approved by the founder (2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   }
  ]
 }

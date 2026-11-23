@@ -4,7 +4,7 @@
 //   slidingIndicator(pill, list).moveTo(el)   an indicator that glides to the active item (tabs line, nav pill, thumb)
 //   swapTransition(inEl, outEl, "slide", …)   the enter / leave pair when one view replaces another
 import { val, isRtl, setStyle, type MaybeFn } from "../../core/util.ts";
-import { animate } from "./playback.ts";
+import { play as animate } from "../play.ts";
 import { reducedMotion } from "./prefs.ts";
 import type { EaseInput } from "./ease.ts";
 

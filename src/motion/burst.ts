@@ -4,7 +4,7 @@
 import "./burst.css";
 import { h } from "../dom/h.ts";
 import { cx } from "../core/util.ts";
-import { animate } from "./animate.ts";
+import { play as animate } from "./play.ts";
 import { reducedMotion } from "./env.ts";
 
 export interface BurstOptions {

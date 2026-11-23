@@ -15,7 +15,7 @@ import { Picture, isPicture, type PictureSource } from "../../media/picture/inde
 import { CornerMark } from "../../media/corner-mark/index.ts";
 import { arrowUpRight } from "../../../icons/glyphs/arrowUpRight.ts";
 import { flip } from "../../../motion/flip.ts";
-import { animate } from "../../../motion/engine/playback.ts";
+import { play } from "../../../motion/play.ts";
 import { still } from "../../../motion/engine/parts.ts";
 import { revealOnScroll, type RevealOptions } from "../reveal/index.ts"; // Reveal: the cards enter one after another
 import { type ColorToken } from "../../../theme/colors.ts";
@@ -93,7 +93,8 @@ export function ProjectGrid(props: ProjectGridProps): Element {
     const apply = (): void => flip(cards.filter(match).map((x) => x.card), swap, { duration: 420, easing: "expo" });
     if (!leaving.length || still()) { apply(); return; }
     // hold the faded state until the cards are hidden, then drop the animation (no flash in between)
-    const out = animate(leaving, { opacity: [1, 0], transform: ["scale(1)", "scale(.94)"] }, { duration: 180, easing: "in", fill: "forwards" });
+    const outs = leaving.map((card) => play(card, { opacity: [1, 0], transform: ["scale(1)", "scale(.94)"] }, { duration: 180, easing: "in", fill: "forwards" }));
+    const out = { finished: Promise.all(outs.map((o) => o.finished)), cancel: () => { for (const o of outs) o.cancel(); } };
     // a newer choice made meanwhile has placed the cards already: only drop the fade
     void out.finished.then(() => { if (filter.peek() === c) apply(); out.cancel(); });
   };

@@ -10,7 +10,7 @@ import { TextInput } from "../../../forms/inputs.ts";
 import { Button } from "../../../ui/button.ts";
 import { CheckMark } from "../../feedback/check-mark/index.ts";
 import { SectionHead } from "../section-head/index.ts";
-import { animate } from "../../../motion/engine/playback.ts";
+import { play } from "../../../motion/play.ts";
 
 export interface NewsletterProps {
   /** Save the address; throw (or reject) to show an error. @tr Adresi kaydeder; hata göstermek için hata fırlatın (ya da reddedin). */
@@ -56,7 +56,7 @@ export function Newsletter(props: NewsletterProps): Element {
   let field: HTMLElement | null = null; // the input: it shakes on an error
   const fail = (msg: string): void => {
     error.set(msg); state.set("error");
-    if (field && props.motion !== false) animate(field, { transform: ["translateX(0px)", "translateX(-7px)", "translateX(7px)", "translateX(-4px)", "translateX(4px)", "translateX(0px)"] }, { duration: 420, easing: "linear" });
+    if (field && props.motion !== false) play(field, { transform: ["translateX(0px)", "translateX(-7px)", "translateX(7px)", "translateX(-4px)", "translateX(4px)", "translateX(0px)"] }, { duration: 420, easing: "linear" });
   };
   const submit = async (e: Event): Promise<void> => {
     e.preventDefault();
@@ -65,10 +65,10 @@ export function Newsletter(props: NewsletterProps): Element {
     state.set("pending"); error.set("");
     try { await props.onSubmit?.(v); } catch (err) { fail((err as Error)?.message || (props.labels?.error ?? t`Something went wrong. Please try again.`)); return; }
     const form = root.querySelector(".m-nl-form") as HTMLElement | null;
-    if (form && props.motion !== false) await animate(form, { opacity: [1, 0], transform: ["scale(1)", "scale(.96)"] }, { duration: 220, easing: "in" }).finished;
+    if (form && props.motion !== false) await play(form, { opacity: [1, 0], transform: ["scale(1)", "scale(.96)"] }, { duration: 220, easing: "in" }).finished;
     state.set("done");
     const ok = root.querySelector(".m-nl-done") as HTMLElement | null;
-    if (ok && props.motion !== false) animate(ok, { opacity: [0, 1], transform: ["scale(.85)", "scale(1)"] }, { duration: 520, easing: "spring-wobbly" });
+    if (ok && props.motion !== false) play(ok, { opacity: [0, 1], transform: ["scale(.85)", "scale(1)"] }, { duration: 520, easing: "spring-wobbly" });
   };
   const root = h("div", { class: () => cx("m-nl", `m-nl-${props.layout ?? "inline"}`, `is-${state()}`, val(props.class)) },
     props.title != null || props.lead != null ? h(SectionHead, {

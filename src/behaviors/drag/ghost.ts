@@ -5,7 +5,7 @@
 import { openLayer } from "../../dom/portal.ts";
 import { owned } from "../../ui/observe.ts";
 import { setStyle, type MaybeFn } from "../../core/util.ts";
-import { animate } from "../../motion/engine/playback.ts";
+import { play } from "../../motion/play.ts";
 import { still } from "../../motion/engine/parts.ts";
 import type { Frames } from "../../motion/engine/tracks.ts";
 import type { Timing } from "../../motion/engine/keyframes.ts";
@@ -45,13 +45,13 @@ export function dragGhost(node: HTMLElement, o: DragGhostOptions = {}): DragGhos
   node.removeAttribute("id");
   let closeLayer: (() => void) | null = openLayer("drag", node, o.scope);
   const close = owned((): void => { closeLayer?.(); closeLayer = null; });
-  if (o.enter !== false && !still(o.motion)) animate(node, o.enter ?? [{ opacity: 0, scale: ".9" }, { opacity: 1, scale: "1" }], { duration: 140, easing: "easeOutCubic", ...o.timing });
+  if (o.enter !== false && !still(o.motion)) play(node, o.enter ?? [{ opacity: 0, scale: ".9" }, { opacity: 1, scale: "1" }], { duration: 140, easing: "easeOutCubic", ...o.timing });
   return {
     el: node,
     move: (x, y) => setStyle(node, { left: `${x + off.x}px`, top: `${y + off.y}px` }),
     leave: (frames, timing) => {
       if (!closeLayer || still(o.motion)) { close(); return Promise.resolve(); }
-      return animate(node, frames, { duration: 200, easing: "out", ...timing, fill: "forwards" }).finished.then(close);
+      return play(node, frames, { duration: 200, easing: "out", ...timing, fill: "forwards" }).finished.then(close);
     },
     close,
   };

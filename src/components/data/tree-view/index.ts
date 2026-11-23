@@ -10,7 +10,7 @@ import { val, cx, uid, setStyle, later, clamp, type MaybeFn, type ClassProp, typ
 import { fold } from "../../../core/text.ts";
 import { createAxis, createViewport } from "../../../core/virtual.ts";
 import { createSelection, moveCursor, type SelectionMode } from "../../../core/selection.ts";
-import { animate, stagger } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { pointerDrag } from "../../../behaviors/drag/index.ts";
 import { dragGhost, type DragGhost } from "../../../behaviors/drag/ghost.ts";
 import { markText } from "../../../ui/mark.ts";
@@ -322,8 +322,8 @@ export function TreeView(props: TreeViewProps): Element {
       setStyle(dropLine, { opacity: d.ok && d.pos !== "inside" ? "1" : "0", transform: `translateY(${(d.pos === "after" ? di + 1 : di) * rowH - 1}px)`, "--m-tv-depth": String(depth) });
     } else setStyle(dropLine, { opacity: "0" });
     if (fresh.length && motion) {
-      const st = stagger(18);
-      fresh.slice(0, 30).forEach((el, n) => void animate(el, landed ? [{ opacity: .3, scale: ".97" }, { opacity: 1, scale: "1" }] : [{ opacity: 0, translate: "0 -8px" }, { opacity: 1, translate: "0 0" }], { duration: landed ? 360 : 220, delay: st(n), easing: landed ? "easeOutBack" : "easeOutCubic" }));
+      const st = (i: number): number => i * 18;
+      fresh.slice(0, 30).forEach((el, n) => void play(el, landed ? [{ opacity: .3, scale: ".97" }, { opacity: 1, scale: "1" }] : [{ opacity: 0, translate: "0 -8px" }, { opacity: 1, translate: "0 0" }], { duration: landed ? 360 : 220, delay: st(n), easing: landed ? "easeOutBack" : "easeOutCubic" }));
     }
     justOpened = null; landed = null;
   };

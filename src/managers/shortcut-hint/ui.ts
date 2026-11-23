@@ -5,7 +5,7 @@ import { effect, onCleanup, untrack } from "../../core/reactive.ts";
 import { h } from "../../dom/h.ts";
 import { openLayer } from "../../dom/portal.ts";
 import { t, messages } from "../../core/i18n.ts";
-import { formatKey } from "../../ui/keys.ts";
+import { formatKey } from "../../ui/key-label.ts";
 import { Kbd } from "../../ui/kbd.ts";
 import { openDialog } from "../../ui/dialog.ts";
 import { shortcutHints, comboOf, type ShortcutEntry } from "./index.ts";

@@ -6,7 +6,7 @@ import { Button } from "../../../ui/button.ts";
 import { Badge } from "../../../ui/badge.ts";
 import { Alert } from "../../../ui/feedback.ts";
 import { Chip } from "../../actions/chip/index.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import type { ThemeEditorContext } from "./types.ts";
 import { withColor } from "../../../theme/colors.ts";
 
@@ -18,7 +18,7 @@ export function PreviewTable({ ctx }: { ctx: ThemeEditorContext }): Element {
   const playMotion = (): void => {
     const m = ctx.draft.peek().motion, off = ctx.reduced.peek() ? 0 : 1;
     const x = ctx.dir.peek() === "rtl" ? "-140%" : "140%";
-    [...dots.children].forEach((el, i) => animate(el, [{ transform: "translateX(0)" }, { transform: `translateX(${x})` }, { transform: "translateX(0)" }], {
+    [...dots.children].forEach((el, i) => play(el, [{ transform: "translateX(0)" }, { transform: `translateX(${x})` }, { transform: "translateX(0)" }], {
       duration: (i === 0 ? m.fast : i === 1 ? m.base : m.slow) * 2 * off, easing: i === 2 ? m.easeSpring : m.easeOut,
     }));
   };

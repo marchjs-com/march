@@ -7,7 +7,7 @@ import { h } from "../../../dom/h.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
-import { labelWithKey } from "../../../ui/keys.ts";
+import { labelWithKey } from "../../../ui/key-label.ts";
 import { IconButton, type IconButtonSize } from "../icon-button/index.ts";
 import { undo as undoIcon } from "../../../icons/glyphs/undo.ts";
 import { redo as redoIcon } from "../../../icons/glyphs/redo.ts";

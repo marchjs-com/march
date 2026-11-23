@@ -12,7 +12,7 @@ import { roving } from "../../../ui/focus.ts";
 import { setStyle } from "../../../motion/env.ts";
 import { colorAttr, BRAND_COLORS, type ColorToken } from "../../../theme/colors.ts";
 import { overlayScopeFor } from "../../layout/overlay-scope/index.ts";
-import { animate } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { Badge } from "../../data/badge/index.ts";
 import { ListRow } from "../../data/list-row/index.ts";
 import type { IconProp } from "../../../icons/types.ts";
@@ -64,8 +64,8 @@ export function openCreateMenu(button: HTMLElement, actions: readonly BottomNavA
     if (closing) return;
     closing = true;
     if (o.motion === false) { close(); o.onClose(); return; }
-    animate(scrim, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, fill: "forwards" });
-    items.forEach((el) => animate(el, [{ opacity: 1 }, { opacity: 0, transform: fan ? "translate(0px, 0px) scale(.3)" : "translateY(10px)" }], { duration: 150, fill: "forwards" }));
+    play(scrim, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, fill: "forwards" });
+    items.forEach((el) => play(el, [{ opacity: 1 }, { opacity: 0, transform: fan ? "translate(0px, 0px) scale(.3)" : "translateY(10px)" }], { duration: 150, fill: "forwards" }));
     setTimeout(() => { close(); o.onClose(); }, 160);
   };
   const pick = (a: BottomNavAction): void => { if (val(a.disabled)) return; o.onPick(a); finish(); };
@@ -105,12 +105,12 @@ export function openCreateMenu(button: HTMLElement, actions: readonly BottomNavA
 
   if (o.motion === false) { queueMicrotask(() => (enabled()[0] ?? panel).focus()); return finish; }
   // in: the scrim fades, the round buttons fly out of the Create button one after another
-  animate(scrim, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, fill: "none" });
+  play(scrim, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, fill: "none" });
   items.forEach((el, i) => {
     const [x, y] = at(i);
     const from = fan ? { opacity: 0, transform: "translate(0px, 0px) scale(.3)" } : { opacity: 0, transform: "translateY(12px) scale(.96)" };
     const to = fan ? { opacity: 1, transform: `translate(${x}px, ${y}px) scale(1)` } : { opacity: 1, transform: "translateY(0) scale(1)" };
-    animate(el, [from, to], { duration: fan ? 380 : 260, delay: 40 * i, easing: fan ? "easeOutBack" : "easeOutCubic", fill: "backwards" });
+    play(el, [from, to], { duration: fan ? 380 : 260, delay: 40 * i, easing: fan ? "easeOutBack" : "easeOutCubic", fill: "backwards" });
   });
   queueMicrotask(() => (enabled()[0] ?? panel).focus());
   return finish;
@@ -145,7 +145,7 @@ function openSheetMenu(list: readonly BottomNavAction[], scope: HTMLElement | nu
       effect(() => { if (!view() && !open()) queueMicrotask(() => { dispose(); o.onClose(); }); });
     }, null);
     // the actions rise one after another behind the sheet
-    if (o.motion !== false) rows.forEach((el, i) => animate(el, [{ opacity: 0, transform: "translateY(12px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 260, delay: 80 + 40 * i, easing: "easeOutCubic", fill: "backwards" }));
+    if (o.motion !== false) rows.forEach((el, i) => play(el, [{ opacity: 0, transform: "translateY(12px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 260, delay: 80 + 40 * i, easing: "easeOutCubic", fill: "backwards" }));
   }, () => { closed = true; o.onClose(); });
   return finish;
 }

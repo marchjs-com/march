@@ -7,7 +7,7 @@ import { h } from "../../../dom/h.ts";
 import { t, locale, dir } from "../../../core/i18n.ts";
 import { val, cx, uid, setStyle, later, clamp, type MaybeFn, type ClassProp, type Handler } from "../../../core/util.ts";
 import { todayIso, addDays, diffDays, dateFormat, utcDate, startOfWeek, firstDayOf, startOfMonth, addMonths, type IsoDate } from "../../../core/date.ts";
-import { animate, stagger } from "../../../motion/animate.ts";
+import { play } from "../../../motion/play.ts";
 import { pointerDrag } from "../../../behaviors/drag/index.ts";
 import { ListRow } from "../list-row/index.ts";
 import { Badge } from "../badge/index.ts";
@@ -191,7 +191,7 @@ export function Gantt(props: GanttProps): Element {
     if (motion) later(() => {
       for (const [tid] of changed) {
         const el = barOf(tid);
-        if (el) void animate(el, tid === task.id ? [{ transform: "scaleY(1.18)" }, { transform: "none" }] : [{ opacity: .4 }, { opacity: 1 }], { duration: 320, easing: "easeOutBack" });
+        if (el) void play(el, tid === task.id ? [{ transform: "scaleY(1.18)" }, { transform: "none" }] : [{ opacity: .4 }, { opacity: 1 }], { duration: 320, easing: "easeOutBack" });
       }
     }, 0);
   };
@@ -311,7 +311,7 @@ export function Gantt(props: GanttProps): Element {
     }
     effect(() => { svg.setAttribute("width", String(width())); svg.setAttribute("height", String(tasks().length * rowH)); });
     // the links draw themselves in once (motion engine: reduced motion shows them at once)
-    if (motion) later(() => { const st = stagger(25); fresh.forEach((p, i) => { const len = p.getTotalLength?.() ?? 0; if (len) void animate(p, [{ strokeDasharray: `${len}`, strokeDashoffset: `${len}` }, { strokeDasharray: `${len}`, strokeDashoffset: "0" }], { duration: 520, delay: st(i), easing: "easeOutCubic" }); }); }, 0);
+    if (motion) later(() => { const st = (i: number): number => i * 25; fresh.forEach((p, i) => { const len = p.getTotalLength?.() ?? 0; if (len) void play(p, [{ strokeDasharray: `${len}`, strokeDashoffset: `${len}` }, { strokeDasharray: `${len}`, strokeDashoffset: "0" }], { duration: 520, delay: st(i), easing: "easeOutCubic" }); }); }, 0);
     return svg as unknown as Element;
   };
 
@@ -351,7 +351,7 @@ export function Gantt(props: GanttProps): Element {
         scroller.scrollLeft = (rtl() ? -1 : 1) * Math.max(0, x);
       };
       toToday(50);
-      if (!first && motion) void animate(canvas, [{ opacity: 0, transform: "scaleX(.97)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "easeOutCubic" });
+      if (!first && motion) void play(canvas, [{ opacity: 0, transform: "scaleX(.97)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "easeOutCubic" });
       first = false;
     }, 0);
   });

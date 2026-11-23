@@ -13,7 +13,7 @@ import { h } from "../../../dom/h.ts";
 import { lazy } from "../../../dom/lazy.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { cx, uid, val, type ClassProp } from "../../../core/util.ts";
-import { isMod } from "../../../ui/keys.ts";
+import { isMod } from "../../../ui/key-label.ts";
 import { model, ctl, live, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { TabList } from "../../../ui/tabs.ts";
 import { Splitter } from "../../../ui/splitter.ts";
