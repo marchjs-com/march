@@ -13,6 +13,16 @@
 import { readFileSync, writeFileSync, rmSync, existsSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 
+// The packer reads and rewrites the same output files many times (every fold retargets the folded chunk's importers):
+// their texts are kept in memory for one packChunks() run, and every write goes to disk too (esbuild reads them back).
+// On Windows each read was a file open, and reading dominated the packer's time.
+const files = new Map();
+const fkey = (abs) => { const r = resolve(abs); return process.platform === "win32" ? r.toLowerCase() : r; };
+const readText = (abs) => { const k = fkey(abs); let t = files.get(k); if (t === undefined) { t = readFileSync(abs, "utf8"); files.set(k, t); } return t; };
+const writeText = (abs, t) => { files.set(fkey(abs), t); writeFileSync(abs, t); };
+const removeFile = (abs) => { files.delete(fkey(abs)); rmSync(abs, { force: true }); };
+const isFile = (abs) => files.has(fkey(abs)) || existsSync(abs);
+
 /** Remove the CSS loader of `css` (css-split.js form, plain or minified) from a chunk's code; null when not found. */
 function stripCssLoader(code, css) {
   const re = new RegExp(String.raw`await new Promise\(\(?\w+\)?=>\{if\(typeof document[^{}]*?new URL\("\./${esc(css)}(?:\?v=\w+)?",import\.meta\.url\)\.href;[\s\S]*?document\.head\.appendChild\(\w+\)\}\);?\n?`);
@@ -33,7 +43,7 @@ const clause = (s) => s.split(",").map((x) => x.trim()).filter(Boolean).map((x) 
  */
 function retarget(cwd, file, fromKey, toKey, names) {
   const abs = resolve(cwd, file);
-  let text = readFileSync(abs, "utf8");
+  let text = readText(abs);
   const spec = `["'](?:\\.{1,2}/)(?:[^"']*/)?${esc(base(fromKey))}["']`;
   const to = JSON.stringify(rel(abs, resolve(cwd, toKey)));
   let ok = true;
@@ -42,7 +52,7 @@ function retarget(cwd, file, fromKey, toKey, names) {
   text = text.replace(new RegExp(`export\\s*\\{([^}]*)\\}\\s*from\\s*${spec}`, "g"), (_m, c) => `export{${map(clause(c), true)}}from${to}`);
   text = text.replace(new RegExp(`import\\s*${spec}`, "g"), () => `import${to}`);
   if (!ok || new RegExp(esc(base(fromKey))).test(text)) return false;
-  writeFileSync(abs, text);
+  writeText(abs, text);
   return true;
 }
 
@@ -93,10 +103,15 @@ function explain(g, t, users, fits, bootFits) {
 }
 
 export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, minSize = 2048, budgetOf, fallback = true, strategy = 0, forceSize = FORCE_SIZE }) {
+  files.clear(); // a new build wrote new outputs
   const outs = meta.outputs;
+  // gzip size of each output on disk; a fold rewrites only its host, the folded chunk and their importers, so only those
+  // are dropped (`stale`): clearing the whole cache made every round re-read and re-gzip every file (~90% of the packer's
+  // time on a 1000-file build)
   const gzCache = new Map();
-  const gz = (k) => { if (!gzCache.has(k)) { const f = resolve(cwd, k); gzCache.set(k, existsSync(f) ? gzipSync(readFileSync(f)).length : 0); } return gzCache.get(k); };
-  const text = (k) => readFileSync(resolve(cwd, k), "utf8");
+  const stale = (keys) => { for (const k of keys) gzCache.delete(k); };
+  const gz = (k) => { if (!gzCache.has(k)) { const f = resolve(cwd, k); gzCache.set(k, isFile(f) ? gzipSync(readText(f)).length : 0); } return gzCache.get(k); };
+  const text = (k) => readText(resolve(cwd, k));
   let stubs = 0, folded = 0;
 
   // 1. entry stubs: importers take the bindings from the entry itself
@@ -108,9 +123,9 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
     const { importers } = graph(outs);
     const users = importers.get(k) ?? [];
     const before = new Map(users.map((u) => [u, text(u)]));
-    if (!users.every((u) => retarget(cwd, u, k, entryKey, names))) { for (const [u, t] of before) writeFileSync(resolve(cwd, u), t); continue; }
+    if (!users.every((u) => retarget(cwd, u, k, entryKey, names))) { for (const [u, t] of before) writeText(resolve(cwd, u), t); continue; }
     for (const u of users) outs[u].imports = dedupe((outs[u].imports ?? []).map((im) => (im.path === k ? { ...im, path: entryKey } : im)));
-    rmSync(resolve(cwd, k), { force: true });
+    removeFile(resolve(cwd, k));
     delete outs[k];
     stubs++;
   }
@@ -229,8 +244,8 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
         }
       }
       if (!best && DEBUG && Object.keys(outs[t].inputs ?? {}).some((i) => i.includes(DEBUG))) explain(g, t, users, fits, bootFits);
-      if (!best || !(await fold(t, best, g.importers.get(t) ?? []))) { skip.add(t); continue; }
-      folded++; done = true; gzCache.clear(); break;
+      if (!best || !(await fold(t, best, users))) { skip.add(t); continue; }
+      folded++; done = true; stale([t, best, ...users]); break;
     }
     if (!done) break;
   }
@@ -241,7 +256,7 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
   {
     const g = graph(outs);
     const cssOf = (k) => outs[k]?.cssBundle;
-    const size = (c) => (existsSync(resolve(cwd, c)) ? readFileSync(resolve(cwd, c)).length : Infinity);
+    const size = (c) => (isFile(resolve(cwd, c)) ? Buffer.byteLength(readText(resolve(cwd, c))) : Infinity);
     for (const x of g.js) {
       const c = cssOf(x);
       if (!c || x === entryKey || size(c) >= minSize) continue;
@@ -258,16 +273,16 @@ export async function packChunks(meta, { cwd, entryKey, esbuild, minify = true, 
       if (!host) continue;
       const stripped = stripCssLoader(text(x), base(c));
       if (stripped == null) continue;
-      const hc = cssOf(host), css = readFileSync(resolve(cwd, c), "utf8"), hcss = readFileSync(resolve(cwd, hc), "utf8");
+      const hc = cssOf(host), css = readText(resolve(cwd, c)), hcss = readText(resolve(cwd, hc));
       // X before its importer (it loads first); otherwise after the host's own rules
       const first = g.closure(host).has(x);
-      writeFileSync(resolve(cwd, hc), first ? `${css}
+      writeText(resolve(cwd, hc), first ? `${css}
 ${hcss}` : `${hcss}
 ${css}`);
-      writeFileSync(resolve(cwd, x), stripped);
+      writeText(resolve(cwd, x), stripped);
       outs[x].bytes = Buffer.byteLength(stripped);
-      rmSync(resolve(cwd, c), { force: true });
-      outs[hc] = { ...outs[hc], bytes: Buffer.byteLength(readFileSync(resolve(cwd, hc))), inputs: { ...(outs[hc]?.inputs ?? {}), ...(outs[c]?.inputs ?? {}) } };
+      removeFile(resolve(cwd, c));
+      outs[hc] = { ...outs[hc], bytes: Buffer.byteLength(readText(resolve(cwd, hc))), inputs: { ...(outs[hc]?.inputs ?? {}), ...(outs[c]?.inputs ?? {}) } };
       delete outs[c];
       delete outs[x].cssBundle;
       cssMoved++;
@@ -280,24 +295,24 @@ ${css}`);
     const m = /new URL\("\.\/([^"?]+\.css)(?:\?v=\w+)?",import\.meta\.url\)/.exec(code);
     const file = m && posix(relative(cwd, resolve(dirname(resolve(cwd, entryKey)), m[1])));
     const stripped = m && stripCssLoader(code, m[1]);
-    if (file && stripped != null && outs[file]) { code = stripped; outs[entryKey].cssBundle = file; writeFileSync(resolve(cwd, entryKey), code); outs[entryKey].bytes = Buffer.byteLength(code); cssMoved++; }
+    if (file && stripped != null && outs[file]) { code = stripped; outs[entryKey].cssBundle = file; writeText(resolve(cwd, entryKey), code); outs[entryKey].bytes = Buffer.byteLength(code); cssMoved++; }
   }
   const mainCss = outs[entryKey]?.cssBundle;
-  if (mainCss && existsSync(resolve(cwd, mainCss))) {
+  if (mainCss && isFile(resolve(cwd, mainCss))) {
     for (const m of [...code.matchAll(/new URL\("\.\/([^"?]+\.css)(?:\?v=\w+)?",import\.meta\.url\)/g)]) {
       const file = posix(relative(cwd, resolve(dirname(resolve(cwd, entryKey)), m[1])));
       const key = Object.keys(outs).find((k) => posix(k) === file);
       const stripped = stripCssLoader(code, m[1]);
-      if (!key || stripped == null || !existsSync(resolve(cwd, key))) continue;
-      const css = readFileSync(resolve(cwd, key), "utf8");
+      if (!key || stripped == null || !isFile(resolve(cwd, key))) continue;
+      const css = readText(resolve(cwd, key));
       fs_append(resolve(cwd, mainCss), css);
       code = stripped;
-      rmSync(resolve(cwd, key), { force: true });
-      outs[mainCss] = { ...outs[mainCss], bytes: readFileSync(resolve(cwd, mainCss)).length, inputs: { ...(outs[mainCss]?.inputs ?? {}), ...(outs[key]?.inputs ?? {}) } };
+      removeFile(resolve(cwd, key));
+      outs[mainCss] = { ...outs[mainCss], bytes: Buffer.byteLength(readText(resolve(cwd, mainCss))), inputs: { ...(outs[mainCss]?.inputs ?? {}), ...(outs[key]?.inputs ?? {}) } };
       delete outs[key];
       cssMoved++;
     }
-    writeFileSync(resolve(cwd, entryKey), code);
+    writeText(resolve(cwd, entryKey), code);
     outs[entryKey].bytes = Buffer.byteLength(code);
   }
   return { stubs, folded, cssMoved, common };
@@ -330,9 +345,10 @@ ${css}`);
     // every route / part that loads a member of a group now loads the whole group (and its imports), and every other
     // group it touches: none may pass its budget
     const groups = [];
-    const fitsAll = (gs) => {
+    // only who loads a member of the changed group can change: every other user was checked when its groups were made
+    const fitsAll = (gs, changed) => {
       if (!budgetOf) return true;
-      const users = new Set(gs.flat().flatMap((t) => [...g.reach.get(t)]));
+      const users = new Set(changed.flatMap((t) => [...g.reach.get(t)]));
       for (const e of users) {
         const lim = budgetOf(e)?.limit;
         if (lim == null) continue;
@@ -345,7 +361,7 @@ ${css}`);
       return true;
     };
     for (const t of cand) {
-      const i = groups.findIndex((x) => x.reduce((s, y) => s + gz(y), 0) + gz(t) <= partLimit && fitsAll(groups.map((y) => (y === x ? [...y, t] : y))));
+      const i = groups.findIndex((x) => x.reduce((s, y) => s + gz(y), 0) + gz(t) <= partLimit && fitsAll(groups.map((y) => (y === x ? [...y, t] : y)), [...x, t]));
       if (i >= 0) groups[i].push(t); else groups.push([t]);
     }
     if (DBG) console.log("[common] groups:", groups.map((x) => x.map(base).join("+")).join(" | "));
@@ -378,7 +394,7 @@ ${css}`);
             const abs = resolve(a.resolveDir || dirname(a.importer), a.path);
             return inside.has(abs) ? { path: abs } : { path: rel(cAbs, abs), external: true };
           });
-          x.onLoad({ filter: /\.js$/ }, (a) => ({ contents: readFileSync(a.path, "utf8").replace(/new URL\("(\.\/[^"]+\.css)",import\.meta\.url\)/g, (_m, css) => `new URL(${JSON.stringify(rel(cAbs, resolve(dirname(a.path), css)))},import.meta.url)`), loader: "js", resolveDir: dirname(a.path) }));
+          x.onLoad({ filter: /\.js$/ }, (a) => ({ contents: readText(a.path).replace(/new URL\("(\.\/[^"]+\.css)",import\.meta\.url\)/g, (_m, css) => `new URL(${JSON.stringify(rel(cAbs, resolve(dirname(a.path), css)))},import.meta.url)`), loader: "js", resolveDir: dirname(a.path) }));
         } }],
       });
     } catch { return false; }
@@ -387,29 +403,29 @@ ${css}`);
     const before = new Map(users.map((u) => [u, text(u)]));
     for (const t of grp) {
       const us = (g.importers.get(t) ?? []).filter((u) => !grp.includes(u));
-      if (!us.every((u) => retarget(cwd, u, t, key, aliases.get(t)))) { for (const [u, x] of before) writeFileSync(resolve(cwd, u), x); return false; }
+      if (!us.every((u) => retarget(cwd, u, t, key, aliases.get(t)))) { for (const [u, x] of before) writeText(resolve(cwd, u), x); return false; }
     }
     let code = res.outputFiles[0].text;
     let css = grp.map((t) => outs[t].cssBundle).filter(Boolean);
     // one stylesheet per common chunk: the members' CSS joins the first one in load order (one loader, no small CSS files)
     if (css.length > 1) {
       const keep = [css[0]];
-      let joined = readFileSync(resolve(cwd, css[0]), "utf8");
+      let joined = readText(resolve(cwd, css[0]));
       for (const c of css.slice(1)) {
         const stripped = stripCssLoader(code, base(c));
-        if (stripped == null || !existsSync(resolve(cwd, c))) { keep.push(c); continue; }
+        if (stripped == null || !isFile(resolve(cwd, c))) { keep.push(c); continue; }
         code = stripped;
         joined += `
-${readFileSync(resolve(cwd, c), "utf8")}`;
+${readText(resolve(cwd, c))}`;
         outs[css[0]] = { ...outs[css[0]], inputs: { ...(outs[css[0]]?.inputs ?? {}), ...(outs[c]?.inputs ?? {}) } };
-        rmSync(resolve(cwd, c), { force: true });
+        removeFile(resolve(cwd, c));
         delete outs[c];
       }
-      writeFileSync(resolve(cwd, css[0]), joined);
+      writeText(resolve(cwd, css[0]), joined);
       outs[css[0]].bytes = Buffer.byteLength(joined);
       css = keep;
     }
-    writeFileSync(cAbs, code);
+    writeText(cAbs, code);
     outs[key] = {
       bytes: Buffer.byteLength(code), common: true, entryPoint: undefined,
       imports: dedupe(grp.flatMap((t) => outs[t].imports ?? []).filter((im) => !grp.includes(im.path))),
@@ -418,8 +434,8 @@ ${readFileSync(resolve(cwd, c), "utf8")}`;
       ...(css.length ? { cssBundle: css[0], cssBundles: css } : {}),
     };
     for (const u of users) outs[u].imports = dedupe((outs[u].imports ?? []).map((im) => (grp.includes(im.path) ? { ...im, path: key } : im)));
-    for (const t of grp) { rmSync(resolve(cwd, t), { force: true }); delete outs[t]; }
-    gzCache.clear();
+    for (const t of grp) { removeFile(resolve(cwd, t)); delete outs[t]; }
+    stale([key, ...grp, ...users]);
     return true;
   }
 
@@ -431,19 +447,19 @@ ${readFileSync(resolve(cwd, c), "utf8")}`;
     const tc = outs[t].cssBundle, bc = outs[b].cssBundle;
     if (!tc || !bc) return null;
     const tText = text(t), stripped = stripCssLoader(tText, base(tc));
-    if (stripped == null || !existsSync(resolve(cwd, tc)) || !existsSync(resolve(cwd, bc))) return null;
-    const tCss = readFileSync(resolve(cwd, tc), "utf8"), bCss = readFileSync(resolve(cwd, bc), "utf8");
+    if (stripped == null || !isFile(resolve(cwd, tc)) || !isFile(resolve(cwd, bc))) return null;
+    const tCss = readText(resolve(cwd, tc)), bCss = readText(resolve(cwd, bc));
     const saved = { tc: outs[tc], bc: outs[bc] };
-    writeFileSync(resolve(cwd, bc), `${tCss}
+    writeText(resolve(cwd, bc), `${tCss}
 ${bCss}`);
-    writeFileSync(resolve(cwd, t), stripped);
-    rmSync(resolve(cwd, tc), { force: true });
+    writeText(resolve(cwd, t), stripped);
+    removeFile(resolve(cwd, tc));
     outs[bc] = { ...outs[bc], bytes: Buffer.byteLength(`${tCss}
 ${bCss}`), inputs: { ...(outs[bc]?.inputs ?? {}), ...(outs[tc]?.inputs ?? {}) } };
     delete outs[tc];
     delete outs[t].cssBundle;
     return () => {
-      writeFileSync(resolve(cwd, bc), bCss); writeFileSync(resolve(cwd, tc), tCss); writeFileSync(resolve(cwd, t), tText);
+      writeText(resolve(cwd, bc), bCss); writeText(resolve(cwd, tc), tCss); writeText(resolve(cwd, t), tText);
       outs[bc] = saved.bc; outs[tc] = saved.tc; outs[t].cssBundle = tc;
     };
   }
@@ -468,16 +484,16 @@ ${bCss}`), inputs: { ...(outs[bc]?.inputs ?? {}), ...(outs[tc]?.inputs ?? {}) } 
             const abs = resolve(a.resolveDir || dirname(a.importer), a.path);
             return inside.has(abs) ? { path: abs } : { path: rel(bAbs, abs), external: true };
           });
-          x.onLoad({ filter: /\.js$/ }, (a) => ({ contents: readFileSync(a.path, "utf8").replace(/new URL\("(\.\/[^"]+\.css)",import\.meta\.url\)/g, (_m, css) => `new URL(${JSON.stringify(rel(bAbs, resolve(dirname(a.path), css)))},import.meta.url)`), loader: "js", resolveDir: dirname(a.path) }));
+          x.onLoad({ filter: /\.js$/ }, (a) => ({ contents: readText(a.path).replace(/new URL\("(\.\/[^"]+\.css)",import\.meta\.url\)/g, (_m, css) => `new URL(${JSON.stringify(rel(bAbs, resolve(dirname(a.path), css)))},import.meta.url)`), loader: "js", resolveDir: dirname(a.path) }));
         } }],
       });
     } catch { return fail(); }
     // importers of T (other than B) now import the same bindings from B
     const others = users.filter((u) => u !== b);
     const before = new Map(others.map((u) => [u, text(u)]));
-    if (!others.every((u) => retarget(cwd, u, t, b, alias))) { for (const [u, x] of before) writeFileSync(resolve(cwd, u), x); return fail(); }
-    writeFileSync(bAbs, res.outputFiles[0].text);
-    rmSync(tAbs, { force: true });
+    if (!others.every((u) => retarget(cwd, u, t, b, alias))) { for (const [u, x] of before) writeText(resolve(cwd, u), x); return fail(); }
+    writeText(bAbs, res.outputFiles[0].text);
+    removeFile(tAbs);
     for (const u of others) outs[u].imports = dedupe((outs[u].imports ?? []).map((im) => (im.path === t ? { ...im, path: b } : im)));
     outs[b].imports = dedupe([...(outs[b].imports ?? []), ...(outs[t].imports ?? [])].filter((im) => im.path !== t && im.path !== b));
     outs[b].exports = [...bExp, ...alias.values()];
@@ -506,6 +522,6 @@ export const STRATEGIES = [
   { commonFirst: true, order: 1, entryHost: true }, { commonFirst: true, order: 2, entryHost: true },
 ];
 
-function fs_append(file, css) { writeFileSync(file, `${readFileSync(file, "utf8")}
+function fs_append(file, css) { writeText(file, `${readText(file)}
 ${css}`); }
 function dedupe(list) { const seen = new Set(); return list.filter((im) => { const k = `${im.kind}:${im.path}`; if (seen.has(k)) return false; seen.add(k); return true; }); }

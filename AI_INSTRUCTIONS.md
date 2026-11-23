@@ -193,11 +193,14 @@ Overlays never take input; put content after them. `front` only for foreground e
   prop). Type your own icon props as `IconType` (march/icons).
 - Leave `<Link>` prefetch on (default hover). Do not prefetch everything by hand.
 - Credit is optional and never required (the licence stays MIT): `<MadeWithMarch />` (`variant` text / badge / small, link constant `MARCH_URL`) or `credit: true` in `march.config.js` (adds `<!-- Built with MarchJS -->` to the built `index.html` and prints the one-line console banner in production too, from a separate tiny `credit.js`; off by default). `march dev` prints the banner once per page; `banner: false` turns it off. Production never prints it otherwise and the app bundle never contains it (size effect 0). The link comes from one constant, `MARCH_URL` in `src/brand.js`. Add it to a footer when the user wants it; never add it unasked.
-- Set `budget` in `march.config.js` for production apps (`{ entry, route, part, routes: { "/x": bytes }, parts: { "src/x.ts": { limit, why } }, fail: true }`); `parts` gives one lazy part (by its import source) its own limit with a written reason, e.g. a third-party library loaded on demand. Turn on `sw: true` when offline use matters.
+- Set `budget` in `march.config.js` for production apps (`{ entry, route, part, routes: { "/x": bytes }, parts: { "src/x.ts": { limit, why } }, fail: true }`); `parts` gives one lazy part (by its import source) its own limit with a written reason, e.g. a third-party library loaded on demand. A lazy part counts what it adds on top of the page that opens it (the page's own files are already there). Turn on `sw: true` when offline use matters.
 - `chunks: { minSize: 10240, allow: { "chunks/x.js": "reason" } }` (default 10 KB before gzip): no JS/CSS file under it. Small shared code
   folds into a chunk loaded with it (else the cheapest partner); a small lazy module becomes a static import of its lazy
   parent, or joins a group chunk with the entry's other small lazy modules that share the most code (second build pass).
-  A file still under the limit fails the build; `allow` needs a reason. `chunks: false` turns it off.
+  A file still under the limit fails the build (`fail: false`: listed, the build passes); `allow` needs a reason.
+  `maxBuilds` / `maxSeconds` cap the packing passes. `chunks: false` turns it off. The packer packs to the default
+  budgets (`route`, `part`); `budget.routes` / `budget.parts` (`{ limit, why }`, a layout too) only let a row that is big
+  by its own content pass the report.
 
 **Don't (security)**
 - Never use `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function`, string `style`.
@@ -342,7 +345,7 @@ useHead(() => ({ title: $product.name, og: { image: $product.photo }, jsonLd: ld
 Order: defaults → route head → `useHead` (later wins; a component's head leaves with it). `march.config.js`
 `seo: { site, prerender: true, sitemap: true, robots: true }` writes each param-less route's HTML at build time plus
 `sitemap.xml` / `robots.txt`; then mount with `hydrate(() => <Router />, el)` from `march/seo/hydrate` instead of
-`render`. Hash routing prerenders only the start page and gets no automatic canonical. Check pages with
+`render`. `exclude: [paths] | (path) => bool` leaves routes out (no HTML, no sitemap line; 404.html opens them). Hash routing prerenders only the start page and gets no automatic canonical. Check pages with
 `march seo check` (title, description, canonical, img alt). Every `<img>` needs `alt` (`alt=""` when decorative).
 Under a Trusted Types CSP use `installSeo({ jsonLd: false })` (run-time script text is blocked) and ship JSON-LD at build time.
 Full reference: `docs/seo.md`.

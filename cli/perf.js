@@ -13,7 +13,7 @@ import { posix } from "../compiler/fs-util.js";
 /**
  * @param {import("esbuild").Metafile} meta
  * @param {{ cwd: string, outdir: string, entry: string }} o  absolute cwd, absolute outdir, entry file (as configured)
- * @returns {{ manifest: Record<string, string[]>, entryFiles: string[], entryKey: string|null }}
+ * @returns {{ manifest: Record<string, string[]>, entryFiles: string[], entryKey: string|null, openers: Record<string, string[]> }}
  */
 export function chunkManifest(meta, { cwd, outdir, entry }) {
   const outs = meta.outputs;
@@ -42,7 +42,19 @@ export function chunkManifest(meta, { cwd, outdir, entry }) {
   if (common.length) manifest["march:common"] = [...new Set(common.flatMap((k) => [...closure(k)]))].filter((f) => !base.has(f)).sort((a, b) => Number(a.endsWith(".css")) - Number(b.endsWith(".css"))).map(rel);
   // each common chunk with what it imports: a size report row of its own (each one is held to the part budget)
   const commons = common.map((k) => [...closure(k)].filter((f) => !base.has(f)).map(rel));
-  return { manifest, entryFiles: [...base].map(rel), entryKey, commons };
+  // who opens each lazy module: the manifest keys whose files hold a chunk that import()s it (the page a lazy part is
+  // opened from); none when the entry opens it. The size report counts a part on top of the page that opens it.
+  const keyOf = new Map(Object.entries(outs).filter(([k, o]) => o.entryPoint && k !== entryKey && k.endsWith(".js")).map(([k, o]) => [k, posix(o.entryPoint)]));
+  const holders = new Map();
+  for (const [k, key] of keyOf) for (const f of closure(k)) { const l = holders.get(f) ?? []; l.push(key); holders.set(f, l); }
+  const openers = {};
+  for (const [k, o] of Object.entries(outs)) for (const im of o.imports ?? []) {
+    const key = im.kind === "dynamic-import" ? keyOf.get(im.path) : undefined;
+    if (!key || base.has(k)) continue;
+    const list = (openers[key] ??= []);
+    for (const h of holders.get(k) ?? []) if (h !== key && !list.includes(h)) list.push(h);
+  }
+  return { manifest, entryFiles: [...base].map(rel), entryKey, commons, openers };
 }
 
 /**
@@ -98,9 +110,13 @@ export function routePaths(meta, cwd, keys) {
 /** A layout module (march gen routes: _layout.tsx): it ships with its routes, so it has the route budget. */
 const LAYOUT = /(^|\/)_?layout\.[cm]?[jt]sx?$/;
 export function sizeReport(m, outdir, budget, routes = {}) {
+  // each file is read and gzipped once: a file is in many rows (shared chunks), and reading it per row made the report
+  // most of a release build's time (Windows file opens)
+  const known = new Map();
+  const gzOf = (f) => { const p = resolve(outdir, f.replace(/\?.*$/, "")); if (!known.has(p)) known.set(p, gz(p)); return known.get(p); };
   const size = (files) => {
     let js = 0, css = 0;
-    for (const f of files) { const n = gz(resolve(outdir, f)); if (/\.css(\?|$)/.test(f)) css += n; else js += n; }
+    for (const f of files) { const n = gzOf(f); if (/\.css(\?|$)/.test(f)) css += n; else js += n; }
     return { js, css };
   };
   // budget.boot: lazy parts the app loads at start-up (shell pieces); a route row then counts only what ITS navigation
@@ -113,6 +129,18 @@ export function sizeReport(m, outdir, budget, routes = {}) {
   // march:common is every common chunk prefetched together; each common chunk is a row (and a part budget) of its own
   const commonRows = (m.commons ?? []).length > 1 ? m.commons.map((files, i) => [`march:common ${i + 1}`, files]) : [];
   const rest = [...Object.entries(m.manifest).filter(([k]) => !bootKeys.includes(k) && !k.startsWith("march-group:") && !(commonRows.length && k === "march:common")), ...commonRows].map(([k, all]) => ({ files: all.filter((f) => !bootFiles.has(f)), k })).map(({ k, files }) => ({ name: routes[k] ?? k, key: k, kind: routes[k] ? "route" : LAYOUT.test(k) ? "layout" : "part", files, ...size(files), entry: false }));
+  // a lazy part loads after the page that opens it: it counts what it adds on top of that page (`files` stays the whole
+  // list; `alone` is its size without the page). Opened from several pages: the one that already holds the most of it.
+  for (const r of rest) {
+    if (r.kind !== "part") continue;
+    const from = (m.openers?.[r.key] ?? []).map((k) => m.manifest[k]).filter(Boolean);
+    if (!from.length) continue;
+    const added = from.map((have) => { const got = new Set(have); return r.files.filter((f) => !got.has(f)); }).map((fs) => ({ fs, ...size(fs) })).sort((a, b) => a.js - b.js)[0];
+    r.alone = r.js;
+    r.js = added.js;
+    r.css = added.css;
+    r.added = added.fs;
+  }
   // routes by path, then the lazy parts by name
   const RANK = { route: 0, layout: 1, part: 2 };
   rest.sort((a, b) => (a.kind === b.kind ? a.name.localeCompare(b.name) : RANK[a.kind] - RANK[b.kind]));
@@ -120,7 +148,7 @@ export function sizeReport(m, outdir, budget, routes = {}) {
   const b = budget === false ? null : { entry: 15 * 1024, route: 60 * 1024, fail: false, ...(budget ?? {}) };
   const over = [];
   for (const r of rows) {
-    r.limit = !b ? Infinity : r.kind === "entry" ? b.entry : r.kind === "boot" ? b.bootLimit ?? b.route : r.kind === "route" ? b.routes?.[r.name] ?? b.route : r.kind === "layout" ? b.route : b.parts?.[r.key]?.limit ?? b.part ?? b.route;
+    r.limit = !b ? Infinity : r.kind === "entry" ? b.entry : r.kind === "boot" ? b.bootLimit ?? b.route : r.kind === "route" ? b.routes?.[r.name] ?? b.route : r.kind === "layout" ? b.parts?.[r.key]?.limit ?? b.route : b.parts?.[r.key]?.limit ?? b.part ?? b.route;
     r.cssLimit = b?.css ?? Infinity;
     r.over = r.js > r.limit || r.css > r.cssLimit;
     if (r.over) over.push(r);

@@ -187,11 +187,22 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
   // a parent that several pages or lazy parts load (shared code): inlining there costs every one of them
   const entries = Object.keys(outs).filter((k) => outs[k].entryPoint && k.endsWith(".js"));
   const shared = (from) => entries.filter((e) => e !== from && reach(e).has(from)).length >= 2;
+  // Into such a parent the module's own code counts too, and so does everything inlined there before: many small
+  // lazy modules (one drawing set per section, each 3 KB) inlined one by one would make every user of the parent
+  // download all of them (counted over the modules planned in this pass; the first pass sees them all).
   plan.keep ??= [];
+  const took = new Map();
   for (const p of pending.filter((x) => !x.toEntry)) {
     if ((plan.inline[p.importer] ?? []).some((x) => x.spec === p.spec)) continue;
     if (plan.keep.includes(posix(p.target))) continue;
-    if (shared(p.from) && extra(p) >= minSize) { plan.keep.push(posix(p.target)); added++; continue; }
+    // a lazy import inside start-up (a shell piece's breadcrumb, its idle extras, a layout feature) is there on purpose:
+    // inlined, it would load at start-up for everyone. It stays a lazy file of its own, whatever its size.
+    if (bootReach.has(p.from)) { plan.keep.push(posix(p.target)); added++; continue; }
+    if (shared(p.from)) {
+      const cost = (took.get(p.from) ?? 0) + bytes(p.key) + extra(p);
+      if (cost >= minSize) { plan.keep.push(posix(p.target)); added++; continue; }
+      took.set(p.from, cost);
+    }
     (plan.inline[p.importer] ??= []).push({ spec: p.spec, mode: "static" });
     added++;
   }

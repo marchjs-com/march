@@ -146,8 +146,10 @@ function budgetOf(budget, meta, plan) {
     if (ep.startsWith("march-group:")) return plan?.boot?.includes(ep.slice(12)) ? { boot: true } : { limit: budget.route ?? 60 * 1024 };
     if (boot.has(ep)) return { boot: true };
     const path = routes[ep];
-    // budget.parts: a lazy part with its own, argued limit ({ limit, why }), e.g. a third-party library loaded on demand
-    return { limit: path ? budget.routes?.[path] ?? budget.route ?? 60 * 1024 : budget.parts?.[ep]?.limit ?? budget.part ?? budget.route ?? 60 * 1024 };
+    // the packer packs to the default budgets: an argued limit (budget.routes / budget.parts, { limit, why }) lets a row
+    // that is big by its own content pass the report, it is not room to fold shared code into it (that would change the
+    // packing, and so the rows the limit was measured on)
+    return { limit: path ? budget.route ?? 60 * 1024 : budget.part ?? budget.route ?? 60 * 1024 };
   };
   // start-up beyond the entry (the "(boot)" row of the size report)
   of.bootLimit = budget.bootLimit ?? budget.route ?? 60 * 1024;
@@ -248,12 +250,14 @@ async function build({ dev = false } = {}) {
       const smallest = files.map((k, i) => ({ file: posix(relative(out, resolve(cwd, k))), bytes: sizes[i] })).sort((a, b) => a.bytes - b.bytes)[0] ?? null;
       const chunkStats = { minSize, files: files.length, bytes: sizes.reduce((a, b) => a + b, 0), smallest, under: small.length, allow };
       console.log(`  files: ${chunkStats.files} JS/CSS, ${(chunkStats.bytes / 1024).toFixed(1)} KB; smallest ${smallest ? `${smallest.file} ${(smallest.bytes / 1024).toFixed(1)} KB` : "-"}; under ${(minSize / 1024).toFixed(0)} KB: ${small.length}`);
-      writeFileSync(join(out, "march-report.json"), `${JSON.stringify({ chunks: chunkStats, files: fileSizes(out), entry: rep.rows[0], boot: rep.rows.find((x) => x.kind === "boot") ?? null, routes: rep.rows.filter((x) => x.kind === "route").map(({ name, key, js, css, limit, over, files }) => ({ name, key, js, css, limit, over, files })), parts: rep.rows.filter((x) => x.kind === "part" || x.kind === "layout").map(({ name, kind, js, css, limit, over, files }) => ({ name, kind, js, css, limit, over, files })), budget: rep.budget }, null, 2)}\n`);
+      writeFileSync(join(out, "march-report.json"), `${JSON.stringify({ chunks: chunkStats, files: fileSizes(out), entry: rep.rows[0], boot: rep.rows.find((x) => x.kind === "boot") ?? null, routes: rep.rows.filter((x) => x.kind === "route").map(({ name, key, js, css, limit, over, files }) => ({ name, key, js, css, limit, over, files })), parts: rep.rows.filter((x) => x.kind === "part" || x.kind === "layout").map(({ name, key, kind, js, css, alone, limit, over, files }) => ({ name, key, kind, js, css, ...(alone != null ? { alone } : {}), limit, over, files })), budget: rep.budget }, null, 2)}\n`);
       if (flag("--analyze") === true) { console.log("  largest modules in the entry (minified, before gzip):"); for (const t of topInputs(r.metafile, cwd, out, chunks.entryFiles, 40)) console.log(`    ${(t.bytes / 1024).toFixed(1).padStart(6)} KB  ${t.file}`); }
       if (small.length) {
         // chunks.allow: { "chunks/x.js": "why it must stay small" } — a reason is required
-        console.error(`[31m✖[0m ${small.length} file(s) under chunks.minSize (${minSize} B): ${small.map((x) => `${x.file} ${x.bytes} B`).join(", ")}`);
-        process.exitCode = 1;
+        // chunks.fail: false — the floor is an aim, not a gate: what is left is listed and the build passes
+        const soft = cfg.chunks?.fail === false;
+        console.error(`${soft ? "[33m![0m" : "[31m✖[0m"} ${small.length} file(s) under chunks.minSize (${minSize} B): ${small.map((x) => `${x.file} ${x.bytes} B`).join(", ")}`);
+        if (!soft) process.exitCode = 1;
       }
       // budget.maxFiles: every file of the output (a host may cap files per deploy)
       const tooMany = filesOver(out, cfg.budget?.maxFiles);

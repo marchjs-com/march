@@ -48,6 +48,18 @@ test("small pages join a group (or the entry); big pages keep their own chunk; n
   } finally { a.done(); }
 });
 
+test("chunks.fail: false — files left under the floor are listed, the build passes (default: it fails)", () => {
+  const pages = { index: "export default () => <p>home</p>\n", big: big("big", 400), other: big("other", 400) };
+  const strict = app({ chunks: { minSize: 1024 * 1024, maxBuilds: 1 } }, pages);
+  const soft = app({ chunks: { minSize: 1024 * 1024, maxBuilds: 1, fail: false } }, pages);
+  try {
+    assert.ok(strict.err, "a file under the floor fails the build");
+    assert.match(String(strict.err.stderr), /under chunks\.minSize/);
+    assert.equal(soft.err, null, String(soft.err?.stderr ?? ""));
+    assert.ok(soft.report.chunks.under > 0, "still listed in the report");
+  } finally { strict.done(); soft.done(); }
+});
+
 test("smallFiles: under the limit is reported; the entry and its CSS are exempt; chunks.allow lets a named file through", () => {
   const dir = mkdtempSync(join(tmpdir(), "march-small-"));
   try {
@@ -82,6 +94,55 @@ test("min-chunks: start-up pieces (budget.boot) group only with each other, neve
   // the boot group (5.5 KB) is exempt from the minimum size
   meta.outputs["dist/g0.js"] = { entryPoint: `march-group:${bootGroup[0]}`, bytes: 5500, imports: [], inputs: {} };
   assert.equal(smallFiles(meta, { cwd: process.cwd(), minSize: 10240, entryKey: "dist/main.js", boot: ["src/shell-a.tsx"], plan }).length, 0);
+});
+
+test("min-chunks: a lazy module that a start-up piece loads stays lazy (idle extras, a breadcrumb): never inlined into start-up", async () => {
+  const { planSmallLazy } = await import("../compiler/min-chunks.js");
+  const out = (entryPoint, bytes, imports = []) => ({ entryPoint, bytes, imports: imports.map((p) => ({ path: p, kind: "import-statement" })), inputs: { [entryPoint]: {} } });
+  const meta = {
+    outputs: {
+      "dist/main.js": { entryPoint: "src/main.tsx", bytes: 40000, imports: [], inputs: { "src/main.tsx": {} } },
+      "dist/shell.js": out("src/shell.tsx", 12000),
+      // loaded by the shell when idle: 300 bytes of its own, 60 KB of motion code behind it
+      "dist/extras.js": out("src/extras.ts", 300, ["dist/motion.js"]),
+      "dist/motion.js": { bytes: 60000, imports: [], inputs: {} },
+      // a light one (a breadcrumb): lazy on purpose too
+      "dist/tiny.js": out("src/tiny.ts", 400),
+    },
+    inputs: {
+      "src/main.tsx": { imports: [{ path: "src/shell.tsx", kind: "dynamic-import", original: "./shell.tsx" }] },
+      "src/shell.tsx": { imports: [{ path: "src/extras.ts", kind: "dynamic-import", original: "./extras.ts" }, { path: "src/tiny.ts", kind: "dynamic-import", original: "./tiny.ts" }] },
+    },
+  };
+  const plan = planSmallLazy(meta, { cwd: process.cwd(), entryKey: "dist/main.js", minSize: 10240, boot: ["src/shell.tsx"] });
+  assert.deepEqual(plan.keep.sort(), ["src/extras.ts", "src/tiny.ts"], "both stay lazy files of their own");
+  const inline = Object.values(plan.inline).flat().map((x) => x.spec);
+  assert.deepEqual(inline, [], "never a static import of the start-up piece");
+});
+
+test("min-chunks: small lazy modules of a shared parent are inlined only up to the floor in all (one drawing set per section)", async () => {
+  const { planSmallLazy } = await import("../compiler/min-chunks.js");
+  const out = (entryPoint, bytes, imports = []) => ({ entryPoint, bytes, imports: imports.map((p) => ({ path: p, kind: "import-statement" })), inputs: { [entryPoint]: {} } });
+  const sets = ["a", "b", "c", "d", "e", "f"].map((s) => `src/art/${s}.ts`);
+  const meta = {
+    outputs: {
+      "dist/main.js": { entryPoint: "src/main.tsx", bytes: 40000, imports: [], inputs: { "src/main.tsx": {} } },
+      // two pages share the art loader (its chunk is shared code)
+      "dist/one.js": out("src/pages/one.tsx", 20000, ["dist/art.js"]),
+      "dist/two.js": out("src/pages/two.tsx", 20000, ["dist/art.js"]),
+      "dist/art.js": { bytes: 2000, imports: [], inputs: { "src/art.ts": {} } },
+      // six sets of 3 KB, no imports of their own
+      ...Object.fromEntries(sets.map((s) => [`dist/${s.split("/").pop().replace(".ts", ".js")}`, out(s, 3000)])),
+    },
+    inputs: {
+      "src/main.tsx": { imports: ["src/pages/one.tsx", "src/pages/two.tsx"].map((p) => ({ path: p, kind: "dynamic-import", original: `./${p}` })) },
+      "src/art.ts": { imports: sets.map((s) => ({ path: s, kind: "dynamic-import", original: `./${s}` })) },
+    },
+  };
+  const plan = planSmallLazy(meta, { cwd: process.cwd(), entryKey: "dist/main.js", minSize: 10240, maxLoad: 61440 });
+  const inlined = Object.values(plan.inline).flat().filter((x) => x.mode === "static" && x.spec.includes("/art/"));
+  assert.equal(inlined.length, 3, "3 × 3 KB fit under the 10 KB floor, the fourth would not");
+  assert.equal(plan.keep.filter((k) => k.includes("/art/")).length, 3, "the rest stay lazy");
 });
 
 test("min-chunks: a group taken apart twice is not planned again (the passes settle instead of cycling)", async () => {

@@ -9,7 +9,7 @@ import { t, messages } from "../../../core/i18n.ts";
 import tr from "../dock-layout/tr.ts";
 import { val, cx, icon, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { ThemeToggle, loadTheme, colorTheme, type ThemeMode } from "../../../ui/theme.ts";
-import { AccentPicker } from "../../../ui/accent.ts";
+import { AccentPicker } from "../../../ui/accent-picker.ts";
 import { ThemeMenu } from "../theme-menu/index.ts";
 import { Joined } from "../../layout/joined/index.ts";
 import { Menu } from "../../actions/menu/index.ts";

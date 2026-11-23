@@ -6,7 +6,7 @@ import { signal, createRoot } from "../src/index.ts";
 import { resolveHead, applyHead, headToHtml, jsonLdText, ld, checkHtml, installSeo, useHead, headTags, _resetSeo, _resetHead } from "../src/seo/index.ts";
 import { hydrate, prerenderedFor } from "../src/seo/hydrate.ts";
 import { createRouter, _resetRouter, navigate } from "../src/router/index.ts";
-import { parseInto, toHtml, sitemapXml, robotsTxt } from "../compiler/prerender.js";
+import { parseInto, toHtml, sitemapXml, robotsTxt, excludeRoutes } from "../compiler/prerender.js";
 
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 const metaOf = (doc, k, v) => doc.head.querySelector(`meta[${k}="${v}"]`)?.getAttribute("content");
@@ -116,6 +116,14 @@ test("checkHtml reports missing title, description, canonical, alt", () => {
   assert.deepEqual(good, []);
   assert.ok(!checkHtml("<title>t</title>", { canonical: false }).some((i) => i.rule === "canonical"));
   assert.ok(checkHtml('<script type="application/ld+json">{bad</script>').some((i) => i.rule === "json-ld"));
+});
+
+test("prerender: seo.exclude leaves routes out (a list or a test); the start page always stays", () => {
+  const all = ["/", "/docs", "/ide", "/buttons/button", "/buttons"];
+  assert.deepEqual(excludeRoutes(all, undefined), all);
+  assert.deepEqual(excludeRoutes(all, ["/ide", "/"]), ["/", "/docs", "/buttons/button", "/buttons"]);
+  assert.deepEqual(excludeRoutes(all, (p) => p.split("/").length > 2), ["/", "/docs", "/ide", "/buttons"]);
+  assert.deepEqual(excludeRoutes(all, () => true), ["/"]);
 });
 
 test("prerender helpers: parse/serialize round trip, sitemap, robots", () => {

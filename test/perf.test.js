@@ -59,6 +59,27 @@ test("entry has no chart/table code; the manifest lists the lazy route's files; 
   } finally { app.cleanup(); }
 });
 
+test("sizeReport: a lazy part counts what it adds on top of the page that opens it (several: the one that holds most)", () => {
+  const dir = mkdtempSync(join(tmpdir(), "march-parts-"));
+  try {
+    // incompressible bytes, so each file's gzip size is about its length
+    const put = (name, n) => { let x = n * 7 + 1; writeFileSync(join(dir, name), Buffer.from(Array.from({ length: n }, () => (x = (x * 1103515245 + 12345) & 0x7fffffff) & 255))); return name; };
+    const lib = put("lib.js", 20000), page = put("page.js", 3000), other = put("other.js", 2000), part = put("part.js", 4000), own = put("own.js", 1000);
+    const m = {
+      entryFiles: [],
+      manifest: { "page.tsx": [page, lib], "other.tsx": [other], "part.tsx": [part, own, lib], "free.tsx": [own] },
+      openers: { "part.tsx": ["page.tsx", "other.tsx"] },
+    };
+    const rep = sizeReport(m, dir, { entry: 15360, route: 61440, part: 25600 }, { "page.tsx": "/page", "other.tsx": "/other" });
+    const row = rep.rows.find((r) => r.key === "part.tsx");
+    const gz = (f) => gzipSync(readFileSync(join(dir, f))).length;
+    assert.equal(row.js, gz(part) + gz(own), "lib.js came with /page: not counted again");
+    assert.equal(row.alone, gz(part) + gz(own) + gz(lib), "its size on its own stays in the row");
+    assert.ok(!row.over, "under the part budget on top of its page");
+    assert.equal(rep.rows.find((r) => r.key === "free.tsx").alone, undefined, "a part nobody opens (the entry does) is counted whole");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
 test("preloadChunks adds one modulepreload per file (CSS as preload/style), resolved from the build root", () => {
   L.setPreloadManifest({ "src/pages/a.tsx": ["assets/chunks/a-1.js", "assets/chunks/shared-2.js", "assets/chunks/a-1.css"], "src/pages/b.tsx": ["assets/chunks/b-3.js", "assets/chunks/shared-2.js"] }, "https://x.test/app/");
   assert.equal(L.preloadChunks("src/pages/a.tsx"), true);
@@ -560,4 +581,16 @@ test("global load listener: runLoad and trackLoad announce start and end; backgr
   assert.deepEqual(seen, ["start:part:1", "start:fetch:2", "start:file:2", "end:part:1:ok", "end:fetch:0:fail", "end:file:0:ok"]);
   assert.equal(L.loadsActive(), 0);
   if (globalThis.addEventListener) { assert.ok(fromWindow.length >= 6); globalThis.removeEventListener("march:load", onWin); }
+});
+
+test("sizeReport: a layout row takes an argued limit from budget.parts (else the route budget)", () => {
+  const dir = mkdtempSync(join(tmpdir(), "march-layout-"));
+  try {
+    writeFileSync(join(dir, "main.js"), "x");
+    writeFileSync(join(dir, "l.js"), Array.from({ length: 4000 }, (_, i) => `v${i * 7919}`).join(";"));
+    const m = { entryFiles: ["main.js"], manifest: { "src/demo/_layout.tsx": ["l.js"] } };
+    const row = (budget) => sizeReport(m, dir, budget).rows.find((r) => r.kind === "layout");
+    assert.equal(row({ entry: 1e6, route: 100 }).limit, 100, "the route budget");
+    assert.equal(row({ entry: 1e6, route: 100, parts: { "src/demo/_layout.tsx": { limit: 1e6, why: "a demo's nested routes" } } }).limit, 1e6);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });

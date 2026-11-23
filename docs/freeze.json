@@ -33,7 +33,7 @@
    "paths": [
     "src/components/composite/app-ui"
    ],
-   "hash": "8c45c347d544e4241f45ecafd33a7e52"
+   "hash": "adebfa6e451e60cd366539bb45b48622"
   },
   "Avatar": {
    "frozen": "2026-11-20",
@@ -1272,7 +1272,7 @@
    "paths": [
     "src/components/composite/theme-menu"
    ],
-   "hash": "bddbf00729e473e4ae6222d6527109e1"
+   "hash": "7a7f85ddf71bfc5f47d757479e1ebeff"
   },
   "ThreadNav": {
    "frozen": "2026-11-20",
@@ -2360,6 +2360,18 @@
    "name": "PropertyGrid",
    "what": "refresh",
    "reason": "Testi Türkçe geri alma etiketini dili açıkça seçerek denetler (makinenin diline bakmaz)"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "AppUI",
+   "what": "refresh",
+   "reason": "ts-worker reads libs.json; preview imports AccentPicker from ui/accent-picker.ts (merged with main)"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ThemeMenu",
+   "what": "refresh",
+   "reason": "the panel loads lazily (panel.ts) (merged with main)"
   }
  ]
 }
