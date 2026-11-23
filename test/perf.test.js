@@ -582,3 +582,15 @@ test("global load listener: runLoad and trackLoad announce start and end; backgr
   assert.equal(L.loadsActive(), 0);
   if (globalThis.addEventListener) { assert.ok(fromWindow.length >= 6); globalThis.removeEventListener("march:load", onWin); }
 });
+
+test("sizeReport: a layout row takes an argued limit from budget.parts (else the route budget)", () => {
+  const dir = mkdtempSync(join(tmpdir(), "march-layout-"));
+  try {
+    writeFileSync(join(dir, "main.js"), "x");
+    writeFileSync(join(dir, "l.js"), Array.from({ length: 4000 }, (_, i) => `v${i * 7919}`).join(";"));
+    const m = { entryFiles: ["main.js"], manifest: { "src/demo/_layout.tsx": ["l.js"] } };
+    const row = (budget) => sizeReport(m, dir, budget).rows.find((r) => r.kind === "layout");
+    assert.equal(row({ entry: 1e6, route: 100 }).limit, 100, "the route budget");
+    assert.equal(row({ entry: 1e6, route: 100, parts: { "src/demo/_layout.tsx": { limit: 1e6, why: "a demo's nested routes" } } }).limit, 1e6);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});

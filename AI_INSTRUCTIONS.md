@@ -198,7 +198,9 @@ Overlays never take input; put content after them. `front` only for foreground e
   folds into a chunk loaded with it (else the cheapest partner); a small lazy module becomes a static import of its lazy
   parent, or joins a group chunk with the entry's other small lazy modules that share the most code (second build pass).
   A file still under the limit fails the build (`fail: false`: listed, the build passes); `allow` needs a reason.
-  `maxBuilds` / `maxSeconds` cap the packing passes. `chunks: false` turns it off.
+  `maxBuilds` / `maxSeconds` cap the packing passes. `chunks: false` turns it off. The packer packs to the default
+  budgets (`route`, `part`); `budget.routes` / `budget.parts` (`{ limit, why }`, a layout too) only let a row that is big
+  by its own content pass the report.
 
 **Don't (security)**
 - Never use `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function`, string `style`.
