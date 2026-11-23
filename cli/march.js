@@ -27,7 +27,9 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSy
 import { join, resolve, relative, dirname, extname, basename, sep } from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
+import { createHash } from "node:crypto";
 import { march } from "../compiler/esbuild.js";
+import { loadCdn } from "../compiler/cdn.js";
 import { genRoutes } from "./routes.js";
 import { genApi, genApiClasses, mockHandler } from "./openapi.js";
 import { bannerSource } from "./banner.js";
@@ -51,6 +53,11 @@ async function loadConfig() {
   const cfg = { entry: "src/main.jsx", outdir: "dist", publicDir: "public", pagesDir: "src/pages", components: "src/components", html: "index.html", port: 5173, alias: {}, define: {}, ...user };
   // the file that exists (esbuild would quietly take main.tsx for main.jsx, and the entry would not be recognised)
   if (!existsSync(resolve(cwd, cfg.entry))) cfg.entry = [".tsx", ".ts", ".jsx", ".js"].map((x) => cfg.entry.replace(/\.[jt]sx?$/, x)).find((p) => existsSync(resolve(cwd, p))) ?? cfg.entry;
+  // cdn: "https://cdn.marchjs.com/<version>": March is loaded from there, not bundled (compiler/cdn.js)
+  if (cfg.cdn) {
+    try { cfg.cdnData = await loadCdn(cfg.cdn, join(cwd, "node_modules", ".cache", "march", "cdn")); }
+    catch (e) { fail(`cdn: ${e.message}`); }
+  }
   return cfg;
 }
 
@@ -92,7 +99,7 @@ function buildOptions(cfg, esbuild, { dev, plan = null }) {
     loader: { ".svg": "file", ".png": "file", ".woff2": "file", ".jpg": "file", ".webp": "file" },
     // compile cache (compiler/esbuild.js): every build and every planner pass reuses March modules compiled before;
     // off with cache: false in march.config.js
-    plugins: [march({ components: resolve(cwd, cfg.components), dev, i18nOut: resolve(cwd, cfg.outdir, "i18n-keys.json"), ...(cfg.cache === false ? {} : { cache: resolve(cwd, "node_modules", ".cache", "march", "compile") }), ...(plan ? { inline: plan.inline, groups: plan.groups } : {}) })],
+    plugins: [march({ components: resolve(cwd, cfg.components), dev, i18nOut: resolve(cwd, cfg.outdir, "i18n-keys.json"), ...(cfg.cache === false ? {} : { cache: resolve(cwd, "node_modules", ".cache", "march", "compile") }), ...(plan ? { inline: plan.inline, groups: plan.groups } : {}), ...(cfg.cdnData ? { cdn: cfg.cdnData } : {}) })],
   };
 }
 
@@ -116,7 +123,9 @@ function writeHtml(cfg, meta, { dev }, manifest = null, entryFiles = null) {
   // an absolute base ("/app/") is written down for the router and appUrl() (march/base); a relative build ("./")
   // finds its root from the entry script instead
   const baseTag = base.startsWith("/") ? `<meta name="march-base" content="${base.replace(/\/?$/, "/")}">` : "";
-  const tags = `${cfg.credit === true ? "<!-- Built with MarchJS -->" : ""}${baseTag}${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : cfg.credit === true ? `<script src="${base}credit.js"></script>` : ""}`;
+  // from the CDN: where the theme stylesheets are (march/ui › loadTheme); the core's files fetched with the entry
+  const cdnTags = cfg.cdnData ? `<meta name="march-themes" content="${cfg.cdnData.base}/css/themes/">${(cfg.cdnData.core ?? []).map((u) => `<link rel="modulepreload" href="${u}" crossorigin>`).join("")}` : "";
+  const tags = `${cfg.credit === true ? "<!-- Built with MarchJS -->" : ""}${baseTag}${cdnTags}${css ? `<link rel="stylesheet" href="${css}">` : ""}${data}${pre}<script type="module" src="${js}"></script>${dev ? '<script type="module" src="/__march/client.js"></script>' : cfg.credit === true ? `<script src="${base}credit.js"></script>` : ""}`;
   const html = src.includes("<!--march-->") ? src.replace("<!--march-->", tags) : src.replace("</head>", `${tags}</head>`);
   writeFileSync(join(out, "index.html"), html);
   if (!dev && cfg.credit === true) writeFileSync(join(out, "credit.js"), bannerSource(marchVersion()));
@@ -131,6 +140,53 @@ async function copyThemes(out, esbuild, { dev }) {
     const css = readFileSync(join(dir, f), "utf8");
     writeFileSync(join(out, "themes", f), dev ? css : (await esbuild.transform(css, { loader: "css", minify: true, legalComments: "none" })).code);
   }
+}
+
+/** What a release build depends on besides its sources: March's version, the config, the page template, public/, flags. */
+function buildKey(cfg) {
+  const h = createHash("sha1");
+  h.update(marchVersion());
+  // the build's own code (a changed compiler or CLI builds again, whatever its version says)
+  for (const d of ["cli", "compiler"]) for (const f of readdirSync(join(MARCH_ROOT, d)).sort()) { const st = statSync(join(MARCH_ROOT, d, f)); if (st.isFile()) h.update(`${d}/${f}:${st.size}:${st.mtimeMs}`); }
+  for (const f of ["march.config.js", cfg.html, "package-lock.json"]) h.update(existsSync(join(cwd, f)) ? readFileSync(join(cwd, f)) : "-");
+  h.update(JSON.stringify({ ...cfg, cdnData: cfg.cdnData?.base ?? null }));
+  h.update(argv.filter((a) => a.startsWith("--") && a !== "--force").sort().join(" "));
+  const pub = resolve(cwd, cfg.publicDir);
+  const walk = (d) => readdirSync(d).flatMap((n) => { const p = join(d, n); const st = statSync(p); return st.isDirectory() ? walk(p) : [`${relative(pub, p)}:${st.size}:${st.mtimeMs}`]; });
+  if (existsSync(pub)) h.update(walk(pub).sort().join("\n"));
+  return h.digest("hex");
+}
+const fileHash = (f) => createHash("sha1").update(readFileSync(f)).digest("hex");
+/** The last build's stamp matches: same key, every source it read unchanged, every file it wrote still there. */
+function sameBuild(stamp, key, out) {
+  let st;
+  try { st = JSON.parse(readFileSync(stamp, "utf8")); } catch { return false; }
+  if (st.key !== key || !existsSync(join(out, "index.html"))) return false;
+  for (const [f, h] of Object.entries(st.inputs ?? {})) { const p = resolve(cwd, f); if (!existsSync(p) || fileHash(p) !== h) return false; }
+  return (st.outputs ?? []).every((f) => existsSync(resolve(cwd, f)));
+}
+function writeStamp(stamp, key, meta, out) {
+  // sources only (not the plugin's virtual modules: those follow from the config and March's version)
+  const inputs = Object.fromEntries(Object.keys(meta.inputs).filter((f) => !/^[\w-]+:/.test(f) && existsSync(resolve(cwd, f))).map((f) => [f, fileHash(resolve(cwd, f))]));
+  const outputs = Object.keys(meta.outputs).filter((f) => existsSync(resolve(cwd, f)));
+  mkdirSync(dirname(stamp), { recursive: true });
+  writeFileSync(stamp, JSON.stringify({ key, inputs, outputs }));
+}
+
+/** The plan an earlier release build settled on (its strategy, what it left), without the modules gone since (or null). */
+function cachedPlan(file) {
+  let saved, plan;
+  try { saved = JSON.parse(readFileSync(file, "utf8")); plan = saved?.plan; } catch { return null; }
+  if (!plan || typeof plan !== "object" || !plan.groups || !plan.inline) return null;
+  for (const [g, list] of Object.entries(plan.groups)) {
+    plan.groups[g] = list.filter((m) => existsSync(m.abs));
+    if (!plan.groups[g].length) delete plan.groups[g];
+  }
+  for (const [imp, list] of Object.entries(plan.inline)) {
+    if (!existsSync(imp)) { delete plan.inline[imp]; continue; }
+    plan.inline[imp] = list.filter((x) => x.mode !== "group" || plan.groups[x.group]?.some((m) => m.name === x.name));
+  }
+  return { plan, strategy: Number(saved.strategy) || 0, small: Number(saved.small) || 0 };
 }
 
 /** Budget of a lazy output (gzip bytes): a start-up piece, a route (its page module) or a lazy part; undefined without a budget. */
@@ -165,6 +221,15 @@ async function build({ dev = false } = {}) {
   T("config");
   if (existsSync(resolve(cwd, cfg.pagesDir))) genRoutes(resolve(cwd, cfg.pagesDir), resolve(cwd, "src/routes.gen.js"));
   const out = resolve(cwd, cfg.outdir);
+  // incremental: a release build whose inputs (every source it read, the config, index.html, public/, March's version)
+  // are the same as the last one's keeps that output (--force builds anyway; cache: false never skips)
+  const stamp = !dev && cfg.cache !== false ? resolve(cwd, "node_modules", ".cache", "march", "build-stamp.json") : null;
+  const key = stamp ? buildKey(cfg) : null;
+  if (stamp && flag("--force") !== true && sameBuild(stamp, key, out)) {
+    console.log(`[32m✔[0m ${relative(cwd, out)} is up to date: nothing it is built from changed (--force rebuilds)`);
+    return null;
+  }
+  if (stamp) rmSync(stamp, { force: true });
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });
   if (existsSync(resolve(cwd, cfg.publicDir))) cpSync(resolve(cwd, cfg.publicDir), out, { recursive: true });
@@ -203,7 +268,12 @@ async function build({ dev = false } = {}) {
     // small files are left; a budget of builds and seconds (chunks.maxBuilds / chunks.maxSeconds, MARCH_PACK_MAX_BUILDS /
     // MARCH_PACK_SECONDS); one line per build with its time
     const env = (k) => (process.env[k] ? Number(process.env[k]) : undefined);
+    // incremental: the plan the last release build of this app settled on (node_modules/.cache/march/plan.json), its
+    // modules that are gone dropped; the planner checks it like any other plan
+    const planFile = resolve(cwd, "node_modules", ".cache", "march", "plan.json");
+    const startPlan = dev || cfg.cache === false ? null : cachedPlan(planFile);
     const res = await packLoop({
+      start: startPlan,
       build: async (p, s) => { plan = p; const ok = await once(s); if (process.env.MARCH_DEBUG_COMMON && ok) console.log("[pack] small:", smallFiles(r.metafile, { cwd, minSize, allow, entryKey, boot: cfg.budget?.boot ?? [], plan }).map((x) => `${x.file.split("/").pop()} ${x.bytes}`).join(", ")); return ok && !!minSize; },
       left,
       // chunks.commonRoom (gzip bytes): page groups stay this far under the route budget, so the shared "common" chunk
@@ -214,6 +284,7 @@ async function build({ dev = false } = {}) {
       maxMs: (env("MARCH_PACK_SECONDS") ?? cfg.chunks?.maxSeconds ?? PACK_BUDGET.maxSeconds) * 1000,
     });
     plan = res.plan;
+    if (!dev && cfg.cache !== false && plan) { mkdirSync(dirname(planFile), { recursive: true }); writeFileSync(planFile, JSON.stringify({ plan, strategy: res.strategy, small: res.small })); }
     // final names: every rewritten file gets a new content version (a cached file must never point at another build),
     // no name starts with _ or . (some hosts refuse those); stable names on request
     T("smallFiles");
@@ -224,7 +295,7 @@ async function build({ dev = false } = {}) {
     aliasGroups(chunks.manifest, plan);
     writeHtml(cfg, r.metafile, { dev }, htmlManifest(chunks.manifest, r.metafile, cwd), dev ? null : chunks.entryFiles);
     T("manifest+html");
-    if (cfg.themes !== false) await copyThemes(out, esbuild, { dev });
+    if (cfg.themes !== false && !cfg.cdn) await copyThemes(out, esbuild, { dev });
     T("themes");
     if (!dev && cfg.seo && cfg.seo.prerender !== false) {
       const { prerender } = await import("../compiler/prerender.js");
@@ -269,6 +340,7 @@ async function build({ dev = false } = {}) {
       }
     }
     T("report");
+    if (stamp && !process.exitCode) writeStamp(stamp, key, r.metafile, out);
     T.print();
     const bytes = Object.values(r.metafile.outputs).reduce((s, o) => s + o.bytes, 0);
     console.log(`\x1b[32m✔\x1b[0m built ${relative(cwd, out)} in ${Date.now() - t0} ms (${(bytes / 1024).toFixed(1)} KB)`);
@@ -296,7 +368,7 @@ async function buildDev({ watch: watching = false } = {}) {
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });
   if (existsSync(resolve(cwd, cfg.publicDir))) cpSync(resolve(cwd, cfg.publicDir), out, { recursive: true });
-  if (cfg.themes !== false) await copyThemes(out, esbuild, { dev: true });
+  if (cfg.themes !== false && !cfg.cdn) await copyThemes(out, esbuild, { dev: true });
   T("setup");
   const opts = buildOptions(cfg, esbuild, { dev: false });
   opts.entryNames = "[name]";
@@ -395,7 +467,7 @@ async function dev() {
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });
   if (existsSync(resolve(cwd, cfg.publicDir))) cpSync(resolve(cwd, cfg.publicDir), out, { recursive: true });
-  if (cfg.themes !== false) await copyThemes(out, esbuild, { dev: true });
+  if (cfg.themes !== false && !cfg.cdn) await copyThemes(out, esbuild, { dev: true });
   const ctx = await esbuild.context(opts);
   await ctx.watch();
 

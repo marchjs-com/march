@@ -65,7 +65,7 @@ function rewriteDynamic(code, barrels) {
 
 // Offsets where an `import` keyword starts a statement in code: after a line break, `;` or `}` (or at the start),
 // outside strings, template literals, comments and regular expressions. `calls`: the offsets of `import(` calls instead.
-function statementStarts(code, calls = false) {
+export function statementStarts(code, calls = false) {
   const out = new Set();
   const n = code.length;
   const tpl = []; // brace depth at each open `${`

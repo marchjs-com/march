@@ -12,6 +12,7 @@ import { loadAutoImports, MARCH_ROOT, MODULES } from "./autoimports.js";
 import { setupCssSplit } from "./css-split.js";
 import { deepImports } from "./deep-imports.js";
 import { pruneBareImports } from "./prune-imports.js";
+import { cdnTargets, cdnImports, cdnModule, cdnStylesheet, cdnDynamic, entryNames, CDN_CSS } from "./cdn.js";
 
 // march/icons/<pack> and …/<pack>/pack: the icon packs made by `march icons add` (src/icons/packs/<id>/)
 function iconPackModules() {
@@ -33,11 +34,11 @@ const globTest = (g) => {
   const re = new RegExp(`${pat.includes("/") ? "^" : "(^|/)"}${pat.split("*").map(escRx).join("[^/]*")}$`);
   return (path) => re.test(path);
 };
-function packageModules() {
+function packageModules(all = false) {
   let pkg = {};
   try { pkg = JSON.parse(readFileSync(join(MARCH_ROOT, "package.json"), "utf8")); } catch { /* no package.json */ }
   const effects = (Array.isArray(pkg.sideEffects) ? pkg.sideEffects : []).map(globTest);
-  return Object.entries(pkg.exports ?? {}).filter(([k, t]) => k !== "." && !k.includes("*") && typeof t === "string" && t.startsWith("./src/") && t.endsWith(".ts") && !effects.some((test) => test(t.slice(2))))
+  return Object.entries(pkg.exports ?? {}).filter(([k, t]) => k !== "." && !k.includes("*") && typeof t === "string" && t.startsWith("./src/") && t.endsWith(".ts") && (all || !effects.some((test) => test(t.slice(2)))))
     .map(([k, t]) => [`march/${k.slice(2)}`, t.slice(2)]);
 }
 
@@ -88,13 +89,46 @@ export function march(opts = {}) {
       const compiled = compileCache(opts, auto);
       const keys = new Set();
       const css = new Map();
+      const cwd = build.initialOptions.absWorkingDir ?? process.cwd();
+      // March from the CDN (opts.cdn, from loadCdn): before css-split, which would take March's stylesheets
+      const cdn = opts.cdn;
+      if (cdn) {
+        // march/css/x.css → the CDN's css/x.css; an entry's own stylesheet (march/motion/motion.css) → that entry's
+        // stylesheet on the CDN (motion.css), which has it
+        build.onResolve({ filter: /^march\/.+\.css$/ }, (a) => {
+          if (a.path.startsWith("march/css/")) return { path: `${cdn.base}/${a.path.slice("march/".length)}`, namespace: "march-cdn-style" };
+          const entry = a.path.replace(/\/[^/]+$/, "");
+          if (cdn.css[entry]) return { path: cdn.css[entry], namespace: "march-cdn-style" };
+          return { errors: [{ text: `${a.path}: no stylesheet of ${entry} on ${cdn.base} (march.config.js › cdn)` }] };
+        });
+        build.onLoad({ filter: /.*/, namespace: "march-cdn-style" }, (a) => ({ contents: cdnStylesheet(a.path, opts.cdnLocal), loader: "js", resolveDir: cwd }));
+        build.onResolve({ filter: /^march-cdn:css$/ }, () => ({ path: "css", namespace: "march-cdn" }));
+        build.onResolve({ filter: /^https:\/\// }, (a) => (a.path.startsWith(`${cdn.base}/`) ? { path: a.path, external: true } : undefined));
+      }
       if (opts.cssSplit !== false) setupCssSplit(build);
 
       // march/* → files of this March copy
       const files = Object.fromEntries([...packageModules(), ...MODULES, ["march/icons", "src/icons/index.ts"], ["march/icons/catalog", "src/icons/catalog.ts"], ["march/icons/packs", "src/icons/packs.ts"], ...iconPackModules(), ["march/theme", "src/theme/index.ts"], ["march/seo", "src/seo/index.ts"], ["march/seo/hydrate", "src/seo/hydrate.ts"], ["march/seo/prerendered", "src/seo/prerendered.ts"], ["march/base", "src/base/index.ts"], ["march/testing", "src/testing/index.ts"]].map(([spec, rel]) => [spec, join(MARCH_ROOT, rel)]));
       // named imports from March barrels go straight to the defining module (see deep-imports.js); off with deepImports: false
-      const deep = opts.deepImports === false ? (c) => c : (c) => (c.includes("march") ? deepImports(c, files) : c);
-      const cwd = build.initialOptions.absWorkingDir ?? process.cwd();
+      // (from the CDN: to the smallest CDN entry that exports the name instead, see cdn.js)
+      // every entry of the package (also those with side effects, which deep imports leave alone)
+      // and the CDN's module entries (march/mod/<path>: each module a barrel re-exports from, see tools/build-cdn.js)
+      const mods = cdn ? Object.fromEntries(Object.keys(cdn.url).filter((k) => k.startsWith("march/mod/")).map((k) => [k, [".ts", ".tsx", ".js"].map((x) => join(MARCH_ROOT, "src", k.slice(10) + x)).find((f) => existsSync(f))]).filter(([, f]) => f)) : {};
+      const entryFiles = cdn ? { ...files, ...Object.fromEntries(packageModules(true).map(([spec, rel]) => [spec, join(MARCH_ROOT, rel)])), ...mods } : null;
+      const target = cdn ? cdnTargets(cdn, { ...files, ...mods }) : null;
+      const deep = cdn ? (c) => cdnDynamic(cdnImports(c, target), cdn, opts.cdnLocal ? entryFiles : null) : opts.deepImports === false ? (c) => c : (c) => (c.includes("march") ? deepImports(c, files) : c);
+      if (cdn) {
+        // an entry → its module on the CDN (its source when prerendering in node) and its stylesheet
+        build.onResolve({ filter: /^march(\/[\w-]+)*$/ }, (a) => {
+          // no stylesheet: the CDN file itself (no module in between, nothing of it in the app's files); with one, a
+          // module that links the stylesheet next to it (cdnModule)
+          if (a.path in cdn.url) return !cdn.css[a.path] && !opts.cdnLocal ? { path: cdn.url[a.path], external: true } : { path: a.path, namespace: "march-cdn" };
+          // prerendering in node may use what is not for browsers (march/testing's DOM)
+          if (opts.cdnLocal) return undefined;
+          return { errors: [{ text: `${a.path} is not on ${cdn.base} (march.config.js › cdn): only the package's browser entries are` }] };
+        });
+        build.onLoad({ filter: /.*/, namespace: "march-cdn" }, (a) => ({ contents: a.path === "css" ? CDN_CSS : cdnModule(a.path, cdn, opts.cdnLocal ? entryFiles[a.path] : null, entryFiles[a.path] ? entryNames(entryFiles[a.path]) : []), loader: "js", resolveDir: cwd }));
+      }
       build.onResolve({ filter: /^march(\/[\w-]+){1,3}$|^march$/ }, (a) => (files[a.path] ? { path: files[a.path] } : undefined));
       // the old name (hadi-march, before November 2026) still resolves, for a while: the same files as march
       build.onResolve({ filter: /^hadi-march(\/|$)/ }, (a) => build.resolve(a.path.slice("hadi-".length), { kind: a.kind, importer: a.importer, resolveDir: a.resolveDir }));

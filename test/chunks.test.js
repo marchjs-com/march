@@ -209,3 +209,27 @@ test("packLoop: the time limit ends the passes; a settled planner with nothing s
   const done = await packLoop({ build: async () => true, left: () => 0, next: () => null, strategies: 6, log: () => {} });
   assert.deepEqual([done.builds, done.small, done.stopped], [1, 0, null]);
 });
+
+test("packLoop: an incremental build starts from the last settled plan: one build when the planner accepts it", async () => {
+  const { packLoop } = await import("../compiler/pack-loop.js");
+  const settled = { inline: {}, groups: { g0: [] } };
+  const built = [];
+  // the planner settles on `settled`: from null it needs two passes, from `settled` none
+  const next = (p) => (p === settled || JSON.stringify(p) === JSON.stringify(settled) ? null : settled);
+  const cold = await packLoop({ build: async (p) => { built.push(p); return true; }, left: () => 0, next, strategies: 1, log: () => {} });
+  const warm = await packLoop({ build: async (p) => { built.push(p); return true; }, left: () => 0, next, strategies: 1, start: { plan: settled, strategy: 0, small: 0 }, log: () => {} });
+  assert.deepEqual([cold.builds, warm.builds], [2, 1]);
+  assert.equal(warm.plan, settled);
+  // files left small: the strategy the last build chose is used at once, no search for another
+  const used = [];
+  const again = await packLoop({ build: async (p, st) => { used.push(st); return true; }, left: () => 3, next, strategies: 6, start: { plan: settled, strategy: 4, small: 3 }, log: () => {} });
+  assert.deepEqual([again.builds, again.strategy, used], [1, 4, [4]]);
+});
+
+test("packLoop: passes stopped at the build limit keep the pass that left the fewest small files", async () => {
+  const { packLoop } = await import("../compiler/pack-loop.js");
+  let disk = null;
+  const counts = [12, 0, 7, 9];
+  const res = await packLoop({ build: async (p, s) => { disk = { p, s }; return true; }, left: () => counts[disk.p], next: (p) => (p ?? 0) + 1, strategies: 3, start: { plan: 0, strategy: 0, small: 12 }, maxBuilds: 3, log: () => {} });
+  assert.deepEqual([res.plan, res.small, disk.p], [1, 0, 1], "pass 2 (0 small) is back on disk");
+});

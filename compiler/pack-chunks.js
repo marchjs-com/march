@@ -391,6 +391,8 @@ ${css}`);
         plugins: [{ name: "march-common", setup(x) {
           x.onResolve({ filter: /.*/ }, (a) => {
             if (a.kind === "entry-point" || !a.importer) return undefined;
+            // a URL (march.config.js › cdn: March's modules on the CDN) stays as written
+            if (/^[a-z][a-z0-9+.-]*:\/\//i.test(a.path)) return { path: a.path, external: true };
             const abs = resolve(a.resolveDir || dirname(a.importer), a.path);
             return inside.has(abs) ? { path: abs } : { path: rel(cAbs, abs), external: true };
           });
@@ -481,6 +483,8 @@ ${bCss}`), inputs: { ...(outs[bc]?.inputs ?? {}), ...(outs[tc]?.inputs ?? {}) } 
         plugins: [{ name: "march-pack", setup(x) {
           x.onResolve({ filter: /.*/ }, (a) => {
             if (a.kind === "entry-point" || !a.importer) return undefined;
+            // a URL (march.config.js › cdn: March's modules on the CDN) stays as written
+            if (/^[a-z][a-z0-9+.-]*:\/\//i.test(a.path)) return { path: a.path, external: true };
             const abs = resolve(a.resolveDir || dirname(a.importer), a.path);
             return inside.has(abs) ? { path: abs } : { path: rel(bAbs, abs), external: true };
           });

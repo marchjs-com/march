@@ -44,6 +44,8 @@ export async function mergeEntry(meta, { cwd, entryKey, esbuild, minify = true }
         // everything outside the closure (lazy pages, dynamic chunks, CSS loaders' hrefs) stays external, re-pathed to the entry
         b.onResolve({ filter: /.*/ }, (a) => {
           if (a.kind === "entry-point" || a.importer === "" || a.namespace !== "file" && !a.importer) return undefined;
+          // a URL (march.config.js › cdn: March's modules on the CDN) stays as written
+          if (/^[a-z][a-z0-9+.-]*:\/\//i.test(a.path)) return { path: a.path, external: true };
           const abs = resolve(a.resolveDir || dirname(a.importer), a.path);
           if (inClosure.has(abs)) return { path: abs };
           return { path: rel(entryAbs, abs), external: true };
