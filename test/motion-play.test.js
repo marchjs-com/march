@@ -33,8 +33,12 @@ test("play(): a WAAPI element gets the CSS curve, the engine defaults (fill both
 });
 
 test("components that only need a short effect use play(), not the engine", () => {
-  for (const f of ["components/forms/segmented/index.ts", "components/landing/reveal/index.ts", "motion/engine/parts.ts", "motion/burst.ts", "components/typography/overflow-text/index.ts", "components/navigation/tabs/index.ts"]) {
+  for (const f of ["components/forms/segmented/index.ts", "components/landing/reveal/index.ts", "motion/engine/parts.ts", "motion/engine/indicator.ts", "motion/burst.ts", "components/typography/overflow-text/index.ts", "components/navigation/tabs/index.ts"]) {
     const src = readFileSync(new URL(`../src/${f}`, import.meta.url), "utf8");
     assert.doesNotMatch(src, /^import (?!type)[^;]*(engine\/playback|motion\/animate|router\/router)\.ts/m, f);
   }
+  // still() / motionPreset() are asked by components that animate with the engine too: parts.ts plays nothing, so the
+  // CDN chunk holding it does not bring play() to them (indicator.ts and swap.ts do the playing)
+  const parts = readFileSync(new URL("../src/motion/engine/parts.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(parts, /^import (?!type)[^;]*(play|playback|animate)\.ts/m);
 });

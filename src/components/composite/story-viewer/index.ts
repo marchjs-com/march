@@ -20,7 +20,7 @@ import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { StoryProgress } from "../../social/story-progress/index.ts";
 import { LikeButton } from "../../social/like-button/index.ts";
-import { play } from "../../../motion/play.ts";
+import { animate } from "../../../motion/animate.ts";
 import "./story-viewer.css";
 import { isRtl, type Handler } from "../../../core/util.ts";
 import { swipeable } from "../../../behaviors/swipe/index.ts";
@@ -95,7 +95,7 @@ function body(props: StoryViewerProps): Element {
   const rtl = (): boolean => isRtl(root);
   const slide = (dir: 1 | -1): void => {
     const s = (rtl() ? -dir : dir) * 28;
-    play(stage, [{ transform: `translateX(${s}%) scale(.94)`, opacity: 0.3 }, { transform: "translateX(0) scale(1)", opacity: 1 }], { duration: 320, easing: "easeOutCubic" });
+    animate(stage, [{ transform: `translateX(${s}%) scale(.94)`, opacity: 0.3 }, { transform: "translateX(0) scale(1)", opacity: 1 }], { duration: 320, easing: "easeOutCubic" });
   };
   const next = (): void => {
     const g = group();
@@ -120,7 +120,7 @@ function body(props: StoryViewerProps): Element {
     // a swipe and the button (or Esc) during the close animation must not close twice
     if (closing) return;
     closing = true;
-    await play(stage, [{ transform: `translateY(${from}px) scale(${1 - from / 1600})`, opacity: 1 }, { transform: "translateY(70%) scale(.8)", opacity: 0 }], { duration: 240, easing: "easeInCubic", fill: "forwards" }).finished;
+    await animate(stage, [{ transform: `translateY(${from}px) scale(${1 - from / 1600})`, opacity: 1 }, { transform: "translateY(70%) scale(.8)", opacity: 0 }], { duration: 240, easing: "easeInCubic", fill: "forwards" }).finished;
     props.onClose();
   };
 
@@ -154,7 +154,7 @@ function body(props: StoryViewerProps): Element {
         if (p.axis === "y") {
           const dy = Math.max(0, p.dy);
           if (dy > CLOSE_AT || p.vy > 0.7) { void close(dy); return; }
-          play(stage, [{ transform: `translateY(${dy}px) scale(${1 - dy / 1600})` }, { transform: "translateY(0) scale(1)" }], { duration: 260, easing: "easeOutBack" });
+          animate(stage, [{ transform: `translateY(${dy}px) scale(${1 - dy / 1600})` }, { transform: "translateY(0) scale(1)" }], { duration: 260, easing: "easeOutBack" });
           setStyle(stage, { transform: null }); setStyle(root, { "--m-story-dim": null }); hold.set(false); return;
         }
         setStyle(stage, { transform: null }); hold.set(false);
@@ -184,7 +184,7 @@ function body(props: StoryViewerProps): Element {
     if (props.sentNote === false) return;
     const sent = h("span", { class: "m-story-sent", role: "status" }, L().sent ?? t`Sent`) as HTMLElement;
     root.append(sent);
-    void play(sent, [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)", offset: 0.2 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }], { duration: 1400 }).finished.then(() => sent.remove());
+    void animate(sent, [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)", offset: 0.2 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }], { duration: 1400 }).finished.then(() => sent.remove());
   };
 
   return h("div", { class: () => cx("m-story", paused() && "is-paused"), ref: (x: HTMLElement) => { root = x; }, onKeydown: key },

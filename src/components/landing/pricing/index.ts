@@ -13,7 +13,7 @@ import { Badge } from "../../../ui/badge.ts";
 import { Segmented } from "../../../forms/inputs.ts";
 import { CheckMark } from "../../feedback/check-mark/index.ts";
 import { minus } from "../../../icons/glyphs/minus.ts";
-import { play } from "../../../motion/play.ts";
+import { animate } from "../../../motion/engine/playback.ts";
 import { still } from "../../../motion/engine/parts.ts";
 import { locale } from "../../../core/i18n.ts";
 import { type ColorToken, withColor } from "../../../theme/colors.ts";
@@ -126,7 +126,7 @@ export function Pricing(props: PricingProps): Element {
   effect(() => {
     period();
     if (first) { first = false; return; }
-    untrack(() => { if (!still()) for (const b of root.querySelectorAll<HTMLElement>(".m-price-billed")) play(b, { opacity: [0, 1], transform: ["translateY(6px)", "translateY(0px)"] }, { duration: 320, easing: "out" }); });
+    untrack(() => { if (!still()) for (const b of root.querySelectorAll<HTMLElement>(".m-price-billed")) animate(b, { opacity: [0, 1], transform: ["translateY(6px)", "translateY(0px)"] }, { duration: 320, easing: "out" }); });
   });
   if (props.reveal !== false) owned(revealOnScroll(row, { effect: "up", stagger: 90, ...props.reveal, select: ".m-price-card" }));
   return root;

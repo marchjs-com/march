@@ -25,7 +25,7 @@ import { MediaGrid, type MediaItem } from "../../social/media-grid/index.ts";
 import { LikeButton } from "../../social/like-button/index.ts";
 import { heartBurst, heartPop } from "../../../motion/burst.ts";
 import { CountRoll } from "../../social/count-roll/index.ts";
-import { play } from "../../../motion/play.ts";
+import { animate } from "../../../motion/animate.ts";
 import "./post-card.css";
 import { withColor } from "../../../theme/colors.ts";
 import type { IconProp } from "../../../icons/types.ts";
@@ -129,7 +129,7 @@ export function PostCard(props: PostCardProps): Element {
     big.hidden = false;
     heartPop(big, true);
     heartBurst(stage, { count: 14, radius: 70 });
-    void play(big, [{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.7 }, { opacity: 0 }], { duration: 900, easing: "linear" }).finished.then(() => { if (big) big.hidden = true; });
+    void animate(big, [{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.7 }, { opacity: 0 }], { duration: 900, easing: "linear" }).finished.then(() => { if (big) big.hidden = true; });
   };
   // a count button (a ghost pill Button): shown while it has a handler or a count; it stays while the number changes (it rolls)
   const counter = (mark: () => unknown, n: () => number | undefined, label: () => string, fn?: () => void): (() => Element | null) => {

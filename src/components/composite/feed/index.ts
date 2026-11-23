@@ -14,7 +14,7 @@ import { BRAND_COLORS, type ColorToken, withColor } from "../../../theme/colors.
 import { Button } from "../../actions/button/index.ts";
 import { Empty } from "../../feedback/empty/index.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
-import { play } from "../../../motion/play.ts";
+import { animate } from "../../../motion/animate.ts";
 import "./feed.css";
 import type { Handler } from "../../../core/util.ts";
 
@@ -120,7 +120,7 @@ export function Feed(props: FeedProps): Element {
     // a pill Button floating over the top of the feed
     const b = withColor(h(Button, { variant: "primary", shape: "pill", class: "m-feed-new", icon: typeof newPill === "function" ? null : arrowUp, onClick: showNew },
       typeof newPill === "function" ? newPill(n) : L().newPosts?.(n) ?? t`${n} new posts`), props.newColor ?? "brand-blue") as HTMLElement;
-    if (val(props.motion) !== false) play(b, [{ transform: "translateY(-120%) scale(.9)", opacity: 0 }, { transform: "translateY(0) scale(1)", opacity: 1 }], { duration: 320, easing: "easeOutBack" });
+    if (val(props.motion) !== false) animate(b, [{ transform: "translateY(-120%) scale(.9)", opacity: 0 }, { transform: "translateY(0) scale(1)", opacity: 1 }], { duration: 320, easing: "easeOutBack" });
     return b;
   };
   return h("div", { class: () => cx("m-feed", `m-feed-${variant()}`, val(props.class)), ref: (x: HTMLElement) => { root = x; } },

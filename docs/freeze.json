@@ -12,7 +12,7 @@
    "paths": [
     "src/components/navigation/activity-bar"
    ],
-   "hash": "f04b182447d7a613eeee4c0d79a42e26"
+   "hash": "0f92ba18499e1903c12b76c22e257b49"
   },
   "Alert": {
    "frozen": "2026-11-20",
@@ -96,7 +96,7 @@
    "paths": [
     "src/components/landing/branching-story"
    ],
-   "hash": "933b29ad444af3fb1be189ccb20d5101"
+   "hash": "dce30da2dcea79387a0248ebe7f632d5"
   },
   "Breadcrumbs": {
    "frozen": "2026-11-20",
@@ -439,7 +439,7 @@
    "paths": [
     "src/components/composite/feed"
    ],
-   "hash": "da7fc15fc6a92d11f9c9e73664295ca7"
+   "hash": "5f3a9c57f740762ef2d49e84ab707bd0"
   },
   "FileUpload": {
    "frozen": "2026-11-20",
@@ -649,14 +649,14 @@
    "paths": [
     "src/components/landing/live-counter"
    ],
-   "hash": "1b7610bac8e6e4cc4a6d7b92e80dfce8"
+   "hash": "5d24c2bcb5c69edb45dfdf5430e2b5ee"
   },
   "LiveFeed": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/live-feed"
    ],
-   "hash": "8fa18ea003475d0bab1574222a2b62ab"
+   "hash": "ed872d552514c05dab0fda164e0010bb"
   },
   "LiveStatus": {
    "frozen": "2026-11-20",
@@ -873,21 +873,21 @@
    "paths": [
     "src/components/composite/post-card"
    ],
-   "hash": "73a1df1655370716267638f8b57b122f"
+   "hash": "46073255e8545b1f85605e178bb03d7a"
   },
   "Presentation": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/presentation"
    ],
-   "hash": "3aa41d0344066411604cde2372875b48"
+   "hash": "d7a29949f6e676487d6bf765a6158219"
   },
   "Pricing": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/pricing"
    ],
-   "hash": "02f60afce1bd1d3279a0a5e180566db5"
+   "hash": "d1d371158cf94034e3e7d2d1770fe875"
   },
   "ProfileHeader": {
    "frozen": "2026-11-20",
@@ -922,7 +922,7 @@
    "paths": [
     "src/components/landing/project-grid"
    ],
-   "hash": "c8da07c5bb1dfce75b6f9cc797f85028"
+   "hash": "5d70e224151f55d0a22f5098348a91b7"
   },
   "PropertyGrid": {
    "frozen": "2026-11-20",
@@ -1020,7 +1020,7 @@
    "paths": [
     "src/components/landing/scroll-story"
    ],
-   "hash": "5380472be669e20e96996b7f27477420"
+   "hash": "68ee3acc70990f0fd570a6e1ce039c22"
   },
   "ScrollToTop": {
    "frozen": "2026-11-20",
@@ -1069,7 +1069,7 @@
    "paths": [
     "src/components/forms/segmented"
    ],
-   "hash": "194e89716c3214bb9d6a0d5922aa9473"
+   "hash": "2f3a16e9357ee84881207120ad3352a0"
   },
   "Select": {
    "frozen": "2026-11-20",
@@ -1090,7 +1090,7 @@
    "paths": [
     "src/components/landing/site-nav"
    ],
-   "hash": "8a8193865cbfe9f1da0f81f74e3ac736"
+   "hash": "562c4fe3d63685b4474231413db4ce90"
   },
   "SiteSection": {
    "frozen": "2026-11-20",
@@ -1216,7 +1216,7 @@
    "paths": [
     "src/components/composite/story-viewer"
    ],
-   "hash": "58b4c61bbbf5aaeeb3b801d35590b517"
+   "hash": "29960d6323a8cf3546947fa351566816"
   },
   "Swatch": {
    "frozen": "2026-11-20",
@@ -2616,6 +2616,84 @@
   {
    "at": "2026-11-23",
    "name": "UndoRedo",
+   "what": "refresh",
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ActivityBar",
+   "what": "refresh",
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "BranchingStory",
+   "what": "refresh",
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Feed",
+   "what": "refresh",
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "LiveCounter",
+   "what": "refresh",
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "LiveFeed",
+   "what": "refresh",
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "PostCard",
+   "what": "refresh",
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Presentation",
+   "what": "refresh",
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Pricing",
+   "what": "refresh",
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ProjectGrid",
+   "what": "refresh",
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ScrollStory",
+   "what": "refresh",
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Segmented",
+   "what": "refresh",
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "SiteNav",
+   "what": "refresh",
+   "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "StoryViewer",
    "what": "refresh",
    "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
   }

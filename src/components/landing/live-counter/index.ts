@@ -14,7 +14,7 @@ import type { ColorToken } from "../../../theme/colors.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
 import { Badge } from "../../data/badge/index.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
-import { play } from "../../../motion/play.ts";
+import { animate } from "../../../motion/engine/playback.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
 import { Counter, formatCount } from "../counter/index.ts";
 import { withColor } from "../../../theme/colors.ts";
@@ -120,11 +120,11 @@ export function LiveCounter(props: LiveCounterProps): Element {
           const b = (typeof props.bubble === "function" ? h("span", { class: "m-lc-bubble is-own" }, props.bubble(d, label))
             : withColor(h(Badge, { class: "m-lc-bubble", tone: props.bubbleColor ? "primary" : "success" }, label), props.bubbleColor)) as HTMLElement;
           box.append(b);
-          void play(b, { opacity: [0, 1, 1, 0], transform: ["translateY(10px) scale(.6)", "translateY(-6px) scale(1.1)", "translateY(-22px) scale(1)", "translateY(-40px) scale(.9)"] }, { duration: 1500, easing: "out" })
+          void animate(b, { opacity: [0, 1, 1, 0], transform: ["translateY(10px) scale(.6)", "translateY(-6px) scale(1.1)", "translateY(-22px) scale(1)", "translateY(-40px) scale(.9)"] }, { duration: 1500, easing: "out" })
             .finished.then(() => { b.remove(); dispose(); });
         }, owner);
       }
-      if (num && props.beat !== false) play(num, { transform: ["scale(1)", "scale(1.06)", "scale(1)"] }, { duration: 520, easing: "out" });
+      if (num && props.beat !== false) animate(num, { transform: ["scale(1)", "scale(1.06)", "scale(1)"] }, { duration: 520, easing: "out" });
     });
   });
   owned(() => anim?.stop());

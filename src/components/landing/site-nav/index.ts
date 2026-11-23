@@ -13,7 +13,7 @@ import { IconButton } from "../../actions/icon-button/index.ts";
 import { openDrawer } from "../../../ui/dialog.ts";
 import { menu } from "../../../icons/glyphs/menu.ts";
 import { reducedMotion } from "../../../motion/engine/prefs.ts";
-import { slidingIndicator } from "../../../motion/engine/parts.ts";
+import { slidingIndicator } from "../../../motion/engine/indicator.ts";
 import { onScrollProgress } from "../../../motion/scroll-fx.ts";
 import { scrollHider } from "../../../behaviors/hide-on-scroll/index.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";

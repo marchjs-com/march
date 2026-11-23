@@ -13,7 +13,9 @@ const { formatDuration, formatSeconds, formatCount, errorText, hashString, snap 
 const { isMod, labelWithKey, undoKeys } = await import("../src/ui/keys.ts");
 const { owned, observeSize, whenVisible, stickToBottom, scrollIntoArea } = await import("../src/ui/observe.ts");
 const { observeWidth } = await import("../src/ui/fit.ts");
-const { still, motionPreset, slidingIndicator, swapFrames, swapTransition } = await import("../src/motion/engine/parts.ts");
+const { still, motionPreset, swapFrames } = await import("../src/motion/engine/parts.ts");
+const { slidingIndicator } = await import("../src/motion/engine/indicator.ts");
+const { swapTransition } = await import("../src/motion/engine/swap.ts");
 const { setReducedOverride } = await import("../src/motion/engine/prefs.ts");
 const { dragGhost } = await import("../src/behaviors/drag/ghost.ts");
 const { BRAND_COLORS, BRAND_COLORS_ALL, colorList, COLOR_TOKENS } = await import("../src/theme/colors.ts");

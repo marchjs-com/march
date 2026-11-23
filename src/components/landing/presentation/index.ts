@@ -22,8 +22,9 @@ import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { monitor } from "../../../icons/glyphs/monitor.ts";
 import { maximize } from "../../../icons/glyphs/maximize.ts";
-import { play } from "../../../motion/play.ts";
-import { still, swapTransition } from "../../../motion/engine/parts.ts";
+import { animate } from "../../../motion/engine/playback.ts";
+import { still } from "../../../motion/engine/parts.ts";
+import { swapTransition } from "../../../motion/engine/swap.ts";
 import { swipe } from "../../../motion/gestures.ts";
 
 messages("tr", { "Slides": "Slaytlar" });
@@ -156,7 +157,7 @@ export function Presentation(props: PresentationProps): Element {
         if (vis && !el.classList.contains("is-shown") && shown === i && !still()) {
           // the step enters the way its <Appear effect> says
           const fx = el.parentElement?.classList;
-          if (!fx?.contains("m-appear-none")) play(el, fx?.contains("m-appear-fade") ? { opacity: [0, 1] } : fx?.contains("m-appear-scale") ? { opacity: [0, 1], transform: ["scale(.8)", "scale(1)"] } : { opacity: [0, 1], transform: ["translate3d(0, .6em, 0)", "translate3d(0, 0, 0)"] }, { duration: 420, easing: "expo" });
+          if (!fx?.contains("m-appear-none")) animate(el, fx?.contains("m-appear-fade") ? { opacity: [0, 1] } : fx?.contains("m-appear-scale") ? { opacity: [0, 1], transform: ["scale(.8)", "scale(1)"] } : { opacity: [0, 1], transform: ["translate3d(0, .6em, 0)", "translate3d(0, 0, 0)"] }, { duration: 420, easing: "expo" });
         }
         el.classList.toggle("is-shown", vis);
       });
