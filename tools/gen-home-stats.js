@@ -25,7 +25,7 @@ const walk = (d) => readdirSync(d).flatMap((n) => { const p = join(d, n); return
 export async function homeStats(root = ROOT) {
   const cats = await categories(root);
   const comps = (await components(root)).filter((c) => c && c.category);
-  const perCategory = cats.map((c) => ({ id: c.id, label: c.label, components: comps.filter((x) => x.category === c.id).length }));
+  const perCategory = cats.map((c) => ({ id: c.id, title: c.title, components: comps.filter((x) => x.category === c.id).length }));
 
   const seen = new Map();
   for (const a of packageApis(root)) for (const i of a.items) seen.set(`${i.file}#${i.name}`, i.kind);

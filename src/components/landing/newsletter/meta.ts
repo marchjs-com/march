@@ -9,6 +9,4 @@ export default defineMeta({
   summary: "Email sign-up, inline or stacked: validation, busy button, success check that pops in, error shake and announcement.",
   composedOf: ["TextInput", "Button", "CheckMark", "SectionHead"],
   behaviors: ["motion engine"],
-  showcase: "/web",
-  demoGroup: "frame",
 });

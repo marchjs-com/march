@@ -30,7 +30,7 @@ export const PENDING = new Set([
  *  missing doc of any other subpath, and when a listed subpath is already complete. */
 export const MD_PENDING = new Set([
   "march", "march/app-ui", "march/base", "march/icons/packs", "march/landing", "march/seo/hydrate", "march/router", "march/data", "march/schema", "march/ui",
-  "march/components/registry.gen.ts", "march/table", "march/charts", "march/crud",
+  "march/table", "march/charts", "march/crud",
   "march/lazy", "march/sw", "march/motion", "march/motion/text", "march/motion/text/meta",
   "march/fx", "march/store", "march/props", "march/channel", "march/behaviors/drag",
   "march/behaviors/roving-focus", "march/behaviors/resize-handle", "march/behaviors/list-nav",
@@ -192,7 +192,7 @@ export function collect(root = ROOT) {
   return out;
 }
 
-/** Component metadata (status, since, showcase page: the page its meta.ts names) by name, from the component folders. */
+/** Component metadata (status, since) by name, from the component folders. */
 function componentMeta(root) {
   const out = new Map();
   const base = join(root, "src/components");
@@ -202,7 +202,7 @@ function componentMeta(root) {
       if (!existsSync(p)) continue;
       const s = readFileSync(p, "utf8");
       const g = (k) => new RegExp(`${k}:\\s*"([^"]*)"`).exec(s)?.[1] ?? "";
-      out.set(g("name"), { status: g("status"), since: g("since"), showcase: g("showcase") });
+      out.set(g("name"), { status: g("status"), since: g("since") });
     }
   }
   return out;
@@ -212,8 +212,8 @@ function componentMeta(root) {
 export const mdPath = (subpath, name) => `${DOCS}/${slugOf(subpath)}/${name}.md`;
 
 /**
- * The API reference files, from March's sources and docs only; an export's `demo` is the page its component's meta.ts
- * names, or "" (the site adds its own links).
+ * The API reference files, from March's sources and docs only (a site adds its own links: the page that shows an
+ * export).
  */
 export function generate(root = ROOT) {
   const recs = collect(root);
@@ -226,8 +226,7 @@ export function generate(root = ROOT) {
     const m = meta.get(r.name);
     const md = existsSync(join(root, mdPath(r.subpath, r.name))) ? readFileSync(join(root, mdPath(r.subpath, r.name)), "utf8") : "";
     const doc = { ...r, tr: tr[r.subpath]?.[r.name] ?? "", md, ...(r.props ? { props: r.props.map(({ src, ...p }) => (p.tr ? p : (({ tr, ...q }) => q)(p))) } : {}),
-      status: r.deprecated ? "deprecated" : r.experimental ? "experimental" : m?.status || "stable", since: r.since || m?.since || "0.1.0",
-      demo: m?.showcase || "" };
+      status: r.deprecated ? "deprecated" : r.experimental ? "experimental" : m?.status || "stable", since: r.since || m?.since || "0.1.0" };
     delete doc.file;
     if (!bySub.has(r.subpath)) bySub.set(r.subpath, []);
     bySub.get(r.subpath).push(doc);

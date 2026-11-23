@@ -9,6 +9,4 @@ export default defineMeta({
   summary: "Scrollytelling: pinned media column, steps scroll past, the active step's media cross-fades and the section takes its colour.",
   composedOf: ["PageDots"],
   behaviors: ["onScrollProgress", "motion engine", "colorAttr"],
-  showcase: "/web",
-  demoGroup: "scroll",
 });

@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["IconTile", "OverflowText", "Link"],
   behaviors: [],
   hubs: [],
-  showcase: "/data",
 });

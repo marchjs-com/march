@@ -9,5 +9,4 @@ export default defineMeta({
   category: "layout",
   composedOf: ["OverlayScope", "IconButton", "Button", "Menu", "Popover", "Slider", "Toggle"],
   behaviors: ["touch emulation", "device events"],
-  showcase: "/layout",
 });

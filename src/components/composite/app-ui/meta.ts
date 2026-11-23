@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["DockLayout", "Menu", "CodeEditor", "ThemeMenu", "Joined", "Debugger", "IconButton", "Button", "PasswordInput", "Textarea", "Select", "Alert", "StatusDot", "CodeView", "TextInput", "Popover", "DevicePicker", "DevicePreview", "NetworkThrottle"],
   behaviors: ["storage (get / set)", "plugins (file types, panels, commands, services)", "command manager"],
   hubs: [],
-  showcase: "/app-ui",
 });

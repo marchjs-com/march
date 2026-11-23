@@ -9,5 +9,4 @@ export default defineMeta({
   category: "typography",
   composedOf: [],
   behaviors: ["motion engine"],
-  showcase: "/navigation",
 });

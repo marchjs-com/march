@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Swatch", "TextInput"],
   behaviors: [],
   hubs: [],
-  showcase: "/forms",
 });

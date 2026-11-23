@@ -25,8 +25,8 @@ export async function checkComponent(root, folder, { runTests = true } = {}) {
   if (!existsSync(dir) || !category) return { ok: false, results: [{ item: "folder", ok: false, note: `src/components/<category>/${name} not found` }] };
   const files = readdirSync(dir);
   const read = (f) => (existsSync(join(dir, f)) ? readFileSync(join(dir, f), "utf8") : "");
-  for (const f of ["index.ts", `${name}.css`, `${name}.test.js`, "docs.md", "demo.tsx", "playground.ts", "meta.ts"]) add(`file ${f}`, files.includes(f), files.includes(f) ? undefined : "missing (CSS may be absent only for components without styles)");
-  const code = read("index.ts"), css = read(`${name}.css`), docs = read("docs.md"), demo = read("demo.tsx");
+  for (const f of ["index.ts", `${name}.css`, `${name}.test.js`, "docs.md", "meta.ts"]) add(`file ${f}`, files.includes(f), files.includes(f) ? undefined : "missing (CSS may be absent only for components without styles)");
+  const code = read("index.ts"), css = read(`${name}.css`), docs = read("docs.md");
 
   // meta: stability + composedOf, and every composed component is really used (reuse, not a copy)
   let meta = null;
@@ -36,8 +36,8 @@ export async function checkComponent(root, folder, { runTests = true } = {}) {
     add("meta: category matches the folder", meta.category === category, `meta.category "${meta.category}", folder ${category}/`);
     add("meta: composedOf is a list", Array.isArray(meta.composedOf));
     if (category === "composite") add("meta: a composite names its parts (composedOf)", (meta.composedOf ?? []).length > 0);
-    // the component's own modules count too (tabs or panels split out of index.ts and loaded lazily); not demo, playground, meta
-    const own = files.filter((f) => /\.tsx?$/.test(f) && !/^(demo|playground|meta|tr)\.tsx?$/.test(f)).map(read).join("\n");
+    // the component's own modules count too (tabs or panels split out of index.ts and loaded lazily); not meta
+    const own = files.filter((f) => /\.tsx?$/.test(f) && !/^(meta|tr)\.tsx?$/.test(f)).map(read).join("\n");
     for (const c of meta.composedOf ?? []) add(`composedOf ${c} is used (not copied)`, new RegExp(`\\b${c}\\b`).test(own), "named in meta but not imported / used in the component's modules");
   }
   // security and CSP
@@ -63,11 +63,6 @@ export async function checkComponent(root, folder, { runTests = true } = {}) {
   }
   // docs
   for (const s of ["## Props", "## Accessibility"]) add(`docs.md: ${s}`, docs.includes(s));
-  // playground: every option has an effect in the demo
-  try {
-    const pg = (await import(pathToFileURL(join(dir, "playground.ts")).href)).default;
-    for (const o of pg.options ?? []) add(`playground option "${o.key}" is used by demo.tsx`, new RegExp(`\\.${o.key}\\b`).test(demo));
-  } catch (e) { add("playground.ts loads", false, e.message); }
   // tests
   if (runTests && files.includes(`${name}.test.js`)) {
     const r = spawnSync(process.execPath, ["--import", pathToFileURL(join(root, "compiler/register.js")).href, "--test", join(dir, `${name}.test.js`)], { cwd: root, encoding: "utf8" });

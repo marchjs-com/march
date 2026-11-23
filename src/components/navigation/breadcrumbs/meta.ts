@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Button", "Menu", "OverflowText"],
   behaviors: ["fit (ui/fit)"],
   hubs: [],
-  showcase: "/ide",
 });

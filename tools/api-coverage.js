@@ -6,7 +6,7 @@
 //   node tools/api-coverage.js            list exports without a summary
 //   node tools/api-coverage.js --check    exit 1 when an export has no (Turkish) summary
 // test/api-coverage.test.js runs the check.
-import { readFileSync, writeFileSync, existsSync, readdirSync, unlinkSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, resolve, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -87,32 +87,18 @@ function managerSummary(name, file) {
   return "";
 }
 
-/** Entries of package.json "exports" that are code: [subpath key ("./ui"), target file ("./src/ui/index.ts")]. The
- *  component wildcard ("./components/*") is opened to the component folders (src/components/<category>/<name>/) that
- *  have a runtime export no named entry gives: a large component kept out of its category barrel (meta.barrel === false)
- *  is imported from march/components/<category>/<name> and is listed under that subpath. Other wildcards (CSS
- *  files, icon packs) are not app APIs of their own. */
+/** Entries of package.json "exports" that are code: [subpath key ("./ui"), target file ("./src/ui/index.ts")]. A large
+ *  component kept out of its category barrel (meta.barrel === false) has its own entry, march/components/<category>/<name>.
+ *  Wildcards (CSS files, icon packs) are not app APIs of their own. */
 export function packageEntries(root = ROOT) {
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
-  const out = [];
-  for (const [sub, target] of Object.entries(pkg.exports)) {
-    if (typeof target !== "string" || sub.includes("*") || !/\.(ts|js)$/.test(target)) continue;
-    out.push([sub, target]);
-  }
-  const wild = pkg.exports["./components/*"];
-  if (typeof wild !== "string" || !wild.includes("*")) return out;
+  const all = Object.entries(pkg.exports).filter(([sub, target]) => typeof target === "string" && !sub.includes("*") && /\.(ts|js)$/.test(target));
+  // a component's own entry (march/components/<category>/<name>) is listed only when it exports something no other
+  // entry does (a large component kept out of its category barrel): the others are their category's names again
+  const own = (sub) => sub.startsWith("./components/");
   const key = (at, name) => `${at.file}#${name}`;
-  const given = new Set(out.flatMap(([, target]) => [...runtimeExports(join(root, target))].map(([name, at]) => key(at, name))));
-  const [before, after] = wild.split("*");
-  const base = join(root, before);
-  const dirs = (p) => (existsSync(p) ? readdirSync(p, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name).sort() : []);
-  for (const cat of dirs(base)) for (const name of dirs(join(base, cat))) {
-    const target = `${before}${cat}/${name}${after}`;
-    const file = join(root, target);
-    if (!existsSync(file) || out.some(([, t]) => join(root, t) === file)) continue;
-    if ([...runtimeExports(file)].some(([n, at]) => !given.has(key(at, n)))) out.push([`./components/${cat}/${name}`, target]);
-  }
-  return out;
+  const given = new Set(all.filter(([sub]) => !own(sub)).flatMap(([, target]) => [...runtimeExports(join(root, target))].map(([name, at]) => key(at, name))));
+  return all.filter(([sub, target]) => !own(sub) || [...runtimeExports(join(root, target))].some(([n, at]) => !given.has(key(at, n))));
 }
 
 /** Subpaths with their runtime exports (CSS, compiler and testing entries are tools, not app APIs). */

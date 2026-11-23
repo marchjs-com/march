@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Button", "IconButton", "Segmented", "Chip", "Card", "TimeRuler", "ListRow", "Badge", "Empty"],
   behaviors: ["motion engine clock"],
   hubs: ["d"],
-  showcase: "/flow",
 });

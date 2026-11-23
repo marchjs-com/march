@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Button", "IconButton", "Divider", "Menu", "Tooltip"],
   behaviors: ["command manager", "fit (ui/fit)", "roving focus", "motion engine"],
   hubs: [],
-  showcase: "/ide",
 });

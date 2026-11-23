@@ -3,20 +3,18 @@
 // and parallel branches that add folders do not conflict. The category list is src/components/categories.ts:
 //   src/components/index.ts              barrel of every component (re-exported by march/ui)
 //   src/components/<category>/index.ts   one barrel per category: the subpath march/<category>
-//   src/components/registry.gen.ts       catalogue: name, folder, category, meta, lazy demo / playground loaders
 //   docs/components.md                   component catalogue by category, for people and AI (each docs.md + meta.ts)
 //   AI_INSTRUCTIONS.md                   the catalogue table between the <!-- components:begin/end --> markers
-//   package.json                         "exports" has "./<category>" for every category
+//   package.json                         "exports" has "./<category>" for every category and "./components/<category>/<name>"
+//                                        for every large component kept out of the barrels (meta.barrel false)
 //   node tools/gen-registry.js          write
 //   node tools/gen-registry.js --check  fail (exit 1) when a written file is out of date or a folder is malformed
-import { readdirSync, readFileSync, writeFileSync, existsSync, statSync, mkdirSync, unlinkSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync, existsSync, statSync, mkdirSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { packageApis } from "./api-coverage.js";
-import { slugOf } from "./api-docs.js";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
-const REQUIRED = ["index.ts", "docs.md", "demo.tsx", "playground.ts", "meta.ts"];
+const REQUIRED = ["index.ts", "docs.md", "meta.ts"];
 const isDir = (p) => existsSync(p) && statSync(p).isDirectory();
 
 /** The category list (src/components/categories.ts). */
@@ -94,12 +92,22 @@ const firstPara = (md) => md.split(/\n\n/).find((b) => b.trim() && !b.startsWith
 const nameOf = (c) => c.meta?.name ?? c.name;
 const anchor = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
+/** The class of a component's root element: meta.root, else the first class its stylesheet styles (tools find the
+ *  component in a page by it; tools/cdn-data.mjs publishes it in data/components.json). */
+export function rootClass(c, root = ROOT) {
+  if (c.meta?.root) return c.meta.root;
+  const dir = join(root, "src/components", c.folder);
+  const css = existsSync(dir) ? readdirSync(dir).find((f) => f.endsWith(".css")) : null;
+  return css ? /^\.(m-[a-z0-9-]+)/m.exec(readFileSync(join(dir, css), "utf8").replace(/\/\*[\s\S]*?\*\//g, ""))?.[1] ?? null : null;
+}
+
 /** The generated files' contents, keyed by path relative to the repo. */
 export async function generate(root = ROOT) {
   const list = await components(root);
   const cats = await categories(root);
   const files = {};
-  // large components (meta.barrel === false) stay out of the barrels: import them from march/components/<folder>;
+  // large components (meta.barrel === false) stay out of the barrels: import them from march/components/<folder> (an
+  // export of its own, below);
   // a component with its own package entry (meta.entry, e.g. "march/flow") too: pages that import march/ui
   // must not reach a heavy one-page feature (esbuild places code by reachability)
   const barrel = list.filter((c) => c.meta?.barrel !== false && !c.meta?.entry);
@@ -112,110 +120,9 @@ export async function generate(root = ROOT) {
     files[`src/components/${cat.id}/index.ts`] = HEAD + `// ${cat.title}: ${cat.desc} Import: march/${cat.id}\n` +
       (own.length ? own.map((c) => `export * from "./${c.name}/index.ts";\n`).join("") + explicitExports(root, own, (c) => `./${c.name}/index.ts`) : "export {};\n");
   }
-  // Demos shown on the same showcase page load together, up to GROUP per lazy module (<page>[-n].demos.gen.ts): one
-  // small chunk per demo would fall under the 10 KB chunk floor and fold into the registry's parent group, which every
-  // page with a component card loads; one module for a page with many cards would pass the lazy part budget. Members
-  // are in folder-name order, so related folders (chat-…, story-…) usually share a module. A page with a single
-  // component card keeps its direct import. meta.demoGroup names a family that loads together; the page's building
-  // blocks share one kit (<page>.kit.gen.ts).
-  const GROUP = 3;
-  // pages whose demos are heavier than the usual card may get fewer per module. /forms is not one: its demo parts weigh
-  // mostly the input code the /forms page already loads (a part row counts it too), two per module measured as heavy as
-  // three (28–30 KB) and made 13 parts instead of 9, each splitting the shared code further
-  const GROUP_OF = {};
-  const pages = new Map();
-  // a large component (barrel: false) keeps its own demo module: its code alone is over the chunk floor, and grouping
-  // it would make every card of the page download it
-  for (const c of list) if (c.meta?.showcase && c.meta?.barrel !== false && !c.meta?.entry) pages.set(c.meta.showcase, [...(pages.get(c.meta.showcase) ?? []), c]);
-  const groupOf = new Map();
-  for (const [page, all] of pages) {
-    if (all.length < 2) continue;
-    const base = page.replace(/^\//, "").replace(/[^\w-]+/g, "-") || "home";
-    const named = new Map(), rest = [];
-    for (const c of all) if (c.meta?.demoGroup) named.set(c.meta.demoGroup, [...(named.get(c.meta.demoGroup) ?? []), c]); else rest.push(c);
-    const parts = [...named].map(([g, members]) => ({ name: `${base}-${g}`, members }));
-    const slices = Math.ceil(rest.length / (GROUP_OF[page] ?? GROUP));
-    for (let s = 0; s < slices; s++) parts.push({ name: `${base}${slices > 1 || parts.length ? `-${s + 1}` : ""}`, members: rest.slice(Math.floor((s * rest.length) / slices), Math.floor(((s + 1) * rest.length) / slices)) });
-    // landing blocks are many and large: only the ones other blocks are built from (composedOf) go in the kit, the rest
-    // stay in their family module; the category's demo data (<category>/demo-kit.tsx) rides in the kit too
-    const usedByOthers = (c) => all.some((o) => o !== c && (o.meta?.composedOf ?? []).includes(c.meta?.name));
-    const blocks = parts.length > 1 ? all.filter((c) => c.category && c.category !== "composite" && (c.category !== "landing" || usedByOthers(c))) : [];
-    const demoKits = [...new Set(blocks.map((c) => c.category))].filter((k) => existsSync(join(root, "src/components", k, "demo-kit.tsx")));
-    const kit = blocks.length > 1 ? `${base}.kit.gen.ts` : null;
-    const gen = (what) => `// GENERATED by tools/gen-registry.js: ${what} — do not edit.\n`;
-    if (kit) files[`src/components/${kit}`] = gen(`the building blocks shown on ${page}`) + blocks.map((c) => `export * from "./${c.folder}/index.ts";\n`).join("") +
-      demoKits.map((k) => `export * from "./${k}/demo-kit.tsx";\n`).join("");
-    for (const { name, members } of parts) {
-      // *.demos.gen.ts: the showcase config lets these stay small lazy files (chunks.allow), never joining the registry
-      const file = `${name}.demos.gen.ts`;
-      members.forEach((c, j) => groupOf.set(c.folder, { file, j }));
-      files[`src/components/${file}`] = gen(`the component folders shown on ${page}`) + (kit ? `export * from "./${kit}";\n` : "") +
-        members.map((c, j) => `import * as d${j} from "./${c.folder}/demo.tsx";\nimport * as p${j} from "./${c.folder}/playground.ts";\n`).join("") +
-        `export { ${members.map((_, j) => `d${j}, p${j}`).join(", ")} };\n`;
-    }
-  }
-  // a component with its own entry is shown statically on its page: no lazy loader here (a lazy demo would be a part
-  // carrying the whole feature), the page imports demo.tsx and playground.ts itself
-  // (its option spec is plain data, so MarchIDE still loads playground.ts lazily)
-  const loader = (c, kind, file) => { if (c.meta?.entry && kind === "d") return `() => ownPage("${nameOf(c)}")`; if (c.meta?.entry) return `() => import("./${c.folder}/${file}")`; const g = groupOf.get(c.folder); return g ? `() => import("./${g.file}").then((m) => m.${kind}${g.j})` : `() => import("./${c.folder}/${file}")`; };
-  files["src/components/registry.gen.ts"] = HEAD + `import type { ComponentMeta, PlaygroundSpec } from "./meta.ts";\n` +
-    list.map((c, i) => `import m${i} from "./${c.folder}/meta.ts";\n`).join("") +
-    `\nexport interface RegistryEntry { folder: string; meta: ComponentMeta; /** First code block of docs.md (the Code tab). */ code: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }\n` +
-    (list.some((c) => c.meta?.entry) ? `const ownPage = (name: string): Promise<never> => Promise.reject(new Error(\`\${name} has its own entry: its page imports the demo\`));\n` : "") +
-    `/** Every component folder: meta, Code-tab snippet and lazy demo / playground loaders. */\nexport const registry: readonly RegistryEntry[] = [\n` +
-    list.map((c, i) => `  { folder: "${c.folder}", meta: m${i}, code: ${JSON.stringify(firstCode(c.docs))}, demo: ${loader(c, "d", "demo.tsx")}, playground: ${loader(c, "p", "playground.ts")} },\n`).join("") + `];\n`;
-  // the showcase card's catalogue: only what a card draws (name, summary, parts, the page of each part, the Code tab) and
-  // the lazy loaders. No meta.ts imports: every page with a component card loads this file, the full metas weigh ~40 KB
-  // (minified) that no card reads
-  // The Code-tab snippets are their own lazy module (cards-code.gen.ts), loaded on the first click on a Code tab. A grouped
-  // demo module is one loader shared by its cards (L(group, index)); a folder of its own keeps its two imports.
-  const groups = [...new Set([...groupOf.values()].map((g) => g.file))];
-  // w: the component's own page on the site: src/components/pages.json (folder → the page that draws its demo, kept
-  // while the site reads this file), else the page named in meta.showcase
-  const pagesFile = join(root, "src/components/pages.json");
-  const sitePages = existsSync(pagesFile) ? JSON.parse(readFileSync(pagesFile, "utf8")) : {};
-  const ownPage = (c) => sitePages[c.folder] ?? c.meta?.showcase;
-  // a: the API reference page of the component (/api/<a>/<name>): the subpath slug that documents it (every package
-  // export, tools/api-coverage.js; the same subpaths as the API index of tools/api-docs.js)
-  const apiIndex = packageApis(root).map((a) => ({ slug: slugOf(a.subpath), items: a.items.map((i) => [i.name, i.kind]) }));
-  const apiOf = (c) => apiIndex.find((x) => x.items.some((it) => it[0] === nameOf(c) && it[1] === "component"))?.slug ?? apiIndex.find((x) => x.items.some((it) => it[0] === nameOf(c) || it[0] === nameOf(c)[0].toLowerCase() + nameOf(c).slice(1)))?.slug;
-  // a component whose export is a function with a small first letter (Toast → toast)
-  const apiName = (c) => (apiIndex.some((x) => x.items.some((it) => it[0] === nameOf(c))) ? nameOf(c) : nameOf(c)[0].toLowerCase() + nameOf(c).slice(1));
-  const pick = (c) => ({ f: c.folder, n: nameOf(c), s: c.meta?.summary ?? "", ...(c.meta?.composedOf?.length ? { p: c.meta.composedOf } : {}), ...(ownPage(c) ? { w: ownPage(c) } : {}), ...(apiOf(c) ? { a: `${apiOf(c)}/${apiName(c)}` } : {}) });
-  const load = (c) => {
-    // its own entry: the page imports the demo; the option spec is plain data, so MarchIDE still loads it
-    if (c.meta?.entry) return `demo: own, playground: () => import("./${c.folder}/playground.ts")`;
-    const g = groupOf.get(c.folder);
-    return g ? `...L(${groups.indexOf(g.file)}, ${g.j})` : `demo: () => import("./${c.folder}/demo.tsx"), playground: () => import("./${c.folder}/playground.ts")`;
-  };
-  files["src/components/cards.gen.ts"] = HEAD + `import type { PlaygroundSpec } from "./meta.ts";\n` +
-    `\n/** f: folder, n: name, s: summary, p: composedOf, w: showcase page, a: API reference page under /api (the Code tab: cardCode(folder)). */\n` +
-    `export interface CardEntry { f: string; n: string; s: string; p?: readonly string[]; w?: string; a?: string; demo: () => Promise<{ default: (p: { values: never }) => unknown; code?: string }>; playground: () => Promise<{ default: PlaygroundSpec<never> }> }\n` +
-    `type Mod = Record<string, { default: never }>;\nconst G: (() => Promise<Mod>)[] = [${groups.map((f) => `() => import("./${f}") as Promise<never>`).join(", ")}];\n` +
-    `const L = (i: number, j: number) => ({ demo: () => G[i]!().then((m) => m[\`d\${j}\`]!), playground: () => G[i]!().then((m) => m[\`p\${j}\`]!) });\n` +
-    (list.some((c) => c.meta?.entry) ? `const own = (): Promise<never> => Promise.reject(new Error("this component has its own entry: its page imports the demo"));\n` : "") +
-    `/** Every component folder as a showcase card needs it (registry.gen.ts has the full meta). */\nexport const cards: readonly CardEntry[] = [\n` +
-    list.map((c) => `  { ${JSON.stringify(pick(c)).slice(1, -1)}, ${load(c)} },\n`).join("") + `];\n` +
-    `/** The Code-tab snippet of a folder (one lazy module for every card). */\nexport const cardCode = (folder: string): Promise<string> => import("./cards-code.gen.ts").then((m) => m.code[folder] ?? "");\n`;
-  // The class of each component's root element (meta.root, else the first class its stylesheet styles): how the showcase
-  // finds the parts of a composite on the stage ("Parçalarına ayır"). Its own lazy module: read on the first use.
-  const rootClass = (c) => {
-    if (c.meta?.root) return c.meta.root;
-    const dir = join(root, "src/components", c.folder);
-    const css = existsSync(dir) ? readdirSync(dir).find((f) => f.endsWith(".css")) : null;
-    return css ? /^\.(m-[a-z0-9-]+)/m.exec(readFileSync(join(dir, css), "utf8").replace(/\/\*[\s\S]*?\*\//g, ""))?.[1] ?? null : null;
-  };
-  files["src/components/cards-roots.gen.ts"] = HEAD + "/** Component name → the class of its root element. */\nexport const roots: Record<string, string> = {\n" +
-    list.filter((c) => rootClass(c)).map((c) => `  ${JSON.stringify(nameOf(c))}: ${JSON.stringify(rootClass(c))},\n`).join("") + "};\n";
-  // The components other components are built from (every name in a composedOf), each behind its own loader: the
-  // showcase gives them props through m:parts when a part of a composite is chosen on the stage.
-  const partNames = new Set(list.flatMap((c) => c.meta?.composedOf ?? []));
-  files["src/components/cards-parts.gen.ts"] = HEAD + "/** Component name → a loader of the component itself (the key of an m:parts map). */\n" +
-    "export const parts: Record<string, () => Promise<unknown>> = {\n" +
-    list.filter((c) => partNames.has(nameOf(c)) && !c.meta?.entry).map((c) => `  ${nameOf(c)}: () => import("./${c.folder}/index.ts").then((m) => (m as Record<string, unknown>)[${JSON.stringify(nameOf(c))}]),\n`).join("") + "};\n";
-  // The lower tabs of a component card (Özellikler, Erişilebilirlik): docs.md's "## Props" table (and the lines after
+  // Each component's props table, notes and accessibility: docs.md's "## Props" table (and the lines after
   // it) and "## Accessibility", one JSON per category (`comp`, not written here: tools/cdn-data.mjs publishes them as
-  // data/comp/<category>.json, which the site fetches when a tab opens).
+  // data/comp/<category>.json, which sites read for a component's Props and Accessibility tabs).
   const comp = {};
   const mdSection = (md, title) => md.match(new RegExp(`^## ${title}[^\\n]*\\n([\\s\\S]*?)(?=^## |(?![\\s\\S]))`, "m"))?.[1].trim() ?? "";
   const cells = (line) => line.trim().replace(/^\||\|$/g, "").split(/(?<!\\)\|/).map((x) => x.trim().replace(/\\\|/g, "|"));
@@ -240,9 +147,6 @@ export async function generate(root = ROOT) {
     (docsByCat[c.category] ??= {})[c.folder] = { props, notes, a11y: mdSection(c.docs, "Accessibility") };
   }
   for (const [cat, all] of Object.entries(docsByCat)) comp[`comp/${cat}.json`] = JSON.stringify(all) + "\n";
-  files["src/components/cards-code.gen.ts"] = HEAD + `export const code: Record<string, string> = {\n` +
-    list.map((c) => `  ${JSON.stringify(c.folder)}: ${JSON.stringify(firstCode(c.docs))},\n`).join("") + `};\n`;
-
   // catalogue by category (menu order), "composed of" links to the parts
   const byName = new Map(list.map((c) => [nameOf(c), c]));
   const part = (n) => (byName.has(n) ? `[${n}](#${anchor(n)})` : n);
@@ -274,6 +178,12 @@ export async function generate(root = ROOT) {
       changed = true;
     }
   }
+  // every component has its own subpath, march/components/<category>/<name> (its index.ts; on the CDN one module per
+  // component, so a page loads only the components it uses). No other file under src/components is reachable from
+  // outside (no wildcard). They come after the other entries: a name keeps its first subpath (its category).
+  const own = new Set(list.filter((c) => c.files.includes("index.ts")).map((c) => `./components/${c.folder}`));
+  for (const key of Object.keys(pkg.exports)) if (key.startsWith("./components/") && !own.has(key)) { delete pkg.exports[key]; changed = true; }
+  for (const key of own) if (pkg.exports[key] !== `./src/${key.slice(2)}/index.ts`) { pkg.exports[key] = `./src/${key.slice(2)}/index.ts`; changed = true; }
   if (changed) files["package.json"] = JSON.stringify(pkg, null, 2) + "\n";
   return { files, list, comp };
 }

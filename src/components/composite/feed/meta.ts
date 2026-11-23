@@ -9,5 +9,4 @@ export default defineMeta({
   summary: "Social feed: PostCards in a VirtualList inside PullToRefresh; skeleton first page and next page, infinite scroll, \"N new posts\" pill, end mark.",
   composedOf: ["PullToRefresh", "VirtualList", "PostCard", "Skeleton", "Button", "Empty", "StatusDot"],
   behaviors: ["motion engine"],
-  showcase: "/social",
 });

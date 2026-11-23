@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Dropdown", "ThemeSwatch", "OverflowText", "SectionLabel"],
   behaviors: [],
   hubs: [],
-  showcase: "/themes",
 });

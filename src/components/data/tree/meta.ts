@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["ListRow", "Chevron", "OverflowText"],
   behaviors: ["roving focus"],
   hubs: [],
-  showcase: "/data",
 });

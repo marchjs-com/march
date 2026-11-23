@@ -9,5 +9,4 @@ export default defineMeta({
   summary: "Back-to-top button: shows after the page is scrolled down, scrolls back on the motion engine; puts itself into BottomRightControls.",
   composedOf: ["IconButton", "BottomRightControls"],
   behaviors: [],
-  showcase: "/buttons",
 });

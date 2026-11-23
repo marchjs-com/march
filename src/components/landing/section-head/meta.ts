@@ -10,6 +10,4 @@ export default defineMeta({
   composedOf: ["Button", "Reveal"],
   behaviors: [],
   hubs: [],
-  showcase: "/web",
-  demoGroup: "frame",
 });

@@ -60,23 +60,6 @@ Roles, keyboard, announcements.
 
 ${composedOf.length ? composedOf.join(", ") : "—"}
 `,
-    "demo.tsx": `// Showcase stage for ${Name}: draws it for the Playground values (playground.ts).
-import { ${Name} } from "./index.ts";
-
-export const code = \`<${Name} size="sm">…</${Name}>\`
-
-export default function ${Name}Demo(props: { values: { size: string } }) {
-  return <div>{() => <${Name} size={props.values.size as "md"}>${Name}</${Name}>}</div>
-}
-`,
-    "playground.ts": `import { definePlayground } from "../../meta.ts";
-
-export default definePlayground<{ size: string }>({
-  options: [
-    { key: "size", label: "Boyut", default: "md", options: ["sm", "md", "lg"] },
-  ],
-});
-`,
     "meta.ts": `import { defineMeta } from "../../meta.ts";
 
 export default defineMeta({

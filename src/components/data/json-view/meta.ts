@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Chevron"],
   behaviors: [],
   hubs: [],
-  showcase: "/data",
 });

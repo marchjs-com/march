@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Disclosure", "SearchBox", "PanelHeader", "UndoRedo", "IconButton", "Button", "Badge", "Chip", "StatusDot", "Tooltip", "SectionLabel", "Empty", "TextInput", "NumberInput", "Slider", "Toggle", "Select", "Segmented", "ColorInput", "Textarea"],
   behaviors: ["Undo manager", "DirtyState manager", "fold search"],
   hubs: [],
-  showcase: "/ide",
 });

@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Portal", "Alert", "Button"],
   behaviors: [],
   hubs: [],
-  showcase: "/overlays",
 });

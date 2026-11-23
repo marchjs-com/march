@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: [],
   behaviors: ["positioning"],
   hubs: [],
-  showcase: "/text",
 });

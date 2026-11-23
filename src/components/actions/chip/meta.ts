@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["OverflowText", "IconButton"],
   behaviors: [],
   hubs: ["d"],
-  showcase: "/buttons",
 });

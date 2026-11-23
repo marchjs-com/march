@@ -10,6 +10,5 @@ export default defineMeta({
   composedOf: ["ListRow", "Chevron", "Spinner", "Button", "Badge", "Empty"],
   behaviors: ["virtual", "selection", "drag", "markText", "layer"],
   hubs: [],
-  showcase: "/big-data",
   barrel: false,
 });

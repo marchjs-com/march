@@ -9,6 +9,4 @@ export default defineMeta({
   summary: "Scroll entrance for any block: fade, rise, slide (RTL mirrored), scale, blur, flip; stagger; scrub follows the scroll.",
   composedOf: [],
   behaviors: ["motion engine", "scrollTimeline", "onVisible"],
-  showcase: "/web",
-  demoGroup: "hero",
 });

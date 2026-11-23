@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["ListRow", "SectionLabel"],
   behaviors: ["list-nav"],
   hubs: [],
-  showcase: "/overlays",
 });

@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Avatar"],
   behaviors: [],
   hubs: [],
-  showcase: "/social",
 });

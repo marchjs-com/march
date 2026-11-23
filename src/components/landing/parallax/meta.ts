@@ -9,6 +9,4 @@ export default defineMeta({
   summary: "Layered depth: every layer (image or node) moves at its own scroll speed and, optionally, with the mouse; transform only.",
   composedOf: ["Overlay"],
   behaviors: ["parallaxLayers", "hoverParallax"],
-  showcase: "/web",
-  demoGroup: "hero",
 });

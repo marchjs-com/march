@@ -9,5 +9,4 @@ export default defineMeta({
   category: "layout",
   composedOf: ["ResizeHandle"],
   behaviors: ["resize-handle"],
-  showcase: "/layout",
 });

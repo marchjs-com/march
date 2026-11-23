@@ -9,6 +9,4 @@ export default defineMeta({
   summary: "Anti-landing block: who the product is not for (and who it is for); the visitor can mark the lines that apply and gets an honest verdict.",
   composedOf: ["CheckMark", "ListRow"],
   behaviors: ["role=checkbox", "aria-live verdict"],
-  showcase: "/web",
-  demoGroup: "sell",
 });

@@ -5,1393 +5,1393 @@
    "paths": [
     "src/components/layout/accordion"
    ],
-   "hash": "a2cea2a37bd74c4275f40caa00c595ec"
+   "hash": "374c840dddb9ce753fb8679edfe36bd0"
   },
   "ActivityBar": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/navigation/activity-bar"
    ],
-   "hash": "0f92ba18499e1903c12b76c22e257b49"
+   "hash": "50915793de82269283f68dfaddc414e6"
   },
   "Alert": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/feedback/alert"
    ],
-   "hash": "2cac92ead1d7fe14b7cba7bb25e7b328"
+   "hash": "4693f83309b644b9a6169eead8d728d3"
   },
   "AppShell": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/app-shell"
    ],
-   "hash": "b3645daf6e1634ae6469f9872afe9430"
+   "hash": "5a7876470b4efc055f65e78692c429c5"
   },
   "AppUI": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/app-ui"
    ],
-   "hash": "721d488491f5ca839e75a47dc69a710a"
+   "hash": "6e8aee1245b44183bdb2cf8efca08a29"
   },
   "Avatar": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/social/avatar"
    ],
-   "hash": "3017277ea7116571d0eabc78e55c0526"
+   "hash": "a6e968869104b7f56d9d8c62fcc4056b"
   },
   "AvatarGroup": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/social/avatar-group"
    ],
-   "hash": "aff62e9b44aa4b0b1c7194b8c853b2b8"
+   "hash": "176365eb09813d30f281ef7c8deb5064"
   },
   "Badge": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/badge"
    ],
-   "hash": "b5d0bc88e13ebde72be10c07ff117b5c"
+   "hash": "8f12476fd1ca7c32953a649f91e972f5"
   },
   "BarChart": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/bar-chart"
    ],
-   "hash": "e33c8c1b96c274672c60650db618b79f"
+   "hash": "091e70489d461995f9fe286875bb626f"
   },
   "BarList": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/bar-list"
    ],
-   "hash": "3ef476c2f2c5eee65815c08f8a84d52d"
+   "hash": "60069eb0213cf777f9594bed1f7f0d08"
   },
   "BeforeAfter": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/before-after"
    ],
-   "hash": "ae4e6fbab2eb6eaa5e42ff16464f4e1e"
+   "hash": "74df840b765dd671c9bc49ecb242eaec"
   },
   "BottomNav": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/bottom-nav"
    ],
-   "hash": "c646d0ed962289b9b0b2601aa36d8f69"
+   "hash": "ab846b7a0022f33ea209f59089cc2b03"
   },
   "BottomRightControls": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/bottom-right-controls"
    ],
-   "hash": "d186f53485bb44ff4f22e4e10f45da38"
+   "hash": "b60227738a01b94e03d175ca0efa1e4b"
   },
   "BranchingStory": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/branching-story"
    ],
-   "hash": "dce30da2dcea79387a0248ebe7f632d5"
+   "hash": "2bcb14437f11cbfb1282c795728043b5"
   },
   "Breadcrumbs": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/navigation/breadcrumbs"
    ],
-   "hash": "e74aded450f5432535c50fce2f9587d3"
+   "hash": "aa2fa9929cfe81909030a4d2577bacb4"
   },
   "Button": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/actions/button"
    ],
-   "hash": "12193c447fea9f4d26167faa5ceb9f5f"
+   "hash": "93a4f04f6e2b73f1a97c9fb9f79e895f"
   },
   "ButtonGroup": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/actions/button-group"
    ],
-   "hash": "e818c97a69d7d60b1c4c9a6cbf3872e8"
+   "hash": "2b9809b1ef736df368b20b862b063b17"
   },
   "Calendar": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/calendar"
    ],
-   "hash": "7d2e81fd3d7a0b9fed57fd6d6998e4bb"
+   "hash": "a4cd2522b72501d93bf8ad2df8bc1cbe"
   },
   "Card": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/card"
    ],
-   "hash": "495cca228350fb2c71ca73fc014e8c88"
+   "hash": "7dd360663ab6087f0b577644e6d9dd1b"
   },
   "Carousel": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/media/carousel"
    ],
-   "hash": "407e62aaa8a615999ac83124eaf8a085"
+   "hash": "523233fa730297218fa73e6c84e55a85"
   },
   "ChatBubble": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/social/chat-bubble"
    ],
-   "hash": "45666d788114ce58b4f49d222fd6b350"
+   "hash": "b5193301d5c97bb9269921865bf61868"
   },
   "ChatComposer": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/chat-composer"
    ],
-   "hash": "e247f3ff8c1d09d3d0873500ff87e0a5"
+   "hash": "ead4e898079c3b74b25882929b8cca47"
   },
   "ChatThread": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/chat-thread"
    ],
-   "hash": "8c32ef54e9f208ada5a852ebd8417ba0"
+   "hash": "5e2dd140ed1d180909713281539e6d3c"
   },
   "Checkbox": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/checkbox"
    ],
-   "hash": "1ea592335457228fefb842582f8a3329"
+   "hash": "cd1a8ee3bbd81f49645ef15e83774bd4"
   },
   "CheckboxGroup": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/checkbox-group"
    ],
-   "hash": "6c392e14abf0963f0dbdde666d702cdf"
+   "hash": "4f983279f2703bef744a6211f73310df"
   },
   "CheckMark": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/feedback/check-mark"
    ],
-   "hash": "0e039a8c42cbc4e1369a502b201d10bf"
+   "hash": "2acce0b02fc5efffdbd3ff3159bdfbbb"
   },
   "Chevron": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/actions/chevron"
    ],
-   "hash": "ff4836003e58ea51ce8ad912b70ac7fc"
+   "hash": "60cfc804ab6e78105ef516753f268604"
   },
   "Chip": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/actions/chip"
    ],
-   "hash": "19f7dc454bed68ded50013fafcee2fd8"
+   "hash": "dfeb45c0f9564c0b7ccca32c5d22b471"
   },
   "ChoicePicker": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/choice-picker"
    ],
-   "hash": "0d9dbf561ec21857eb4f26211b2977c6"
+   "hash": "4e539ef6970e754c068286296c8ba3b1"
   },
   "ClampText": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/typography/clamp-text"
    ],
-   "hash": "e381c9700ee5d66e7910f3faa6bffd2a"
+   "hash": "fa374bd0a7e765f2dd186332bd79c7dd"
   },
   "CodeEditor": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/code-editor"
    ],
-   "hash": "99c22be6928d93331332c94d2e532643"
+   "hash": "c3015e2db393e8aa70cee2ee1fbe3b47"
   },
   "CodeInput": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/code-input"
    ],
-   "hash": "939c5ebd6d42b9fa1b315558b4ea3404"
+   "hash": "011e8662e7c92c3b7978942338f532c8"
   },
   "CodeView": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/typography/code-view"
    ],
-   "hash": "ec345b6a0cb1791c8a0dc7468898091b"
+   "hash": "f33bf7bbdb868459b56a6d7cb9cd7a1e"
   },
   "ColorInput": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/color-input"
    ],
-   "hash": "7a1db2553a7b279361a28c6b4556e8ec"
+   "hash": "30aacadfb8ad5ab7764ba11c0a3122d4"
   },
   "ColorPicker": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/color-picker"
    ],
-   "hash": "74509a30f4e03c067e157c4e5ac725b2"
+   "hash": "ad46bacbc595939669c94422cedc747a"
   },
   "Combobox": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/combobox"
    ],
-   "hash": "59996d5d26078a47db70aa42d91730cf"
+   "hash": "e960d9cbd50ae8a951dc4acaae0eb6d1"
   },
   "CommandPalette": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/command-palette"
    ],
-   "hash": "84d740d623d2a787d50585f29e853e16"
+   "hash": "07a2ddea8f493d48667549f19650d3b3"
   },
   "ConsentBanner": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/consent-banner"
    ],
-   "hash": "cc11d0209107dbf5046b670a77e5d282"
+   "hash": "6f55ebce8edd0e6ea9ac5b9b379b6fbf"
   },
   "ContextMenu": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/overlays/context-menu"
    ],
-   "hash": "c383b23a155ac0d7f1c968eec7c78566"
+   "hash": "5a8e397e95c5769ab6eed87addd0d1ac"
   },
   "CopyButton": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/actions/copy-button"
    ],
-   "hash": "717617930b1bec720dcad8b315a3bb9c"
+   "hash": "f49cab5b60f0a06bf7f4df8f04ddf524"
   },
   "CornerMark": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/media/corner-mark"
    ],
-   "hash": "83fea9efd62d3c8bf3a8f0a5376ff953"
+   "hash": "41d202de3bdd2632987726846c9a1100"
   },
   "Counter": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/counter"
    ],
-   "hash": "0efed5c33222d06c0ad5dc63ce0f4aae"
+   "hash": "e451fe8753ce8db5338b6123ba8294dd"
   },
   "CountRoll": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/social/count-roll"
    ],
-   "hash": "122f23a828a4d0ee716ea7897e75f5bd"
+   "hash": "cff186ef11a2ac13c85b627b440a1c02"
   },
   "CtaBand": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/cta-band"
    ],
-   "hash": "8ee2aed896102bbffc07029e5b45b9a4"
+   "hash": "5bce80ba000a67b4287577d8508f4a52"
   },
   "DataGrid": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/data-grid"
    ],
-   "hash": "58a524a30c04bd78583d49ee7f8be8d9"
+   "hash": "a0a6d681986ccaae0cecadb6a1ff9af9"
   },
   "DatePicker": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/date-picker"
    ],
-   "hash": "38ada5c481cd10582c7d78100239ba4e"
+   "hash": "a79bb06ce53a984f3deb04c4c501d261"
   },
   "DateRangePicker": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/date-range-picker"
    ],
-   "hash": "e3ebbbd3ddabd981a49a38e490c219bb"
+   "hash": "14b3972b4ae953d1d3d6598f62a06d07"
   },
   "DateTimeInput": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/date-time-input"
    ],
-   "hash": "ad5380ea8b8cdc4bf26793b61765fcfb"
+   "hash": "dfacc076b6742cf1227f9f85bfad5994"
   },
   "Debugger": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/debugger"
    ],
-   "hash": "acf014e83baec7da9a4fdb28484856b3"
+   "hash": "a210d5e716c8a58ac4165aec0c0bc6e3"
   },
   "DevicePicker": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/device-picker"
    ],
-   "hash": "6f92da18d5281b5ac5789525494a799c"
+   "hash": "d3c6e052e97df8a4beeed98d1118f5a5"
   },
   "DevicePreview": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/device-preview"
    ],
-   "hash": "0be1a79ab1b800d1d090cdacb4ba04ec"
+   "hash": "fa91f0f5e081db2a86a42fc1aef6904f"
   },
   "Dialog": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/overlays/dialog"
    ],
-   "hash": "d097ab07e39d3189ab887e114a1b98d6"
+   "hash": "80cc5a093e6d4f8854c7ddac75402cc9"
   },
   "Disclosure": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/disclosure"
    ],
-   "hash": "73256693ac608e9485f4c703e69d5c6e"
+   "hash": "e76be90ee3ef1e4087581e8aa2f5c904"
   },
   "DockLayout": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/dock-layout"
    ],
-   "hash": "5a9cb2d9726c91da1c74e17a78751cc6"
+   "hash": "54d23c01736dc96c351875b30fb7d6c5"
   },
   "Drawer": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/overlays/drawer"
    ],
-   "hash": "31a140a642e33337cf81c3101d7a1e52"
+   "hash": "977666540615ee4c8585b9506b99a6fc"
   },
   "EasingCurveEditor": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/motion/easing-curve-editor"
    ],
-   "hash": "d4670c63f8bd4190e45ec75d8cc27754"
+   "hash": "b43cab01d925f1c97145cde6f086c341"
   },
   "EditorFrame": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/editor-frame"
    ],
-   "hash": "416b5d9d5822cc150d0baf5be194f486"
+   "hash": "0f0478536862767a4d749bbe64a4c48d"
   },
   "Empty": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/feedback/empty"
    ],
-   "hash": "2a8f03910159be5b03e27615b32a0ec7"
+   "hash": "c31fc7f9e8192f089eab6955c49d74ac"
   },
   "ErrorBox": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/feedback/error-box"
    ],
-   "hash": "d218971bf23ab6ed9b0842f694e7643c"
+   "hash": "3397b75f150fc557a5592ecde5477de3"
   },
   "ExplodedView": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/exploded-view"
    ],
-   "hash": "562e34bcbc34f6f74bd88a0298ff5b98"
+   "hash": "8605ea2c32d9e04cece1efe589fa1f1b"
   },
   "Faq": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/faq"
    ],
-   "hash": "9db430e2239f7237eca2a7e371261f3c"
+   "hash": "6c64f981f1222a650acf69f9242e1d85"
   },
   "FeatureGrid": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/feature-grid"
    ],
-   "hash": "340775d5c76f23d0b7c5efd7264684c4"
+   "hash": "09364ef09f5a831c7380b9a534cf1c2f"
   },
   "Feed": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/feed"
    ],
-   "hash": "5f3a9c57f740762ef2d49e84ab707bd0"
+   "hash": "1dc25b3fef7cc231a9f6b0b71d64ee5a"
   },
   "FileUpload": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/file-upload"
    ],
-   "hash": "ad26db5d5e7b84e2351ccb1728a546d8"
+   "hash": "0343a5d888dad6b9ce3613ce48efce3c"
   },
   "FollowButton": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/social/follow-button"
    ],
-   "hash": "de0537bb12391aedf841d9229a0a975b"
+   "hash": "7da2bd92c69ace3da2b43c62b489f396"
   },
   "FontPicker": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/font-picker"
    ],
-   "hash": "0ff4859a84bbb191b864f538a26af239"
+   "hash": "bc5d40c6f92ef7e91f5c28b43e80b8f2"
   },
   "FormatToolbar": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/format-toolbar"
    ],
-   "hash": "61d71925b99daeef15e759d14fdad202"
+   "hash": "3f9c8f22e03e46f822c142b8252ab943"
   },
   "Gantt": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/gantt"
    ],
-   "hash": "bfb769c8ab3f22af174611eadb01b1a1"
+   "hash": "fb140d8042eab5c4e93009ca004f3bc2"
   },
   "GradientEditor": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/gradient-editor"
    ],
-   "hash": "da843df01f87521448058a8c141f5acb"
+   "hash": "1e007021f0ce3bdcb5bd47e3f72b6a8e"
   },
   "Grid": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/grid"
    ],
-   "hash": "4bbf17f15082d75f0df4d1131a4458df"
+   "hash": "1e38bc4cd8995347ce31ece20a03aa6d"
   },
   "Heatmap": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/heatmap"
    ],
-   "hash": "de417c365f987235a92213c8f24d195e"
+   "hash": "c73a88bee404c38f9cabf131e6eda812"
   },
   "Hero": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/hero"
    ],
-   "hash": "403494c488efeb4710c64f886e7fafd8"
+   "hash": "8d9c106314f89958cc43a20eb5fcb650"
   },
   "HonestCompare": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/honest-compare"
    ],
-   "hash": "8dfb7d230eeaf8bc99b5e3ad02e62cba"
+   "hash": "acdb5fdcbd4ce4084da34687d6b52b3b"
   },
   "HorizontalScroll": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/horizontal-scroll"
    ],
-   "hash": "bddcb4807737e7fe600df00daaf6a601"
+   "hash": "122427e89bf13d719b6b25eea8e18821"
   },
   "IconButton": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/actions/icon-button"
    ],
-   "hash": "670ab411725e85b1285833496e969ab3"
+   "hash": "c3eea19272b217ec45bcb39960164a6d"
   },
   "IconPicker": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/icon-picker"
    ],
-   "hash": "5ab88f6367a3e2b90d23f7cc3bc3fd46"
+   "hash": "9bdddec85d53b2c0cdb13648289d4ee3"
   },
   "IconTile": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/icon-tile"
    ],
-   "hash": "eff7ff4a10fcef217d8d5b7d35059e5a"
+   "hash": "d119ac88ac991065b26f2d3445fc4f8c"
   },
   "ImageCropper": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/image-cropper"
    ],
-   "hash": "e03c967653225f5bd73dc46b850af602"
+   "hash": "bd5ca3de4b2eddb9cdab5249f01ce1a4"
   },
   "Joined": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/joined"
    ],
-   "hash": "34aa0d0607a6266d0bdf209534fa40b9"
+   "hash": "6c9a42330021185da3ea709a7bbc904d"
   },
   "JsonEditor": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/json-editor"
    ],
-   "hash": "13f284616e45fe2fb1a213d71a92a577"
+   "hash": "a822bb7dc990c187c2c2d0b1f2711bf4"
   },
   "JsonView": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/json-view"
    ],
-   "hash": "057e5a8af637f49fccc81bcac960b764"
+   "hash": "18f7f275eb7043cdafe56bc0b0849bf8"
   },
   "Kanban": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/kanban"
    ],
-   "hash": "9d4209a7a983ec863bf4d8faa85fe6de"
+   "hash": "7b3f949f5fa1a8e48a30c262296b13e4"
   },
   "Kbd": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/typography/kbd"
    ],
-   "hash": "43e70a96491ed8e51fd14fe8870b59ef"
+   "hash": "13e57bffe43eece293ae502fdfc718a8"
   },
   "KeyframeTimeline": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/keyframe-timeline"
    ],
-   "hash": "384357de6ad32f6ca346252bfac2088f"
+   "hash": "87a74b89035b2d23cf18574be199b059"
   },
   "KeyValue": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/key-value"
    ],
-   "hash": "2f94cbc6f940d2486838295a249d64f7"
+   "hash": "e547107be4a86a4c19bfbcd7bbbb65eb"
   },
   "KeyValueEditor": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/key-value-editor"
    ],
-   "hash": "e7d7c17170631026cc08d47ea5a85eeb"
+   "hash": "80414d05d7b562dfe5c14d2c1237c0cf"
   },
   "Layout": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/layout"
    ],
-   "hash": "21bfb141671d2f3023da6e31a8cc6b4e"
+   "hash": "5442bbe6b731e127c32e9acd064946c5"
   },
   "LikeButton": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/social/like-button"
    ],
-   "hash": "0cbd8a94b7f46a0dc8ec23dbb2f435d4"
+   "hash": "02ac8574a2a78227f2d66c9ad054f8a9"
   },
   "LineChart": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/line-chart"
    ],
-   "hash": "606c0c59541b48499cf82c3bfcd7544e"
+   "hash": "ab5cc00503b332784c9aa1a54f7645d4"
   },
   "LinkCard": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/navigation/link-card"
    ],
-   "hash": "2f30378cd79e15142928e27f7fd1b5d5"
+   "hash": "6340ef4b389a0c3e405d800e6ec56836"
   },
   "ListEditor": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/list-editor"
    ],
-   "hash": "875d88eb49ddc9bcb621823b808f55cf"
+   "hash": "0cd2cb07ddad6da04d73be0799378f40"
   },
   "ListRow": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/list-row"
    ],
-   "hash": "82a2d249e7849c4972c7ef2be0292519"
+   "hash": "084e3a09d81568bd148e793f46473727"
   },
   "LiveCounter": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/live-counter"
    ],
-   "hash": "5d24c2bcb5c69edb45dfdf5430e2b5ee"
+   "hash": "2c511fc221377fbc330a9fd0afe4f84e"
   },
   "LiveFeed": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/live-feed"
    ],
-   "hash": "ed872d552514c05dab0fda164e0010bb"
+   "hash": "8f77c12b25b4e7d6eed4037c964f0863"
   },
   "LiveStatus": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/feedback/live-status"
    ],
-   "hash": "a30869560f797de857ce8044e9187f21"
+   "hash": "3f73a3e05f6b3c12e5106df3994b1f01"
   },
   "Loader": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/feedback/loader"
    ],
-   "hash": "25e240626426e6f5ac5af353ecbfc1a2"
+   "hash": "69f0115a9dae0b8c9fd96dbc26de8afc"
   },
   "LogoCloud": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/logo-cloud"
    ],
-   "hash": "52a4c06e725b5eb80e3384aabf2d20fc"
+   "hash": "3e036ac00183a3630fc1b85a61333e59"
   },
   "MadeWithMarch": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/actions/made-with-march"
    ],
-   "hash": "3dac34e2bd3dea7c57bdd369ebbf4735"
+   "hash": "86d0619f5990f2d42cbada8d86a7ceb7"
   },
   "MarkdownEditor": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/markdown-editor"
    ],
-   "hash": "1edb1cee963e36b7c97fb1ea4f72166c"
+   "hash": "37db9ee172770acb5e196e7913762c9b"
   },
   "Media": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/media/media"
    ],
-   "hash": "b3313d63103b8a5e6319d4d34872d880"
+   "hash": "8fc2b7ea07f0820c26ff21fdc4912b5d"
   },
   "MediaGrid": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/social/media-grid"
    ],
-   "hash": "2379e9a48115297fd5383a8e0d160bee"
+   "hash": "5a7282ae9b0f7890dfe3ca1c62ad8340"
   },
   "Menu": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/actions/menu"
    ],
-   "hash": "208c8e285d7ad538eb44df45be434694"
+   "hash": "d28dcc2f2d108aff40f9369414a5c291"
   },
   "MultiSelect": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/multi-select"
    ],
-   "hash": "14117793edf3c58cda22277ed24e26c8"
+   "hash": "a430cfcce7e12d397d13cd09fb9a4dad"
   },
   "NavMenu": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/navigation/nav-menu"
    ],
-   "hash": "ca8050ca653a22d1bece0565c95aeeb2"
+   "hash": "be8d2caf93c74ea71876b1cf37806308"
   },
   "NavSidebar": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/nav-sidebar"
    ],
-   "hash": "41545824653d7ad6a056579cfafc0dee"
+   "hash": "63de05859667512ae9bb0ca976cc8ef5"
   },
   "NetworkThrottle": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/network-throttle"
    ],
-   "hash": "03bdb28742e7e74b3cefbaad3c200a32"
+   "hash": "f1b878c5c791ba1d88ce6ae863f7aa69"
   },
   "Newsletter": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/newsletter"
    ],
-   "hash": "5ef26db6d7437a6cb8e87413fdb7316d"
+   "hash": "901cb60f5eb04781a1ef3adbe11bd584"
   },
   "NotForYou": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/not-for-you"
    ],
-   "hash": "52b8448dbda40dfeba173389c094a58e"
+   "hash": "da5fab1b5fd4dc80f5d28ed054989241"
   },
   "NumberInput": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/number-input"
    ],
-   "hash": "3cfae6b9ce25419ad7965600de05eff7"
+   "hash": "dcb93d80b924aebaa835efef4ac00510"
   },
   "OptionList": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/option-list"
    ],
-   "hash": "9ab4196315fd4641ad4783394cad7ecc"
+   "hash": "ed4a25cf19ad8052a9fcdda30b15bc9a"
   },
   "OverflowText": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/typography/overflow-text"
    ],
-   "hash": "3c6423dcc9317a24d2bbbea37ce7da4a"
+   "hash": "4e5049c4d9400fdc3db1a1dd851f543f"
   },
   "OverflowToolbar": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/actions/overflow-toolbar"
    ],
-   "hash": "a8e0f94f8302fdc8a7d804a8b1b2a1fd"
+   "hash": "dffef0f541220a0b679ab32e861d271b"
   },
   "Overlay": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/media/overlay"
    ],
-   "hash": "cb8ac0c320aa741dbcb7ab509d6126ca"
+   "hash": "69ccb33265c617a841e7f27c92ae67db"
   },
   "OverlayScope": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/overlay-scope"
    ],
-   "hash": "998b29f3f28e4c8fa5452cc0c58f76ab"
+   "hash": "cd76082b58eddee08055d3c542f13a1d"
   },
   "PageDots": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/navigation/page-dots"
    ],
-   "hash": "4ade13835303672e8c491c6a340f2d4d"
+   "hash": "ba6884fc2dedeed917f5447a9a606f15"
   },
   "Pagination": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/navigation/pagination"
    ],
-   "hash": "eb7dbb0ee34a86af526f6100b2b99b26"
+   "hash": "b38fd4e810647f9a9380a5119125ccca"
   },
   "PanelHeader": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/panel-header"
    ],
-   "hash": "ddc305017fe32b56e0ad8a590a3e6701"
+   "hash": "18434d76414c6587de8e73168bf8dc3f"
   },
   "Parallax": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/parallax"
    ],
-   "hash": "98395661069ca2a83db9c4c63feaf8ca"
+   "hash": "9d59cc4213d29eedcc7d8f5b57b5d72d"
   },
   "PasswordInput": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/password-input"
    ],
-   "hash": "67ded0ee0dfe4427994181b352f767f0"
+   "hash": "83bd3e8aaf350dbee54d50e4e1059b20"
   },
   "PeriodNav": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/navigation/period-nav"
    ],
-   "hash": "27f81517250ad8a194ea18ef68855617"
+   "hash": "bdc7b65891299fe126a0001af86b3799"
   },
   "PhoneInput": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/phone-input"
    ],
-   "hash": "290493776e7421db74b671b0ffabd97c"
+   "hash": "bccb1bbb60219531feb174924d25ec88"
   },
   "Picture": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/media/picture"
    ],
-   "hash": "987260ab3714dd27cf13be3310d785d7"
+   "hash": "a86e21abb7f73e85ff2527ee1097933e"
   },
   "PieChart": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/pie-chart"
    ],
-   "hash": "4adb227efd0bbaf6ea89d497e453abdc"
+   "hash": "672459ddee5af0f38d22b1fb4eb820cf"
   },
   "Popover": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/overlays/popover"
    ],
-   "hash": "af26ab661f283af436955eb0d399bd4d"
+   "hash": "76c26fdd4a2ebc6b59a2ada7704ceb6e"
   },
   "PostCard": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/post-card"
    ],
-   "hash": "46073255e8545b1f85605e178bb03d7a"
+   "hash": "9ed4a5d71e519ab86b61fa40162b7f7a"
   },
   "Presentation": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/presentation"
    ],
-   "hash": "d7a29949f6e676487d6bf765a6158219"
+   "hash": "8e33acfee46d0b12d222e5a9f45b9a71"
   },
   "Pricing": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/pricing"
    ],
-   "hash": "d1d371158cf94034e3e7d2d1770fe875"
+   "hash": "26bc0f7b470e234acdcd9e9aa10d4f44"
   },
   "ProfileHeader": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/profile-header"
    ],
-   "hash": "e049d9bf5bfe004da857253b6b8799c7"
+   "hash": "bd5234b6a120bc97cc57a0df344efefd"
   },
   "Progress": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/feedback/progress"
    ],
-   "hash": "65b5ac4f615f64c87cc055a4bfe3fdca"
+   "hash": "99b1d97783d5378a990332c99c111efd"
   },
   "ProgressRing": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/progress-ring"
    ],
-   "hash": "1d93e5960eeaa64add7476d8249d14ad"
+   "hash": "67435d484dfadd939c1de0ca22a8815e"
   },
   "ProjectDetail": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/project-detail"
    ],
-   "hash": "7b054b4ef8e8d9c7228c7c91f12f657e"
+   "hash": "61238cc4afa47a3c325ebb77e98453a7"
   },
   "ProjectGrid": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/project-grid"
    ],
-   "hash": "5d70e224151f55d0a22f5098348a91b7"
+   "hash": "97c91422b37eb06f29cb981b7643536b"
   },
   "PropertyGrid": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/property-grid"
    ],
-   "hash": "fcda12c5a7bd854e95b2f63608ffc561"
+   "hash": "b6bf29310f6c756ae4e955fdf4d81dab"
   },
   "PullToRefresh": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/feedback/pull-to-refresh"
    ],
-   "hash": "f4070e849d13ccb35fba20fce4c0ec49"
+   "hash": "e3948ec894b78be98d9511f9571e2a75"
   },
   "RadioGroup": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/radio-group"
    ],
-   "hash": "3370491a5a02541c335d7fe22dcf0bac"
+   "hash": "6e28927741a3adaf73913114bd510f56"
   },
   "Rating": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/rating"
    ],
-   "hash": "7e2058f7d169e7401426f5b4fdb17ffb"
+   "hash": "fab40991423a13aa425efba3f8d43730"
   },
   "ReactionPicker": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/social/reaction-picker"
    ],
-   "hash": "ce24da59d51ed37096f01d7e29290d8b"
+   "hash": "476337fca78c28277c1b25d3f5415acd"
   },
   "ReplyQuote": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/social/reply-quote"
    ],
-   "hash": "4e47f36b1a96c5c4083c164756302d2a"
+   "hash": "39e33a37bb5753f471a80071778ff7d1"
   },
   "ResizeHandle": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/resize-handle"
    ],
-   "hash": "84dc0460edd4551f54e216b22e5816a7"
+   "hash": "3eebaddf071d26d11dc6a06b034d53fa"
   },
   "Reveal": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/reveal"
    ],
-   "hash": "e41586ece1825e134725f41038e98846"
+   "hash": "077d23608f0f21f3515e795c1fdc6e0b"
   },
   "RichTextEditor": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/rich-text-editor"
    ],
-   "hash": "bf82595b2571566b128b7388e0c8813f"
+   "hash": "ea9a62b7b8a3d52d3be73f7596c04374"
   },
   "Roadmap": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/roadmap"
    ],
-   "hash": "86a97c99676abf9a8a4f20f945751eff"
+   "hash": "3f62764ed938479a3348d5c02ba01f52"
   },
   "RowTools": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/row-tools"
    ],
-   "hash": "b213ccd5abdfc2a4aa1ed39f6129ca07"
+   "hash": "ad4d0a254f38c0aaf879bb69a2e6e010"
   },
   "Scheduler": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/scheduler"
    ],
-   "hash": "009b198b20a875ffbcdc46073354ac3e"
+   "hash": "6fc7ccb3e1968288119431cca3aed6cc"
   },
   "ScrollProgress": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/scroll-progress"
    ],
-   "hash": "5f05c3ccdd1bc73373a63f14f7bd5967"
+   "hash": "86b50eb5b89f3f79675d01080e6bf286"
   },
   "ScrollStory": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/scroll-story"
    ],
-   "hash": "68ee3acc70990f0fd570a6e1ce039c22"
+   "hash": "aab730e1f07882d39d20e634cda3e81b"
   },
   "ScrollToTop": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/actions/scroll-to-top"
    ],
-   "hash": "e0940a62e28e1186247a78cee0df074d"
+   "hash": "1f7abf453107fc3156b85699a0433025"
   },
   "SearchBox": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/search-box"
    ],
-   "hash": "1d2c0d1d12526e90e76b8dac2201245c"
+   "hash": "ea08de605da9da801867c1b55fe86107"
   },
   "Secret": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/typography/secret"
    ],
-   "hash": "f0ff91f1b178af084a772ed596023d98"
+   "hash": "495e518fcd67d94b7bc5c1a7dde0c61a"
   },
   "SectionHead": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/section-head"
    ],
-   "hash": "881444a4571e25c7f5bdf745f7470969"
+   "hash": "627ba735a1420c3bfa2e4c37eadaee57"
   },
   "SectionLabel": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/typography/section-label"
    ],
-   "hash": "37bb1d3df9be381296992ee781345505"
+   "hash": "9450a8c9e77d5bbdf02383822dead1a7"
   },
   "SectionTimeline": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/navigation/section-timeline"
    ],
-   "hash": "3dee428834cec05c2d7baf4c2a3aacde"
+   "hash": "bd796c8c378b68753f6677bd0d92c5b5"
   },
   "Segmented": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/segmented"
    ],
-   "hash": "dab4c75bbdfa4d5ebc0f7a87a2317b80"
+   "hash": "7c29ace3d62d85905cba987ff4761b96"
   },
   "Select": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/select"
    ],
-   "hash": "26a7efcdeb8651c50826e183175d5120"
+   "hash": "7053c0a33619e716e9bb3956ab7b6de8"
   },
   "SiteFooter": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/site-footer"
    ],
-   "hash": "5da49bd9f5b7864bd7ec4e72b5e7aaa9"
+   "hash": "08d6150add518f402d3b5b2ec097a9b8"
   },
   "SiteNav": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/site-nav"
    ],
-   "hash": "562c4fe3d63685b4474231413db4ce90"
+   "hash": "68ed72b1a543fb83ae168015184d1c98"
   },
   "SiteSection": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/site-section"
    ],
-   "hash": "dd6ddcf95fbd33d697e1c337bc3a1edd"
+   "hash": "6f6724e3aaa9d53a5eb0e142266defef"
   },
   "Skeleton": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/feedback/skeleton"
    ],
-   "hash": "0149a6efb19932b7cd9eb1355da69d15"
+   "hash": "1cf760d5af5ad20ce2ef0389b219b24e"
   },
   "Slider": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/slider"
    ],
-   "hash": "de5d43ab18d6c0692cf27c5eef99766d"
+   "hash": "a1e4923e3784c1bd55a91fefb304c756"
   },
   "Spacer": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/spacer"
    ],
-   "hash": "74e1525dea145c3a167d5bb0f6e83b24"
+   "hash": "67637ec84ced386d1f53aae900cbbadb"
   },
   "Sparkline": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/sparkline"
    ],
-   "hash": "64b3f8422e325d534e5acff7e4452fcf"
+   "hash": "2d0fbecc3cd8f555121d9ffa0f50d5cf"
   },
   "Spinner": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/feedback/spinner"
    ],
-   "hash": "318ca9aca62b291917af900291a0b4d8"
+   "hash": "7653403bfa909dcbafb28cd4e5728eda"
   },
   "Splitter": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/splitter"
    ],
-   "hash": "712bbbdeeab3043c82483fb233f49bf9"
+   "hash": "8b1fc7d5a014149a4807f98708db593a"
   },
   "Stack": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/stack"
    ],
-   "hash": "cbd2f5b70be4819740eaafaa2583f89a"
+   "hash": "0bb9eb6912b858f4f8c21ee31d0f461a"
   },
   "Stat": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/stat"
    ],
-   "hash": "976de370b2d7cb944afcdee4a908bd7b"
+   "hash": "4ae9b29083e3e759ce37bc2a43107c8f"
   },
   "StatsBand": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/stats-band"
    ],
-   "hash": "61f0d29dd3e18349fdad7cd5ea795634"
+   "hash": "658a2bb177af09f289e795e6b8c4d7c5"
   },
   "StatTile": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/stat-tile"
    ],
-   "hash": "e62f4cdf9ab96c39f51a047b2cf75e7b"
+   "hash": "c2b0d2444e1fb8826d174d30783ee91a"
   },
   "StatusBar": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/status-bar"
    ],
-   "hash": "1342b172d52845948a77c53600a5c5ea"
+   "hash": "c8cc62d8d20f4cf0f16911bcc583f503"
   },
   "StatusDot": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/feedback/status-dot"
    ],
-   "hash": "2583882f6b1de547e149835e2f077654"
+   "hash": "6ac03aee8dfb18f91f284b4a3da3bab1"
   },
   "Stepper": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/navigation/stepper"
    ],
-   "hash": "177aa49834cb6045679196d91b9f6dc0"
+   "hash": "5a6b8a9c1314061fdd0313b4f5d42dc3"
   },
   "Steps": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/navigation/steps"
    ],
-   "hash": "b01fa4ec6f8b2ed356f2636e35507376"
+   "hash": "36ef884d53f141672f1b394150e918bb"
   },
   "StoryProgress": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/social/story-progress"
    ],
-   "hash": "65ef6ea5e78478464d7d5c7566934d10"
+   "hash": "79b8ac86797bf0c8f0fa58e83bafaab2"
   },
   "StoryRing": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/social/story-ring"
    ],
-   "hash": "286bbdb2a9bb5083848ca5aace29620c"
+   "hash": "30732d10459533da6437cd33aca30064"
   },
   "StoryViewer": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/story-viewer"
    ],
-   "hash": "b4c0a891dfdde86782029b83c84f488b"
+   "hash": "e2fa839ddae2ca6c3a14b3608094d141"
   },
   "Swatch": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/swatch"
    ],
-   "hash": "6551b0482765f6a7f43709ec8187aec5"
+   "hash": "d3ec88755ed038c95d6564b6dee4c7dc"
   },
   "Tabs": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/navigation/tabs"
    ],
-   "hash": "62db49c4cdf51c92cdc7cdfa6db6994f"
+   "hash": "68a7542e057078c8b1b86cf1913bc9bc"
   },
   "Terminal": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/terminal"
    ],
-   "hash": "0df84fb41923199a9b4130f2a2e19a1e"
+   "hash": "c38d19d4fc3976c5fd30b6bf65f34120"
   },
   "Testimonials": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/testimonials"
    ],
-   "hash": "2d43583eefc6402fb04bec14762cc668"
+   "hash": "9a41164bd959b240dfa55a0d7aa1a184"
   },
   "Textarea": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/textarea"
    ],
-   "hash": "5d244aaf4cc5fb66be05f5f11e6d80e3"
+   "hash": "fbf7a9941ff991082024f4339b61cc61"
   },
   "TextInput": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/text-input"
    ],
-   "hash": "93d5a28dfa3880b0c050fa88d6679299"
+   "hash": "71d1d204f729b85dd08d09e09bee955c"
   },
   "ThemeEditor": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/theme-editor"
    ],
-   "hash": "981cc13285ef66ab66ab2e0c9974f7da"
+   "hash": "c5687c6c5e7613f99bd178761da40f26"
   },
   "ThemeMenu": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/theme-menu"
    ],
-   "hash": "7a7f85ddf71bfc5f47d757479e1ebeff"
+   "hash": "b288ecc2e6f9fb301072d9cea35e36c6"
   },
   "ThreadNav": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/navigation/thread-nav"
    ],
-   "hash": "8ec72387bfa1c9fd10f2dd114c4f2ff5"
+   "hash": "f9b83bc494a012280d17fb3897b4a2a0"
   },
   "TimeInput": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/time-input"
    ],
-   "hash": "274d7d17b97e63ec5853f9ad775eeb2f"
+   "hash": "6dee72535a43ba9f5c55c1738855e154"
   },
   "Timeline": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/timeline"
    ],
-   "hash": "5a4eb05575986366c3dcd1bbc1ad589f"
+   "hash": "925b1a627c8b9da4aa29176c55b77e71"
   },
   "TimeRuler": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/time-ruler"
    ],
-   "hash": "b74893f40b6f9055ad3e73b91faa4fbc"
+   "hash": "4e437023018933ac8ed3cc172423ffc8"
   },
   "Toast": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/overlays/toast"
    ],
-   "hash": "676508d0d60e17bf66ac334b5b6c1350"
+   "hash": "71cc158f35aa22ba432553a9038d0194"
   },
   "Toggle": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/toggle"
    ],
-   "hash": "5afc9beed005e8a55a053a449a68cf9b"
+   "hash": "d115214529f403e0cd0f06e8c758017a"
   },
   "Tooltip": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/overlays/tooltip"
    ],
-   "hash": "da4f8fadc03e1274b4f77f2bb7e2d412"
+   "hash": "9c66eb11a0d2d0aff0f747e22c95edbb"
   },
   "Tree": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/tree"
    ],
-   "hash": "825fe2728a338e216ee5b02c9ff4ca2a"
+   "hash": "887ca1b4c655a04f0abd38571c648560"
   },
   "TreeEditor": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/tree-editor"
    ],
-   "hash": "2e6cc122260b385b267f20814ab8b4b4"
+   "hash": "ce1dacde2ed77ac0ebe1ca702937c42d"
   },
   "TreeView": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/tree-view"
    ],
-   "hash": "2a1495d466ecc45b75389f074179ad7a"
+   "hash": "8eb8185ad136d3a4be72d6d261b58f2b"
   },
   "TypingIndicator": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/social/typing-indicator"
    ],
-   "hash": "47411366717fdc547f216e00b93d5656"
+   "hash": "25bd022dea79ecc2376c4459b74279ff"
   },
   "UndoRedo": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/actions/undo-redo"
    ],
-   "hash": "8a2c53e4fe8d5a071cca6981fd7a7156"
+   "hash": "8e9be55098060b1f8e34375b4a102025"
   },
   "VerifiedMark": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/social/verified-mark"
    ],
-   "hash": "27b212c2b60b08a32452b845ce107e9f"
+   "hash": "3439abc2e0f0d7f7c05a225960deb6b2"
   },
   "VideoBackground": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/landing/video-background"
    ],
-   "hash": "9d0572798bc89dda624183e9dc4aba22"
+   "hash": "5480da227cb96d055f3a34f283cae99a"
   },
   "VirtualList": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/data/virtual-list"
    ],
-   "hash": "e8b5f886ed1c6de43a6f1da9e7805efb"
+   "hash": "1e3c3dad490017624ff7f80f0666e788"
   },
   "Window": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/layout/window"
    ],
-   "hash": "8c73743098a16afa3429165164005e23"
+   "hash": "db1ad41a61be489b2b3c9d7f9764f8f8"
   },
   "Wizard": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/composite/wizard"
    ],
-   "hash": "9ff2fa90b415831701403b6e997dea09"
+   "hash": "32566376cb1b07caaa7dd7152bbcc12f"
   }
  },
  "log": [
@@ -2696,6 +2696,1200 @@
    "name": "StoryViewer",
    "what": "refresh",
    "reason": "Shared size change (approved 2026-11-23): short effects via motion/play.ts (WAAPI, engine on demand), key labels from ui/key-label.ts, OverflowText marquee and Tabs router late-bound; same behaviour"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Accordion",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ActivityBar",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Alert",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "AppShell",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "AppUI",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Avatar",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "AvatarGroup",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Badge",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "BarChart",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "BarList",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "BeforeAfter",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "BottomNav",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "BottomRightControls",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "BranchingStory",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Breadcrumbs",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Button",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ButtonGroup",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Calendar",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Card",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Carousel",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ChatBubble",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ChatComposer",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ChatThread",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Checkbox",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "CheckboxGroup",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "CheckMark",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Chevron",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Chip",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ChoicePicker",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ClampText",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "CodeEditor",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "CodeInput",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "CodeView",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ColorInput",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ColorPicker",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Combobox",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "CommandPalette",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ConsentBanner",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ContextMenu",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "CopyButton",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "CornerMark",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Counter",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "CountRoll",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "CtaBand",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "DataGrid",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "DatePicker",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "DateRangePicker",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "DateTimeInput",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Debugger",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "DevicePicker",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "DevicePreview",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Dialog",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Disclosure",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "DockLayout",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Drawer",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "EasingCurveEditor",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "EditorFrame",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Empty",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ErrorBox",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ExplodedView",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Faq",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "FeatureGrid",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Feed",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "FileUpload",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "FollowButton",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "FontPicker",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "FormatToolbar",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Gantt",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "GradientEditor",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Grid",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Heatmap",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Hero",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "HonestCompare",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "HorizontalScroll",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "IconButton",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "IconPicker",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "IconTile",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ImageCropper",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Joined",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "JsonEditor",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "JsonView",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Kanban",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Kbd",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "KeyframeTimeline",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "KeyValue",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "KeyValueEditor",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Layout",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "LikeButton",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "LineChart",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "LinkCard",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ListEditor",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ListRow",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "LiveCounter",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "LiveFeed",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "LiveStatus",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Loader",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "LogoCloud",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "MadeWithMarch",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "MarkdownEditor",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Media",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "MediaGrid",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Menu",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "MultiSelect",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "NavMenu",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "NavSidebar",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "NetworkThrottle",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Newsletter",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "NotForYou",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "NumberInput",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "OptionList",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "OverflowText",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "OverflowToolbar",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Overlay",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "OverlayScope",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "PageDots",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Pagination",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "PanelHeader",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Parallax",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "PasswordInput",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "PeriodNav",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "PhoneInput",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Picture",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "PieChart",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Popover",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "PostCard",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Presentation",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Pricing",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ProfileHeader",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Progress",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ProgressRing",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ProjectDetail",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ProjectGrid",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "PropertyGrid",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "PullToRefresh",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "RadioGroup",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Rating",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ReactionPicker",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ReplyQuote",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ResizeHandle",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Reveal",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "RichTextEditor",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Roadmap",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "RowTools",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Scheduler",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ScrollProgress",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ScrollStory",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ScrollToTop",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "SearchBox",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Secret",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "SectionHead",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "SectionLabel",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "SectionTimeline",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Segmented",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Select",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "SiteFooter",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "SiteNav",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "SiteSection",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Skeleton",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Slider",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Spacer",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Sparkline",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Spinner",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Splitter",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Stack",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Stat",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "StatsBand",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "StatTile",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "StatusBar",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "StatusDot",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Stepper",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Steps",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "StoryProgress",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "StoryRing",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "StoryViewer",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Swatch",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Tabs",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Terminal",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Testimonials",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Textarea",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "TextInput",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ThemeEditor",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ThemeMenu",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "ThreadNav",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "TimeInput",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Timeline",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "TimeRuler",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Toast",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Toggle",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Tooltip",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Tree",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "TreeEditor",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "TreeView",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "TypingIndicator",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "UndoRedo",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "VerifiedMark",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "VideoBackground",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "VirtualList",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Window",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
+  },
+  {
+   "at": "2026-11-23",
+   "name": "Wizard",
+   "what": "refresh",
+   "reason": "the card's demo and options moved to the site; meta.ts no longer names the site's page"
   },
   {
    "at": "2026-11-23",

@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Calendar", "IconButton", "Popover"],
   behaviors: [],
   hubs: [],
-  showcase: "/forms",
 });

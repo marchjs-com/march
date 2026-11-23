@@ -9,6 +9,4 @@ export default defineMeta({
   summary: "Pinned section whose panels slide sideways while the page scrolls down; progress line; native snap scroller on touch.",
   composedOf: ["Progress"],
   behaviors: ["onScrollProgress"],
-  showcase: "/web",
-  demoGroup: "scroll",
 });

@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["PanelHeader", "Button"],
   behaviors: ["dismiss", "positioning"],
   hubs: [],
-  showcase: "/overlays",
 });

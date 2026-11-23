@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["ColorPicker", "Card", "Stack", "Segmented", "IconButton", "Swatch", "NumberInput", "CopyButton"],
   behaviors: ["drag"],
   hubs: [],
-  showcase: "/editors",
 });

@@ -9,6 +9,4 @@ export default defineMeta({
   summary: "Portfolio covers with filter Chips: FLIP re-layout on filter, open into ProjectDetail (shared element) or the Lightbox.",
   composedOf: ["Card", "Chip", "openMedia", "CornerMark", "Picture", "Reveal"],
   behaviors: ["flip", "motion engine"],
-  showcase: "/web",
-  demoGroup: "work",
 });

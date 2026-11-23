@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Spinner"],
   behaviors: ["action"],
   hubs: [],
-  showcase: "/buttons",
 });

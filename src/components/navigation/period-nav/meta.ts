@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["ButtonGroup", "IconButton", "Button"],
   behaviors: [],
   hubs: [],
-  showcase: "/navigation",
 });
