@@ -74,3 +74,9 @@ test("cdn: a lazy entry import is the CDN file itself, its stylesheet loaded alo
   assert.match(out, /const s = "import\(\\"march\/router\\"\)";/, "text in a string stays");
   assert.match(cdnDynamic('import("march/router")', cdn, { "march/router": "C:\\m\\src\\router\\index.ts" }), /import\("C:\/m\/src\/router\/index\.ts"\)/, "prerender: the source");
 });
+
+test("cdn: with the CDN's names.json the smallest entry comes from it, not from March's sources", () => {
+  const t = cdnTargets({ ...cdn, best: { "march/ui": { Button: "march/components/actions/button" } } }, {});
+  assert.equal(t("march/ui", "Button"), "march/components/actions/button");
+  assert.equal(t("march/ui", "toast"), "march/ui", "a name it does not list stays");
+});

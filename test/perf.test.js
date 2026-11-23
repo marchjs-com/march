@@ -174,6 +174,40 @@ test("service worker: precache on install, one cache per version, old versions d
   assert.match(headersFile(), /\/assets\/\*\n {2}Cache-Control: public, max-age=31536000, immutable/);
 });
 
+test("service worker on the CDN: a site's sw.js sets its settings and imports the shared runtime; CDN files cache-first", async () => {
+  const { swRuntime } = await import("../cli/perf.js");
+  const cdn = "https://cdn.test/1.0.0";
+  const src = swSource({ version: "v3", precache: ["./"], cdn, cdnPrecache: [`${cdn}/march.js`] });
+  assert.match(src, /let url = "https:\/\/cdn\.test\/1\.0\.0\/sw\.js";[\s\S]*importScripts\(url\);/, "the runtime comes from the CDN's version folder");
+  assert.doesNotMatch(src, /addEventListener/, "none of the runtime is inlined");
+  // a strict CSP's Trusted Types: the URL goes through a policy that lets only it through
+  const imported = [];
+  const policy = (name) => ({ createScriptURL: (x) => `trusted:${name}:${x}` });
+  vm.runInNewContext(src, { self: { trustedTypes: { createPolicy: (name, o) => { if (name !== "march-worker") throw new Error("not allowed"); assert.equal(o.createScriptURL("https://evil.test/x.js"), ""); return policy(name); } } }, importScripts: (u) => imported.push(u) });
+  assert.deepEqual(imported, [`trusted:march-worker:${cdn}/sw.js`], "the policy the CSP allows, for that URL only");
+  const stores = new Map();
+  const caches = {
+    open: async (k) => { if (!stores.has(k)) stores.set(k, new Map()); const s = stores.get(k); return { addAll: async (urls) => urls.forEach((u) => s.set(u, "pre")), match: async (r) => s.get(typeof r === "string" ? r : r.url), put: async (r, v) => s.set(typeof r === "string" ? r : r.url, v) }; },
+    keys: async () => [...stores.keys()], delete: async (k) => stores.delete(k), match: async () => undefined,
+  };
+  const handlers = {};
+  let fetched = 0;
+  const self = { location: new URL("https://site.test/sw.js"), registration: { scope: "https://site.test/" }, addEventListener: (t, f) => { handlers[t] = f; }, clients: { claim: async () => {} } };
+  // what importScripts would run: the settings line, then the CDN's sw.js
+  vm.runInNewContext(src.replace(/importScripts\(url\);/, "") + swRuntime(), { self, caches, fetch: async () => { fetched++; return { ok: true, clone() { return this; } }; }, URL, Response, Promise });
+  let wait;
+  handlers.install({ waitUntil: (p) => { wait = p; } }); await wait;
+  assert.ok(stores.get("march-cdn").has(`${cdn}/march.js`), "the core is cached at install");
+  const n = fetched;
+  let responded;
+  handlers.fetch({ request: { method: "GET", url: `${cdn}/march.js`, mode: "cors" }, respondWith: (p) => { responded = p; } });
+  await responded;
+  assert.equal(fetched, n, "a CDN file is served from the cache");
+  handlers.fetch({ request: { method: "GET", url: `${cdn}/components/actions/button.js`, mode: "cors" }, respondWith: (p) => { responded = p; } });
+  await responded;
+  assert.ok(stores.get("march-cdn").has(`${cdn}/components/actions/button.js`), "and cached the first time it arrives");
+});
+
 test("barrel imports compile to the defining module; the entry does not load page-only code it merely reaches", async () => {
   const { deepImports } = await import("../compiler/deep-imports.js");
   const ui = resolve("src/ui/index.ts");

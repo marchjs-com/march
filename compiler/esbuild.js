@@ -127,7 +127,7 @@ export function march(opts = {}) {
           if (opts.cdnLocal) return undefined;
           return { errors: [{ text: `${a.path} is not on ${cdn.base} (march.config.js › cdn): only the package's browser entries are` }] };
         });
-        build.onLoad({ filter: /.*/, namespace: "march-cdn" }, (a) => ({ contents: a.path === "css" ? CDN_CSS : cdnModule(a.path, cdn, opts.cdnLocal ? entryFiles[a.path] : null, entryFiles[a.path] ? entryNames(entryFiles[a.path]) : []), loader: "js", resolveDir: cwd }));
+        build.onLoad({ filter: /.*/, namespace: "march-cdn" }, (a) => ({ contents: a.path === "css" ? CDN_CSS : cdnModule(a.path, cdn, opts.cdnLocal ? entryFiles[a.path] : null, cdn.exports?.[a.path] ?? (entryFiles[a.path] ? entryNames(entryFiles[a.path]) : [])), loader: "js", resolveDir: cwd }));
       }
       build.onResolve({ filter: /^march(\/[\w-]+){1,3}$|^march$/ }, (a) => (files[a.path] ? { path: files[a.path] } : undefined));
       // the old name (hadi-march, before November 2026) still resolves, for a while: the same files as march

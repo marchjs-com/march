@@ -15,7 +15,7 @@ import { exportMap, statementStarts } from "./deep-imports.js";
  * The version folder's importmap.json and sizes.json, kept in `cacheDir` (a version's files never change).
  * @param {string} base  e.g. "https://cdn.marchjs.com/0.3.10"
  * @param {string} [cacheDir]
- * @returns {Promise<{ base: string, url: Record<string, string>, size: Record<string, number>, css: Record<string, string>, core: string[] }>}
+ * @returns {Promise<{ base: string, url: Record<string, string>, size: Record<string, number>, css: Record<string, string>, core: string[], exports: Record<string, string[]> | null, best: Record<string, Record<string, string>> | null }>}
  */
 export async function loadCdn(base, cacheDir) {
   base = base.replace(/\/+$/, "");
@@ -28,7 +28,8 @@ export async function loadCdn(base, cacheDir) {
     if (file) { mkdirSync(dirname(file), { recursive: true }); writeFileSync(file, text); }
     return JSON.parse(text);
   };
-  const [map, sizes] = await Promise.all([get("importmap.json"), get("sizes.json")]);
+  // names.json (published since 0.3.13): the names and the smallest entry per name, from the CDN instead of March's sources
+  const [map, sizes, names] = await Promise.all([get("importmap.json"), get("sizes.json"), get("names.json").catch(() => null)]);
   const url = {}, size = {}, css = {};
   for (const [spec, u] of Object.entries(map.imports ?? {})) {
     // the map's URLs point at the folder it was published for (latest/ or the version): use the one asked for
@@ -39,7 +40,7 @@ export async function loadCdn(base, cacheDir) {
   }
   // the core's files (every page loads them): index.html announces them up front
   const core = (sizes.core?.files ?? []).map((f) => `${base}/${f}`);
-  return { base, url, size, css, core };
+  return { base, url, size, css, core, exports: names?.exports ?? null, best: names?.best ?? null };
 }
 
 /**
@@ -61,6 +62,8 @@ export function cdnTargets(cdn, files) {
       }
     }
   };
+  // the CDN's own table (names.json) when it has one
+  if (cdn.best) return (spec, name) => cdn.best[spec]?.[name] ?? spec;
   return (spec, name) => {
     if (!best) index();
     const file = files[spec];

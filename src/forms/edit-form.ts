@@ -4,7 +4,6 @@ import { signal, untrack, provide } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { t } from "../core/i18n.ts";
 import type { Schema, Values } from "../schema/index.ts";
-import { askReason } from "../ui/dialog.ts";
 import { toast } from "../ui/toast.ts";
 import { scoped, cx, live, type ClassProp } from "./util.ts";
 import { FormContext } from "./field.ts";
@@ -93,7 +92,8 @@ export function changedFields<V extends Values>(values: V, before: Values): Part
 export function EditForm<V = Values>(props: EditFormProps<V>): unknown;
 export function EditForm(props: EditFormProps): unknown {
   return scoped(() => {
-    const ask = props.ask ?? (askReason as unknown as NonNullable<EditFormProps["ask"]>);
+    // the reason dialog loads the first time a reason is asked for (most saves never ask)
+    const ask = props.ask ?? (((o: ReasonPrompt) => import("../ui/dialog.ts").then((m) => (m.askReason as unknown as NonNullable<EditFormProps["ask"]>)(o))) as NonNullable<EditFormProps["ask"]>);
     const notify = props.notify ?? (toast as unknown as NonNullable<EditFormProps["notify"]>);
     const state = signal<"loading" | "error" | "ready">("loading");
     const loadError = signal<string | null>(null);

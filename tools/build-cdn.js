@@ -6,6 +6,8 @@
 //   css/…            the stylesheets the package exports as files (tokens.css, themes/…)
 //   importmap.json   { imports: { "march": ".../march.js", "march/ui": ".../ui.js", … } } with absolute URLs
 //   sizes.json       per entry: gzip bytes a page downloads, on top of the core, and its closure (tools/cdn-size.mjs)
+//   names.json       per entry its exported names; per barrel the smallest entry for each name (compiler/cdn.js)
+//   sw.js            the service worker's code; a site's sw.js (march build, sw + cdn) imports it
 //   components/<category>/<name>.js   one entry per component: a page loads what it uses (a barrel loads all)
 //   mod/<path>.js    every module a barrel re-exports from (march/mod/<path>, for apps built with march.config.js › cdn)
 //   files.json       every file of the version (a deploy uses it to keep the older versions)
@@ -19,6 +21,8 @@ import { writeData } from "./cdn-data.mjs";
 import { measure, check, readBudget } from "./cdn-size.mjs";
 import { exportMap } from "../compiler/deep-imports.js";
 import { march } from "../compiler/esbuild.js";
+import { cdnTargets, entryNames } from "../compiler/cdn.js";
+import { swRuntime } from "../cli/perf.js";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
@@ -119,6 +123,9 @@ renameSync(join(dist, ".css", "march.css"), join(out, "march.css"));
 if (existsSync(join(dist, ".css", "_"))) cpSync(join(dist, ".css", "_"), join(out, "_"), { recursive: true });
 rmSync(join(dist, ".css"), { recursive: true, force: true });
 rmSync(all, { force: true });
+// sw.js: the service worker's code every March site runs (a site's own sw.js sets its settings and imports this one)
+writeFileSync(join(out, "sw.js"), `/*! MarchJS v${version} | MIT | marchjs.com */
+${swRuntime()}`);
 // the stylesheets the package exports as files
 cpSync(join(root, "src/css"), join(out, "css"), { recursive: true });
 // the fonts css/font.css points at (../fonts/…)
@@ -133,6 +140,19 @@ writeFileSync(join(out, "importmap.json"), `${JSON.stringify(importmap, null, 2)
 // modulepreload); an entry past its budget (cdn/budget.json, tools/cdn-size.mjs) fails the build before anything is published
 const sizes = measure(out);
 writeFileSync(join(out, "sizes.json"), `${JSON.stringify({ version, ...sizes })}\n`);
+// names.json: what each entry exports and, per barrel, the smallest entry for each of its names. A compiler with
+// march.config.js › cdn (compiler/cdn.js) reads it instead of March's sources: the CLI and the browser's compiler alike
+{
+  const own = entries.filter((e) => !e.out.startsWith("icons/"));
+  const size = Object.fromEntries(entries.map((e) => [e.spec, e.spec === "march" ? 0 : sizes.entries[e.spec]?.added ?? Infinity]));
+  const target = cdnTargets({ url: Object.fromEntries(entries.map((e) => [e.spec, e.in])), size }, Object.fromEntries(own.map((e) => [e.spec, e.in])));
+  const exportsOf = {}, best = {};
+  for (const e of own) {
+    exportsOf[e.spec] = entryNames(e.in);
+    for (const n of exportsOf[e.spec]) { const t = target(e.spec, n); if (t !== e.spec) (best[e.spec] ??= {})[n] = t; }
+  }
+  writeFileSync(join(out, "names.json"), `${JSON.stringify({ version, exports: exportsOf, best })}\n`);
+}
 const over = check(sizes, readBudget());
 if (over.length) {
   for (const o of over) console.error(`✖ cdn size: ${o.spec} ${(o.size / 1024).toFixed(1)} KB > ${(o.limit / 1024).toFixed(1)} KB (cdn/budget.json)`);

@@ -16,6 +16,10 @@ test("CDN build: modules, march.css, import map, file list, latest", () => {
   // css/font.css points at ../fonts/; a module a barrel re-exports from is an entry of its own (march/mod/<path>)
   assert.ok(existsSync(at(`${version}/fonts/inter-latin.woff2`)), "the fonts");
   assert.ok(existsSync(at(`${version}/mod/ui/theme.js`)), "march/mod/ui/theme");
+  // names.json: an entry's names; the smallest entry per name of a barrel
+  const names = JSON.parse(readFileSync(at(`${version}/names.json`), "utf8"));
+  assert.ok(names.exports["march/components/actions/button"].includes("Button"));
+  assert.equal(names.best["march/ui"].Button, "march/components/actions/button");
   const css = readFileSync(at(`${version}/march.css`), "utf8");
   assert.match(css, /^\/\*! MarchJS v/);
   assert.match(css, /--m-accent:/, "the tokens are in");
