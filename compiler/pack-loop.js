@@ -13,12 +13,14 @@ export const PACK_BUDGET = { maxBuilds: 14, maxSeconds: 600 };
 
 /**
  * @param {{ build: (plan: unknown, strategy: number) => Promise<boolean>, left: () => number, next: (plan: unknown) => unknown,
- *   strategies: number, start?: unknown, maxPasses?: number, maxBuilds?: number, maxMs?: number, now?: () => number, log?: (line: string) => void }} o
+ *   strategies: number, start?: unknown, overBudget?: () => number, maxPasses?: number, maxBuilds?: number, maxMs?: number, now?: () => number, log?: (line: string) => void }} o
  * @returns {Promise<{ plan: unknown, strategy: number, small: number, builds: number, stopped: string | null }>}
  */
-export async function packLoop({ build, left, next, strategies, start = null, maxPasses = 9, maxBuilds = PACK_BUDGET.maxBuilds, maxMs = PACK_BUDGET.maxSeconds * 1000, now = () => Date.now(), log = (l) => console.log(l) }) {
+export async function packLoop({ build, left, next, strategies, start = null, overBudget = () => 0, maxPasses = 9, maxBuilds = PACK_BUDGET.maxBuilds, maxMs = PACK_BUDGET.maxSeconds * 1000, now = () => Date.now(), log = (l) => console.log(l) }) {
   const t0 = now();
-  let builds = 0, stopped = null, onDisk = { plan: null, strategy: 0 };
+  let builds = 0, stopped = null, onDisk = { plan: null, strategy: 0 }, lastOver = 0;
+  // a build is better with fewer rows over budget, then fewer small files
+  const better = (a, b) => a.o < b.o || (a.o === b.o && a.n < b.n);
   const over = () => {
     if (builds >= maxBuilds) return (stopped = `build limit (${maxBuilds})`);
     if (now() - t0 >= maxMs) return (stopped = `time limit (${Math.round(maxMs / 1000)} s)`);
@@ -30,7 +32,8 @@ export async function packLoop({ build, left, next, strategies, start = null, ma
     builds++;
     onDisk = { plan, strategy };
     const small = ok ? left() : 0;
-    log(`[pack] build ${builds} (${what}): ${small} small, ${((now() - t) / 1000).toFixed(1)} s`);
+    lastOver = ok ? overBudget() : 0;
+    log(`[pack] build ${builds} (${what}): ${small} small${lastOver ? `, ${lastOver} over budget` : ""}, ${((now() - t) / 1000).toFixed(1)} s`);
     return ok ? small : -1;
   };
   // passes: plan, build, plan again (strategy 0)
@@ -46,7 +49,7 @@ export async function packLoop({ build, left, next, strategies, start = null, ma
     small = await run(plan, st, `pass ${pass + 1}`);
     if (small < 0) return { plan, strategy: 0, small: 0, builds, stopped };
     const key = JSON.stringify(plan);
-    if (!seen.some((x) => x.key === key)) seen.push({ plan, n: small, key, s: st });
+    if (!seen.some((x) => x.key === key)) seen.push({ plan, n: small, o: lastOver, key, s: st });
     const nxt = next(plan);
     if (!nxt) { settled = true; break; }
     // the planner's plans can cycle: a plan seen before ends the passes
@@ -56,19 +59,20 @@ export async function packLoop({ build, left, next, strategies, start = null, ma
   }
   // the build on disk is the last one; its plan is `plan` (the passes may have ended on a newer, unbuilt plan)
   plan = onDisk.plan;
-  let best = { plan, strategy: onDisk.strategy, n: small };
-  // passes that did not settle: an earlier pass may have left fewer small files than the last one
-  if (!settled) for (const x of seen) if (x.n < best.n) best = { plan: x.plan, strategy: x.s, n: x.n };
+  let best = { plan, strategy: onDisk.strategy, n: small, o: lastOver };
+  // passes that did not settle: an earlier pass may have done better than the last one (fewer rows over budget, then
+  // fewer small files)
+  if (!settled) for (const x of seen) if (better(x, best)) best = { plan: x.plan, strategy: x.s, n: x.n, o: x.o };
   const warm = settled && builds === 1 && start && small <= (start.small ?? 0);
   if (small > 0 && !stopped && !warm) {
-    const plans = settled ? [{ plan, n: small }] : [...seen].sort((a, b) => a.n - b.n).slice(0, 2);
+    const plans = settled ? [{ plan, n: small }] : [...seen].sort((a, b) => (better(a, b) ? -1 : better(b, a) ? 1 : 0)).slice(0, 2);
     search: for (const p of plans) for (let s = 0; s < strategies; s++) {
       if (p.plan === onDisk.plan && s === onDisk.strategy) continue; // that build is on disk
       if (over()) break search;
       const n = await run(p.plan, s, `last step, strategy ${s}`);
       if (n < 0) break search;
-      if (n < best.n) best = { plan: p.plan, strategy: s, n };
-      if (!n) break search;
+      if (better({ n, o: lastOver }, best)) best = { plan: p.plan, strategy: s, n, o: lastOver };
+      if (!n && !lastOver) break search;
     }
   }
   // the best build back on disk when it is not the last one (allowed past the budget: the output must be the best)
