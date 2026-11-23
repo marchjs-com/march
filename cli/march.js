@@ -274,6 +274,15 @@ async function build({ dev = false } = {}) {
     const startPlan = dev || cfg.cache === false ? null : cachedPlan(planFile);
     const res = await packLoop({
       start: startPlan,
+      // rows over budget in the build on disk (the size report's count): a pass that leaves fewer small files but a page
+      // group over its budget is not the better one
+      overBudget: () => {
+        if (!cfg.budget || !entryKey) return 0;
+        const m = chunkManifest(r.metafile, { cwd, outdir: out, entry: cfg.entry });
+        // (a grouped page's row is its group's files, as in the final report)
+        aliasGroups(m.manifest, plan);
+        return sizeReport(m, out, cfg.budget, routePaths(r.metafile, cwd, Object.keys(m.manifest))).over.length;
+      },
       build: async (p, s) => { plan = p; const ok = await once(s); if (process.env.MARCH_DEBUG_COMMON && ok) console.log("[pack] small:", smallFiles(r.metafile, { cwd, minSize, allow, entryKey, boot: cfg.budget?.boot ?? [], plan }).map((x) => `${x.file.split("/").pop()} ${x.bytes}`).join(", ")); return ok && !!minSize; },
       left,
       // chunks.commonRoom (gzip bytes): page groups stay this far under the route budget, so the shared "common" chunk
