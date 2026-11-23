@@ -11,5 +11,4 @@ export default defineMeta({
   composedOf: ["OverflowText"],
   behaviors: [],
   hubs: [],
-  showcase: "/charts",
 });

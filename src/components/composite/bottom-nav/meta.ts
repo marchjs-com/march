@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Badge", "OverflowText", "ListRow", "Drawer"],
   behaviors: ["motion engine"],
   hubs: ["d"],
-  showcase: "/navigation",
 });

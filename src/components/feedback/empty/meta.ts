@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["IconTile"],
   behaviors: [],
   hubs: [],
-  showcase: "/feedback",
 });

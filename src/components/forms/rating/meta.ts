@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: [],
   behaviors: ["roving focus"],
   hubs: [],
-  showcase: "/forms",
 });

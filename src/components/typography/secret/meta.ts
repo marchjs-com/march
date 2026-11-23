@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["IconButton", "CopyButton"],
   behaviors: [],
   hubs: [],
-  showcase: "/buttons",
 });

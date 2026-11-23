@@ -9,5 +9,4 @@ export default defineMeta({
   category: "layout",
   composedOf: ["PanelHeader", "IconButton", "ResizeHandle"],
   behaviors: ["drag"],
-  showcase: "/layout",
 });

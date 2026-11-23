@@ -10,7 +10,6 @@ export default defineMeta({
   composedOf: ["Steps", "Progress", "Button", "Alert"],
   behaviors: [],
   hubs: [],
-  showcase: "/forms",
   // the form engine comes with it: kept out of the march/ui barrel (march/forms exports it)
   barrel: false,
 });

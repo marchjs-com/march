@@ -283,7 +283,6 @@
   "defineLayout": "Kendi varsayılanları olan bir Layout üretir (bölgeler, köşeler, özellikler, başlık kalıbı); `.extend` ile türetilir.",
   "defineLayoutFeature": "Adlı bir Layout özelliği kaydeder (`features={{ ad: true | {…} }}` ile kullanılır).",
   "defineMeta": "Bir bileşen klasörünün meta.ts dosyası için tipli yardımcı (name, status, category, composedOf …).",
-  "definePlayground": "Bir bileşen klasörünün playground.ts dosyası (vitrin seçenekleri) için tipli yardımcı.",
   "defineTerminalCommands": "Sayfadaki her terminale komut ekler; komutları geri alan işlevi döndürür.",
   "DevicePreview": "İçeriği telefon ya da tablet kasasında gerçek ekran boyuyla gösterir; fare parmak gibi davranır (sürükle-kaydır, fırlatma, uzun bas).",
   "DEVICES": "Kimliğe göre cihazlar (ekran boyları CSS pikseli): iPhone, Pixel, Galaxy, iPad.",
@@ -570,9 +569,6 @@
   "throttleBypass": "Bir aracın kendi yüklemeleri: fonksiyon yavaşlatılmadan çalışır.",
   "throttleLabel": "Şu anki ağın kısa adı (\"Hızlı 3G\", \"1.2 Mb/s · 300 ms\", \"Çevrimdışı\").",
   "formatSpeed": "Hızı yazar: \"1.4 Mb/s\", \"400 kb/s\" ya da \"∞\"."
- },
- "march/components/registry.gen.ts": {
-  "registry": "Her bileşen klasörü: meta, Kod sekmesi parçası ve tembel demo / oyun alanı yükleyicileri."
  },
  "march/table": {
   "CellEditor": "Tablonun geçerli düzenlemesi (`table.editing()`) için satır içi hücre düzenleyici: sütun türüne göre input / select / checkbox; Enter kaydeder, Escape iptal eder, doğrulama iletisi altında görünür. <Table> ve DataGrid tarafından ortak kullanılır.",

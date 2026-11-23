@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Segmented","DatePicker"],
   behaviors: [],
   hubs: [],
-  showcase: "/forms",
 });

@@ -9,5 +9,4 @@ export default defineMeta({
   summary: "Full-screen stories: StoryProgress bars, tap back / forward (RTL mirrored), hold to pause, swipe for the next person, drag down to close, reply field and LikeButton.",
   composedOf: ["Dialog", "Avatar", "StoryProgress", "LikeButton", "IconButton", "ListRow", "Picture", "TextInput"],
   behaviors: ["motion engine", "Dialog (focus trap, Esc, scroll lock)", "swipe"],
-  showcase: "/social",
 });

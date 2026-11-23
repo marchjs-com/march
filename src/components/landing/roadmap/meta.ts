@@ -9,6 +9,4 @@ export default defineMeta({
   summary: "Timeline whose line fills with the scroll: done / now / next statuses, passed dots light up; roadmaps, stories, work history.",
   composedOf: ["Timeline", "Badge", "Progress", "Reveal"],
   behaviors: ["scrollIndicator", "onScrollProgress"],
-  showcase: "/web",
-  demoGroup: "scroll",
 });

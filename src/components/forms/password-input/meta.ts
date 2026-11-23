@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Button", "IconButton"],
   behaviors: [],
   hubs: [],
-  showcase: "/forms",
 });

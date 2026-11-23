@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Portal", "PanelHeader", "IconButton", "Button", "Field", "TextInput", "Textarea", "Select", "Drawer"],
   behaviors: ["focus trap", "layer stack"],
   hubs: [],
-  showcase: "/overlays",
 });

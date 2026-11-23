@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Chip", "OptionList"],
   behaviors: [],
   hubs: [],
-  showcase: "/forms",
 });

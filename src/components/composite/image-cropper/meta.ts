@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Card", "Segmented", "Slider", "IconButton"],
   behaviors: ["drag", "canvas output"],
   hubs: [],
-  showcase: "/editors",
 });

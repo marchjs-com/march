@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["IconButton", "Slider", "Disclosure", "JsonView", "TextInput", "Checkbox", "Toggle", "Badge", "StatusDot", "Splitter", "CopyButton"],
   behaviors: ["recording (ring buffer)", "breakpoints, conditions, logpoints", "watches (evaluated per stop)", "persist (localStorage)"],
   hubs: [],
-  showcase: "/editors",
 });

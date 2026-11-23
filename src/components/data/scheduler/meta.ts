@@ -10,6 +10,5 @@ export default defineMeta({
   composedOf: ["PanelHeader", "PeriodNav", "Button", "Segmented", "ResizeHandle", "LiveStatus"],
   behaviors: ["date", "pointerDrag"],
   hubs: ["j"],
-  showcase: "/big-data",
   barrel: false,
 });

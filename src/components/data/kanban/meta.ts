@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["PanelHeader", "StatusDot", "Badge"],
   behaviors: ["drag"],
   hubs: [],
-  showcase: "/data",
 });

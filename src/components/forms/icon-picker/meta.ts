@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Dropdown", "SearchBox", "Chip", "IconButton", "Spinner", "Empty"],
   behaviors: [],
   hubs: [],
-  showcase: "/forms",
 });

@@ -11,5 +11,4 @@ export default defineMeta({
   composedOf: ["StatTile", "Sparkline"],
   behaviors: [],
   hubs: [],
-  showcase: "/charts",
 });

@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["EasingCurveEditor", "Card", "TimeRuler", "ListRow", "StatusDot", "IconButton", "Segmented", "NumberInput"],
   behaviors: ["motion engine (timeline / Playback, easings)", "drag"],
   hubs: [],
-  showcase: "/editors",
 });

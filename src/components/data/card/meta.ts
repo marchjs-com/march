@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["PanelHeader"],
   behaviors: [],
   hubs: [],
-  showcase: "/data",
 });

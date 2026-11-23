@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Progress", "ListRow", "IconButton", "Button", "Badge"],
   behaviors: ["dropzone"],
   hubs: [],
-  showcase: "/forms",
 });

@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["IconButton"],
   behaviors: [],
   hubs: [],
-  showcase: "/layout",
 });

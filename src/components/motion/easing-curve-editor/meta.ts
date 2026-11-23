@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Card", "Button", "NumberInput"],
   behaviors: ["motion engine (ease, defineEasing, onFrame)", "drag"],
   hubs: [],
-  showcase: "/editors",
 });

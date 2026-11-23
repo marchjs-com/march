@@ -9,5 +9,4 @@ export default defineMeta({
   category: "layout",
   composedOf: ["ListRow", "Chevron"],
   behaviors: ["roving focus"],
-  showcase: "/layout",
 });

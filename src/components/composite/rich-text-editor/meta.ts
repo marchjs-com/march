@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["EditorFrame", "FormatToolbar", "IconButton", "Avatar", "Popover", "OptionList", "Field", "TextInput"],
   behaviors: ["safe content core (dom/safe, dom/sanitize, dom/markdown, dom/to-markdown)", "UndoManager (undoHistory)", "floating"],
   hubs: [],
-  showcase: "/editors",
 });

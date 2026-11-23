@@ -27,8 +27,8 @@ export const GENERATORS = [
   { name: "themes", script: "tools/gen-themes.js", inputs: ["src/theme/presets.ts", "src/theme/contrast.ts", "src/core/util.ts"], outputs: ["src/css/themes.css", "src/theme/names.ts"] },
   { name: "accent", script: "tools/gen-accent.js", inputs: ["src/css/colors.css"], outputs: ["src/ui/accent.css"] },
   { name: "grid", script: "tools/gen-grid.js", inputs: [], outputs: ["src/components/layout/grid/grid.css"] },
-  // the component folders, and every package export (the API page of each card: tools/api-coverage.js)
-  { name: "registry", script: "tools/gen-registry.js", inputs: ["src", "package.json"], outputs: ["src/components/registry.gen.ts", "docs/components.md"] },
+  // the component folders: barrels, the catalogue, the package exports of the categories and large components
+  { name: "registry", script: "tools/gen-registry.js", inputs: ["src", "package.json"], outputs: ["docs/components.md"] },
   // reads every package export's JSDoc: the whole src/ tree and package.json (which the registry writes)
   { name: "api", script: "tools/api-coverage.js", inputs: ["src", "package.json", "docs/api.tr.json"], outputs: [] },
   { name: "icon-names", script: "tools/gen-icon-names.js", inputs: ["src/icons/set.ts", "src/icons/packs"], outputs: ["compiler/icon-names.gen.js", "src/icons/names.gen.ts"] },

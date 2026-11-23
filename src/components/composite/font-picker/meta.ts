@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Popover", "Dialog", "SearchBox", "Segmented", "Select", "VirtualList", "ListRow", "SectionLabel", "IconButton", "Button", "Textarea", "Slider", "Toggle", "CopyButton", "Alert", "Empty"],
   behaviors: ["list-nav", "lazy font catalog", "storage"],
   hubs: [],
-  showcase: "/editors",
 });

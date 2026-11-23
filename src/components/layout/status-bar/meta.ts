@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["ListRow", "Menu", "Tooltip", "StatusDot"],
   behaviors: ["command manager", "fit (ui/fit)", "motion engine"],
   hubs: [],
-  showcase: "/ide",
 });

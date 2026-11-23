@@ -51,7 +51,7 @@ First consumer: `src/ui/code-widget.ts` (`codeView` point, `CodeViewer`, Copy, F
 Every unit lives in its own folder with the same shape, so new units add folders instead of editing shared files:
 
 ```
-src/components/<category>/<name>/   index.ts <name>.css <name>.test.js docs.md demo.tsx playground.ts meta.ts   (UI: draws only)
+src/components/<category>/<name>/   index.ts <name>.css <name>.test.js docs.md meta.ts   (UI: draws only)
 src/behaviors/<name>/    <name>.ts  index.ts                          (use:<name> actions: draggable, rovingFocus, …)
 src/managers/<name>/     <name>.ts  index.ts                          (app-wide services: Command, Layer, Focus, …)
 src/hubs/<name>/         <name>.ts  index.ts                          (shared engines: position, collection, field,
@@ -67,12 +67,17 @@ src/net/  src/errors/  src/channel/  src/motion/   (modules)
 - Rarely used pieces of the core sit in their own modules so a lazy page that uses one does not grow the start-up chunk:
   `dom/switch.ts` (Switch, Match), `dom/await.ts`, `dom/dynamic.ts` beside `dom/flow.ts` (If, For, Try), and
   `core/i18n-tools.ts` (missing, unused, setFallbackLocale) beside `core/i18n.ts`.
-- Categories: `src/components/categories.ts` (folder, subpath `march/<category>`, showcase menu group, catalogue
-  section); `meta.category` must match the folder.
+- Categories: `src/components/categories.ts` (folder, subpath `march/<category>`, catalogue section); `meta.category`
+  must match the folder.
 - `tools/gen-registry.js` writes `src/components/index.ts` (re-exported by `march/ui`), one barrel per category
-  (`src/components/<category>/index.ts`, the `march/<category>` export), `src/components/registry.gen.ts`
-  (showcase `ComponentDemo`), `docs/components.md` and the AI_INSTRUCTIONS catalogue from these folders; nobody edits
-  them by hand, so two changes that add folders do not conflict. `--check` runs in `npm test` (test/registry.test.js).
+  (`src/components/<category>/index.ts`, the `march/<category>` export), the package exports (`march/<category>`, and
+  `march/components/<category>/<name>` for a large component kept out of the barrels), `docs/components.md` and the
+  AI_INSTRUCTIONS catalogue from these folders; nobody edits them by hand, so two changes that add folders do not
+  conflict. `--check` runs in `npm test` (test/registry.test.js). No other file under `src/components` is a package
+  export.
+- The site (marchjs.com) draws a card for every component: its live demo and Options panel are the site's own files
+  (`src/catalog/<category>/<name>/demo.tsx`, `playground.ts` there); it reads the components from the published
+  `data/components.json` (meta, docs.md, root class) and `data/comp/` (props tables), and imports only package entries.
 - Moved so far (old path kept as a one-line re-export): `src/ui/chip.ts` → `src/components/actions/chip/`.
   Checklist: docs/component-checklist.md.
 - A folder imports other units only through their `index.ts`; core (`src/core`, `src/dom`) never imports a unit.

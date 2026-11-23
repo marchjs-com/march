@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Segmented","RadioGroup","Combobox"],
   behaviors: [],
   hubs: [],
-  showcase: "/forms",
 });

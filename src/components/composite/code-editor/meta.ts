@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["EditorFrame", "Popover", "OptionList", "CopyButton", "Dropdown", "Kbd", "StatusDot", "Chip", "TextInput", "IconButton", "Button"],
   behaviors: ["list-nav"],
   hubs: [],
-  showcase: "/editors",
 });

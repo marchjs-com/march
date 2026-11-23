@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["IconButton", "PageDots"],
   behaviors: [],
   hubs: [],
-  showcase: "/overlay",
 });

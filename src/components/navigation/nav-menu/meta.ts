@@ -9,5 +9,4 @@ export default defineMeta({
   category: "navigation",
   composedOf: ["ListRow", "IconButton", "SearchBox", "Badge", "Chevron", "SectionLabel", "Empty", "Drawer"],
   behaviors: ["router", "fold search", "storage"],
-  showcase: "/navigation",
 });

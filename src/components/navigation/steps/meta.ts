@@ -9,5 +9,4 @@ export default defineMeta({
   category: "navigation",
   composedOf: ["CheckMark"],
   behaviors: [],
-  showcase: "/navigation",
 });

@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Chip", "Slider", "SectionLabel", "IconButton", "Empty"],
   behaviors: [],
   hubs: [],
-  showcase: "/composite",
 });

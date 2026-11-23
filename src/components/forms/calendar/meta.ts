@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["PeriodNav"],
   behaviors: [],
   hubs: [],
-  showcase: "/forms",
 });

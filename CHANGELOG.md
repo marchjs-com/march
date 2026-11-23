@@ -4,11 +4,21 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
 
 ## Unreleased
 
+### Breaking
+- The package exports only its entries: `march/components/*` is gone. Import a component from its category
+  (`march/actions`, `march/landing`…) or `march/ui`; the large ones kept out of the barrels have their own entry
+  (`march/components/composite/theme-editor`, `…/wizard`, `…/consent-banner`, `march/components/data/data-grid`, `…/gantt`,
+  `…/scheduler`, `…/tree-view`), also on the CDN.
+- The site's component catalog left the package: `march/components/registry.gen.ts`, `march/components/meta.ts`,
+  `definePlayground` and the `Playground*` types (`march/ui`), each component's `demo.tsx` / `playground.ts` and
+  `meta.showcase` / `meta.demoGroup` now live in marchjs.com. `defineMeta` and `ComponentMeta` stay.
+
 ### New
 - The compiler resolves every package entry without side effects (`march/landing`, `march/composite`,
   `march/behaviors/drag`…) like the core subpaths: a named import goes straight to the defining module, so a page that
   uses one block no longer reaches the whole category. A lazy import of one name does the same:
   `import("march/forms").then((m) => m.Calendar)` (or `({ default: m.Calendar })` for `lazy()`) loads Calendar alone.
+- `data/components.json` on the CDN gives each component's root element class (`root`).
 
 ## 0.3.0 — 2026-11-21
 

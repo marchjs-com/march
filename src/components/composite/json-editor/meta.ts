@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["TreeEditor", "Textarea", "Button", "Tabs"],
   behaviors: ["lazy (tree view)", "json-path (schema subset)"],
   hubs: [],
-  showcase: "/editors",
 });

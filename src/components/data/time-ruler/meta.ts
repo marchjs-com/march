@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: [],
   behaviors: ["drag (track)"],
   hubs: [],
-  showcase: "/data",
 });

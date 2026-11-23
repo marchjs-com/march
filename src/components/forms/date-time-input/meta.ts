@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["DatePicker","TimeInput"],
   behaviors: [],
   hubs: [],
-  showcase: "/forms",
 });

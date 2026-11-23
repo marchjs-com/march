@@ -25,7 +25,7 @@ const version = pkg.version;
 const dist = join(root, "cdn", "dist"), out = join(dist, version);
 
 // node-only or build-time entries stay out
-const SKIP = new Set(["./testing", "./compiler", "./esbuild", "./register", "./components/registry.gen.ts", "./components/meta.ts"]);
+const SKIP = new Set(["./testing", "./compiler", "./esbuild", "./register"]);
 /** The entries: export subpath → { in: source, out: name in the version folder } */
 const entries = [];
 for (const [key, target] of Object.entries(pkg.exports)) {

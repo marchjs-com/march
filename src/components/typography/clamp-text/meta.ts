@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Button"],
   behaviors: ["ResizeObserver"],
   hubs: [],
-  showcase: "/text",
 });

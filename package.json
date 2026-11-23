@@ -15,9 +15,6 @@
     "./data": "./src/data/index.ts",
     "./schema": "./src/schema/index.ts",
     "./ui": "./src/ui/index.ts",
-    "./components/registry.gen.ts": "./src/components/registry.gen.ts",
-    "./components/meta.ts": "./src/components/meta.ts",
-    "./components/*": "./src/components/*/index.ts",
     "./table": "./src/table/index.ts",
     "./charts": "./src/charts/index.ts",
     "./testing": "./src/testing/index.ts",
@@ -119,7 +116,14 @@
     "./dom/safe": "./src/dom/safe.ts",
     "./dom/sanitize": "./src/dom/sanitize.ts",
     "./dom/markdown": "./src/dom/markdown.ts",
-    "./dom/to-markdown": "./src/dom/to-markdown.ts"
+    "./dom/to-markdown": "./src/dom/to-markdown.ts",
+    "./components/composite/consent-banner": "./src/components/composite/consent-banner/index.ts",
+    "./components/composite/theme-editor": "./src/components/composite/theme-editor/index.ts",
+    "./components/composite/wizard": "./src/components/composite/wizard/index.ts",
+    "./components/data/data-grid": "./src/components/data/data-grid/index.ts",
+    "./components/data/gantt": "./src/components/data/gantt/index.ts",
+    "./components/data/scheduler": "./src/components/data/scheduler/index.ts",
+    "./components/data/tree-view": "./src/components/data/tree-view/index.ts"
   },
   "bin": {
     "march": "./cli/march.js"

@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: [],
   behaviors: ["resize-handle"],
   hubs: [],
-  showcase: "/layout",
 });

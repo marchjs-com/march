@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Toolbar", "IconButton", "Divider"],
   behaviors: ["roving-focus"],
   hubs: [],
-  showcase: "/editors",
 });

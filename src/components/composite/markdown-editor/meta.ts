@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["EditorFrame", "FormatToolbar", "Splitter", "Tabs", "RichTextEditor"],
   behaviors: ["safe content core (dom/markdown)", "lazy (rich view)"],
   hubs: [],
-  showcase: "/editors",
 });

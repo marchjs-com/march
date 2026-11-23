@@ -9,5 +9,4 @@ export default defineMeta({
   category: "layout",
   composedOf: ["SearchBox", "Segmented", "ListRow", "SectionLabel", "Empty", "Field", "TextInput", "NumberInput", "Toggle", "Button", "IconButton"],
   behaviors: [],
-  showcase: "/layout",
 });

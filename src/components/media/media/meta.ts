@@ -10,5 +10,4 @@ export default defineMeta({
   composedOf: ["Dialog"],
   behaviors: [],
   hubs: [],
-  showcase: "/overlay",
 });

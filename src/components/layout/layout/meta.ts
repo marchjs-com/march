@@ -9,5 +9,4 @@ export default defineMeta({
   category: "layout",
   composedOf: ["Button", "Badge", "Progress", "ScrollToTop"],
   behaviors: [],
-  showcase: "/layout",
 });

@@ -9,6 +9,4 @@ export default defineMeta({
   summary: "Slides: keys, wheel, swipe, step-by-step fragments, slide / fade / zoom, full screen, URL index, speaker window (cross-tab), print.",
   composedOf: ["IconButton", "Pagination", "Progress", "Toolbar"],
   behaviors: ["motion engine", "swipe", "channel (crossTab)"],
-  showcase: "/web",
-  demoGroup: "talk",
 });
