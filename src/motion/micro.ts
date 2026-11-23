@@ -10,6 +10,7 @@ import { frame } from "./env.ts";
 import { onFrame } from "./engine/clock.ts";
 import { drawPath } from "./svg.ts";
 import { listen, setStyle } from "../core/util.ts";
+import { isActivateKey } from "../ui/behave.ts";
 import { t } from "../core/i18n.ts";
 
 const obj = <T extends object>(raw: unknown): Partial<T> => (raw && typeof raw === "object" ? (raw as Partial<T>) : {});
@@ -39,7 +40,7 @@ export function ripple(el: Element, raw?: unknown): () => void {
   };
   return listen(h, {
     pointerdown: (e: PointerEvent) => spawn(e.clientX, e.clientY),
-    keydown: (e: KeyboardEvent) => { if ((e.key === "Enter" || e.key === " ") && !e.repeat) { const r = h.getBoundingClientRect(); spawn(r.left + r.width / 2, r.top + r.height / 2); } },
+    keydown: (e: KeyboardEvent) => { if ((isActivateKey(e)) && !e.repeat) { const r = h.getBoundingClientRect(); spawn(r.left + r.width / 2, r.top + r.height / 2); } },
   });
 }
 

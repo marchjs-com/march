@@ -13,6 +13,7 @@ import { h } from "../../../dom/h.ts";
 import { lazy } from "../../../dom/lazy.ts";
 import { t, messages } from "../../../core/i18n.ts";
 import { cx, uid, val, type ClassProp } from "../../../core/util.ts";
+import { locked } from "../../../ui/behave.ts";
 import { isMod } from "../../../ui/key-label.ts";
 import { model, ctl, live, syncValue, type ControlProps } from "../../../forms/util.ts";
 import { TabList } from "../../../ui/tabs.ts";
@@ -78,7 +79,7 @@ export function MarkdownEditor(props: MarkdownEditorProps): unknown {
   const first = untrack(() => props.view ?? (props.preview === "split" ? "split" : views()[0] ?? "write"));
   const view = signal<MarkdownView>(views().includes(first) ? first : views()[0] ?? "write");
   const c = ctl(props);
-  const ro = (): boolean => !!(props.readonly || props.disabled);
+  const ro = (): boolean => locked(props);
   let syncing = false;
   const L = (): NonNullable<MarkdownEditorProps["labels"]> => props.labels ?? {};
 

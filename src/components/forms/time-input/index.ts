@@ -12,6 +12,7 @@ import { Popover } from "../../overlays/popover/index.ts";
 import { clock as clockIcon } from "../../../icons/glyphs/clock.ts";
 import type { IconProp } from "../../../icons/types.ts";
 import { ClockDial } from "./dial.ts";
+import { locked } from "../../../ui/behave.ts";
 
 export interface TimeInputProps extends ControlProps<string> {
   /** Earliest allowed time ("HH:MM"). @tr İzin verilen en erken saat ("HH:MM"). */
@@ -55,7 +56,7 @@ export function TimeInput(props: TimeInputProps): unknown {
   const open = signal(false);
   const loc = (): string => props.locale ?? locale();
   const choose = (): string => props.labels?.choose ?? t`Choose time`;
-  const off = (): boolean => !!(props.disabled || props.readonly);
+  const off = (): boolean => locked(props);
   const btn = h(IconButton, {
     class: "m-time-btn", label: choose, icon: () => ownPart(props.icon, () => clockIcon), "aria-haspopup": "dialog", "aria-expanded": () => String(open()),
     disabled: off, onClick: () => { if (!off()) open.set(!open.peek()); },

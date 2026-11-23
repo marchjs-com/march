@@ -43,12 +43,12 @@ export function ContextMenu(props: ContextMenuProps): Element {
   const close = (refocus?: boolean): void => { open.set(null); if (refocus) returnTo?.focus?.(); };
   return h("div", {
     class: () => cx("m-ctxmenu", val(props.class)),
-    onContextmenu: (e: MouseEvent) => {
+    onContextMenu: (e: MouseEvent) => {
       if (props.when && !props.when(e.target as Element)) return;
       e.preventDefault();
       show(e.clientX, e.clientY, e.target as Element);
     },
-    onKeydown: (e: KeyboardEvent) => {
+    onKeyDown: (e: KeyboardEvent) => {
       if (!(e.key === "ContextMenu" || (e.key === "F10" && e.shiftKey))) return;
       const tg = e.target as HTMLElement;
       const r = tg.getBoundingClientRect?.();

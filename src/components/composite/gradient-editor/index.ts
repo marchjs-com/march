@@ -8,6 +8,7 @@ import { h } from "../../../dom/h.ts";
 import { track, arrowStep } from "../../../behaviors/drag/index.ts";
 import { t, messages, dir } from "../../../core/i18n.ts";
 import { cx, uid, val, clamp, setStyle, type ClassProp } from "../../../core/util.ts";
+import { locked } from "../../../ui/behave.ts";
 import { model, ctl, live, type ControlProps } from "../../../forms/util.ts";
 import { Segmented } from "../../../forms/inputs.ts";
 import { Field } from "../../../forms/field.ts";
@@ -67,7 +68,7 @@ export function GradientEditor(props: GradientEditorProps): unknown {
   const [get, set] = model(props, DEFAULT);
   const id = uid("m-ge");
   const c = ctl(props);
-  const ro = (): boolean => !!(props.readonly || props.disabled);
+  const ro = (): boolean => locked(props);
   const L = (): NonNullable<GradientEditorProps["labels"]> => props.labels ?? {};
   const degrees = (a: number): string => L().degrees?.(a) ?? t`${a} degrees`;
   const grad = signal<G.Gradient>(G.parseGradient(untrack(get) ?? DEFAULT) ?? G.parseGradient(DEFAULT)!);

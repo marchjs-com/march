@@ -30,7 +30,7 @@ test("Tooltip: color, class and motion on the bubble; disabled never shows; own 
     h(Tooltip, { text: "Hidden", disabled: off }, h("button", { class: "b" }, "B")),
   ]);
   const a = m.el.querySelector(".a"), b = m.el.querySelector(".b");
-  a.parentElement.dispatchEvent(new globalThis.MouseEvent("mouseenter"));
+  a.parentElement.dispatchEvent(new globalThis.Event("pointerenter"));
   await tick(); await tick();
   const tip = document.getElementById(a.getAttribute("aria-describedby"));
   assert.ok(tip, "delay 0: shown on the next tick");

@@ -105,7 +105,7 @@ export function SearchBox(props: SearchBoxProps): Element {
     "aria-expanded": combobox ? () => String(val(props.expanded) ?? true) : null,
     "aria-activedescendant": props.activeDescendant != null ? () => val(props.activeDescendant) || null : null,
     onInput: (e: Event) => { const v = (e.target as HTMLInputElement).value; current.set(v); props.onInput?.(v); emit(v); },
-    onKeydown: (e: KeyboardEvent) => {
+    onKeyDown: (e: KeyboardEvent) => {
       props.onKeyDown?.(e);
       if (e.defaultPrevented) return;
       if (e.key === "Escape" && current.peek()) { e.preventDefault(); e.stopPropagation(); clear(); }

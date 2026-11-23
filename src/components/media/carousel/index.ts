@@ -14,6 +14,7 @@ import { chevronLeft } from "../../../icons/glyphs/chevronLeft.ts";
 import { chevronRight } from "../../../icons/glyphs/chevronRight.ts";
 import { withColor } from "../../../theme/colors.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import { on } from "../../../core/util.ts";
 
 export interface CarouselProps {
   /** Accessible name of the carousel (default "Carousel", translated). @tr Atlıkarıncanın erişilebilir adı (varsayılan "Carousel", çevrilir). */
@@ -61,6 +62,7 @@ export function Carousel(props: CarouselProps): Element {
   // swipe={true}: the mouse drags the track as a finger does; let go, it settles on the next slide (a short flick is
   // enough) or back on this one. A drag is no click: the click that ends it does not reach the slide
   let drag: { x: number; left: number; moved: boolean; at: number } | null = null, dragged = false;
+  const offs: Array<() => void> = []; // a drag's window listeners, while it lasts
   const noClick = (c: Event): void => { if (dragged) { c.stopPropagation(); c.preventDefault(); } };
   // swipe={false}: the track does not scroll by itself, so ← → move it here
   const onKeyDown = (e: KeyboardEvent): void => {
@@ -81,8 +83,7 @@ export function Carousel(props: CarouselProps): Element {
       track.scrollLeft = drag.left - dx;
     };
     const up = (ev: PointerEvent): void => {
-      globalThis.removeEventListener("pointermove", move);
-      globalThis.removeEventListener("pointerup", up);
+      for (const f of offs.splice(0)) f();
       const d = drag;
       drag = null;
       if (!d || !track) return;
@@ -95,8 +96,7 @@ export function Carousel(props: CarouselProps): Element {
       dragged = true;
       setTimeout(() => { dragged = false; }, 0);
     };
-    globalThis.addEventListener("pointermove", move);
-    globalThis.addEventListener("pointerup", up);
+    offs.push(on(globalThis, "pointermove", move), on(globalThis, "pointerup", up));
   };
   // slides added or removed later: the count (arrows, dots) follows
   const watch = (el: HTMLElement): void => {
@@ -112,7 +112,7 @@ export function Carousel(props: CarouselProps): Element {
   const slidesOf = (c: unknown): unknown => (typeof c === "function" ? () => slidesOf((c as () => unknown)()) : Array.isArray(c) ? c.flat(Infinity).map(slide) : slide(c));
   const slides = slidesOf(props.children);
   return h("section", { class: () => cx("m-carousel", `m-carousel-${props.perView ?? 1}`, props.smooth === false && "is-instant", props.swipe === true && "is-swipe", props.swipe === false && "is-noswipe", val(props.class)), "aria-roledescription": "carousel", "aria-label": () => val(props.label) ?? t`Carousel` },
-    h("div", { class: "m-carousel-track", ref: (el: HTMLElement) => { track = el; watch(el); el.addEventListener("click", noClick, true); }, onScroll: update, onPointerdown: onPointerDown, onKeydown: onKeyDown, onDragstart: (e: DragEvent) => { if (props.swipe === true) e.preventDefault(); }, tabindex: "0" }, slides),
+    h("div", { class: "m-carousel-track", ref: (el: HTMLElement) => { track = el; watch(el); el.addEventListener("click", noClick, true); }, onScroll: update, onPointerDown: onPointerDown, onKeyDown: onKeyDown, onDragStart: (e: DragEvent) => { if (props.swipe === true) e.preventDefault(); }, tabindex: "0" }, slides),
     props.arrows !== false && arrow("prev", props.prevIcon, chevronLeft, () => props.labels?.previous ?? t`Previous`, () => index() <= 0, () => index() - 1),
     props.arrows !== false && arrow("next", props.nextIcon, chevronRight, () => props.labels?.next ?? t`Next`, () => index() >= last(), () => index() + 1),
     props.dots !== false && h(PageDots, { class: "m-carousel-dots", count: () => Math.max(0, last() + 1), value: index, onChange: goTo,

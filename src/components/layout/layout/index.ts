@@ -21,6 +21,7 @@ import { cx, val, type ClassProp, type MaybeFn } from "../../../ui/util.ts";
 import { openLayer } from "../../../dom/portal.ts";
 import { COLOR_TOKENS } from "../../../theme/colors.ts";
 import { addCornerControl, cornerControls, CORNERS, type Corner } from "../bottom-right-controls/index.ts";
+import { on as listen } from "../../../core/util.ts";
 
 export type SlotName = "top" | "header" | "nav" | "aside" | "footer";
 export type LayoutRegion = Corner | SlotName;
@@ -245,8 +246,7 @@ function render(defaults: LayoutProps, props: LayoutProps): Element {
         onClick: () => set(!open.peek()) }, () => val(pick("labels")?.panel) ?? t`Panel`);
     }));
     const esc = (e: KeyboardEvent): void => { if (e.key === "Escape" && open.peek()) { set(false); btn?.focus(); } };
-    globalThis.addEventListener?.("keydown", esc);
-    onCleanup(() => globalThis.removeEventListener?.("keydown", esc));
+    listen(globalThis, "keydown", esc);
   }
 
   const corners = { ...defaults.corners, ...props.corners };
@@ -311,8 +311,8 @@ export const autoHideHeaderFeature = defineLayoutFeature("autoHideHeader", (opts
     header.toggleAttribute("data-hidden", hide);
     last = y;
   };
-  globalThis.document.addEventListener("scroll", onScroll, { capture: true, passive: true });
-  return () => { globalThis.document.removeEventListener("scroll", onScroll, { capture: true }); header.removeAttribute("data-hidden"); };
+  const off = listen(globalThis.document, "scroll", onScroll, { capture: true, passive: true });
+  return () => { off(); header.removeAttribute("data-hidden"); };
 });
 
 /** Draw a lazily loaded component into a region (or the end of <body>), inside `wrap` (default: a box that adds no
@@ -358,9 +358,8 @@ export const connectionFeature = defineLayoutFeature("connection", (opts: { corn
     const { Badge } = await import("../../data/badge/index.ts");
     return () => (offline() ? h(Badge, { tone: "warn", dot: true }, opts.label ?? t`You are offline`) : null);
   }, host);
-  globalThis.addEventListener?.("online", update);
-  globalThis.addEventListener?.("offline", update);
-  return () => { globalThis.removeEventListener?.("online", update); globalThis.removeEventListener?.("offline", update); out(); };
+  const offs = [listen(globalThis, "online", update), listen(globalThis, "offline", update)];
+  return () => { for (const f of offs) f(); out(); };
 });
 
 /** A "Feedback" button in a corner: asks for a message and hands it to `onSubmit`, then thanks with a toast. */
@@ -397,8 +396,8 @@ export const devOverlayFeature = defineLayoutFeature("devOverlay", () => (api) =
     panel.hidden = !on;
     if (on) draw();
   };
-  globalThis.addEventListener("keydown", toggle);
-  return () => { globalThis.removeEventListener("keydown", toggle); root.removeAttribute("data-m-layout-debug"); closePanel(); };
+  const off = listen(globalThis, "keydown", toggle);
+  return () => { off(); root.removeAttribute("data-m-layout-debug"); closePanel(); };
 });
 
 /** The default Layout: back-to-top and route focus on. `features={{ scrollToTop: false }}` turns one off. */

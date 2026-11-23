@@ -6,6 +6,7 @@ import { inputOf } from "../../../forms/affix.ts";
 import { colorAttr } from "../../../theme/colors.ts";
 import { choiceBox, choiceText, lookClass, type ChoiceLook } from "../../../forms/choice.ts";
 import type { Handler } from "../../../core/util.ts";
+import { locked } from "../../../ui/behave.ts";
 
 export interface CheckboxProps extends ControlProps<boolean>, ChoiceLook {
   /** Text next to the box (or use children). @tr Kutunun yanındaki metin (ya da children kullanılır). */
@@ -32,7 +33,7 @@ export function Checkbox(props: CheckboxProps): unknown {
   const input = h("input", {
     ...ctl(props), type: "checkbox", class: "m-check-input", checked: () => !!get(), indeterminate: () => !!props.indeterminate,
     // after a change the box shows the model again (a controlled value may not have followed the click)
-    disabled: () => !!(props.disabled || props.readonly), onChange: (e: Event) => { const box = inputOf(e); set(box.checked); box.checked = !!get(); },
+    disabled: () => locked(props), onChange: (e: Event) => { const box = inputOf(e); set(box.checked); box.checked = !!get(); },
     onClick: props.onClick, tabindex: props.tabIndex ?? null,
   });
   // no label, no hint: the box alone (a selection cell)

@@ -9,6 +9,7 @@ import { slidingIndicator } from "../../../motion/engine/indicator.ts";
 import { model, ctl, cx, normOptions, same, labelledBy, useField, type ControlProps, type OptionsProp } from "../../../forms/util.ts";
 import { colorAttr } from "../../../theme/colors.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import { locked } from "../../../ui/behave.ts";
 
 /** An option of Segmented (a bare value works too). */
 export interface SegmentedOption {
@@ -51,7 +52,7 @@ export function Segmented<T = unknown>(props: SegmentedProps<T>): unknown {
         title: (o["title"] as string | undefined) ?? null, "aria-label": o.label === "" ? (o["title"] as string | undefined) ?? null : null,
         "aria-checked": () => String(same(get(), o.value)),
         tabindex: () => (same(get(), o.value) || (i === 0 && !opts.some((x) => same(x.value, get()))) ? "0" : "-1"),
-        disabled: () => !!(props.disabled || props.readonly || o.disabled), onClick: () => set(o.value as T),
+        disabled: () => (locked(props) || !!o.disabled), onClick: () => set(o.value as T),
       }, icon(o["icon"], "m-segment-icon"), o.label));
     }) as HTMLElement;
   if (thumb) {

@@ -5,6 +5,7 @@ import { model, ctl, uid, normOptions, same, labelledBy, useField, type ControlP
 import { inputOf } from "../../../forms/affix.ts";
 import { colorAttr } from "../../../theme/colors.ts";
 import { choiceBox, choiceText, itemColor, groupClass, type ChoiceGroupLook } from "../../../forms/choice.ts";
+import { locked } from "../../../ui/behave.ts";
 
 export interface RadioGroupProps<T = unknown> extends ControlProps<T | null>, ChoiceGroupLook {
   /** The choices: `[value]`, `[{ value, label, hint?, icon?, meta?, disabled? }]` or a comma-separated text ("S, M, L"). @tr Seçenekler: `[value]`, `[{ value, label, hint?, icon?, meta?, disabled? }]` ya da virgülle ayrılmış metin ("S, M, L"). */
@@ -24,7 +25,7 @@ export function RadioGroup<T = unknown>(props: RadioGroupProps<T>): unknown {
     () => normOptions(props.options).map((o, i) => h("label", { class: "m-check", "data-m-color": () => itemColor(props.colors, i) },
       h("input", {
         type: "radio", class: "m-check-input", id: i ? `${baseId}-${i}` : baseId, name, onBlur: props.onBlur,
-        checked: () => same(get(), o.value), disabled: () => !!(props.disabled || props.readonly || o.disabled),
+        checked: () => same(get(), o.value), disabled: () => (locked(props) || !!o.disabled),
         onChange: (e: Event) => { if (inputOf(e).checked) set(o.value as T); },
       }),
       choiceBox("radio", props),

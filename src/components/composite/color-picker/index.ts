@@ -8,6 +8,7 @@ import { track, arrowStep } from "../../../behaviors/drag/index.ts";
 import { BRAND_COLORS } from "../../../theme/colors.ts";
 import { t, messages, dir } from "../../../core/i18n.ts";
 import { cx, uid, val, clamp, setStyle, type ClassProp } from "../../../core/util.ts";
+import { locked } from "../../../ui/behave.ts";
 import { model, ctl, live, type ControlProps } from "../../../forms/util.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { Badge } from "../../data/badge/index.ts";
@@ -70,7 +71,7 @@ export function ColorPicker(props: ColorPickerProps): unknown {
   const [get, set] = model(props, "#f2801f");
   const id = uid("m-cp");
   const c = ctl(props);
-  const ro = (): boolean => !!(props.readonly || props.disabled);
+  const ro = (): boolean => locked(props);
   const L = (): ColorPickerLabels => props.labels ?? {};
   const useAlpha = (): boolean => props.alpha !== false;
   const fmt = signal<C.ColorFormat>(untrack(() => props.format ?? "hex"));

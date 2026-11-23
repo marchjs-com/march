@@ -9,6 +9,7 @@ import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, useSize, att
   type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps, type TooltipProp } from "../../../charts/util.ts";
 import { Frame, tooltipState, showTip, tipBody } from "../../../charts/parts.ts";
 import { clamp, type Handler } from "../../../core/util.ts";
+import { isActivateKey } from "../../../ui/behave.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -111,7 +112,7 @@ export function PieChart<D>(props: PieChartProps<D>): Element {
   const hide = (): void => { active.set(-1); tip.at.set(null); };
   const select = (k = active.peek()): void => { const p = pointAt(k); if (p) props.onSelect?.(p); };
   const onKeyDown = (e: KeyboardEvent): void => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); return select(); }
+    if (isActivateKey(e)) { e.preventDefault(); return select(); }
     if (e.key === "Escape") return hide();
     const k = navIndex(e.key, active.peek(), 0, slices().length - 1);
     if (k == null || !slices().length) return;

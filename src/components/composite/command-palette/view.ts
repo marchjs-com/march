@@ -123,7 +123,7 @@ export function PaletteView(props: CommandPaletteProps): unknown {
       heading && h(SectionLabel, { as: "li", role: "presentation", class: "m-pal-heading" }, heading),
       h(ListRow, {
         as: "li", id, role: "option", "aria-selected": () => String(on()), class: `m-pal-row m-pal-${r.kind}`, active: on, indicator: true,
-        "data-id": r.item?.id ?? null, onClick: () => activate(r), onMousemove: () => { if (!on()) sel.set(i); },
+        "data-id": r.item?.id ?? null, onClick: () => activate(r), onPointerMove: () => { if (!on()) sel.set(i); },
         lead: ask ? (props.askIcon === false ? undefined : props.askIcon ?? sparkles) : r.item.icon,
         title: ask ? () => (r.status === "loading" ? L().asking ?? t`Asking…` : r.status === "error" ? L().askFailed ?? t`Ask failed — press Enter to retry` : L().ask?.(q()) ?? t`Ask: “${q()}”`) : r.item.title,
         trail: ask || !(r.reason || r.item.sub || r.item.shortcut) ? undefined : [

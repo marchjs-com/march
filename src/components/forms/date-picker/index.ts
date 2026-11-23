@@ -12,6 +12,7 @@ import { IconButton } from "../../actions/icon-button/index.ts";
 import { Popover } from "../../overlays/popover/index.ts";
 import { calendar as calendarIcon } from "../../../icons/glyphs/calendar.ts";
 import type { IconProp } from "../../../icons/types.ts";
+import { locked } from "../../../ui/behave.ts";
 
 const NUMERIC: Intl.DateTimeFormatOptions = { year: "numeric", month: "2-digit", day: "2-digit" };
 
@@ -90,7 +91,7 @@ export function DatePicker(props: DatePickerProps): unknown {
   const choose = () => props.labels?.choose ?? t`Choose date`;
   const btn = props.icon === false ? null : h(IconButton, {
     class: "m-date-btn", label: choose, icon: () => ownPart(props.icon, () => calendarIcon), "aria-haspopup": "dialog", "aria-expanded": () => String(open()),
-    disabled: () => !!(props.disabled || props.readonly), onClick: () => toggle(),
+    disabled: () => locked(props), onClick: () => toggle(),
   });
   // the calendar opens in a Popover anchored to the whole control; Escape returns focus to the input
   wrap = h("span", { class: () => cx("m-affix m-date", props.class) }, input, btn,

@@ -84,7 +84,7 @@ export function frame(o: FrameOptions): HTMLElement {
   const drawer = o.kind === "drawer";
   const overlay = h("div", {
     class: cx("m-overlay", drawer && "m-overlay-drawer", !modal && "is-modeless", o.motion === "none" && "m-motion-none"),
-    onPointerdown: (e: Event) => { down = e.target === overlay; },
+    onPointerDown: (e: Event) => { down = e.target === overlay; },
     onClick: (e: Event) => { if (e.target === overlay && down !== false && dismissable()) o.onClose(); down = null; },
   },
   h("div", {
@@ -92,7 +92,7 @@ export function frame(o: FrameOptions): HTMLElement {
     class: cx(drawer ? "m-drawer" : `m-dialog m-dialog-${val(o.size) ?? "md"}`, o.motion && o.motion !== "scale" && `m-motion-${o.motion}`, o.class),
     role: o.role ?? "dialog", "aria-modal": modal ? "true" : null, tabindex: "-1",
     "aria-labelledby": o.title != null ? titleId : null, "aria-label": o.title == null ? o.label ?? null : null,
-    onKeydown: (e: KeyboardEvent) => { if (panel && modal) trapTab(panel)(e); },
+    onKeyDown: (e: KeyboardEvent) => { if (panel && modal) trapTab(panel)(e); },
   },
   o.title != null && h(PanelHeader, {
     class: "m-dialog-head", size: "lg", title: () => val(o.title), titleAs: "h2", titleId,

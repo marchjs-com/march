@@ -8,6 +8,7 @@ import { signal, computed, effect, untrack, createRoot, onCleanup } from "../../
 import { h } from "../../../dom/h.ts";
 import { t, dir } from "../../../core/i18n.ts";
 import { val, cx, uid, setStyle, clamp, type MaybeFn, type ClassProp, type Handler } from "../../../core/util.ts";
+import { isActivateKey } from "../../../ui/behave.ts";
 import { createAxis, createViewport } from "../../../core/virtual.ts";
 import { moveCursor } from "../../../core/selection.ts";
 import { applyPipe } from "../../../core/pipes.ts";
@@ -576,7 +577,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     if ((e.target as Element) !== scroller) return;
     const { r, c } = untrack(cursor), it = itemAt(r), m = cols().nav.length, ctrl = e.ctrlKey || e.metaKey;
     const page = Math.max(1, Math.floor((scroller.clientHeight - headH()) / rowH()) - 1);
-    if (it?.kind === "group" && (e.key === "Enter" || e.key === " " || ((e.key === "ArrowRight" || e.key === "ArrowLeft") && c === 0))) {
+    if (it?.kind === "group" && (isActivateKey(e) || ((e.key === "ArrowRight" || e.key === "ArrowLeft") && c === 0))) {
       e.preventDefault();
       toggleGroup(it, e.key === "ArrowRight" ? !rtl() : e.key === "ArrowLeft" ? rtl() : undefined);
       return;
@@ -618,7 +619,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
     class: "m-dg-scroll", role: "grid", tabindex: "0", id: `${id}-grid`,
     "aria-label": () => val(props.label) ?? t`Data grid`, "aria-rowcount": () => String(count() + 1), "aria-colcount": () => String(cols().nav.length + (props.selectable ? 1 : 0)),
     "aria-multiselectable": props.selectable ? "true" : null,
-    onKeydown: onKey,
+    onKeyDown: onKey,
     onClick: (e: MouseEvent) => {
       if ((e.target as Element).closest("input,select,button,textarea")) return;
       const at = cellAt(e);
@@ -629,7 +630,7 @@ export function DataGrid<R = Row>(props: DataGridProps<R>): Element {
       if (it?.kind === "group") toggleGroup(it);
       else if (it && props.selectable && (e.shiftKey || e.ctrlKey || e.metaKey)) table.toggle(it.row, { range: e.shiftKey });
     },
-    onDblclick: (e: MouseEvent) => { const at = cellAt(e); if (at) startEdit(at.r, at.c); },
+    onDblClick: (e: MouseEvent) => { const at = cellAt(e); if (at) startEdit(at.r, at.c); },
   }, canvas, empty) as HTMLElement;
   setStyle(scroller, { height: `${props.height ?? 480}px` });
 

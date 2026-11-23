@@ -11,6 +11,7 @@ import { rowsOf, accessor, formatter, num, seriesOf, seriesClass, colorStyle, us
   type MaybeReactive, type DataProp, type Field, type SeriesSpec, type SeriesLabels, type FormatSpec, type ChartBaseProps, type ChartPoint, type TooltipProp, type Box, f1 } from "../../../charts/util.ts";
 import { Frame, Axis, Grid, tooltipState, showTip, tipBody, thin, type Tick } from "../../../charts/parts.ts";
 import { clamp, type Handler } from "../../../core/util.ts";
+import { isActivateKey } from "../../../ui/behave.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -145,7 +146,7 @@ export function BarChart<D>(props: BarChartProps<D>): Element {
   const hide = (): void => { active.set(-1); tip.at.set(null); };
   const select = (i = active.peek()): void => { if (i >= 0) props.onSelect?.(pointAt(i)); };
   const onKeyDown = (e: KeyboardEvent): void => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); return select(); }
+    if (isActivateKey(e)) { e.preventDefault(); return select(); }
     if (e.key === "Escape") return hide();
     const i = navIndex(e.key, active.peek(), 0, rows().length - 1);
     if (i == null || !rows().length) return;

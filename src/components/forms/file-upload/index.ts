@@ -9,6 +9,7 @@ import { applyPipe } from "../../../core/pipes.ts";
 import { model, ctl, cx, uid, type ControlProps } from "../../../forms/util.ts";
 import { Progress } from "../../../ui/progress.ts";
 import { clamp, type Handler } from "../../../core/util.ts";
+import { locked, isActivateKey } from "../../../ui/behave.ts";
 import { ownPart } from "../../../ui/parts.ts";
 import { errorText } from "../../../ui/format.ts";
 import { Button } from "../../actions/button/index.ts";
@@ -139,16 +140,16 @@ export function FileUpload<R = unknown>(props: FileUploadProps<R>): unknown {
   let input: HTMLInputElement;
   input = h("input", {
     type: "file", id: inputId, class: "m-sr-only", tabindex: "-1", accept: () => props.accept ?? null, multiple: multi,
-    disabled: () => !!(props.disabled || props.readonly), "aria-hidden": "true",
+    disabled: () => locked(props), "aria-hidden": "true",
     onChange: (e: Event) => { const el = e.target as HTMLInputElement; add([...(el.files ?? [])]); el.value = ""; },
   }) as HTMLInputElement;
   const open = () => { if (!props.disabled && !props.readonly) input.click(); };
   const zone = h("div", {
     ...c, role: "button", tabindex: () => (props.disabled ? "-1" : "0"), class: "m-drop", "class:m-drop-over": over, "aria-disabled": () => (props.disabled ? "true" : null),
     onClick: open,
-    onKeyDown: (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } },
+    onKeyDown: (e: KeyboardEvent) => { if (isActivateKey(e)) { e.preventDefault(); open(); } },
     // drops (counted enter / leave, files only) and pasted files: the dropzone behavior; add() checks accept and size
-    ref: (x: HTMLElement) => dropzone(x, { onFiles: add, onOver: (on) => over.set(on), paste: true, disabled: () => !!(props.disabled || props.readonly) }),
+    ref: (x: HTMLElement) => dropzone(x, { onFiles: add, onOver: (on) => over.set(on), paste: true, disabled: () => locked(props) }),
   }, h("span", { class: "m-drop-text" }, () => props.label ?? (multi ? t`Drop files here or click to choose` : t`Drop a file here or click to choose`)),
     () => (props.hint === false || props.hint === null ? null
       : props.hint !== undefined && props.hint !== true ? h("small", { class: "m-hint m-drop-hint" }, ownPart(props.hint, () => null))

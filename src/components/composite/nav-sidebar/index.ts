@@ -19,7 +19,7 @@ import { val, cx, uid, icon, load, save, arr, type MaybeFn, type ClassProp } fro
 import { menu } from "../../../icons/glyphs/menu.ts";
 import { clock } from "../../../icons/glyphs/clock.ts";
 import { panelLeft } from "../../../icons/glyphs/panelLeft.ts";
-import { clamp, type Handler } from "../../../core/util.ts";
+import { clamp, type Handler, on } from "../../../core/util.ts";
 import { reducedMotion } from "../../../motion/env.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { Button } from "../../actions/button/index.ts";
@@ -296,9 +296,8 @@ export function NavSidebar(props: NavSidebarProps): Element {
       const t = e.target as Element | null;
       if (fly.peek().length && t?.closest?.(".m-sb-fly .m-sb-row")) setTimeout(() => fly.set([]), 0);
     };
-    globalThis.document?.addEventListener("pointerdown", away, true);
-    globalThis.document?.addEventListener("click", chosen, true);
-    onCleanup(() => { globalThis.document?.removeEventListener("pointerdown", away, true); globalThis.document?.removeEventListener("click", chosen, true); });
+    on(globalThis.document, "pointerdown", away, true);
+    on(globalThis.document, "click", chosen, true);
   }
   const toggleKids = (id: string): void => {
     if (flyMode() && !pinned(id)) { fly.set(fly.peek()[0] === id ? [] : [id]); return; }
@@ -401,7 +400,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
       children: () => h("ul", { class: "m-sb-list m-sb-sublist m-sb-fly-list" }, kids.map((k) => row(k, "child", undefined, depth + 1))),
     }) : null;
     return h("li", { class: () => cx("m-sb-li", "is-parent", kidsOpen(x.id) && "is-kids-open", pinned(x.id) && "is-pinned", flyAt(depth) === x.id && "is-flying"), ref: (n: HTMLElement) => { liEl = n; }, "data-fly-li": x.id,
-      onPointerenter: props.subMenus === "flyout" ? () => flyShow(x.id, depth) : undefined, onPointerleave: props.subMenus === "flyout" ? () => flyHide(depth) : undefined },
+      onPointerEnter: props.subMenus === "flyout" ? () => flyShow(x.id, depth) : undefined, onPointerLeave: props.subMenus === "flyout" ? () => flyHide(depth) : undefined },
       el, flyout,
       h(IconButton, { class: "m-sb-kids-btn", size: "xs", icon: h(Chevron, {}), title: false, tabindex: "-1", "aria-expanded": () => String(kidsOpen(x.id)), "aria-controls": kid,
         label: () => (kidsOpen(x.id) ? props.labels?.hideUnder?.(text(x.label)) ?? t`Hide pages under ${text(x.label)}` : props.labels?.showUnder?.(text(x.label)) ?? t`Show pages under ${text(x.label)}`), onClick: () => toggleKids(x.id) }),
@@ -535,7 +534,7 @@ export function NavSidebar(props: NavSidebarProps): Element {
   const railLabel = (): string => (rail() ? L("expandSidebar", t`Expand sidebar`) : L("collapseSidebar", t`Collapse sidebar`));
   return h("div", { class: () => cx("m-nav-wrap", "m-sb-wrap", drawer() && "is-open", rail() && "is-rail", props.resizable && "is-resizable", props.nestedSubs && "is-nested-subs", lgItems && "is-lg-items", val(props.floating) && "is-floating", val(props.glass) && "is-glass", props.subMenus === "flyout" && "is-flyout-subs", val(props.class)), ref: (x: HTMLElement) => { wrapEl = x; const w = cssWidth(); if (w) x.style.setProperty("--m-sb-w", w); } },
     props.menuButton === false ? null : sheet.burger,
-    sheet.place(h("nav", { class: "m-nav m-sb", id: navId, ref: (x: HTMLElement) => { navEl = x; }, "aria-label": () => val(props.label) ?? t`Main`, onKeydown: onKey },
+    sheet.place(h("nav", { class: "m-nav m-sb", id: navId, ref: (x: HTMLElement) => { navEl = x; }, "aria-label": () => val(props.label) ?? t`Main`, onKeyDown: onKey },
       h("div", { class: "m-sb-head" },
         (title != null || props.collapsible) && h(PanelHeader, { as: "div", class: "m-sb-titlebar", title: title ?? undefined, titleAs: "span", subtitle: props.subtitle ?? undefined,
           actions: props.collapsible ? h(IconButton, { class: "m-nav-rail-btn", size: "sm", icon: panelLeft, "aria-pressed": () => String(rail()), label: railLabel, onClick: () => { rail.update((x) => !x); persist(); } }) : undefined }),

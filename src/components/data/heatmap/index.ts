@@ -11,6 +11,7 @@ import { rowsOf, accessor, formatter, num, useSize, attr, textWidth, each,
   type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps, type Getter, type TooltipProp, f1 } from "../../../charts/util.ts";
 import { Frame, tooltipState, showTip, tipBody, thin } from "../../../charts/parts.ts";
 import { clamp, type Handler } from "../../../core/util.ts";
+import { isActivateKey } from "../../../ui/behave.ts";
 import { ease, cssOf } from "../../../motion/engine/ease.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
@@ -131,7 +132,7 @@ export function Heatmap<D>(props: HeatmapProps<D>): Element {
   const onKeyDown = (e: KeyboardEvent): void => {
     const g = grid(), nx = g.xs.length, n = g.cells.length;
     if (!n) return;
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); return select(); }
+    if (isActivateKey(e)) { e.preventDefault(); return select(); }
     if (e.key === "Escape") return hide();
     const i = Math.max(0, active.peek());
     const moves: Record<string, number> = { ArrowRight: i + 1, ArrowLeft: i - 1, ArrowDown: i + nx, ArrowUp: i - nx, Home: 0, End: n - 1 };

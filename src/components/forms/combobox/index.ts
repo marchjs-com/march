@@ -14,6 +14,7 @@ import { Chip } from "../../actions/chip/index.ts";
 import { OptionList, type OptionItem } from "../option-list/index.ts";
 import type { IconProp } from "../../../icons/types.ts";
 import type { Handler } from "../../../core/util.ts";
+import { locked } from "../../../ui/behave.ts";
 
 export interface ComboboxProps<T = unknown> extends ControlProps<T | null | T[]> {
   /** Static options: [value] or [{ value, label, hint, disabled }], or a comma-separated text ("Kadıköy, Beşiktaş"). @tr Sabit seçenekler: [value] ya da [{ value, label, hint, disabled }], ya da virgülle ayrılmış bir metin ("Kadıköy, Beşiktaş"). */
@@ -94,7 +95,7 @@ export function Combobox<T = unknown>(props: ComboboxProps<T>): unknown {
   let editing = false, input: HTMLInputElement, wrap: Element;
   const restore = () => { editing = false; if (!multi) input.value = untrack(() => labelOf(get())); };
   const openList = () => {
-    if (props.disabled || props.readonly || open.peek()) return;
+    if (locked(props) || open.peek()) return;
     open.set(true);
     const list = items.peek();
     const i = multi ? 0 : list.findIndex((o) => same(o.value, untrack(get)));
@@ -167,7 +168,7 @@ export function Combobox<T = unknown>(props: ComboboxProps<T>): unknown {
   wrap = h("div", { class: () => cx("m-combo", multi && "m-multi", props.class), "class:m-disabled": () => !!props.disabled, onClick: (e: MouseEvent) => { if (e.target === wrap) input.focus(); } },
     multi ? () => (getList() ?? []).map((v) => {
       const label = labelOf(v);
-      const fixed = props.readonly || props.disabled || props.removeIcon === false;
+      const fixed = locked(props) || props.removeIcon === false;
       return h(Chip, {
         class: "m-chip", removeLabel: props.labels?.remove?.(label) ?? t`Remove ${label}`, removeIcon: ownPart(props.removeIcon, () => undefined),
         ...(fixed ? null : { onRemove: () => { removeAt(v); input.focus(); } }),

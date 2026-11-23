@@ -7,6 +7,7 @@ import { model, ctl, cx, syncValue, extend, type ControlProps } from "../../../f
 import { inputOf } from "../../../forms/affix.ts";
 import { Swatch } from "../swatch/index.ts";
 import { TextInput, type TextInputProps } from "../text-input/index.ts";
+import { locked } from "../../../ui/behave.ts";
 
 export interface ColorInputProps extends ControlProps<string> {
   /** The native swatch picker: `false` leaves only the text field. @tr Tarayıcının renk seçicisi: `false` yalnız metin alanını bırakır. */
@@ -24,7 +25,7 @@ export function ColorInput(props: ColorInputProps): unknown {
   const [get, set] = model(props, "");
   const both = props.swatch !== false && props.text !== false;
   // with the text field off, the swatch is the control (id, name, aria wiring)
-  const swatch = h("input", { ...(props.text === false ? ctl(props) : {}), type: "color", class: "m-color-swatch", "aria-label": () => props.swatchLabel ?? props["aria-label"] ?? props.ariaLabel ?? t`Pick a color`, disabled: () => !!(props.disabled || props.readonly), onInput: (e: Event) => set(inputOf(e).value.toLowerCase()) }) as HTMLInputElement;
+  const swatch = h("input", { ...(props.text === false ? ctl(props) : {}), type: "color", class: "m-color-swatch", "aria-label": () => props.swatchLabel ?? props["aria-label"] ?? props.ariaLabel ?? t`Pick a color`, disabled: () => locked(props), onInput: (e: Event) => set(inputOf(e).value.toLowerCase()) }) as HTMLInputElement;
   const hex = () => (/^#[0-9a-f]{6}$/i.test(get() ?? "") ? get().toLowerCase() : "#000000");
   syncValue(swatch, hex);
   // the colour is drawn by a Swatch; the native picker lies over it, invisible, and takes the click and the keyboard

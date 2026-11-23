@@ -10,6 +10,7 @@ import { type ColorToken } from "../../../theme/colors.ts";
 import { Button } from "../../actions/button/index.ts";
 import tr from "./tr.ts";
 import type { Handler } from "../../../core/util.ts";
+import { observeSize } from "../../../ui/observe.ts";
 
 messages("tr", tr);
 
@@ -55,12 +56,7 @@ export function ClampText(props: ClampTextProps): Element {
   if (props.expandable !== false && props.expandable !== "always") {
     const measure = (): void => { if (!untrack(open) && untrack(lines) > 0) overflows.set(text.scrollHeight > text.clientHeight + 1); };
     effect(() => { lines(); open(); val(props.text); queueMicrotask(measure); });
-    const RO = globalThis.ResizeObserver;
-    if (RO) {
-      const ro = new RO(measure);
-      ro.observe(text);
-      if (getOwner()) onCleanup(() => ro.disconnect());
-    }
+    observeSize(text, measure);
   }
   return h("div", { class: () => cx("m-clamp", val(props.class)) },
     text,

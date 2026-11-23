@@ -6,6 +6,7 @@ import { pointerDrag } from "../behaviors/drag/index.ts";
 import { ownPart } from "../ui/parts.ts";
 import type { RowAction, RowToolsProps } from "../components/forms/row-tools/index.ts";
 import { FieldContext, scoped, type ClassProp } from "./util.ts";
+import { locked } from "../ui/behave.ts";
 
 export { ownPart };
 
@@ -45,7 +46,7 @@ export function rowList<T>(list: () => readonly T[], set: (next: T[]) => void, p
     const c = [...l]; const [x] = c.splice(f, 1); c.splice(to(), 0, x!); return c;
   };
   const grab = (e: PointerEvent, i: Accessor<number>): void => {
-    if (e.button !== 0 || props.disabled || props.readonly || untrack(list).length < 2) return;
+    if (e.button !== 0 || locked(props) || untrack(list).length < 2) return;
     const box = (e.target as Element).closest("[data-m-row]")?.parentElement;
     if (!box) return;
     e.preventDefault();
@@ -69,7 +70,7 @@ export function rowList<T>(list: () => readonly T[], set: (next: T[]) => void, p
   return {
     shown, grab, sorting: () => from() != null, dragging: (i) => from() != null && to() === i,
     idx: computed(() => list().map((_, i) => i), { equals: sameLength }),
-    ro: () => !!(props.disabled || props.readonly),
+    ro: () => locked(props),
     full: () => props.max != null && list().length >= props.max,
     count: () => list().length,
     move: (i, d) => { const cur = [...untrack(list)]; const j = i + d; if (j < 0 || j >= cur.length) return; [cur[i], cur[j]] = [cur[j]!, cur[i]!]; set(cur); },

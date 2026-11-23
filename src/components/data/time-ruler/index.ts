@@ -12,6 +12,7 @@ import { track, arrowStep } from "../../../behaviors/drag/index.ts";
 import { frame } from "../../../motion/env.ts";
 import tr from "./tr.ts";
 import type { Handler } from "../../../core/util.ts";
+import { observeSize } from "../../../ui/observe.ts";
 
 messages("tr", tr);
 
@@ -152,6 +153,6 @@ export function TimeRuler(props: TimeRulerProps): Element {
   }
   if (seekable) drag(rail);
   // a new width: the labels are fitted again
-  if (typeof ResizeObserver === "function") { const ro = new ResizeObserver(() => fit()); ro.observe(root); if (getOwner()) onCleanup(() => ro.disconnect()); }
+  observeSize(root, () => fit());
   return root;
 }

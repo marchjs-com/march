@@ -10,6 +10,7 @@ import { signal, computed, effect, untrack, batch } from "../../../core/reactive
 import { h } from "../../../dom/h.ts";
 import { t, messages, dir } from "../../../core/i18n.ts";
 import { cx, uid, on, val, type ClassProp } from "../../../core/util.ts";
+import { locked } from "../../../ui/behave.ts";
 import { fold } from "../../../core/text.ts";
 import { glyph } from "../../../ui/util.ts";
 import { isMod, undoKeys } from "../../../ui/key-label.ts";
@@ -135,7 +136,7 @@ export function RichTextEditor(props: RichTextEditorProps): unknown {
   const suggest = (s: Suggest): void => batch(() => { sugActive.set(0); sug.set(s); });
   const linkOpen = signal(false);
   const linkText = signal("");
-  const ro = (): boolean => !!(props.readonly || props.disabled);
+  const ro = (): boolean => locked(props);
   const c = ctl(props);
   const L = (): NonNullable<RichTextEditorProps["labels"]> => props.labels ?? {};
   let last: string | null = null;
