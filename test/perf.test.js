@@ -192,6 +192,21 @@ test("barrel imports compile to the defining module; the entry does not load pag
   } finally { app.cleanup(); }
 });
 
+test("a category entry (march/landing) compiles like march/ui: the entry does not reach the category's other blocks", async () => {
+  const { deepImports } = await import("../compiler/deep-imports.js");
+  const landing = resolve("src/components/landing/index.ts");
+  assert.match(deepImports(`import { Pricing } from "march/landing";`, { "march/landing": landing }), /import \{ Pricing \} from "[^"]*src\/components\/landing\/pricing\/index\.ts";/);
+  const app = await buildApp({
+    "main.tsx": `import { render } from "march"\nimport { SectionHead } from "march/landing"\nimport { createRouter, Router } from "march/router"\ncreateRouter({ routes: { "/": () => import("./a.tsx") } })\nrender(() => <div><SectionHead title="x" /><Router /></div>, document.body)\n`,
+    "a.tsx": `import { Pricing } from "march/landing"\nexport default () => <Pricing plans={[]} />\n`,
+  });
+  try {
+    const m = chunkManifest(app.meta, { cwd: app.dir, outdir: app.outdir, entry: "main.tsx" });
+    const entryJs = m.entryFiles.filter((f) => f.endsWith(".js")).map((f) => readFileSync(resolve(app.outdir, f), "utf8")).join("\n");
+    assert.equal(entryJs.match(/m-pricing/g), null, "Pricing stays with its page");
+  } finally { app.cleanup(); }
+});
+
 test("icon glyph modules and the catalog are generated from set.ts", async () => {
   const { execFileSync } = await import("node:child_process");
   const out = execFileSync(process.execPath, ["tools/gen-icon-catalog.js", "--check"], { encoding: "utf8" });

@@ -20,6 +20,18 @@ function iconPackModules() {
   return ids.flatMap((id) => [[`march/icons/${id}`, `src/icons/packs/${id}/index.js`], [`march/icons/${id}/pack`, `src/icons/packs/${id}/pack.js`]]);
 }
 
+// the component entries of the package (the categories, "march/landing", "march/composite"…, and the large components
+// under march/components/…): resolved to this copy, and a named import from a category goes straight to the defining
+// module (deepImports), like the core subpaths. Without it an app that imports march/landing would reach every block of
+// the category, and code splitting places code by the files an entry reaches. Only src/components: those modules have
+// no side effects (a barrel with side effects, march/net or a manager, must stay the module that is imported).
+function componentModules() {
+  let exp = {};
+  try { exp = JSON.parse(readFileSync(join(MARCH_ROOT, "package.json"), "utf8")).exports ?? {}; } catch { /* no package.json */ }
+  return Object.entries(exp).filter(([k, t]) => !k.includes("*") && typeof t === "string" && t.startsWith("./src/components/") && t.endsWith("/index.ts"))
+    .map(([k, t]) => [`march/${k.slice(2)}`, t.slice(2)]);
+}
+
 /**
  * @param {{ components?: string|string[], i18nOut?: string, dev?: boolean, filter?: RegExp, onKeys?: (keys: string[]) => void, cssSplit?: boolean, deepImports?: boolean }} [opts]
  * cssSplit (default true): component CSS follows the component's code into the output chunk that uses it (css-split.js).
@@ -70,7 +82,7 @@ export function march(opts = {}) {
       if (opts.cssSplit !== false) setupCssSplit(build);
 
       // march/* → files of this March copy
-      const files = Object.fromEntries([...MODULES, ["march/icons", "src/icons/index.ts"], ["march/icons/catalog", "src/icons/catalog.ts"], ["march/icons/packs", "src/icons/packs.ts"], ...iconPackModules(), ["march/theme", "src/theme/index.ts"], ["march/seo", "src/seo/index.ts"], ["march/seo/hydrate", "src/seo/hydrate.ts"], ["march/seo/prerendered", "src/seo/prerendered.ts"], ["march/base", "src/base/index.ts"], ["march/testing", "src/testing/index.ts"]].map(([spec, rel]) => [spec, join(MARCH_ROOT, rel)]));
+      const files = Object.fromEntries([...componentModules(), ...MODULES, ["march/icons", "src/icons/index.ts"], ["march/icons/catalog", "src/icons/catalog.ts"], ["march/icons/packs", "src/icons/packs.ts"], ...iconPackModules(), ["march/theme", "src/theme/index.ts"], ["march/seo", "src/seo/index.ts"], ["march/seo/hydrate", "src/seo/hydrate.ts"], ["march/seo/prerendered", "src/seo/prerendered.ts"], ["march/base", "src/base/index.ts"], ["march/testing", "src/testing/index.ts"]].map(([spec, rel]) => [spec, join(MARCH_ROOT, rel)]));
       // named imports from March barrels go straight to the defining module (see deep-imports.js); off with deepImports: false
       const deep = opts.deepImports === false ? (c) => c : (c) => (c.includes("march") ? deepImports(c, files) : c);
       const cwd = build.initialOptions.absWorkingDir ?? process.cwd();

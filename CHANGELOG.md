@@ -2,6 +2,12 @@
 
 All notable changes to March. Versions follow [semver](https://semver.org/).
 
+## Unreleased
+
+### New
+- The compiler resolves every component entry (`march/landing`, `march/composite`…) like the core subpaths: a named
+  import goes straight to the component's module, so a page that uses one block no longer reaches the whole category.
+
 ## 0.3.0 — 2026-11-21
 
 ### New
