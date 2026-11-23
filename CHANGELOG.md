@@ -5,10 +5,9 @@ All notable changes to March. Versions follow [semver](https://semver.org/).
 ## Unreleased
 
 ### Breaking
-- The package exports only its entries: `march/components/*` is gone. Import a component from its category
-  (`march/actions`, `march/landing`…) or `march/ui`; the large ones kept out of the barrels have their own entry
-  (`march/components/composite/theme-editor`, `…/wizard`, `…/consent-banner`, `march/components/data/data-grid`, `…/gantt`,
-  `…/scheduler`, `…/tree-view`), also on the CDN.
+- The package exports only its entries: the wildcard `march/components/*` is gone, so no internal file of a
+  component folder is reachable. Each component has an entry of its own, `march/components/<category>/<name>` (its
+  `index.ts`, one module per component on the CDN), besides its category (`march/actions`, `march/landing`…) and `march/ui`.
 - The site's component catalog left the package: `march/components/registry.gen.ts`, `march/components/meta.ts`,
   `definePlayground` and the `Playground*` types (`march/ui`), each component's `demo.tsx` / `playground.ts` and
   `meta.showcase` / `meta.demoGroup` now live in marchjs.com. `defineMeta` and `ComponentMeta` stay.

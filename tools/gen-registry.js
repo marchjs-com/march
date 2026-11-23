@@ -178,11 +178,12 @@ export async function generate(root = ROOT) {
       changed = true;
     }
   }
-  // a large component (barrel: false) has its own subpath, march/components/<category>/<name>; no other file under
-  // src/components is reachable from outside (no wildcard)
-  const large = new Set(list.filter((c) => c.meta?.barrel === false && !c.meta?.entry).map((c) => `./components/${c.folder}`));
-  for (const key of Object.keys(pkg.exports)) if (key.startsWith("./components/") && !large.has(key)) { delete pkg.exports[key]; changed = true; }
-  for (const key of large) if (pkg.exports[key] !== `./src/${key.slice(2)}/index.ts`) { pkg.exports[key] = `./src/${key.slice(2)}/index.ts`; changed = true; }
+  // every component has its own subpath, march/components/<category>/<name> (its index.ts; on the CDN one module per
+  // component, so a page loads only the components it uses). No other file under src/components is reachable from
+  // outside (no wildcard). They come after the other entries: a name keeps its first subpath (its category).
+  const own = new Set(list.filter((c) => c.files.includes("index.ts")).map((c) => `./components/${c.folder}`));
+  for (const key of Object.keys(pkg.exports)) if (key.startsWith("./components/") && !own.has(key)) { delete pkg.exports[key]; changed = true; }
+  for (const key of own) if (pkg.exports[key] !== `./src/${key.slice(2)}/index.ts`) { pkg.exports[key] = `./src/${key.slice(2)}/index.ts`; changed = true; }
   if (changed) files["package.json"] = JSON.stringify(pkg, null, 2) + "\n";
   return { files, list, comp };
 }

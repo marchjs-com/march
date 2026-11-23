@@ -92,7 +92,13 @@ function managerSummary(name, file) {
  *  Wildcards (CSS files, icon packs) are not app APIs of their own. */
 export function packageEntries(root = ROOT) {
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
-  return Object.entries(pkg.exports).filter(([sub, target]) => typeof target === "string" && !sub.includes("*") && /\.(ts|js)$/.test(target));
+  const all = Object.entries(pkg.exports).filter(([sub, target]) => typeof target === "string" && !sub.includes("*") && /\.(ts|js)$/.test(target));
+  // a component's own entry (march/components/<category>/<name>) is listed only when it exports something no other
+  // entry does (a large component kept out of its category barrel): the others are their category's names again
+  const own = (sub) => sub.startsWith("./components/");
+  const key = (at, name) => `${at.file}#${name}`;
+  const given = new Set(all.filter(([sub]) => !own(sub)).flatMap(([, target]) => [...runtimeExports(join(root, target))].map(([name, at]) => key(at, name))));
+  return all.filter(([sub, target]) => !own(sub) || [...runtimeExports(join(root, target))].some(([n, at]) => !given.has(key(at, n))));
 }
 
 /** Subpaths with their runtime exports (CSS, compiler and testing entries are tools, not app APIs). */

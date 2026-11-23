@@ -71,7 +71,7 @@ src/net/  src/errors/  src/channel/  src/motion/   (modules)
   must match the folder.
 - `tools/gen-registry.js` writes `src/components/index.ts` (re-exported by `march/ui`), one barrel per category
   (`src/components/<category>/index.ts`, the `march/<category>` export), the package exports (`march/<category>`, and
-  `march/components/<category>/<name>` for a large component kept out of the barrels), `docs/components.md` and the
+  `march/components/<category>/<name>` for every component: its own module, also on the CDN), `docs/components.md` and the
   AI_INSTRUCTIONS catalogue from these folders; nobody edits them by hand, so two changes that add folders do not
   conflict. `--check` runs in `npm test` (test/registry.test.js). No other file under `src/components` is a package
   export.

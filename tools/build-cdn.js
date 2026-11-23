@@ -31,16 +31,10 @@ const entries = [];
 for (const [key, target] of Object.entries(pkg.exports)) {
   const file = typeof target === "string" ? target : target.import ?? target.default;
   if (SKIP.has(key) || typeof file !== "string" || !/\.(ts|js)$/.test(file) || !file.startsWith("./src/")) continue;
+  // components/<category>/<name> are entries of their own in package.json (tools/gen-registry.js): one module per
+  // component, so a page loads the components it uses and what they share (march/ui and the other barrels load every
+  // component they export: no tree-shaking in a browser)
   if (key.includes("*")) {
-    // components/<category>/<name>: one entry per component, so a page loads the components it uses and what they share
-    // (march/ui and the other barrels load every component they export: no tree-shaking in a browser)
-    if (key === "./components/*") {
-      const dir = join(root, "src/components");
-      for (const cat of readdirSync(dir).filter((d) => statSync(join(dir, d)).isDirectory()))
-        for (const name of readdirSync(join(dir, cat)).filter((d) => existsSync(join(dir, cat, d, "index.ts"))))
-          entries.push({ spec: `march/components/${cat}/${name}`, in: join(dir, cat, name, "index.ts"), out: `components/${cat}/${name}` });
-      continue;
-    }
     // icons/<pack> and icons/<pack>/pack: one entry per pack there is
     if (!key.startsWith("./icons/")) continue;
     const dir = join(root, "src/icons/packs");
