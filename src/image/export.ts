@@ -21,7 +21,7 @@ export interface ExportOptions {
 
 type AnyCanvas = HTMLCanvasElement | OffscreenCanvas;
 const blobOf = (c: AnyCanvas, type: string, quality?: number): Promise<Blob | null> =>
-  "convertToBlob" in c ? (c as OffscreenCanvas).convertToBlob({ type, quality }).catch(() => null) : new Promise((res) => (c as HTMLCanvasElement).toBlob(res, type, quality));
+  "convertToBlob" in c ? (c as OffscreenCanvas).convertToBlob(quality == null ? { type } : { type, quality }).catch(() => null) : new Promise((res) => (c as HTMLCanvasElement).toBlob(res, type, quality));
 
 const encodable = new Map<string, boolean>();
 /** Does this browser encode a type (AVIF is not everywhere)? */

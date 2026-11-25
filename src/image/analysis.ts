@@ -55,7 +55,7 @@ export function sampleColor(r: Raster, x: number, y: number, radius = 0): [numbe
   for (let yy = Math.max(0, Math.round(y) - radius); yy <= Math.min(r.height - 1, Math.round(y) + radius); yy++)
     for (let xx = Math.max(0, Math.round(x) - radius); xx <= Math.min(r.width - 1, Math.round(x) + radius); xx++) {
       const i = (yy * r.width + xx) * 4;
-      for (let k = 0; k < 4; k++) out[k] += r.data[i + k]!;
+      for (let k = 0; k < 4; k++) out[k] = out[k]! + r.data[i + k]!;
       n++;
     }
   return n ? (out.map((v) => v / n) as [number, number, number, number]) : out;

@@ -16,3 +16,5 @@ export * from "./analysis.ts";
 export { glView, type GLView } from "./gl.ts";
 export { gaussian, gaussPlane, lumaPlane, lightPlane, localContrast } from "./blur.ts";
 export { linToOklab, oklabToLin, withLch, hexToLin, curveTable, readTable, toneByLightness, perChannelEncoded, hueDist } from "./color.ts";
+export { collage, collageCells, COLLAGE_TEMPLATES } from "./collage.ts";
+export { lanczosResize, solveHomography, warpHomography } from "./geometry.ts";

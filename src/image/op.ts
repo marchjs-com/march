@@ -37,7 +37,7 @@ export interface OpContext {
 }
 
 /** An op's implementation. */
-export interface OpDef<P extends object = Record<string, unknown>> {
+export interface OpDef<P extends object = Record<string, any>> {
   type: string;
   kind: OpKind;
   /** Default parameters (also the neutral setting where there is one). */
@@ -61,7 +61,7 @@ export interface OpDef<P extends object = Record<string, unknown>> {
 }
 
 /** One step of an edit list: plain JSON. */
-export interface ImageOp<P extends object = Record<string, unknown>> {
+export interface ImageOp<P extends object = Record<string, any>> {
   type: string;
   params: P;
   /** Stable id within an edit list (added by imageDoc). */
