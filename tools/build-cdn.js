@@ -12,7 +12,7 @@
 //   mod/<path>.js    every module a barrel re-exports from (march/mod/<path>, for apps built with march.config.js › cdn)
 //   files.json       every file of the version (a deploy uses it to keep the older versions)
 //   data/…           the version's data: API reference, MarchIDE types, components (tools/cdn-data.mjs)
-// and the same files again in cdn/dist/latest/. Usage: node tools/build-cdn.js [--base https://cdn.marchjs.com]
+// (latest/ is served by the Worker as a redirect to it). Usage: node tools/build-cdn.js [--base https://cdn.marchjs.com]
 import { readFileSync, writeFileSync, rmSync, cpSync, readdirSync, statSync, existsSync, renameSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -160,11 +160,9 @@ if (over.length) {
 }
 const files = walk(out).map((f) => relative(out, f).replace(/\\/g, "/")).sort();
 writeFileSync(join(out, "files.json"), `${JSON.stringify({ version, files: [...files, "files.json"] }, null, 2)}\n`);
-// latest: the same files (its importmap points at latest/)
-const latest = join(dist, "latest");
-rmSync(latest, { recursive: true, force: true });
-cpSync(out, latest, { recursive: true });
-writeFileSync(join(latest, "importmap.json"), `${JSON.stringify({ imports: Object.fromEntries(entries.map((e) => [e.spec, `${BASE}/latest/${e.out}.js`])) }, null, 2)}\n`);
+// latest/ is not a copy: the Worker sends /latest/… to the newest version's file (cdn/worker.js), so a release adds its
+// files once (the Worker's static assets are counted against a limit)
+rmSync(join(dist, "latest"), { recursive: true, force: true });
 
 const size = walk(out).reduce((n, f) => n + statSync(f).size, 0);
-console.log(`cdn/dist/${version}: ${entries.length} entries, ${files.length} files, ${(size / 1024 / 1024).toFixed(1)} MB (${Math.round(performance.now() - t0)} ms); also latest/`);
+console.log(`cdn/dist/${version}: ${entries.length} entries, ${files.length} files, ${(size / 1024 / 1024).toFixed(1)} MB (${Math.round(performance.now() - t0)} ms)`);

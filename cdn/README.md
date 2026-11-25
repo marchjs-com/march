@@ -4,7 +4,7 @@ MarchJS as browser ES modules, served by a Cloudflare Worker's static assets.
 
 | | |
 |---|---|
-| `npm run build:cdn` | `tools/build-cdn.js`: `cdn/dist/<version>/` and `cdn/dist/latest/` (gitignored) |
+| `npm run build:cdn` | `tools/build-cdn.js`: `cdn/dist/<version>/` (gitignored) |
 | `npm run deploy:cdn` | `tools/cdn-deploy.js`: build, keep the versions already out, write `versions.json` and `_headers`, `wrangler deploy` (`--dry-run`: no deploy) |
 | `node tools/cdn-version.js` | the version a release is published as (the workflow runs it) |
 
@@ -15,10 +15,12 @@ MarchJS as browser ES modules, served by a Cloudflare Worker's static assets.
 - `/<version>/march.css`: the tokens, the sx utilities and every component's styles. `/<version>/css/…`: the stylesheets
   the package exports as files (themes).
 - `/<version>/importmap.json` (every entry), `/<version>/files.json` (every file), `/versions.json`.
-- `/latest/…`: the newest version's files.
+- `/latest/…`: a redirect (302, five minutes) of the Worker to the newest version's file; a module loaded through it
+  imports its chunks from the version it landed on.
+- A patch no longer kept (see "How many versions stay"): a redirect to the newest kept version of the same minor.
 
 Headers (`_headers`): `Access-Control-Allow-Origin: *` on every file; a version's files `Cache-Control: public,
-max-age=31536000, immutable`; `latest/` and `versions.json` five minutes.
+max-age=31536000, immutable`; `versions.json` and the Worker's redirects five minutes.
 
 ## Releases
 
@@ -33,8 +35,19 @@ tags the merge commit `v<version>`.
   holds marchjs.com) and `CLOUDFLARE_ACCOUNT_ID`.
 - By hand: `npm run deploy:cdn` (`--dry-run`: everything but the deploy), after `wrangler login`.
 
-A deploy replaces every asset, so `cdn-deploy.js` downloads each published version (its `files.json`) and publishes it
+A deploy replaces every asset, so `cdn-deploy.js` downloads each kept version (its `files.json`) and publishes it
 again with the new one. A version that is out is never published again changed: browsers keep it for a year.
+
+### How many versions stay
+
+Workers Free allows 20,000 static asset files per deploy, and a version is about 1,200 files. So `cdn-deploy.js`:
+- always keeps the newest version of each minor (0.1.0, 0.2.0, the newest 0.3.x…);
+- then keeps the newest other versions while the total stays under `MAX_FILES` (19,000; `CDN_MAX_FILES` overrides);
+- drops the rest.
+
+Dropped versions are listed in `versions.json` (`dropped`) and never published again. The Worker sends a request for one
+to the same file of the newest kept version of its minor (same API), so old links keep working. Workers Paid (100,000
+files) would let more versions stay.
 
 ## Usage notes
 
