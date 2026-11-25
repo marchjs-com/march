@@ -1,9 +1,14 @@
 {
   "name": "march",
-  "version": "0.3.0",
+  "version": "0.3.14",
   "homepage": "https://github.com/marchjs-com/march",
-  "repository": { "type": "git", "url": "git+https://github.com/marchjs-com/march.git" },
-  "bugs": { "url": "https://github.com/marchjs-com/march/issues" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marchjs-com/march.git"
+  },
+  "bugs": {
+    "url": "https://github.com/marchjs-com/march/issues"
+  },
   "private": true,
   "description": "MarchJS: a tiny, fine-grained reactive TypeScript framework. Signals instead of a virtual DOM, JSX compiled by an esbuild plugin, zero runtime dependencies, CSP and Trusted Types friendly.",
   "license": "MIT",
