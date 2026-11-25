@@ -1,0 +1,82 @@
+// Turkish texts of PhotoEditor (shell, menus, commands). English source → Turkish. Panels and dialogs add their own.
+const tr: Record<string, string> = {
+  // menus
+  "File": "Dosya", "Edit": "Düzen", "Image": "Görüntü", "Layer": "Katman", "Type": "Yazı", "Select": "Seç", "Filter": "Filtre",
+  "View": "Görünüm", "Plugins": "Eklentiler", "Window": "Pencere", "Help": "Yardım",
+  "Export": "Dışa Aktar", "Import": "İçe Aktar", "Automate": "Otomatikleştir", "Paste Special": "Özel Yapıştır", "Transform": "Dönüştür",
+  "Purge": "Temizle", "Mode": "Kip", "Image Rotation": "Görüntü Döndürme", "Variables": "Değişkenler", "New": "Yeni",
+  "New Fill Layer": "Yeni Dolgu Katmanı", "New Adjustment Layer": "Yeni Ayar Katmanı", "Layer Style": "Katman Stili",
+  "Layer Mask": "Katman Maskesi", "Vector Mask": "Vektör Maskesi", "Smart Objects": "Akıllı Nesneler", "Rasterize": "Pikselleştir",
+  "Arrange": "Düzenle", "Align": "Hizala", "Modify": "Değiştir", "Show": "Göster", "Guides": "Kılavuzlar", "Screen Mode": "Ekran Kipi",
+  "Workspace": "Çalışma Alanı",
+  // File
+  "New…": "Yeni…", "Open…": "Aç…", "Close": "Kapat", "Close All": "Tümünü Kapat", "Save": "Kaydet", "Save As…": "Farklı Kaydet…",
+  "Revert": "Geri Döndür", "Export As…": "Farklı Dışa Aktar…", "Quick Export as PNG": "PNG Olarak Hızlı Dışa Aktar",
+  "Export for Web…": "Web İçin Dışa Aktar…", "Layers to Files…": "Katmanları Dosyalara…", "Artboards to Files…": "Çalışma Yüzeylerini Dosyalara…",
+  "Place Embedded…": "Gömülü Yerleştir…", "Variable Data Sets…": "Değişken Veri Kümeleri…", "Batch…": "Toplu İşlem…",
+  "File Info…": "Dosya Bilgisi…", "Print…": "Yazdır…",
+  // Edit
+  "Undo": "Geri Al", "Redo": "Yinele", "Step Backward": "Bir Adım Geri", "Fade…": "Soldur…", "Cut": "Kes", "Copy": "Kopyala",
+  "Copy Merged": "Birleşik Kopyala", "Paste": "Yapıştır", "Paste in Place": "Yerine Yapıştır", "Clear": "Sil", "Fill…": "Doldur…",
+  "Fill with Foreground": "Ön Plan Rengiyle Doldur", "Fill with Background": "Arka Plan Rengiyle Doldur", "Stroke…": "Kontur…",
+  "Content-Aware Fill…": "İçeriğe Duyarlı Dolgu…", "Generative Fill…": "Üretken Dolgu…", "Free Transform": "Serbest Dönüştür",
+  "Again": "Tekrar", "Puppet Warp": "Kukla Çarpıtma", "Perspective Warp": "Perspektif Çarpıtma", "Content-Aware Scale": "İçeriğe Duyarlı Ölçek",
+  "Auto-Align Layers…": "Katmanları Otomatik Hizala…", "Auto-Blend Layers…": "Katmanları Otomatik Karıştır…", "Define Pattern…": "Desen Tanımla…",
+  "Define Brush Preset…": "Fırça Hazır Ayarı Tanımla…", "Purge Histories": "Geçmişleri Temizle", "Color Settings…": "Renk Ayarları…",
+  "Assign Profile…": "Profil Ata…", "Convert to Profile…": "Profile Dönüştür…", "Keyboard Shortcuts…": "Klavye Kısayolları…",
+  "Preferences…": "Tercihler…",
+  // Image
+  "RGB Color": "RGB Renk", "Grayscale": "Gri Tonlama", "CMYK Color": "CMYK Renk", "Lab Color": "Lab Renk", "Indexed Color…": "Dizinli Renk…",
+  "Bitmap…": "Bit Eşlem…", "8 Bits/Channel": "8 Bit/Kanal", "16 Bits/Channel": "16 Bit/Kanal", "32 Bits/Channel": "32 Bit/Kanal",
+  "Auto Tone": "Otomatik Ton", "Auto Contrast": "Otomatik Kontrast", "Auto Color": "Otomatik Renk", "Image Size…": "Görüntü Boyutu…",
+  "Canvas Size…": "Tuval Boyutu…", "180°": "180°", "90° Clockwise": "90° Saat Yönünde", "90° Counter Clockwise": "90° Saat Yönünün Tersine",
+  "Arbitrary…": "Serbest…", "Flip Canvas Horizontal": "Tuvali Yatay Çevir", "Flip Canvas Vertical": "Tuvali Dikey Çevir", "Crop": "Kırp",
+  "Trim…": "Kırpıntıyı Al…", "Reveal All": "Tümünü Göster", "Duplicate…": "Çoğalt…", "Apply Image…": "Görüntü Uygula…",
+  "Calculations…": "Hesaplamalar…", "Define…": "Tanımla…", "Data Sets…": "Veri Kümeleri…",
+  // Layer
+  "Layer…": "Katman…", "New Layer": "Yeni Katman", "Layer from Background": "Arka Plandan Katman", "Group Layers": "Katmanları Grupla",
+  "Ungroup Layers": "Grubu Çöz", "Layer via Copy": "Kopyalayarak Katman", "Layer via Cut": "Keserek Katman", "Duplicate Layer…": "Katmanı Çoğalt…",
+  "Delete Layer": "Katmanı Sil", "Layer Style…": "Katman Stili…", "Copy Layer Style": "Katman Stilini Kopyala", "Paste Layer Style": "Katman Stilini Yapıştır",
+  "Clear Layer Style": "Katman Stilini Temizle", "Solid Color…": "Düz Renk…", "Gradient…": "Degrade…", "Pattern…": "Desen…",
+  "Adjustment…": "Ayar…", "Hide All": "Tümünü Gizle", "Reveal Selection": "Seçimi Göster", "Delete": "Sil", "Disable": "Devre Dışı Bırak",
+  "Current Path": "Geçerli Yol", "Create Clipping Mask": "Kırpma Maskesi Oluştur", "Convert to Smart Object": "Akıllı Nesneye Dönüştür",
+  "Edit Contents": "İçeriği Düzenle", "Bring to Front": "En Öne Getir", "Bring Forward": "Öne Getir", "Send Backward": "Geriye Gönder",
+  "Send to Back": "En Arkaya Gönder", "Align…": "Hizala…", "Lock Layers…": "Katmanları Kilitle…", "Merge Down": "Aşağı Birleştir",
+  "Merge Visible": "Görünenleri Birleştir", "Stamp Visible": "Görüneni Damgala", "Flatten Image": "Görüntüyü Düzleştir", "Hide Layers": "Katmanları Gizle",
+  // Select
+  "All": "Tümü", "Deselect": "Seçimi Kaldır", "Reselect": "Yeniden Seç", "Inverse": "Ters Çevir", "All Layers": "Tüm Katmanlar",
+  "Deselect Layers": "Katman Seçimini Kaldır", "Find Layers": "Katman Bul", "Color Range…": "Renk Aralığı…", "Focus Area…": "Odak Alanı…",
+  "Subject": "Konu", "Sky": "Gökyüzü", "Select and Mask…": "Seç ve Maskele…", "Border…": "Kenarlık…", "Smooth…": "Yumuşat…",
+  "Expand…": "Genişlet…", "Contract…": "Daralt…", "Feather…": "Yumuşak Kenar…", "Grow": "Büyüt", "Similar": "Benzer",
+  "Transform Selection": "Seçimi Dönüştür", "Edit in Quick Mask Mode": "Hızlı Maske Kipinde Düzenle", "Load Selection…": "Seçimi Yükle…",
+  "Save Selection…": "Seçimi Kaydet…",
+  // View
+  "Proof Colors": "Prova Renkleri", "Gamut Warning": "Gam Uyarısı", "Zoom In": "Yakınlaştır", "Zoom Out": "Uzaklaştır",
+  "Fit on Screen": "Ekrana Sığdır", "Fill Screen": "Ekranı Doldur", "100%": "%100", "Reset Rotation": "Döndürmeyi Sıfırla",
+  "Standard Screen Mode": "Standart Ekran Kipi", "Full Screen Mode With Menu Bar": "Menü Çubuklu Tam Ekran", "Full Screen Mode": "Tam Ekran Kipi",
+  "Cycle Screen Mode": "Ekran Kipini Değiştir", "Presentation": "Sunum", "Extras": "Ekstralar", "Selection Edges": "Seçim Kenarları",
+  "Grid": "Izgara", "Smart Guides": "Akıllı Kılavuzlar", "Pixel Grid": "Piksel Izgarası", "Rulers": "Cetveller", "Snap": "Yasla",
+  "Lock Guides": "Kılavuzları Kilitle", "Clear Guides": "Kılavuzları Temizle", "New Guide…": "Yeni Kılavuz…",
+  "New Guide Layout…": "Yeni Kılavuz Düzeni…", "New Guides From Shape": "Şekilden Yeni Kılavuzlar", "Clear Slices": "Dilimleri Temizle",
+  // Window, Help
+  "Essentials": "Temel", "Photography": "Fotoğrafçılık", "Painting": "Boyama", "Design": "Tasarım", "Reset Workspace": "Çalışma Alanını Sıfırla",
+  "Float in Window": "Pencerede Yüzdür", "Consolidate All to Tabs": "Tümünü Sekmelerde Birleştir", "Show / Hide Panels": "Panelleri Göster / Gizle",
+  "Search Commands…": "Komut Ara…", "Keyboard Shortcuts": "Klavye Kısayolları", "About Photo Editor": "Fotoğraf Düzenleyici Hakkında",
+  "Swap Colors": "Renkleri Değiştir", "Default Colors": "Varsayılan Renkler", "Decrease Brush Size": "Fırçayı Küçült", "Increase Brush Size": "Fırçayı Büyüt",
+  "Decrease Hardness": "Sertliği Azalt", "Increase Hardness": "Sertliği Artır",
+  // panels
+  "Layers": "Katmanlar", "Channels": "Kanallar", "Paths": "Yollar", "History": "Geçmiş", "Adjustments": "Ayarlamalar", "Properties": "Özellikler",
+  "Color": "Renk", "Swatches": "Renk Örnekleri", "Gradients": "Degradeler", "Patterns": "Desenler", "Brushes": "Fırçalar", "Character": "Karakter",
+  "Paragraph": "Paragraf", "Histogram": "Histogram", "Navigator": "Gezgin", "Info": "Bilgi", "Actions": "Eylemler", "Glyphs": "Glifler", "Comments": "Yorumlar",
+  // shell
+  "Photo editor": "Fotoğraf düzenleyici", "Menu": "Menü", "Tools": "Araçlar", "Tool options": "Araç seçenekleri", "Panels": "Paneller",
+  "Documents": "Belgeler", "Status": "Durum", "Ready": "Hazır", "Fit on screen": "Ekrana sığdır", "Doc: {0} · History: {1}": "Belge: {0} · Geçmiş: {1}",
+  "Search commands": "Komut ara", "Start a new picture": "Yeni bir resme başla", "Create a document, open an image or drop one here.": "Bir belge oluşturun, bir görüntü açın ya da buraya bırakın.",
+  "New document": "Yeni belge", "Colors": "Renkler", "Foreground color": "Ön plan rengi", "Background color": "Arka plan rengi",
+  "Swap colors": "Renkleri değiştir", "Default colors": "Varsayılan renkler", "Quick mask": "Hızlı maske", "Screen mode": "Ekran kipi",
+  "Reset tool": "Aracı sıfırla", "Cancel (Esc)": "İptal (Esc)", "Commit": "Uygula", "{0}: slider": "{0}: kaydırıcı",
+  "image canvas": "görüntü tuvali", "Canvas: {0}, {1} %": "Tuval: {0}, %{1}",
+  // options
+  "New selection": "Yeni seçim", "Add to selection": "Seçime ekle", "Subtract from selection": "Seçimden çıkar", "Intersect with selection": "Seçimle kesiştir",
+};
+export default tr;

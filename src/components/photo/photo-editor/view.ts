@@ -324,6 +324,20 @@ export function CanvasView(props: CanvasViewProps & { api?: ((a: CanvasViewApi) 
       doc.samplers.forEach((s, i) => { const [sx, sy] = m.toScreen(s.x, s.y); ctx.strokeStyle = "#fff"; ctx.beginPath(); ctx.arc(sx * dpr, sy * dpr, 6 * dpr, 0, 6.3); ctx.stroke(); ctx.fillStyle = "#fff"; ctx.fillText(String(i + 1), sx * dpr + 8 * dpr, sy * dpr + 12 * dpr); });
       for (const n of doc.notes) { const [sx, sy] = m.toScreen(n.x, n.y); ctx.fillStyle = "#ffd34d"; ctx.fillRect(sx * dpr - 6 * dpr, sy * dpr - 6 * dpr, 12 * dpr, 12 * dpr); }
     }
+    // collaborators' cursors on this document
+    const collab = ed.shared.collab as { cursors(): { id: string; name: string; color: string; doc: string; x: number; y: number }[] } | undefined;
+    if (collab) {
+      ctx.font = `600 ${11 * dpr}px system-ui, sans-serif`;
+      for (const c of collab.cursors()) {
+        if (c.doc !== doc.id || c.x < 0) continue;
+        const [sx, sy] = m.toScreen(c.x, c.y), x = sx * dpr, y = sy * dpr;
+        ctx.fillStyle = c.color;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 11 * dpr, y + 4 * dpr); ctx.lineTo(x + 5 * dpr, y + 6 * dpr); ctx.lineTo(x + 3 * dpr, y + 12 * dpr); ctx.closePath(); ctx.fill();
+        const w = ctx.measureText(c.name).width + 10 * dpr;
+        ctx.fillRect(x + 10 * dpr, y + 12 * dpr, w, 17 * dpr);
+        ctx.fillStyle = "#fff"; ctx.fillText(c.name, x + 15 * dpr, y + 24 * dpr);
+      }
+    }
     // the tool's own shapes
     const tool = getTool(untrack(ed.tool)), tctx = ed.toolContext();
     if (tool?.overlay && tctx) for (const s of tool.overlay(tctx)) drawShape(ctx, m, s, accent);
