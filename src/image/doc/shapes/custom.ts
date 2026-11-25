@@ -1,4 +1,4 @@
-// The custom shape library: 40 shapes drawn for March (arrows, hearts, stars, speech bubbles, marks, ornaments,
+// The custom shape library: 45 shapes drawn for March (arrows, hearts, stars, speech bubbles, marks, ornaments,
 // frames, weather, nature) as PathData in a 100 × 100 box. Written with a tiny path notation (M / L / C / Q / Z,
 // absolute) read by our own parser, plus circles, ellipses and stars from helpers. Shapes with holes use evenodd;
 // a crescent uses a subtract subpath (the shape renderer evaluates subpath ops).
