@@ -3,7 +3,7 @@
 import { untrack } from "../../../core/reactive.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
 import { onCleanup } from "../../../core/reactive.ts";
-import { installPaintTools, BUILTIN_BRUSHES, builtinPatterns, getTool } from "../../../image/doc/index.ts";
+import { installPaintTools, installVectorTools, installStyles, BUILTIN_BRUSHES, builtinPatterns, getTool } from "../../../image/doc/index.ts";
 import { installSelectTools } from "../../../image/doc/tools/select-tools.ts";
 import type { Editor } from "./editor.ts";
 
@@ -15,6 +15,8 @@ export function installTools(ed: Editor): void {
     installed = true;
     installSelectTools();
     installPaintTools();
+    installVectorTools();
+    installStyles();
   }
   ed.shared.brushPresets ??= BUILTIN_BRUSHES;
   ed.shared.patterns ??= builtinPatterns();

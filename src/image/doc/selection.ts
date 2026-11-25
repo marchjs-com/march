@@ -367,6 +367,14 @@ export function selectionToPath(m: Mask, tolerance = 2): PathData {
 /** Douglas–Peucker. */
 export function simplify(pts: [number, number][], tol: number): [number, number][] {
   if (pts.length < 3) return pts;
+  // a closed ring (first point = last): split at the point farthest from the start, simplify both halves
+  const f = pts[0]!, l = pts[pts.length - 1]!;
+  if (f[0] === l[0] && f[1] === l[1] && pts.length > 3) {
+    let far = 1, fd = -1;
+    for (let i = 1; i < pts.length - 1; i++) { const d = Math.hypot(pts[i]![0] - f[0], pts[i]![1] - f[1]); if (d > fd) { fd = d; far = i; } }
+    const a = simplify(pts.slice(0, far + 1), tol), b = simplify(pts.slice(far), tol);
+    return [...a, ...b.slice(1)];
+  }
   const keep = new Uint8Array(pts.length);
   keep[0] = keep[pts.length - 1] = 1;
   const stack: [number, number][] = [[0, pts.length - 1]];
