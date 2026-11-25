@@ -57,7 +57,7 @@ function one(rel) {
   memo.set(rel, d);
   return d;
 }
-const TOOLCHAIN = [process.version, "package-lock.json", "compiler/register.js", "compiler/node-loader.js", "tools/dep-recorder.mjs"];
+const TOOLCHAIN = [process.version, "package-lock.json", "compiler/register.js", "compiler/node-loader.js", "compiler/hooks-flag.js", "tools/dep-recorder.mjs"];
 function digest(file, deps) {
   const h = createHash("sha1").update(TOOLCHAIN[0]);
   for (const f of [...TOOLCHAIN.slice(1), file, ...deps]) h.update(f).update("\0").update(one(f)).update("\n");

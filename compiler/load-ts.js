@@ -15,8 +15,8 @@ const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 
 // March components import their own CSS (`import "./button.css"`; the esbuild plugin bundles it). When node itself loads
 // March's sources (the compiler reads the auto-import table from src/*/index.ts) those imports are no-ops. In-thread sync
-// hooks; inside a module.register() hooks thread they are unavailable, and there node-loader.js stubs .css instead. Not
-// next to march/register's hooks either: node 22 crashes chaining a sync load hook into them (loadSync is not a function).
+// hooks; none next to march/register's hooks (hooks-flag.js): there node-loader.js stubs .css, and node 22 crashes
+// chaining a sync load hook into them (loadSync is not a function).
 if (!globalThis[Symbol.for("march.asyncHooks")]) try {
   nodeModule.registerHooks?.({
     load(url, context, next) { return url.startsWith("file:") && /\.css(\?.*)?$/.test(url) ? { format: "module", source: "", shortCircuit: true } : next(url, context); },
