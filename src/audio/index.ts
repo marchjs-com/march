@@ -11,7 +11,7 @@
 // (read phase), only while something uses them (`use(el)`) and that element is on screen; under reduced motion they
 // update twice a second (a meter that stands still would say nothing). One AudioContext is shared by every source.
 import { signal, onCleanup, type Accessor } from "../core/reactive.ts";
-import { val, type MaybeFn } from "../core/util.ts";
+import { val, type MaybeFn, clamp } from "../core/util.ts";
 import { onFrame } from "../motion/engine/clock.ts";
 import { watchVisibility } from "../motion/engine/visibility.ts";
 import { reducedMotion } from "../motion/engine/prefs.ts";
@@ -92,7 +92,7 @@ export function audioContext(): AudioContext | null {
 }
 
 const clamp01 = (x: number): number => (x < 0 ? 0 : x > 1 ? 1 : x);
-const pow2 = (n: number): number => { const p = 2 ** Math.round(Math.log2(Math.max(32, Math.min(32768, n)))); return p; };
+const pow2 = (n: number): number => { const p = 2 ** Math.round(Math.log2(clamp(n, 32, 32768))); return p; };
 
 /** The "demo" input: a soft chord loop with a pulsing bass and a hi-hat, synthesized (no file, no permission). */
 function demoGraph(ctx: AudioContext, out: AudioNode): () => void {
@@ -153,7 +153,7 @@ export function mediaChain(el: HTMLMediaElement): MediaChain | null {
 /** Make an audio source (see the top of this file). @tr Bir ses kaynağı yap (dosyanın başına bak). */
 export function audioSource(input: AudioInput, o: AudioSourceOptions = {}): AudioSource {
   const fft = pow2(o.fftSize ?? 2048), bins = fft / 2;
-  const smooth = Math.max(0, Math.min(0.99, o.smoothing ?? 0.8));
+  const smooth = clamp(o.smoothing ?? 0.8, 0, 0.99);
   const [edgeA, edgeB] = o.bandEdges ?? [250, 4000];
   const level = signal(0), peak = signal(0), active = signal(false), error = signal<string | null>(null);
   const bands = signal<AudioBands>({ bass: 0, mid: 0, treble: 0 }, { equals: false });

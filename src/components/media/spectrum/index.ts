@@ -5,7 +5,7 @@ import "./spectrum.css";
 import { signal, effect, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
-import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
+import { val, cx, clamp, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { colorAttr, colorList, tokenColor, type ColorToken, type MultiColors } from "../../../theme/colors.ts";
 import { still } from "../../../motion/engine/parts.ts";
 import { now } from "../../../motion/engine/clock.ts";
@@ -77,7 +77,7 @@ export interface SpectrumProps {
 
 type Ctx = CanvasRenderingContext2D;
 const bar = (ctx: Ctx, x: number, y: number, w: number, hgt: number, r: number): void => {
-  const rr = Math.max(0, Math.min(r, w / 2, hgt / 2));
+  const rr = clamp(r, 0, Math.min(w, hgt) / 2);
   if (rr && ctx.roundRect) ctx.roundRect(x, y, w, hgt, rr); else ctx.rect(x, y, w, hgt);
 };
 

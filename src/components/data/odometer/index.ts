@@ -5,7 +5,7 @@
 import "./odometer.css";
 import { h } from "../../../dom/h.ts";
 import { locale, t } from "../../../core/i18n.ts";
-import { val, cx, type MaybeFn, type ClassProp } from "../../../core/util.ts";
+import { val, cx, type MaybeFn, type ClassProp, clamp } from "../../../core/util.ts";
 import { still } from "../../../motion/engine/parts.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { CountRoll } from "../../social/count-roll/index.ts";
@@ -44,7 +44,7 @@ export interface OdometerProps {
 }
 
 const DURATION: Record<OdometerVariant, number> = { mechanical: 600, digital: 260, flip: 420 };
-const count = (x: unknown, d: number, hi: number): number => { const n = Math.floor(Number(x)); return Number.isFinite(n) ? Math.max(0, Math.min(hi, n)) : d; };
+const count = (x: unknown, d: number, hi: number): number => { const n = Math.floor(Number(x)); return Number.isFinite(n) ? clamp(n, 0, hi) : d; };
 
 /** The locale's decimal mark ("." or ","). */
 export function decimalMark(lang = locale()): string {

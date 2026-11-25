@@ -1,9 +1,10 @@
 // The spectrum's maths, apart from drawing (tested on its own): bar edges in Hz (log or linear) and each bar's value
 // from the analyser's bins.
+import { clamp } from "../../../core/util.ts";
 
 /** `bars + 1` edges in Hz from `minHz` to `maxHz`, spaced evenly on a log (default) or linear scale. */
 export function barEdges(bars: number, minHz: number, maxHz: number, scale: "log" | "linear" = "log"): Float32Array {
-  const n = Math.max(1, Math.round(bars)), lo = Math.max(1, Math.min(minHz, maxHz - 1)), hi = Math.max(lo + 1, maxHz);
+  const n = Math.max(1, Math.round(bars)), lo = clamp(minHz, 1, maxHz - 1), hi = Math.max(lo + 1, maxHz);
   const out = new Float32Array(n + 1);
   for (let i = 0; i <= n; i++) out[i] = scale === "linear" ? lo + ((hi - lo) * i) / n : lo * (hi / lo) ** (i / n);
   return out;
