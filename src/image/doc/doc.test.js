@@ -155,15 +155,19 @@ test("compositor: clipping mask, group pass-through vs isolated, layer mask with
   near(px(d2, 0, 0)[0], 0.5, 0.01);
 });
 
-test("adjustment layers and smart filters run the engine registry; unknown ids pass through", () => {
-  const off = D.registerFilter({ id: "test-invert", label: "Invert", group: "adjust", adjustment: true, params: [], apply: (p) => { for (let i = 0; i < p.data.length; i += 4) { p.data[i] = 1 - p.data[i]; p.data[i + 1] = 1 - p.data[i + 1]; p.data[i + 2] = 1 - p.data[i + 2]; } } });
+test("adjustment layers run the image engine's ops in linear light; unknown ops pass through", async () => {
+  const { defineOp } = await import("../op.ts");
+  defineOp({ type: "test-invert", kind: "color", defaults: {}, color: (c) => { c[0] = 1 - c[0]; c[1] = 1 - c[1]; c[2] = 1 - c[2]; } });
+  const { toLinear, toEncoded } = await import("../raster.ts");
   const doc = new ImageDocument({ width: 2, height: 2, background: [0.2, 0.2, 0.2, 1] });
   doc.change("adj", () => doc.add(doc.newAdjustment("test-invert", {})));
-  near(px(doc, 0, 0)[0], 0.8);
+  const want = toEncoded(1 - toLinear(0.2));
+  near(px(doc, 0, 0)[0], want, 2e-3);
   doc.change("op", () => { doc.active.opacity = 0.5; });
-  near(px(doc, 0, 0)[0], 0.5);
-  off();
-  near(px(doc, 0, 0)[0], 0.2, 1e-3, "filter gone: passes through");
+  near(px(doc, 0, 0)[0], 0.2 + (want - 0.2) * 0.5, 2e-3);
+  doc.change("unknown", () => { doc.active.adjust = { id: "no-such-op", params: {} }; });
+  near(px(doc, 0, 0)[0], 0.2, 1e-3, "unknown op: passes through");
+  assert.equal(D.getFilter("test-invert").adjustment, true);
 });
 
 test("selection: shapes combine, modify, invert, wand, channels", () => {

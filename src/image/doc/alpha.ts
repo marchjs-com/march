@@ -2,48 +2,13 @@
 // shrink (distance-based), float coverage reading.
 
 import type { Mask, Rect } from "./tiles.ts";
+import { gaussPlane } from "../blur.ts";
 
-/** Blur a float plane in place: three box passes approximate a Gaussian of the given radius (sigma ≈ radius / 2). */
+/** Blur a float plane in place (Gaussian, sigma = radius / 2): the engine's gaussPlane (march/image). */
 export function blurPlane(a: Float32Array, w: number, h: number, radius: number): Float32Array {
   if (radius <= 0.25) return a;
-  const sigma = radius / 2;
-  // box sizes for 3 passes (Kovesi)
-  const n = 3, wIdeal = Math.sqrt((12 * sigma * sigma) / n + 1);
-  let wl = Math.floor(wIdeal);
-  if (wl % 2 === 0) wl--;
-  const m = Math.round((12 * sigma * sigma - n * wl * wl - 4 * n * wl - 3 * n) / (-4 * wl - 4));
-  const tmp = new Float32Array(a.length);
-  for (let i = 0; i < n; i++) {
-    const r = ((i < m ? wl : wl + 2) - 1) / 2;
-    if (r < 1) continue;
-    boxH(a, tmp, w, h, r);
-    boxV(tmp, a, w, h, r);
-  }
+  a.set(gaussPlane(a, w, h, radius / 2));
   return a;
-}
-
-function boxH(src: Float32Array, dst: Float32Array, w: number, h: number, r: number): void {
-  const k = 1 / (r + r + 1);
-  for (let y = 0; y < h; y++) {
-    const row = y * w;
-    let acc = 0;
-    for (let x = -r - 1; x < r; x++) acc += src[row + Math.min(w - 1, Math.max(0, x))]!;
-    for (let x = 0; x < w; x++) {
-      acc += src[row + Math.min(w - 1, x + r)]! - src[row + Math.max(0, x - r - 1)]!;
-      dst[row + x] = acc * k;
-    }
-  }
-}
-function boxV(src: Float32Array, dst: Float32Array, w: number, h: number, r: number): void {
-  const k = 1 / (r + r + 1);
-  for (let x = 0; x < w; x++) {
-    let acc = 0;
-    for (let y = -r - 1; y < r; y++) acc += src[Math.min(h - 1, Math.max(0, y)) * w + x]!;
-    for (let y = 0; y < h; y++) {
-      acc += src[Math.min(h - 1, y + r) * w + x]! - src[Math.max(0, y - r - 1) * w + x]!;
-      dst[y * w + x] = acc * k;
-    }
-  }
 }
 
 /**

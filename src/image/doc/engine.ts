@@ -1,103 +1,81 @@
-// The bridge to march/image (the image-editing engine): adjustment layers and smart filters run the engine's filters.
-// No filter bodies live here; the engine registers its filters (or an app registers its own), the document stores
-// { id, params } and calls them per region.
+// The bridge to march/image (the image-editing engine): adjustment layers and smart filters store an op value
+// ({ type, params, on, mix }) and run it through the engine's pipeline. No filter bodies live here: every adjustment
+// and filter is the engine's op (src/image/ops/*), found by type (loaded on demand with ensureOps).
+// The document keeps sRGB-encoded straight colors; ops work in linear light, so a region is converted on the way in
+// and back on the way out.
 
+import { getOp, opTypes, defineOp, ensureOps, type OpDef, type ImageOp, type ParamSpec as OpParamSpec } from "../op.ts";
+import { render } from "../pipeline.ts";
+import { toLinear, toEncoded, type Raster } from "../raster.ts";
 import type { Rect } from "./tiles.ts";
 
-/** One parameter of a filter, for generated UIs (Properties panel, filter gallery). */
-export interface ParamSpec {
-  key: string;
-  label: string;
-  kind: "number" | "angle" | "color" | "boolean" | "choice" | "curve" | "levels" | "gradient" | "point" | "map";
-  min?: number | undefined;
-  max?: number | undefined;
-  step?: number | undefined;
-  default: unknown;
-  options?: { value: string; label: string }[];
-}
-
-/** Pixels handed to a filter: straight RGBA floats 0–1, row-major. */
+/** Pixels handed to a filter: straight RGBA floats 0–1 (sRGB-encoded), row-major. */
 export interface FilterPixels { width: number; height: number; data: Float32Array }
 
 export interface FilterContext {
-  /** Where the pixels are in the document (some filters are position-aware: lighting, clouds, lens flare). */
+  /** Where the pixels are in the document. */
   rect: Rect;
   /** Document size and resolution. */
   doc: { width: number; height: number; dpi: number };
-  /** Preview scale (1 = full size): filters with radii scale them for previews. */
+  /** Preview scale (1 = full size): ops scale their radii by it. */
   scale: number;
-  /** The selection / mask coverage 0–1 for the region (null = everywhere). */
-  mask?: Float32Array | null | undefined;
   signal?: AbortSignal | undefined;
 }
 
-export interface FilterDef {
+/** A filter / adjustment as the editor lists it (menus, Properties, filter gallery). */
+export interface FilterInfo {
   id: string;
-  label: string;
-  /** Menu group: "adjust" (Image › Adjustments) or a Filter menu group ("blur", "sharpen", "distort", "noise", "pixelate", "render", "stylize", "other"…). */
-  group: string;
-  params: ParamSpec[];
-  /** Works on the pixels in place or returns new ones of the same size. */
-  apply(px: FilterPixels, params: Record<string, unknown>, ctx: FilterContext): FilterPixels | void;
-  /** How many pixels around a region the filter reads (blur radius…); 0 = per pixel. Infinity = needs the whole image. */
-  halo?(params: Record<string, unknown>, scale: number): number;
-  /** Can be an adjustment layer (pure per-pixel color change). */
-  adjustment?: boolean | undefined;
-  /** Short description for menus and the filter gallery. */
-  hint?: string | undefined;
-  /** Preview thumbnail kind for galleries. */
-  icon?: string | undefined;
+  kind: OpDef["kind"];
+  /** Numeric parameters with their slider ranges. */
+  params: Record<string, OpParamSpec>;
+  defaults: Record<string, unknown>;
+  /** A pure color change: can be an adjustment layer and runs per tile. */
+  adjustment: boolean;
 }
 
-const registry = new Map<string, FilterDef>();
-const listeners = new Set<() => void>();
+const info = (def: OpDef): FilterInfo => ({
+  id: def.type, kind: def.kind, params: (def.params ?? {}) as Record<string, OpParamSpec>, defaults: def.defaults as Record<string, unknown>,
+  adjustment: def.kind === "color",
+});
 
-/** Add filters (the engine calls this; apps and plugins may add their own). Returns a remover. */
-export function registerFilter(...defs: FilterDef[]): () => void {
-  for (const d of defs) registry.set(d.id, d);
-  for (const fn of listeners) fn();
-  return () => { for (const d of defs) if (registry.get(d.id) === d) registry.delete(d.id); for (const fn of listeners) fn(); };
-}
+/** The engine's op for an id, as a FilterInfo. */
+export const getFilter = (id: string): FilterInfo | undefined => { const d = getOp(id); return d ? info(d) : undefined; };
+/** Every registered op (optionally of one kind). */
+export const filters = (kind?: OpDef["kind"]): FilterInfo[] => opTypes().map((t) => getOp(t)!).filter((d) => !kind || d.kind === kind).map(info);
+/** Ops that can be adjustment layers (color ops). */
+export const adjustments = (): FilterInfo[] => filters("color");
+/** Add an op of your own (plugins): the engine's defineOp. */
+export const registerFilter = <P extends object>(def: OpDef<P>): OpDef<P> => defineOp(def);
 
-export const getFilter = (id: string): FilterDef | undefined => registry.get(id);
-export const filters = (group?: string): FilterDef[] => [...registry.values()].filter((d) => !group || d.group === group);
-export const adjustments = (): FilterDef[] => [...registry.values()].filter((d) => d.adjustment);
-export function onFilters(fn: () => void): () => void { listeners.add(fn); return () => listeners.delete(fn); }
-
-/** Default parameters of a filter. */
+/** Default parameters of an op. */
 export function defaultParams(id: string): Record<string, unknown> {
-  const d = registry.get(id);
-  return d ? Object.fromEntries(d.params.map((p) => [p.key, structuredClone(p.default)])) : {};
+  const d = getOp(id);
+  return d ? { ...(d.defaults as Record<string, unknown>) } : {};
 }
 
-/** Run a filter on straight float pixels (returns the result; unknown ids pass the pixels through). */
-export function runFilter(id: string, px: FilterPixels, params: Record<string, unknown>, ctx: FilterContext): FilterPixels {
-  const d = registry.get(id);
-  if (!d) return px;
-  const out = d.apply(px, { ...defaultParams(id), ...params }, ctx);
-  return out ?? px;
+/** Load every op a document's adjustment layers and smart filters need (call after opening a file). */
+export async function ensureDocOps(ids: readonly string[]): Promise<void> {
+  await ensureOps(ids.map((type) => ({ type, params: {} } as ImageOp)));
 }
 
-export function filterHalo(id: string, params: Record<string, unknown>, scale = 1): number {
-  const d = registry.get(id);
-  return d?.halo ? d.halo({ ...defaultParams(id), ...params }, scale) : 0;
+/** Run one op on straight sRGB-encoded pixels; unknown ids pass the pixels through. */
+export function runFilter(id: string, px: FilterPixels, params: Record<string, unknown>, ctx: FilterContext, mix = 1): FilterPixels {
+  if (!getOp(id)) return px;
+  const n = px.width * px.height, lin = new Float32Array(n * 4), d = px.data;
+  for (let i = 0; i < n * 4; i += 4) { lin[i] = toLinear(d[i]!); lin[i + 1] = toLinear(d[i + 1]!); lin[i + 2] = toLinear(d[i + 2]!); lin[i + 3] = d[i + 3]!; }
+  const src: Raster = { width: px.width, height: px.height, data: lin, space: "srgb" };
+  const out = render(src, [{ type: id, params, mix }], { scale: ctx.scale, fullWidth: ctx.doc.width, fullHeight: ctx.doc.height });
+  const o = out.data, res = new Float32Array(out.width * out.height * 4);
+  for (let i = 0; i < res.length; i += 4) { res[i] = toEncoded(Math.max(0, o[i]!)); res[i + 1] = toEncoded(Math.max(0, o[i + 1]!)); res[i + 2] = toEncoded(Math.max(0, o[i + 2]!)); res[i + 3] = o[i + 3]!; }
+  return { width: out.width, height: out.height, data: res };
 }
 
-/** 8-bit ImageData-like ↔ float pixels (for engines that work on bytes). */
-export function toBytes(px: FilterPixels): { width: number; height: number; data: Uint8ClampedArray } {
-  const d = new Uint8ClampedArray(px.data.length);
-  for (let i = 0; i < d.length; i++) d[i] = Math.round(px.data[i]! * 255);
-  return { width: px.width, height: px.height, data: d };
+/**
+ * How far around a region an op reads: 0 for color ops (they run per tile); Infinity for pixel, spatial and geometry
+ * ops (position-aware or neighbourhood ops get the whole document region, cached by the caller).
+ */
+export function filterHalo(id: string, _params?: Record<string, unknown>, _scale = 1): number {
+  const d = getOp(id);
+  if (!d) return 0;
+  return d.kind === "color" ? 0 : Infinity;
 }
-export function fromBytes(img: { width: number; height: number; data: Uint8ClampedArray }): FilterPixels {
-  const f = new Float32Array(img.data.length);
-  for (let i = 0; i < f.length; i++) f[i] = img.data[i]! / 255;
-  return { width: img.width, height: img.height, data: f };
-}
-
-/** Wrap a byte-based filter function (ImageData in, ImageData out) as a FilterDef apply. */
-export const byteFilter = (fn: (img: { width: number; height: number; data: Uint8ClampedArray }, params: Record<string, unknown>, ctx: FilterContext) => { width: number; height: number; data: Uint8ClampedArray } | void) =>
-  (px: FilterPixels, params: Record<string, unknown>, ctx: FilterContext): FilterPixels => {
-    const img = toBytes(px);
-    return fromBytes(fn(img, params, ctx) ?? img);
-  };
