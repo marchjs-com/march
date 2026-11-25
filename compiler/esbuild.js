@@ -45,6 +45,8 @@ function packageModules(all = false) {
 /**
  * @param {{ components?: string|string[], i18nOut?: string, dev?: boolean, filter?: RegExp, onKeys?: (keys: string[]) => void, cssSplit?: boolean, deepImports?: boolean }} [opts]
  * cssSplit (default true): component CSS follows the component's code into the output chunk that uses it (css-split.js).
+ * noSplitEffects (default true): in a build without `splitting`, March's own files count as having side effects (every
+ * module March uses gets initialized; see the comment in setup). false: as in a split build (a test that shows why).
  * cache: a folder for compiled modules (keyed by the source, the compiler's own files and the auto-import table), so a
  * cold build reuses what an earlier build compiled; in one process (watch / rebuild) unchanged files are always reused.
  */
@@ -92,6 +94,28 @@ export function march(opts = {}) {
       const cwd = build.initialOptions.absWorkingDir ?? process.cwd();
       // March from the CDN (opts.cdn, from loadCdn): before css-split, which would take March's stylesheets
       const cdn = opts.cdn;
+      // Without code splitting (a widget or a library in one file) esbuild can leave some of March's modules
+      // uninitialized: a module March imports lazily somewhere is wrapped (its init runs on first use), and in a
+      // side-effect free package esbuild may drop the call that runs it where the module is also imported statically
+      // (Drawer from march/ui: "edgeOf is not a function"). Such a build treats March's own files as having side
+      // effects, so every init call stays; unused exports are still dropped. Builds with splitting (march build, the CDN)
+      // are left as they are. test/bundle-no-split.test.js
+      const src = join(MARCH_ROOT, "src") + sep;
+      if (!build.initialOptions.splitting && !cdn && opts.noSplitEffects !== false) {
+        build.onResolve({ filter: /.*/ }, async (a) => {
+          if (a.pluginData?.marchEffects || a.kind === "entry-point") return undefined;
+          // March's files import each other by relative path with the extension: those resolve here directly
+          if (a.path.startsWith(".") && (a.resolveDir + sep).startsWith(MARCH_ROOT + sep)) {
+            const p = resolve(a.resolveDir, a.path);
+            if (p.startsWith(src) && existsSync(p) && statSync(p).isFile()) return { path: p, sideEffects: true };
+          }
+          if (!/^(hadi-)?march(\/|$)/.test(a.path)) return undefined;
+          const r = await build.resolve(a.path, { kind: a.kind, importer: a.importer, resolveDir: a.resolveDir, namespace: a.namespace, pluginData: { marchEffects: true } });
+          if (r.errors.length) return { errors: r.errors };
+          if (r.external || !r.path.startsWith(src)) return undefined;
+          return { path: r.path, namespace: r.namespace, pluginData: r.pluginData, sideEffects: true };
+        });
+      }
       if (cdn) {
         // march/css/x.css → the CDN's css/x.css; an entry's own stylesheet (march/motion/motion.css) → that entry's
         // stylesheet on the CDN (motion.css), which has it
