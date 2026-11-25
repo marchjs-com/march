@@ -8,6 +8,8 @@
 //                                                           class of the root element)
 //   data/comp/<category>.json                               each component's props table, notes, accessibility (docs.md)
 //   data/stats.json                                         the numbers: components, exports, icons, animations, tests…
+//   data/text-costs.json                                    what each text animation costs (gzip bytes over the motion
+//                                                           engine: bench/text-size.js), a site's cost badges
 //   data/index.json                                         the files above, with the version
 // tools/build-cdn.js calls writeData(out); alone: node tools/cdn-data.mjs <folder> (default cdn/dist/<version>).
 import { readFileSync, writeFileSync, mkdirSync, cpSync, readdirSync, statSync, rmSync } from "node:fs";
@@ -17,6 +19,7 @@ import { execFileSync } from "node:child_process";
 import { generate as apiDocs } from "./api-docs.js";
 import { categories, components, rootClass, generate as registry } from "./gen-registry.js";
 import { homeStats } from "./gen-home-stats.js";
+import { textCosts } from "../bench/text-size.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -46,6 +49,8 @@ export async function writeData(out) {
   // the numbers sites show (components per category, exports, icons, animations, managers, themes, tests)
   const stats = await homeStats(ROOT);
   put("stats.json", `${JSON.stringify(stats, null, 2)}\n`);
+  // what one import of each text animation (march/motion/text) adds over the motion engine, measured as an app build
+  put("text-costs.json", `${JSON.stringify(await textCosts(), null, 2)}\n`);
 
   const walk = (d) => readdirSync(d).flatMap((n) => { const p = join(d, n); return statSync(p).isDirectory() ? walk(p) : [p]; });
   const pkg = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
