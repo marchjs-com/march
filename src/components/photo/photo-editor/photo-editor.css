@@ -1,0 +1,94 @@
+/* March — PhotoEditor. Tokens only (--m-*); the editor's own variables are --m-pe-*. Dark by default (m:theme night),
+   with darker / medium / light interface colors and a high-contrast mode. */
+.m-pe {
+  --m-pe-bg: color-mix(in oklab, var(--m-bg) 86%, #000);
+  --m-pe-chrome: color-mix(in oklab, var(--m-surface) 92%, var(--m-bg));
+  --m-pe-line: color-mix(in oklab, var(--m-border) 70%, transparent);
+  --m-pe-paste: color-mix(in oklab, var(--m-bg) 70%, #000);
+  --m-pe-accent: var(--m-accent, var(--m-primary));
+  --m-pe-muted: var(--m-text-3, var(--m-text-2));
+  --m-pe-guide: #22d3ee;
+  --m-pe-tool: 2.25rem;
+  display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; min-block-size: 24rem; inline-size: 100%;
+  background: var(--m-pe-bg); color: var(--m-text); font-size: var(--m-text-sm); overflow: hidden; position: relative;
+  border-radius: var(--m-radius-3); isolation: isolate; contain: layout paint;
+}
+.m-pe-ui-darker { --m-pe-bg: color-mix(in oklab, var(--m-bg) 70%, #000); --m-pe-paste: #0b0c0f; }
+.m-pe-ui-medium { --m-pe-bg: color-mix(in oklab, var(--m-surface) 80%, #777); --m-pe-paste: color-mix(in oklab, var(--m-surface) 60%, #555); }
+.m-pe-ui-light { --m-pe-bg: var(--m-surface-2); --m-pe-chrome: var(--m-surface); --m-pe-paste: color-mix(in oklab, var(--m-surface-2) 85%, #888); }
+.m-pe-hc { --m-pe-line: var(--m-text); --m-pe-muted: var(--m-text); }
+.m-pe-hc :focus-visible { outline: 3px solid var(--m-focus) !important; outline-offset: 1px; }
+
+/* top: menu bar, workspaces, search */
+.m-pe-top { display: flex; align-items: center; gap: .5rem; padding: .25rem .5rem; background: var(--m-pe-chrome); border-block-end: 1px solid var(--m-pe-line); min-inline-size: 0; }
+.m-pe-top .m-menubar { flex: 1 1 auto; }
+.m-pe-top-spacer { flex: 1 1 0; }
+.m-pe-workspaces { flex: none; }
+
+/* options bar */
+.m-pe-options { display: flex; align-items: center; min-block-size: 2.5rem; padding: .25rem .5rem; gap: .5rem; background: var(--m-pe-chrome); border-block-end: 1px solid var(--m-pe-line); overflow-x: auto; scrollbar-width: thin; }
+.m-pe-options-body { display: flex; align-items: center; gap: .75rem; inline-size: 100%; }
+.m-pe-options-tool { display: inline-flex; align-items: center; gap: .25rem; padding-inline-end: .75rem; border-inline-end: 1px solid var(--m-pe-line); white-space: nowrap; }
+.m-pe-opt { display: inline-flex; align-items: center; gap: .375rem; white-space: nowrap; }
+.m-pe-opt-label { color: var(--m-pe-muted); font-size: var(--m-text-xs); }
+.m-pe-num { inline-size: 5.25rem; }
+.m-pe-text { inline-size: 9rem; }
+.m-pe-options-spacer { flex: 1 1 auto; }
+.m-pe-options-commit { display: inline-flex; gap: .25rem; align-items: center; }
+.m-pe-slider-pop { padding: .75rem 1rem; min-inline-size: 14rem; }
+
+/* main: toolbar | documents | panels */
+.m-pe-main { display: flex; min-block-size: 0; min-inline-size: 0; }
+.m-pe-toolbar { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: .375rem .25rem; background: var(--m-pe-chrome); border-inline-end: 1px solid var(--m-pe-line); overflow-y: auto; scrollbar-width: none; flex: none; }
+.m-pe-toolbar.is-two { display: grid; grid-template-columns: repeat(2, var(--m-pe-tool)); }
+.m-pe-tool.m-icon-btn, .m-pe-toolbar .m-pe-tool { inline-size: var(--m-pe-tool); block-size: var(--m-pe-tool); border-radius: var(--m-radius-2); position: relative; z-index: 1; color: var(--m-text-2, var(--m-text)); transition: color var(--m-dur-fast, .12s); }
+.m-pe-tool.is-active { color: var(--m-on-primary-fill, #fff); }
+.m-pe-tool.has-flyout::after { content: ""; position: absolute; inset-block-end: 3px; inset-inline-end: 3px; border: 3px solid transparent; border-block-end-color: currentColor; border-inline-end-color: currentColor; opacity: .55; }
+.m-pe-tool-ind { position: absolute; inset-block-start: 0; inset-inline-start: 0; inline-size: var(--m-pe-tool); block-size: var(--m-pe-tool); border-radius: var(--m-radius-2); opacity: 0; pointer-events: none;
+  background: linear-gradient(135deg, var(--m-pe-accent), color-mix(in oklab, var(--m-pe-accent) 70%, var(--m-brand-purple, #8b5cf6))); box-shadow: 0 4px 14px -4px color-mix(in oklab, var(--m-pe-accent) 70%, transparent); }
+[dir="rtl"] .m-pe-tool-ind { inset-inline-start: auto; }
+.m-pe-toolbar-sep { inline-size: 70%; block-size: 1px; background: var(--m-pe-line); margin-block: .375rem; flex: none; }
+.m-pe-colors { position: relative; inline-size: 2.75rem; block-size: 2.75rem; flex: none; margin-block: .25rem; }
+.m-pe-colors .m-pe-fg { position: absolute; inset-block-start: 0; inset-inline-start: 0; z-index: 2; box-shadow: 0 0 0 2px var(--m-pe-chrome); }
+.m-pe-colors .m-pe-bg { position: absolute; inset-block-end: 0; inset-inline-end: 0; z-index: 1; box-shadow: 0 0 0 2px var(--m-pe-chrome); }
+.m-pe-colors .m-pe-swap { position: absolute; inset-block-start: -2px; inset-inline-end: -4px; }
+.m-pe-colors .m-pe-defaults { position: absolute; inset-block-end: -2px; inset-inline-start: -4px; }
+.m-pe-flyout { min-inline-size: 15rem; }
+
+/* documents */
+.m-pe-docs { position: relative; display: flex; flex-direction: column; flex: 1 1 auto; min-inline-size: 0; min-block-size: 0; background: var(--m-pe-paste); }
+.m-pe-doctabs { flex: none; background: var(--m-pe-chrome); border-block-end: 1px solid var(--m-pe-line); }
+.m-pe-stage { position: relative; flex: 1 1 auto; min-block-size: 0; display: grid; grid-template-columns: 0 minmax(0, 1fr); grid-template-rows: 0 minmax(0, 1fr); }
+.m-pe-stage.m-pe-with-rulers { grid-template-columns: 20px minmax(0, 1fr); grid-template-rows: 20px minmax(0, 1fr); }
+.m-pe-ruler { display: block; background: var(--m-pe-chrome); inline-size: 100%; block-size: 100%; }
+.m-pe-ruler-x { grid-column: 2; grid-row: 1; cursor: s-resize; border-block-end: 1px solid var(--m-pe-line); }
+.m-pe-ruler-y { grid-column: 1; grid-row: 2; cursor: e-resize; border-inline-end: 1px solid var(--m-pe-line); }
+.m-pe-ruler-corner { grid-column: 1; grid-row: 1; background: var(--m-pe-chrome); }
+.m-pe-stage:not(.m-pe-with-rulers) .m-pe-ruler, .m-pe-stage:not(.m-pe-with-rulers) .m-pe-ruler-corner { display: none; }
+.m-pe-port { grid-column: 2; grid-row: 2; position: relative; overflow: hidden; touch-action: none; outline: none; }
+.m-pe-port:focus-visible { box-shadow: inset 0 0 0 2px var(--m-focus); }
+.m-pe-port canvas { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
+.m-pe-overlay { pointer-events: none; }
+.m-pe-start { flex: 1 1 auto; display: grid; place-items: center; padding: 2rem; background: radial-gradient(60% 60% at 50% 40%, color-mix(in oklab, var(--m-pe-accent) 12%, transparent), transparent 70%); }
+
+/* panels */
+.m-pe-dock { flex: 0 0 clamp(16rem, 24vw, 22rem); min-inline-size: 0; border-inline-start: 1px solid var(--m-pe-line); background: var(--m-pe-chrome); }
+.m-pe .m-sbar { background: var(--m-pe-chrome); border-block-start: 1px solid var(--m-pe-line); }
+
+/* screen modes and Tab */
+.m-pe-screen-full-menu .m-pe-docs { background: #000; }
+.m-pe-screen-full { border-radius: 0; }
+.m-pe-screen-full .m-pe-docs { background: #000; }
+.m-pe-ui-hidden .m-pe-docs { background: var(--m-pe-paste); }
+
+/* motion off */
+.m-pe-still *, .m-pe-still *::before, .m-pe-still *::after { animation-duration: 0s !important; transition-duration: 0s !important; }
+
+@media (max-width: 760px) {
+  .m-pe-main { flex-direction: column; }
+  .m-pe-toolbar { flex-direction: row; overflow-x: auto; overflow-y: hidden; border-inline-end: 0; border-block-end: 1px solid var(--m-pe-line); }
+  .m-pe-toolbar-sep { inline-size: 1px; block-size: 70%; margin: 0 .375rem; }
+  .m-pe-dock { flex: 0 0 40%; border-inline-start: 0; border-block-start: 1px solid var(--m-pe-line); }
+  .m-pe-workspaces { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .m-pe-tool-ind { transition: none; } }

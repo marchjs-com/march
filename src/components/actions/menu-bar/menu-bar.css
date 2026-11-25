@@ -1,0 +1,10 @@
+/* March — MenuBar: an application menu bar; its panels are Menu panels (menu.css). */
+.m-menubar { display: flex; align-items: center; gap: 1px; min-inline-size: 0; overflow-x: auto; scrollbar-width: none; }
+.m-menubar::-webkit-scrollbar { display: none; }
+.m-menubar .m-btn.m-menubar-item { font-weight: 500; padding-inline: .625rem; border-radius: var(--m-radius-2); color: var(--m-text-2, var(--m-text)); }
+.m-menubar .m-menubar-item[aria-expanded="true"] { background: var(--m-surface-2); color: var(--m-text); }
+.m-menubar-md .m-btn.m-menubar-item { padding-inline: .875rem; }
+.m-menubar-panel.is-sub { --m-pop-pad: .25rem; }
+.m-menubar-sub[aria-expanded="true"] { background: var(--m-surface-2); }
+.m-menubar-chev { margin-inline-start: auto; opacity: .7; }
+[dir="rtl"] .m-menubar-chev { transform: scaleX(-1); }
