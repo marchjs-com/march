@@ -71,3 +71,14 @@ test("ChatComposer: disabled and placeholder stay live on the field", () => {
   assert.equal(field.getAttribute("placeholder"), "Later");
   m.dispose();
 });
+
+test("ChatComposer: the recording waveform is Waveform's decorative bars (24, hidden from screen readers)", async () => {
+  const m = mount(() => h(ChatComposer, { onSend() {}, onVoice() {} }));
+  m.el.querySelector(".m-compose-act").click();
+  await wait();
+  const wave = m.el.querySelector(".m-compose-wave");
+  assert.ok(wave.classList.contains("m-wave") && wave.classList.contains("is-live"));
+  assert.equal(wave.getAttribute("aria-hidden"), "true");
+  assert.equal(wave.querySelectorAll(".m-wave-bars i").length, 24);
+  m.dispose();
+});

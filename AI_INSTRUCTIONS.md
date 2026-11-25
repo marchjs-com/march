@@ -744,13 +744,16 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | Card | stable | Surface with an optional header (title, subtitle, actions), a body and a footer; action() objects in the header render as buttons. | PanelHeader |
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | SearchBox, Button, Chip, Menu, Checkbox, Chevron, Badge, ResizeHandle, Empty, LiveStatus, FilterControl, CellEditor |
 | Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | ListRow, ResizeHandle, Badge, LiveStatus |
+| Gauge | experimental | A dial with a needle: arc track, coloured zones, redline, ticks with labels, spring needle, peak mark and a rolling readout; speedometer, tachometer, half and VU looks, a number or an audio source. | CountRoll, Odometer |
 | Heatmap | experimental | Heatmap: a grid of intensities (day × hour) or a calendar of weeks, in tones of the theme accent; keyboard cells, tooltip and a data table for screen readers. | — |
 | IconTile | stable | An icon in a tinted rounded square: a tone or any theme colour token; soft, outline or solid; square or round. | — |
 | JsonView | stable | Collapsible read-only JSON tree: typed colours, item / key counts when closed, circular references marked. | Chevron |
 | Kanban | stable | Board of columns with toned headers, counts and cards you move by drag and drop or Alt+← / Alt+→. | PanelHeader, StatusDot, Badge |
 | KeyValue | stable | Definition list for detail views: label / value rows in 1–4 columns, hints, hidden rows and a placeholder for empty values. | StatTile |
+| LevelMeter | experimental | A studio LED segment meter: a value or a live sound (march/audio), mono or stereo, green / amber / red zones, a peak light that holds then falls, a latched clip light, a dB scale. | IconButton, StatusDot |
 | LineChart | experimental | Line and area charts (AreaChart in the same folder): time, number or category x axis, several series, drag to zoom, keyboard points, tooltip, legend and a data table for screen readers. | — |
 | ListRow | experimental | The row lists are made of: lead (icon, avatar, dot, thumbnail) + title + sub text + trail and actions; a link, a button or a plain element that takes any role, ARIA and tabindex; active, selected, disabled; long text scrolls, is cut or wraps. | OverflowText |
+| Odometer | experimental | A counter on number drums (a mileage counter, a meter, a flip clock): fixed digits with leading zeros, red fraction drums, a unit; mechanical, digital or flip look. Rolls through CountRoll. | CountRoll |
 | PieChart | experimental | Pie or donut chart: shares of a whole, the total in the donut hole, slices that turn to new angles, keyboard slices, tooltip, legend and a data table for screen readers. | — |
 | ProgressRing | experimental | A score ring 0–100 (or 0–max) with the number in the middle: low / mid / high levels from thresholds, one theme color or several (gradient, segments, flowing). | — |
 | Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | PanelHeader, PeriodNav, Button, Segmented, ResizeHandle, LiveStatus |
@@ -811,11 +814,15 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| AudioReactive | experimental | A wrapper that moves with a sound: writes --m-level, --m-bass, --m-mid, --m-treble and --m-peak (0–1) on itself from a source, with ready pulse / glow / ring / bounce effects. | — |
 | Carousel | stable | Scroll-snap carousel: one to four slides per view, previous / next buttons and dots, swipe on touch, one slide on phones. | IconButton, PageDots |
 | CornerMark | experimental | A small round mark in a corner of a picture, card or avatar (video sign, open arrow, add badge): corner, icon, colour, size, look, shown always or on hover. | — |
 | Media | stable | An image, video or audio element that fits its container (kind from the extension), a text fallback when loading fails; openMedia() shows it in a dialog. | Dialog |
+| Oscilloscope | experimental | The shape of a sound, live: a triggered waveform trace with glow and phosphor afterglow over a graticule, or left against right (X/Y Lissajous); a modern panel or a retro CRT look; reads any march/audio source. | — |
 | Overlay | stable | A decorative layer inside its container: an image, a muted looping video, an SVG, a canvas drawing or a CSS effect (glass, mesh, noise …); never takes input. | — |
 | Picture | experimental | An image from a picture object ({ src, alt, width, height, srcset, sizes }) or a ready node passed through: lazy by default, eager for the first screen, fit and a fallback. | — |
+| Spectrum | experimental | The frequencies of a sound, live: log-frequency bars with falling peak caps, mirrored, around a circle or as a line; one theme color, the four HADİ colors or your own tokens; reads any march/audio source. | — |
+| Waveform | experimental | The bars of a sound (voice message, podcast): from peaks, an audio file (decoded lazily) or a live march/audio source; playhead with played bars, chapter regions, seek by pointer and keyboard; decorative recording bars. | — |
 
 ### Motion — `march/motion`
 
@@ -847,7 +854,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 |---|---|---|---|
 | AppUI | experimental | march-app-ui, the core of March IDE: a top bar (title, your tools, the Layout menu with presets, saved layouts and the panel list) over a DockLayout; plugins add file types (the code editor opens code files), panels, commands and services. | DockLayout, Menu, CodeEditor, ThemeMenu, Joined, Debugger, IconButton, Button, PasswordInput, Textarea, Select, Alert, StatusDot, CodeView, TextInput, Popover, DevicePicker, DevicePreview, NetworkThrottle |
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | Badge, OverflowText, ListRow, Drawer |
-| ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, ReactionPicker, IconButton, StatusDot, ReplyQuote |
+| ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | Menu, Textarea, ReactionPicker, IconButton, StatusDot, ReplyQuote, Waveform |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | ChatBubble, TypingIndicator, ReactionPicker, Avatar, Button, Picture |
 | CodeEditor | experimental | A code field with an IDE's comfort: coloured as it is typed (bracket pairs, indent guides, the caret's line, the word's other places), pairs that close themselves, find and replace, go to line, a suggestion list at the caret, marked ranges, a foot line with a status and a copy button. | EditorFrame, Popover, OptionList, CopyButton, Dropdown, Kbd, StatusDot, Chip, TextInput, IconButton, Button |
 | ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | IconButton, Segmented, Badge, SectionLabel, Slider, Swatch, TextInput |

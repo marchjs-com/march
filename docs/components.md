@@ -99,13 +99,16 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | Card | stable | Surface with an optional header (title, subtitle, actions), a body and a footer; action() objects in the header render as buttons. | [PanelHeader](#panelheader) |
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | [SearchBox](#searchbox), [Button](#button), [Chip](#chip), [Menu](#menu), [Checkbox](#checkbox), [Chevron](#chevron), [Badge](#badge), [ResizeHandle](#resizehandle), [Empty](#empty), [LiveStatus](#livestatus), FilterControl, CellEditor |
 | Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | [ListRow](#listrow), [ResizeHandle](#resizehandle), [Badge](#badge), [LiveStatus](#livestatus) |
+| Gauge | experimental | A dial with a needle: arc track, coloured zones, redline, ticks with labels, spring needle, peak mark and a rolling readout; speedometer, tachometer, half and VU looks, a number or an audio source. | [CountRoll](#countroll), [Odometer](#odometer) |
 | Heatmap | experimental | Heatmap: a grid of intensities (day × hour) or a calendar of weeks, in tones of the theme accent; keyboard cells, tooltip and a data table for screen readers. | — |
 | IconTile | stable | An icon in a tinted rounded square: a tone or any theme colour token; soft, outline or solid; square or round. | — |
 | JsonView | stable | Collapsible read-only JSON tree: typed colours, item / key counts when closed, circular references marked. | [Chevron](#chevron) |
 | Kanban | stable | Board of columns with toned headers, counts and cards you move by drag and drop or Alt+← / Alt+→. | [PanelHeader](#panelheader), [StatusDot](#statusdot), [Badge](#badge) |
 | KeyValue | stable | Definition list for detail views: label / value rows in 1–4 columns, hints, hidden rows and a placeholder for empty values. | [StatTile](#stattile) |
+| LevelMeter | experimental | A studio LED segment meter: a value or a live sound (march/audio), mono or stereo, green / amber / red zones, a peak light that holds then falls, a latched clip light, a dB scale. | [IconButton](#iconbutton), [StatusDot](#statusdot) |
 | LineChart | experimental | Line and area charts (AreaChart in the same folder): time, number or category x axis, several series, drag to zoom, keyboard points, tooltip, legend and a data table for screen readers. | — |
 | ListRow | experimental | The row lists are made of: lead (icon, avatar, dot, thumbnail) + title + sub text + trail and actions; a link, a button or a plain element that takes any role, ARIA and tabindex; active, selected, disabled; long text scrolls, is cut or wraps. | [OverflowText](#overflowtext) |
+| Odometer | experimental | A counter on number drums (a mileage counter, a meter, a flip clock): fixed digits with leading zeros, red fraction drums, a unit; mechanical, digital or flip look. Rolls through CountRoll. | [CountRoll](#countroll) |
 | PieChart | experimental | Pie or donut chart: shares of a whole, the total in the donut hole, slices that turn to new angles, keyboard slices, tooltip, legend and a data table for screen readers. | — |
 | ProgressRing | experimental | A score ring 0–100 (or 0–max) with the number in the middle: low / mid / high levels from thresholds, one theme color or several (gradient, segments, flowing). | — |
 | Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | [PanelHeader](#panelheader), [PeriodNav](#periodnav), [Button](#button), [Segmented](#segmented), [ResizeHandle](#resizehandle), [LiveStatus](#livestatus) |
@@ -166,11 +169,15 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| AudioReactive | experimental | A wrapper that moves with a sound: writes --m-level, --m-bass, --m-mid, --m-treble and --m-peak (0–1) on itself from a source, with ready pulse / glow / ring / bounce effects. | — |
 | Carousel | stable | Scroll-snap carousel: one to four slides per view, previous / next buttons and dots, swipe on touch, one slide on phones. | [IconButton](#iconbutton), [PageDots](#pagedots) |
 | CornerMark | experimental | A small round mark in a corner of a picture, card or avatar (video sign, open arrow, add badge): corner, icon, colour, size, look, shown always or on hover. | — |
 | Media | stable | An image, video or audio element that fits its container (kind from the extension), a text fallback when loading fails; openMedia() shows it in a dialog. | [Dialog](#dialog) |
+| Oscilloscope | experimental | The shape of a sound, live: a triggered waveform trace with glow and phosphor afterglow over a graticule, or left against right (X/Y Lissajous); a modern panel or a retro CRT look; reads any march/audio source. | — |
 | Overlay | stable | A decorative layer inside its container: an image, a muted looping video, an SVG, a canvas drawing or a CSS effect (glass, mesh, noise …); never takes input. | — |
 | Picture | experimental | An image from a picture object ({ src, alt, width, height, srcset, sizes }) or a ready node passed through: lazy by default, eager for the first screen, fit and a fallback. | — |
+| Spectrum | experimental | The frequencies of a sound, live: log-frequency bars with falling peak caps, mirrored, around a circle or as a line; one theme color, the four HADİ colors or your own tokens; reads any march/audio source. | — |
+| Waveform | experimental | The bars of a sound (voice message, podcast): from peaks, an audio file (decoded lazily) or a live march/audio source; playhead with played bars, chapter regions, seek by pointer and keyboard; decorative recording bars. | — |
 
 ### Motion — `march/motion`
 
@@ -202,7 +209,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 |---|---|---|---|
 | AppUI | experimental | march-app-ui, the core of March IDE: a top bar (title, your tools, the Layout menu with presets, saved layouts and the panel list) over a DockLayout; plugins add file types (the code editor opens code files), panels, commands and services. | [DockLayout](#docklayout), [Menu](#menu), [CodeEditor](#codeeditor), [ThemeMenu](#thememenu), [Joined](#joined), [Debugger](#debugger), [IconButton](#iconbutton), [Button](#button), [PasswordInput](#passwordinput), [Textarea](#textarea), [Select](#select), [Alert](#alert), [StatusDot](#statusdot), [CodeView](#codeview), [TextInput](#textinput), [Popover](#popover), [DevicePicker](#devicepicker), [DevicePreview](#devicepreview), [NetworkThrottle](#networkthrottle) |
 | BottomNav | experimental | Mobile tab bar: sliding colored bubble, count / dot badges, raised Create button with a turning four-color HADİ ring. | [Badge](#badge), [OverflowText](#overflowtext), [ListRow](#listrow), [Drawer](#drawer) |
-| ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | [Menu](#menu), [Textarea](#textarea), [ReactionPicker](#reactionpicker), [IconButton](#iconbutton), [StatusDot](#statusdot), [ReplyQuote](#replyquote) |
+| ChatComposer | experimental | Message field: attach Menu (+ turns 45°), growing Textarea, emoji panel (ReactionPicker grid), mic ↔ send morph, recording with timer and live waveform, reply preview. | [Menu](#menu), [Textarea](#textarea), [ReactionPicker](#reactionpicker), [IconButton](#iconbutton), [StatusDot](#statusdot), [ReplyQuote](#replyquote), [Waveform](#waveform) |
 | ChatThread | experimental | Conversation: ChatBubble runs per sender, day separators, TypingIndicator, ReactionPicker under a message, send / arrive motion, stick to bottom with a "N new" jump. | [ChatBubble](#chatbubble), [TypingIndicator](#typingindicator), [ReactionPicker](#reactionpicker), [Avatar](#avatar), [Button](#button), [Picture](#picture) |
 | CodeEditor | experimental | A code field with an IDE's comfort: coloured as it is typed (bracket pairs, indent guides, the caret's line, the word's other places), pairs that close themselves, find and replace, go to line, a suggestion list at the caret, marked ranges, a foot line with a status and a copy button. | [EditorFrame](#editorframe), [Popover](#popover), [OptionList](#optionlist), [CopyButton](#copybutton), Dropdown, [Kbd](#kbd), [StatusDot](#statusdot), [Chip](#chip), [TextInput](#textinput), [IconButton](#iconbutton), [Button](#button) |
 | ColorPicker | experimental | Advanced color picker: saturation / brightness area, hue and alpha sliders, eyedropper, HADİ / theme / recent palettes, hex · rgb · hsl input, WCAG contrast. | [IconButton](#iconbutton), [Segmented](#segmented), [Badge](#badge), [SectionLabel](#sectionlabel), [Slider](#slider), [Swatch](#swatch), [TextInput](#textinput) |
@@ -341,6 +348,23 @@ Composed of: [DockLayout](#docklayout), [Menu](#menu), [CodeEditor](#codeeditor)
 ```
 
 Full page: src/components/composite/app-ui/docs.md
+
+## AudioReactive
+
+A wrapper that makes anything move with a sound. On each reading of its `source` (the microphone, an `<audio>`, a call's stream, the "demo" loop, any number 0–1; see `march/audio`) it writes five CSS variables on itself, each 0–1: `--m-level`, `--m-bass`, `--m-mid`, `--m-treble` and `--m-peak`. Your CSS reads them, or a ready effect does. The variables are written in the motion clock's write phase and only while the wrapper is on screen.
+
+```tsx
+// an avatar ring that pulses while someone speaks
+<AudioReactive source={call} effect="ring" color="brand-green">
+  <Avatar name="Ada" />
+</AudioReactive>
+
+<AudioReactive source={song} as="section" effect={["pulse", "glow"]} gain={1.5} intensity={0.6}>…</AudioReactive>
+<AudioReactive source={mic} vars={{ level: "--talk", peak: false }} sx={{ opacity: "calc(.4 + var(--talk) * .6)" }} />
+<AudioReactive source={() => $load / 100} onLevel={(l) => console.log(l.level)} />
+```
+
+Full page: src/components/media/audio-reactive/docs.md
 
 ## Avatar
 
@@ -577,7 +601,7 @@ Full page: src/components/social/chat-bubble/docs.md
 
 The message field of a chat. On the start side an attach Menu whose + turns 45° while it is open; in the middle a growing Textarea (Enter sends, Shift+Enter breaks the line) with an emoji button that opens a ReactionPicker grid (the emoji goes in at the caret). On the end side one round button morphs on the motion engine: a microphone in Heyecan orange while the field is empty, a send arrow in Aktivite blue once there is text. Recording replaces the field with a pulsing dot, a running timer and a live waveform; the round button sends it, the trash button or Esc drops it. A reply preview with an orange bar sits above.
 
-Composed of: [Menu](#menu), [Textarea](#textarea), [ReactionPicker](#reactionpicker), [IconButton](#iconbutton), [StatusDot](#statusdot), [ReplyQuote](#replyquote)
+Composed of: [Menu](#menu), [Textarea](#textarea), [ReactionPicker](#reactionpicker), [IconButton](#iconbutton), [StatusDot](#statusdot), [ReplyQuote](#replyquote), [Waveform](#waveform)
 
 ```tsx
 <ChatComposer onSend={(text) => send(text)} onVoice={sendVoice} attachments={[photo, file]} replyTo={$reply} />
@@ -1278,6 +1302,22 @@ import { Gantt } from "march/components/data/gantt";
 
 Full page: src/components/data/gantt/docs.md
 
+## Gauge
+
+A dial with a needle, as on a car's instrument cluster, a fine watch or a studio VU meter: server load, download speed, a speed, engine revs, a loudness. The arc carries a track, coloured `zones` and a `redline`; major and minor ticks carry labels; the needle moves on spring physics on the motion engine (or with VU ballistics); a peak mark keeps the highest value; the readout under the hub is a rolling number (CountRoll) or number drums (Odometer).
+
+Composed of: [CountRoll](#countroll), [Odometer](#odometer)
+
+```tsx
+<Gauge value={$speed} max={240} unit="km/h" label="Speed" />
+<Gauge variant="tachometer" value={$rpm} />                               // 0–8000, ×1000 labels, redline at 6500
+<Gauge variant="half" value={$load} unit="%" zones={[{ from: 0, to: 60, color: "success" }, { from: 60, to: 85, color: "warning" }]} redline={85} peak />
+<Gauge variant="vu" source={audioSource("demo")} />                      // a needle VU meter in dB (march/audio)
+<Gauge value={$mbps} max={1000} readout="odometer" needle="vu" color="brand-blue" />
+```
+
+Full page: src/components/data/gauge/docs.md
+
 ## GradientEditor
 
 Build a CSS gradient by hand. Pick the type (linear, radial, conic), turn the angle dial or press a quick angle, click the stop bar to add a color stop (its color is the gradient's color at that point), drag stops to move them, drag one down (or press Delete) to remove it, and edit the selected stop's color with a full ColorPicker. Presets start from the HADİ colors and the theme palette; the CSS is ready to copy.
@@ -1554,6 +1594,21 @@ const SettingsPage = Page.extend({ narrow: true, tabsQuery: "tab" })
 ```
 
 Full page: src/components/layout/layout/docs.md
+
+## LevelMeter
+
+A studio LED meter: a column (or row) of segments that light green, amber and red as the level rises, a peak light that holds for a moment and then falls, and a clip light that stays on after the signal hit the top until you press it. Feed it a number (`value`, 0–1 or `min`…`max`, one per channel for stereo) or a live sound (`source`: the microphone, an `<audio>`, a call's stream, the "demo" loop or any number accessor; see `march/audio`). The segments are built once: a reading writes one CSS variable and moves one class, so a meter at 60 frames a second creates no nodes, and it reads only while it is on screen.
+
+Composed of: [IconButton](#iconbutton), [StatusDot](#statusdot)
+
+```tsx
+<LevelMeter value={$cpu} />
+<LevelMeter source={mic} scale="db" ticks />                       // stereo from the source's left / right
+<LevelMeter value={[$left, $right]} orientation="horizontal" segments={32} peakHold={2000} />
+<LevelMeter value={$load} min={0} max={100} zones={[0.6, 0.85]} colors={["info", "brand-gold", "danger"]} clip={false} />
+```
+
+Full page: src/components/data/level-meter/docs.md
 
 ## LikeButton
 
@@ -1862,6 +1917,21 @@ A locale-aware number: accepts `12,5` and `12.5`, never produces `NaN` (bad text
 
 Full page: src/components/forms/number-input/docs.md
 
+## Odometer
+
+A counter drawn on number drums: a car's mileage counter, a water or power meter, a visitor counter, a flip clock. It is CountRoll (the one rolling number) inside a drum frame: `digits` integer drums with leading zeros (past the last one it rolls over, 999999 → 000000), `decimals` fraction drums (the classic red drum), a `unit`, and three looks. Only the drums whose digit changed roll, upward when the value grows and downward when it shrinks, on the motion engine.
+
+Composed of: [CountRoll](#countroll)
+
+```tsx
+<Odometer value={$km} digits={6} decimals={1} unit="km" />
+<Odometer value={$visitors} digits={7} variant="flip" size="lg" />
+<Odometer value={$kwh} decimals={2} unit="kWh" variant="digital" color="success" />
+<Odometer value={$n} frame={false} motion={false} />
+```
+
+Full page: src/components/data/odometer/docs.md
+
 ## OptionList
 
 A list of choices inside a panel: a theme or accent picker, a type menu, the suggestions under a field. Each row has a lead (icon, swatch, avatar), a label, a hint, a trailing part and a tick when chosen. It is a radio group by default, a listbox (one or many) or a menu of commands; a field can drive it with its own keys (`keysFrom`).
@@ -1878,6 +1948,22 @@ Composed of: [ListRow](#listrow), [SectionLabel](#sectionlabel)
 ```
 
 Full page: src/components/forms/option-list/docs.md
+
+## Oscilloscope
+
+The shape of a sound, live. A waveform trace over a graticule, triggered where the signal rises through zero so the picture stands still, with a soft glow and a phosphor afterglow (the last frames fade instead of vanishing). With `mode="xy"` it draws the left channel against the right: a Lissajous figure (a mono input is paired with itself a quarter period later, so it still draws a shape). Two looks: a clean `modern` panel in the theme and a retro `crt` tube with scanlines. It reads any `march/audio` source; with none it shows a quiet flat line.
+
+```tsx
+import { audioSource } from "march/audio";
+const song = audioSource("demo");                       // start it from a click: song.start()
+
+<Oscilloscope source={song} />
+<Oscilloscope source={song} look="crt" persistence={0.8} />
+<Oscilloscope source={song} mode="xy" color="brand-purple" height={220} />
+<Oscilloscope source={() => $cpu / 100} timebase={10} grid={false} idleText="Waiting…" />
+```
+
+Full page: src/components/media/oscilloscope/docs.md
 
 ## OverflowText
 
@@ -2582,6 +2668,22 @@ A tiny trend line without axes: in a table cell, a list row or a KPI box (Stat u
 
 Full page: src/components/data/sparkline/docs.md
 
+## Spectrum
+
+The frequencies of a sound, live: bass on one side, treble on the other. Bars on a log-frequency scale (`minHz` to `maxHz`, as the ear hears, so low notes get as much room as high ones) with peak caps that fall slowly. Four looks: `bars`, `mirror` (around the middle line), `circle` (around a ring) and `line` (a curve with a soft fill). One theme color, the four HADİ colors (`colors="brand"`) or your own list of tokens, as a gradient or hard segments. It reads any `march/audio` source; with none it shows empty bars.
+
+```tsx
+import { audioSource } from "march/audio";
+const song = audioSource("demo");                       // start it from a click: song.start()
+
+<Spectrum source={song} />
+<Spectrum source={song} variant="mirror" colors="brand" bars={64} gap={1} />
+<Spectrum source={song} variant="circle" colors={["brand-blue", "brand-pink"]} height={260} />
+<Spectrum source={song} variant="line" color="success" minHz={60} maxHz={8000} peaks={false} />
+```
+
+Full page: src/components/media/spectrum/docs.md
+
 ## Spinner
 
 A ring that turns while something loads. Three sizes; in a multicolour theme (HADİ) it carries the brand colours, `colors` picks them (a list of colour tokens) or keeps it to one.
@@ -3060,6 +3162,19 @@ A long list that keeps only the rows near the viewport in the DOM, so 100,000 ro
 ```
 
 Full page: src/components/data/virtual-list/docs.md
+
+## Waveform
+
+The bars of a sound, as in a voice message or a podcast player. The bars come from `peaks` (numbers 0–1, any length), from `src` (an audio file: fetched and decoded once it is on screen, the peaks computed once per URL), or live from a `source` (march/audio) as bars rolling in from the inline end. `live` without a source is the decorative motion of a recording (ChatComposer shows it): no audio, no permission. A playhead (`progress` 0–1, or `currentTime` with `duration` in seconds) paints the played bars in the progress color; `regions` (chapters) lie as soft bands under the bars with their labels below; `seekable` turns it into a slider you press, drag or move with the keyboard.
+
+```tsx
+<Waveform peaks={voice.peaks} currentTime={$t} duration={voice.seconds} seekable onSeek={(p, s) => ($t = s)} />
+<Waveform src="/episodes/42.mp3" progress={$p} regions={chapters} seekable onSeek={seek} onRegionClick={(r) => toast(r.label)} />
+<Waveform source={audioSource("mic")} height={32} barWidth={2} gap={2} />
+<Waveform live bars={24} height={24} />
+```
+
+Full page: src/components/media/waveform/docs.md
 
 ## Window
 

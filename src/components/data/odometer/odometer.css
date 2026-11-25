@@ -1,0 +1,74 @@
+/* March — Odometer. The drums are CountRoll's cells (motion/digits.ts): each digit cell (.m-roll-d, or the .m-roll-slot
+   wrapping one while it rolls) is a drum; the decimal mark (.m-roll-s) splits the integer drums from the fraction
+   drums (every cell after it). Drums stay dark in every theme, as on a real counter (--m-scrim / --m-on-scrim). */
+.m-odo {
+  --m-odo-h: 28px;
+  --m-odo-w: calc(var(--m-odo-h) * .66);
+  --m-odo-gap: max(1px, calc(var(--m-odo-h) * .05));
+  --m-odo-radius: calc(var(--m-odo-h) * .12);
+  --m-odo-drum: color-mix(in srgb, var(--m-scrim) 86%, var(--m-text) 14%);
+  --m-odo-ink: color-mix(in srgb, var(--m-on-scrim) 94%, transparent);
+  --m-odo-frac: color-mix(in srgb, var(--m-danger) 78%, var(--m-scrim));
+  --m-odo-shade: color-mix(in srgb, var(--m-scrim) 62%, transparent);
+  --m-odo-shine: color-mix(in srgb, var(--m-on-scrim) 10%, transparent);
+  --m-odo-lit: color-mix(in srgb, var(--m-accent, var(--m-primary)) 78%, var(--m-on-scrim));
+  display: inline-flex; align-items: center; gap: calc(var(--m-odo-h) * .3); vertical-align: middle;
+  line-height: 1;
+}
+.m-odo-sm { --m-odo-h: 20px; }
+.m-odo-lg { --m-odo-h: 44px; }
+
+/* the frame: a brushed bezel around the drums */
+.m-odo-drums {
+  display: inline-flex; align-items: center; gap: var(--m-odo-gap);
+  padding: calc(var(--m-odo-h) * .14); border-radius: calc(var(--m-odo-radius) + var(--m-odo-h) * .12);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--m-text) 5%, var(--m-surface)), color-mix(in srgb, var(--m-text) 18%, var(--m-surface)));
+  border: var(--m-border-w, 1px) solid var(--m-border-strong);
+  box-shadow: var(--m-highlight), var(--m-shadow-1), inset 0 -1px 0 color-mix(in srgb, var(--m-text) 10%, transparent);
+}
+.m-odo-bare .m-odo-drums { padding: 0; border: 0; background: none; box-shadow: none; }
+
+/* CountRoll inside: no clip around the whole number, each drum clips its own roll */
+.m-odo .m-roll { line-height: 1; font-variant-numeric: tabular-nums; }
+.m-odo .m-roll-vis { overflow: visible; padding: 0; margin: 0; gap: var(--m-odo-gap); align-items: stretch; }
+.m-odo .m-roll-vis > .m-roll-d, .m-odo .m-roll-vis > .m-roll-slot {
+  position: relative; display: inline-grid; place-items: center; overflow: clip;
+  inline-size: var(--m-odo-w); block-size: var(--m-odo-h); border-radius: var(--m-odo-radius);
+  font: 650 calc(var(--m-odo-h) * .72) / 1 var(--m-font); color: var(--m-odo-ink);
+  background-color: var(--m-odo-drum);
+  /* a cylinder: dark at the rims, a soft light band across the middle */
+  background-image: linear-gradient(180deg, var(--m-odo-shade), transparent 32%, var(--m-odo-shine) 50%, transparent 68%, var(--m-odo-shade));
+}
+.m-odo .m-roll-slot > .m-roll-d, .m-odo .m-roll-ghost { display: grid; place-items: center; inline-size: 100%; block-size: 100%; }
+.m-odo .m-roll-vis > .m-roll-s { display: inline-flex; align-items: flex-end; padding-block-end: calc(var(--m-odo-h) * .08); color: var(--m-text-2); font: 800 calc(var(--m-odo-h) * .6) / 1 var(--m-font); }
+/* fraction drums: the classic red one */
+.m-odo .has-frac .m-roll-s ~ * { --m-odo-drum: var(--m-odo-frac); }
+.m-odo-sign { font: 650 calc(var(--m-odo-h) * .6) / 1 var(--m-font); color: var(--m-text); padding-inline: .1em; }
+.m-odo-unit { font: 600 calc(var(--m-odo-h) * .42) / 1 var(--m-font); color: var(--m-text-2); letter-spacing: .04em; }
+
+/* digital: a lit display with the unlit segments faintly behind */
+.m-odo-digital .m-odo-drums { background: var(--m-odo-drum); border-color: color-mix(in srgb, var(--m-scrim) 50%, var(--m-border-strong)); box-shadow: inset 0 2px 6px var(--m-odo-shade), var(--m-shadow-1); }
+.m-odo-digital .m-roll-vis > .m-roll-d, .m-odo-digital .m-roll-vis > .m-roll-slot {
+  background: none; inline-size: calc(var(--m-odo-h) * .6);
+  font: 500 calc(var(--m-odo-h) * .8) / 1 var(--m-font-mono, ui-monospace, monospace); color: var(--m-odo-lit);
+  text-shadow: 0 0 calc(var(--m-odo-h) * .25) color-mix(in srgb, var(--m-odo-lit) 55%, transparent);
+}
+.m-odo-digital .m-roll-vis > .m-roll-d::before, .m-odo-digital .m-roll-vis > .m-roll-slot::before {
+  content: "8"; position: absolute; inset: 0; display: grid; place-items: center; opacity: .07; text-shadow: none;
+}
+.m-odo-digital .m-roll-vis > .m-roll-s { color: var(--m-odo-lit); }
+.m-odo-digital .has-frac .m-roll-s ~ * { --m-odo-lit: color-mix(in srgb, var(--m-danger) 70%, var(--m-on-scrim)); }
+
+/* flip: split cards of a flip clock */
+.m-odo-flip { --m-odo-w: calc(var(--m-odo-h) * .74); --m-odo-gap: calc(var(--m-odo-h) * .1); }
+.m-odo-flip .m-odo-drums { background: none; border: 0; box-shadow: none; padding: 0; }
+.m-odo-flip .m-roll-vis > .m-roll-d, .m-odo-flip .m-roll-vis > .m-roll-slot {
+  block-size: calc(var(--m-odo-h) * 1.25); border-radius: calc(var(--m-odo-h) * .14);
+  background-image: linear-gradient(180deg, var(--m-odo-shine), transparent 49.5%, var(--m-odo-shade) 49.5%, var(--m-odo-shade) 50.5%, transparent 50.5%);
+  box-shadow: var(--m-shadow-2), inset 0 1px 0 var(--m-odo-shine);
+}
+.m-odo-flip .m-roll-vis > .m-roll-d::after, .m-odo-flip .m-roll-vis > .m-roll-slot::after {
+  /* the hinge pins at the card's sides */
+  content: ""; position: absolute; inset-inline: 0; inset-block-start: calc(50% - 1px); block-size: 2px;
+  background: linear-gradient(90deg, var(--m-odo-shade) 6%, transparent 6%, transparent 94%, var(--m-odo-shade) 94%);
+}

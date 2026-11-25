@@ -86,9 +86,9 @@ let shared: AudioContext | null = null;
 /** The one AudioContext every source (and an effects chain) shares, made on first use; null without Web Audio. @tr Her kaynağın (ve bir efekt zincirinin) paylaştığı tek AudioContext, ilk kullanımda yapılır; Web Audio yoksa null. */
 export function audioContext(): AudioContext | null {
   if (shared) return shared;
-  const AC = (globalThis as { AudioContext?: typeof AudioContext; webkitAudioContext?: typeof AudioContext }).AudioContext
+  const Ctor = (globalThis as { AudioContext?: typeof AudioContext; webkitAudioContext?: typeof AudioContext }).AudioContext
     ?? (globalThis as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-  return AC ? (shared = new AC()) : null;
+  return Ctor ? (shared = new Ctor()) : null;
 }
 
 const clamp01 = (x: number): number => (x < 0 ? 0 : x > 1 ? 1 : x);

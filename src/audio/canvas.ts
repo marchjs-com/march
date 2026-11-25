@@ -48,11 +48,25 @@ export function audioCanvas(canvas: HTMLCanvasElement, draw: AudioCanvasDraw): A
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     draw(ctx, w, h, color);
   };
+  // the box is set by CSS, never by the bitmap: a canvas sized by its own width / height attributes would grow by the
+  // device pixel ratio on every resize (bitmap → box → bitmap…)
+  canvas.style?.setProperty?.("width", "100%");
+  canvas.style?.setProperty?.("height", "100%");
   observeSize(canvas, (s) => {
-    const dpr = globalThis.devicePixelRatio || 1;
+    // an unchanged or empty box: nothing to do (no resize loop, no work while hidden)
+    if ((s.width === w && s.height === h) || !s.width || !s.height) return;
     w = s.width; h = s.height; colors = new Map();
     // the bitmap is written in the frame's write phase, with the drawing right after it
-    if (!queued) { queued = true; mutate(() => { queued = false; canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); paint(); }); }
+    if (!queued) {
+      queued = true;
+      mutate(() => {
+        queued = false;
+        const dpr = globalThis.devicePixelRatio || 1, bw = Math.round(w * dpr), bh = Math.round(h * dpr);
+        if (canvas.width !== bw) canvas.width = bw;
+        if (canvas.height !== bh) canvas.height = bh;
+        paint();
+      });
+    }
   });
   const refresh = (): void => { colors = new Map(); mutate(paint); };
   onCleanup(onRestyle(refresh));

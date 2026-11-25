@@ -118,6 +118,13 @@
   "hrefOf": "Rotanın sayfaya yazılacak bağlantısı: geçmiş kipinde geçerli adrese göre göreli (\"../flow\"), her kökte ve yeni sekmede doğru; hash kipinde \"#/flow\"."
  },
  "march/data": {
+  "Gauge": "`<Gauge value={$hız} max={240} unit=\"km/h\" />` — ibreli kadran: renkli bölgeler, kırmızı çizgi, yaylı ibre, tepe işareti ve dönen gösterge; hız, devir, yarım ve VU görünümü, sayı ya da ses kaynağı.",
+  "Odometer": "`<Odometer value={$km} digits={6} decimals={1} unit=\"km\" />` — sayı çarklarında sayaç: sabit hane, kırmızı kesir çarkı, birim; mekanik, dijital ya da yaprak saat görünümü.",
+  "LevelMeter": "`<LevelMeter value={$v} />` — stüdyo tipi LED seviye ölçer: sayı ya da canlı ses, mono / stereo, yeşil-amber-kırmızı bölgeler, düşen tepe ışığı ve basınca sönen kırpılma ışığı.",
+  "niceStep": "Bir ölçek aralığı için yuvarlak tik adımı (1, 2, 2,5 ya da 5 × 10ⁿ), yaklaşık `count` adım verir.",
+  "dialGeometry": "Bir kadranın viewBox birimlerinde geometrisi (200 genişlik): merkez, yarıçap, yükseklik, göstergenin ve başlığın yeri; görünüme ve `sweep` değerine göre.",
+  "decimalMark": "Etkin dilin ondalık işareti (\".\" ya da \",\").",
+  "drumText": "Sayaç çarklarının metni: sabit tam hane ve kesir hanesi, taşınca baştan döner.",
   "IconTile": "Renkli yuvarlak köşeli karedeki simge: `<IconTile icon={users} tone=\"primary\" />`",
   "TimeRuler": "Zaman çizelgesinin üstündeki cetvel: tikler, zaman etiketleri ve oynatma başı; `onSeek` verilirse sürüklenir ve baş bir kaydırıcı olur: `<TimeRuler duration={2000} value={$now} onSeek={seek} />`",
   "timeTicks": "Bir süre için cetvel tiklerini üretir: her `step` ms'de ara tik, her `major` ms'de etiketli tik (verilmezse süreye göre seçilir).",
@@ -161,6 +168,13 @@
   "TYPES": "Alan türleri ve temel davranışları. `fieldType(name, def)` ile genişletilir."
  },
  "march/ui": {
+  "AudioReactive": "`<AudioReactive source={mic} effect=\"ring\">…</AudioReactive>` — sesle hareket eden sarmalayıcı: kaynaktan --m-level, --m-bass, --m-mid, --m-treble, --m-peak değişkenlerini yazar; hazır nabız / ışıltı / halka / zıplama efektleri.",
+  "audioVarNames": "AudioReactive'in `vars` ayarına göre her okumanın CSS değişkeni adı (yazılmayan null).",
+  "Oscilloscope": "`<Oscilloscope source={song} look=\"crt\" />` — sesin dalga biçimini canlı çizer: tetiklenen iz, fosfor izi, ölçek ızgarası, XY Lissajous; modern ya da retro CRT görünüm.",
+  "Spectrum": "`<Spectrum source={song} variant=\"mirror\" colors=\"brand\" />` — sesin frekanslarını canlı gösterir: log ölçekli çubuklar ve düşen tepe başlıkları; çubuk, ayna, halka ya da çizgi; tema, HADİ ya da kendi renklerin.",
+  "Waveform": "`<Waveform peaks={…} currentTime={$t} duration={60} seekable onSeek={…} />` — bir sesin çubukları (sesli mesaj, podcast): çalınan kısım renkli, bölümler, basıp atlama; dosyadan, canlı sesten ya da süs olarak.",
+  "decodePeaks": "Bir ses dosyasını çözüp Waveform için normalleştirilmiş tepe değerlerini verir (adrese göre önbellekli).",
+  "resamplePeaks": "Tepe değerlerini `n` çubuğa indirir ya da çoğaltır (her kovadaki en yüksek değer).",
   "IconPicker": "Simge seçici: seçili simgeyi ve adını gösteren düğme; açılan panelde arama, süzgeç çipleri ve bütün simgelerin ızgarası (inline ile düğmesiz).",
   "ICON_GROUPS": "IconPicker süzgeç çiplerinin hazır listesi: oklar, dosya, medya, iletişim, kişi, düzen, dolu.",
   "typeScriptPlugin": "TypeScript dil servisi eklentisi: bir worker içinde çalışır; bütün JavaScript / TypeScript / DOM API tamamlaması, hata ve uyarıların yerleri. CSP Trusted Types ile çalışıyorsa trusted-types march-worker gerekir.",

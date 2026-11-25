@@ -24,6 +24,8 @@ import { ReactionPicker } from "../../social/reaction-picker/index.ts";
 import { ReplyQuote } from "../../social/reply-quote/index.ts";
 import { play } from "../../../motion/play.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
+// Waveform's decorative recording bars only (its canvas and audio parts stay out of ChatComposer)
+import { WaveformBars } from "../../media/waveform/bars.ts";
 import "./chat-composer.css";
 import { withColor } from "../../../theme/colors.ts";
 import type { IconProp } from "../../../icons/types.ts";
@@ -83,9 +85,8 @@ export interface ChatComposerProps {
 /** `<ChatComposer onSend={(text) => send(text)} onVoice={sendVoice} attachments={[photo, file]} replyTo={$reply} />` */
 export function ChatComposer(props: ChatComposerProps): Element {
   const text = signal(""), emojiOpen = signal(false), rec = signal(false), elapsed = signal(0);
-  let field: HTMLTextAreaElement | null = null, action!: HTMLElement, bars!: HTMLElement;
+  let field: HTMLTextAreaElement | null = null, action!: HTMLElement;
   let lastTyping = 0, stopClock: (() => void) | null = null, recStart = 0;
-  const runs: { cancel(): void }[] = [];
   const L = (): ChatComposerLabels => val(props.labels) ?? {};
   const moves = (): boolean => val(props.motion) !== false;
   const hasText = (): boolean => text().trim().length > 0;
@@ -122,15 +123,7 @@ export function ChatComposer(props: ChatComposerProps): Element {
     const m = mode();
     untrack(() => { if (action && moves()) play(action, [{ transform: "scale(.6) rotate(-30deg)", opacity: 0.4 }, { transform: "scale(1) rotate(0deg)", opacity: 1 }], { duration: 220, easing: "easeOutBack" }); void m; });
   });
-  // live waveform while recording
-  effect(() => {
-    const on = rec();
-    untrack(() => {
-      for (const r of runs.splice(0)) r.cancel();
-      if (on && moves()) queueMicrotask(() => [...(bars?.children ?? [])].forEach((b, i) => runs.push(play(b as HTMLElement, [{ transform: "scaleY(.25)" }, { transform: `scaleY(${0.5 + ((i * 37) % 50) / 100})` }, { transform: "scaleY(.3)" }], { duration: 700 + ((i * 53) % 400), delay: i * 40, iterations: Infinity, direction: "alternate", easing: "easeInOutCubic" }))));
-    });
-  });
-  onCleanup(() => { stopClock?.(); for (const r of runs) r.cancel(); });
+  onCleanup(() => { stopClock?.(); });
 
   const key = (e: KeyboardEvent): void => {
     if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); submit(); }
@@ -166,7 +159,8 @@ export function ChatComposer(props: ChatComposerProps): Element {
       ? h("div", { class: "m-compose-rec", role: "status", "aria-live": "off" },
         props.recordingDot === false ? null : h(StatusDot, { class: "m-compose-dot", tone: "danger", size: "lg", pulse: () => (moves() ? "blink" : false) }),
         h("span", { class: "m-compose-time" }, () => formatDuration(elapsed())),
-        props.wave === false ? null : h("span", { class: "m-compose-wave", "aria-hidden": "true", ref: (x: HTMLElement) => { bars = x; } }, Array.from({ length: 24 }, () => h("i"))),
+        // the live waveform is a decorative Waveform (it hides itself from screen readers)
+        props.wave === false ? null : h(WaveformBars, { live: true, bars: 24, class: "m-compose-wave", motion: () => moves() }),
         h("span", { class: "m-sr-only" }, L().recording ?? t`Recording`))
       : h("div", { class: "m-compose-field" },
         h(Textarea, {

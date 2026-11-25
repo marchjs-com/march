@@ -1,0 +1,10 @@
+/* Spectrum: a quiet stage, the bars (canvas, colors read from these variables), the idle text. */
+.m-spec { --m-spec-bar: var(--m-accent, var(--m-primary)); --m-spec-peak: color-mix(in srgb, var(--m-text) 65%, transparent); --m-spec-idle: var(--m-border);
+  position: relative; display: block; inline-size: 100%; block-size: var(--m-spec-h, 160px); overflow: hidden; }
+.m-spec-circle { block-size: var(--m-spec-h, 240px); }
+.m-spec-canvas { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; display: block; }
+.m-spec-idle { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none;
+  font-size: var(--m-text-xs); letter-spacing: var(--m-tracking-caps, .06em); text-transform: uppercase; color: var(--m-faint, var(--m-text-2));
+  opacity: 0; transition: opacity var(--m-dur) var(--m-ease); }
+.m-spec.is-idle .m-spec-idle { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .m-spec-idle { transition: none; } }
