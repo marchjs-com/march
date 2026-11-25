@@ -29,7 +29,7 @@
 .m-compose-emoji .m-react-grid { border: 0; background: var(--m-surface-2); }
 .m-compose-rec { display: flex; align-items: center; gap: .625rem; flex: 1; min-width: 0; height: 2.75rem; padding: 0 1rem; border-radius: 1.5rem; background: var(--m-surface-2); overflow: hidden; }
 .m-compose-time { flex: none; font-variant-numeric: tabular-nums; font-weight: 800; font-size: var(--m-text-sm); min-width: 2.75rem; }
-.m-compose-wave { display: flex; align-items: center; gap: 3px; flex: 1; min-width: 0; height: 1.5rem; overflow: hidden; }
-.m-compose-wave i { flex: none; width: 3px; height: 100%; border-radius: 2px; background: var(--m-brand-orange, var(--m-primary)); transform: scaleY(.3); }
+/* the live waveform is a decorative Waveform: Heyecan orange bars, 3px wide and 3px apart */
+.m-compose .m-compose-wave.m-wave { flex: 1; min-width: 0; overflow: hidden; --m-wave-h: 1.5rem; --m-wave-bw: 3px; --m-wave-gap: 3px; --m-wave-bar: var(--m-brand-orange, var(--m-primary)); }
 .m-compose-cancel.m-icon-btn, .m-compose-cancel.m-icon-btn:hover { color: var(--m-danger); }
 .m-compose-cancel.m-icon-btn:hover { background: var(--m-danger-soft); }

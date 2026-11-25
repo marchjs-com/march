@@ -1,0 +1,38 @@
+/* March — Waveform. Bars on a canvas (colors read from --m-wave-*), regions as soft bands under them, labels below. */
+.m-wave { --m-wave-played: var(--m-accent, var(--m-primary)); --m-wave-bar: var(--m-border-strong); position: relative; display: block; min-width: 0;
+  -webkit-user-select: none; user-select: none; touch-action: pan-y; }
+.m-wave.is-live { --m-wave-bar: var(--m-accent, var(--m-primary)); }
+.m-wave-track { position: relative; height: var(--m-wave-h, 3rem); }
+.m-wave-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* the bars are drawn from the left; a right-to-left page mirrors them */
+:dir(rtl) .m-wave-canvas { transform: scaleX(-1); }
+.m-wave[data-state="loading"] .m-wave-canvas { opacity: .45; }
+.m-wave.is-seekable { cursor: pointer; border-radius: var(--m-radius-1, 6px); }
+.m-wave.is-seekable:focus-visible { outline: 2px solid var(--m-wave-played); outline-offset: 4px; }
+
+/* the playhead: a hairline with a small knob on top while it can be dragged */
+.m-wave-playhead { position: absolute; inset-block: -3px; inset-inline-start: calc(var(--m-wave-p, 0) * 100%); width: 2px; margin-inline-start: -1px;
+  border-radius: 1px; background: var(--m-wave-played); pointer-events: none; box-shadow: 0 0 0 1px color-mix(in srgb, var(--m-surface) 70%, transparent); }
+.m-wave-playhead[hidden] { display: none; }
+.m-wave.is-seekable .m-wave-playhead::before { content: ""; position: absolute; inset-block-start: -4px; inset-inline-start: 50%; width: 10px; height: 10px; margin-inline-start: -5px;
+  border-radius: 50%; background: var(--m-wave-played); box-shadow: 0 1px 4px -1px color-mix(in srgb, var(--m-wave-played) 70%, transparent);
+  transform: scale(.6); transition: transform var(--m-dur-fast) var(--m-ease-spring, ease); }
+.m-wave.is-seekable:hover .m-wave-playhead::before, .m-wave.is-seekable:focus-visible .m-wave-playhead::before { transform: scale(1); }
+
+/* regions: soft bands of their color under the bars, labels on a row below */
+.m-wave-regions { position: absolute; inset: 0; pointer-events: none; }
+.m-wave-region { position: absolute; inset-block: -4px; border-radius: var(--m-radius-1, 6px);
+  background: color-mix(in srgb, var(--m-accent, var(--m-primary)) 13%, transparent);
+  box-shadow: inset 2px 0 0 color-mix(in srgb, var(--m-accent, var(--m-primary)) 55%, transparent); }
+:dir(rtl) .m-wave-region { box-shadow: inset -2px 0 0 color-mix(in srgb, var(--m-accent, var(--m-primary)) 55%, transparent); }
+.m-wave-marks { position: relative; height: 1.25rem; margin-block-start: .375rem; pointer-events: none; }
+.m-wave-marks[hidden] { display: none; }
+.m-wave-mark { position: absolute; inset-block-start: 0; padding-inline-start: .375rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  font-size: var(--m-text-xs); font-weight: 600; line-height: 1.25rem; color: var(--m-text-2); border-inline-start: 2px solid var(--m-accent, var(--m-primary)); }
+
+/* decorative live bars (no audio): a row of DOM bars moved on the compositor */
+.m-wave-bars { display: flex; align-items: center; gap: var(--m-wave-gap, 2px); height: var(--m-wave-h, 3rem); overflow: hidden; }
+.m-wave-bottom .m-wave-bars { align-items: flex-end; }
+.m-wave-bars i { flex: none; width: var(--m-wave-bw, 3px); height: 100%; border-radius: calc(var(--m-wave-bw, 3px) / 2 + 1px); background: var(--m-wave-bar); transform: scaleY(.3); }
+.m-wave-bottom .m-wave-bars i { transform-origin: bottom; }
+.m-wave.is-square .m-wave-bars i { border-radius: 0; }

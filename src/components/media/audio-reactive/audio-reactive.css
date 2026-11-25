@@ -1,0 +1,22 @@
+/* March — AudioReactive. The wrapper only carries the variables (--m-level, --m-bass, --m-mid, --m-treble, --m-peak,
+   0–1, written per reading); the effects below read them. Each is a class you can also put on any child yourself:
+   .m-ar-pulse (scales with the level), .m-ar-glow (a soft light), .m-ar-ring (a ring that grows: an avatar speaking),
+   .m-ar-bounce (jumps on the bass). --m-ar-k is the strength (intensity, 0–2); the color is the accent (`color`). */
+.m-ar { --m-ar-k: 1; --m-ar-c: var(--m-accent, var(--m-primary)); }
+.m-ar:where(span), .m-ar-ring:where(div, span) { display: inline-flex; vertical-align: middle; }
+.m-ar-pulse { scale: calc(1 + var(--m-level, 0) * .12 * var(--m-ar-k, 1)); transform-origin: center; }
+.m-ar-glow {
+  box-shadow: 0 0 calc(var(--m-level, 0) * 28px * var(--m-ar-k, 1)) calc(var(--m-level, 0) * 6px * var(--m-ar-k, 1))
+    color-mix(in oklab, var(--m-ar-c) calc(25% + var(--m-level, 0) * 55%), transparent);
+}
+.m-ar-ring { border-radius: 50%;
+  box-shadow: 0 0 0 calc(2px + var(--m-level, 0) * 10px * var(--m-ar-k, 1)) color-mix(in oklab, var(--m-ar-c) calc(var(--m-level, 0) * 85%), transparent),
+    0 0 0 calc(4px + var(--m-peak, 0) * 18px * var(--m-ar-k, 1)) color-mix(in oklab, var(--m-ar-c) calc(var(--m-peak, 0) * 28%), transparent);
+}
+.m-ar-glow.m-ar-ring {
+  box-shadow: 0 0 0 calc(2px + var(--m-level, 0) * 10px * var(--m-ar-k, 1)) color-mix(in oklab, var(--m-ar-c) calc(var(--m-level, 0) * 85%), transparent),
+    0 0 calc(var(--m-level, 0) * 32px * var(--m-ar-k, 1)) calc(var(--m-level, 0) * 8px * var(--m-ar-k, 1)) color-mix(in oklab, var(--m-ar-c) calc(var(--m-level, 0) * 60%), transparent);
+}
+.m-ar-bounce { translate: 0 calc(var(--m-bass, 0) * -10px * var(--m-ar-k, 1)); }
+/* reduced motion: the readings come twice a second, so nothing changes size or place; light and color still follow */
+@media (prefers-reduced-motion: reduce) { .m-ar-pulse { scale: none; } .m-ar-bounce { translate: none; } }

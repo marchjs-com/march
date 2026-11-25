@@ -152,7 +152,7 @@
    "paths": [
     "src/components/composite/chat-composer"
    ],
-   "hash": "ead4e898079c3b74b25882929b8cca47"
+   "hash": "f07ee33a57126069148eebf4252b6a35"
   },
   "ChatThread": {
    "frozen": "2026-11-20",
@@ -4244,6 +4244,24 @@
    "name": "CheckMark",
    "what": "refresh",
    "reason": "Yalnız test: hareket motorunu 30 ms yerine koşulla bekler, düğüm yerine boolean karşılaştırır (Node 22'de yavaş yükleme ve bellek taşması)"
+  },
+  {
+   "at": "2026-11-25",
+   "name": "ChatComposer",
+   "what": "refresh",
+   "reason": "Kayıt dalgası Waveform bileşenine taşındı (aynı davranış)"
+  },
+  {
+   "at": "2026-11-25",
+   "name": "ChatComposer",
+   "what": "refresh",
+   "reason": "Kayıt dalgası Waveform bileşenine taşındı (aynı davranış)"
+  },
+  {
+   "at": "2026-11-25",
+   "name": "ChatComposer",
+   "what": "refresh",
+   "reason": "Kayıt dalgası Waveform bileşenine taşındı (aynı davranış)"
   }
  ]
 }

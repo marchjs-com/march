@@ -1,0 +1,83 @@
+/* March — Gauge. A dial in a brushed bezel: the face and the bezel are theme surfaces (light and dark), the needle and
+   the value arc the accent, the red zone `--m-danger`. Sizes follow the width (container units), so one `size` scales
+   every part. */
+.m-gauge {
+  --m-gauge-w: 220px;
+  --m-gauge-needle: var(--m-accent, var(--m-primary));
+  --m-gauge-bezel: calc(var(--m-gauge-w) * .026);
+  --m-gauge-face: radial-gradient(130% 110% at 50% 18%, var(--m-surface) 0%, color-mix(in srgb, var(--m-text) 4%, var(--m-surface)) 55%, color-mix(in srgb, var(--m-text) 11%, var(--m-surface)) 100%);
+  --m-gauge-metal: conic-gradient(from 200deg, var(--m-surface-3), var(--m-surface), var(--m-border-strong), var(--m-surface), var(--m-surface-3), var(--m-surface), var(--m-border-strong), var(--m-surface-3));
+  position: relative; display: inline-block; box-sizing: border-box; vertical-align: middle;
+  inline-size: var(--m-gauge-w); max-inline-size: 100%; aspect-ratio: var(--m-gauge-ratio, 1);
+  container-type: inline-size; isolation: isolate;
+  border: var(--m-gauge-bezel) solid transparent;
+  background: var(--m-gauge-face) padding-box, var(--m-gauge-metal) border-box;
+  box-shadow: var(--m-shadow-3), inset 0 calc(var(--m-gauge-w) * .008) calc(var(--m-gauge-w) * .024) color-mix(in srgb, var(--m-scrim) 14%, transparent);
+  color: var(--m-text); font-family: var(--m-font);
+}
+.m-gauge.is-round { border-radius: 50%; }
+.m-gauge-half { border-radius: 50% 50% calc(var(--m-gauge-w) * .04) calc(var(--m-gauge-w) * .04) / 66% 66% calc(var(--m-gauge-w) * .04) calc(var(--m-gauge-w) * .04); }
+.m-gauge-vu {
+  --m-gauge-needle: var(--m-text);
+  border-radius: calc(var(--m-gauge-w) * .05);
+  --m-gauge-face: radial-gradient(120% 140% at 50% 100%, color-mix(in srgb, var(--m-warn) 30%, var(--m-surface)) 0%, color-mix(in srgb, var(--m-warn) 14%, var(--m-surface)) 60%, color-mix(in srgb, var(--m-warn) 8%, var(--m-surface)) 100%);
+}
+.m-gauge-bare { border: 0; background: none; box-shadow: none; }
+
+.m-gauge-svg { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; overflow: visible; }
+.m-gauge-track { fill: none; stroke: color-mix(in srgb, var(--m-text) 9%, transparent); stroke-width: 5; stroke-linecap: round; }
+.m-gauge-zone { fill: none; stroke-width: 3; opacity: .85; }
+.m-gauge-arc {
+  fill: none; stroke: var(--m-gauge-needle); stroke-width: 5; stroke-linecap: round;
+  filter: drop-shadow(0 0 2.5px color-mix(in srgb, var(--m-gauge-needle) 55%, transparent));
+}
+.m-gauge-tick { fill: none; stroke: var(--m-text); stroke-linecap: round; }
+.m-gauge-tick.is-major { stroke-width: 1.7; }
+.m-gauge-tick.is-minor { stroke-width: .8; opacity: .5; }
+.m-gauge-tick.is-red { stroke: var(--m-danger); }
+.m-gauge-label { fill: var(--m-text-2); font: 600 10.5px/1 var(--m-font); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.m-gauge-label.is-red { fill: var(--m-danger-text, var(--m-danger)); }
+.m-gauge-caption { fill: var(--m-muted); font: 650 6.5px/1 var(--m-font); letter-spacing: .16em; text-transform: uppercase; }
+.m-gauge-peak { fill: var(--m-warn); stroke: color-mix(in srgb, var(--m-scrim) 30%, transparent); stroke-width: .5; }
+.m-gauge-peak.is-off { display: none; }
+.m-gauge-needle path { fill: var(--m-gauge-needle); filter: drop-shadow(0 1.4px 1.2px color-mix(in srgb, var(--m-scrim) 38%, transparent)); }
+.m-gauge-hub-ring { fill: color-mix(in srgb, var(--m-text) 86%, var(--m-surface)); stroke: color-mix(in srgb, var(--m-surface) 55%, transparent); stroke-width: 1; }
+.m-gauge-hub-cap { fill: var(--m-gauge-needle); }
+
+/* past the redline the arc and the needle turn red and the face warms up */
+.m-gauge.is-redline { --m-gauge-needle: var(--m-danger); }
+.m-gauge-vu.is-redline { --m-gauge-needle: var(--m-text); }
+.m-gauge::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; z-index: -1;
+  background: radial-gradient(closest-side, transparent 55%, color-mix(in srgb, var(--m-danger) 26%, transparent));
+  transition: opacity var(--m-dur-slow) var(--m-ease-out, ease);
+}
+.m-gauge.is-redline::after { opacity: 1; }
+
+/* the VU meter: a thin scale with the marks above it and a classic black needle */
+.m-gauge-vu .m-gauge-svg { overflow: hidden; border-radius: inherit; }
+.m-gauge-vu .m-gauge-track { stroke: var(--m-text); stroke-width: 1.2; opacity: .8; stroke-linecap: butt; }
+.m-gauge-vu .m-gauge-zone { stroke-width: 5; opacity: .9; }
+.m-gauge-vu .m-gauge-tick.is-major { stroke-width: 1.4; }
+.m-gauge-vu .m-gauge-label { font-size: 9.5px; fill: var(--m-text); }
+.m-gauge-vu .m-gauge-caption { fill: var(--m-text); font: italic 700 15px/1 var(--m-font); letter-spacing: .04em; text-transform: none; opacity: .85; }
+.m-gauge-vu .m-gauge-needle path { filter: drop-shadow(1.5px 2px 1px color-mix(in srgb, var(--m-scrim) 30%, transparent)); }
+
+/* the readout */
+.m-gauge-readout {
+  position: absolute; inset-inline-start: 50%; translate: -50% -50%; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: 1.2cqi; white-space: nowrap;
+}
+.m-gauge-value { font: 700 13cqi/1 var(--m-font); letter-spacing: -.03em; font-variant-numeric: tabular-nums; color: var(--m-text); }
+.m-gauge-half .m-gauge-value { font-size: 12cqi; }
+.m-gauge-vu .m-gauge-value { font-size: 7cqi; }
+.m-gauge-unit { font: 650 3.8cqi/1 var(--m-font); letter-spacing: .16em; text-transform: uppercase; color: var(--m-muted); }
+.m-gauge-readout .m-odo { --m-odo-h: 9cqi; }
+
+/* glass: a soft reflection over the dial */
+.m-gauge-glass {
+  position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(155deg, color-mix(in srgb, var(--m-on-scrim) 22%, transparent) 0%, color-mix(in srgb, var(--m-on-scrim) 4%, transparent) 38%, transparent 40%);
+}
+.m-gauge-bare .m-gauge-glass, .m-gauge-bare::after { display: none; }
+@media (prefers-reduced-motion: reduce) { .m-gauge::after { transition: none; } }

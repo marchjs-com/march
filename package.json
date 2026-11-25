@@ -2,8 +2,13 @@
   "name": "march",
   "version": "0.3.0",
   "homepage": "https://github.com/marchjs-com/march",
-  "repository": { "type": "git", "url": "git+https://github.com/marchjs-com/march.git" },
-  "bugs": { "url": "https://github.com/marchjs-com/march/issues" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marchjs-com/march.git"
+  },
+  "bugs": {
+    "url": "https://github.com/marchjs-com/march/issues"
+  },
   "private": true,
   "description": "MarchJS: a tiny, fine-grained reactive TypeScript framework. Signals instead of a virtual DOM, JSX compiled by an esbuild plugin, zero runtime dependencies, CSP and Trusted Types friendly.",
   "license": "MIT",
@@ -17,6 +22,7 @@
     "./ui": "./src/ui/index.ts",
     "./table": "./src/table/index.ts",
     "./charts": "./src/charts/index.ts",
+    "./audio": "./src/audio/index.ts",
     "./testing": "./src/testing/index.ts",
     "./compiler": "./compiler/index.js",
     "./esbuild": "./compiler/esbuild.js",
@@ -318,7 +324,14 @@
     "./components/typography/kbd": "./src/components/typography/kbd/index.ts",
     "./components/typography/overflow-text": "./src/components/typography/overflow-text/index.ts",
     "./components/typography/secret": "./src/components/typography/secret/index.ts",
-    "./components/typography/section-label": "./src/components/typography/section-label/index.ts"
+    "./components/typography/section-label": "./src/components/typography/section-label/index.ts",
+    "./components/media/audio-reactive": "./src/components/media/audio-reactive/index.ts",
+    "./components/data/gauge": "./src/components/data/gauge/index.ts",
+    "./components/data/level-meter": "./src/components/data/level-meter/index.ts",
+    "./components/data/odometer": "./src/components/data/odometer/index.ts",
+    "./components/media/oscilloscope": "./src/components/media/oscilloscope/index.ts",
+    "./components/media/spectrum": "./src/components/media/spectrum/index.ts",
+    "./components/media/waveform": "./src/components/media/waveform/index.ts"
   },
   "bin": {
     "march": "./cli/march.js"

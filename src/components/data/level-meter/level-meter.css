@@ -1,0 +1,85 @@
+/* March — LevelMeter. A studio LED column: segments built once, lit by one variable per channel (--m-lm-lit: how many
+   are on). Each segment knows its index (--i) and computes --on (0 / 1) from it, so a reading writes one property and
+   no node. The lit layer fades out a little (release) and snaps on (attack); the peak segment is a class.
+   Hooks: .m-lm (root), .m-lm-ch (a channel column), .m-lm-meter (role meter), .m-lm-bar, .m-lm-seg (.is-low / .is-mid /
+   .is-high, .is-peak), .m-lm-clip (the clip light, .is-on), .m-lm-label, .m-lm-scale, .m-lm-tick. */
+.m-lm {
+  --m-lm-t: 10px;
+  --m-lm-release: 180ms;
+  --m-lm-glow: 6px;
+  --m-lm-well: var(--m-surface-2);
+  --m-lm-track: color-mix(in oklab, var(--m-text) 6%, var(--m-surface-2));
+  --m-lm-ink: var(--m-text-2);
+  display: inline-grid; gap: .375rem; box-sizing: border-box; vertical-align: middle; color: var(--m-lm-ink);
+  font: 600 .625rem/1 var(--m-font-mono, ui-monospace, monospace); letter-spacing: .04em;
+}
+.m-lm-sm { --m-lm-t: 6px; }
+.m-lm-lg { --m-lm-t: 16px; }
+
+/* console: a dark graphite housing (tinted by the theme) in light and dark themes alike, with glowing LEDs */
+.m-lm-console {
+  --m-lm-well: color-mix(in oklab, var(--m-primary) 6%, oklch(0.21 0.012 260));
+  --m-lm-track: color-mix(in oklab, var(--m-lm-well) 70%, oklch(0.08 0 0));
+  --m-lm-ink: oklch(0.82 0.01 260);
+  padding: .625rem .625rem .5rem; border-radius: var(--m-radius-2, 10px);
+  background: linear-gradient(to bottom, color-mix(in oklab, var(--m-lm-well) 88%, oklch(0.6 0 0)), var(--m-lm-well) 38%);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / .08), inset 0 -1px 0 oklch(0 0 0 / .3), var(--m-shadow-2);
+}
+.m-lm-flat { --m-lm-glow: 0px; }
+
+/* vertical: rows = clip light · bar · label; the scale and every channel are columns sharing those rows */
+.m-lm-v { grid-auto-flow: column; grid-template-rows: auto var(--m-lm-len, 10rem) auto; justify-items: center; }
+.m-lm-v .m-lm-ch { grid-row: 1 / -1; display: grid; grid-template-rows: subgrid; justify-items: center; }
+.m-lm-v .m-lm-clip { grid-row: 1; }
+.m-lm-v .m-lm-meter { grid-row: 2; inline-size: var(--m-lm-t); block-size: 100%; }
+.m-lm-v .m-lm-label { grid-row: 3; }
+.m-lm-v .m-lm-scale { grid-row: 2; position: relative; block-size: 100%; min-inline-size: 1.9em; justify-self: stretch; }
+.m-lm-v .m-lm-bar { flex-direction: column-reverse; }
+.m-lm-v .m-lm-tick { inset-inline-end: 0; inset-block-end: calc(var(--p) * 100%); translate: 0 50%; }
+
+/* horizontal: columns = label · bar · clip light; the scale goes under the channels; fills from the inline start */
+.m-lm-h { display: grid; grid-template-columns: auto minmax(0, var(--m-lm-len, 1fr)) auto; align-items: center; }
+.m-lm-h .m-lm-ch { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: center; }
+.m-lm-h .m-lm-label { grid-column: 1; }
+.m-lm-h .m-lm-meter { grid-column: 2; block-size: var(--m-lm-t); inline-size: 100%; }
+.m-lm-h .m-lm-clip { grid-column: 3; }
+.m-lm-h .m-lm-scale { grid-column: 2; order: 1; position: relative; block-size: 1em; }
+.m-lm-h .m-lm-bar { flex-direction: row; }
+.m-lm-h .m-lm-tick { inset-block-start: 0; inset-inline-start: calc(var(--p) * 100%); translate: -50% 0; }
+.m-lm-h:dir(rtl) .m-lm-tick { translate: 50% 0; }
+
+/* the recessed track and its segments */
+.m-lm-meter { box-sizing: border-box; padding: 2px; border-radius: 4px; background: var(--m-lm-track); box-shadow: inset 0 1px 2px oklch(0 0 0 / .35); }
+.m-lm-flat .m-lm-meter { box-shadow: none; }
+.m-lm-bar { display: flex; gap: var(--m-lm-gap, 2px); inline-size: 100%; block-size: 100%; }
+.m-lm-seg {
+  --c: var(--m-lm-c1);
+  --on: clamp(0, var(--m-lm-lit, 0) - var(--i), 1);
+  position: relative; flex: 1 1 0; min-inline-size: 0; min-block-size: 0; border-radius: 1.5px;
+  background: color-mix(in oklab, var(--c) 16%, var(--m-lm-track));
+}
+.m-lm-seg.is-mid { --c: var(--m-lm-c2); }
+.m-lm-seg.is-high { --c: var(--m-lm-c3); }
+/* the light: snaps on, fades off over --m-lm-release (the transition time follows --on) */
+.m-lm-seg::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; opacity: var(--on);
+  background: linear-gradient(to bottom, color-mix(in oklab, var(--c) 70%, oklch(1 0 0)), var(--c) 60%);
+  box-shadow: 0 0 var(--m-lm-glow) color-mix(in oklab, var(--c) 70%, transparent);
+  transition: opacity calc((1 - var(--on)) * var(--m-lm-release)) linear;
+}
+.m-lm-flat .m-lm-seg::after { background: var(--c); }
+.m-lm-seg.is-peak::after { opacity: 1; transition: none; }
+.m-lm-console .m-lm-seg.is-peak::after { box-shadow: 0 0 calc(var(--m-lm-glow) * 1.6) var(--c); }
+
+.m-lm-label { color: var(--m-lm-ink); opacity: .85; }
+.m-lm-tick { position: absolute; white-space: nowrap; color: var(--m-lm-ink); opacity: .7; font-variant-numeric: tabular-nums; }
+
+/* the clip light: an IconButton holding a StatusDot (dark until a clip, then a latched red glow) */
+.m-lm-clip.m-icon-btn { color: var(--m-lm-ink); }
+.m-lm-clip .m-status-dot.is-neutral { --m-status-dot-c: color-mix(in oklab, var(--m-lm-c3) 22%, var(--m-lm-track)); }
+.m-lm-clip .m-status-dot.is-danger { --m-status-dot-c: var(--m-lm-c3); }
+.m-lm-clip .m-status-dot { transition: background-color var(--m-dur-fast), box-shadow var(--m-dur-fast); }
+.m-lm-clip.is-on .m-status-dot { box-shadow: 0 0 0 2px color-mix(in oklab, var(--m-lm-c3) 30%, transparent), 0 0 10px var(--m-lm-c3); }
+
+.m-lm.is-still .m-lm-seg::after, .m-lm.is-still .m-lm-clip .m-status-dot { transition: none; }
+@media (prefers-reduced-motion: reduce) { .m-lm-seg::after, .m-lm-clip .m-status-dot { transition: none; } }

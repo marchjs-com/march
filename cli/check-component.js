@@ -42,7 +42,8 @@ export async function checkComponent(root, folder, { runTests = true } = {}) {
   }
   // security and CSP
   add("no innerHTML / outerHTML / insertAdjacentHTML", !/\b(innerHTML|outerHTML|insertAdjacentHTML)\b/.test(code));
-  add("no string styles (CSP: style attribute strings)", !/style:\s*["'`]|\.style\.cssText|setAttribute\(\s*["']style/.test(code));
+  // (Intl's `style: "percent" | "currency" | "decimal" | "unit"` is a number format, not a style attribute)
+  add("no string styles (CSP: style attribute strings)", !/style:\s*["'`](?!(?:percent|currency|decimal|unit)["'`])|\.style\.cssText|setAttribute\(\s*["']style/.test(code));
   add("no eval / new Function", !/\beval\(|new Function\(/.test(code));
   // i18n: user-facing literal strings go through t``
   const literals = [...code.matchAll(/"(aria-label|title|placeholder|alt)":\s*"([^"]+)"/g)].map((m) => m[2]);
