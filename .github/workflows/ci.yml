@@ -33,7 +33,6 @@ jobs:
         with:
           node-version: 22
       - run: npm ci
-      # a test process that runs away dies on its own heap limit (named in the log) instead of taking the runner down
-      - run: npm run test:all
-        env:
-          NODE_OPTIONS: --max-old-space-size=1536
+      - run: |
+          (while sleep 3; do echo "MEM $(free -m | sed -n 2p)"; ps -eo rss,etimes,args --sort=-rss | sed -n 2,4p | cut -c1-200; done) &
+          npm run test:all
