@@ -86,8 +86,10 @@ test("CheckMark: motion plays a transition between two values (the old glyph lea
   b.set(false); b.set("partial");
   assert.ok(flip.querySelectorAll(".m-checkmark-glyph").length <= 2);
   assert.ok(flip.classList.contains("is-partial"));
-  await new Promise((r) => setTimeout(r, 30)); // the motion engine arrives: the transition starts, nothing waits unseen
-  assert.equal(flip.querySelector(".is-arriving"), null);
+  // the motion engine arrives (loaded on the first transition, slower on node 22): the transition starts, nothing waits unseen.
+  // A boolean, not the element: a failing assert.equal on a DOM node makes node 22 diff the whole tree (out of memory)
+  for (let i = 0; i < 100 && flip.querySelector(".is-arriving"); i++) await new Promise((r) => setTimeout(r, 10));
+  assert.equal(flip.querySelector(".is-arriving") != null, false, "the arriving glyph starts its transition");
   dispose();
 });
 
