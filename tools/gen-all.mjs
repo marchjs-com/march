@@ -16,8 +16,7 @@ const CACHE = join(ROOT, "node_modules", ".cache", "march", "gen.json");
 
 /**
  * Only generators whose output a test holds equal to a fresh run (`--check` or generate() compared in test/): their
- * files are pure functions of the inputs. Not here: tools/gen-css.js (src/css/sx.css has hand-written rules since) and
- * bench/text-size.js --write (measured sizes, refreshed on purpose).
+ * files are pure functions of the inputs. Not here: tools/gen-css.js (src/css/sx.css has hand-written rules since).
  * inputs: files or folders (relative to the root; a folder means every file under it, generated outputs included —
  * the digest is taken again after the run, so a generator that writes inside its own inputs is not stale next time).
  * outputs: files that must exist (a missing one forces a run).

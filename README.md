@@ -155,6 +155,12 @@ March esbuild plugin (`march build` / `march dev`) does the rest:
 
 Without the plugin, `march/css/ui.css` and `march/css/forms.css` still bundle every component's CSS.
 
+**One file, without code splitting** (a widget, a library build): esbuild can leave some of March's modules
+uninitialized there (a module March loads lazily, also imported statically, e.g. `Drawer` from `march/ui`). The plugin
+handles it: in a build without `splitting` it treats March's own files as having side effects (unused exports are still
+dropped; `test/bundle-no-split.test.js`). Bundling March with esbuild without the plugin, either keep `splitting: true`
+or set `ignoreAnnotations: true`.
+
 | What                                         | before (one stylesheet, router always) | now            |
 | -------------------------------------------- | -------------------------------------- | -------------- |
 | App with one `<Button>` — JS, min / gzip     | 20.4 KB / 8.1 KB                       | 14.6 KB / 5.9 KB |
