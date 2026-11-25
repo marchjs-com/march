@@ -101,8 +101,8 @@ const f1 = (v: number): number => Math.round(v * 10) / 10;
 const num = (v: unknown): number | null => (v == null || v === "" || isNaN(Number(v)) ? null : Number(v));
 const attr = <T>(fn: () => T): Accessor<T> => computed(fn);
 
-/** A round tick step (1, 2, 2.5 or 5 times a power of ten) giving about `count` steps, one that ends on the end of the scale when it can. */
-export function niceStep(span: number, count: number): number {
+/** The dial's round tick step (1, 2, 2.5 or 5 times a power of ten) giving about `count` steps, one that ends on the end of the scale when it can (unlike the charts' niceStep, which only rounds). */
+export function dialStep(span: number, count: number): number {
   span = Math.abs(span) || 1;
   const raw = span / Math.max(1, count), p = 10 ** Math.floor(Math.log10(raw));
   const all = [p / 10, p, p * 10].flatMap((q) => [1, 2, 2.5, 5].map((m) => m * q));
@@ -214,7 +214,7 @@ export function Gauge(props: GaugeProps): Element {
     if (o.values) major = o.values.filter((v) => v >= lo && v <= hi);
     else if (vu) major = VU_TICKS.filter((v) => v >= lo && v <= hi);
     else {
-      step = o.step && o.step > 0 ? o.step : tach ? niceStep(hi - lo, 8) : niceStep(hi - lo, sweep() > 180 ? 10 : 6);
+      step = o.step && o.step > 0 ? o.step : tach ? dialStep(hi - lo, 8) : dialStep(hi - lo, sweep() > 180 ? 10 : 6);
       major = [];
       for (let v = Math.ceil(lo / step - 1e-9) * step, i = 0; v <= hi + 1e-9 && i < 80; v += step, i++) major.push(+v.toFixed(6));
     }

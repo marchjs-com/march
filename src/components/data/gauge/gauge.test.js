@@ -4,7 +4,7 @@ import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal, setLocale } = await import("../../../index.ts");
 const E = await import("../../../motion/engine/clock.ts");
-const { Gauge, niceStep, dialGeometry } = await import("./index.ts");
+const { Gauge, dialStep, dialGeometry } = await import("./index.ts");
 
 setLocale("en");
 E.manualClock(true);
@@ -13,11 +13,11 @@ const needle = (el) => Number(/rotate\(([-\d.]+)/.exec(el.querySelector(".m-gaug
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const run = (ms) => { for (let i = 0; i < ms / 16; i++) E.step(16); };
 
-test("niceStep and the dial geometry", () => {
-  assert.equal(niceStep(240, 10), 20, "a step that ends on 240");
-  assert.equal(niceStep(7, 10), 1);
-  assert.equal(niceStep(100, 10), 10);
-  assert.equal(niceStep(8000, 8), 1000);
+test("dialStep and the dial geometry", () => {
+  assert.equal(dialStep(240, 10), 20, "a step that ends on 240");
+  assert.equal(dialStep(7, 10), 1);
+  assert.equal(dialStep(100, 10), 10);
+  assert.equal(dialStep(8000, 8), 1000);
   assert.equal(dialGeometry("speedometer", 270).h, 200);
   assert.ok(dialGeometry("half", 180).h < 200);
 });

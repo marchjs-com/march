@@ -121,7 +121,7 @@
   "Gauge": "`<Gauge value={$hız} max={240} unit=\"km/h\" />` — ibreli kadran: renkli bölgeler, kırmızı çizgi, yaylı ibre, tepe işareti ve dönen gösterge; hız, devir, yarım ve VU görünümü, sayı ya da ses kaynağı.",
   "Odometer": "`<Odometer value={$km} digits={6} decimals={1} unit=\"km\" />` — sayı çarklarında sayaç: sabit hane, kırmızı kesir çarkı, birim; mekanik, dijital ya da yaprak saat görünümü.",
   "LevelMeter": "`<LevelMeter value={$v} />` — stüdyo tipi LED seviye ölçer: sayı ya da canlı ses, mono / stereo, yeşil-amber-kırmızı bölgeler, düşen tepe ışığı ve basınca sönen kırpılma ışığı.",
-  "niceStep": "Bir ölçek aralığı için yuvarlak tik adımı (1, 2, 2,5 ya da 5 × 10ⁿ), yaklaşık `count` adım verir.",
+  "dialStep": "Gauge kadranı için yuvarlak tik adımı (1, 2, 2,5 ya da 5 × 10ⁿ): yaklaşık `count` adım, mümkünse ölçeğin sonunda biter (grafiklerin niceStep'inden farklı).",
   "dialGeometry": "Bir kadranın viewBox birimlerinde geometrisi (200 genişlik): merkez, yarıçap, yükseklik, göstergenin ve başlığın yeri; görünüme ve `sweep` değerine göre.",
   "decimalMark": "Etkin dilin ondalık işareti (\".\" ya da \",\").",
   "drumText": "Sayaç çarklarının metni: sabit tam hane ve kesir hanesi, taşınca baştan döner.",
