@@ -12,8 +12,8 @@ jobs:
     # a normal run takes 2–4 minutes; a hang ends here, not after GitHub's six hours
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           # Node's current LTS
           node-version: 24
@@ -23,3 +23,14 @@ jobs:
       # the CDN build and its size budget (cdn/budget.json): a PR that makes an entry heavier than its limit fails here,
       # not when the merge is published
       - run: node tools/build-cdn.js
+  # the oldest Node package.json allows (engines): the tests run there too, so a site that builds with it works
+  node22:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run test:all

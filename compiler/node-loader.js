@@ -1,6 +1,7 @@
 // Node module hooks: import March `.jsx` / `.tsx` files directly in node (tests, scripts). Registered by compiler/register.js:
 //   node --import march/register --test
 // Project components are auto-imported from ./src/components (override: MARCH_COMPONENTS=dir1,dir2).
+import "./hooks-flag.js";
 import { readFile } from "node:fs/promises";
 import { resolve, isAbsolute } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";

@@ -60,6 +60,8 @@ test("runtime m:tip: a hint on keyboard focus linked by aria-describedby, the te
   await createRoot(async (dispose) => {
     const host = document.createElement("div"), btn = document.createElement("button");
     host.appendChild(btn); document.body.appendChild(host);
+    // the hint is loaded on first use: have it in the module cache (on node 22 a first load can take longer than 20 ms)
+    await import("../src/components/overlays/tooltip/tip.ts");
     P.mProps(btn, { tip: "Copy link" });
     await tick(20);
     assert.equal(btn.parentNode, host, "the element stays where it is");

@@ -180,7 +180,7 @@
    "paths": [
     "src/components/feedback/check-mark"
    ],
-   "hash": "2acce0b02fc5efffdbd3ff3159bdfbbb"
+   "hash": "e127c2a22609710f8016f99bbdc9ddc2"
   },
   "Chevron": {
    "frozen": "2026-11-20",
@@ -4238,6 +4238,12 @@
    "name": "TreeEditor",
    "what": "refresh",
    "reason": "Shared behaviour forms (approved 2026-11-23): locked(), isActivateKey(), keepFocus, on(), observeSize(), pointer hover, one event-prop spelling; guarded by test/behaviors-one-form.test.js"
+  },
+  {
+   "at": "2026-11-25",
+   "name": "CheckMark",
+   "what": "refresh",
+   "reason": "Yalnız test: hareket motorunu 30 ms yerine koşulla bekler, düğüm yerine boolean karşılaştırır (Node 22'de yavaş yükleme ve bellek taşması)"
   }
  ]
 }

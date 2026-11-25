@@ -146,7 +146,8 @@ test("UI: banner until decided, Reject all is offered next to Accept all; gate p
   assert.equal(consent.has("thirdParty"), true);
 
   const done = openConsentPreferences();
-  await tick();
+  // the panel is loaded on first use: wait for it (it takes longer on node 22)
+  for (let i = 0; i < 200 && !document.querySelector(".m-consent-panel"); i++) await tick();
   const panel = document.querySelector(".m-consent-panel");
   assert.ok(panel, "panel open");
   const switches = [...panel.querySelectorAll('[role="switch"]')];
