@@ -73,6 +73,13 @@
   "useContext": "En yakın sağlanan değeri (veya varsayılanı) okur.",
   "version": "Kitaplık sürümü."
  },
+ "march/audio": {
+  "audioContext": "Her ses kaynağının ve efekt zincirinin paylaştığı tek AudioContext; ilk kullanımda yapılır, Web Audio yoksa null.",
+  "mediaChain": "Bir medya öğesinin tek ses yolu `{ input, output }`: varsayılan input → output → hoparlör; efektler arasına girer, ölçerler `output`'u okur.",
+  "audioSource": "Ölçerler ve görselleştiriciler için bir ses kaynağı: `audioSource(\"mic\" | \"demo\" | audioEl | stream | () => 0.4)`; düzey, bas/orta/tiz bantları, sol/sağ kanal, dalga biçimi ve spektrum verir; yalnız kullanıldığı ve ekranda olduğu sürece okur.",
+  "isAudioSource": "Bir değer zaten bir AudioSource ise true döner.",
+  "toAudioSource": "Bir AudioSource ya da kaynak yapılabilecek bir giriş alır, AudioSource döndürür; yeni yapılan kaynak sahibiyle birlikte durur."
+ },
  "march/router": {
   "_resetRouter": "Yönlendirici durumunu sıfırlar (testler için).",
   "_router": "Outlet modülü için iç yapılar (herkese açık API değildir).",

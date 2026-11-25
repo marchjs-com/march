@@ -17,6 +17,7 @@
     "./ui": "./src/ui/index.ts",
     "./table": "./src/table/index.ts",
     "./charts": "./src/charts/index.ts",
+    "./audio": "./src/audio/index.ts",
     "./testing": "./src/testing/index.ts",
     "./compiler": "./compiler/index.js",
     "./esbuild": "./compiler/esbuild.js",
