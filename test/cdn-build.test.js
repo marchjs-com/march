@@ -1,5 +1,5 @@
 // The CDN build (tools/build-cdn.js → cdn.marchjs.com): every browser entry as a module, one march.css with the tokens,
-// an import map with absolute URLs, the file list deploys keep older versions with, the same files under latest/.
+// an import map with absolute URLs, the file list deploys keep older versions with; no latest/ copy (the Worker redirects it).
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -9,7 +9,7 @@ const root = new URL("../", import.meta.url);
 const { version } = JSON.parse(readFileSync(new URL("package.json", root), "utf8"));
 const at = (p) => new URL(`cdn/dist/${p}`, root);
 
-test("CDN build: modules, march.css, import map, file list, latest", () => {
+test("CDN build: modules, march.css, import map, file list, no latest/ copy", () => {
   execFileSync(process.execPath, [new URL("tools/build-cdn.js", root).pathname.replace(/^\/(\w:)/, "$1"), "--base", "https://cdn.example"], { stdio: "pipe" });
   for (const f of ["march.js", "ui.js", "app-ui.js", "icons.js", "behaviors/drag.js", "march.css", "css/tokens.css"]) assert.ok(existsSync(at(`${version}/${f}`)), f);
   assert.ok(!existsSync(at(`${version}/testing.js`)) && !existsSync(at(`${version}/compiler.js`)), "node-only entries stay out");
@@ -28,7 +28,7 @@ test("CDN build: modules, march.css, import map, file list, latest", () => {
   const map = JSON.parse(readFileSync(at(`${version}/importmap.json`), "utf8")).imports;
   assert.equal(map["march"], `https://cdn.example/${version}/march.js`);
   assert.equal(map["march/ui"], `https://cdn.example/${version}/ui.js`);
-  assert.equal(JSON.parse(readFileSync(at("latest/importmap.json"), "utf8")).imports["march"], "https://cdn.example/latest/march.js");
+  assert.ok(!existsSync(at("latest")), "latest/ is a redirect of the Worker, not a copy");
   const { files } = JSON.parse(readFileSync(at(`${version}/files.json`), "utf8"));
   assert.ok(files.includes("march.js") && files.includes("files.json") && files.every((f) => existsSync(at(`${version}/${f}`))), "files.json lists every file");
   // the modules share their chunks and import them relatively (no bare specifier left for a browser)
