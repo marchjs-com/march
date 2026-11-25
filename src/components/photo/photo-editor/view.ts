@@ -14,64 +14,38 @@ import { reducedMotion } from "../../../motion/env.ts";
 import { select, newId, type Rect, type ImageDocument } from "../../../image/doc/index.ts";
 import { getTool, sample, type OverlayShape, type PointerSample, type ToolCursor } from "../../../image/doc/tools/tool.ts";
 import { DisplayTiles, MAX_LEVEL, makeCanvas, type Drawable } from "./tiles-display.ts";
+import { docToScreen, screenToDoc, viewMatrix, visibleDocRect, fitRect, centerOn, rotateAt, zoomAt as coreZoomAt, stepZoom } from "../../../image/doc/tools/view.ts";
 import type { DocEntry, Editor, ViewState } from "./editor.ts";
 
-export const MIN_ZOOM = 0.01;
-export const MAX_ZOOM = 32;
-/** Zoom steps of Ctrl + / Ctrl − (the familiar presets). */
-export const ZOOM_STEPS = [0.01, 0.02, 0.03, 0.04, 0.05, 0.0625, 0.0833, 0.125, 0.1667, 0.25, 0.3333, 0.5, 0.6667, 1, 2, 3, 4, 5, 6, 7, 8, 12, 16, 20, 24, 28, 32];
+export { MIN_ZOOM, MAX_ZOOM, ZOOM_STEPS, stepZoom } from "../../../image/doc/tools/view.ts";
 
-/** Map between document and view (CSS px) coordinates. */
+/** Map between document and view (CSS px) coordinates: the core's view math (pan in screen px, angle in degrees). */
 export class ViewMath {
   constructor(public v: ViewState, public w: number, public h: number, public dw: number, public dh: number) {}
-  toScreen(x: number, y: number): [number, number] {
-    const { zoom: z, angle, panX, panY } = this.v, c = Math.cos(angle), s = Math.sin(angle);
-    const dx = (x - this.dw / 2) * z, dy = (y - this.dh / 2) * z;
-    return [this.w / 2 + panX + dx * c - dy * s, this.h / 2 + panY + dx * s + dy * c];
-  }
-  toDoc(sx: number, sy: number): [number, number] {
-    const { zoom: z, angle, panX, panY } = this.v, c = Math.cos(-angle), s = Math.sin(-angle);
-    const dx = sx - this.w / 2 - panX, dy = sy - this.h / 2 - panY;
-    return [this.dw / 2 + (dx * c - dy * s) / z, this.dh / 2 + (dx * s + dy * c) / z];
-  }
-  /** The document rectangle visible in the view (bounding box when rotated). */
+  toScreen(x: number, y: number): [number, number] { return docToScreen(this.v, x, y); }
+  toDoc(sx: number, sy: number): [number, number] { return screenToDoc(this.v, sx, sy); }
+  /** The document rectangle visible in the view, clipped to the document. */
   visible(): Rect {
-    const pts = [this.toDoc(0, 0), this.toDoc(this.w, 0), this.toDoc(0, this.h), this.toDoc(this.w, this.h)];
-    const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
-    const x0 = Math.max(0, Math.floor(Math.min(...xs))), y0 = Math.max(0, Math.floor(Math.min(...ys)));
-    const x1 = Math.min(this.dw, Math.ceil(Math.max(...xs))), y1 = Math.min(this.dh, Math.ceil(Math.max(...ys)));
+    const r = visibleDocRect(this.v, this.w, this.h);
+    const x0 = Math.max(0, r.x), y0 = Math.max(0, r.y), x1 = Math.min(this.dw, r.x + r.w), y1 = Math.min(this.dh, r.y + r.h);
     return { x: x0, y: y0, w: Math.max(0, x1 - x0), h: Math.max(0, y1 - y0) };
   }
   /** Canvas 2D matrix (doc → device pixels). */
   matrix(dpr: number): [number, number, number, number, number, number] {
-    const { zoom: z, angle } = this.v, c = Math.cos(angle) * z * dpr, s = Math.sin(angle) * z * dpr;
-    const [ox, oy] = this.toScreen(0, 0);
-    return [c, s, -s, c, ox * dpr, oy * dpr];
+    const m = viewMatrix(this.v);
+    return [m[0] * dpr, m[1] * dpr, m[2] * dpr, m[3] * dpr, m[4] * dpr, m[5] * dpr];
   }
 }
 
 /** Fit the document into the view (zoom and pan). */
 export function fitView(v: ViewState, w: number, h: number, dw: number, dh: number, fill = false): ViewState {
-  const z = fill ? Math.max(w / dw, h / dh) : Math.min((w - 48) / dw, (h - 48) / dh);
-  return { ...v, zoom: clamp(z, MIN_ZOOM, MAX_ZOOM), panX: 0, panY: 0 };
-}
-
-/** Next zoom preset up / down. */
-export function stepZoom(z: number, dir: 1 | -1): number {
-  if (dir > 0) return ZOOM_STEPS.find((s) => s > z + 1e-6) ?? MAX_ZOOM;
-  return [...ZOOM_STEPS].reverse().find((s) => s < z - 1e-6) ?? MIN_ZOOM;
+  if (!fill) return { ...v, ...fitRect(v, { x: 0, y: 0, w: dw, h: dh }, w, h, 0.92) };
+  const z = Math.max(w / dw, h / dh);
+  return { ...v, ...centerOn({ ...v, zoom: z }, dw / 2, dh / 2, w, h) };
 }
 
 /** Zoom keeping a view point fixed. */
-export function zoomAt(v: ViewState, z: number, sx: number, sy: number, w: number, h: number, dw: number, dh: number): ViewState {
-  z = clamp(z, MIN_ZOOM, MAX_ZOOM);
-  const m = new ViewMath(v, w, h, dw, dh);
-  const [x, y] = m.toDoc(sx, sy);
-  const next = { ...v, zoom: z };
-  const m2 = new ViewMath(next, w, h, dw, dh);
-  const [nx, ny] = m2.toScreen(x, y);
-  return { ...next, panX: v.panX + sx - nx, panY: v.panY + sy - ny };
-}
+export function zoomAt(v: ViewState, z: number, sx: number, sy: number): ViewState { return { ...v, ...coreZoomAt(v, z, sx, sy) }; }
 
 const CURSORS: Partial<Record<ToolCursor, string>> = {
   crosshair: "crosshair", move: "move", text: "text", grab: "grab", grabbing: "grabbing", "not-allowed": "not-allowed",
@@ -115,11 +89,11 @@ export function CanvasView(props: CanvasViewProps & { api?: ((a: CanvasViewApi) 
   const api: CanvasViewApi = {
     fit: (fill) => { const [w, h2] = size.peek(); if (w) setView(fitView(untrack(entry.view), w, h2, doc.width, doc.height, fill)); },
     actual: () => setView({ ...untrack(entry.view), zoom: 1 }),
-    zoomBy: (dir) => { const [w, h2] = size.peek(); setView(zoomAt(untrack(entry.view), stepZoom(untrack(entry.view).zoom, dir), w / 2, h2 / 2, w, h2, doc.width, doc.height)); },
+    zoomBy: (dir) => { const [w, h2] = size.peek(); setView(zoomAt(untrack(entry.view), stepZoom(untrack(entry.view).zoom, dir), w / 2, h2 / 2)); },
     math, redraw: () => { tiles.invalidate(null); needPixels = needOverlay = true; }, tiles,
   };
   props.api?.(api);
-  ed.shared.view = api;
+  ed.shared.canvas = api;
 
   let fitted = false;
   observeSize(port, (r) => {
@@ -509,6 +483,21 @@ export function CanvasView(props: CanvasViewProps & { api?: ((a: CanvasViewApi) 
   onCleanup(stopFrames);
 
   // ——— input ———
+  // view tools (hand, zoom, rotate view) work on ctx.shared.view / viewport; the view reads the result back
+  let handed: { zoom: number; panX: number; panY: number; angle: number } | null = null;
+  const withView = (ctx: import("../../../image/doc/tools/tool.ts").ToolContext): import("../../../image/doc/tools/tool.ts").ToolContext => {
+    const v = untrack(entry.view);
+    handed = { zoom: v.zoom, panX: v.panX, panY: v.panY, angle: v.angle };
+    ctx.shared.view = handed;
+    ctx.shared.viewport = { w: size.peek()[0], h: size.peek()[1] };
+    ctx.shared.doc = doc;
+    return ctx;
+  };
+  const syncView = (): void => {
+    const nv = ed.shared.view as { zoom: number; panX: number; panY: number; angle: number } | undefined;
+    if (!nv || !handed) return;
+    if (nv.zoom !== handed.zoom || nv.panX !== handed.panX || nv.panY !== handed.panY || nv.angle !== handed.angle) { setView({ ...untrack(entry.view), ...nv }); handed = { ...nv }; }
+  };
   const docPoint = (e: { clientX: number; clientY: number }): [number, number] => {
     const r = port.getBoundingClientRect();
     return math().toDoc(e.clientX - r.left, e.clientY - r.top);
@@ -564,36 +553,17 @@ export function CanvasView(props: CanvasViewProps & { api?: ((a: CanvasViewApi) 
         return;
       }
     }
-    if (e.button === 1 || spaceDown || untrack(ed.tool) === "hand") { e.preventDefault(); pan(e); return; }
+    if (e.button === 1 || spaceDown) { e.preventDefault(); pan(e); return; }
     if (e.button === 2) return;
     const id = untrack(ed.tool);
-    if (id === "zoom") {
-      const r = port.getBoundingClientRect(), [w, hh] = size.peek(), v = untrack(entry.view);
-      const sx = e.clientX - r.left, sy = e.clientY - r.top;
-      // scrubby zoom on drag, a step on click
-      pointerDrag(e, {
-        threshold: 3,
-        onMove: (p) => setView(zoomAt(v, v.zoom * Math.pow(2, p.dx / 120), sx, sy, w, hh, doc.width, doc.height)),
-        onClick: (ev) => setView(zoomAt(v, stepZoom(v.zoom, ev.altKey ? -1 : 1), sx, sy, w, hh, doc.width, doc.height)),
-      });
-      return;
-    }
-    if (id === "rotate-view") {
-      const r = port.getBoundingClientRect(), c = [r.left + r.width / 2, r.top + r.height / 2], v = untrack(entry.view);
-      const a0 = Math.atan2(e.clientY - c[1]!, e.clientX - c[0]!);
-      pointerDrag(e, { threshold: 0, onMove: (p) => {
-        let a = v.angle + Math.atan2(p.clientY - c[1]!, p.clientX - c[0]!) - a0;
-        if (p.event?.shiftKey) a = Math.round(a / (Math.PI / 12)) * (Math.PI / 12);
-        setView({ ...v, angle: a });
-      } });
-      return;
-    }
-    const tool = getTool(id), ctx = ed.toolContext();
-    if (!tool || !ctx) return;
+    const tool = getTool(id), ctx0 = ed.toolContext();
+    if (!tool || !ctx0) return;
+    const ctx = withView(ctx0);
     // guides follow the move tool
     if (id === "move" && dragGuide(e)) return;
     const s = toSample(e);
     tool.down?.(ctx, s);
+    syncView();
     strokeOpen = true;
     needOverlay = true;
     pointerDrag(e, {
@@ -603,6 +573,7 @@ export function CanvasView(props: CanvasViewProps & { api?: ((a: CanvasViewApi) 
         if (!ev || !strokeOpen) return;
         const list = typeof ev.getCoalescedEvents === "function" ? ev.getCoalescedEvents() : [];
         for (const ce of list.length ? list : [ev]) tool.move?.(ctx, toSample(ce));
+        syncView();
         hoverSample = toSample(ev);
         pointer = [hoverSample.x, hoverSample.y];
         needOverlay = true;
@@ -611,10 +582,11 @@ export function CanvasView(props: CanvasViewProps & { api?: ((a: CanvasViewApi) 
         if (!strokeOpen) return;
         strokeOpen = false;
         if (cancelled) tool.cancel?.(ctx); else tool.up?.(ctx, p.event ? toSample(p.event) : s);
+        syncView();
         needOverlay = true;
         updateCursor();
       },
-      onClick: (ev) => { if (!strokeOpen) return; strokeOpen = false; tool.up?.(ctx, toSample(ev)); needOverlay = true; updateCursor(); },
+      onClick: (ev) => { if (!strokeOpen) return; strokeOpen = false; tool.up?.(ctx, toSample(ev)); syncView(); needOverlay = true; updateCursor(); },
     });
   });
   port.addEventListener("pointermove", (e: PointerEvent) => {
@@ -624,8 +596,9 @@ export function CanvasView(props: CanvasViewProps & { api?: ((a: CanvasViewApi) 
       if (gesture && touches.size >= 2) {
         const g = gestureFrom(), [w, hh] = size.peek(), v0 = gesture.v;
         if (Math.abs(g.d - gesture.d) > 8 || Math.hypot(g.cx - gesture.cx, g.cy - gesture.cy) > 8) gesture.moved = true;
-        let v = zoomAt(v0, v0.zoom * (g.d / gesture.d), gesture.cx, gesture.cy, w, hh, doc.width, doc.height);
-        v = { ...v, angle: v0.angle + (g.a - gesture.a), panX: v.panX + g.cx - gesture.cx, panY: v.panY + g.cy - gesture.cy };
+        let v = zoomAt(v0, v0.zoom * (g.d / gesture.d), gesture.cx, gesture.cy);
+        v = { ...v, ...rotateAt(v, v0.angle + ((g.a - gesture.a) * 180) / Math.PI, gesture.cx, gesture.cy) };
+        v = { ...v, panX: v.panX + g.cx - gesture.cx, panY: v.panY + g.cy - gesture.cy };
         setView(v);
       }
       return;
@@ -649,7 +622,7 @@ export function CanvasView(props: CanvasViewProps & { api?: ((a: CanvasViewApi) 
   port.addEventListener("pointerup", endTouch);
   port.addEventListener("pointercancel", endTouch);
   port.addEventListener("pointerleave", () => { hoverSample = null; pointer = null; needOverlay = true; });
-  port.addEventListener("dblclick", (e: MouseEvent) => { const tool = getTool(untrack(ed.tool)), ctx = ed.toolContext(); if (tool?.dbl && ctx) tool.dbl(ctx, toSample(e as PointerEvent)); });
+  port.addEventListener("dblclick", (e: MouseEvent) => { const tool = getTool(untrack(ed.tool)), ctx = ed.toolContext(); if (tool?.dbl && ctx) { tool.dbl(withView(ctx), toSample(e as PointerEvent)); syncView(); } });
   port.addEventListener("contextmenu", (e: MouseEvent) => { e.preventDefault(); const [x, y] = docPoint(e); props.onContext?.(e, x, y); });
   port.addEventListener("wheel", (e: WheelEvent) => {
     e.preventDefault();
@@ -657,7 +630,7 @@ export function CanvasView(props: CanvasViewProps & { api?: ((a: CanvasViewApi) 
     const zoomIt = e.ctrlKey || e.altKey || e.metaKey || untrack(ed.prefs).wheelZooms;
     if (zoomIt) {
       const k = Math.exp(-e.deltaY * (e.deltaMode === 1 ? 0.05 : 0.0015));
-      setView(zoomAt(v, v.zoom * k, e.clientX - r.left, e.clientY - r.top, w, hh, doc.width, doc.height));
+      setView(zoomAt(v, v.zoom * k, e.clientX - r.left, e.clientY - r.top));
     } else {
       const dx = e.shiftKey ? e.deltaY : e.deltaX, dy = e.shiftKey ? 0 : e.deltaY;
       setView({ ...v, panX: v.panX - dx, panY: v.panY - dy });

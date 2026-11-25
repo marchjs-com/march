@@ -11,7 +11,7 @@ const hasSel = (ed: Editor): boolean => !!ed.doc?.selection;
 const activePixel = (ed: Editor): boolean => { const l = ed.doc?.active; return !!l && hasRaster(l) && !l.locks.pixels; };
 const activeLayer = (ed: Editor): Layer | null => ed.doc?.active ?? null;
 const sel = (ed: Editor): string[] => ed.doc?.selected ?? [];
-const view = (ed: Editor): import("./view.ts").CanvasViewApi | undefined => ed.shared.view as import("./view.ts").CanvasViewApi | undefined;
+const view = (ed: Editor): import("./view.ts").CanvasViewApi | undefined => ed.shared.canvas as import("./view.ts").CanvasViewApi | undefined;
 const ui = (ed: Editor, what: string, data?: unknown): unknown => (ed.shared.ui as ((w: string, d?: unknown) => unknown) | undefined)?.(what, data);
 const setView = (ed: Editor, patch: Partial<import("./editor.ts").ViewState>): void => { const e = ed.entry(); if (e) e.view.set({ ...untrack(e.view), ...patch }); };
 const flag = (ed: Editor, k: keyof import("./editor.ts").ViewState): boolean => { const e = ed.entry(); return !!e && !!untrack(e.view)[k]; };
