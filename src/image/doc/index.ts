@@ -28,3 +28,8 @@ export * as color from "./color/index.ts";
 export * from "./render/cache.ts";
 export * from "./render/worker.ts";
 export * from "./render/scratch.ts";
+export * from "./brush/tips.ts";
+export * from "./brush/presets.ts";
+export * from "./brush/engine.ts";
+export * from "./tools/paint-tools.ts";
+export type { PaintTool, PaintHooks } from "./tools/paint-common.ts";
