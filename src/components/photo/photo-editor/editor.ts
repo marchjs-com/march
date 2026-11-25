@@ -372,7 +372,7 @@ export class Editor {
       editor: this,
       addTool: (t) => { const off = registerTool(t); offs.push(off); return off; },
       addCommand: (c) => { const off = this.addCommand(c); offs.push(off); return off; },
-      addPanel: (panel) => { this.panels.set([...untrack(this.panels), panel]); const off = (): void => this.panels.set(untrack(this.panels).filter((x) => x !== panel)); offs.push(off); return off; },
+      addPanel: (panel) => { this.panels.set([...untrack(this.panels), panel]); const off = (): void => { this.panels.set(untrack(this.panels).filter((x) => x !== panel)); }; offs.push(off); return off; },
       addFilter: (def) => { const reg = this.shared.registerFilter as ((d: unknown) => () => void) | undefined; const off = reg ? reg(def) : () => {}; offs.push(off); return off; },
       on: (ev, fn) => { const off = this.on(ev, fn); offs.push(off); return off; },
     };

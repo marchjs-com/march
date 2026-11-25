@@ -96,7 +96,7 @@ export function MenuBar(props: MenuBarProps): Element {
           const row = h(PlainListRow, {
             size: "sm", tabindex: "-1", role: "menuitem", class: "m-menu-item m-menubar-sub", "data-sub": String(i),
             "aria-haspopup": "menu", "aria-expanded": () => String(subOpen() === i), disabled: () => !!val(it.disabled),
-            lead: it.icon, title: () => val(it.label), trail: h(Chevron, { direction: "right", class: "m-menubar-chev" }),
+            lead: it.icon, title: () => val(it.label), trail: h(Chevron, { direction: "end", class: "m-menubar-chev" }),
             ref: (x: HTMLElement) => { rowEl = x; },
             onClick: () => subOpen.set(subOpen.peek() === i ? -1 : i),
             onPointerEnter: () => { clearTimeout(timer); timer = setTimeout(() => subOpen.set(i), props.hoverDelay ?? 120); },

@@ -198,7 +198,7 @@ export function PhotoEditor(props: PhotoEditorProps): Element {
   const docTabs = h(TabList, {
     class: "m-pe-doctabs", label: () => L().documents ?? t`Documents`,
     tabs: () => ed.docs().filter((d) => !d.floating()).map((d) => ({ id: d.id, label: () => `${d.doc.name} @ ${Math.round(d.view().zoom * 100)}%`, closable: true, dirty: () => { d.srev(); d.rev(); return d.doc.dirtySinceSave; }, icon: ICONS.fill })),
-    active: () => ed.activeId(), onSelect: (id: string) => ed.activate(id), onClose: (id: string) => ed.shared.ui && (ed.shared.ui as (w: string, d?: unknown) => void)("close", id),
+    value: () => ed.activeId(), onSelect: (id: string) => ed.activate(id), onClose: (id: string) => ed.shared.ui && (ed.shared.ui as (w: string, d?: unknown) => void)("close", id),
   });
   const docArea = h("div", { class: "m-pe-docs" },
     () => (ed.docs().some((d) => !d.floating()) ? docTabs : null),
@@ -274,7 +274,7 @@ export function PhotoEditor(props: PhotoEditorProps): Element {
 
   // the workspace switcher
   const switcher = (): unknown => h(Segmented, {
-    size: "sm", class: "m-pe-workspaces", "aria-label": t`Workspace`,
+    size: "sm" as const, class: "m-pe-workspaces", "aria-label": t`Workspace`,
     options: [{ value: "essentials", label: t`Essentials` }, { value: "photography", label: t`Photography` }, { value: "painting", label: t`Painting` }, { value: "design", label: t`Design` }],
     get value() { return ed.workspace(); }, setValue: (v: Workspace) => ed.workspace.set(v),
   });

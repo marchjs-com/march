@@ -21,7 +21,8 @@ export { MIN_ZOOM, MAX_ZOOM, ZOOM_STEPS, stepZoom } from "../../../image/doc/too
 
 /** Map between document and view (CSS px) coordinates: the core's view math (pan in screen px, angle in degrees). */
 export class ViewMath {
-  constructor(public v: ViewState, public w: number, public h: number, public dw: number, public dh: number) {}
+  v: ViewState; w: number; h: number; dw: number; dh: number;
+  constructor(v: ViewState, w: number, h: number, dw: number, dh: number) { this.v = v; this.w = w; this.h = h; this.dw = dw; this.dh = dh; }
   toScreen(x: number, y: number): [number, number] { return docToScreen(this.v, x, y); }
   toDoc(sx: number, sy: number): [number, number] { return screenToDoc(this.v, sx, sy); }
   /** The document rectangle visible in the view, clipped to the document. */

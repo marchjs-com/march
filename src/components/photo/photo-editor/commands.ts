@@ -294,10 +294,10 @@ export function menuTree(cmds: Iterable<EditorCommand>): MenuNode[] {
   for (const cmd of cmds) {
     if (!cmd.menu || cmd.hidden) continue;
     const [top, ...rest] = cmd.menu.split("/");
-    let node = roots.get(top!);
+    let node: MenuNode | undefined = roots.get(top!);
     if (!node) { node = { label: top!, items: [] }; roots.set(top!, node); }
     for (const part of rest) {
-      let sub = node.items.find((x): x is MenuNode => typeof x === "object" && "items" in x && x.label === part);
+      let sub: MenuNode | undefined = node.items.find((x): x is MenuNode => typeof x === "object" && "items" in x && x.label === part);
       if (!sub) { sub = { label: part, items: [] }; node.items.push(sub); }
       node = sub;
     }

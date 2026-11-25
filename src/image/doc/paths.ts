@@ -14,7 +14,7 @@ export interface Anchor {
   type: "corner" | "smooth" | "symmetric";
 }
 export interface SubPath { anchors: Anchor[]; closed: boolean; /** combine with the paths before: */ op?: "add" | "subtract" | "intersect" | "exclude" | undefined }
-export interface PathData { subpaths: SubPath[]; fillRule?: "nonzero" | "evenodd" }
+export interface PathData { subpaths: SubPath[]; fillRule?: "nonzero" | "evenodd" | undefined }
 
 export const anchor = (x: number, y: number, type: Anchor["type"] = "corner"): Anchor => ({ x, y, ix: x, iy: y, ox: x, oy: y, type });
 

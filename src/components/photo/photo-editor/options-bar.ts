@@ -63,13 +63,13 @@ export function optionControl(ed: Editor, toolId: string, o: ToolOption): unknow
       return h(Toggle, { size: "sm", class: "m-pe-opt", label, get value() { return !!get(); }, setValue: (v: boolean | null) => set(!!v) });
     case "choice": {
       const opts = (o.options ?? []).map((x) => ({ value: x.value, label: t(x.label), ...(x.icon ? { icon: (ICONS as Record<string, unknown>)[x.icon] ?? x.icon } : {}) }));
-      if (opts.length <= 5 && opts.every((x) => String(x.label).length <= 12)) return field(h(Segmented, { size: "sm", options: opts, "aria-label": label, get value() { return get(); }, setValue: (v: unknown) => set(v) }));
-      return field(h(Select, { size: "sm", options: opts, placeholder: false, "aria-label": label, get value() { return get(); }, setValue: (v: unknown) => set(v) }));
+      if (opts.length <= 5 && opts.every((x) => String(x.label).length <= 12)) return field(h(Segmented, { size: "sm" as const, options: opts, "aria-label": label, get value() { return get(); }, setValue: (v: unknown) => set(v) }));
+      return field(h(Select, { size: "sm" as const, options: opts, placeholder: false as const, "aria-label": label, get value() { return get(); }, setValue: (v: unknown) => set(v) }));
     }
     case "select-op":
-      return h(Segmented, { size: "sm", class: "m-pe-selop", "aria-label": label, options: SELECT_OPS.map((x) => ({ value: x.value, icon: x.icon, title: t(x.label), label: "" })), get value() { return get() ?? "new"; }, setValue: (v: unknown) => set(v) });
+      return h(Segmented, { size: "sm" as const, class: "m-pe-selop", "aria-label": label, options: SELECT_OPS.map((x) => ({ value: x.value, icon: x.icon, title: t(x.label), label: "" })), get value() { return get() ?? "new"; }, setValue: (v: unknown) => set(v) });
     case "blend":
-      return field(h(Select, { size: "sm", placeholder: false, "aria-label": label, options: [...(o.options ?? []).map((x) => ({ value: x.value, label: t(x.label) })), ...BLEND_MODES.map((m) => ({ value: m, label: t(BLEND_LABELS[m]) }))], get value() { return get() ?? "normal"; }, setValue: (v: unknown) => set(v) }));
+      return field(h(Select, { size: "sm" as const, placeholder: false as const, "aria-label": label, options: [...(o.options ?? []).map((x) => ({ value: x.value, label: t(x.label) })), ...BLEND_MODES.map((m) => ({ value: m, label: t(BLEND_LABELS[m]) }))], get value() { return get() ?? "normal"; }, setValue: (v: unknown) => set(v) }));
     case "color":
       return field(h(ColorInput, { size: "sm", text: false, swatchLabel: label, get value() { const c = (get() ?? o.default) as RGBA; return hex(c); }, setValue: (v: string) => set(fromHex(v)) }));
     case "text": case "font":
