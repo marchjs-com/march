@@ -242,16 +242,18 @@ function renderList(list: Layer[], r: Rect, dst: Float32Array, ctx: Ctx, groupSt
     let content = layerContent(ctx.doc, l, r, ctx.opts);
     if (!content) { i = j - 1; continue; }
     const passes = activeEffects(l.styles).length && renderHooks.styles ? stylePasses(l, r, ctx) : null;
+    // a content pass already has fill opacity in it (interior effects are not faded by fill)
+    let fill = l.fill;
     if (passes) {
       const c = passes.find((p) => p.place === "content");
-      if (c) content = c.px;
+      if (c) { content = c.px; fill = 1; }
     }
     const cov = layerCoverage(ctx.doc, l, r);
 
     // clipping group: clipped layers draw onto the base, inside the base's alpha
     if (clipped.length) {
       const base = new Float32Array(n * 4);
-      compositeInto(base, content, { mode: "normal", opacity: 1, fill: l.fill });
+      compositeInto(base, content, { mode: "normal", opacity: 1, fill });
       const baseA = new Float32Array(n);
       for (let p = 0; p < n; p++) baseA[p] = base[p * 4 + 3]!;
       for (const c of clipped) {
@@ -266,7 +268,8 @@ function renderList(list: Layer[], r: Rect, dst: Float32Array, ctx: Ctx, groupSt
         const cp = activeEffects(c.styles).length && renderHooks.styles ? stylePasses(c, r, ctx) : null;
         const ccov = layerCoverage(ctx.doc, c, r);
         drawPasses(base, cp, "under", r);
-        compositeInto(base, cp?.find((p) => p.place === "content")?.px ?? cc, { mode: c.blend === "pass-through" ? "normal" : c.blend, opacity: c.opacity, fill: c.fill, mask: ccov, x: r.x, y: r.y, w: r.w, channels: c.channels });
+        const cpc = cp?.find((p) => p.place === "content")?.px;
+        compositeInto(base, cpc ?? cc, { mode: c.blend === "pass-through" ? "normal" : c.blend, opacity: c.opacity, fill: cpc ? 1 : c.fill, mask: ccov, x: r.x, y: r.y, w: r.w, channels: c.channels });
         drawPasses(base, cp, "over", r);
       }
       // keep the base's coverage
@@ -296,7 +299,7 @@ function renderList(list: Layer[], r: Rect, dst: Float32Array, ctx: Ctx, groupSt
       }
     }
     drawPasses(dst, passes, "under", r, l.opacity, cov);
-    compositeInto(dst, content, { mode: l.blend === "pass-through" ? "normal" : l.blend, opacity: l.opacity, fill: l.fill, mask, x: r.x, y: r.y, w: r.w, channels: l.channels });
+    compositeInto(dst, content, { mode: l.blend === "pass-through" ? "normal" : l.blend, opacity: l.opacity, fill, mask, x: r.x, y: r.y, w: r.w, channels: l.channels });
     drawPasses(dst, passes, "over", r, l.opacity, cov);
   }
 }
@@ -351,7 +354,8 @@ function renderContainer(g: ContainerLayer, r: Rect, dst: Float32Array, ctx: Ctx
     return ps.map((p) => ({ ...p, px: crop(p.px, outer, r) }));
   })() : null;
   drawPasses(dst, passes, "under", r, g.opacity, cov);
-  compositeInto(dst, passes?.find((p) => p.place === "content")?.px ?? straight, { mode: g.blend === "pass-through" ? "normal" : g.blend, opacity: g.opacity, fill: g.fill, mask: cov, x: r.x, y: r.y, w: r.w, channels: g.channels });
+  const gc = passes?.find((p) => p.place === "content")?.px;
+  compositeInto(dst, gc ?? straight, { mode: g.blend === "pass-through" ? "normal" : g.blend, opacity: g.opacity, fill: gc ? 1 : g.fill, mask: cov, x: r.x, y: r.y, w: r.w, channels: g.channels });
   drawPasses(dst, passes, "over", r, g.opacity, cov);
 }
 
