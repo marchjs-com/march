@@ -22,6 +22,7 @@ export const CATEGORIES = [
   { id: "overlays", title: "Overlays", desc: "Dialogs, drawers, popovers, tooltips, toasts." },
   { id: "navigation", title: "Navigation", desc: "Tabs, breadcrumbs, pagination, menus, bottom bars." },
   { id: "media", title: "Media", desc: "Images, video, carousels, media overlays." },
+  { id: "photo", title: "Photo", desc: "Image editing: adjustment sliders, curves, histograms, crop, filters and editors (on march/image)." },
   { id: "motion", title: "Motion", desc: "Animated components on the motion engine." },
   { id: "social", title: "Social", desc: "Avatars, reactions, comments, feeds, presence." },
   { id: "composite", title: "Composite", desc: "Components built from other components (composedOf)." },

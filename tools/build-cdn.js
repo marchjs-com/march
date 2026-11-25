@@ -42,6 +42,15 @@ for (const [key, target] of Object.entries(pkg.exports)) {
   // component, so a page loads the components it uses and what they share (march/ui and the other barrels load every
   // component they export: no tree-shaking in a browser)
   if (key.includes("*")) {
+    // image/ops/<name>: one entry per image op (each filter loads alone)
+    if (key === "./image/ops/*") {
+      const dir = join(root, "src/image/ops");
+      for (const f of existsSync(dir) ? readdirSync(dir).filter((f) => /^[a-z0-9-]+\.ts$/.test(f) && f !== "index.ts") : []) {
+        const id = f.slice(0, -3);
+        entries.push({ spec: `march/image/ops/${id}`, in: join(dir, f), out: `image/ops/${id}` });
+      }
+      continue;
+    }
     // icons/<pack> and icons/<pack>/pack: one entry per pack there is
     if (!key.startsWith("./icons/")) continue;
     const dir = join(root, "src/icons/packs");
