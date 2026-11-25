@@ -11,7 +11,8 @@ import { rectIntersect, type Rect } from "../tiles.ts";
 import { encodePng, type RawImage } from "./png.ts";
 import { encodeTiff } from "./tiff.ts";
 import { exportSvg } from "./svg.ts";
-import { layerBounds, sliceRects } from "./slices.ts";
+import { sliceRects } from "./slices.ts";
+import { layerBounds } from "../bounds.ts";
 
 export * from "./png.ts";
 export * from "./tiff.ts";

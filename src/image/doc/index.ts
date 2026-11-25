@@ -49,3 +49,8 @@ export * from "./tools/shape.ts";
 export * from "./tools/type.ts";
 export * from "./tools/vector.ts";
 export { renderStyles, installStyles, contourLut } from "./styles-render.ts";
+export * from "./export/index.ts";
+export * from "./autosave.ts";
+export * from "./actions.ts";
+export * from "./variables.ts";
+export * from "./bounds.ts";

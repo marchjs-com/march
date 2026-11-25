@@ -26,6 +26,7 @@
     "./image/ops/*": "./src/image/ops/*.ts",
     "./image/samples": "./src/image/samples.ts",
     "./image/doc": "./src/image/doc/index.ts",
+    "./image/psd": "./src/image/psd/index.ts",
     "./photo-editor": "./src/components/photo/photo-editor/index.ts",
     "./crud": "./src/crud/index.ts",
     "./forms": "./src/forms/index.ts",

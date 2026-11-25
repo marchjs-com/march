@@ -4,6 +4,7 @@
 // document's edges and center, other layers' edges and centers, guides and the grid, with lines and distance labels.
 // Align and distribute work on the selected layers, to the selection, or to the canvas.
 
+import { layerBounds } from "../bounds.ts";
 import type { ImageDocument } from "../document.ts";
 import { hasRaster, isContainer, walk, type Layer } from "../layers.ts";
 import { pathBounds, transformPath } from "../paths.ts";
@@ -13,19 +14,6 @@ import type { OverlayShape, PointerSample, Tool, ToolContext } from "./tool.ts";
 // ——— geometry helpers ———
 
 /** Bounds of a layer's visible content in document pixels (containers: their children; fill / adjustment: null). */
-export function layerBounds(doc: ImageDocument, l: Layer): Rect | null {
-  if (isContainer(l)) {
-    let r: Rect | null = l.kind === "artboard" ? { ...l.rect } : null;
-    if (l.kind !== "artboard") for (const c of l.children) r = rectUnion(r, layerBounds(doc, c));
-    return r;
-  }
-  if (hasRaster(l)) {
-    const b = l.raster.bounds();
-    if (b) return b;
-    if (l.kind === "shape") return pathBounds(l.path);
-  }
-  return null;
-}
 
 /** Shift a mask's pixels by whole pixels (journaled). */
 export function shiftMask(m: Mask, dx: number, dy: number): void {

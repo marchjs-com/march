@@ -5,7 +5,7 @@
 import type { ImageDocument } from "../document.ts";
 import type { ArtboardLayer, Layer, RGBA } from "../layers.ts";
 import { rectUnion, type Rect } from "../tiles.ts";
-import { layerBounds } from "./smart.ts";
+import { layerBounds } from "../bounds.ts";
 
 export interface ArtboardPreset { id: string; name: string; group: "phone" | "tablet" | "web" | "social" | "print" | "desktop"; w: number; h: number }
 

@@ -1,17 +1,12 @@
 // Slices: user slices, slices made from layers (their rectangle follows the layer's pixels) and auto slices that cover
 // the rest of the document, as the "Save for Web" table layout expects.
 
+import { layerBounds } from "../bounds.ts";
 import type { ImageDocument, Slice } from "../document.ts";
 import { hasRaster, isContainer, newId, type Layer } from "../layers.ts";
 import { rectIntersect, rectUnion, type Rect } from "../tiles.ts";
 
 /** Pixel bounds of a layer in document pixels (containers: their children; fill / adjustment layers: the document). */
-export function layerBounds(doc: ImageDocument, l: Layer): Rect | null {
-  if (l.kind === "artboard") return { ...l.rect };
-  if (isContainer(l)) { let r: Rect | null = null; for (const c of l.children) r = rectUnion(r, layerBounds(doc, c)); return r; }
-  if (hasRaster(l)) return l.raster.bounds();
-  return doc.bounds;
-}
 
 /** Add a user slice (call inside doc.change). */
 export function addSlice(doc: ImageDocument, rect: Rect, name?: string): Slice {
