@@ -78,7 +78,7 @@ test("LevelMeter: the clip light latches and a press resets it", () => {
   dispose();
 });
 
-test("LevelMeter: a source drives it on the clock; dB scale, ticks, horizontal, min / max", () => {
+test("LevelMeter: a source drives it on the clock; dB scale, ticks, horizontal, min / max", async () => {
   const v = signal(0.5);
   const [el, dispose] = mount(() => [
     h(LevelMeter, { source: () => v(), channels: 1, scale: "db", floor: -48, ticks: true, segments: 48, orientation: "horizontal", variant: "flat", size: "lg", length: 200 }),
@@ -88,6 +88,7 @@ test("LevelMeter: a source drives it on the clock; dB scale, ticks, horizontal, 
   assert.ok(a.classList.contains("m-lm-h") && a.classList.contains("m-lm-flat") && a.classList.contains("m-lm-lg"));
   assert.equal(a.style.getPropertyValue("--m-lm-len"), "200px");
   const m = a.querySelector(".m-lm-meter");
+  await import("../../../audio/index.ts"); await new Promise((r) => setTimeout(r, 0)); // march/audio loads with the first source
   E.step(16);
   // 0.5 linear = −6 dB → (−6 + 48) / 48 of 48 segments = 42
   assert.equal(lit(m), "42");

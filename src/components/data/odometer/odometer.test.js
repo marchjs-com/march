@@ -24,7 +24,7 @@ test("Odometer: padded drums, a red fraction, the unit and a spoken name; only c
   assert.equal(root.getAttribute("role"), "img");
   assert.ok(root.classList.contains("m-odo-mechanical"));
   assert.equal(drums(el), "012345.6");
-  assert.ok(el.querySelector(".m-odo-roll.has-frac"), "fraction drums are marked");
+  assert.ok(el.querySelector(".m-odo-roll.is-frac"), "fraction drums are marked");
   assert.equal(el.querySelector(".m-odo-unit").textContent, "km");
   assert.equal(root.getAttribute("aria-label"), "Odometer: 12,345.6 km");
   km.set(12345.7);

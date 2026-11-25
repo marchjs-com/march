@@ -50,7 +50,7 @@
 .m-gauge::after {
   content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; z-index: -1;
   background: radial-gradient(closest-side, transparent 55%, color-mix(in srgb, var(--m-danger) 26%, transparent));
-  transition: opacity .35s var(--m-ease-out, ease);
+  transition: opacity var(--m-dur-slow) var(--m-ease-out, ease);
 }
 .m-gauge.is-redline::after { opacity: 1; }
 

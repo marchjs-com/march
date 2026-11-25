@@ -42,7 +42,7 @@
 .m-odo .m-roll-slot > .m-roll-d, .m-odo .m-roll-ghost { display: grid; place-items: center; inline-size: 100%; block-size: 100%; }
 .m-odo .m-roll-vis > .m-roll-s { display: inline-flex; align-items: flex-end; padding-block-end: calc(var(--m-odo-h) * .08); color: var(--m-text-2); font: 800 calc(var(--m-odo-h) * .6) / 1 var(--m-font); }
 /* fraction drums: the classic red one */
-.m-odo .has-frac .m-roll-s ~ * { --m-odo-drum: var(--m-odo-frac); }
+.m-odo .is-frac .m-roll-s ~ * { --m-odo-drum: var(--m-odo-frac); }
 .m-odo-sign { font: 650 calc(var(--m-odo-h) * .6) / 1 var(--m-font); color: var(--m-text); padding-inline: .1em; }
 .m-odo-unit { font: 600 calc(var(--m-odo-h) * .42) / 1 var(--m-font); color: var(--m-text-2); letter-spacing: .04em; }
 
@@ -57,7 +57,7 @@
   content: "8"; position: absolute; inset: 0; display: grid; place-items: center; opacity: .07; text-shadow: none;
 }
 .m-odo-digital .m-roll-vis > .m-roll-s { color: var(--m-odo-lit); }
-.m-odo-digital .has-frac .m-roll-s ~ * { --m-odo-lit: color-mix(in srgb, var(--m-danger) 70%, var(--m-on-scrim)); }
+.m-odo-digital .is-frac .m-roll-s ~ * { --m-odo-lit: color-mix(in srgb, var(--m-danger) 70%, var(--m-on-scrim)); }
 
 /* flip: split cards of a flip clock */
 .m-odo-flip { --m-odo-w: calc(var(--m-odo-h) * .74); --m-odo-gap: calc(var(--m-odo-h) * .1); }

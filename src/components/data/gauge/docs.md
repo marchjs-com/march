@@ -27,7 +27,7 @@ the highest value; the readout under the hub is a rolling number (CountRoll) or 
 | `ticks` | `{ step, values, minor, labels }` or `false`. Default: a round step that ends on the scale's end, 4 minor ticks. `labels` may be a function. |
 | `needle` | `"spring"` (default), `"vu"` (300 ms ballistics) or `"none"`. |
 | `readout` | `true` (rolling number), `"odometer"`, your own node or `(value) => node`; `false`: none. Default true (vu: false). |
-| `unit` / `format` | Unit under the readout and in the spoken value; format of the readout (pipe or function). |
+| `unit` / `format` | Unit under the readout and in the spoken value; format of the readout (a function or Intl.NumberFormat options). |
 | `caption` | Text on the dial. Default: tachometer "×1000 r/min", vu "VU". |
 | `size` / `sweep` | Width in px (default 220, half 240, vu 260) and the scale's angle (90–320°). |
 | `color` | Theme color token of the needle and the value arc. Default: the accent. |

@@ -7,13 +7,12 @@
 import "./gauge.css";
 import { signal, computed, effect, untrack, onCleanup, getOwner, runWithOwner, type Accessor } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
-import { t } from "../../../core/i18n.ts";
+import { t, locale } from "../../../core/i18n.ts";
 import { val, cx, clamp, later, type MaybeFn, type ClassProp } from "../../../core/util.ts";
 import { still } from "../../../motion/engine/parts.ts";
 import { track } from "../../../motion/engine/value.ts";
-import { formatter, f1, attr, num, type FormatSpec } from "../../../charts/util.ts";
 import { colorAttr, tokenColor, type ColorToken } from "../../../theme/colors.ts";
-import { toAudioSource, type AudioSourceLike } from "../../../audio/index.ts";
+import type { AudioSourceLike } from "../../../audio/index.ts";
 import { CountRoll } from "../../social/count-roll/index.ts";
 import { Odometer } from "../odometer/index.ts";
 
@@ -56,8 +55,8 @@ export interface GaugeProps {
   unit?: MaybeFn<string | undefined>;
   /** Text printed on the dial; false: none. Default: tachometer "×1000 r/min", vu "VU". @tr Kadrana basılı metin; false: yok. Varsayılan: tachometer "×1000 r/min", vu "VU". */
   caption?: MaybeFn<string | false | undefined>;
-  /** Format of the readout and the spoken value (pipe name, [pipe, …args] or a function). Default: rounded. @tr Göstergenin ve okunan değerin biçimi (boru adı, [boru, …argümanlar] ya da işlev). Varsayılan: yuvarlanmış. */
-  format?: FormatSpec | undefined;
+  /** Format of the readout and the spoken value: a function or Intl.NumberFormat options (`{ maximumFractionDigits: 1 }`). Default: rounded, in the page's language. @tr Göstergenin ve okunan değerin biçimi: bir işlev ya da Intl.NumberFormat seçenekleri (`{ maximumFractionDigits: 1 }`). Varsayılan: yuvarlanmış, sayfanın dilinde. */
+  format?: ((v: number) => string) | Intl.NumberFormatOptions | undefined;
   /** Look: "speedometer" (270°, default), "tachometer" (×1000 labels, redline), "half" (180°) or "vu" (a needle VU meter). @tr Görünüm: "speedometer" (270°, varsayılan), "tachometer" (×1000 etiketler, kırmızı çizgi), "half" (180°) ya da "vu" (ibreli VU ölçer). */
   variant?: GaugeVariant | undefined;
   /** Width in px. Default 220 (half 240, vu 260). @tr px cinsinden genişlik. Varsayılan 220 (half 240, vu 260). */
@@ -96,6 +95,11 @@ const SPRING = { spring: { stiffness: 150, damping: 13 } }, VU = { spring: { sti
 const VU_REF = 0.5;
 const VU_TICKS = [-20, -10, -7, -5, -3, -2, -1, 0, 1, 2, 3];
 const RAD = Math.PI / 180;
+
+// small numeric helpers of the dial (the chart helpers would bring the charts' stylesheet and pipes along)
+const f1 = (v: number): number => Math.round(v * 10) / 10;
+const num = (v: unknown): number | null => (v == null || v === "" || isNaN(Number(v)) ? null : Number(v));
+const attr = <T>(fn: () => T): Accessor<T> => computed(fn);
 
 /** A round tick step (1, 2, 2.5 or 5 times a power of ten) giving about `count` steps, one that ends on the end of the scale when it can. */
 export function niceStep(span: number, count: number): number {
@@ -170,7 +174,11 @@ export function Gauge(props: GaugeProps): Element {
     pending = true;
     runWithOwner(owner, () => later(() => { pending = false; spoken.set(untrack(target)); }, 250));
   });
-  const fmt = (v: number): string => String(formatter(props.format, (x) => String(Math.round(x as number)))(v));
+  // FORMAT number: a function, or Intl options in the page's language (default: whole numbers)
+  const fmt = (v: number): string => {
+    const f = props.format;
+    return typeof f === "function" ? f(v) : new Intl.NumberFormat(locale(), { maximumFractionDigits: 0, ...f }).format(v);
+  };
   const valueText = (v: number): string => { const u = val(props.unit); return u ? `${fmt(v)} ${u}` : fmt(v); };
 
   // STATE peak: the highest value seen (true), or a fixed mark (number)
@@ -286,11 +294,19 @@ export function Gauge(props: GaugeProps): Element {
     style: () => ({ "--m-gauge-w": `${num(val(props.size)) ?? look.size}px`, "--m-gauge-ratio": `200 / ${geo().h}` }),
   }, svg, readout, part("glass") ? h("div", { class: "m-gauge-glass", "aria-hidden": "true" }) : null) as HTMLElement;
 
-  // SAMPLE audio: the needle follows the source while the gauge is on screen
+  // SAMPLE audio: the needle follows the source while the gauge is on screen; march/audio loads only for a source
+  // (LOAD lazily), so a gauge of a plain number never downloads it
   if (props.source != null) {
-    const src = toAudioSource(props.source);
-    src.use(root);
-    onCleanup(src.onUpdate((s) => level.set(s.level())));
+    let gone = false;
+    onCleanup(() => { gone = true; });
+    void import("../../../audio/index.ts").then(({ toAudioSource }) => {
+      if (gone) return;
+      runWithOwner(owner, () => {
+        const src = toAudioSource(props.source!);
+        src.use(root);
+        onCleanup(src.onUpdate((s) => level.set(s.level())));
+      });
+    });
   }
   return root;
 }

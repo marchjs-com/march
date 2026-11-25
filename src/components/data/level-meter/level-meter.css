@@ -78,7 +78,7 @@
 .m-lm-clip.m-icon-btn { color: var(--m-lm-ink); }
 .m-lm-clip .m-status-dot.is-neutral { --m-status-dot-c: color-mix(in oklab, var(--m-lm-c3) 22%, var(--m-lm-track)); }
 .m-lm-clip .m-status-dot.is-danger { --m-status-dot-c: var(--m-lm-c3); }
-.m-lm-clip .m-status-dot { transition: background-color var(--m-dur-fast, 120ms), box-shadow var(--m-dur-fast, 120ms); }
+.m-lm-clip .m-status-dot { transition: background-color var(--m-dur-fast), box-shadow var(--m-dur-fast); }
 .m-lm-clip.is-on .m-status-dot { box-shadow: 0 0 0 2px color-mix(in oklab, var(--m-lm-c3) 30%, transparent), 0 0 10px var(--m-lm-c3); }
 
 .m-lm.is-still .m-lm-seg::after, .m-lm.is-still .m-lm-clip .m-status-dot { transition: none; }

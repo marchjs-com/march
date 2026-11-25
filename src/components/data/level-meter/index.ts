@@ -6,12 +6,12 @@
 // readers, updated at most four times a second.
 import "./level-meter.css";
 import { h } from "../../../dom/h.ts";
-import { signal, effect, untrack, onCleanup, type Signal } from "../../../core/reactive.ts";
+import { signal, effect, untrack, onCleanup, getOwner, runWithOwner, type Signal } from "../../../core/reactive.ts";
 import { t, locale } from "../../../core/i18n.ts";
 import { val, cx, clamp, later, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { onFrame, mutate, now } from "../../../motion/engine/clock.ts";
 import { still } from "../../../motion/engine/parts.ts";
-import { toAudioSource, type AudioSourceLike } from "../../../audio/index.ts";
+import type { AudioSourceLike } from "../../../audio/index.ts";
 import { tokenColor, type ColorToken } from "../../../theme/colors.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { StatusDot } from "../../feedback/status-dot/index.ts";
@@ -211,14 +211,21 @@ export function LevelMeter(props: LevelMeterProps): Element {
   // ---- readings
   const norm = (v: number): number => (Number.isFinite(v) ? clamp((v - lo()) / (hi() - lo() || 1), 0, 1) : 0);
   if (props.source != null) {
-    // SAMPLE audio: the source reads on the clock while the meter is on screen; the DOM is written in the write phase
-    const src = toAudioSource(props.source);
-    src.use(root);
-    let queued = false, levels: readonly number[] = [0, 0];
-    onCleanup(src.onUpdate((s) => {
-      levels = count === 2 ? s.channels() : [s.level()];
-      if (!queued) { queued = true; mutate(() => { queued = false; if (!gone) apply(levels, now()); }); }
-    }));
+    // SAMPLE audio: the source reads on the clock while the meter is on screen; the DOM is written in the write phase.
+    // march/audio loads only for a source (LOAD lazily): a meter of a plain number never downloads it
+    const owner = getOwner();
+    void import("../../../audio/index.ts").then(({ toAudioSource }) => {
+      if (gone) return;
+      runWithOwner(owner, () => {
+        const src = toAudioSource(props.source!);
+        src.use(root);
+        let queued = false, levels: readonly number[] = [0, 0];
+        onCleanup(src.onUpdate((s) => {
+          levels = count === 2 ? s.channels() : [s.level()];
+          if (!queued) { queued = true; mutate(() => { queued = false; if (!gone) apply(levels, now()); }); }
+        }));
+      });
+    });
   } else {
     // a value: draw on change; the clock runs only while a peak falls
     let levels: readonly number[] = [0], fall: (() => void) | null = null;

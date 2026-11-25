@@ -77,7 +77,7 @@ test("Gauge tachometer: ×1000 labels, a caption, the redline (red ticks, glow, 
   dispose();
 });
 
-test("Gauge vu: dB scale from an audio source (a number accessor), VU caption, no readout, 0 dB redline", () => {
+test("Gauge vu: dB scale from an audio source (a number accessor), VU caption, no readout, 0 dB redline", async () => {
   const loud = signal(0.5);
   const [el, dispose] = mount(() => h(Gauge, { variant: "vu", source: () => loud(), motion: false }));
   const root = el.querySelector(".m-gauge");
@@ -86,6 +86,7 @@ test("Gauge vu: dB scale from an audio source (a number accessor), VU caption, n
   assert.equal(el.querySelector(".m-gauge-readout"), null);
   assert.equal(el.querySelector(".m-gauge-hub"), null, "the pivot sits under the window");
   assert.equal(root.getAttribute("aria-valuemin"), "-20");
+  await import("../../../audio/index.ts"); await new Promise((r) => setTimeout(r, 0)); // march/audio loads with the first source
   E.step(16);
   const at0 = needle(el);
   assert.ok(at0 > 0 && at0 < 48, "0 dB sits right of the middle on a voltage-linear scale");

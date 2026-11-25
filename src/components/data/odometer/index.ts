@@ -95,7 +95,7 @@ export function Odometer(props: OdometerProps): Element {
       roll: () => !still(props.motion),
       duration: props.duration ?? DURATION[variant()],
       stagger: props.stagger ?? 40,
-      class: () => cx("m-odo-roll", decimals() > 0 && "has-frac"),
+      class: () => cx("m-odo-roll", decimals() > 0 && "is-frac"),
     })),
   () => {
     const u = val(props.unit);
