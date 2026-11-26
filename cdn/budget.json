@@ -196,6 +196,10 @@
    "limit": 29184,
    "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026"
   },
+  "march/components/data/sankey-chart": {
+   "limit": 27648,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026"
+  },
   "march/components/data/scatter-chart": {
    "limit": 31232,
    "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026"
