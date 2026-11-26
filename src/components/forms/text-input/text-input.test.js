@@ -80,3 +80,47 @@ test("TextInput: errorSpace keeps the error line in place while there is no erro
   assert.equal(msg.textContent, "Required");
   assert.equal(el.querySelector("input").getAttribute("aria-describedby"), "kept-err");
 });
+
+test("TextInput mask: formats while typing, binds the raw value, hint, error part, eager template", async () => {
+  const v = signal("5551234567");
+  const states = [];
+  const { el } = mount(() => h(TextInput, { "bind:value": v, mask: "(999) 999 99 99", maskHint: "(5XX) XXX XX XX", onMaskState: (s) => states.push(s) }));
+  const input = el.querySelector("input");
+  // the mask part loads with the first masked input
+  for (let i = 0; i < 20 && !el.querySelector(".m-mask-mirror"); i++) await new Promise((r) => setTimeout(r, 5));
+  assert.equal(input.value, "(555) 123 45 67");
+  assert.equal(states.at(-1).complete, true);
+  assert.ok(el.querySelector(".m-mask-done.is-on"));
+  const hint = el.querySelector(".m-sr-only");
+  assert.equal(hint.textContent, "(5XX) XXX XX XX");
+  assert.ok(input.getAttribute("aria-describedby").includes(hint.id));
+  assert.equal(input.getAttribute("inputmode"), "numeric");
+  v.set("212");
+  assert.equal(input.value, "(212");
+  assert.equal(el.querySelector(".m-mask-done.is-on"), null);
+  input.selectionStart = input.selectionEnd = input.value.length;
+  const e = new Event("beforeinput", { bubbles: true, cancelable: true });
+  Object.assign(e, { inputType: "insertText", data: "4" });
+  input.dispatchEvent(e);
+  assert.equal(e.defaultPrevented, true);
+  assert.equal(v(), "2124");
+  assert.equal(input.value, "(212) 4");
+  // the mirror draws the same text, literals marked
+  assert.equal(el.querySelector(".m-mask-line").textContent, "(212) 4");
+  assert.equal(el.querySelectorAll(".m-mask-c.is-lit").length, 3);
+});
+
+test("TextInput mask: the mask's error shows in the input's own error part; maskMotion false draws no mirror text", async () => {
+  const { cardNumber } = await import("../../../mask/presets.ts");
+  const v = signal("4242424242424241");
+  const { el } = mount(() => h(TextInput, { "bind:value": v, mask: cardNumber(), maskMotion: false, maskDone: false }));
+  for (let i = 0; i < 20 && !el.querySelector(".m-mask-mirror"); i++) await new Promise((r) => setTimeout(r, 5));
+  const input = el.querySelector("input");
+  assert.equal(input.value, "4242 4242 4242 4241");
+  assert.equal(input.getAttribute("aria-invalid"), "true");
+  assert.ok(el.querySelector(".m-input-error").textContent.length > 0);
+  assert.equal(el.querySelector(".m-mask").classList.contains("m-mask-on"), false);
+  v.set("4242424242424242");
+  assert.equal(input.getAttribute("aria-invalid"), null);
+  assert.equal(el.querySelector(".m-mask-done"), null);
+});

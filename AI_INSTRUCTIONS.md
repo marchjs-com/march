@@ -470,6 +470,10 @@ One interaction, written once, attached to any element; each behavior is its own
 - **swipe** — `swipeable(el, { axis, accept, onMove, onEnd, onTap, holdMs, onHold })` + `rubberBand`, `fling`, `nearest`:
   axis lock, veto, release velocity, tap / hold, click after a swipe swallowed (Drawer, PullToRefresh, ChatBubble,
   StoryViewer). Never write your own follow-the-finger pointer loop.
+- **mask** — `<input use:mask={"(999) 999 99 99"} />` / TextInput `mask={…}` (march/mask): formatted fields (phone,
+  card, IBAN, date, money, codes) with caret mapping, paste, beforeinput, IME and own undo; presets in
+  `march/mask/presets`, validators in `march/mask/validators`, `formatMask` / `unmask` for tables and the server. NEVER
+  write your own mask or digit-grouping onInput handler.
 - **dismiss** — `dismiss(panel, { inside, onDismiss(why), on, escape })`: outside press + Escape (capture phase) for
   popovers, menus and pickers. Never add document pointerdown / click / Escape listeners for that yourself.
 
