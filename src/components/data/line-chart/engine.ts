@@ -78,7 +78,7 @@ export interface XYChartProps<D = unknown> extends ChartBaseProps {
   yTitle?: Opt<string>;
   /** Title of the right value axis. @tr Sağ değer ekseninin başlığı. */
   y2Title?: Opt<string>;
-  /** Grid lines: `true` (default, horizontal), `false`, "x" or "both" (adds vertical ones). @tr Izgara çizgileri: `true` (varsayılan, yatay), `false`, "x" ya da "both" (dikeyleri de ekler). */
+  /** Grid lines: `true` (default, horizontal), `false`, "x" (vertical only) or "both". @tr Izgara çizgileri: `true` (varsayılan, yatay), `false`, "x" (yalnız dikey) ya da "both" (ikisi). */
   grid?: Opt<boolean | "x" | "both">;
   /** Line shape: "linear" (default), "smooth" (never overshoots), "step", "step-before", "step-after". @tr Çizgi biçimi: "linear" (varsayılan), "smooth" (veriyi aşmaz), "step", "step-before", "step-after". */
   curve?: Opt<Curve>;
@@ -319,6 +319,15 @@ export function xyChart<D>(props: AreaChartProps<D>, kind: "line" | "area" | "ba
   const grid = computed(() => read(props.grid) ?? true);
   const yTicks = computed((): Tick[] => { const s = ys(), f = yFmt(); return stream() ? [] : yNice().ticks.map((v) => ({ key: v, pos: s(v), label: f(v) })); });
   const y2Ticks = computed((): Tick[] => { const s = y2s(), f = y2Fmt(); return hasRight() ? y2Nice().ticks.map((v) => ({ key: v, pos: s(v), label: f(v) })) : []; });
+  // horizontal grid lines: on for true / "both", off for "x" (vertical only); a stream has no value axis, but "both"
+  // still rules its scale so the thickness of the layers can be compared
+  const hTicks = computed((): Tick[] => {
+    const g = grid();
+    if (!g || g === "x") return [];
+    if (!stream()) return yTicks();
+    const s = ys();
+    return yNice().ticks.map((v) => ({ key: v, pos: s(v), label: "" }));
+  });
 
   // ---- geometry of the drawn state
   const curve = computed((): Curve => read(props.curve) ?? (stream() ? "smooth" : "linear"));
@@ -453,7 +462,7 @@ export function xyChart<D>(props: AreaChartProps<D>, kind: "line" | "area" | "ba
   const shown = computed(() => series().filter((s) => drawn().series.has(s.key)));
   const body = [
     h("defs", {}, h("clipPath", { id: clipId }, h("rect", { x: -2, y: -4, width: attr(() => box().w + 4), height: attr(() => box().h + 8) }))),
-    Grid({ dir: "h", ticks: () => (grid() ? yTicks() : []), box }),
+    Grid({ dir: "h", ticks: hTicks, box }),
     Grid({ dir: "v", ticks: () => (grid() === "both" || grid() === "x" ? xTicks() : []), box }),
     marks({ marks: props.marks, scales, layer: "back" }),
     () => (stream() ? null : Axis({ side: "left", ticks: yTicks, box, title: () => read(props.yTitle) })),

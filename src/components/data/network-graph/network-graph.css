@@ -6,6 +6,8 @@
 .m-network-link { stroke: var(--m-chart-axis); stroke-linecap: round; transition: stroke var(--m-chart-dur), stroke-opacity var(--m-chart-dur); }
 .m-network-arrow path { fill: var(--m-chart-axis); }
 .m-network-node { cursor: pointer; }
+.m-network-draggable .m-network-node { cursor: grab; }
+.m-network-draggable .m-network-node:active { cursor: grabbing; }
 .m-network-dot { fill: var(--m-c); stroke: var(--m-chart-bg); stroke-width: 1.5; }
 .m-network-ring { fill: var(--m-c); fill-opacity: 0; stroke: var(--m-c); stroke-opacity: 0; stroke-width: 2; transition: fill-opacity var(--m-chart-dur), stroke-opacity var(--m-chart-dur); }
 .m-network-node:hover .m-network-ring, .m-network-near .m-network-ring { fill-opacity: 0.16; }

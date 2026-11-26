@@ -27,7 +27,8 @@ export interface HeatCell { key: string; xi: number; yi: number; value: number |
 export interface HeatPoint { index: number; x: unknown; y: unknown; value: number | null; label: unknown; datum: HeatCell }
 /** Texts of the level legend. */
 export interface HeatLegendLabels { less?: string; more?: string }
-export interface HeatmapProps<D = unknown> extends ChartBaseProps {
+// no series, so no series legend: the "less → more" scale is `levelLegend`
+export interface HeatmapProps<D = unknown> extends Omit<ChartBaseProps, "legend"> {
   /** Rows: an array (or signal / function returning one) of objects. @tr Satırlar: nesnelerden oluşan bir dizi (ya da onu döndüren sinyal / fonksiyon). */
   data?: DataProp<D>;
   /** Column key or getter (default "x"); a date in calendar mode. @tr Sütun anahtarı ya da getter (varsayılan "x"); takvim modunda bir tarih. */

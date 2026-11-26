@@ -20,7 +20,7 @@ zoom, legend, tooltip, onSelect, export, colors, title, description…), with th
 | `offset` | Baseline of the stream: "wiggle" (default, least shear between layers), "silhouette" (centred) or "expand" (shares of 100 %). |
 | `edges` | Draw each layer's edge line (default false: soft layers only). |
 | `curve` | Default "smooth". |
-| `grid` | Default "x" (vertical lines for time). |
+| `grid` | Default "x" (vertical lines for time); "both" also rules the scale horizontally, so layer thickness can be compared. |
 | `legend` | Default "bottom"; items toggle layers. |
 | `animate` | Change animations (see Motion). Default on. |
 
