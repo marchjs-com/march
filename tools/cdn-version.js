@@ -23,7 +23,9 @@ if (!m) throw new Error(`package.json version ${base}: expected x.y.z`);
 
 const r = await fetch(`${BASE}/versions.json?t=${Date.now()}`);
 if (!r.ok) throw new Error(`${BASE}/versions.json: ${r.status}`);
-const published = (await r.json()).versions ?? [];
+const list = await r.json();
+// a version that was out counts even after cdn-deploy dropped its files (versions.json › dropped): it is never reused
+const published = [...(list.versions ?? []), ...(list.dropped ?? [])];
 
 let version = base;
 if (published.includes(base)) {
