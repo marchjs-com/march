@@ -80,3 +80,17 @@ test("cdn: with the CDN's names.json the smallest entry comes from it, not from 
   assert.equal(t("march/ui", "Button"), "march/components/actions/button");
   assert.equal(t("march/ui", "toast"), "march/ui", "a name it does not list stays");
 });
+
+test("cdn: a stylesheet the package exports as a file (march/motion/motion.css) links that file from the CDN", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "march-cdn-css-"));
+  try {
+    writeFileSync(join(dir, "main.ts"), 'import "march/motion/motion.css";\nimport "march/charts/charts.css";\nexport const x = 1;\n');
+    const withMotion = { ...cdn, url: { ...cdn.url, "march/motion": `${BASE}/motion.js` }, css: { ...cdn.css, "march/motion": `${BASE}/motion.css` } };
+    await esbuild.build({ entryPoints: [join(dir, "main.ts")], bundle: true, format: "esm", outdir: join(dir, "out"), write: true, logLevel: "silent", absWorkingDir: dir, plugins: [march({ cdn: withMotion })] });
+    const code = readdirSync(join(dir, "out")).filter((f) => f.endsWith(".js")).map((f) => readFileSync(join(dir, "out", f), "utf8")).join("\n");
+    // the file itself (the theme waves' rules live there) and, for an entry with sheets, the entry's sheets too
+    assert.match(code, /https:\/\/cdn\.test\/1\.0\.0\/motion\/motion\.css/);
+    assert.match(code, /https:\/\/cdn\.test\/1\.0\.0\/motion\.css/);
+    assert.match(code, /https:\/\/cdn\.test\/1\.0\.0\/charts\/charts\.css/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});

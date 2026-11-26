@@ -29,6 +29,10 @@ function iconPackModules() {
 // a "sideEffects" glob ("./src/managers/*/index.ts", "*.css") → a test on a path relative to the package
 // (a pattern without "/" matches the file name at any depth, as in package.json)
 const escRx = (s) => s.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+/** The stylesheets March's package.json exports as files of their own ("motion/motion.css", "charts/charts.css"…). */
+let exportedCssSet = null;
+const exportedCss = () => (exportedCssSet ??= new Set(Object.keys(JSON.parse(readFileSync(join(MARCH_ROOT, "package.json"), "utf8")).exports ?? {})
+  .filter((k) => k.endsWith(".css") && !k.startsWith("./css/")).map((k) => k.slice(2))));
 const globTest = (g) => {
   const pat = g.replace(/^\.\//, "");
   const re = new RegExp(`${pat.includes("/") ? "^" : "(^|/)"}${pat.split("*").map(escRx).join("[^/]*")}$`);
@@ -122,10 +126,23 @@ export function march(opts = {}) {
         build.onResolve({ filter: /^march\/.+\.css$/ }, (a) => {
           if (a.path.startsWith("march/css/")) return { path: `${cdn.base}/${a.path.slice("march/".length)}`, namespace: "march-cdn-style" };
           const entry = a.path.replace(/\/[^/]+$/, "");
+          // a stylesheet the package exports as a file of its own (march/motion/motion.css: the theme waves and the
+          // motion utilities, which no module imports): that file (the CDN publishes it at its export path), and the
+          // entry's sheets as before
+          if (exportedCss().has(a.path.slice("march/".length)) && hasCss(entry, cdn)) {
+            return { path: `both:${JSON.stringify([`${cdn.base}/${a.path.slice("march/".length)}`, cdn.sheets?.[entry] ?? cdn.css[entry]])}`, namespace: "march-cdn-style" };
+          }
+          if (exportedCss().has(a.path.slice("march/".length))) return { path: `${cdn.base}/${a.path.slice("march/".length)}`, namespace: "march-cdn-style" };
           if (hasCss(entry, cdn)) return { path: cdn.sheets?.[entry] ? JSON.stringify(cdn.sheets[entry]) : cdn.css[entry], namespace: "march-cdn-style" };
           return { errors: [{ text: `${a.path}: no stylesheet of ${entry} on ${cdn.base} (march.config.js › cdn)` }] };
         });
-        build.onLoad({ filter: /.*/, namespace: "march-cdn-style" }, (a) => ({ contents: cdnStylesheet(/^[[{]/.test(a.path) ? JSON.parse(a.path) : a.path, opts.cdnLocal), loader: "js", resolveDir: cwd }));
+        build.onLoad({ filter: /.*/, namespace: "march-cdn-style" }, (a) => {
+          if (a.path.startsWith("both:")) {
+            const [file, sheets] = JSON.parse(a.path.slice("both:".length));
+            return { contents: `${cdnStylesheet(sheets, opts.cdnLocal)}\n${cdnStylesheet(file, opts.cdnLocal).replace(/^import[^\n]*\n/, "")}`, loader: "js", resolveDir: cwd };
+          }
+          return { contents: cdnStylesheet(/^[[{]/.test(a.path) ? JSON.parse(a.path) : a.path, opts.cdnLocal), loader: "js", resolveDir: cwd };
+        });
         build.onResolve({ filter: /^march-cdn:css$/ }, () => ({ path: "css", namespace: "march-cdn" }));
         build.onResolve({ filter: /^https:\/\// }, (a) => (a.path.startsWith(`${cdn.base}/`) ? { path: a.path, external: true } : undefined));
       }
