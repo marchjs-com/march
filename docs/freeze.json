@@ -4267,7 +4267,7 @@
    "at": "2026-11-26",
    "name": "CodeEditor",
    "what": "refresh",
-   "reason": "Founder: comments quieter, brighter on the caret line and under the pointer (26 Nov 2026)"
+   "reason": "Comments quieter, full strength on the caret line and under the pointer"
   }
  ]
 }
