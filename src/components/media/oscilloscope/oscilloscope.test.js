@@ -74,3 +74,52 @@ test("Oscilloscope: the trigger finds the rising crossing; a period; mono and st
   assert.ok(isMono(s, new Float32Array(n)));
   assert.ok(!isMono(s, Float32Array.from(s, (_, i) => Math.cos(i / 10))));
 });
+
+// a canvas that draws: a box from a stand-in ResizeObserver and a 2D context that records what is set on it
+function fakeCanvas() {
+  const set = [];
+  const ctx = new Proxy({}, { get: (o, k) => (k in o ? o[k] : () => {}), set: (o, k, v) => { o[k] = v; set.push([k, v]); return true; } });
+  const proto = Object.getPrototypeOf(document.createElement("canvas"));
+  const had = proto.getContext, RO = globalThis.ResizeObserver;
+  proto.getContext = () => ctx;
+  globalThis.ResizeObserver = class { constructor(fn) { this.fn = fn; } observe() { this.fn([{ contentRect: { width: 200, height: 100 } }]); } disconnect() {} };
+  return { set, restore: () => { proto.getContext = had; globalThis.ResizeObserver = RO; } };
+}
+
+test("Oscilloscope: a prop changed later draws again, idle too (lineWidth, mode, gain…)", () => {
+  const fake = fakeCanvas();
+  const lineWidth = signal(2), mode = signal("wave");
+  let frames = 0;
+  const [, dispose] = mount(() => h(Oscilloscope, { lineWidth, mode, draw: () => { frames++; } }));
+  E.step(16);
+  const first = frames;
+  assert.ok(first >= 1, "drawn once it has a box");
+  lineWidth.set(5);
+  E.step(16);
+  assert.ok(frames > first, "drawn again for the new width");
+  assert.deepEqual(fake.set.filter(([k]) => k === "lineWidth").at(-1), ["lineWidth", 5]);
+  const before = frames;
+  mode.set("xy");
+  E.step(16);
+  assert.ok(frames > before, "drawn again for the new mode");
+  dispose();
+  fake.restore();
+});
+
+test("Oscilloscope: the source follows the prop: none → a number (one source, its loudness live) → none", () => {
+  const given = signal(undefined);
+  const [el, dispose] = mount(() => h(Oscilloscope, { get source() { return given(); } }));
+  const osc = el.querySelector(".m-osc");
+  assert.ok(osc.classList.contains("is-idle"));
+  given.set(0.6);
+  E.step(16);
+  assert.ok(!osc.classList.contains("is-idle"));
+  assert.equal(osc.getAttribute("aria-label"), "Oscilloscope: loud");
+  given.set(0.05);
+  for (let i = 0; i < 70; i++) E.step(16);
+  assert.equal(osc.getAttribute("aria-label"), "Oscilloscope: quiet", "the same source reads the new number");
+  given.set(undefined);
+  assert.ok(osc.classList.contains("is-idle"));
+  assert.equal(osc.getAttribute("aria-label"), "Oscilloscope: No signal");
+  dispose();
+});

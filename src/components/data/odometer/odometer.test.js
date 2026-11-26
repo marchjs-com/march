@@ -63,3 +63,18 @@ test("Odometer: a live digit count redraws the same value; the Turkish locale us
   setLocale("en");
   dispose();
 });
+
+test("Odometer: decimals, color and variant follow later values (getters)", () => {
+  const dec = signal(1), co = signal(undefined), va = signal("mechanical");
+  const [el, dispose] = mount(() => h(Odometer, { value: 12.5, digits: 3, get decimals() { return dec(); }, get color() { return co(); }, get variant() { return va(); }, motion: false }));
+  const root = el.querySelector(".m-odo");
+  assert.match(root.getAttribute("aria-label"), /12\.5/);
+  dec.set(0);
+  assert.doesNotMatch(root.getAttribute("aria-label"), /12\.5/);
+  assert.ok(!el.querySelector(".m-odo-roll").classList.contains("is-frac"));
+  co.set("success");
+  assert.equal(root.getAttribute("data-m-color"), "success");
+  va.set("flip");
+  assert.ok(root.classList.contains("m-odo-flip"));
+  dispose();
+});

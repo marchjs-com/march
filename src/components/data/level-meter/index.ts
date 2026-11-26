@@ -6,7 +6,7 @@
 // readers, updated at most four times a second.
 import "./level-meter.css";
 import { h } from "../../../dom/h.ts";
-import { signal, effect, untrack, onCleanup, getOwner, runWithOwner, type Signal } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack, onCleanup, getOwner, runWithOwner, type Signal } from "../../../core/reactive.ts";
 import { t, locale } from "../../../core/i18n.ts";
 import { val, cx, clamp, later, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { onFrame, mutate, now } from "../../../motion/engine/clock.ts";
@@ -102,8 +102,11 @@ const perf = (): number => globalThis.performance?.now?.() ?? Date.now();
 
 /** `<LevelMeter value={$level} />` · `<LevelMeter source={mic} scale="db" ticks />` (stereo) */
 export function LevelMeter(props: LevelMeterProps): Element {
-  const first = untrack(() => val(props.value));
-  const count = props.channels ?? (props.source != null || (Array.isArray(first) && first.length > 1) ? 2 : 1);
+  // the channel count follows `channels`, the source and the value (the columns are built anew when it changes)
+  const count = computed((): number => {
+    const v = val(props.value);
+    return val(props.channels) ?? (props.source != null || (Array.isArray(v) && v.length > 1) ? 2 : 1);
+  });
   const n = (): number => Math.max(2, Math.round(val(props.segments) ?? 24));
   const vertical = (): boolean => val(props.orientation) !== "horizontal";
   const db = (): boolean => val(props.scale) === "db";
@@ -160,7 +163,7 @@ export function LevelMeter(props: LevelMeterProps): Element {
 
   // ---- the parts
   const names = (): readonly string[] => val(props.channelNames) ?? [t`left`, t`right`];
-  const letters = (): readonly string[] => { const l = val(props.labels) ?? true; return l === false ? [] : l === true ? (count === 2 ? [t`L`, t`R`] : []) : l; };
+  const letters = (): readonly string[] => { const l = val(props.labels) ?? true; return l === false ? [] : l === true ? (count() === 2 ? [t`L`, t`R`] : []) : l; };
   const zone = (k: number, segs: number): string => {
     const [a, b] = val(props.zones) ?? [0.7, 0.9], f = (k + 0.5) / segs;
     return f >= b ? "is-high" : f >= a ? "is-mid" : "is-low";
@@ -170,7 +173,7 @@ export function LevelMeter(props: LevelMeterProps): Element {
     const clipped = signal(false);
     const c: Channel = { meter: null as unknown as HTMLElement, segs: [], lit: 0, pos: 0, level: 0, peak: 0, peakAt: 0, peakSeg: -1, clipped, spokeAt: -1e9, speakTimer: null };
     chans[i] = c;
-    const name = (): string => { const l = val(props.label) ?? t`Level`; return count === 2 ? `${l}, ${names()[i] ?? i + 1}` : l; };
+    const name = (): string => { const l = val(props.label) ?? t`Level`; return count() === 2 ? `${l}, ${names()[i] ?? i + 1}` : l; };
     const bar = h("span", { class: "m-lm-bar", "aria-hidden": "true" }, () => {
       const segs = n();
       // rebuilt only when the count or the zones change; readings never touch these nodes
@@ -197,7 +200,10 @@ export function LevelMeter(props: LevelMeterProps): Element {
       return f < 0 || f > 1 ? null : h("span", { class: "m-lm-tick", style: { "--p": f } }, fmt(m));
     }));
   };
-  const columns = Array.from({ length: count }, (_, i) => column(i));
+  const columns = (): Element[] => {
+    const k = count();
+    return untrack(() => { chans.length = 0; return Array.from({ length: k }, (_, i) => column(i)); });
+  };
   const root = h("div", {
     class: () => cx("m-lm", vertical() ? "m-lm-v" : "m-lm-h", `m-lm-${val(props.size) ?? "md"}`, val(props.variant) === "flat" ? "m-lm-flat" : "m-lm-console", still(props.motion) && "is-still", val(props.class)),
     style: () => {
@@ -210,34 +216,47 @@ export function LevelMeter(props: LevelMeterProps): Element {
 
   // ---- readings
   const norm = (v: number): number => (Number.isFinite(v) ? clamp((v - lo()) / (hi() - lo() || 1), 0, 1) : 0);
-  if (props.source != null) {
-    // SAMPLE audio: the source reads on the clock while the meter is on screen; the DOM is written in the write phase.
-    // march/audio loads only for a source (LOAD lazily): a meter of a plain number never downloads it
+  // a new `source` (or none: the value) is read instead; what the old one set up goes with this run
+  const hasSource = computed(() => props.source != null);
+  effect(() => { const has = hasSource(); untrack(() => (has ? listen() : follow())); });
+  function listen(): void {
+    // SAMPLE audio (liveSource: a later source replaces the first, a number stays one source): it reads on the clock
+    // while the meter is on screen; the DOM is written in the write phase. march/audio loads only for a source (LOAD
+    // lazily): a meter of a plain number never downloads it
     const owner = getOwner();
-    void import("../../../audio/index.ts").then(({ toAudioSource }) => {
-      if (gone) return;
+    let stale = false;
+    onCleanup(() => { stale = true; });
+    void import("../../../audio/live.ts").then(({ liveSource }) => {
+      if (gone || stale) return;
       runWithOwner(owner, () => {
-        const src = toAudioSource(props.source!);
-        src.use(root);
-        let queued = false, levels: readonly number[] = [0, 0];
-        onCleanup(src.onUpdate((s) => {
-          levels = count === 2 ? s.channels() : [s.level()];
-          if (!queued) { queued = true; mutate(() => { queued = false; if (!gone) apply(levels, now()); }); }
-        }));
+        const source = liveSource(() => props.source as AudioSourceLike | null | undefined);
+        effect(() => {
+          const src = source();
+          if (!src) return;
+          untrack(() => {
+            src.use(root);
+            let queued = false, levels: readonly number[] = [0, 0];
+            onCleanup(src.onUpdate((s) => {
+              levels = count() === 2 ? s.channels() : [s.level()];
+              if (!queued) { queued = true; mutate(() => { queued = false; if (!gone && !stale) apply(levels, now()); }); }
+            }));
+          });
+        });
       });
     });
-  } else {
+  }
+  function follow(): void {
     // a value: draw on change; the clock runs only while a peak falls
     let levels: readonly number[] = [0], fall: (() => void) | null = null;
     const settle = (): void => {
       if (fall || gone) return;
       fall = onFrame((time) => { if (!apply(levels, time)) { fall?.(); fall = null; } }, { phase: "write" });
     };
-    onCleanup(() => fall?.());
+    onCleanup(() => { fall?.(); fall = null; });
     effect(() => {
       const v = val(props.value);
       const list = (Array.isArray(v) ? v : [v ?? 0]).map((x) => norm(Number(x)));
-      n(); val(props.scale); val(props.floor); // a new scale redraws the same value
+      n(); val(props.scale); val(props.floor); count(); // a new scale (or new columns) redraws the same value
       untrack(() => { levels = list; if (apply(levels, now())) settle(); });
     });
   }

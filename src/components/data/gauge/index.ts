@@ -152,10 +152,13 @@ export function Gauge(props: GaugeProps): Element {
     return `M${x0} ${y0}A${r} ${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1} ${y1}`;
   };
 
-  // ANIMATE needle: spring physics or VU ballistics on the engine; none under still(motion)
-  const mode = props.needle ?? look.needle;
-  const follow = mode === "none" ? null : track(() => target(), mode === "vu" ? VU : SPRING);
-  const shown = (): number => (follow && !still(props.motion) ? follow() : target());
+  // ANIMATE needle: spring physics or VU ballistics on the engine; none under still(motion). A new `needle` builds the
+  // follower anew (the old one is disposed with the computed's run)
+  const follow = computed(() => {
+    const mode = val(props.needle) ?? look.needle;
+    return mode === "none" ? null : untrack(() => track(() => target(), mode === "vu" ? VU : SPRING));
+  });
+  const shown = (): number => { const f = follow(); return f && !still(props.motion) ? f() : target(); };
 
   const redline = computed((): number | null => {
     const r = val(props.redline);
@@ -272,21 +275,23 @@ export function Gauge(props: GaugeProps): Element {
       h("circle", { class: "m-gauge-hub-cap", cx: () => geo().cx, cy: () => geo().cy, r: 4.5 })) : null);
 
   // COMPOSE CountRoll (or Odometer drums) for the readout; a live source updates it with the spoken value (4/s)
-  const shownValue: Accessor<number> = props.source != null ? spoken : target;
-  const ro = props.readout ?? look.readout;
-  const readout = !part("readout") || ro === false ? null
-    : h("div", { class: "m-gauge-readout", "aria-hidden": "true", style: () => ({ top: `${f1((geo().readY / geo().h) * 100)}%` }) },
+  const shownValue: Accessor<number> = computed(() => (props.source != null ? spoken() : target()));
+  // a new `readout` draws the readout anew
+  const readout = (): unknown => {
+    const ro = props.readout ?? look.readout;
+    return !part("readout") || ro === false ? null : h("div", { class: "m-gauge-readout", "aria-hidden": "true", style: () => ({ top: `${f1((geo().readY / geo().h) * 100)}%` }) },
       ro === "odometer"
         ? h(Odometer, { value: shownValue, digits: () => String(Math.floor(Math.max(Math.abs(max()), Math.abs(min())))).length, size: "sm", motion: props.motion })
         : typeof ro === "function" ? () => (ro as (v: number) => unknown)(shownValue())
         : ro === true ? h(CountRoll, { value: shownValue, formatter: fmt, roll: () => !still(props.motion), duration: 260, class: "m-gauge-value" })
         : ro,
       () => { const u = val(props.unit); return u ? h("span", { class: "m-gauge-unit" }, u) : null; });
+  };
 
   const root = h("div", {
     class: () => cx("m-gauge", `m-gauge-${variant}`, sweep() > 180 && !vu ? "is-round" : "is-flat", !part("face") && "m-gauge-bare", isRed() && "is-redline", val(props.class)),
     role: "meter",
-    "data-m-color": colorAttr(props.color),
+    "data-m-color": () => colorAttr(val(props.color)),
     "aria-label": () => val(props.label) ?? t`Gauge`,
     "aria-valuemin": min, "aria-valuemax": max,
     "aria-valuenow": () => f1(spoken()),
@@ -295,18 +300,27 @@ export function Gauge(props: GaugeProps): Element {
   }, svg, readout, part("glass") ? h("div", { class: "m-gauge-glass", "aria-hidden": "true" }) : null) as HTMLElement;
 
   // SAMPLE audio: the needle follows the source while the gauge is on screen; march/audio loads only for a source
-  // (LOAD lazily), so a gauge of a plain number never downloads it
-  if (props.source != null) {
-    let gone = false;
-    onCleanup(() => { gone = true; });
-    void import("../../../audio/index.ts").then(({ toAudioSource }) => {
-      if (gone) return;
-      runWithOwner(owner, () => {
-        const src = toAudioSource(props.source!);
-        src.use(root);
-        onCleanup(src.onUpdate((s) => level.set(s.level())));
+  // (LOAD lazily), so a gauge of a plain number never downloads it. A new `source` is followed instead
+  // (liveSource: a later source replaces the first, a number stays one source)
+  let gone = false;
+  onCleanup(() => { gone = true; });
+  const hasSource = computed(() => props.source != null);
+  effect(() => {
+    if (!hasSource()) return;
+    const run = getOwner();
+    let stale = false;
+    onCleanup(() => { stale = true; level.set(0); });
+    void import("../../../audio/live.ts").then(({ liveSource }) => {
+      if (gone || stale) return;
+      runWithOwner(run, () => {
+        const source = liveSource(() => props.source);
+        effect(() => {
+          const src = source();
+          if (!src) return;
+          untrack(() => { src.use(root); onCleanup(src.onUpdate((s) => level.set(s.level()))); });
+        });
       });
     });
-  }
+  });
   return root;
 }
