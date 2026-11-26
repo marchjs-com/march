@@ -1,0 +1,27 @@
+/* LedMatrix and every LED part: a panel, the screen (cols × rows, square LEDs), the LED canvas and its bloom halo. */
+.m-led { --m-led-on: var(--m-accent, var(--m-primary)); --m-led-pad: var(--m-space-3, 12px);
+  position: relative; display: block; inline-size: var(--m-led-w, 100%); max-inline-size: 100%; box-sizing: border-box;
+  padding: var(--m-led-pad); border-radius: var(--m-radius-3); isolation: isolate; }
+.m-led[data-m-led="amber"] { --m-led-on: color-mix(in oklab, var(--m-brand-gold) 60%, var(--m-brand-orange)); }
+.m-led[data-m-led="green"] { --m-led-on: color-mix(in oklab, var(--m-success) 75%, var(--m-on-scrim)); }
+.m-led[data-m-led="red"] { --m-led-on: color-mix(in oklab, var(--m-danger) 85%, var(--m-on-scrim)); }
+.m-led[data-m-led="blue"] { --m-led-on: color-mix(in oklab, var(--m-info) 75%, var(--m-on-scrim)); }
+.m-led[data-m-led="white"] { --m-led-on: var(--m-on-scrim); }
+
+/* the panel: black in both themes (LEDs glow on black), the page's surface, or none */
+.m-led-panel-dark { background: radial-gradient(120% 100% at 50% 0%, color-mix(in oklab, var(--m-scrim) 92%, var(--m-on-scrim)), var(--m-scrim) 75%);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--m-on-scrim) 6%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--m-on-scrim) 4%, transparent),
+    0 0.5rem 1.5rem color-mix(in srgb, var(--m-scrim) 22%, transparent); }
+.m-led-panel-theme { background: var(--m-surface-2, var(--m-surface)); border: var(--m-border-w, 1px) solid var(--m-border);
+  box-shadow: var(--m-shadow-inset, inset 0 1px 2px color-mix(in srgb, var(--m-text) 8%, transparent)); }
+.m-led-panel-none { padding: 0; background: none; }
+
+.m-led-screen { position: relative; inline-size: 100%; aspect-ratio: var(--m-led-cols, 32) / var(--m-led-rows, 8); }
+.m-led-canvas, .m-led-halo { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; display: block; }
+/* the halo is a quarter-size copy of the LEDs, blurred and added on top: lit LEDs glow, dark ones do not */
+.m-led-halo { filter: blur(var(--m-led-bloom, 6px)) saturate(1.3); opacity: .85; mix-blend-mode: screen; pointer-events: none; }
+.m-led-panel-theme .m-led-halo { mix-blend-mode: normal; opacity: .55; }
+
+.m-led.is-scanlined .m-led-screen::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background: repeating-linear-gradient(to bottom, transparent 0 2px, color-mix(in srgb, var(--m-scrim) 28%, transparent) 2px 3px); }
+.m-led:focus-visible { outline: 2px solid var(--m-focus, var(--m-accent)); outline-offset: 2px; }

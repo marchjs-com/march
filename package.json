@@ -351,7 +351,12 @@
     "./components/data/stream-graph": "./src/components/data/stream-graph/index.ts",
     "./components/data/sunburst-chart": "./src/components/data/sunburst-chart/index.ts",
     "./components/data/treemap": "./src/components/data/treemap/index.ts",
-    "./components/data/waterfall-chart": "./src/components/data/waterfall-chart/index.ts"
+    "./components/data/waterfall-chart": "./src/components/data/waterfall-chart/index.ts",
+    "./components/media/led-board": "./src/components/media/led-board/index.ts",
+    "./components/media/led-eyes": "./src/components/media/led-eyes/index.ts",
+    "./components/media/led-matrix": "./src/components/media/led-matrix/index.ts",
+    "./components/media/pixel-font": "./src/components/media/pixel-font/index.ts",
+    "./components/media/pixel-sprite": "./src/components/media/pixel-sprite/index.ts"
   },
   "bin": {
     "march": "./cli/march.js"

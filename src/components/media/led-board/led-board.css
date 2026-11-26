@@ -1,0 +1,7 @@
+/* LedBoard: the LED screen (led-matrix.css) plus focus and the paused mark. */
+.m-led-board { position: relative; display: block; border-radius: var(--m-radius-3); cursor: default; }
+.m-led-board > .m-led { inline-size: var(--m-led-w, 100%); }
+.m-led-board:focus-visible { outline: 2px solid var(--m-focus, var(--m-accent)); outline-offset: 3px; }
+/* paused from the keyboard: a small pause mark in the corner, so the stillness is explained */
+.m-led-board[data-paused]::after { content: ""; position: absolute; inset-block-start: 6px; inset-inline-end: 6px;
+  inline-size: 8px; block-size: 9px; border-inline: 3px solid color-mix(in srgb, var(--m-on-scrim) 70%, transparent); box-sizing: border-box; pointer-events: none; }

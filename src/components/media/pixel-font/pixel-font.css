@@ -1,0 +1,2 @@
+/* PixelFont: an LED label that sits in a line of text, as wide as its letters. */
+.m-led.m-pixel-font { display: inline-block; vertical-align: middle; inline-size: var(--m-led-w, calc(var(--m-led-cols) * 0.5em)); --m-led-pad: var(--m-space-1, 4px); }
