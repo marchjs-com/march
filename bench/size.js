@@ -24,7 +24,12 @@ import { tmpdir } from "node:os";
 // was read once and a plugin's editor or a debugger toggle never followed its value; +~40 bytes, measured 5.02 KB)
 // core 16.6 KB since shown texts follow the locale in i18n builds (_tr, _trf in core/i18n.ts; +~90 bytes, measured
 // 16.59 KB). Only an app built with i18n imports them: minimal and typical unchanged (docs/internal/size-watch.md).
-export const BUDGET = { core: 16.6 * 1024, minimal: 5.05 * 1024 };
+// core 16.75 KB since the list speed work (dom/for.ts: a swap moves two rows, no reorder pass, swap 0.9 -> 0.3 ms; dom/h.ts:
+// an event prop's name parsed once per name; +~140 bytes, measured 16.74 KB). A CDN page no longer loads this barrel:
+// each core module is a CDN entry of its own (tools/build-cdn.js), a page loads the ones it uses.
+// minimal 5.1 KB since the same work (a text binding made with its first value, a class written only when it changes, an
+// event name parsed once: create 1,000 rows 14-18 ms -> 8-9 ms script; measured 5.08 KB)
+export const BUDGET = { core: 16.75 * 1024, minimal: 5.1 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const ENTRIES = { core: "src/index.ts", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
 
@@ -95,7 +100,8 @@ render(() => <App />, document.body);
 // carries the link variant, pressed, pill and external links: about 0.2 KB). buttonJs 7.75 KB: measured 7.51 KB. Both
 // grew ~1.4 KB when Button's busy ring became the Spinner component itself (a part MarchIDE's Hierarchy lists and
 // m:parts={{ Spinner: … }} reaches): Spinner brings i18n (its default "Loading" label) and the colour lists
-export const APP_BUDGET = { buttonJs: 7.75 * 1024, buttonCss: 5.5 * 1024, typicalJs: 9.25 * 1024 };
+// typicalJs 9.3 KB since the list speed work (a swap fast path in For, event names parsed once: measured 9.28 KB)
+export const APP_BUDGET = { buttonJs: 7.75 * 1024, buttonCss: 5.5 * 1024, typicalJs: 9.3 * 1024 };
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const s = await sizes();

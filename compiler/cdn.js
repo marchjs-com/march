@@ -43,8 +43,9 @@ export async function loadCdn(base, cacheDir) {
     // sheets named by their rank (s/<rank>.css, since 0.3.24): the ranks alone; before that, each sheet's address
     if (own?.length) sheets[spec] = sheetList.named === "rank" ? { b: `${base}/s/`, r: own } : own.map((i) => [i, `${base}/${sheetList.sheets[i]}`]);
   }
-  // the core's files (every page loads them): index.html announces them up front
-  const core = (sizes.core?.files ?? []).map((f) => `${base}/${f}`);
+  // the runtime's files (every page that renders loads them; the core's other modules load when used):
+  // index.html announces them up front. Older versions: the whole core's files.
+  const core = (sizes.runtime?.files ?? sizes.core?.files ?? []).map((f) => `${base}/${f}`);
   return { base, url, size, css, sheets, core, exports: names?.exports ?? null, best: names?.best ?? null };
 }
 
