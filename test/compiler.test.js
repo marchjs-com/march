@@ -126,7 +126,7 @@ test("compile errors point at the source", () => {
 
 test("templates: one effect per clone for its classes, attributes and text parts that cannot create nodes", () => {
   const out = c(`const r = (row) => <tr class={sel() === row().id ? "on" : ""} title={row().label}><td>{row().id}</td><td>{view()}</td><td>{$n}</td></tr>`);
-  assert.match(out, /_\$fx\(\(\) => \{ _\$scls\(_r, sel\(\) === row\(\)\.id \? "on" : ""\); _\$sattr\(_r, "tr", "title", row\(\)\.label\); _x\d+ = _\$st\(_x\d+, _\d+, null, row\(\)\.id\); _x\d+ = _\$st\(_x\d+, _\d+, null, \$n\); \}\)/, "class, attribute and text parts in one effect");
+  assert.match(out, /_\$fx\(\(\) => \{ _k\d+ = _\$scl\(_r, sel\(\) === row\(\)\.id \? "on" : "", _k\d+\); _\$sattr\(_r, "tr", "title", row\(\)\.label\); _x\d+ = _\$st\(_x\d+, _\d+, null, row\(\)\.id\); _x\d+ = _\$st\(_x\d+, _\d+, null, \$n\); \}\)/, "class, attribute and text parts in one effect");
   assert.match(out, /let _x\d+ = null;/, "a text part's node is made by the effect, with its first value");
   assert.match(c(`const e = <td>{a()} {view()}</td>`.replace("a()", "$a")), /let _x\d+ = _\$txt\(/, "next to a region, a text part is placed up front (order)");
   assert.match(out, /_\$ins\(_\d+, \(\) => \(view\(\)\), null, 1\)/, "{view()} may render a component: it keeps its own region");
@@ -144,7 +144,7 @@ const s = <svg viewBox="0 0 1 1"><path d="M0 0" /></svg>; const sp = <div {...p}
   const decl = out.match(/const _\$t\d+ = _\$tpl\(/g) ?? [];
   assert.equal(decl.length, 2, "one template for the row (inner cells taken in) and one for <b> inside the spread <div>");
   assert.match(out, /_\$tpl\(\["tr",\[\["class","row"\]\],\["td",\[\["class","c1"\]\]\],\["td",\[\],\["a",\[\]," !"\]\],\["td",\[\["hidden",""\]\]\]\]\)/);
-  assert.match(out, /_\$fx\(\(\) => \{ _\$scls\(_\d+, \$sel\); \}\)/, "a bound class joins the template's one effect");
+  assert.match(out, /_\$fx\(\(\) => \{ _k\d+ = _\$scl\(_\d+, \$sel, _k\d+\); \}\)/, "a bound class joins the template's one effect (compared with the class last written)");
   assert.match(out, /_\$on\(_\d+, "click", go\)/, "a plain event is wired with _on, not a template attribute");
   assert.match(out, /_\$attr\(_\d+, "a", "href", "\/x"\)/, "URL attributes keep their runtime check (_attr)");
   assert.match(out, /_\$ins\(_\d+, label, _\d+, 1\)/, "a child before static text is inserted before it (owned by the clone: no cleanup)");

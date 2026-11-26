@@ -7,7 +7,7 @@
 //            ─► render interceptors around Comp(props) ─► output ─► setup (after render, with the root elements)
 import { computed, untrack, getOwner, runWithOwner, isReactive, reactive, provide, useContext, signal, DEV, onCleanup, _owner, type Owner } from "../core/reactive.ts";
 import { insert } from "./insert.ts";
-import { _componentHook, Fragment, type Component } from "./component.ts";
+import { _componentHook, createComponent, Fragment, type Component } from "./component.ts";
 import { If, Else, Try } from "./flow.ts";
 import { For } from "./for.ts";
 import { Switch, Match } from "./switch.ts";
@@ -145,7 +145,7 @@ const wantsPath = (t: Target): boolean => isPath(t) || (isTest(t) && ((t as unkn
 function changed(): void {
   cache = new WeakMap();
   tracking = scopedPaths || entries.some((e) => wantsPath(e.target));
-  _componentHook(entries.length || scopes ? pipeline : undefined);
+  _componentHook(entries.length || scopes ? pipeline : undefined, createComponent);
   version.update((v) => v + 1);
 }
 
@@ -370,7 +370,19 @@ function rootsOf(v: unknown, into: Element[] = []): Element[] {
 }
 const snap = (p: Props): Props => { const o: Props = {}; for (const k of Object.keys(p)) { const v = p[k]; o[k] = isReactive(v) && !RAW.test(k) ? untrack(v) : v; } return o; };
 
-function pipeline(Comp: Component<Props>, raw0: Props): [Component<Props>, Props] {
+/** Compiler-ready props (dom/component.ts › _cp) in the form h() gives them: a live getter becomes a reactive thunk; the
+ * children getter stays a getter (copied as one). Extensions read props as they always did. */
+function thunked(ready: Props): Props {
+  const raw: Props = {};
+  for (const key of Object.keys(ready)) {
+    const d = Object.getOwnPropertyDescriptor(ready, key)!;
+    if (!d.get || key === "children") Object.defineProperty(raw, key, d);
+    else raw[key] = reactive(() => (d.get as () => unknown).call(ready));
+  }
+  return raw;
+}
+function pipeline(Comp: Component<Props>, raw0: Props, ready?: boolean): [Component<Props>, Props] {
+  if (ready) raw0 = thunked(raw0);
   if (!tracking) return runPipeline(Comp, raw0);
   // a path target is registered: every instance runs under an owner of its own that knows its component ancestors
   const parent = useContext(PathCtx);

@@ -26,7 +26,9 @@ import { tmpdir } from "node:os";
 // 16.59 KB). Only an app built with i18n imports them: minimal and typical unchanged (docs/internal/size-watch.md).
 // Measured as a production build (PROD below: development-only code left out, as march build and the CDN build ship it)
 // since the list speed work and the h.ts modules (dom/insert, events, tpl, props, component): the same budgets hold.
-export const BUDGET = { core: 16.6 * 1024, minimal: 5.05 * 1024 };
+// core 16.65 KB since components take compiler-ready props (_cp, with the copying path reached only through h(), _c or
+// an installed extension: an app made by the compiler no longer bundles it; the site's bench app went 4.88 -> 4.62 KB)
+export const BUDGET = { core: 16.65 * 1024, minimal: 5.05 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const ENTRIES = { core: "src/index.ts", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
 

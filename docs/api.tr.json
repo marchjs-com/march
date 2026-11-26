@@ -20,6 +20,7 @@
   "_on": "Derleyici yardımcısı (doğrudan kullanım için değil): değiştiricisiz bir olay işleyicisi (onClick) bağlar; render() ağacında belgeye devredilir, değilse doğrudan dinleyici.",
   "_prop": "Derleyici yardımcısı (doğrudan kullanım için değil): şablon kopyasındaki bir öğeye tek bir JSX özelliğini h() gibi uygular (bağlı öznitelik, olay, ref, yönerge).",
   "_sattr": "Derleyici yardımcısı (doğrudan kullanım için değil): şablonun tek etkisi içinde düz bir özniteliği yazar (değişince).",
+  "_scl": "Derleyici yardımcısı (doğrudan kullanım için değil): başka sınıf kaynağı olmayan bir öğenin class değerini şablonun tek etkisi içinde yazar; son yazılanla JS içinde karşılaştırır (DOM okunmaz).",
   "_scls": "Derleyici yardımcısı (doğrudan kullanım için değil): şablonun tek etkisi içinde class değerini yazar (değişmediyse yazmaz).",
   "_st": "Derleyici yardımcısı (doğrudan kullanım için değil): şablonun bir metin parçasını çizer; ilk çağrıda metin düğümünü değeriyle oluşturur, sonra yalnız değişince yazar.",
   "_tpl": "Derleyici yardımcısı (doğrudan kullanım için değil): yerel öğe ağacını bir kez DOM çağrılarıyla kurar (HTML dizgesi yok), her kullanımda kopyalar; yalnız dinamik kısımlar bağlanır.",

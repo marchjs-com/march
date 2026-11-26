@@ -19,8 +19,8 @@ const { sx: resolveSx } = await importTs(new URL("../src/core/sx.ts", import.met
 const TEXT_ATTRS = new Set(["title", "placeholder", "label", "alt", "aria-label", "aria-description", "description", "hint", "message"]);
 // an object's fields whose string is read by people (lang.json collects them): `{ label: "Enerjik", hint: "…" }`
 const TEXT_KEYS = new Set(["label", "title", "text", "message", "description", "placeholder", "hint", "caption", "subtitle", "heading", "tooltip", "tip", "helperText", "emptyText", "confirmText", "cancelText", "okText"]);
-const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins", gen: "_$gen", tr: "_$tr", trf: "_$trf", c: "_$c", cp: "_$cp", cls: "_$cls", attr: "_$attr", on: "_$on", fx: "_$fx", txt: "_$txt", st: "_$st", scls: "_$scls", sattr: "_$sattr" };
-const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert", gen: "_gen", tr: "_tr", trf: "_trf", c: "_c", cp: "_cp", cls: "_cls", attr: "_attr", on: "_on", fx: "effect", txt: "_txt", st: "_st", scls: "_scls", sattr: "_sattr" };
+const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins", gen: "_$gen", tr: "_$tr", trf: "_$trf", c: "_$c", cp: "_$cp", cls: "_$cls", attr: "_$attr", on: "_$on", fx: "_$fx", txt: "_$txt", st: "_$st", scls: "_$scls", scl: "_$scl", sattr: "_$sattr" };
+const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert", gen: "_gen", tr: "_tr", trf: "_trf", c: "_c", cp: "_cp", cls: "_cls", attr: "_attr", on: "_on", fx: "effect", txt: "_txt", st: "_st", scls: "_scls", scl: "_scl", sattr: "_sattr" };
 // Templates: a native element subtree is built once (DOM calls, no HTML strings) and cloned; only its dynamic parts
 // (bound attributes, events, refs, directives, {expressions}, components) are wired on the clone. Not templated:
 // SVG (namespace), forbidden tags (h() throws for them), spreads.
@@ -930,7 +930,14 @@ class Transformer {
     const nextStatic = (n, i) => n.kids.slice(i + 1).find((x) => !x.expr);
     const walk = (n, ref) => {
       for (const [key, value, raw] of n.props) {
-        if (FX && raw && (key === "class" || key === "className")) fx.push(`${this.helper("scls")}(${ref}, ${raw})`);
+        if (FX && raw && (key === "class" || key === "className")) {
+          // the only class source on the element: compared with the class last written, kept here (no DOM read)
+          if (!n.props.some(([k]) => k === "sx" || k.startsWith("class:") || k.startsWith("m:")) && !n.statics.some(([k]) => k === "class")) {
+            const cv = `_k${++v}`;
+            wire.push(`let ${cv} = "";`); // the template element has no class: an empty class is not written
+            fx.push(`${cv} = ${this.helper("scl")}(${ref}, ${raw}, ${cv})`);
+          } else fx.push(`${this.helper("scls")}(${ref}, ${raw})`);
+        }
         else if (FX && raw && plainAttr(key)) fx.push(`${this.helper("sattr")}(${ref}, ${JSON.stringify(n.tag)}, ${JSON.stringify(key)}, ${raw})`);
         else wire.push(this.wireProp(ref, n.tag, key, value));
       }

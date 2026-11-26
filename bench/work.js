@@ -31,7 +31,7 @@ function counter() {
 export async function listWork(n = 1000) {
   installDom();
   const { c, reset } = counter();
-  const { render, signal, selector, effect, For, reactive, lazyChildren, insert, _tpl, _scls, _st, _on, _c } = await import("../src/index.ts");
+  const { render, signal, selector, effect, For, reactive, lazyChildren, insert, _tpl, _scl, _st, _on, _c } = await import("../src/index.ts");
   let id = 0;
   const rows = (k) => Array.from({ length: k }, () => ({ id: ++id, label: `row ${id}` }));
   const $rows = signal([]), $sel = signal(0);
@@ -44,9 +44,9 @@ export async function listWork(n = 1000) {
   render(() => table((t) => {
     insert(t.firstChild, _c(For, { each: reactive(() => $rows()), key: "id" }, lazyChildren(() => [(row) => tr((r) => {
       const a = r.firstChild, b = a.nextSibling, link = b.firstChild;
-      let x1 = null, x2 = null;
+      let x1 = null, x2 = null, k1 = "";
       _on(link, "click", () => $sel.set(row().id));
-      effect(() => { _scls(r, isSelected(row().id) ? "danger" : ""); x1 = _st(x1, a, null, row().id); x2 = _st(x2, link, null, row().label); });
+      effect(() => { k1 = _scl(r, isSelected(row().id) ? "danger" : "", k1); x1 = _st(x1, a, null, row().id); x2 = _st(x2, link, null, row().label); });
     })])), null, 1);
   }), host);
   const tbody = host.querySelector("tbody");

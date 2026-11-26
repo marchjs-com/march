@@ -84,6 +84,16 @@ export function _st(t: Part | null, parent: Node, before: Node | null, v: unknow
   insert(host, v, t.e);
   return t;
 }
+/**
+ * Compiler helper (not for direct use): a class inside a template's one effect, on an element nothing else sets classes
+ * on (no sx, no class:x): a class string is compared with the one last written (`prev`, kept by the compiler), so the
+ * DOM is never read. Returns the new `prev`.
+ */
+export function _scl(el: Element, v: unknown, prev: unknown): unknown {
+  if (typeof v === "string") { if (v !== prev) (el as HTMLElement).className = v; return v; }
+  setClass(el as MarchEl, v);
+  return undefined;
+}
 /** Compiler helper (not for direct use): a class inside a template's one effect. */
 export const _scls = (el: Element, v: unknown): void => setClass(el as MarchEl, v);
 /** Compiler helper (not for direct use): a plain attribute inside a template's one effect. */
