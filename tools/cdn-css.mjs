@@ -3,7 +3,7 @@
 // modules happen to load in. With one stylesheet per entry holding its whole closure, a later entry brought the rules
 // of what it is made of back after an earlier entry's own rules: StatsBand's `.m-stats { display: grid }` lost to
 // Reveal's `.m-reveal-box { display: block }` (the same specificity, Reveal's link later), and the stats stood in a
-// column. So every source stylesheet is a sheet of its own (s/<path>.css), linked once, in the package's order: what a
+// column. So every source stylesheet is a sheet of its own (s/<rank>.css), linked once, in the package's order: what a
 // module imports comes before the module's own rules, as an app's rules come after March's.
 //   cssOrder(metafile, roots)   every source stylesheet, the ones a module depends on first
 //   entrySheets(metafile, out)  per entry module (its output file), the source stylesheets its closure has

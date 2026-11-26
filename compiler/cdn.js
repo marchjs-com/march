@@ -15,7 +15,7 @@ import { exportMap, statementStarts } from "./deep-imports.js";
  * The version folder's importmap.json and sizes.json, kept in `cacheDir` (a version's files never change).
  * @param {string} base  e.g. "https://cdn.marchjs.com/0.3.10"
  * @param {string} [cacheDir]
- * @returns {Promise<{ base: string, url: Record<string, string>, size: Record<string, number>, css: Record<string, string>, sheets: Record<string, [number, string][]>, core: string[], exports: Record<string, string[]> | null, best: Record<string, Record<string, string>> | null }>}
+ * @returns {Promise<{ base: string, url: Record<string, string>, size: Record<string, number>, css: Record<string, string>, sheets: Record<string, Sheets>, core: string[], exports: Record<string, string[]> | null, best: Record<string, Record<string, string>> | null }>}
  */
 export async function loadCdn(base, cacheDir) {
   base = base.replace(/\/+$/, "");
@@ -40,7 +40,8 @@ export async function loadCdn(base, cacheDir) {
     size[spec] = spec === "march" ? 0 : e?.added ?? Infinity;
     if (e?.css) css[spec] = url[spec].replace(/\.js$/, ".css");
     const own = sheetList?.entries?.[spec];
-    if (own?.length) sheets[spec] = own.map((i) => [i, `${base}/${sheetList.sheets[i]}`]);
+    // sheets named by their rank (s/<rank>.css, since 0.3.24): the ranks alone; before that, each sheet's address
+    if (own?.length) sheets[spec] = sheetList.named === "rank" ? { b: `${base}/s/`, r: own } : own.map((i) => [i, `${base}/${sheetList.sheets[i]}`]);
   }
   // the core's files (every page loads them): index.html announces them up front
   const core = (sizes.core?.files ?? []).map((f) => `${base}/${f}`);
@@ -125,9 +126,11 @@ import { cdnCss } from "march-cdn:css";
 ${local ? "" : "await "}cdnCss(${cssOf(spec, cdn)});`;
 }
 
-/** Whether an entry has stylesheets on the CDN. @param {string} spec @param {{ css: Record<string, string>, sheets?: Record<string, [number, string][]> }} cdn */
+/** An entry's sheets: `{ b: "<version>/s/", r: [rank, …] }` (s/<rank>.css), or `[[rank, address], …]` (0.3.23). */
+/** @typedef {{ b: string, r: number[] } | [number, string][]} Sheets */
+/** Whether an entry has stylesheets on the CDN. @param {string} spec @param {{ css: Record<string, string>, sheets?: Record<string, Sheets> }} cdn */
 export const hasCss = (spec, cdn) => !!(cdn.sheets?.[spec] ?? cdn.css[spec]);
-/** What cdnCss links for an entry: its sheets in the package's order (`[[rank, href], …]`, css.json), else its one stylesheet. */
+/** What cdnCss links for an entry: its sheets in the package's order (css.json), else its one stylesheet. */
 export const cssOf = (spec, cdn) => JSON.stringify(cdn.sheets?.[spec] ?? cdn.css[spec]);
 
 /**
@@ -154,7 +157,7 @@ export function cdnDynamic(code, cdn, local) {
   return used ? `import { cdnLazy as __mCdnLazy } from "march-cdn:css";\n${out}` : out;
 }
 
-/** A stylesheet of the package (`import "march/css/tokens.css"`), or an entry's sheets (`[[rank, href], …]`): linked from the CDN. */
+/** A stylesheet of the package (`import "march/css/tokens.css"`), or an entry's sheets (Sheets): linked from the CDN. */
 export const cdnStylesheet = (href, local) => `import { cdnCss } from "march-cdn:css";\n${local ? "" : "await "}cdnCss(${JSON.stringify(href)});`;
 
 /** The link helper the entry modules share (one <link> per URL; a prerendered page already has it in <head>). An entry's
@@ -185,11 +188,12 @@ function link(href, rank) {
   seen.set(href, p);
   return p;
 }
-/** Link a stylesheet (an address) or an entry's sheets ([[rank, address], …]); resolves when they are in. */
+/** Link a stylesheet (an address) or an entry's sheets ({ b, r: ranks } or [[rank, address], …]); resolves when they are in. */
 export function cdnCss(css) {
   if (typeof css === "string") return link(css);
   if (typeof document === "undefined") return;
-  return Promise.all(css.map(([rank, href]) => link(href, rank))).then(() => undefined);
+  const list = Array.isArray(css) ? css : css.r.map((r) => [r, css.b + r + ".css"]);
+  return Promise.all(list.map(([rank, href]) => link(href, rank))).then(() => undefined);
 }
 export const cdnLazy = (mod, css) => Promise.all([mod, cdnCss(css)]).then(([m]) => m);
 `;

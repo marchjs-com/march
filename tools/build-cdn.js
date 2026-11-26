@@ -3,7 +3,8 @@
 // cdn/dist/<version>/ — march.js (the "." entry), ui.js, app-ui.js, behaviors/drag.js, icons/lucide.js… — with
 //   march.css        every stylesheet of every entry, in one file (a page links this one)
 //   <entry>.css      the stylesheets of one entry (when it has any), what it is made of first
-//   s/<path>.css     each source stylesheet on its own; css.json: their order and each entry's (a CDN app links these)
+//   s/<rank>.css     each source stylesheet on its own, named by its place in the order; css.json: that order (the
+//                    source paths) and each entry's sheets (a CDN app links these)
 //   css/…            the stylesheets the package exports as files (tokens.css, themes/…)
 //   importmap.json   { imports: { "march": ".../march.js", "march/ui": ".../ui.js", … } } with absolute URLs
 //   sizes.json       per entry: gzip bytes a page downloads, on top of the core, and its closure (tools/cdn-size.mjs)
@@ -115,11 +116,12 @@ const keep = paying(first);
 if (keep.length < mods.length) await compile([...entries, ...keep]);
 console.log(`module entries: ${keep.length} of ${mods.length} pay (march/mod/…)`);
 entries.push(...keep);
-// the stylesheets (tools/cdn-css.mjs): every source stylesheet as a sheet of its own (s/<path>.css) in one order for the
+// the stylesheets (tools/cdn-css.mjs): every source stylesheet as a sheet of its own (s/<rank>.css) in one order for the
 // whole package, what a module is made of first. css.json lists the sheets in that order and, per entry, the ones its
 // closure needs: a page links each sheet once, in that order (compiler/cdn.js), whatever order its modules load in.
 // <entry>.css (one file per entry, for pages that link it by hand and for older compilers) and march.css (everything)
-// are those sheets put together in the same order.
+// are those sheets put together in the same order. A sheet is named by its rank (s/12.css): an app links an entry's
+// sheets by their ranks alone (compiler/cdn.js), a few bytes per entry instead of an address per sheet.
 {
   const rel = (p) => relative(root, p).split("\\").join("/");
   const order = cssOrder(meta, entries.map((e) => rel(e.in)));
@@ -127,7 +129,7 @@ entries.push(...keep);
   const used = new Set([...closure.values()].flat());
   const sheets = order.filter((k) => used.has(k));
   const rank = new Map(sheets.map((k, i) => [k, i]));
-  const sheetOf = (k) => `s/${k.replace(/^src\//, "")}`;
+  const sheetOf = (k) => `s/${rank.get(k)}.css`;
   const body = new Map();
   for (const k of sheets) {
     const { code } = await esbuild.transform(readFileSync(join(root, k), "utf8"), { loader: "css", minify: true, legalComments: "none" });
@@ -145,7 +147,7 @@ entries.push(...keep);
     perEntry[e.spec] = list.map((k) => rank.get(k));
     writeFileSync(join(out, `${e.out}.css`), joined(list));
   }
-  writeFileSync(join(out, "css.json"), `${JSON.stringify({ version, sheets: sheets.map(sheetOf), entries: perEntry })}\n`);
+  writeFileSync(join(out, "css.json"), `${JSON.stringify({ version, named: "rank", sheets: sheets.map((k) => k.replace(/^src\//, "")), entries: perEntry })}\n`);
   // march.css: the design tokens first and the sx utilities (an app imports march/css/tokens.css and sx.css itself; a
   // CDN page links march.css alone), then every sheet
   const own = [];

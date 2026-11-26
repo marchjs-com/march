@@ -125,7 +125,7 @@ export function march(opts = {}) {
           if (hasCss(entry, cdn)) return { path: cdn.sheets?.[entry] ? JSON.stringify(cdn.sheets[entry]) : cdn.css[entry], namespace: "march-cdn-style" };
           return { errors: [{ text: `${a.path}: no stylesheet of ${entry} on ${cdn.base} (march.config.js › cdn)` }] };
         });
-        build.onLoad({ filter: /.*/, namespace: "march-cdn-style" }, (a) => ({ contents: cdnStylesheet(a.path.startsWith("[") ? JSON.parse(a.path) : a.path, opts.cdnLocal), loader: "js", resolveDir: cwd }));
+        build.onLoad({ filter: /.*/, namespace: "march-cdn-style" }, (a) => ({ contents: cdnStylesheet(/^[[{]/.test(a.path) ? JSON.parse(a.path) : a.path, opts.cdnLocal), loader: "js", resolveDir: cwd }));
         build.onResolve({ filter: /^march-cdn:css$/ }, () => ({ path: "css", namespace: "march-cdn" }));
         build.onResolve({ filter: /^https:\/\// }, (a) => (a.path.startsWith(`${cdn.base}/`) ? { path: a.path, external: true } : undefined));
       }
