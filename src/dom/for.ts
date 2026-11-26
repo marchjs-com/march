@@ -1,5 +1,5 @@
 // Keyed list <For> (its own module: a page that only needs If/Try does not pull it into its chunk).
-import { getOwner, untrack, onCleanup, effect, runWithOwner, _cell, _setCell, _owner, _dispose, type Accessor, type Cell, type Owner } from "../core/reactive.ts";
+import { getOwner, untrack, onCleanup, effect, runWithOwner, _runIn, _cell, _setCell, _owner, _dispose, type Accessor, type Cell, type Owner } from "../core/reactive.ts";
 import { insert, removeNode, disposeDetached, LEAVE, doc as document } from "./insert.ts";
 import { val, call } from "./val.ts";
 
@@ -44,10 +44,12 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
   const renderRow = render as ForProps<T>["children"];
   const wantsIndex = renderRow.length !== 1; // `(item) => …` never reads the index: no index signal per row
 
+  // a row's nodes, drawn under the row's owner (one function for the list: no closures per row)
+  const draw = (item: Accessor<T>, index: Accessor<number>): Node[] => collect(renderRow(item, index));
   const make = (it: T, i: number, k: unknown): Row<T> => {
     const item = _cell(it), index = wantsIndex ? _cell(i) : null;
     const o = _owner(owner);
-    return { item, index, o, k, at: i, nodes: runWithOwner(o, () => collect(() => renderRow(item, index as Accessor<number>))) };
+    return { item, index, o, k, at: i, nodes: _runIn(o, draw, item, index as Accessor<number>) };
   };
   /** Drop rows; when they are every row of a parent the list owns alone, empty the parent at once. */
   const drop = (rs: Map<unknown, Row<T>>, all: boolean, host: Node): void => {
@@ -98,7 +100,7 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
       if (byKey.size) drop(byKey, byKey.size === m, host);
       if (!n && props.fallback != null && !fallback) {
         const o = _owner(owner);
-        fallback = { o, nodes: runWithOwner(o, () => collect(() => call(props.fallback))) };
+        fallback = { o, nodes: runWithOwner(o, () => collect(call(props.fallback))) };
         for (const x of fallback.nodes) host.insertBefore(x, end);
       }
       if (s > e2) return;
@@ -151,8 +153,7 @@ export function lis(a: ArrayLike<number>): Uint8Array {
 }
 
 /** Render a value into a detached fragment and return its top-level nodes. */
-function collect(fn: () => unknown): Node[] {
-  const v = fn();
+function collect(v: unknown): Node[] {
   if (v && typeof v === "object" && (v as Node).nodeType === 1) return [v as Node]; // one element: no fragment
   const frag = document().createDocumentFragment();
   insert(frag, v);

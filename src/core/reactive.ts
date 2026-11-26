@@ -325,6 +325,12 @@ export function createRoot<T>(fn: (dispose: Cleanup) => T, parent: Owner | null 
 
 /** The current reactive owner (capture it before an await, resume with runWithOwner). */
 export const getOwner = (): Owner | null => Owner;
+/** runWithOwner for a function of two arguments (not for direct use): no closure per call (a keyed list's rows). */
+export function _runIn<A, B, T>(owner: Owner | null, fn: (a: A, b: B) => T, a: A, b: B): T {
+  const prevO = Owner, prevL = Listener;
+  Owner = owner; Listener = null;
+  try { return fn(a, b); } finally { Owner = prevO; Listener = prevL; }
+}
 /** Run `fn` with a previously captured owner (async continuations). */
 export function runWithOwner<T>(owner: Owner | null, fn: () => T): T {
   const prevO = Owner, prevL = Listener;
