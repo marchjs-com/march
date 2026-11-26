@@ -3,3 +3,7 @@
 .m-chart-plot:hover .m-chart-slice:not(.m-chart-active) { opacity: 0.6; }
 .m-chart-center { font-size: 18px; font-weight: 600; fill: var(--m-chart-text); }
 @media (prefers-reduced-motion: reduce) { .m-chart-slice { transition: none; } }
+.m-chart-slice-g { transition: transform var(--m-ring-dur) cubic-bezier(.2,.8,.2,1); }
+.m-chart .m-chart-slice-label { fill: var(--m-on-primary-fill); font-weight: 700; pointer-events: none; paint-order: stroke; stroke: var(--m-chart-text); stroke-width: 2px; stroke-opacity: .35; }
+.m-chart-slice.m-chart-leaving { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .m-chart-slice-g { transition: none; } }

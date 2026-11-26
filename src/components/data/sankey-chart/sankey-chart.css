@@ -1,0 +1,17 @@
+/* SankeyChart: translucent ribbons (gradient from source to target by default) under solid nodes; hovering a node or a
+   ribbon lights its flow and fades the rest. */
+.m-sankey-link { fill: none; stroke-opacity: var(--m-sankey-link-opacity, 0.42); stroke-linecap: butt; transition: stroke-opacity var(--m-chart-dur); }
+.m-sankey-link:not(.m-sankey-gradient) { stroke: var(--m-c); }
+.m-sankey-neutral { stroke: var(--m-chart-muted); --m-sankey-link-opacity: 0.25; }
+.m-sankey-stop { stop-color: var(--m-c); }
+.m-sankey-flow:hover .m-sankey-link, .m-sankey-flow.m-sankey-on .m-sankey-link { stroke-opacity: 0.72; }
+.m-sankey-focus .m-sankey-flow:not(.m-sankey-on) .m-sankey-link { stroke-opacity: 0.08; }
+.m-sankey-focus .m-sankey-node:not(.m-sankey-on) rect { opacity: 0.35; }
+.m-sankey-node rect { fill: var(--m-c); stroke: none; transition: opacity var(--m-chart-dur); }
+.m-sankey-node.m-chart-active rect, .m-sankey-flow.m-chart-active .m-sankey-link { stroke: var(--m-chart-focus); stroke-width: 1.5; }
+.m-sankey-flow.m-chart-active .m-sankey-link { stroke-opacity: 0.85; }
+.m-chart .m-sankey-label { fill: var(--m-chart-text); font-weight: 600; pointer-events: none;
+  paint-order: stroke; stroke: color-mix(in oklab, var(--m-chart-bg) 75%, transparent); stroke-width: 3px; stroke-linejoin: round; }
+.m-chart .m-sankey-value { fill: var(--m-chart-muted); font-weight: 400; font-variant-numeric: tabular-nums; }
+.m-sankey-node, .m-sankey-link { cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { .m-sankey-link, .m-sankey-node rect { transition: none; } }

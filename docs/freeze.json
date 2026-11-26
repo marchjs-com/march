@@ -56,20 +56,6 @@
    ],
    "hash": "8f12476fd1ca7c32953a649f91e972f5"
   },
-  "BarChart": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/data/bar-chart"
-   ],
-   "hash": "091e70489d461995f9fe286875bb626f"
-  },
-  "BarList": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/data/bar-list"
-   ],
-   "hash": "60069eb0213cf777f9594bed1f7f0d08"
-  },
   "BeforeAfter": {
    "frozen": "2026-11-20",
    "paths": [
@@ -448,13 +434,6 @@
    ],
    "hash": "3f9c8f22e03e46f822c142b8252ab943"
   },
-  "Gantt": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/data/gantt"
-   ],
-   "hash": "fb140d8042eab5c4e93009ca004f3bc2"
-  },
   "GradientEditor": {
    "frozen": "2026-11-20",
    "paths": [
@@ -468,13 +447,6 @@
     "src/components/layout/grid"
    ],
    "hash": "1e38bc4cd8995347ce31ece20a03aa6d"
-  },
-  "Heatmap": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/data/heatmap"
-   ],
-   "hash": "c73a88bee404c38f9cabf131e6eda812"
   },
   "Hero": {
    "frozen": "2026-11-20",
@@ -594,13 +566,6 @@
     "src/components/social/like-button"
    ],
    "hash": "02ac8574a2a78227f2d66c9ad054f8a9"
-  },
-  "LineChart": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/data/line-chart"
-   ],
-   "hash": "ab5cc00503b332784c9aa1a54f7645d4"
   },
   "LinkCard": {
    "frozen": "2026-11-20",
@@ -819,13 +784,6 @@
    ],
    "hash": "a86e21abb7f73e85ff2527ee1097933e"
   },
-  "PieChart": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/data/pie-chart"
-   ],
-   "hash": "672459ddee5af0f38d22b1fb4eb820cf"
-  },
   "Popover": {
    "frozen": "2026-11-20",
    "paths": [
@@ -867,13 +825,6 @@
     "src/components/feedback/progress"
    ],
    "hash": "99b1d97783d5378a990332c99c111efd"
-  },
-  "ProgressRing": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/data/progress-ring"
-   ],
-   "hash": "67435d484dfadd939c1de0ca22a8815e"
   },
   "ProjectDetail": {
    "frozen": "2026-11-20",
@@ -1085,13 +1036,6 @@
    ],
    "hash": "67637ec84ced386d1f53aae900cbbadb"
   },
-  "Sparkline": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/data/sparkline"
-   ],
-   "hash": "2d0fbecc3cd8f555121d9ffa0f50d5cf"
-  },
   "Spinner": {
    "frozen": "2026-11-20",
    "paths": [
@@ -1112,13 +1056,6 @@
     "src/components/layout/stack"
    ],
    "hash": "0bb9eb6912b858f4f8c21ee31d0f461a"
-  },
-  "Stat": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/data/stat"
-   ],
-   "hash": "4ae9b29083e3e759ce37bc2a43107c8f"
   },
   "StatsBand": {
    "frozen": "2026-11-20",
@@ -4261,6 +4198,59 @@
    "name": "CodeInput",
    "what": "thaw",
    "reason": "input mask: box characters filtered by march/mask (other keyboards' digits, locale capitals)"
+  },
+  {
+   "name": "LineChart",
+   "what": "thaw",
+   "reason": "Charts enrichment (25 Nov 2026): change animations (enter/update/exit, controllable animate prop) and shared chart features"
+  },
+  {
+   "at": "2026-11-25",
+   "name": "BarChart",
+   "what": "thaw",
+   "reason": "Charts enrichment (25 Nov 2026): change animations (enter/update/exit, controllable animate prop) and shared chart features"
+  },
+  {
+   "at": "2026-11-25",
+   "name": "PieChart",
+   "what": "thaw",
+   "reason": "Charts enrichment (25 Nov 2026): change animations (enter/update/exit, controllable animate prop) and shared chart features"
+  },
+  {
+   "at": "2026-11-25",
+   "name": "Heatmap",
+   "what": "thaw",
+   "reason": "Charts enrichment (25 Nov 2026): change animations (enter/update/exit, controllable animate prop) and shared chart features"
+  },
+  {
+   "at": "2026-11-25",
+   "name": "Sparkline",
+   "what": "thaw",
+   "reason": "Charts enrichment (25 Nov 2026): change animations (enter/update/exit, controllable animate prop) and shared chart features"
+  },
+  {
+   "at": "2026-11-25",
+   "name": "Stat",
+   "what": "thaw",
+   "reason": "Charts enrichment (25 Nov 2026): change animations (enter/update/exit, controllable animate prop) and shared chart features"
+  },
+  {
+   "at": "2026-11-25",
+   "name": "ProgressRing",
+   "what": "thaw",
+   "reason": "Charts enrichment (25 Nov 2026): change animations (enter/update/exit, controllable animate prop) and shared chart features"
+  },
+  {
+   "at": "2026-11-25",
+   "name": "BarList",
+   "what": "thaw",
+   "reason": "Charts enrichment (25 Nov 2026): change animations (enter/update/exit, controllable animate prop) and shared chart features"
+  },
+  {
+   "at": "2026-11-25",
+   "name": "Gantt",
+   "what": "thaw",
+   "reason": "Charts enrichment (25 Nov 2026): change animations (enter/update/exit, controllable animate prop) and shared chart features"
   }
  ]
 }

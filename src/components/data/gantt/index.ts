@@ -2,7 +2,7 @@
 // or resize a bar, drag its knob to set progress, a today line and day / week / month scales. Successors that would
 // start before their predecessor ends are pushed later (`cascade`). Dates via core/date + Intl, drags via behaviors/drag.
 import "./gantt.css";
-import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack, onCleanup, type Signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, locale, dir } from "../../../core/i18n.ts";
 import { val, cx, uid, setStyle, later, clamp, type MaybeFn, type ClassProp, type Handler } from "../../../core/util.ts";
@@ -14,6 +14,8 @@ import { Badge } from "../badge/index.ts";
 import { ResizeHandle } from "../../layout/resize-handle/index.ts";
 import { LiveStatus } from "../../feedback/live-status/index.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
+import { For } from "../../../dom/for.ts";
+import { tween, presence, animated, animateOf, type AnimateProp } from "../../../charts/motion.ts";
 
 export interface GanttTask {
   id: string;
@@ -93,8 +95,15 @@ export interface GanttProps {
   barLabel?: Handler<[task: GanttTask]> | undefined;
   /** Your own texts: `{ today, task, days, help, helpReadonly, done, after, moved, pushed }`. @tr Kendi metinleriniz: `{ today, task, days, help, helpReadonly, done, after, moved, pushed }`. */
   labels?: Partial<GanttLabels> | undefined;
-  /** Arrow drawing, settle and scale-change animations (default true). @tr Ok çizimi, yerine oturma ve ölçek değişimi animasyonları (varsayılan true). */
-  animate?: boolean | undefined;
+  /**
+   * Change animation: bars glide to new dates and rows when the tasks change (not while you drag), new tasks grow in,
+   * removed ones fade out; arrows draw themselves in, a dropped bar settles, a scale change fades in. `true` (default:
+   * a spring), `false`, an easing name or `{ duration, easing, stagger, delay, enter, update, exit }`.
+   * @tr Değişim animasyonu: görevler değişince çubuklar yeni tarihlerine ve satırlarına kayar (sürüklerken değil), yeni
+   * görevler büyüyerek gelir, silinenler solar; oklar kendini çizer, bırakılan çubuk yerine oturur, ölçek değişimi
+   * belirir. `true` (varsayılan: yay), `false`, bir easing adı ya da `{ duration, easing, stagger, delay, enter, update, exit }`.
+   */
+  animate?: AnimateProp | (() => AnimateProp);
   /** Accessible name of the chart (default "Project timeline"). @tr Grafiğin erişilebilir adı (varsayılan "Project timeline"). */
   label?: MaybeFn<string | undefined>;
   /** Extra CSS classes on the chart. @tr Grafiğe eklenen CSS sınıfları. */
@@ -102,6 +111,10 @@ export interface GanttProps {
 }
 
 const PX: Record<GanttScale, number> = { day: 40, week: 18, month: 5 };
+/** Where a bar is drawn: inline start and width in px, row as a (fractional while gliding) row index. */
+interface BarGeo { x: number; w: number; row: number }
+/** A drawn bar and the time origin and scale its px were measured against. */
+interface DrawnGeo extends BarGeo { from: IsoDate; p: number }
 const NAME_W = 220;
 
 /** `<Gantt tasks={$tasks} scale="week" onChange={(task) => save(task)} />` */
@@ -117,7 +130,13 @@ export function Gantt(props: GanttProps): Element {
   const loc = (): string => locale();
   const today = todayIso();
   const lb = <K extends keyof GanttLabels>(k: K): GanttLabels[K] => props.labels?.[k] ?? LABELS[k]();
-  const motion = props.animate !== false;
+  const how = (): AnimateProp => animateOf(props.animate);
+  const motion = (): boolean => animated(untrack(how));
+  // the geometry each bar is drawn with now (follows its tween): arrows hang on it, a re-rendered bar starts from it
+  const drawn = new Map<string, Signal<DrawnGeo | null>>();
+  const geoOf = (tid: string): Signal<DrawnGeo | null> => { let g = drawn.get(tid); if (!g) drawn.set(tid, (g = signal<DrawnGeo | null>(null))); return g; };
+  /** A drawn geometry moved onto the current time origin (the range grows or shrinks with the tasks); none across scales. */
+  const rebase = (g: DrawnGeo | null): BarGeo | null => (g && g.p === px() ? { x: g.x + diffDays(range().from, g.from) * g.p, w: g.w, row: g.row } : null);
   // live preview while dragging: id → { start, end, progress }
   const preview = signal<Record<string, Partial<GanttTask>>>({});
   const view = (task: GanttTask): GanttTask => ({ ...task, ...preview()[task.id] });
@@ -187,13 +206,8 @@ export function Gantt(props: GanttProps): Element {
     const moved = changed.get(task.id) as GanttTask, f = dateFormat(loc(), { day: "numeric", month: "short" });
     const pushed = changed.size > 1 ? lb("pushed")(changed.size - 1) : "";
     status.set(`${lb("moved")(moved.name, f.format(utcDate(moved.start)), f.format(utcDate(moved.end)))}${pushed ? `, ${pushed}` : ""}`);
-    // pushed successors slide to their new place (they were re-rendered at it)
-    if (motion) later(() => {
-      for (const [tid] of changed) {
-        const el = barOf(tid);
-        if (el) void play(el, tid === task.id ? [{ transform: "scaleY(1.18)" }, { transform: "none" }] : [{ opacity: .4 }, { opacity: 1 }], { duration: 320, easing: "easeOutBack" });
-      }
-    }, 0);
+    // the changed bar settles with a small pop; pushed successors glide to their new place (their tween)
+    if (motion()) later(() => { const el = barOf(task.id); if (el) void play(el, [{ transform: "scaleY(1.18)" }, { transform: "none" }], { duration: 320, easing: "easeOutBack" }); }, 0);
   };
 
   // ------------------------------------------------------------------ bars
@@ -219,8 +233,9 @@ export function Gantt(props: GanttProps): Element {
       onEnd: (_pt, cancelled) => {
         bar.classList.remove("is-dragging");
         later(() => { dragging = false; }, 0);
-        preview.set({});
+        // commit first: the re-rendered bar starts where it was dropped (no snap back); a cancelled drag glides home
         if (!cancelled && Object.keys(next).length) commit(task, which === "progress" ? { progress: Math.round((next.progress ?? 0) * 20) / 20 } : next);
+        preview.set({});
       },
     });
   };
@@ -269,13 +284,38 @@ export function Gantt(props: GanttProps): Element {
       h(ResizeHandle, { edge: "end", class: "m-gantt-handle m-gantt-handle-end", "data-handle": "end" }),
       h("span", { class: "m-gantt-knob", "data-handle": "progress", "aria-hidden": "true" }),
     ]) as HTMLElement;
+    // the bar glides from where it was drawn (a re-render after a change) to its place; while it is dragged, or when
+    // the scale changes (the header jumps too), it is placed at once. A new task grows in from its start day.
+    let atScale = untrack(scale);
+    const before = untrack(() => rebase(geoOf(task.id)()));
+    const target = (): BarGeo => { const x = live(), p = px(), w = task.milestone ? rowH * 0.5 : (diffDays(x.start, x.end) + 1) * p; return { x: xOf(x.start) + (task.milestone ? p / 2 - w / 2 : 0), w, row }; };
+    const g = tween(target, ["x", "w", "row"], () => {
+      const s = untrack(scale);
+      if (s !== atScale) { atScale = s; return false; }
+      return untrack(preview)[task.id] ? false : how();
+    }, (to) => before ?? { ...to, w: 0 }, { index: () => row, key: task.id });
     effect(() => {
-      const x = live(), p = px(), w = task.milestone ? rowH * 0.5 : (diffDays(x.start, x.end) + 1) * p;
-      setStyle(el, { "inset-inline-start": `${xOf(x.start) + (task.milestone ? p / 2 - w / 2 : 0)}px`, width: `${w}px`, top: `${row * rowH + (task.milestone ? rowH * 0.25 : 7)}px`, "--m-gantt-p": `${Math.round((x.progress ?? 0) * 100)}%` });
+      const d = g();
+      setStyle(el, { "inset-inline-start": `${d.x}px`, width: `${Math.max(0, d.w)}px`, top: `${d.row * rowH + (task.milestone ? rowH * 0.25 : 7)}px` });
+      geoOf(task.id).set({ ...d, from: untrack(range).from, p: untrack(px) });
     });
+    effect(() => setStyle(el, { "--m-gantt-p": `${Math.round((live().progress ?? 0) * 100)}%` }));
     return el;
   };
   const hot = signal<string | null>(null);
+  const gone = presence(tasks, (x) => x.id, how);
+  const ghost = (task: GanttTask): Element => {
+    const g0 = untrack(() => rebase(geoOf(task.id)()));
+    const el = h("div", { class: cx("m-gantt-bar is-leaving", task.milestone && "is-milestone"), "data-m-color": colorAttr(task.color ?? "primary"), "aria-hidden": "true" },
+      task.milestone ? null : h("span", { class: "m-gantt-bar-label" }, task.name)) as HTMLElement;
+    const o = tween(() => ({ o: 0 }), ["o"], how, () => ({ o: 1 }), { key: task.id, leaving: () => true, onSettle: () => { drawn.delete(task.id); later(() => gone.done(task.id), 0); } });
+    effect(() => {
+      const v = Math.max(0, o().o);
+      if (g0) setStyle(el, { "inset-inline-start": `${g0.x}px`, width: `${g0.w}px`, top: `${g0.row * rowH + (task.milestone ? rowH * 0.25 : 7)}px` });
+      setStyle(el, { opacity: String(Math.round(v * 100) / 100), transform: `scale(${Math.round((0.92 + 0.08 * v) * 1000) / 1000})` });
+    });
+    return el;
+  };
 
   // ------------------------------------------------------------------ dependency arrows (SVG, mirrored in RTL)
   const arrows = (): Element => {
@@ -295,8 +335,10 @@ export function Gantt(props: GanttProps): Element {
       const path = document.createElementNS(svgNs, "path") as SVGPathElement;
       path.setAttribute("marker-end", `url(#${id}-tip)`);
       effect(() => {
-        const a = view(pre), b = view(task), p = px(), ia = indexOf().get(pre.id) ?? 0, ib = indexOf().get(task.id) ?? 0;
-        const x1 = xOf(a.end) + p + (pre.milestone ? -p / 2 + rowH / 4 : 0), y1 = ia * rowH + rowH / 2, x2 = xOf(b.start) + (task.milestone ? p / 2 - rowH / 4 : 0), y2 = ib * rowH + rowH / 2;
+        // the arrow hangs on the bars as they are drawn (it follows their glide)
+        const a = view(pre), b = view(task), ga = geoOf(pre.id)(), gb = geoOf(task.id)();
+        if (!ga || !gb) return;
+        const x1 = ga.x + ga.w, y1 = ga.row * rowH + rowH / 2, x2 = gb.x, y2 = gb.row * rowH + rowH / 2;
         const gap = 10, mid = y1 + (y2 > y1 ? rowH / 2 : -rowH / 2);
         // elbow: out of the predecessor, down between rows, into the successor; a backwards link detours around it
         const d = x2 - gap >= x1 + gap
@@ -311,7 +353,7 @@ export function Gantt(props: GanttProps): Element {
     }
     effect(() => { svg.setAttribute("width", String(width())); svg.setAttribute("height", String(tasks().length * rowH)); });
     // the links draw themselves in once (motion engine: reduced motion shows them at once)
-    if (motion) later(() => { const st = (i: number): number => i * 25; fresh.forEach((p, i) => { const len = p.getTotalLength?.() ?? 0; if (len) void play(p, [{ strokeDasharray: `${len}`, strokeDashoffset: `${len}` }, { strokeDasharray: `${len}`, strokeDashoffset: "0" }], { duration: 520, delay: st(i), easing: "easeOutCubic" }); }); }, 0);
+    if (motion()) later(() => { const st = (i: number): number => i * 25; fresh.forEach((p, i) => { const len = p.getTotalLength?.() ?? 0; if (len) void play(p, [{ strokeDasharray: `${len}`, strokeDashoffset: `${len}` }, { strokeDasharray: `${len}`, strokeDashoffset: "0" }], { duration: 520, delay: st(i), easing: "easeOutCubic" }); }); }, 0);
     return svg as unknown as Element;
   };
 
@@ -328,7 +370,9 @@ export function Gantt(props: GanttProps): Element {
       () => { const n = tasks().length; return Array.from({ length: n }, (_, i) => { const r = h("div", { class: "m-gantt-row" }) as HTMLElement; setStyle(r, { top: `${i * rowH}px`, height: `${rowH}px` }); return r; }); },
       () => { if (val(props.todayLine) === false) return null; const x = xOf(today); const el = h("div", { class: "m-gantt-today" }, h(Badge, { size: "xs", tone: "primary" }, lb("today"))) as HTMLElement; setStyle(el, { "inset-inline-start": `${x + px() / 2}px` }); return el; },
       () => (val(props.arrows) ?? true ? arrows() : null),
-      () => tasks().map((task, i) => bar(task, i)))) as HTMLElement;
+      () => tasks().map((task, i) => bar(task, i)),
+      // removed tasks fade out where they were drawn, then go (presence)
+      h(For<GanttTask & { leaving?: boolean }>, { each: () => gone.items().filter((x) => x.leaving), key: "id", children: (it: () => GanttTask) => ghost(untrack(it)) }))) as HTMLElement;
   effect(() => { setStyle(canvas, { width: `${width()}px`, "--m-gantt-rows": `${tasks().length * rowH}px`, "--m-gantt-row": `${rowH}px`, "--m-gantt-px": `${px()}px` }); });
   const side = props.names === false ? null : h("div", { class: "m-gantt-side" }, h("div", { class: "m-gantt-side-head" }, () => lb("task")), names) as HTMLElement;
   const scroller = h("div", { class: "m-gantt-scroll", role: "grid", "aria-label": () => val(props.label) ?? t`Project timeline`, "aria-describedby": props.help === false ? null : `${id}-help` },
@@ -351,7 +395,7 @@ export function Gantt(props: GanttProps): Element {
         scroller.scrollLeft = (rtl() ? -1 : 1) * Math.max(0, x);
       };
       toToday(50);
-      if (!first && motion) void play(canvas, [{ opacity: 0, transform: "scaleX(.97)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "easeOutCubic" });
+      if (!first && motion()) void play(canvas, [{ opacity: 0, transform: "scaleX(.97)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "easeOutCubic" });
       first = false;
     }, 0);
   });

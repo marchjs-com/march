@@ -1,0 +1,20 @@
+/* NetworkGraph: nodes in their group colors with a halo, hairline links, labels under the nodes. Hovering (or the
+   keyboard node) lights up its neighbours and dims the rest. */
+.m-network-chart .m-chart-svg { touch-action: none; user-select: none; -webkit-user-select: none; }
+.m-network-bg { fill: transparent; cursor: grab; }
+.m-network-bg:active { cursor: grabbing; }
+.m-network-link { stroke: var(--m-chart-axis); stroke-linecap: round; transition: stroke var(--m-chart-dur), stroke-opacity var(--m-chart-dur); }
+.m-network-arrow path { fill: var(--m-chart-axis); }
+.m-network-node { cursor: pointer; }
+.m-network-dot { fill: var(--m-c); stroke: var(--m-chart-bg); stroke-width: 1.5; }
+.m-network-ring { fill: var(--m-c); fill-opacity: 0; stroke: var(--m-c); stroke-opacity: 0; stroke-width: 2; transition: fill-opacity var(--m-chart-dur), stroke-opacity var(--m-chart-dur); }
+.m-network-node:hover .m-network-ring, .m-network-near .m-network-ring { fill-opacity: 0.16; }
+.m-network-node.m-chart-active .m-network-ring { stroke: var(--m-chart-focus); stroke-opacity: 1; fill-opacity: 0.16; }
+.m-network-pinned .m-network-dot { stroke: var(--m-chart-text); stroke-width: 2; }
+.m-chart .m-network-label { fill: var(--m-chart-text); font-size: 10.5px; pointer-events: none; paint-order: stroke; stroke: var(--m-chart-bg); stroke-width: 3px; stroke-linejoin: round; }
+.m-network-node, .m-network-link { transition: opacity var(--m-chart-dur); }
+.m-network-focus .m-network-node:not(.m-network-near) { opacity: 0.22; }
+.m-network-focus .m-network-link:not(.m-network-near) { stroke-opacity: 0.25; }
+.m-network-focus .m-network-link.m-network-near { stroke: var(--m-chart-muted); }
+.m-network-chart .m-chart-reset { position: absolute; inset-block-end: 0; inset-inline-end: 0; font: inherit; padding: 2px 8px; border: 1px solid var(--m-chart-grid); border-radius: 4px; background: var(--m-chart-bg); color: inherit; cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { .m-network-link, .m-network-ring, .m-network-node { transition: none; } }

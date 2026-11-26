@@ -2,14 +2,15 @@
 // formats) are in src/charts/.
 // PieChart (and donut): one slice per row, `x` = label key, `y` = value key. Slices are keyed by label.
 import "./pie-chart.css";
-import { signal, computed, read } from "../../../core/reactive.ts";
+import { signal, computed, read, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { applyPipe } from "../../../core/pipes.ts";
-import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, useSize, attr, navIndex, each, tween,
+import { rowsOf, accessor, formatter, num, seriesClass, colorStyle, useSize, attr, navIndex, each, tween, presence, animateOf, type AnimateProp, type Present,
   type MaybeReactive, type DataProp, type Field, type FormatSpec, type ChartBaseProps, type TooltipProp } from "../../../charts/util.ts";
 import { Frame, tooltipState, showTip, tipBody } from "../../../charts/parts.ts";
 import { clamp, type Handler } from "../../../core/util.ts";
 import { isActivateKey } from "../../../ui/behave.ts";
+import { arcPath, TAU } from "../../../charts/arc.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -38,15 +39,18 @@ export interface PieChartProps<D = unknown> extends ChartBaseProps {
   tooltip?: TooltipProp<PiePoint<D>>;
   /** Called with the point on click, or Enter / Space on the focused one. @tr Tıklanınca ya da odaktaki öğede Enter / Space'e basılınca noktayla çağrılır. */
   onSelect?: Handler<[p: PiePoint<D>]> | undefined;
-  /** When the data changes the slices turn to their new angles (a new one opens from its edge): `true` (a spring) or an easing name ("spring-wobbly", "out"…); default off. @tr Veri değişince dilimler yeni açılarına döner (yeni dilim kenarından açılır): `true` (yay) ya da bir easing adı ("spring-wobbly", "out"…); varsayılan kapalı. */
-  animate?: Opt<boolean | string>;
+  /** Change animations: slices open from their edge (one after another with `stagger`), turn to new angles and close when they leave. `true` (default, a spring), `false`, an easing name, `{ duration, easing, stagger, delay, enter, update, exit }` or `(ctx) => …`. @tr Değişim animasyonları: dilimler kenarlarından açılır (`stagger` ile sırayla), yeni açılarına döner ve ayrılırken kapanır. `true` (varsayılan, yay), `false`, bir easing adı, `{ duration, easing, stagger, delay, enter, update, exit }` ya da `(ctx) => …`. */
+  animate?: AnimateProp | (() => AnimateProp);
+  /** Text on the slices: "percent", "value", "label", `true` (= "percent") or `false` (default); thin slices stay bare. @tr Dilimlerin üstündeki yazı: "percent", "value", "label", `true` (= "percent") ya da `false` (varsayılan); ince dilimler yazısız kalır. */
+  labels?: Opt<boolean | "percent" | "value" | "label">;
+  /** The active (hovered / focused) slice moves out by this many px (default 6; 0 keeps it in place). @tr Etkin (üstüne gelinen / odaktaki) dilim bu kadar px dışarı çıkar (varsayılan 6; 0 yerinde tutar). */
+  pop?: Opt<number>;
 }
 /** One slice of `pieLayout`. */
 export interface PieSlice { start: number; end: number; value: number; share: number }
 interface PieItem<D> { key: string; label: string; index: number; value: number; datum: D }
 type Slice<D> = PieItem<D> & PieSlice & { d: string };
 
-const TAU = Math.PI * 2;
 const f2 = (v: number): number => Math.round(v * 100) / 100;
 
 /** Angles (radians, clockwise from 12 o'clock) for non-negative values. Returns [{start, end, value, share}]. */
@@ -61,18 +65,8 @@ export function pieLayout(values: readonly unknown[], { padAngle = 0 }: { padAng
   });
 }
 
-/** SVG path for an annular sector (r0 = 0 for a pie slice). */
-export function arcPath(cx: number, cy: number, r: number, r0: number, a0: number, a1: number): string {
-  const pt = (rad: number, a: number): string => `${f2(cx + rad * Math.sin(a))},${f2(cy - rad * Math.cos(a))}`;
-  if (a1 - a0 >= TAU - 1e-9) { // full circle: two half arcs
-    const ring = (rad: number, sweep: number): string => `M${pt(rad, 0)}A${rad},${rad} 0 1 ${sweep} ${pt(rad, Math.PI)}A${rad},${rad} 0 1 ${sweep} ${pt(rad, 0)}Z`;
-    return ring(r, 1) + (r0 > 0 ? ring(r0, 0) : "");
-  }
-  if (a1 <= a0) return "";
-  const large = a1 - a0 > Math.PI ? 1 : 0;
-  const outer = `M${pt(r, a0)}A${r},${r} 0 ${large} 1 ${pt(r, a1)}`;
-  return r0 > 0 ? `${outer}L${pt(r0, a1)}A${r0},${r0} 0 ${large} 0 ${pt(r0, a0)}Z` : `${outer}L${f2(cx)},${f2(cy)}Z`;
-}
+// arcPath lives in src/charts/arc.ts (shared by the round charts); exported here as before
+export { arcPath };
 
 /** Pie / donut chart. See docs/charts.md for props. */
 export function PieChart<D>(props: PieChartProps<D>): Element {
@@ -120,15 +114,34 @@ export function PieChart<D>(props: PieChartProps<D>): Element {
     show(k);
   };
   const activeKey = (): string | undefined => slices()[active()]?.key;
+  const how = (): AnimateProp => animateOf(props.animate);
+  const live = presence(slices, (x) => x.key, how);
+  const labelMode = computed(() => { const l = read(props.labels); return l === true ? "percent" : l || null; });
 
   const body = [
     h("g", { class: "m-chart-plot", onPointerLeave: hide },
-      each<Slice<D>>({ each: slices, key: (s) => s.key, children: (s) => { const a = tween(s, ["start", "end"], () => read(props.animate), (to) => ({ ...to, end: to.start })); return h("path", {
-        class: () => `m-chart-slice ${seriesClass(s().index)}`, "class:m-chart-active": () => activeKey() === s().key,
-        style: () => colorStyle(props.colors, s().index), d: attr(() => { const t = a(), g = geo(); return t.start === s().start && t.end === s().end ? s().d : arcPath(g.cx, g.cy, g.r, g.r0, t.start, Math.max(t.start, t.end)); }),
-        onPointerEnter: () => show(slices().findIndex((x) => x.key === s().key)),
-        onClick: () => select(slices().findIndex((x) => x.key === s().key)),
-      }); } })),
+      each<Present<Slice<D>>>({ each: live.items, key: (s) => s.key, children: (s) => {
+        const key = untrack(s).key;
+        // a leaving slice closes onto its middle; a new one opens from its start edge
+        const a = tween(() => { const t = s(); if (!t.leaving) return t; const mid = (t.start + t.end) / 2; return { ...t, start: mid, end: mid }; }, ["start", "end"], how, (to) => ({ ...to, end: to.start }),
+          { index: () => s().index, key, leaving: () => !!s().leaving, onSettle: () => { if (s().leaving) live.done(key); } });
+        const mid = (): number => { const t = a(); return (t.start + t.end) / 2; };
+        const out = (): number => (activeKey() === key ? num(read(props.pop)) ?? 6 : 0);
+        return h("g", { class: "m-chart-slice-g", style: () => { const o = out(); return { transform: o ? `translate(${f2(o * Math.sin(mid()))}px,${f2(-o * Math.cos(mid()))}px)` : "" }; } },
+          h("path", {
+            class: () => `m-chart-slice ${seriesClass(s().index)}`, "class:m-chart-active": () => activeKey() === key, "class:m-chart-leaving": () => !!s().leaving,
+            style: () => colorStyle(props.colors, s().index), d: attr(() => { const t = a(), g = geo(); return t.start === s().start && t.end === s().end && !s().leaving ? s().d : arcPath(g.cx, g.cy, g.r, g.r0, t.start, Math.max(t.start, t.end)); }),
+            onPointerEnter: () => show(slices().findIndex((x) => x.key === key)),
+            onClick: () => select(slices().findIndex((x) => x.key === key)),
+          }),
+          () => {
+            const m = labelMode();
+            if (!m || s().leaving) return null;
+            const at = attr(() => { const t = a(), g = geo(), r = g.r0 > 0 ? (g.r + g.r0) / 2 : g.r * 0.62, m2 = (t.start + t.end) / 2; return { x: f2(g.cx + r * Math.sin(m2)), y: f2(g.cy - r * Math.cos(m2)), wide: t.end - t.start > 0.32 }; });
+            return h("text", { class: "m-chart-slice-label", x: () => at().x, y: () => at().y, "text-anchor": "middle", "dominant-baseline": "middle", visibility: () => (at().wide ? "visible" : "hidden") },
+              () => { const t = s(); return m === "value" ? String(fmt()(t.value)) : m === "label" ? t.label : String(applyPipe("percent", t.share, 0)); });
+          });
+      } })),
     () => (geo().r0 > 0 ? h("text", { class: "m-chart-center", x: () => geo().cx, y: () => geo().cy, "text-anchor": "middle", "dominant-baseline": "middle" },
       () => { const c = read(props.center); return c ?? fmt()(total()); }) : null),
   ];

@@ -1,8 +1,5 @@
 /* LineChart / AreaChart: the pointer surface, the zoom brush and its reset button, the guide at the keyboard point.
    The line and area marks are shared with Sparkline (src/charts/charts.css). */
-.m-chart-overlay { fill: transparent; cursor: crosshair; }
-.m-chart-brush { fill: var(--m-chart-brush); stroke: var(--m-chart-1); stroke-width: 1; pointer-events: none; }
-.m-chart-focus { pointer-events: none; }
-.m-chart-guide { stroke: var(--m-chart-axis); stroke-dasharray: 3 3; }
-.m-chart-reset { position: absolute; inset-block-start: 0; inset-inline-end: 0; font: inherit; padding: 2px 8px; border: 1px solid var(--m-chart-grid); border-radius: 4px; background: var(--m-chart-bg); color: inherit; cursor: pointer; }
-.m-chart-reset[hidden] { display: none; }
+.m-chart-dots { fill: var(--m-c, var(--m-chart-1)); stroke: var(--m-chart-bg); stroke-width: 1.5; }
+.m-chart-is-bar .m-chart-bar { fill: var(--m-c); }
+.m-chart-is-bar .m-chart-bar:hover { opacity: 0.85; }

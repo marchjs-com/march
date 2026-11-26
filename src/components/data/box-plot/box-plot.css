@@ -1,0 +1,19 @@
+/* BoxPlot: a tinted box with a strong median, whiskers with caps, a mean diamond, outlier rings; a violin is a soft
+   silhouette in the series color with a slim box (mode "both") or a bar and a median dot (mode "violin") inside. */
+.m-boxplot-surface { fill: transparent; }
+.m-boxplot-item { transition: opacity var(--m-chart-dur); }
+.m-boxplot-hovering .m-boxplot-item:not(.m-chart-active) { opacity: 0.45; }
+.m-boxplot-leaving { pointer-events: none; }
+.m-boxplot-box { fill: color-mix(in srgb, var(--m-c) 22%, var(--m-chart-bg)); stroke: var(--m-c); stroke-width: 1.5; stroke-linejoin: round; }
+.m-boxplot-item.m-chart-active .m-boxplot-box { fill: color-mix(in srgb, var(--m-c) 36%, var(--m-chart-bg)); }
+.m-boxplot-whisker { fill: none; stroke: var(--m-c); stroke-width: 1.5; stroke-linecap: round; }
+.m-boxplot-median { stroke: var(--m-chart-text); stroke-width: 2.5; stroke-linecap: round; }
+.m-boxplot-mean { fill: var(--m-chart-bg); stroke: var(--m-chart-text); stroke-width: 1.5; }
+.m-boxplot-outlier { fill: var(--m-chart-bg); stroke: var(--m-c); stroke-width: 1.5; }
+.m-boxplot-dot { fill: var(--m-c); fill-opacity: 0.55; pointer-events: none; }
+.m-boxplot-violin { fill: color-mix(in srgb, var(--m-c) 30%, transparent); stroke: var(--m-c); stroke-width: 1.25; stroke-linejoin: round; }
+.m-boxplot-mode-both .m-boxplot-box { fill: var(--m-chart-text); fill-opacity: 0.85; stroke: none; }
+.m-boxplot-mode-both .m-boxplot-median { stroke: var(--m-chart-bg); }
+.m-boxplot-mode-violin .m-boxplot-box { fill: none; stroke: var(--m-chart-text); stroke-width: 5; stroke-linecap: round; }
+.m-boxplot-mode-violin .m-boxplot-median { stroke: var(--m-chart-bg); stroke-width: 3; }
+@media (prefers-reduced-motion: reduce) { .m-boxplot-item { transition: none; } }

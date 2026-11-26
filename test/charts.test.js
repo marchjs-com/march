@@ -7,6 +7,10 @@ const C = await import("../src/charts/index.ts");
 const { scaleLinear, scaleTime, scaleBand, niceTicks, timeTicks, lttb, pieLayout, heatLevel } = C;
 
 setLocale("en");
+// Charts animate by default (on the engine clock, which runs here too). These tests read final geometry, so they run with
+// reduced motion (every change jumps to its end); the animate tests at the bottom switch it back on.
+const { setReducedMotion } = await import("../src/motion/env.ts");
+setReducedMotion(true);
 const mount = (fn) => { const el = document.createElement("div"); document.body.appendChild(el); const dispose = render(fn, el); return { el, dispose }; };
 const key = (el, k) => el.dispatchEvent(new Event("keydown", { key: k, bubbles: true, cancelable: true }));
 const all = (el) => { const out = []; const walk = (n) => { if (n.nodeType === 1) out.push(n); n.childNodes.forEach(walk); }; walk(el); return out; };
@@ -149,8 +153,10 @@ test("Heatmap: cell count and levels; calendar mode; ProgressRing and BarList", 
   assert.equal(heatLevel(10, 10), 4);
   assert.equal(heatLevel(1, 10), 1);
   const cal = mount(() => h(C.Heatmap, { data: [{ date: "2026-03-02T12:00:00", n: 3 }], x: "date", value: "n", calendar: { weeks: 12 }, width: 600 })).el;
-  assert.equal(cal.querySelectorAll("rect.m-heat-cell").length, 12 * 7);
-  assert.equal(cal.querySelectorAll("rect.m-heat-4").length, 1);
+  // days after today are left out of the calendar (gaps), so the last week may be short
+  const cells = cal.querySelectorAll("rect.m-heat-cell").length;
+  assert.ok(cells <= 12 * 7 && cells > 11 * 7, `${cells} cells`);
+  assert.equal(cal.querySelectorAll("rect.m-heat-cell.m-heat-4").length, 1);
 
   const ring = mount(() => h(C.ProgressRing, { value: 72, label: "Score" })).el.querySelector("svg");
   assert.ok(ring.classList.contains("m-ring-mid"));
@@ -271,10 +277,11 @@ test("empty state and CSP: no style attribute anywhere", () => {
 });
 
 test("BarChart animate: the first draw is in place; a data change glides the bars (the axes take the new scale at once), off: in place", async () => {
+  setReducedMotion(null);
   const bars = (el) => all(el).filter((n) => n.getAttribute?.("class")?.includes("m-chart-bar")).map((n) => Number(n.getAttribute("height")));
   const data = signal([{ c: "a", v: 10 }, { c: "b", v: 20 }]);
-  const on = mount(() => h(C.BarChart, { data, x: "c", y: "v", width: 400, height: 200, animate: true })).el;
-  const off = mount(() => h(C.BarChart, { data, x: "c", y: "v", width: 400, height: 200 })).el;
+  const on = mount(() => h(C.BarChart, { data, x: "c", y: "v", width: 400, height: 200, animate: { enter: false } })).el;
+  const off = mount(() => h(C.BarChart, { data, x: "c", y: "v", width: 400, height: 200, animate: false })).el;
   const before = bars(on);
   assert.deepEqual(before, bars(off), "the first draw is the same");
   data.set([{ c: "a", v: 20 }, { c: "b", v: 10 }]);
@@ -286,10 +293,11 @@ test("BarChart animate: the first draw is in place; a data change glides the bar
 });
 
 test("PieChart animate: slices open from their edge, then turn to new angles on a data change; off: in place", async () => {
+  setReducedMotion(null);
   const paths = (el) => all(el).filter((n) => n.getAttribute?.("class")?.includes("m-chart-slice")).map((n) => n.getAttribute("d"));
   const data = signal([{ label: "a", value: 1 }, { label: "b", value: 3 }]);
   const on = mount(() => h(C.PieChart, { data, width: 200, height: 200, animate: "out" })).el;
-  const off = mount(() => h(C.PieChart, { data, width: 200, height: 200 })).el;
+  const off = mount(() => h(C.PieChart, { data, width: 200, height: 200, animate: false })).el;
   assert.notDeepEqual(paths(on), paths(off), "with animate the slices are still opening");
   await new Promise((r) => setTimeout(r, 1200));
   assert.deepEqual(paths(on), paths(off), "the slices arrived");
@@ -303,7 +311,7 @@ test("Heatmap animate: the cells carry a fill transition with the easing's curve
   const data = [{ x: 1, y: 1, value: 2 }, { x: 2, y: 1, value: 4 }];
   const plot = (el) => el.querySelector(".m-chart-plot");
   const on = plot(mount(() => h(C.Heatmap, { data, width: 300, animate: "out" })).el);
-  const off = plot(mount(() => h(C.Heatmap, { data, width: 300 })).el);
+  const off = plot(mount(() => h(C.Heatmap, { data, width: 300, animate: false })).el);
   assert.ok(on.classList.contains("m-heat-anim"));
   assert.ok(on.style.getPropertyValue("--m-heat-ease"), "the easing is set");
   assert.match(on.style.getPropertyValue("--m-heat-dur"), /^\d+ms$/);

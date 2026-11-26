@@ -1,7 +1,7 @@
 # BarChart
 
 Bars from rows of objects: one series, several side by side (grouped) or on top of each other (`stacked`), standing up
-or lying down (`horizontal`). Data may be a signal or a function; with `animate` the bars glide to new values while the
+or lying down (`horizontal`). Data may be a signal or a function; the bars glide to new values (`animate`) while the
 axes take the new scale at once.
 
 ```tsx
@@ -21,7 +21,10 @@ axes take the new scale at once.
 | `series` | Series labels (legend, tooltip, table): a list aligned with `y`, `{ key: label }` or one label. |
 | `stacked` | Stacks the visible series. |
 | `horizontal` / `orientation` | Categories on the y axis, bars grow to the right ("vertical" is the default). |
-| `animate` | On a data change the bars glide: `true` (a spring) or an easing name ("out", "spring-wobbly"…). Default off. |
+| `animate` | Change animations (see Motion). Default on. |
+| `labels` | Value labels: `true` / "outside", "inside" or `false` (default). |
+| `marks` | Reference lines, bands and statistics on the value axis (vertical bars): `{ y }`, `{ y: [a, b] }`, `{ y: "average", series }`, `{ x: ["Mar", "May"] }`; with `label`, `color`, `dash`. |
+| `export` | Export buttons: `true` (PNG, SVG, CSV), a list of formats or options. |
 | `xFormat` / `format` | Formats of the category labels and of the values: a pipe name, `[pipe, ...args]` or a function. |
 | `yMin` / `yMax` | The value axis range (rounded to nice ticks). |
 | `grid` | Grid lines. Default true. |
@@ -30,6 +33,13 @@ axes take the new scale at once.
 | `onSelect` | Called with the clicked / Enter-pressed bar (`{ x, y, series, datum, values }`). |
 | `title` / `description` | Accessible name (SVG title, table caption) and longer description. |
 | `xLabel` / `empty` / `colors` / `width` / `height` / `class` | Table x header, no-data content, per-series colors, size (default: container width × 260). |
+
+## Motion
+
+Bars grow from the baseline when first drawn, glide to new values when the data changes and sink back to the
+baseline before a removed category or hidden series disappears; value labels ride on the bar ends. `animate`: `true`
+(default, a spring), `false`, an easing name, `{ duration, easing, stagger, delay, enter, update, exit }` (stagger runs
+category by category) or `({ index, key, phase }) => …`. On the engine clock: global speed, pause and reduced motion apply.
 
 ## Accessibility
 

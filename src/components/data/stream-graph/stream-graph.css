@@ -1,0 +1,7 @@
+/* StreamGraph: soft layers without edge lines (edges brings them back), a little more fill than an area chart. */
+.m-stream-chart .m-chart-area { fill-opacity: 0.78; }
+.m-stream-chart .m-chart-line { stroke-width: 0; }
+.m-stream-chart.m-stream-edges .m-chart-line { stroke-width: 1.25; stroke: var(--m-chart-bg); }
+.m-stream-chart .m-chart-plot:hover .m-chart-series:not(:hover) .m-chart-area { fill-opacity: 0.45; }
+.m-stream-chart .m-chart-area { transition: fill-opacity var(--m-chart-dur); }
+@media (prefers-reduced-motion: reduce) { .m-stream-chart .m-chart-area { transition: none; } }

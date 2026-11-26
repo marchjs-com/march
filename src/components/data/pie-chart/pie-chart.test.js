@@ -11,7 +11,7 @@ const rows = [{ label: "A", value: 50 }, { label: "B", value: 30 }, { label: "C"
 
 test("PieChart: one slice per row; the donut shows the total, center replaces it; live data", () => {
   const data = signal(rows);
-  const [el, dispose] = mount(() => [h(PieChart, { data, donut: true, width: 300, height: 200 }), h(PieChart, { data: rows, donut: 0.8, center: "Votes", width: 300, height: 200 })]);
+  const [el, dispose] = mount(() => [h(PieChart, { data, donut: true, animate: false, width: 300, height: 200 }), h(PieChart, { data: rows, donut: 0.8, center: "Votes", width: 300, height: 200 })]);
   const [a, b] = el.querySelectorAll(".m-chart");
   assert.equal(a.querySelectorAll(".m-chart-slice").length, 3);
   assert.ok(a.querySelector(".m-chart-center").textContent.includes("100"));
@@ -28,5 +28,15 @@ test("PieChart: a pie has no center; onSelect gets the slice and its share", () 
   el.querySelector(".m-chart-slice").dispatchEvent(new Event("click", { bubbles: true }));
   assert.equal(got?.label, "A");
   assert.equal(got?.share, 0.5);
+  dispose();
+});
+
+test("PieChart: with animation a removed slice stays while it closes (marked leaving); labels show shares", () => {
+  const data = signal(rows);
+  const [el, dispose] = mount(() => h(PieChart, { data, labels: true, width: 300, height: 200 }));
+  data.set(rows.slice(0, 2));
+  assert.equal(el.querySelectorAll(".m-chart-slice").length, 3);
+  assert.equal(el.querySelectorAll(".m-chart-slice.m-chart-leaving").length, 1);
+  assert.ok(el.querySelector(".m-chart-slice-label"));
   dispose();
 });

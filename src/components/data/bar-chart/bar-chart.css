@@ -3,3 +3,6 @@
 .m-chart-plot:hover .m-chart-bar:not(.m-chart-active) { opacity: 0.6; }
 .m-chart-band { fill: var(--m-chart-grid); opacity: 0.5; }
 @media (prefers-reduced-motion: reduce) { .m-chart-bar { transition: none; } }
+.m-chart .m-chart-value { fill: var(--m-chart-text); font-weight: 600; font-variant-numeric: tabular-nums; pointer-events: none; }
+.m-chart .m-chart-value-inside { fill: var(--m-on-primary-fill); }
+.m-chart-bar.m-chart-leaving { pointer-events: none; }

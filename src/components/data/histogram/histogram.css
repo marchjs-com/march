@@ -1,0 +1,12 @@
+/* Histogram: touching bars in the series color (translucent when groups overlay), the band behind the active bin and a
+   smooth curve (normal or kernel density) drawn over the bars. */
+.m-histogram-surface { fill: transparent; }
+.m-histogram-bar { fill: var(--m-c); fill-opacity: 0.85; transition: opacity var(--m-chart-dur), fill-opacity var(--m-chart-dur); }
+.m-histogram-overlay .m-histogram-bar { fill-opacity: 0.45; }
+.m-histogram-hovering .m-histogram-bar:not(.m-chart-active) { opacity: 0.55; }
+.m-histogram-bar.m-chart-active { fill-opacity: 1; stroke: none; }
+.m-histogram-overlay .m-histogram-bar.m-chart-active { fill-opacity: 0.7; }
+.m-histogram-band { pointer-events: none; }
+.m-histogram-curve { fill: none; stroke: var(--m-c); stroke-width: 2.25; stroke-linejoin: round; pointer-events: none;
+  filter: drop-shadow(0 1px 0 var(--m-chart-bg)); }
+@media (prefers-reduced-motion: reduce) { .m-histogram-bar { transition: none; } }

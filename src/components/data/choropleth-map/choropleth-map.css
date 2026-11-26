@@ -1,0 +1,77 @@
+/* ChoroplethMap: regions filled by value (fill set per region through CSSOM), a hairline border in the surface colour,
+   the hovered region drawn again on top, raised; labels with a halo; a colour legend and zoom buttons. */
+.m-choropleth-chart { --m-choropleth-border: var(--m-chart-bg); --m-choropleth-focus: var(--m-chart-focus); }
+.m-choropleth-chart .m-chart-svg { overflow: hidden; }
+.m-choropleth-bg { fill: transparent; }
+.m-choropleth-zoomable { touch-action: pan-x pan-y; }
+.m-choropleth-zoomed { touch-action: none; cursor: grab; }
+.m-choropleth-zoomed:active { cursor: grabbing; }
+.m-choropleth-region {
+  stroke: var(--m-choropleth-border); stroke-width: 0.75; stroke-linejoin: round; vector-effect: non-scaling-stroke;
+  cursor: pointer; transition: fill-opacity var(--m-chart-dur);
+}
+.m-choropleth-dim { fill-opacity: 0.16; }
+.m-choropleth-selected { stroke: var(--m-choropleth-focus); stroke-width: 2; }
+.m-choropleth-raised {
+  stroke: var(--m-choropleth-focus); stroke-width: 1.75; stroke-linejoin: round; vector-effect: non-scaling-stroke; pointer-events: none;
+  transform-box: fill-box; transform-origin: center; transform: scale(1.06);
+  filter: drop-shadow(0 3px 6px color-mix(in srgb, var(--m-chart-text) 28%, transparent));
+}
+.m-choropleth-hatch-bg { fill: var(--m-surface-2); }
+.m-choropleth-hatch { stroke: var(--m-chart-axis); stroke-width: 1.2; }
+.m-choropleth-skeleton { fill: var(--m-surface-2); opacity: 0.7; }
+.m-chart .m-choropleth-label {
+  fill: var(--m-chart-text); font-size: 10px; font-weight: 600; pointer-events: none;
+  paint-order: stroke; stroke: var(--m-chart-bg); stroke-width: 2.5px; stroke-linejoin: round; stroke-opacity: 0.8;
+}
+
+/* legend */
+.m-choropleth-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; }
+.m-choropleth-legend[hidden] { display: none; }
+.m-choropleth-scale { display: flex; flex-direction: column; gap: 3px; inline-size: min(220px, 60%); }
+.m-choropleth-ramp { position: relative; block-size: 10px; border-radius: 999px; }
+.m-choropleth-ramp:dir(rtl) { transform: scaleX(-1); }
+.m-choropleth-marker {
+  position: absolute; inset-block: -3px; inline-size: 3px; margin-inline-start: -1.5px; border-radius: 2px;
+  background: var(--m-chart-text); box-shadow: 0 0 0 1.5px var(--m-chart-bg); transition: inset-inline-start var(--m-chart-dur);
+}
+.m-choropleth-ticks { display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; color: var(--m-chart-muted); }
+.m-choropleth-classes { display: flex; flex-wrap: wrap; gap: 4px; }
+.m-choropleth-class {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border: 1px solid transparent; border-radius: 999px;
+  background: none; color: inherit; font: inherit; font-variant-numeric: tabular-nums; cursor: pointer;
+  transition: opacity var(--m-chart-dur), border-color var(--m-chart-dur);
+}
+.m-choropleth-class:hover { border-color: var(--m-chart-axis); }
+.m-choropleth-class[aria-pressed="true"] { border-color: var(--m-choropleth-focus); }
+.m-choropleth-class:focus-visible { outline: 2px solid var(--m-chart-1); }
+.m-choropleth-class.m-chart-off { opacity: 0.45; }
+.m-choropleth-swatch { inline-size: 14px; block-size: 10px; border-radius: 3px; flex: none; }
+.m-choropleth-nodata-key { display: inline-flex; align-items: center; gap: 6px; color: var(--m-chart-muted); }
+.m-choropleth-swatch-none {
+  border: 1px solid var(--m-chart-axis);
+  background: repeating-linear-gradient(45deg, var(--m-surface-2) 0 2px, var(--m-chart-axis) 2px 3px);
+}
+.m-choropleth-at-right { flex-direction: row; align-items: flex-start; }
+.m-choropleth-at-right .m-chart-svg { flex: 1 1 auto; min-width: 0; }
+.m-choropleth-at-right .m-choropleth-legend { flex-direction: column; align-items: flex-start; flex: none; }
+.m-choropleth-at-right .m-choropleth-classes { flex-direction: column; }
+
+/* zoom buttons */
+.m-choropleth-zoom {
+  position: absolute; inset-block-start: 6px; inset-inline-end: 6px; z-index: 2; display: flex; flex-direction: column;
+  border-radius: 10px; background: var(--m-chart-tooltip-bg); box-shadow: var(--m-shadow-2); overflow: hidden;
+}
+.m-choropleth-zoom[hidden] { display: none; }
+.m-choropleth-zoom button {
+  inline-size: 28px; block-size: 28px; border: 0; background: none; color: var(--m-chart-text); font: inherit; font-size: 16px; line-height: 1; cursor: pointer;
+}
+.m-choropleth-zoom button[hidden] { display: none; }
+.m-choropleth-zoom button + button { border-block-start: 1px solid var(--m-chart-grid); }
+.m-choropleth-zoom button:hover:not(:disabled) { background: var(--m-surface-2); }
+.m-choropleth-zoom button:disabled { opacity: 0.35; cursor: default; }
+.m-choropleth-zoom button:focus-visible { outline: 2px solid var(--m-chart-1); outline-offset: -2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .m-choropleth-region, .m-choropleth-marker, .m-choropleth-class { transition: none; }
+}

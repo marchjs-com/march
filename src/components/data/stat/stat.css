@@ -20,5 +20,5 @@
 .m-stat-good { color: var(--m-chart-good); }
 .m-stat-bad { color: var(--m-chart-bad); }
 .m-stat-neutral { color: var(--m-chart-muted); }
-.m-stat-arrow { font-size: 0.8em; }
+.m-stat-arrow { display: inline-block; font-size: 0.8em; line-height: 1; }
 .m-stat-hint { color: var(--m-chart-muted); font-weight: 400; }
