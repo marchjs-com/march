@@ -1,0 +1,19 @@
+/* March — Thermometer. A glass tube and bulb on the theme's surface, a liquid column in a token colour with a soft
+   glow, a fine scale (main unit on the inline start, the other unit on the end) and a rolling readout under the bulb.
+   The height follows `--m-thermo-h`; light and dark themes follow the tokens. */
+.m-thermo { --m-thermo-h: 220px; display: inline-flex; flex-direction: column; align-items: center; gap: .35rem; vertical-align: middle; color: var(--m-text); font-family: var(--m-font); }
+.m-thermo-svg { block-size: var(--m-thermo-h); inline-size: auto; aspect-ratio: 100 / 240; overflow: visible; }
+.m-thermo-glass-tube, .m-thermo-glass-bulb {
+  fill: color-mix(in srgb, var(--m-text) 5%, var(--m-surface)); stroke: var(--m-border-strong); stroke-width: 1.2;
+  filter: drop-shadow(0 1.5px 2px color-mix(in srgb, var(--m-scrim) 18%, transparent));
+}
+.m-thermo-liquid { filter: drop-shadow(0 0 2.5px color-mix(in srgb, currentColor 30%, transparent)); }
+.m-thermo-zone { opacity: .9; }
+.m-thermo-tick { fill: none; stroke: var(--m-text); stroke-linecap: round; }
+.m-thermo-tick.is-major { stroke-width: 1.1; }
+.m-thermo-tick.is-minor { stroke-width: .7; opacity: .5; }
+.m-thermo-label { fill: var(--m-text-2); font: 600 7.5px/1 var(--m-font); font-variant-numeric: tabular-nums; }
+.m-thermo-scale.is-secondary .m-thermo-label { fill: var(--m-muted); }
+.m-thermo-unit { fill: var(--m-muted); font: 700 7px/1 var(--m-font); letter-spacing: .04em; }
+.m-thermo-shine { stroke: color-mix(in srgb, var(--m-on-scrim) 55%, transparent); stroke-width: 1.4; stroke-linecap: round; fill: none; }
+.m-thermo-readout { font: 700 1.05rem/1 var(--m-font); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }

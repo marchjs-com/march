@@ -1,0 +1,19 @@
+/* March — Compass. The dial is a Gauge; the compass dresses it: bold cardinal letters (north in the accent), a lubber
+   line fixed at the top over a turning rose, a two-tone needle in needle mode, the bearing marker in the accent and a
+   rolling "045° NE" readout. Theme tokens only; the accent comes from `color` (data-m-color, default danger). */
+.m-compass { --m-accent: var(--m-danger); position: relative; display: inline-block; vertical-align: middle; max-inline-size: 100%; }
+.m-compass .m-gauge { --m-gauge-needle: var(--m-text); }
+.m-compass .m-gauge-label { font-size: 9px; fill: var(--m-text-2); }
+.m-compass .m-gauge-tick.is-minor { opacity: .4; }
+.m-compass-rose .m-gauge-label:nth-child(1) { fill: var(--m-accent); }
+.m-compass .m-gauge-peak { fill: var(--m-accent); }
+.m-compass .m-gauge-hub-cap { fill: var(--m-accent); }
+.m-compass-south path { opacity: .7; }
+.m-compass-lubber {
+  position: absolute; inset-block-start: 3.2%; inset-inline-start: 50%; translate: -50% 0;
+  inline-size: 0; block-size: 0; pointer-events: none;
+  border-inline: calc(var(--m-gauge-w, 220px) * .028) solid transparent;
+  border-block-start: calc(var(--m-gauge-w, 220px) * .06) solid var(--m-accent);
+  filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--m-scrim) 40%, transparent));
+}
+.m-compass-readout { font: 700 7.5cqi/1 var(--m-font); letter-spacing: .02em; color: var(--m-text); font-variant-numeric: tabular-nums; }
