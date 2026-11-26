@@ -35,7 +35,7 @@ export interface ChoroplethMapProps<D = unknown> extends ChartBaseProps {
   id?: Field<D> | undefined;
   /** The value of a row: a key or getter (default "value"). @tr Satırın değeri: bir anahtar ya da getter (varsayılan "value"). */
   value?: Field<D> | undefined;
-  /** Built-in map: "turkey" (default, the 81 provinces) or "turkey-regions" (the 7 geographic regions: Marmara, Ege, Akdeniz, İç Anadolu, Karadeniz, Doğu Anadolu, Güneydoğu Anadolu); ignored when `shapes` is given. @tr Hazır harita: "turkey" (varsayılan, 81 il) ya da "turkey-regions" (7 coğrafi bölge: Marmara, Ege, Akdeniz, İç Anadolu, Karadeniz, Doğu Anadolu, Güneydoğu Anadolu); `shapes` verilince yok sayılır. */
+  /** Built-in map: "turkey" (default, the 81 provinces) or "turkey-regions" (the 7 geographic regions; rows match by id — marmara, aegean, mediterranean, central-anatolia, black-sea, eastern-anatolia, southeastern-anatolia — or by Turkish name); ignored when `shapes` is given. @tr Hazır harita: "turkey" (varsayılan, 81 il) ya da "turkey-regions" (7 coğrafi bölge; satırlar kimliğe — marmara, aegean, mediterranean, central-anatolia, black-sea, eastern-anatolia, southeastern-anatolia — ya da Türkçe ada göre eşleşir); `shapes` verilince yok sayılır. */
   map?: Opt<"turkey" | "turkey-regions">;
   /** Your own regions: `[{ id, name, d, cx?, cy? }]` (with `viewBox`) or a GeoJSON FeatureCollection. @tr Kendi bölgeleriniz: `[{ id, name, d, cx?, cy? }]` (`viewBox` ile) ya da bir GeoJSON FeatureCollection. */
   shapes?: Opt<readonly MapShape[] | GeoCollection>;
@@ -90,12 +90,13 @@ const DEEP = [`var(--m-chart-lo, color-mix(in oklab, ${ACCENT} 10%, var(--m-surf
 const ALIASES: Record<string, string> = { afyon: "tr03", icel: "tr33", maras: "tr46", urfa: "tr63", antep: "tr27" };
 // the 7 geographic regions: one letter per province, by plate code (1 = Adana … 81 = Düzce)
 const REGION_OF = "AGEDKIAKEMMDDKAMMIKEGMDDDIGKKDAAAMEDKIMIMIEDEAGEDIIKKMKGKIMKKDGEDIKIKIIGGKDDMKGAK";
-const REGIONS: Record<string, string> = { M: "Marmara", E: "Ege", A: "Akdeniz", I: "İç Anadolu", K: "Karadeniz", D: "Doğu Anadolu", G: "Güneydoğu Anadolu" };
+// the 7 geographic regions: an English id (data rows may use it) and the Turkish name shown on the map (rows may use it too)
+const REGIONS: Record<string, readonly [string, string]> = { M: ["marmara", "Marmara"], E: ["aegean", "Ege"], A: ["mediterranean", "Akdeniz"], I: ["central-anatolia", "İç Anadolu"], K: ["black-sea", "Karadeniz"], D: ["eastern-anatolia", "Doğu Anadolu"], G: ["southeastern-anatolia", "Güneydoğu Anadolu"] };
 /** The provinces merged into their regions: one shape each (the provinces' paths), labelled at their mean centre. */
 function regionsOf(list: readonly MapShape[]): MapShape[] {
   const by = new Map<string, MapShape[]>();
   for (const p of list) { const r = REGION_OF[(p.code ?? 0) - 1]; if (r) by.set(r, [...(by.get(r) ?? []), p]); }
-  return [...by].map(([r, ps]) => ({ id: REGIONS[r]!, name: REGIONS[r]!, d: ps.map((p) => p.d).join(""),
+  return [...by].map(([r, ps]) => ({ id: REGIONS[r]![0], name: REGIONS[r]![1], d: ps.map((p) => p.d).join(""),
     cx: ps.reduce((a, p) => a + (p.cx ?? 0), 0) / ps.length, cy: ps.reduce((a, p) => a + (p.cy ?? 0), 0) / ps.length }));
 }
 
