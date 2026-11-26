@@ -63,7 +63,8 @@ export function setClass(el: MarchEl, v: unknown): void {
 // One effect per template clone: the compiler gathers a template's class, plain-attribute and text parts into one
 // effect (fewer computations per row, as Svelte 5's template effects). A text part joins only when its expression cannot
 // create nodes (compiler/index.js › textSafe); the others keep their own region.
-type Part = Text & { e?: Comment };
+/** A text part: its end marker once it holds nodes; `v` the text last written (compared in JS, not read back from the DOM). */
+type Part = Text & { e?: Comment; v?: string };
 /** Compiler helper (not for direct use): an empty text part placed up front (when a sibling region needs the order). */
 export const _txt = (parent: Node, before: Node | null): Text => parent.insertBefore(doc().createTextNode(""), before);
 /**
@@ -73,12 +74,12 @@ export const _txt = (parent: Node, before: Node | null): Text => parent.insertBe
  */
 export function _st(t: Part | null, parent: Node, before: Node | null, v: unknown): Part {
   if (!t) {
-    if (typeof v === "string" || typeof v === "number") return parent.insertBefore(doc().createTextNode("" + v), before);
+    if (typeof v === "string" || typeof v === "number") { const n: Part = parent.insertBefore(doc().createTextNode((v = "" + v)), before); n.v = v as string; return n; }
     t = parent.insertBefore(doc().createTextNode(""), before);
-  } else if (!t.e && (typeof v === "string" || typeof v === "number")) { const s = "" + v; if (t.data !== s) t.data = s; return t; }
+  } else if (!t.e && (typeof v === "string" || typeof v === "number")) { const s = "" + v; if (t.v !== s) t.data = t.v = s; return t; }
   const host = t.parentNode;
   if (!host) return t;
-  if (!t.e) { t.data = ""; host.insertBefore((t.e = doc().createComment("")), t.nextSibling); }
+  if (!t.e) { t.data = t.v = ""; host.insertBefore((t.e = doc().createComment("")), t.nextSibling); }
   clearBetween(t, t.e);
   insert(host, v, t.e);
   return t;
