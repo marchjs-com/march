@@ -5,7 +5,8 @@
 //   data/ide/march-types.json, march-icons/<pack>.d.ts      MarchIDE's TypeScript: the package's declarations (gen-ide-types)
 //   data/ide/lib-docs/…                                     MarchIDE's hover docs of the language's built-ins
 //   data/components.json                                    the categories and the components (meta.ts, docs.md, the
-//                                                           class of the root element)
+//                                                           class of the root element, `added`: the day it first
+//                                                           appeared, YYYY-MM-DD, from git: a site's "New" badges)
 //   data/comp/<category>.json                               each component's props table, notes, accessibility (docs.md)
 //   data/stats.json                                         the numbers: components, exports, icons, animations, tests…
 //   data/text-costs.json                                    what each text animation costs (gzip bytes over the motion
@@ -22,6 +23,29 @@ import { homeStats } from "./gen-home-stats.js";
 import { textCosts } from "../bench/text-size.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+
+/**
+ * The day each component folder (`category/name`) first appeared, YYYY-MM-DD: the earliest commit touching a file in
+ * it, following renames (a component moved to another category keeps its day). One `git log` over src/components.
+ * A folder git does not know yet gets today. Needs the full history: a shallow clone is deepened first, and when
+ * that fails (no git, no remote) the map is empty and no component gets `added` (no false "New" everywhere).
+ */
+export function addedDates(root = ROOT) {
+  const git = (...args) => execFileSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 1 << 28, stdio: ["ignore", "pipe", "ignore"] });
+  const days = new Map();
+  try {
+    if (git("rev-parse", "--is-shallow-repository").trim() === "true") git("fetch", "--quiet", "--unshallow");
+    const folder = (p) => /^src\/components\/([^/]+\/[^/]+)\//.exec(p ?? "")?.[1];
+    let day;
+    for (const line of git("log", "--reverse", "--format=@%cs", "--name-status", "-M", "--", "src/components").split("\n")) {
+      if (line.startsWith("@")) { day = line.slice(1); continue; }
+      const [status, a, b] = line.split("\t");
+      const to = folder(status?.[0] === "R" || status?.[0] === "C" ? b : a);
+      if (to && !days.has(to)) days.set(to, (status[0] === "R" && days.get(folder(a))) || day);
+    }
+  } catch { return new Map(); }
+  return days;
+}
 
 /** Write data/ into a version folder (`out`, e.g. cdn/dist/0.3.1). */
 export async function writeData(out) {
@@ -40,8 +64,11 @@ export async function writeData(out) {
   // the components: categories and each component's meta.ts (plain values), docs.md and root element class
   const plain = (v) => JSON.parse(JSON.stringify(v, (_, x) => (typeof x === "function" ? undefined : x)));
   const list = await components(ROOT);
+  const added = addedDates(ROOT);
+  const today = new Date().toISOString().slice(0, 10);
   put("components.json", JSON.stringify({ categories: plain(await categories(ROOT)),
-    components: list.map((c) => ({ folder: c.folder, category: c.category, name: c.name, meta: plain(c.meta), docs: c.docs, root: rootClass(c, ROOT) })) }));
+    components: list.map((c) => ({ folder: c.folder, category: c.category, name: c.name, meta: plain(c.meta), docs: c.docs, root: rootClass(c, ROOT),
+      ...(added.size ? { added: added.get(c.folder) ?? today } : {}) })) }));
 
   // each component's props table, notes and accessibility, per category (the files the site's component pages read)
   const { comp } = await registry(ROOT);
