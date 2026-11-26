@@ -134,3 +134,17 @@ test("ChoroplethMap: animated entrance starts faded; a GeoJSON FeatureCollection
   assert.equal(region(el, "a").getAttribute("opacity"), "0", "regions fade in");
   dispose();
 });
+
+test("ChoroplethMap: map \"turkey-regions\" draws the 7 geographic regions; rows match by English id or Turkish name", async () => {
+  const map = signal("turkey-regions");
+  const [el, dispose] = mount(() => h(ChoroplethMap, { map, width: 500, animate: false, data: [{ id: "Ege", value: 4 }, { id: "central-anatolia", value: 2 }, { id: "black-sea", value: 1 }] }));
+  await loadTurkey(); await tick();
+  assert.equal(regions(el).length, 7);
+  const ids = [...regions(el)].map((r) => r.getAttribute("data-id"));
+  for (const id of ["marmara", "aegean", "mediterranean", "central-anatolia", "black-sea", "eastern-anatolia", "southeastern-anatolia"]) assert.ok(ids.includes(id), id);
+  const rows = [...el.querySelectorAll("table tbody tr")].map((r) => r.textContent);
+  assert.ok(rows.some((t) => t.includes("Ege") && t.includes("4")), "Ege's row is matched");
+  map.set("turkey");
+  assert.equal(regions(el).length, 81, "back to the provinces");
+  dispose();
+});

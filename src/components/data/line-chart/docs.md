@@ -28,7 +28,7 @@ its container's width. Long series are downsampled (LTTB).
 | `xFormat` / `format` / `y2Format` | Formats of the x labels, the left values and the right values: a pipe name, `[pipe, ...args]` or a function. |
 | `yMin` / `yMax` / `y2Min` / `y2Max` / `zero` | The value axis ranges (rounded to nice ticks); `zero` includes 0. |
 | `xTitle` / `yTitle` / `y2Title` | Axis titles. |
-| `grid` | `true` (horizontal, default), `false`, "x" or "both". |
+| `grid` | `true` (horizontal, default), `false`, "x" (vertical only) or "both". |
 | `curve` | "linear" (default), "smooth" (monotone, never overshoots), "step", "step-before", "step-after". |
 | `markers` | Point markers: `true`, "circle", "square", "diamond", "triangle" or "auto" (only when points are few). |
 | `connectNulls` | Draws across missing values; by default a null leaves a gap. |
