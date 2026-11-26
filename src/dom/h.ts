@@ -181,6 +181,8 @@ function setProp(el: MarchEl, tag: string, key: string, value: unknown): void {
     if (typeof value === "function") { const s = value as Partial<Signal<Element>> & ((el: Element) => void); if (s.signal && s.set) s.set(el); else s(el); }
     return;
   }
+  // the most common key first (a list row's class binding)
+  if (key === "class" || key === "className") return bindValue(value, (v) => setClass(el, v));
   if (key.startsWith("on:") || /^on[A-Z]/.test(key)) return listen(el, key, value);
   if (key.startsWith("bind:")) return bindProp(el, key.slice(5), value);
   if (key.startsWith("class:")) { const name = key.slice(6); return bindValue(value, (v) => { el.classList.toggle(name, !!v); }); }
@@ -195,7 +197,6 @@ function setProp(el: MarchEl, tag: string, key: string, value: unknown): void {
   if (key.startsWith("transition:")) return transition(el, key.slice(11), value);
   const ns = NS.get(key.slice(0, key.indexOf(":")));
   if (ns) return ns(el, key.slice(key.indexOf(":") + 1), value);
-  if (key === "class" || key === "className") return bindValue(value, (v) => setClass(el, v));
   // sx: the compiler turns it into classes (a literal at build time, anything else through sxValue()); h() by hand: sx(obj)
   if (key === "sx") return bindValue(value, (v) => { if (v != null && typeof v !== "string") throw new TypeError("March: sx needs the compiler or sx({...})"); const user = el.__mClass === undefined ? el.getAttribute("class") ?? "" : el.__mUser ?? ""; el.__mClass = v ?? ""; setClass(el, user); });
   if (key === "style") {
@@ -221,7 +222,9 @@ function bindValue(value: unknown, apply: (v: unknown) => void): void {
 function setClass(el: MarchEl, v: unknown): void {
   // fast path: a class string on an element without sx (no expando, no joining)
   if (typeof v === "string" && el.__mClass === undefined) {
-    if (typeof (el as HTMLElement).className === "string") (el as HTMLElement).className = v; else el.setAttribute("class", v);
+    // unchanged (a row that is not selected: "" on an element without a class) → no write, no style invalidation
+    if (typeof (el as HTMLElement).className !== "string") el.setAttribute("class", v);
+    else if ((el as HTMLElement).className !== v) (el as HTMLElement).className = v;
     return;
   }
   el.__mUser = v;
@@ -356,20 +359,25 @@ function toNode(v: unknown): Node | null {
 
 function region(parent: Node, fn: () => unknown, before: Node | null, owned?: unknown): void {
   // A text node marks the start and, while the value is text (the usual case), is the region itself; an end marker
-  // is added the first time the value is something else (nodes, a list, nothing). Placed now: an effect created
-  // inside batch() runs later, and the region must keep its place among its siblings.
-  const start = doc().createTextNode("");
-  let end: Comment | null = null;
-  parent.insertBefore(start, before);
+  // is added the first time the value is something else (nodes, a list, nothing). When the effect runs at once
+  // (outside batch()), the text node is made with its first value: one node, one insert.
+  let start = null as unknown as Text, end: Comment | null = null;
+  const place = (s: string): void => { parent.insertBefore((start = doc().createTextNode(s)), before); };
   effect(() => {
     const v = fn();
-    if (!end && (typeof v === "string" || typeof v === "number")) { const s = "" + v; if (start.data !== s) start.data = s; return; }
+    if (!end && (typeof v === "string" || typeof v === "number")) {
+      const s = "" + v;
+      if (!start) place(s); else if (start.data !== s) start.data = s;
+      return;
+    }
+    start || place("");
     const host = start.parentNode;
     if (!host) return;
     if (!end) { start.data = ""; host.insertBefore((end = doc().createComment("")), start.nextSibling); }
     clearBetween(start, end);
     insert(host, v, end);
   });
+  start || place(""); // deferred (inside batch()) or the first run threw: the region keeps its place now
   // inside an element its own owner made (a template clone), the region leaves with that element: no cleanup
   if (!owned) onCleanup(() => { if (!detaching) { if (end) { clearBetween(start, end); removeNode(end); } removeNode(start); } });
 }

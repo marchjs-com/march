@@ -93,22 +93,16 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
         for (const x of fallback.nodes) host.insertBefore(x, end);
       }
       if (s > e2) return;
-      // rows on a longest increasing run of old positions stay; the others (moved or new) are gathered in order and
-      // inserted, one fragment at a time, before the next row that stays. Filling an empty list is one insert.
+      // rows on a longest increasing run of old positions stay; the others (moved or new) are inserted, last to
+      // first, straight before the next row that stays (no fragment: each node moves once)
       const place = (): void => {
         const keep = lis(was);
-        let ref: Node = e2 + 1 < n ? ((next[e2 + 1] as Row<T>).nodes[0] ?? end) : end, pending: DocumentFragment | null = null;
+        let ref: Node = e2 + 1 < n ? ((next[e2 + 1] as Row<T>).nodes[0] ?? end) : end;
         for (let i = e2; i >= s; i--) {
           const ns = (next[i] as Row<T>).nodes;
-          if (keep[i - s]) {
-            if (pending) { host.insertBefore(pending, ref); pending = null; }
-            if (ns.length) ref = ns[0] as Node;
-          } else {
-            pending ??= doc.createDocumentFragment();
-            for (let x = ns.length - 1; x >= 0; x--) pending.insertBefore(ns[x] as Node, pending.firstChild);
-          }
+          if (keep[i - s]) { if (ns.length) ref = ns[0] as Node; }
+          else for (let x = ns.length - 1; x >= 0; x--) { const nd = ns[x] as Node; host.insertBefore(nd, ref); ref = nd; }
         }
-        if (pending) host.insertBefore(pending, ref);
       };
       if (props.animate && flipHook) flipHook(next.flatMap((r) => r.nodes).filter((x): x is Element => x.nodeType === 1), place, props.animate);
       else place();

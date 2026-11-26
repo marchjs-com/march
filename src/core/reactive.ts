@@ -167,7 +167,7 @@ function run(c: Computation): void {
 }
 
 function flush(): void {
-  if (flushing || batchDepth) return;
+  if (flushing || batchDepth || !queue.length) return; // nothing queued: no try/finally, no new queue array
   flushing = true;
   try {
     for (let i = 0; i < queue.length; i++) {
