@@ -4,7 +4,7 @@ import { writeFileSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { pathToFileURL } from "node:url";
-import { compile, isStaticCode } from "../compiler/index.js";
+import { compile, isStaticCode, textSafe } from "../compiler/index.js";
 import { loadAutoImports } from "../compiler/autoimports.js";
 import { installDom } from "../src/testing/dom.ts";
 
@@ -124,13 +124,27 @@ test("compile errors point at the source", () => {
   catch (e) { assert.match(e.message, /expected <\/b>/); assert.match(e.message, /:2:/); assert.ok(e.frame.includes(">    2 |")); }
 });
 
+test("templates: one effect per clone for its classes, attributes and text parts that cannot create nodes", () => {
+  const out = c(`const r = (row) => <tr class={sel() === row().id ? "on" : ""} title={row().label}><td>{row().id}</td><td>{view()}</td><td>{$n}</td></tr>`);
+  assert.match(out, /_\$fx\(\(\) => \{ _\$scls\(_r, sel\(\) === row\(\)\.id \? "on" : ""\); _\$sattr\(_r, "tr", "title", row\(\)\.label\); _x\d+ = _\$st\(_x\d+, _\d+, null, row\(\)\.id\); _x\d+ = _\$st\(_x\d+, _\d+, null, \$n\); \}\)/, "class, attribute and text parts in one effect");
+  assert.match(out, /let _x\d+ = null;/, "a text part's node is made by the effect, with its first value");
+  assert.match(c(`const e = <td>{a()} {view()}</td>`.replace("a()", "$a")), /let _x\d+ = _\$txt\(/, "next to a region, a text part is placed up front (order)");
+  assert.match(out, /_\$ins\(_\d+, \(\) => \(view\(\)\), null, 1\)/, "{view()} may render a component: it keeps its own region");
+  assert.doesNotMatch(c(`const e = <p>{a()}</p>`, { templateEffect: false }), /_\$fx/, "templateEffect: false keeps one region per part");
+});
+
+test("textSafe: only expressions that cannot create nodes join a template's effect", () => {
+  for (const e of ["row().id", "a + b", "user()?.name", "price().toFixed(2)", "_$tr(\"x\")", "Math.round(x)", "$count()"]) assert.ok(textSafe(e), e);
+  for (const e of ["view()", "f(x)", "items.map((x) => x)", "obj.render()", "x()()", "_$c(Foo, {})", "`${a}`"]) assert.ok(!textSafe(e), e);
+});
+
 test("templates: a native subtree is built once and cloned; only its dynamic parts are wired", () => {
   const out = c(`const e = <tr class="row"><td class="c1">{id}</td><td><a class={$sel} onClick={go} href="/x">{label} !</a></td><td hidden /></tr>
 const s = <svg viewBox="0 0 1 1"><path d="M0 0" /></svg>; const sp = <div {...p}><b>x</b></div>`);
   const decl = out.match(/const _\$t\d+ = _\$tpl\(/g) ?? [];
   assert.equal(decl.length, 2, "one template for the row (inner cells taken in) and one for <b> inside the spread <div>");
   assert.match(out, /_\$tpl\(\["tr",\[\["class","row"\]\],\["td",\[\["class","c1"\]\]\],\["td",\[\],\["a",\[\]," !"\]\],\["td",\[\["hidden",""\]\]\]\]\)/);
-  assert.match(out, /_\$cls\(_\d+, \(\) => \(\$sel\)\)/, "a bound class is wired with _cls (a plain thunk: any function is live)");
+  assert.match(out, /_\$fx\(\(\) => \{ _\$scls\(_\d+, \$sel\); \}\)/, "a bound class joins the template's one effect");
   assert.match(out, /_\$on\(_\d+, "click", go\)/, "a plain event is wired with _on, not a template attribute");
   assert.match(out, /_\$attr\(_\d+, "a", "href", "\/x"\)/, "URL attributes keep their runtime check (_attr)");
   assert.match(out, /_\$ins\(_\d+, label, _\d+, 1\)/, "a child before static text is inserted before it (owned by the clone: no cleanup)");

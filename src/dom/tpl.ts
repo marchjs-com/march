@@ -1,7 +1,7 @@
 // March — template clones (the compiler's output for native elements) and the props a template wires most: a class
 // binding (_cls) and a plain attribute (_attr). The other prop kinds go through _prop (dom/props.ts).
 import { effect, DEV } from "../core/reactive.ts";
-import { doc, type MarchEl } from "./insert.ts";
+import { doc, insert, clearBetween, type MarchEl } from "./insert.ts";
 
 const URL_ATTRS = new Set(["href", "src", "action", "formaction", "xlink:href", "poster", "cite", "background"]);
 /** Allow only safe URL schemes (relative URLs are fine). */
@@ -60,12 +60,38 @@ export function setClass(el: MarchEl, v: unknown): void {
   el.setAttribute("class", s.trim());
 }
 
+// One effect per template clone: the compiler gathers a template's class, plain-attribute and text parts into one
+// effect (fewer computations per row, as Svelte 5's template effects). A text part joins only when its expression cannot
+// create nodes (compiler/index.js › textSafe); the others keep their own region.
+type Part = Text & { e?: Comment };
+/** Compiler helper (not for direct use): an empty text part placed up front (when a sibling region needs the order). */
+export const _txt = (parent: Node, before: Node | null): Text => parent.insertBefore(doc().createTextNode(""), before);
+/**
+ * Compiler helper (not for direct use): draw a text part as a region draws its value (text in place; anything else
+ * between the text node and an end marker) and return its text node. The first call makes the node with its value
+ * (one node, one write); `t = _st(t, parent, before, value)`.
+ */
+export function _st(t: Part | null, parent: Node, before: Node | null, v: unknown): Part {
+  if (!t) {
+    if (typeof v === "string" || typeof v === "number") return parent.insertBefore(doc().createTextNode("" + v), before);
+    t = parent.insertBefore(doc().createTextNode(""), before);
+  } else if (!t.e && (typeof v === "string" || typeof v === "number")) { const s = "" + v; if (t.data !== s) t.data = s; return t; }
+  const host = t.parentNode;
+  if (!host) return t;
+  if (!t.e) { t.data = ""; host.insertBefore((t.e = doc().createComment("")), t.nextSibling); }
+  clearBetween(t, t.e);
+  insert(host, v, t.e);
+  return t;
+}
+/** Compiler helper (not for direct use): a class inside a template's one effect. */
+export const _scls = (el: Element, v: unknown): void => setClass(el as MarchEl, v);
+/** Compiler helper (not for direct use): a plain attribute inside a template's one effect. */
+export const _sattr = (el: Element, tag: string, attr: string, v: unknown): void => setAttr(el, tag, attr, v);
 /** Compiler helper (not for direct use): a class binding on an element of a template clone. */
 export function _cls(el: Element, value: unknown): void { bindValue(value, (v) => setClass(el as MarchEl, v)); }
 /** Compiler helper (not for direct use): a plain attribute (removed for null / false, "" for true; URL attributes are checked). */
-export function _attr(el: Element, tag: string, attr: string, value: unknown): void {
-  bindValue(value, (v) => {
-    if (v == null || v === false) el.removeAttribute(attr);
-    else el.setAttribute(attr, v === true ? "" : URL_ATTRS.has(attr) ? safeUrl(v, tag) : String(v));
-  });
+export function _attr(el: Element, tag: string, attr: string, value: unknown): void { bindValue(value, (v) => setAttr(el, tag, attr, v)); }
+function setAttr(el: Element, tag: string, attr: string, v: unknown): void {
+  if (v == null || v === false) el.removeAttribute(attr);
+  else el.setAttribute(attr, v === true ? "" : URL_ATTRS.has(attr) ? safeUrl(v, tag) : String(v));
 }

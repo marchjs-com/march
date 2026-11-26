@@ -19,13 +19,44 @@ const { sx: resolveSx } = await importTs(new URL("../src/core/sx.ts", import.met
 const TEXT_ATTRS = new Set(["title", "placeholder", "label", "alt", "aria-label", "aria-description", "description", "hint", "message"]);
 // an object's fields whose string is read by people (lang.json collects them): `{ label: "Enerjik", hint: "…" }`
 const TEXT_KEYS = new Set(["label", "title", "text", "message", "description", "placeholder", "hint", "caption", "subtitle", "heading", "tooltip", "tip", "helperText", "emptyText", "confirmText", "cancelText", "okText"]);
-const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins", gen: "_$gen", tr: "_$tr", trf: "_$trf", c: "_$c", cls: "_$cls", attr: "_$attr", on: "_$on" };
-const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert", gen: "_gen", tr: "_tr", trf: "_trf", c: "_c", cls: "_cls", attr: "_attr", on: "_on" };
+const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins", gen: "_$gen", tr: "_$tr", trf: "_$trf", c: "_$c", cls: "_$cls", attr: "_$attr", on: "_$on", fx: "_$fx", txt: "_$txt", st: "_$st", scls: "_$scls", sattr: "_$sattr" };
+const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert", gen: "_gen", tr: "_tr", trf: "_trf", c: "_c", cls: "_cls", attr: "_attr", on: "_on", fx: "effect", txt: "_txt", st: "_st", scls: "_scls", sattr: "_sattr" };
 // Templates: a native element subtree is built once (DOM calls, no HTML strings) and cloned; only its dynamic parts
 // (bound attributes, events, refs, directives, {expressions}, components) are wired on the clone. Not templated:
 // SVG (namespace), forbidden tags (h() throws for them), spreads.
 // lowercase prop names that are not plain attributes (dom/props.ts: DOM properties, style, sx, ref, forbidden)
 const PROP_KEYS = new Set(["value", "checked", "selected", "indeterminate", "muted", "style", "sx", "ref", "srcdoc"]);
+/** A plain attribute (dom/tpl.ts › _attr): lowercase, not a DOM property, style, sx, ref or event. */
+const plainAttr = (key) => /^[a-z][a-z0-9-]*$/.test(key) && !PROP_KEYS.has(key) && !key.startsWith("on");
+// One effect per template: a text part joins it only when its expression cannot create nodes. Allowed: reads, operators,
+// an accessor call whose result is read (`row().id`), text helpers and text methods. Anything else (JSX, a function, any
+// other call: `{view()}` may render a component) keeps its own region, so nothing is created twice or re-created when a
+// sibling part changes.
+const SAFE_FNS = new Set(["_$tr", "_$trf", "_$pipe", "String", "Number", "Boolean", "encodeURIComponent"]);
+const SAFE_METHODS = new Set(["toFixed", "toPrecision", "toString", "toLocaleString", "toUpperCase", "toLowerCase", "trim", "trimStart", "trimEnd", "padStart", "padEnd", "join", "slice", "substring", "replace", "replaceAll", "repeat", "at", "charAt", "stringify", "abs", "round", "floor", "ceil", "min", "max"]);
+export function textSafe(code) {
+  if (/=>|\bfunction\b|\bnew\b|\bawait\b|\byield\b|`/.test(code)) return false;
+  const s = code.replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, '""');
+  for (let i = 0; i < s.length; i++) {
+    if (s[i] !== "(") continue;
+    let j = i - 1;
+    while (j >= 0 && /\s/.test(s[j])) j--;
+    if (j < 0 || !/[\w$)\]]/.test(s[j])) continue; // a group, not a call
+    if (s[j] === ")" || s[j] === "]") return false; // f()() / a[b]()
+    let k = j;
+    while (k >= 0 && /[\w$]/.test(s[k])) k--;
+    const name = s.slice(k + 1, j + 1), method = s[k] === "." || (s[k] === "?" && s[k + 1] === ".");
+    if (/^(if|for|while|switch|return|typeof)$/.test(name)) continue;
+    let d = 0, e = i;
+    for (; e < s.length; e++) { if (s[e] === "(") d++; else if (s[e] === ")" && --d === 0) break; }
+    const empty = !s.slice(i + 1, e).trim(), after = s.slice(e + 1).trimStart();
+    if (method ? SAFE_METHODS.has(name) : SAFE_FNS.has(name)) continue;
+    if (!method && empty && /^(\?\.|\.|\[)/.test(after)) continue; // an accessor whose result is read: row().id
+    if (!method && empty && name.startsWith("$")) continue; // a $signal read ($count compiles to $count())
+    return false;
+  }
+  return true;
+}
 const TPL_SKIP_TAGS = new Set(["svg", "g", "path", "circle", "ellipse", "rect", "line", "polyline", "polygon", "text", "tspan", "defs",
   "linearGradient", "radialGradient", "stop", "clipPath", "mask", "pattern", "use", "symbol", "title", "desc", "marker", "foreignObject",
   "script", "iframe", "object", "embed", "base", "meta", "math"]);
@@ -863,13 +894,13 @@ class Transformer {
         value = `[${fn}, ${a.code === "true" && !a.raw ? "undefined" : a.code}]`;
       // a plain thunk: _prop treats any function as live (no reactive() tag to set on every clone)
       } else value = a.dynamic ? `() => (${a.code})` : a.code;
-      props.push([a.name, value]);
+      props.push([a.name, value, a.dynamic && !a.name.startsWith("use:") ? a.code : null]);
     }
     const out = [];
     for (const k of kids) {
       if (k.text) out.push({ text: JSON.parse(k.code) });
       else if (!k.dynamic && this.tnodes?.has(k.code)) out.push(this.tnodes.get(k.code));
-      else out.push({ expr: childCode(k) });
+      else out.push({ expr: childCode(k), raw: k.dynamic ? k.code : null });
     }
     return { tag, statics, props, kids: out };
   }
@@ -881,7 +912,7 @@ class Transformer {
   wireProp(ref, tag, key, value) {
     if (key === "class" || key === "className") return `${this.helper("cls")}(${ref}, ${value});`;
     if (/^on[A-Z][A-Za-z]*$/.test(key)) return `${this.helper("on")}(${ref}, ${JSON.stringify(key.slice(2).toLowerCase())}, ${value});`;
-    if (/^[a-z][a-z0-9-]*$/.test(key) && !PROP_KEYS.has(key)) return `${this.helper("attr")}(${ref}, ${JSON.stringify(tag)}, ${JSON.stringify(key)}, ${value});`;
+    if (plainAttr(key)) return `${this.helper("attr")}(${ref}, ${JSON.stringify(tag)}, ${JSON.stringify(key)}, ${value});`;
     return `${this.helper("p")}(${ref}, ${JSON.stringify(tag)}, ${JSON.stringify(key)}, ${value});`;
   }
 
@@ -892,12 +923,17 @@ class Transformer {
     const spec = (n) => [n.tag, n.statics, ...n.kids.filter((k) => !k.expr).map((k) => (k.text !== undefined ? k.text : spec(k)))];
     (this.tpls ??= new Map()).set(name, JSON.stringify(spec(tn)));
     this.helper("tpl");
-    const decl = [], wire = [];
+    const decl = [], wire = [], fx = [];
+    const FX = this.opts.templateEffect !== false;
     let v = 0;
     const needs = (n) => n.props.length > 0 || n.kids.some((k) => k.expr || (k.tag && needs(k)));
     const nextStatic = (n, i) => n.kids.slice(i + 1).find((x) => !x.expr);
     const walk = (n, ref) => {
-      for (const [key, value] of n.props) wire.push(this.wireProp(ref, n.tag, key, value));
+      for (const [key, value, raw] of n.props) {
+        if (FX && raw && (key === "class" || key === "className")) fx.push(`${this.helper("scls")}(${ref}, ${raw})`);
+        else if (FX && raw && plainAttr(key)) fx.push(`${this.helper("sattr")}(${ref}, ${JSON.stringify(n.tag)}, ${JSON.stringify(key)}, ${raw})`);
+        else wire.push(this.wireProp(ref, n.tag, key, value));
+      }
       // the template children (text and elements) that need a name: wired elements and the anchors of runtime children
       const stat = n.kids.filter((k) => !k.expr);
       const want = new Set();
@@ -914,13 +950,22 @@ class Transformer {
         prev = nm;
       }
       for (const k of stat) if (k.tag && want.has(k)) walk(k, names.get(k));
+      const eager = n.kids.some((k) => k.expr && !(FX && k.raw && textSafe(k.raw)));
       n.kids.forEach((k, i) => {
         if (!k.expr) return;
         const next = nextStatic(n, i);
+        if (FX && k.raw && textSafe(k.raw)) {
+          // the effect makes the text node with its first value; placed up front only when a sibling region needs the order
+          const tv = `_x${++v}`, at = next ? names.get(next) : "null";
+          wire.push(eager ? `let ${tv} = ${this.helper("txt")}(${ref}, ${at});` : `let ${tv} = null;`);
+          fx.push(`${tv} = ${this.helper("st")}(${tv}, ${ref}, ${at}, ${k.raw})`);
+          return;
+        }
         wire.push(`${this.helper("ins")}(${ref}, ${k.expr}, ${next ? names.get(next) : "null"}, 1);`);
       });
     };
     walk(tn, "_r");
+    if (fx.length) wire.push(`${this.helper("fx")}(() => { ${fx.join("; ")}; });`);
     if (!wire.length) return `${name}()`;
     // every node is named before anything is inserted (inserting changes the sibling chain)
     return `${name}((_r) => { ${decl.length ? `const ${decl.join(", ")}; ` : ""}${wire.join(" ")} })`;
