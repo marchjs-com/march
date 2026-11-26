@@ -188,10 +188,15 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | AudioReactive | experimental | A wrapper that moves with a sound: writes --m-level, --m-bass, --m-mid, --m-treble and --m-peak (0–1) on itself from a source, with ready pulse / glow / ring / bounce effects. | — |
 | Carousel | stable | Scroll-snap carousel: one to four slides per view, previous / next buttons and dots, swipe on touch, one slide on phones. | [IconButton](#iconbutton), [PageDots](#pagedots) |
 | CornerMark | experimental | A small round mark in a corner of a picture, card or avatar (video sign, open arrow, add badge): corner, icon, colour, size, look, shown always or on hover. | — |
+| LedBoard | experimental | A fun LED sign: scrolling text in any direction (typewriter, blink, wave, rainbow, inline pixel emoji) and scenes one after another (emoji, eyes and mouth, pixel art, clock, countdown, a score whose digits roll, ticker, audio bars) with wipe, dissolve, pixel rain or iris transitions; reduced motion pages instead of scrolling. | [LedMatrix](#ledmatrix), [PixelFont](#pixelfont), [PixelSprite](#pixelsprite), [LedEyes](#ledeyes) |
+| LedEyes | experimental | A pair of LED eyes that feel alive: blink, look left / right / up / down, surprised, sleepy, happy, angry, sad, in love; random blinks and glances, optional pointer following, and a mouth (smile, grin, talk…) on a tall enough screen. | [LedMatrix](#ledmatrix) |
+| LedMatrix | experimental | A dot-matrix screen of LEDs on a canvas: shows a picture (an LED frame or pixel art as text) and repaints only the LEDs that changed; round LEDs, square pixels or glow tubes, gap, roundness, bloom halo, ghost of unlit LEDs, scanlines; one color or full RGB on the theme's accent. | — |
 | Media | stable | An image, video or audio element that fits its container (kind from the extension), a text fallback when loading fails; openMedia() shows it in a dialog. | [Dialog](#dialog) |
 | Oscilloscope | experimental | The shape of a sound, live: a triggered waveform trace with glow and phosphor afterglow over a graticule, or left against right (X/Y Lissajous); a modern panel or a retro CRT look; reads any march/audio source. | — |
 | Overlay | stable | A decorative layer inside its container: an image, a muted looping video, an SVG, a canvas drawing or a CSS effect (glass, mesh, noise …); never takes input. | — |
 | Picture | experimental | An image from a picture object ({ src, alt, width, height, srcset, sizes }) or a ready node passed through: lazy by default, eager for the first screen, fit and a fallback. | — |
+| PixelFont | experimental | Text in March's own pixel fonts (5×7 with every Turkish letter, and a bolder 8×8) on a small LED screen, with `:heart:` pixel emoji inline; layoutText / wrapText lay LED text out for any LED part. | [LedMatrix](#ledmatrix) |
+| PixelSprite | experimental | A pixel drawing on an LED screen, still or animated frame by frame: a built-in emoji or icon by name (heart, fire, rocket…) or your own `.led.json` sprite; frames run on the motion engine's clock. | [LedMatrix](#ledmatrix) |
 | Spectrum | experimental | The frequencies of a sound, live: log-frequency bars with falling peak caps, mirrored, around a circle or as a line; one theme color, the four HADİ colors or your own tokens; reads any march/audio source. | — |
 | Waveform | experimental | The bars of a sound (voice message, podcast): from peaks, an audio file (decoded lazily) or a live march/audio source; playhead with played bars, chapter regions, seek by pointer and keyboard; decorative recording bars. | — |
 
@@ -1696,6 +1701,62 @@ const SettingsPage = Page.extend({ narrow: true, tabsQuery: "tab" })
 
 Full page: src/components/layout/layout/docs.md
 
+## LedBoard
+
+A fun LED sign. Text scrolls in any direction, with typewriter, blink, wave and rainbow effects and pixel emoji inline (`:heart:`), and a list of scenes plays one after another: text, emoji, LED eyes with a mouth, pixel art, a clock, a countdown, a score whose changed digits roll, a ticker, audio bars. Scenes change with a wipe, a dissolve, pixel rain or an iris. It is composed of LedMatrix (the screen), PixelFont, PixelSprite and LedEyes.
+
+Composed of: [LedMatrix](#ledmatrix), [PixelFont](#pixelfont), [PixelSprite](#pixelsprite), [LedEyes](#ledeyes)
+
+```tsx
+<LedBoard text="HADİ'ye hoş geldin :heart:" color="amber" />
+
+<LedBoard transition="rain" scenes={[
+  { text: "HADİ" },
+  { eye: "look-left" }, { eye: "look-right", mouth: "smile" },
+  { emoji: "heart" },
+  { score: () => [$home, $away], teams: ["EV", "DEP"] },
+  { clock: true },
+  { countdown: "2027-01-01T00:00", done: "MUTLU YILLAR" },
+  { ticker: ["BIST +1,2%", "USD 34,10"] },
+  { bars: audioSource("demo") },
+]} />
+```
+
+Full page: src/components/media/led-board/docs.md
+
+## LedEyes
+
+A pair of LED eyes that feel alive. They blink, look left, right, up and down, go wide with surprise, droop when sleepy, smile, frown, fall in love; on their own they blink every few seconds and glance around, and they can follow the pointer. On a screen of 10 rows or more a mouth fits under them (smile, grin, flat, sad, open, o, talk).
+
+Composed of: [LedMatrix](#ledmatrix)
+
+```tsx
+<LedEyes />                                      {/* alive: blinks and glances */}
+<LedEyes expression="look-left" color="blue" />
+<LedEyes mouth="talk" follow shape="tube" />
+<LedEyes expression={$mood} alive={false} cols={24} rows={10} />
+```
+
+Full page: src/components/media/led-eyes/docs.md
+
+## LedMatrix
+
+A dot-matrix screen of LEDs on a canvas. Give it a picture, an `LedFrame` or pixel art as text ("." is off), and it paints it; on every change it repaints only the LEDs that changed, and off screen it paints nothing until it comes back. Every LED part (PixelFont, PixelSprite, LedEyes, LedBoard) draws on it, so they all share one look.
+
+```tsx
+import { LedMatrix, ledFrame, setLed } from "march/ui";
+
+<LedMatrix frame={[".#.#.", "#####", ".###.", "..#.."]} color="red" pitch={16} />
+<LedMatrix frame={["rr.gg", "rr.gg"]} palette={{ r: "#ff3355", g: "#3ddc84" }} />
+
+const f = ledFrame(16, 8);              // your own drawing: one byte of brightness per LED
+setLed(f, 3, 4);                         // full brightness, the screen's color
+setLed(f, 4, 4, 128, 0xff8800 + 1);      // half brightness, orange
+<LedMatrix frame={() => ($tick, f)} shape="square" scanlines />
+```
+
+Full page: src/components/media/led-matrix/docs.md
+
 ## LevelMeter
 
 A studio LED meter: a column (or row) of segments that light green, amber and red as the level rises, a peak light that holds for a moment and then falls, and a clip light that stays on after the signal hit the top until you press it. Feed it a number (`value`, 0–1 or `min`…`max`, one per channel for stereo) or a live sound (`source`: the microphone, an `<audio>`, a call's stream, the "demo" loop or any number accessor; see `march/audio`). The segments are built once: a reading writes one CSS variable and moves one class, so a meter at 60 frames a second creates no nodes, and it reads only while it is on screen.
@@ -2263,6 +2324,34 @@ Shares of a whole as a pie or a donut. `x` names each slice, `y` gives its value
 ```
 
 Full page: src/components/data/pie-chart/docs.md
+
+## PixelFont
+
+Text in a pixel font on a small LED screen, as wide as the text. The fonts are March's own drawings: "5x7" with every Turkish letter (Ç Ğ İ Ö Ş Ü ç ğ ı ö ş ü, Â â, ₺ €) and "8x8", the same letters one column bolder. Letters are as wide as they are drawn (an "i" is narrow); digits are all five wide so a clock never jumps; `:heart:` puts a pixel emoji in the line. A still LED label, badge or heading; LedBoard is the one that moves.
+
+Composed of: [LedMatrix](#ledmatrix)
+
+```tsx
+<PixelFont text="HADİ :heart:" color="amber" />
+<PixelFont text="Kapı 3" font="8x8" shape="square" ink="#3ddc84" />
+<PixelFont text="7" cols={12} align="end" label="Seven waiting" />
+```
+
+Full page: src/components/media/pixel-font/docs.md
+
+## PixelSprite
+
+A pixel drawing on an LED screen, still or animated frame by frame: a built-in emoji or icon by name, or your own `.led.json` sprite. The frames advance on the motion engine's clock: global speed and pause act on them, reduced motion or `motion={false}` shows one frame, off screen nothing runs.
+
+Composed of: [LedMatrix](#ledmatrix)
+
+```tsx
+<PixelSprite sprite="fire" pitch={12} />
+<PixelSprite sprite="rocket" color="amber" />   {/* one color: the features stay readable (they are holes) */}
+<PixelSprite sprite={{ fps: 6, palette: { g: "#3ddc84" }, frames: [["g.g", ".g."], [".g.", "g.g"]] }} />
+```
+
+Full page: src/components/media/pixel-sprite/docs.md
 
 ## Popover
 

@@ -1,0 +1,2 @@
+/* LedEyes: a face panel; a little rounder than a sign. */
+.m-led.m-led-eyes { border-radius: var(--m-radius-4, 1.25rem); }

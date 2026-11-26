@@ -1,0 +1,2 @@
+/* PixelSprite: a small square LED tile by default (a fixed pitch makes it any size). */
+.m-led.m-pixel-sprite { display: inline-block; vertical-align: middle; inline-size: var(--m-led-w, 4.5rem); --m-led-pad: var(--m-space-2, 8px); }
