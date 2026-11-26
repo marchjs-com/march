@@ -78,3 +78,21 @@ test("Odometer: decimals, color and variant follow later values (getters)", () =
   assert.ok(root.classList.contains("m-odo-flip"));
   dispose();
 });
+
+// Rule "data changes animate": a new value arrives through the roll cells (the old digit leaves as a ghost, the new one
+// rolls in on the motion engine), never as an instant swap; a change mid-roll rolls on from the digit shown.
+test("Odometer animates every change: new digits roll in through slots, an interrupted roll goes on from the shown digit", () => {
+  const n = signal(16);
+  const [el, dispose] = mount(() => h(Odometer, { value: n, digits: 2 }));
+  n.set(17);
+  const slot = el.querySelector(".m-roll-slot");
+  assert.ok(slot, "the changed drum rolls");
+  assert.equal(slot.querySelector(".m-roll-ghost").textContent, "6", "the old digit leaves");
+  assert.equal(slot.querySelector(".m-roll-d").textContent, "7", "the new digit arrives");
+  assert.equal(el.querySelectorAll(".m-roll-slot").length, 1, "the unchanged drum stays");
+  n.set(18);
+  const again = el.querySelector(".m-roll-slot");
+  assert.equal(again.querySelector(".m-roll-ghost").textContent, "7", "rolls on from what is shown");
+  assert.equal(drums(el), "18");
+  dispose();
+});

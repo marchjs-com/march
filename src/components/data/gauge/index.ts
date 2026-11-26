@@ -2,15 +2,20 @@
 // track with coloured zones and a redline, major and minor ticks with labels, a needle that moves on spring physics
 // (or with VU ballistics), a hub, a peak marker and a digital readout (CountRoll, or Odometer drums). The value is a
 // number, or the loudness of an audio source (march/audio). Four looks: speedometer (270°), tachometer (×1000, redline),
-// half (180°) and vu (a needle VU meter in dB).
+// half (180°) and vu (a needle VU meter in dB). Several needles (`needles`), a full-circle scale that wraps (`sweep`
+// 360, `start`, `wrap`), a scale that turns under fixed needles (`turn`, a compass rose) and your own drawing on the
+// face (`inlay`) make it the dial of the other instruments (AnalogClock, Stopwatch, Compass, Altimeter,
+// AttitudeIndicator).
 //   <Gauge value={$speed} max={240} unit="km/h" />   <Gauge variant="vu" source={audioSource("demo")} />
+//   <Gauge value={$now} needles={[{ value: $avg, label: "Average", color: "info" }]} />
 import "./gauge.css";
 import { signal, computed, effect, untrack, onCleanup, getOwner, runWithOwner, type Accessor } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
+import { throttled } from "../../../ui/spoken.ts";
 import { t, locale } from "../../../core/i18n.ts";
 import { val, cx, clamp, later, type MaybeFn, type ClassProp } from "../../../core/util.ts";
 import { still } from "../../../motion/engine/parts.ts";
-import { track } from "../../../motion/engine/value.ts";
+import { track, type Tracked } from "../../../motion/engine/value.ts";
 import { colorAttr, tokenColor, type ColorToken } from "../../../theme/colors.ts";
 import type { AudioSourceLike } from "../../../audio/index.ts";
 import { CountRoll } from "../../social/count-roll/index.ts";
@@ -30,6 +35,38 @@ export interface GaugeTicks {
 export interface GaugeParts {
   face?: boolean; track?: boolean; arc?: boolean; zones?: boolean; ticks?: boolean; labels?: boolean;
   caption?: boolean; needle?: boolean; hub?: boolean; peak?: boolean; readout?: boolean; glass?: boolean;
+  needles?: boolean; inlay?: boolean;
+}
+/** One more needle on the dial: its own value, colour, spoken label, shape and motion. @tr Kadranda bir ibre daha: kendi değeri, rengi, okunan adı, biçimi ve hareketi. */
+export interface GaugeNeedle {
+  /** The value (it may be live). @tr Değer (canlı olabilir). */
+  value: MaybeFn<number | null | undefined>;
+  /** Name in the spoken value ("Average"). @tr Okunan değerdeki adı ("Ortalama"). */
+  label?: string | undefined;
+  /** Theme color token. Default: the needle colour. @tr Tema renk belirteci. Varsayılan: ibre rengi. */
+  color?: ColorToken | undefined;
+  /** Length as a share of the radius (0.2–1.2). Default 0.9. @tr Yarıçapın payı olarak uzunluk (0.2–1.2). Varsayılan 0.9. */
+  length?: number | undefined;
+  /** Width at the hub (viewBox units, the dial is 200 wide). Default 2.6. @tr Göbekteki genişlik (viewBox birimi, kadran 200 geniş). Varsayılan 2.6. */
+  width?: number | undefined;
+  /** Width at the tip. Default 1.2. @tr Uçtaki genişlik. Varsayılan 1.2. */
+  tip?: number | undefined;
+  /** Tail behind the hub as a share of the radius. Default 0.2. @tr Göbeğin arkasındaki kuyruk, yarıçapın payı. Varsayılan 0.2. */
+  tail?: number | undefined;
+  /** How this needle moves (as `needle`). Default: the gauge's `needle`. @tr Bu ibrenin hareketi (`needle` gibi). Varsayılan: kadranın `needle` değeri. */
+  move?: "spring" | "vu" | "none" | undefined;
+  /** Left out of the spoken value (a decorative needle, the second half of a compass needle). @tr Okunan değerin dışında bırakılır (süs bir ibre, pusula ibresinin ikinci yarısı). */
+  silent?: boolean | undefined;
+  /** Extra class on the needle. @tr İbreye eklenen sınıf. */
+  class?: string | undefined;
+}
+
+/** A circular value made continuous: the value nearest to `prev` that equals `next` modulo `span` (a heading 350 → 10
+ *  becomes 370, so a needle takes the short way round). */
+export function unwrap(prev: number, next: number, span: number): number {
+  if (!isFinite(prev)) return next;
+  const d = ((((next - prev) % span) + span * 1.5) % span) - span / 2;
+  return prev + d;
 }
 
 export interface GaugeProps {
@@ -61,15 +98,25 @@ export interface GaugeProps {
   variant?: GaugeVariant | undefined;
   /** Width in px. Default 220 (half 240, vu 260). @tr px cinsinden genişlik. Varsayılan 220 (half 240, vu 260). */
   size?: MaybeFn<number | undefined>;
-  /** Sweep of the scale in degrees (90–320). Default 270 (half 180, vu 96). @tr Ölçeğin açısı (derece, 90–320). Varsayılan 270 (half 180, vu 96). */
+  /** Sweep of the scale in degrees (90–360; 360 is a full circle, as on a clock). Default 270 (half 180, vu 96). @tr Ölçeğin açısı (derece, 90–360; 360 bir saatteki gibi tam daire). Varsayılan 270 (half 180, vu 96). */
   sweep?: MaybeFn<number | undefined>;
+  /** Where `min` sits, in degrees clockwise from 12 o'clock. Default: the scale is centred on the top (−sweep / 2); a clock uses 0. @tr `min` değerinin yeri, saat 12'den saat yönünde derece. Varsayılan: ölçek üstte ortalanır (−sweep / 2); bir saat 0 kullanır. */
+  start?: MaybeFn<number | undefined>;
+  /** A circular scale: values are not clamped and go round (1250 on a 0–1000 dial is one turn and 250, as on an altimeter). Default: true on a 360° sweep. @tr Dairesel ölçek: değerler sınırlanmaz, döner (0–1000 kadranda 1250 bir tur ve 250'dir, altimetredeki gibi). Varsayılan: 360° açıda true. */
+  wrap?: MaybeFn<boolean | undefined>;
+  /** Degrees the scale turns clockwise under fixed needles (a compass rose: `turn={-heading}`); it moves as the needle does. Default 0. @tr Ölçeğin sabit ibrelerin altında saat yönünde döndüğü derece (pusula gülü: `turn={-heading}`); ibre gibi hareket eder. Varsayılan 0. */
+  turn?: MaybeFn<number | undefined>;
+  /** More needles, each with its own value, colour, label, shape and motion: `[{ value: $avg, label: "Average", color: "info" }]`. Every needle is in the spoken value. Without `value` only these are drawn. @tr Daha fazla ibre; her birinin kendi değeri, rengi, adı, biçimi ve hareketi: `[{ value: $avg, label: "Ortalama", color: "info" }]`. Her ibre okunan değerdedir. `value` yoksa yalnız bunlar çizilir. */
+  needles?: MaybeFn<readonly GaugeNeedle[] | undefined>;
+  /** Your own drawing on the face, under the scale and the needles (a logo, sub-dials, an artificial horizon): a node or a function. @tr Kadran yüzüne, ölçeğin ve ibrelerin altına kendi çiziminiz (bir logo, alt kadranlar, yapay ufuk): bir düğüm ya da işlev. */
+  inlay?: Node | (() => unknown) | undefined;
   /** Ticks (see GaugeTicks); false: none. Default: a round step for the scale, 4 minor ticks each. @tr Çentikler (bkz. GaugeTicks); false: yok. Varsayılan: ölçeğe uygun yuvarlak adım, her birinde 4 ara çentik. */
   ticks?: MaybeFn<GaugeTicks | false | undefined>;
   /** How the needle moves: "spring" (physics with a little overshoot, default), "vu" (300 ms VU ballistics) or "none" (jumps). @tr İbrenin hareketi: "spring" (hafif taşan fizik, varsayılan), "vu" (300 ms VU balistiği) ya da "none" (atlar). */
   needle?: "spring" | "vu" | "none" | undefined;
   /** Digital readout: true (a rolling number), "odometer" (number drums), your own node or `(value) => node`; false: none. Default true (vu: false). @tr Sayısal gösterge: true (yuvarlanan sayı), "odometer" (sayı çarkları), kendi düğümünüz ya da `(value) => düğüm`; false: yok. Varsayılan true (vu: false). */
   readout?: boolean | "odometer" | Node | ((value: number) => unknown) | undefined;
-  /** Parts on or off: face, track, arc (the value arc), zones, ticks, labels, caption, needle, hub, peak, readout, glass. @tr Parçalar açık ya da kapalı: face, track, arc (değer yayı), zones, ticks, labels, caption, needle, hub, peak, readout, glass. */
+  /** Parts on or off: face, track, arc (the value arc), zones, ticks, labels, caption, needle, needles (the extra ones), hub, peak, readout, glass, inlay. @tr Parçalar açık ya da kapalı: face, track, arc (değer yayı), zones, ticks, labels, caption, needle, needles (ek ibreler), hub, peak, readout, glass, inlay. */
   parts?: GaugeParts | undefined;
   /** Theme color token of the needle and the value arc. Default: the accent. @tr İbrenin ve değer yayının tema renk belirteci. Varsayılan: vurgu rengi. */
   color?: ColorToken | undefined;
@@ -126,9 +173,14 @@ export function Gauge(props: GaugeProps): Element {
   const part = (k: keyof GaugeParts, d = true): boolean => parts[k] ?? d;
   const min = computed(() => num(val(props.min)) ?? look.min);
   const max = computed(() => { const m = num(val(props.max)) ?? look.max; return m > min() ? m : min() + 1; });
-  const sweep = computed(() => clamp(num(val(props.sweep)) ?? look.sweep, 90, 320));
+  const sweep = computed(() => clamp(num(val(props.sweep)) ?? look.sweep, 90, 360));
+  const full = computed(() => sweep() >= 359.9);
+  const start = computed(() => num(val(props.start)) ?? -sweep() / 2);
+  const wrap = computed(() => val(props.wrap) ?? full());
   const geo = computed(() => dialGeometry(variant, sweep()));
   const owner = getOwner();
+  // a value on the scale: clamped, or free on a circular (wrapping) scale
+  const fit = (v: number): number => (wrap() ? v : clamp(v, min(), max()));
 
   // the value: the prop, or the loudness of a source (SAMPLE audio)
   const level = signal(0);
@@ -136,7 +188,7 @@ export function Gauge(props: GaugeProps): Element {
     const raw = props.source != null
       ? (vu ? (level() > 0 ? 20 * Math.log10(level() / VU_REF) : -Infinity) : min() + level() * (max() - min()))
       : num(val(props.value)) ?? min();
-    return clamp(raw, min(), max());
+    return wrap() && isFinite(raw) ? raw : clamp(raw, min(), max());
   });
   // where a value sits on the scale, 0–1 (a VU scale is linear in voltage, so its dB marks crowd towards the top)
   const frac = (v: number): number => {
@@ -144,21 +196,44 @@ export function Gauge(props: GaugeProps): Element {
     const lin = (x: number): number => 10 ** (x / 20);
     return (lin(v) - lin(min())) / (lin(max()) - lin(min()));
   };
-  const angle = (v: number, peg = 0): number => -sweep() / 2 + clamp(frac(v), -peg, 1 + peg) * sweep();
+  const angle = (v: number, peg = 0): number => start() + (wrap() ? frac(v) : clamp(frac(v), -peg, 1 + peg)) * sweep();
   const pt = (r: number, a: number): [number, number] => [f1(geo().cx + r * Math.sin(a * RAD)), f1(geo().cy - r * Math.cos(a * RAD))];
   const arc = (r: number, a0: number, a1: number): string => {
     if (a1 - a0 < 0.05) return "";
+    // a full circle is two half arcs (an arc that ends where it starts draws nothing)
+    if (a1 - a0 >= 359.9) return arc(r, a0, a0 + 180) + arc(r, a0 + 180, a0 + 359.99).replace(/^M[^A]+/, "");
     const [x0, y0] = pt(r, a0), [x1, y1] = pt(r, a1);
     return `M${x0} ${y0}A${r} ${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1} ${y1}`;
   };
 
   // ANIMATE needle: spring physics or VU ballistics on the engine; none under still(motion). A new `needle` builds the
   // follower anew (the old one is disposed with the computed's run)
-  const follow = computed(() => {
-    const mode = val(props.needle) ?? look.needle;
-    return mode === "none" ? null : untrack(() => track(() => target(), mode === "vu" ? VU : SPRING));
-  });
-  const shown = (): number => { const f = follow(); return f && !still(props.motion) ? f() : target(); };
+  // (the mode is its own computed: a rebuilt needles array with the same mode keeps the running follower)
+  const follower = (src: () => number, mode: () => "spring" | "vu" | "none" | undefined) => {
+    const m = computed(() => mode() ?? look.needle);
+    return computed(() => (m() === "none" ? null : untrack(() => track(src, m() === "vu" ? VU : SPRING))));
+  };
+  const moved = (f: Accessor<Tracked<number> | null>, src: () => number) => (): number => { const x = f(); return x && !still(props.motion) ? x() : src(); };
+  const shown = moved(follower(() => target(), () => val(props.needle)), () => target());
+  // the scale turns (a compass rose) on the same motion as the needle
+  const turnTo = computed(() => num(val(props.turn)) ?? 0);
+  const turned = moved(follower(() => turnTo(), () => val(props.needle)), () => turnTo());
+  // a rotation in degrees for an SVG transform; a wrapping dial keeps it within one turn
+  const deg = (a: number): number => f1(wrap() ? a - 360 * Math.round(a / 360) : a);
+
+  // the extra needles: one slot per index, made once with the gauge's owner, so a new array (an inline literal that is
+  // rebuilt whenever a value in it changes) moves the same needles instead of building new ones
+  const list = computed(() => val(props.needles) ?? []);
+  const count = computed(() => (part("needles") ? list().length : 0));
+  interface Slot { at: () => GaugeNeedle | undefined; target: Accessor<number>; shown: () => number; el: Element | null }
+  const slots: Slot[] = [];
+  const slot = (i: number): Slot => slots[i] ??= runWithOwner(owner, () => {
+    const at = (): GaugeNeedle | undefined => list()[i];
+    const tgt = computed(() => fit(num(val(at()?.value)) ?? min()));
+    return { at, target: tgt, shown: moved(follower(() => tgt(), () => at()?.move ?? val(props.needle)), () => tgt()), el: null };
+  })!;
+  // the main needle is drawn when there is a value or a source, or no other needle
+  const main = computed(() => props.source != null || props.value != null || !count());
 
   const redline = computed((): number | null => {
     const r = val(props.redline);
@@ -168,21 +243,22 @@ export function Gauge(props: GaugeProps): Element {
   });
   const isRed = computed(() => redline() != null && target() >= redline()!);
 
-  // the spoken value, at most 4 times a second (a live needle would flood a screen reader)
-  const spoken = signal(untrack(target));
-  let pending = false;
-  effect(() => {
-    target();
-    if (pending) return;
-    pending = true;
-    runWithOwner(owner, () => later(() => { pending = false; spoken.set(untrack(target)); }, 250));
-  });
+  // the spoken values (the main one and every needle), at most 4 times a second (a live needle would flood a screen reader)
+  // (a wrapping scale speaks the value within one turn: 370 on a 0–360 compass is 10)
+  const inTurn = (v: number): number => { if (!wrap() || !isFinite(v)) return v; const span = max() - min(); return min() + (((v - min()) % span) + span) % span; };
+  const spokenAll = throttled(() => [target(), ...Array.from({ length: count() }, (_, i) => slot(i).target())].map(inTurn));
+  const spoken = (): number => spokenAll()[0]!;
   // FORMAT number: a function, or Intl options in the page's language (default: whole numbers)
   const fmt = (v: number): string => {
     const f = props.format;
     return typeof f === "function" ? f(v) : new Intl.NumberFormat(locale(), { maximumFractionDigits: 0, ...f }).format(v);
   };
   const valueText = (v: number): string => { const u = val(props.unit); return u ? `${fmt(v)} ${u}` : fmt(v); };
+  const spokenText = (): string => {
+    const [first, ...rest] = spokenAll();
+    const extra = rest.flatMap((v, i) => { const n = untrack(() => list()[i]); return n?.silent ? [] : [n?.label ? `${n.label} ${valueText(v)}` : valueText(v)]; });
+    return (main() ? [valueText(first!), ...extra] : extra).join(", ");
+  };
 
   // STATE peak: the highest value seen (true), or a fixed mark (number)
   const peak = signal<number | null>(null);
@@ -191,7 +267,7 @@ export function Gauge(props: GaugeProps): Element {
     const p = val(props.peak), v = target();
     untrack(() => {
       if (p == null || p === false) { peak.set(null); return; }
-      if (typeof p === "number") { peak.set(clamp(p, min(), max())); return; }
+      if (typeof p === "number") { peak.set(fit(p)); return; }
       const cur = peak.peek();
       if (cur != null && v <= cur) return;
       peak.set(v);
@@ -217,14 +293,16 @@ export function Gauge(props: GaugeProps): Element {
     if (o.values) major = o.values.filter((v) => v >= lo && v <= hi);
     else if (vu) major = VU_TICKS.filter((v) => v >= lo && v <= hi);
     else {
-      step = o.step && o.step > 0 ? o.step : tach ? dialStep(hi - lo, 8) : dialStep(hi - lo, sweep() > 180 ? 10 : 6);
+      step = o.step && o.step > 0 ? o.step : tach ? dialStep(hi - lo, 8) : dialStep(hi - lo, full() ? 12 : sweep() > 180 ? 10 : 6);
       major = [];
-      for (let v = Math.ceil(lo / step - 1e-9) * step, i = 0; v <= hi + 1e-9 && i < 80; v += step, i++) major.push(+v.toFixed(6));
+      for (let v = Math.ceil(lo / step - 1e-9) * step, i = 0; v <= hi + 1e-9 && i < 400; v += step, i++) major.push(+v.toFixed(6));
     }
     const lead = step ? step / 10 ** Math.floor(Math.log10(step)) : 0;
     const per = o.minor ?? (vu || !step ? 0 : tach ? 1 : lead === 2 ? 3 : 4);
     const minor: number[] = [];
     if (step && per > 0) for (let i = 0; i < major.length - 1; i++) for (let k = 1; k <= per; k++) minor.push(major[i]! + (k * step) / (per + 1));
+    // on a full circle the end of the scale sits on its start: one mark there, not two
+    if (full() && major.length > 1 && major.at(-1) === hi && major[0] === lo) major.pop();
     const label = o.labels === false ? null : typeof o.labels === "function" ? o.labels
       : tach ? (v: number) => String(+(v / 1000).toFixed(1)) : vu ? (v: number) => (v > 0 ? `+${v}` : String(Math.abs(v))) : (v: number) => String(+v.toFixed(2));
     return { major, minor, label };
@@ -238,47 +316,62 @@ export function Gauge(props: GaugeProps): Element {
   });
 
   const R = (): number => geo().r;
-  const rot = (a: () => number) => attr(() => `rotate(${f1(a())} ${geo().cx} ${geo().cy})`);
+  const rot = (a: () => number) => attr(() => `rotate(${deg(a())} ${geo().cx} ${geo().cy})`);
   const tickPath = (vs: readonly number[], r0: number, r1: number): string =>
     vs.map((v) => { const a = angle(v), [x0, y0] = pt(r0, a), [x1, y1] = pt(r1, a); return `M${x0} ${y0}L${x1} ${y1}`; }).join("");
   // ticks inside the band on a round dial; on a VU meter they stand on the arc and the labels sit above it
   const tickR = (): [number, number, number, number] => (vu ? [R(), R() + 9, R() + 5, R() + 18] : [R() - 9, R() - 19, R() - 14, R() - 30]);
+  // a needle: `tip` from the hub to its point, `w` / `tw` wide at the hub / the tip, `tail` behind the hub
+  const needlePath = (tip: number, tail: number, w: number, tw: number): string => {
+    const { cx: x, cy: y } = geo(), t2 = tw / 2;
+    return `M${f1(x - w)} ${y}L${f1(x - t2)} ${f1(y - tip)}L${f1(x + t2)} ${f1(y - tip)}L${f1(x + w)} ${y}L${f1(x + w * 1.3)} ${f1(y + tail)}L${f1(x - w * 1.3)} ${f1(y + tail)}Z`;
+  };
+  const extraNeedle = (i: number): Element => {
+    const s = slot(i);
+    return (s.el ??= runWithOwner(owner, () => h("g", {
+      class: () => cx("m-gauge-needle", "is-extra", s.at()?.class), transform: rot(() => angle(s.shown(), 0.03)),
+      style: () => { const c = s.at()?.color; return c ? { "--m-gauge-needle": tokenColor(c) } : {}; },
+    }, h("path", { d: attr(() => {
+      const n = s.at() ?? { value: 0 };
+      return needlePath(R() * clamp(n.length ?? 0.9, 0.2, 1.2), R() * clamp(n.tail ?? 0.2, 0, 0.6), n.width ?? 2.6, n.tip ?? 1.2);
+    }) })))!);
+  };
 
   const svg = h("svg", { class: "m-gauge-svg", viewBox: () => `0 0 200 ${geo().h}`, "aria-hidden": "true", focusable: "false" },
-    part("track") ? h("path", { class: "m-gauge-track", d: attr(() => arc(vu ? R() : R() - 3, -sweep() / 2, sweep() / 2)) }) : null,
-    part("zones") ? h("g", { class: "m-gauge-zones" }, () => zones().map((z) =>
-      h("path", { class: cx("m-gauge-zone", z.red && "is-red"), d: arc(vu ? R() + 2.5 : R() - 9.5, angle(z.from), angle(z.to)), style: { stroke: tokenColor(z.color) } }))) : null,
-    part("arc", look.arc) ? h("path", { class: "m-gauge-arc", d: attr(() => arc(R() - 3, -sweep() / 2, angle(shown(), 0))) }) : null,
-    part("ticks") ? h("g", { class: "m-gauge-ticks" },
-      h("path", { class: "m-gauge-tick is-minor", d: attr(() => { const [a, , c] = tickR(); return tickPath(ticks().minor, a, c); }) }),
-      h("path", { class: "m-gauge-tick is-major", d: attr(() => { const [a, b] = tickR(); const r = redline(); return tickPath(ticks().major.filter((v) => r == null || v < r), a, b); }) }),
-      h("path", { class: "m-gauge-tick is-major is-red", d: attr(() => { const [a, b] = tickR(); const r = redline(); return r == null ? "" : tickPath(ticks().major.filter((v) => v >= r), a, b); }) })) : null,
-    part("labels") ? h("g", { class: "m-gauge-labels" }, () => {
-      const { major, label } = ticks(), r = redline();
-      if (!label) return null;
-      return major.map((v) => { const [x, y] = pt(tickR()[3], angle(v)); return h("text", { class: cx("m-gauge-label", r != null && v >= r && "is-red"), x, y, "text-anchor": "middle", "dominant-baseline": "central" }, label(v)); });
-    }) : null,
+    // the scale: track, zones, ticks, labels and the peak mark turn together (`turn`)
+    h("g", { class: "m-gauge-scale", transform: rot(() => turned()) },
+      part("track") ? h("path", { class: "m-gauge-track", d: attr(() => arc(vu ? R() : R() - 3, start(), start() + sweep())) }) : null,
+      part("zones") ? h("g", { class: "m-gauge-zones" }, () => zones().map((z) =>
+        h("path", { class: cx("m-gauge-zone", z.red && "is-red"), d: arc(vu ? R() + 2.5 : R() - 9.5, angle(z.from), angle(z.to)), style: { stroke: tokenColor(z.color) } }))) : null,
+      part("ticks") ? h("g", { class: "m-gauge-ticks" },
+        h("path", { class: "m-gauge-tick is-minor", d: attr(() => { const [a, , c] = tickR(); return tickPath(ticks().minor, a, c); }) }),
+        h("path", { class: "m-gauge-tick is-major", d: attr(() => { const [a, b] = tickR(); const r = redline(); return tickPath(ticks().major.filter((v) => r == null || v < r), a, b); }) }),
+        h("path", { class: "m-gauge-tick is-major is-red", d: attr(() => { const [a, b] = tickR(); const r = redline(); return r == null ? "" : tickPath(ticks().major.filter((v) => v >= r), a, b); }) })) : null,
+      part("labels") ? h("g", { class: "m-gauge-labels" }, () => {
+        const { major, label } = ticks(), r = redline();
+        if (!label) return null;
+        return major.map((v) => { const [x, y] = pt(tickR()[3], angle(v)); return h("text", { class: cx("m-gauge-label", r != null && v >= r && "is-red"), x, y, "text-anchor": "middle", "dominant-baseline": "central" }, label(v)); });
+      }) : null,
+      part("peak") ? h("path", { class: () => cx("m-gauge-peak", peak() == null && "is-off"),
+        d: attr(() => { const { cx: x, cy: y } = geo(), r = vu ? R() + 1 : R() + 1.5; return `M${x} ${f1(y - r + 8)}L${f1(x - 4)} ${f1(y - r)}L${f1(x + 4)} ${f1(y - r)}Z`; }),
+        transform: rot(() => angle(peak() ?? min())) }) : null),
+    part("arc", look.arc) ? h("path", { class: "m-gauge-arc", d: attr(() => (main() ? arc(R() - 3, start(), angle(shown(), 0)) : "")) }) : null,
     part("caption") ? () => {
       const c = val(props.caption) ?? (tach ? t`×1000 r/min` : vu ? t`VU` : false);
       return c ? h("text", { class: "m-gauge-caption", x: geo().cx, y: geo().capY, "text-anchor": "middle", "dominant-baseline": "central" }, c) : null;
     } : null,
-    part("peak") ? h("path", { class: () => cx("m-gauge-peak", peak() == null && "is-off"),
-      d: attr(() => { const { cx: x, cy: y } = geo(), r = vu ? R() + 1 : R() + 1.5; return `M${x} ${f1(y - r + 8)}L${f1(x - 4)} ${f1(y - r)}L${f1(x + 4)} ${f1(y - r)}Z`; }),
-      transform: rot(() => angle(peak() ?? min())) }) : null,
-    part("needle") ? h("g", { class: "m-gauge-needle", transform: rot(() => angle(shown(), 0.03)) },
-      h("path", { d: attr(() => {
-        const { cx: x, cy: y } = geo(), tip = vu ? R() + 6 : R() - 8, tail = vu ? 0 : 18, w = vu ? 0.9 : 2.6;
-        return `M${f1(x - w)} ${y}L${f1(x - 0.6)} ${f1(y - tip)}L${f1(x + 0.6)} ${f1(y - tip)}L${f1(x + w)} ${y}L${f1(x + w * 1.3)} ${y + tail}L${f1(x - w * 1.3)} ${y + tail}Z`;
-      }) })) : null,
+    h("g", { class: "m-gauge-needles" }, () => Array.from({ length: count() }, (_, i) => extraNeedle(i))),
+    part("needle") ? () => (main() ? h("g", { class: "m-gauge-needle", transform: rot(() => angle(shown(), 0.03)) },
+      h("path", { d: attr(() => (vu ? needlePath(R() + 6, 0, 0.9, 1.2) : needlePath(R() - 8, 18, 2.6, 1.2))) })) : null) : null,
     part("hub", !vu) ? h("g", { class: "m-gauge-hub" },
       h("circle", { class: "m-gauge-hub-ring", cx: () => geo().cx, cy: () => geo().cy, r: 11 }),
       h("circle", { class: "m-gauge-hub-cap", cx: () => geo().cx, cy: () => geo().cy, r: 4.5 })) : null);
 
   // COMPOSE CountRoll (or Odometer drums) for the readout; a live source updates it with the spoken value (4/s)
   const shownValue: Accessor<number> = computed(() => (props.source != null ? spoken() : target()));
-  // a new `readout` draws the readout anew
+  // a new `readout` draws the readout anew; without a main value there is none unless you ask for one
   const readout = (): unknown => {
-    const ro = props.readout ?? look.readout;
+    const ro = props.readout ?? (main() ? look.readout : false);
     return !part("readout") || ro === false ? null : h("div", { class: "m-gauge-readout", "aria-hidden": "true", style: () => ({ top: `${f1((geo().readY / geo().h) * 100)}%` }) },
       ro === "odometer"
         ? h(Odometer, { value: shownValue, digits: () => String(Math.floor(Math.max(Math.abs(max()), Math.abs(min())))).length, size: "sm", motion: props.motion })
@@ -287,6 +380,7 @@ export function Gauge(props: GaugeProps): Element {
         : ro,
       () => { const u = val(props.unit); return u ? h("span", { class: "m-gauge-unit" }, u) : null; });
   };
+  const inlay = props.inlay != null && part("inlay") ? h("div", { class: "m-gauge-inlay", "aria-hidden": "true" }, props.inlay) : null;
 
   const root = h("div", {
     class: () => cx("m-gauge", `m-gauge-${variant}`, sweep() > 180 && !vu ? "is-round" : "is-flat", !part("face") && "m-gauge-bare", isRed() && "is-redline", val(props.class)),
@@ -294,10 +388,10 @@ export function Gauge(props: GaugeProps): Element {
     "data-m-color": () => colorAttr(val(props.color)),
     "aria-label": () => val(props.label) ?? t`Gauge`,
     "aria-valuemin": min, "aria-valuemax": max,
-    "aria-valuenow": () => f1(spoken()),
-    "aria-valuetext": () => valueText(spoken()),
+    "aria-valuenow": () => f1(main() ? spoken() : spokenAll()[1] ?? spoken()),
+    "aria-valuetext": spokenText,
     style: () => ({ "--m-gauge-w": `${num(val(props.size)) ?? look.size}px`, "--m-gauge-ratio": `200 / ${geo().h}` }),
-  }, svg, readout, part("glass") ? h("div", { class: "m-gauge-glass", "aria-hidden": "true" }) : null) as HTMLElement;
+  }, inlay, svg, readout, part("glass") ? h("div", { class: "m-gauge-glass", "aria-hidden": "true" }) : null) as HTMLElement;
 
   // SAMPLE audio: the needle follows the source while the gauge is on screen; march/audio loads only for a source
   // (LOAD lazily), so a gauge of a plain number never downloads it. A new `source` is followed instead

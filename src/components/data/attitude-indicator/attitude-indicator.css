@@ -1,0 +1,21 @@
+/* March — AttitudeIndicator. The case, the glass and the roll scale are a Gauge; the face carries the horizon card:
+   sky and ground from theme tokens (set by the component as fills), a bright horizon line, the pitch ladder in the
+   on-scrim colour, the aircraft symbol in its token colour. The sky pointer is the Gauge's peak mark. */
+.m-att { display: inline-block; vertical-align: middle; max-inline-size: 100%; }
+.m-att > .m-gauge { --m-gauge-needle: var(--m-on-scrim); }
+.m-att-svg { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
+.m-att-sky { filter: saturate(.85); }
+.m-att-ground { filter: saturate(.8) brightness(.8); }
+.m-att-horizon { stroke: var(--m-on-scrim); stroke-width: 1.4; }
+.m-att-rung { stroke: var(--m-on-scrim); stroke-linecap: round; }
+.m-att-rung.is-major { stroke-width: 1.3; }
+.m-att-rung.is-minor { stroke-width: .9; opacity: .8; }
+.m-att-num { fill: var(--m-on-scrim); font: 700 7px/1 var(--m-font); font-variant-numeric: tabular-nums; }
+.m-att-aircraft path {
+  fill: none; stroke: var(--m-att-mark, var(--m-warn)); stroke-width: 3.6; stroke-linejoin: round; stroke-linecap: round;
+  filter: drop-shadow(0 1px 1.2px color-mix(in srgb, var(--m-scrim) 55%, transparent));
+}
+.m-att-aircraft circle { fill: var(--m-att-mark, var(--m-warn)); }
+.m-att .m-gauge-tick { stroke: var(--m-on-scrim); }
+.m-att .m-gauge-tick.is-major { stroke-width: 2; }
+.m-att .m-gauge-peak { fill: var(--m-warn); }

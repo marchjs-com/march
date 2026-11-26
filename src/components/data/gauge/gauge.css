@@ -24,6 +24,7 @@
 }
 .m-gauge-bare { border: 0; background: none; box-shadow: none; }
 
+.m-gauge-inlay { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; container-type: inline-size; }
 .m-gauge-svg { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; overflow: visible; }
 .m-gauge-track { fill: none; stroke: color-mix(in srgb, var(--m-text) 9%, transparent); stroke-width: 5; stroke-linecap: round; }
 .m-gauge-zone { fill: none; stroke-width: 3; opacity: .85; }
@@ -41,6 +42,7 @@
 .m-gauge-peak { fill: var(--m-warn); stroke: color-mix(in srgb, var(--m-scrim) 30%, transparent); stroke-width: .5; }
 .m-gauge-peak.is-off { display: none; }
 .m-gauge-needle path { fill: var(--m-gauge-needle); filter: drop-shadow(0 1.4px 1.2px color-mix(in srgb, var(--m-scrim) 38%, transparent)); }
+.m-gauge-needle.is-extra path { filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--m-scrim) 32%, transparent)); }
 .m-gauge-hub-ring { fill: color-mix(in srgb, var(--m-text) 86%, var(--m-surface)); stroke: color-mix(in srgb, var(--m-surface) 55%, transparent); stroke-width: 1; }
 .m-gauge-hub-cap { fill: var(--m-gauge-needle); }
 

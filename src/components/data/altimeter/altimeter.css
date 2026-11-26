@@ -1,0 +1,16 @@
+/* March — Altimeter. The dial is a Gauge in a dark cockpit look on any theme's face: white-ish numerals 0–9, a long
+   hundreds hand, a short wide thousands hand, a thin ten-thousands pointer with a wedge tip in its token colour, and a
+   pressure window at 3 o'clock whose digits roll. Colours from tokens. */
+.m-alt { display: inline-block; vertical-align: middle; max-inline-size: 100%; }
+.m-alt > .m-gauge { --m-gauge-needle: var(--m-text); }
+.m-alt .m-gauge-label { font-size: 14px; font-weight: 700; fill: var(--m-text); }
+.m-alt .m-gauge-tick.is-major { stroke-width: 2.2; }
+.m-alt .m-gauge-caption { font-size: 7px; }
+.m-alt .m-alt-100 path, .m-alt .m-alt-1k path { stroke: color-mix(in srgb, var(--m-surface) 40%, transparent); stroke-width: .5; }
+.m-alt > .m-gauge > .m-gauge-readout { inset-inline-start: 72%; }
+.m-alt-window {
+  display: inline-flex; align-items: baseline; gap: .8cqi; padding-block: .8cqi; padding-inline: 1.6cqi; border-radius: 1cqi;
+  font: 700 5.6cqi/1 var(--m-font); font-variant-numeric: tabular-nums; color: var(--m-text);
+  background: color-mix(in srgb, var(--m-scrim) 8%, var(--m-surface)); box-shadow: inset 0 .4cqi 1cqi color-mix(in srgb, var(--m-scrim) 30%, transparent), 0 0 0 .5cqi var(--m-border-strong);
+}
+.m-alt-punit { font-size: 3.2cqi; font-weight: 650; color: var(--m-muted); letter-spacing: .08em; }

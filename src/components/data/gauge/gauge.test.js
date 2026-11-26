@@ -154,3 +154,88 @@ test("Gauge: a source given later (a getter) drives the needle; taking it away r
   assert.equal(needle(el), -108, "back on 10");
   dispose();
 });
+
+// Rule "data changes animate": a new value tweens on the motion engine, an interrupted tween retargets from where the
+// needle is, and motion={false} jumps.
+test("Gauge animates every value change: between old and new after one frame, retargets mid-tween, motion off jumps", () => {
+  const v = signal(0);
+  const [el, dispose] = mount(() => [h(Gauge, { value: v, class: "a" }), h(Gauge, { value: v, motion: false, class: "b" })]);
+  const [a, b] = el.querySelectorAll(".m-gauge");
+  v.set(100); E.step(16);
+  const first = needle(a);
+  assert.ok(first > -135 && first < 135, `between the old and the new angle (${first})`);
+  assert.equal(needle(b), 135, "motion off: jumps");
+  run(64);
+  const mid = needle(a);
+  assert.ok(mid > first, "still on its way up");
+  v.set(0); E.step(16);
+  const back = needle(a);
+  assert.ok(back > -135 && back < 135 && Math.abs(back - mid) < 60, `retargets from where it is (${mid} → ${back}), no jump`);
+  run(3000);
+  assert.ok(Math.abs(needle(a) + 135) < 0.5, "lands on the new target");
+  dispose();
+});
+
+const extras = (el) => [...el.querySelectorAll(".m-gauge-needle.is-extra")].map((n) => Number(/rotate\(([-\d.]+)/.exec(n.getAttribute("transform"))[1]));
+
+test("Gauge needles: each extra needle tweens on its own, keeps its node when the array is rebuilt, and is spoken", async () => {
+  const a = signal(20), b = signal(50);
+  const [el, dispose] = mount(() => h(Gauge, { value: 10, unit: "%", label: "Load",
+    get needles() { return [{ value: a(), label: "Average", color: "info", length: 0.7 }, { value: b(), label: "Max", move: "none" }]; } }));
+  const root = el.querySelector(".m-gauge");
+  const nodes = [...el.querySelectorAll(".m-gauge-needle.is-extra")];
+  assert.equal(nodes.length, 2);
+  assert.equal(nodes[0].style.getPropertyValue("--m-gauge-needle"), "var(--m-info)");
+  assert.deepEqual(extras(el), [-81, 0]);
+  a.set(80); b.set(100); E.step(16);
+  const [x, y] = extras(el);
+  assert.ok(x > -81 && x < 81, `the spring needle is between (${x})`);
+  assert.equal(y, 135, "move: none jumps");
+  assert.deepEqual([...el.querySelectorAll(".m-gauge-needle.is-extra")], nodes, "the same nodes, not new ones");
+  run(3000);
+  assert.ok(Math.abs(extras(el)[0] - 81) < 0.5);
+  await wait(300);
+  assert.equal(root.getAttribute("aria-valuetext"), "10 %, Average 80 %, Max 100 %");
+  dispose();
+});
+
+test("Gauge without value: only the needles, the first is aria-valuenow, no readout", async () => {
+  const [el, dispose] = mount(() => h(Gauge, { needles: [{ value: 30 }], motion: false }));
+  assert.equal(el.querySelectorAll(".m-gauge-needle").length, 1);
+  assert.equal(el.querySelector(".m-gauge-readout"), null);
+  await wait(300);
+  assert.equal(el.querySelector(".m-gauge").getAttribute("aria-valuenow"), "30");
+  dispose();
+});
+
+test("Gauge full circle: sweep 360 from start 0 wraps (no clamp, one turn per span), one mark at the top, turn rotates the scale", () => {
+  const v = signal(15), turn = signal(0);
+  const [el, dispose] = mount(() => h(Gauge, { value: v, max: 60, sweep: 360, start: 0, turn, motion: false, ticks: { step: 5 }, inlay: h("i", { class: "mine" }) }));
+  assert.equal(needle(el), 90, "15 of 60 is a quarter turn");
+  v.set(75);
+  assert.equal(needle(el), 90, "75 wraps to the same place");
+  v.set(-15);
+  assert.equal(needle(el), -90);
+  const labels = [...el.querySelectorAll(".m-gauge-label")].map((x) => x.textContent);
+  assert.equal(labels.length, 12, "0 and 60 share one mark");
+  assert.ok(el.querySelector(".m-gauge-track").getAttribute("d").split("A").length === 3, "a full circle is two arcs");
+  turn.set(-90);
+  assert.match(el.querySelector(".m-gauge-scale").getAttribute("transform"), /^rotate\(-90 /);
+  assert.ok(el.querySelector(".m-gauge-inlay .mine"), "the inlay is drawn on the face");
+  dispose();
+});
+
+test("Gauge turn tweens like a needle; unwrap takes the short way round", async () => {
+  const { unwrap } = await import("./index.ts");
+  assert.equal(unwrap(350, 10, 360), 370);
+  assert.equal(unwrap(10, 350, 360), -10);
+  assert.equal(unwrap(720, 90, 360), 810);
+  const turn = signal(0);
+  const [el, dispose] = mount(() => h(Gauge, { value: 0, sweep: 360, turn }));
+  turn.set(-90); E.step(16);
+  const r = Number(/rotate\(([-\d.]+)/.exec(el.querySelector(".m-gauge-scale").getAttribute("transform"))[1]);
+  assert.ok(r < 0 && r > -90, `turning (${r})`);
+  run(3000);
+  assert.match(el.querySelector(".m-gauge-scale").getAttribute("transform"), /^rotate\(-90 /);
+  dispose();
+});

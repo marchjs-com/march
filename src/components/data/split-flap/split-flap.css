@@ -1,0 +1,61 @@
+/* March — SplitFlap. A cell is two halves of a card (top: the next character, bottom: the one shown) and a leaf that
+   folds down over the hinge (--m-flap-turn, 0 → -180deg, written per frame by the engine): its front is the top half of
+   the shown character, its back the bottom half of the next one. Cards stay dark in every theme, as on a real board
+   (--m-scrim / --m-on-scrim). Hooks: .m-flap (root; .is-moving), .m-flap-cells, .m-flap-cell (.is-idle),
+   .m-flap-half (.is-top / .is-bottom), .m-flap-leaf, .m-flap-face (.is-front / .is-back), .m-flap-glyph. */
+.m-flap {
+  --m-flap-h: 40px;
+  --m-flap-w: calc(var(--m-flap-h) * .7);
+  --m-flap-gap: calc(var(--m-flap-h) * .07);
+  --m-flap-radius: calc(var(--m-flap-h) * .1);
+  --m-flap-card: color-mix(in srgb, var(--m-scrim) 88%, var(--m-text) 12%);
+  --m-flap-card-2: color-mix(in srgb, var(--m-scrim) 94%, var(--m-text) 6%);
+  --m-flap-ink: color-mix(in srgb, var(--m-on-scrim) 94%, transparent);
+  --m-flap-seam: color-mix(in srgb, var(--m-scrim) 80%, transparent);
+  --m-flap-shine: color-mix(in srgb, var(--m-on-scrim) 8%, transparent);
+  display: inline-flex; vertical-align: middle; max-inline-size: 100%; line-height: 1;
+}
+.m-flap[data-m-color] { --m-flap-ink: var(--m-accent); }
+.m-flap-sm { --m-flap-h: 26px; }
+.m-flap-lg { --m-flap-h: 64px; }
+
+.m-flap-cells {
+  display: inline-flex; flex-wrap: wrap; gap: var(--m-flap-gap);
+  padding: calc(var(--m-flap-h) * .14); border-radius: calc(var(--m-flap-radius) * 1.6);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--m-scrim) 70%, var(--m-surface)), color-mix(in srgb, var(--m-scrim) 84%, var(--m-surface)));
+  box-shadow: var(--m-shadow-2), inset 0 1px 0 var(--m-flap-shine);
+}
+.m-flap-bare .m-flap-cells { padding: 0; background: none; box-shadow: none; }
+
+.m-flap-cell {
+  position: relative; display: inline-block; flex: none;
+  inline-size: var(--m-flap-w); block-size: var(--m-flap-h); perspective: calc(var(--m-flap-h) * 6);
+  font: 700 calc(var(--m-flap-h) * .66) / 1 var(--m-font-mono, ui-monospace, monospace); color: var(--m-flap-ink);
+  text-transform: none;
+}
+.m-flap-half, .m-flap-face {
+  position: absolute; inset-inline: 0; block-size: 50%; overflow: hidden;
+  background: var(--m-flap-card); backface-visibility: hidden;
+}
+.m-flap-half.is-top, .m-flap-face.is-front { inset-block-start: 0; border-radius: var(--m-flap-radius) var(--m-flap-radius) 0 0;
+  background: linear-gradient(180deg, var(--m-flap-shine), transparent 60%), var(--m-flap-card); }
+.m-flap-half.is-bottom, .m-flap-face.is-back { inset-block-end: 0; border-radius: 0 0 var(--m-flap-radius) var(--m-flap-radius);
+  background: var(--m-flap-card-2); box-shadow: 0 calc(var(--m-flap-h) * .04) calc(var(--m-flap-h) * .08) var(--m-flap-seam); }
+/* the glyph is as tall as the card: each half shows its own half of it */
+.m-flap-glyph { position: absolute; inset-inline: 0; block-size: 200%; display: grid; place-items: center; }
+.m-flap-half.is-top .m-flap-glyph, .m-flap-face.is-front .m-flap-glyph { inset-block-start: 0; }
+.m-flap-half.is-bottom .m-flap-glyph, .m-flap-face.is-back .m-flap-glyph { inset-block-end: 0; }
+
+/* the leaf: the top half, hinged at the middle line, folding down */
+.m-flap-leaf {
+  position: absolute; inset-inline: 0; inset-block-start: 0; block-size: 50%; z-index: 1;
+  transform-origin: 50% 100%; transform: rotateX(var(--m-flap-turn, 0deg)); transform-style: preserve-3d;
+}
+.m-flap-leaf .m-flap-face { block-size: 100%; }
+.m-flap-face.is-back { transform: rotateX(180deg); inset-block-end: auto; inset-block-start: 0; }
+.m-flap-cell.is-idle .m-flap-leaf { visibility: hidden; }
+/* the hinge: a thin dark line across the middle */
+.m-flap-cell::after {
+  content: ""; position: absolute; inset-inline: 0; inset-block-start: calc(50% - .5px); block-size: 1px; z-index: 2;
+  background: var(--m-flap-seam);
+}

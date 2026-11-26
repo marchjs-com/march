@@ -1,0 +1,17 @@
+/* March — AnalogClock. The dial is a Gauge; the clock only dresses its hands: hour and minute hands in the text
+   colour with a light edge, a slim second hand in its token colour with a round counterweight-like tail, numerals a
+   little larger than a gauge's labels. Every colour is a theme token, so light and dark themes follow. */
+.m-clock { display: inline-block; vertical-align: middle; max-inline-size: 100%; }
+.m-clock > .m-gauge { --m-gauge-needle: var(--m-text); }
+.m-clock .m-gauge-label { font-size: 13px; font-weight: 650; fill: var(--m-text); }
+.m-clock .m-gauge-tick.is-major { stroke-width: 2.4; }
+.m-clock .m-gauge-tick.is-minor { stroke-width: 1; opacity: .45; }
+.m-clock .m-clock-hour path, .m-clock .m-clock-minute path { stroke: color-mix(in srgb, var(--m-surface) 35%, transparent); stroke-width: .5; }
+.m-clock .m-clock-second path { filter: none; }
+.m-clock .m-gauge-hub-ring { r: 6px; }
+.m-clock .m-gauge-hub-cap { r: 2.6px; fill: var(--m-danger); }
+.m-clock-readout {
+  display: inline-block; padding-block: .6cqi; padding-inline: 2cqi; border-radius: 1.2cqi;
+  font: 650 5.2cqi/1 var(--m-font); font-variant-numeric: tabular-nums; letter-spacing: .04em; color: var(--m-text-2);
+  background: color-mix(in srgb, var(--m-text) 6%, var(--m-surface)); box-shadow: inset 0 0 0 1px var(--m-border);
+}
