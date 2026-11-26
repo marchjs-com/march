@@ -132,7 +132,7 @@ entries.push(...keep);
   for (const k of sheets) {
     const { code } = await esbuild.transform(readFileSync(join(root, k), "utf8"), { loader: "css", minify: true, legalComments: "none" });
     // a sheet is the source file as it is: an address relative to it would point elsewhere on the CDN
-    if (/url\(\s*["']?(?!data:|https?:|#)/.test(code)) throw new Error(`${k}: a relative url() in a component stylesheet (inline it as data: or put the file in src/css/)`);
+    if (/url\(\s*(?!["']?(?:data:|https?:|#))/.test(code)) throw new Error(`${k}: a relative url() in a component stylesheet (inline it as data: or put the file in src/css/)`);
     body.set(k, ownRules(code));
     mkdirSync(dirname(join(out, sheetOf(k))), { recursive: true });
     writeFileSync(join(out, sheetOf(k)), `${banner.css}\n${body.get(k)}\n`);
