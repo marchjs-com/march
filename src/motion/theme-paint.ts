@@ -389,7 +389,7 @@ export function warpTime(to: number, ms: number): Promise<void> {
   });
 }
 
-type FreezeVT = { finished: Promise<void>; ready: Promise<void> };
+type FreezeVT = { finished: Promise<void>; ready: Promise<void>; skipTransition?: () => void };
 /** Whether a frozen drip can run here: View Transitions and a clip by a path. */
 export const canFreezeDrip = (doc: Document): boolean =>
   typeof (doc as Document & { startViewTransition?: unknown }).startViewTransition === "function"
@@ -412,7 +412,8 @@ export async function frozenDrip(doc: Document, change: () => void, o: { duratio
 async function frozen(doc: Document, change: () => void, o: { duration?: number | undefined }): Promise<void> {
   const root = doc.documentElement, start = (doc as Document & { startViewTransition: (cb: () => void) => FreezeVT }).startViewTransition.bind(doc);
   const w = globalThis.innerWidth || root.clientWidth, h = globalThis.innerHeight || root.clientHeight;
-  let thaw: Promise<void> | null = null, press: (() => void) | null = null;
+  let thaw: Promise<void> | null = null, press: (() => void) | null = null, watchdog: ReturnType<typeof setTimeout> | undefined;
+  let paint: Animation[] = [];
   const shade = doc.createElement("div");
   try {
     await warpTime(0, FREEZE_MS);
@@ -425,10 +426,13 @@ async function frozen(doc: Document, change: () => void, o: { duration?: number 
     let vt: FreezeVT;
     try { vt = start(() => { change(); root.append(shade); }); } catch { change(); return; }
     const timing = { duration: o.duration ?? 1500, easing: "linear", fill: "both" as const };
+    // the picture never stays: where frames stall (a tab in the background, a page that is not drawn), the paint ends
+    // and the transition is dropped a moment after its time, so the page and its controls are never held behind it
+    watchdog = setTimeout(() => { for (const a of paint) { try { a.finish(); } catch { /* gone */ } } vt.skipTransition?.(); }, timing.duration + BUFFER_MAX_MS + FREEZE_MS + 1500);
     await vt.ready.then(() => {
       // the browser's own transition animations keep their time (they would wait for time to come back)
       for (const a of doc.getAnimations?.() ?? []) if ((a.effect as KeyframeEffect | null)?.pseudoElement?.startsWith("::view-transition")) a.cancel();
-      const paint = [
+      paint = [
         startUnwarped(root, liquidFrames(st, false), { ...timing, pseudoElement: "::view-transition-old(root)" }),
         startUnwarped(shade, liquidFrames(st, false), timing),
         startUnwarped(shape, liquidFrames(st, true, 0, 18, SHADE_SCALE), timing),
@@ -447,6 +451,7 @@ async function frozen(doc: Document, change: () => void, o: { duration?: number 
     }).catch(() => undefined);
     await vt.finished.catch(() => undefined);
   } finally {
+    clearTimeout(watchdog);
     shade.remove();
     (press as (() => void) | null)?.();
     root.removeAttribute("data-m-wave");
@@ -468,6 +473,8 @@ function hurryOnInput(doc: Document, paint: Animation[]): () => void {
     if (hurried) return;
     hurried = true;
     for (const a of paint) {
+      // still held for the back buffer: the press starts it (a press never waits behind the picture)
+      if (a.playState === "paused") a.play();
       const end = Number(a.effect?.getComputedTiming().endTime ?? 0), now = Number(a.currentTime ?? 0);
       if (end > now) a.updatePlaybackRate(Math.max(1, (end - now) / HURRY_MS));
     }
@@ -543,11 +550,13 @@ function backBuffer(doc: Document): Promise<void> {
   void Promise.all([doc.fonts?.ready, ...inView.map((img) => img.decode().catch(() => undefined))]).then(() => { loaded = true; }, () => { loaded = true; });
   return new Promise((resolve) => {
     let last = t0, calm = 0;
+    // no frames (a page that is not drawn): the paint does not wait for them
+    const late = setTimeout(() => { off(); resolve(); }, BUFFER_MAX_MS + 100);
     const off = onFrame(() => {
       const now = performance.now();
       calm = now - last < QUIET_FRAME_MS ? calm + 1 : 0;
       last = now;
-      if ((loaded && calm >= BUFFER_FRAMES) || now - t0 > BUFFER_MAX_MS) { off(); resolve(); }
+      if ((loaded && calm >= BUFFER_FRAMES) || now - t0 > BUFFER_MAX_MS) { clearTimeout(late); off(); resolve(); }
     }, { essential: true });
   });
 }
