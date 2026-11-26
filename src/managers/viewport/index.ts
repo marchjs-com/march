@@ -8,7 +8,7 @@
 //
 // Each signal starts listening on first read (an app that never asks for `online` adds no listener).
 import { signal, computed, effect, onCleanup, getOwner, type Accessor, type Signal } from "../../core/reactive.ts";
-import { registerNamespace } from "../../dom/h.ts";
+import { registerNamespace } from "../../dom/props.ts";
 import { openLayer } from "../../dom/portal.ts";
 import { defineManager, emit } from "../manager.ts";
 

@@ -12,7 +12,7 @@
 // Roving lives in the behaviors layer (src/behaviors/roving-focus); the trap stack stays here (only the newest trap is
 // active, which needs one app-wide owner).
 import { signal, untrack, getOwner, runWithOwner, onCleanup } from "../../core/reactive.ts";
-import { registerNamespace } from "../../dom/h.ts";
+import { registerNamespace } from "../../dom/props.ts";
 import { focusables, trapTab, focusFirst } from "../../ui/focus.ts";
 import { rovingFocus, type RovingOptions } from "../../behaviors/roving-focus/index.ts";
 import { defineManager, emit } from "../manager.ts";

@@ -66,7 +66,7 @@ test("directives, shorthand attributes, bind needs a $variable", () => {
   assert.match(out, /"class:on": _\$r\(\(\) => \(\$v\(\)\)\)/);
   assert.match(out, /"use:focus": \[focus, 1\]/);
   assert.match(out, /"transition:fade": true/);
-  assert.match(out, /_\$h\(Row, \{user: user, v: _\$r\(\(\) => \(\$v\(\)\)\)\}\)/);
+  assert.match(out, /_\$c\(Row, \{user: user, v: _\$r\(\(\) => \(\$v\(\)\)\)\}\)/);
   assert.throws(() => c("const e = <input bind:value={x} />"), /needs a \$variable/);
 });
 
@@ -85,8 +85,8 @@ test("sx literal resolves at build time; invalid sx fails the build", () => {
 
 test("components get lazy children; If/Else split", () => {
   const out = body("const e = <Card title='x'><p>a</p>{b}</Card>; const f = <If when={ok}>yes<Else>no</Else></If>", NOTPL);
-  assert.match(out, /_\$h\(Card, \{title: "x"\}, _\$lazy\(\(\) => \[_\$h\("p", null, "a"\), b\]\)\)/);
-  assert.match(out, /_\$h\(If, \{when: ok, else: \(\) => \["no"\]\}, _\$lazy\(\(\) => \["yes"\]\)\)/);
+  assert.match(out, /_\$c\(Card, \{title: "x"\}, _\$lazy\(\(\) => \[_\$h\("p", null, "a"\), b\]\)\)/);
+  assert.match(out, /_\$c\(If, \{when: ok, else: \(\) => \["no"\]\}, _\$lazy\(\(\) => \["yes"\]\)\)/);
 });
 
 test("async functions keep their owner across await", () => {
@@ -130,9 +130,9 @@ const s = <svg viewBox="0 0 1 1"><path d="M0 0" /></svg>; const sp = <div {...p}
   const decl = out.match(/const _\$t\d+ = _\$tpl\(/g) ?? [];
   assert.equal(decl.length, 2, "one template for the row (inner cells taken in) and one for <b> inside the spread <div>");
   assert.match(out, /_\$tpl\(\["tr",\[\["class","row"\]\],\["td",\[\["class","c1"\]\]\],\["td",\[\],\["a",\[\]," !"\]\],\["td",\[\["hidden",""\]\]\]\]\)/);
-  assert.match(out, /_\$p\(_\d+, "a", "class", _\$r\(\(\) => \(\$sel\)\)\)/, "a bound class is wired");
-  assert.match(out, /_\$p\(_\d+, "a", "onClick", go\)/, "events are wired, not template attributes");
-  assert.match(out, /_\$p\(_\d+, "a", "href", "\/x"\)/, "URL attributes keep their runtime check");
+  assert.match(out, /_\$cls\(_\d+, \(\) => \(\$sel\)\)/, "a bound class is wired with _cls (a plain thunk: any function is live)");
+  assert.match(out, /_\$on\(_\d+, "click", go\)/, "a plain event is wired with _on, not a template attribute");
+  assert.match(out, /_\$attr\(_\d+, "a", "href", "\/x"\)/, "URL attributes keep their runtime check (_attr)");
   assert.match(out, /_\$ins\(_\d+, label, _\d+, 1\)/, "a child before static text is inserted before it (owned by the clone: no cleanup)");
   assert.match(out, /_\$h\("svg"/, "SVG keeps h() (namespace)");
   assert.match(out, /_\$h\("div", \{\.\.\.p\}/, "spreads keep h()");
@@ -252,8 +252,8 @@ test("texts: a string a JSX expression shows as a whole value (a branch of ?: / 
 
 test("compiler: a component's type arguments (<List<User> …>, <Pick<{ a: () => void }> …>) are erased like other types", () => {
   const out = c(`export const A = () => <div><List<string> items={[]} /><Pick<{ from: number; f: () => void }> open={() => true}>x</Pick></div>`);
-  assert.match(out, /h\(List, \{items:/);
-  assert.match(out, /h\(Pick, \{open:/);
+  assert.match(out, /_\$c\(List, \{items:/);
+  assert.match(out, /_\$c\(Pick, \{open:/);
   assert.doesNotMatch(out, /List</);
 });
 

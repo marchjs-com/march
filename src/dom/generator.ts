@@ -7,7 +7,8 @@
 // The compiler turns `function* Name(` / `async function* Name(` (a capitalised declaration) into a plain component that
 // calls _gen(); by hand: generator(function* Name() {…}).
 import { getOwner, runWithOwner, reportError, onCleanup, useContext, _owner, _dispose, type Owner } from "../core/reactive.ts";
-import { insert, clearBetween, LoadingContext, defaultLoading, type Component } from "./h.ts";
+import { insert, clearBetween } from "./insert.ts";
+import { LoadingContext, defaultLoading, type Component } from "./component.ts";
 
 /** What a generator component may say about itself (static properties: `List.chunk = 20`). */
 export interface GeneratorOptions {

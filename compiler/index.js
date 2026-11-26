@@ -19,11 +19,13 @@ const { sx: resolveSx } = await importTs(new URL("../src/core/sx.ts", import.met
 const TEXT_ATTRS = new Set(["title", "placeholder", "label", "alt", "aria-label", "aria-description", "description", "hint", "message"]);
 // an object's fields whose string is read by people (lang.json collects them): `{ label: "Enerjik", hint: "…" }`
 const TEXT_KEYS = new Set(["label", "title", "text", "message", "description", "placeholder", "hint", "caption", "subtitle", "heading", "tooltip", "tip", "helperText", "emptyText", "confirmText", "cancelText", "okText"]);
-const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins", gen: "_$gen", tr: "_$tr", trf: "_$trf" };
-const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert", gen: "_gen", tr: "_tr", trf: "_trf" };
+const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins", gen: "_$gen", tr: "_$tr", trf: "_$trf", c: "_$c", cls: "_$cls", attr: "_$attr", on: "_$on" };
+const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert", gen: "_gen", tr: "_tr", trf: "_trf", c: "_c", cls: "_cls", attr: "_attr", on: "_on" };
 // Templates: a native element subtree is built once (DOM calls, no HTML strings) and cloned; only its dynamic parts
 // (bound attributes, events, refs, directives, {expressions}, components) are wired on the clone. Not templated:
 // SVG (namespace), forbidden tags (h() throws for them), spreads.
+// lowercase prop names that are not plain attributes (dom/props.ts: DOM properties, style, sx, ref, forbidden)
+const PROP_KEYS = new Set(["value", "checked", "selected", "indeterminate", "muted", "style", "sx", "ref", "srcdoc"]);
 const TPL_SKIP_TAGS = new Set(["svg", "g", "path", "circle", "ellipse", "rect", "line", "polyline", "polygon", "text", "tspan", "defs",
   "linearGradient", "radialGradient", "stop", "clipPath", "mask", "pattern", "use", "symbol", "title", "desc", "marker", "foreignObject",
   "script", "iframe", "object", "embed", "base", "meta", "math"]);
@@ -859,7 +861,8 @@ class Transformer {
         if (!/^[A-Za-z_$][\w$.]*$/.test(fn)) throw fail(this.src, this.pos, `invalid action name in ${a.name}`);
         this.used.add(fn.split(".")[0]);
         value = `[${fn}, ${a.code === "true" && !a.raw ? "undefined" : a.code}]`;
-      } else value = a.dynamic ? `${this.helper("r")}(() => (${a.code}))` : a.code;
+      // a plain thunk: _prop treats any function as live (no reactive() tag to set on every clone)
+      } else value = a.dynamic ? `() => (${a.code})` : a.code;
       props.push([a.name, value]);
     }
     const out = [];
@@ -869,6 +872,17 @@ class Transformer {
       else out.push({ expr: childCode(k) });
     }
     return { tag, statics, props, kids: out };
+  }
+
+  /**
+   * One prop of a template element: a class, a plain event (onClick) and a plain attribute through their own small
+   * helpers (a page whose templates need nothing else does not load every prop kind), anything else through _prop.
+   */
+  wireProp(ref, tag, key, value) {
+    if (key === "class" || key === "className") return `${this.helper("cls")}(${ref}, ${value});`;
+    if (/^on[A-Z][A-Za-z]*$/.test(key)) return `${this.helper("on")}(${ref}, ${JSON.stringify(key.slice(2).toLowerCase())}, ${value});`;
+    if (/^[a-z][a-z0-9-]*$/.test(key) && !PROP_KEYS.has(key)) return `${this.helper("attr")}(${ref}, ${JSON.stringify(tag)}, ${JSON.stringify(key)}, ${value});`;
+    return `${this.helper("p")}(${ref}, ${JSON.stringify(tag)}, ${JSON.stringify(key)}, ${value});`;
   }
 
   /** `_$tN((r) => { …wire the clone… })`, with `const _$tN = _$tpl(spec)` declared at the top of the module. */
@@ -883,7 +897,7 @@ class Transformer {
     const needs = (n) => n.props.length > 0 || n.kids.some((k) => k.expr || (k.tag && needs(k)));
     const nextStatic = (n, i) => n.kids.slice(i + 1).find((x) => !x.expr);
     const walk = (n, ref) => {
-      for (const [key, value] of n.props) wire.push(`${this.helper("p")}(${ref}, ${JSON.stringify(n.tag)}, ${JSON.stringify(key)}, ${value});`);
+      for (const [key, value] of n.props) wire.push(this.wireProp(ref, n.tag, key, value));
       // the template children (text and elements) that need a name: wired elements and the anchors of runtime children
       const stat = n.kids.filter((k) => !k.expr);
       const want = new Set();
@@ -1010,11 +1024,11 @@ class Transformer {
     if (elseKids) props.push(`else: () => [${elseKids}]`);
     const tagCode = isComp ? tag : JSON.stringify(tag);
     const childCode = (k) => (k.dynamic ? `() => (${k.code})` : k.code);
-    const h = this.helper("h");
     let code;
     if (isComp) {
       const body = kids.length ? `, ${this.helper("lazy")}(() => [${kids.map(childCode).join(", ")}])` : "";
-      code = `${h}(${tagCode}, {${props.join(", ")}}${body})`;
+      // _c: a component without h()'s element path (every prop kind), which a page then loads only if it uses it
+      code = `${this.helper("c")}(${tagCode}, {${props.join(", ")}}${body})`;
     } else {
       const tn = this.opts.typecheck || this.opts.templates === false ? null : this.tnode(tag, attrs, kids, childCode);
       if (tn) {
@@ -1023,7 +1037,7 @@ class Transformer {
         (this.tnodes ??= new Map()).set(code, tn);
         return code;
       }
-      code = `${h}(${tagCode}, ${props.length ? `{${props.join(", ")}}` : "null"}${kids.map((k) => `, ${childCode(k)}`).join("")})`;
+      code = `${this.helper("h")}(${tagCode}, ${props.length ? `{${props.join(", ")}}` : "null"}${kids.map((k) => `, ${childCode(k)}`).join("")})`;
     }
     if (tag === "Else") { this.elseCodes ??= new Map(); this.elseCodes.set(code, kids.map(childCode).join(", ")); }
     return mWrap(code);
@@ -1041,7 +1055,7 @@ export function isStaticCode(code) {
   if (/^`[^`$]*`$/.test(c)) return true;
   if (/^(async\s+)?function\b/.test(c)) return true;
   if (/^(async\s*)?(\([^()]*(\([^()]*\)[^()]*)*\)|[A-Za-z_$][\w$]*)\s*=>/.test(c)) return true;
-  if (c.startsWith(`${H.h}(`) && balancedCall(c)) return true;
+  if ((c.startsWith(`${H.h}(`) || c.startsWith(`${H.c}(`)) && balancedCall(c)) return true;
   if (/^_\$t\d+\(/.test(c) && balancedCall(c)) return true; // a template clone
   if (c.startsWith(`${M_HELPER}(`) && balancedCall(c)) return true; // an element / component with m: props
   if (c.startsWith(`${PARTS_HELPER}(`) && balancedCall(c)) return true; // … inside an m:parts scope

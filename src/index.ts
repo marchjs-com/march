@@ -1,7 +1,12 @@
 // March — core entry. Everything else (router, data, schema, ui, table, charts, testing) is a separate module.
 export { signal, computed, effect, batch, untrack, selector, onCleanup, createRoot, getOwner, runWithOwner, catchError, context, provide, useContext, reactive, isReactive, read, DEV, _enter, _leave } from "./core/reactive.ts";
 export { store, patch, unwrap } from "./core/store.ts";
-export { h, Fragment, insert, lazyChildren, safeUrl, registerTransition, _tpl, _prop } from "./dom/h.ts";
+export { h } from "./dom/h.ts";
+export { insert } from "./dom/insert.ts";
+export { Fragment, lazyChildren, _c } from "./dom/component.ts";
+export { safeUrl, _tpl, _cls, _attr } from "./dom/tpl.ts";
+export { registerTransition, _prop } from "./dom/props.ts";
+export { _on } from "./dom/events.ts";
 export { extend, intercept, inside, partOf, defineExtension, withExtensions, Extensions, extensions, type Extension, type ExtensionDef, type ExtensionTarget, type ExtensionContext, type SetupContext, type ExtensionPropSpec, type ExtensionTrace, type ComponentInfo, type ExtensionProps, type ComponentExtensions, type ExtensionPropsOf, type ExtensionTest, type PathStep, type PathTarget } from "./dom/extend.ts";
 export { If, Else, Try } from "./dom/flow.ts";
 export { For, setFlipHook } from "./dom/for.ts";

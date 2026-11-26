@@ -22,7 +22,7 @@ const STATIC = /(?:^|[;}\s])(?:import|export)\s*(?:[\w$*{},\s]*from\s*)?["'](\.{
 /**
  * Measure a CDN version folder (importmap.json beside the entries).
  * @param {string} dir
- * @returns {{ core: { js: number, files: string[] }, entries: Record<string, { js: number, added: number, css: number, files: string[] }> }}
+ * @returns {{ core: { js: number, files: string[] }, runtime: { js: number, files: string[] }, entries: Record<string, { js: number, added: number, css: number, files: string[] }> }}
  */
 export function measure(dir) {
   const map = JSON.parse(readFileSync(join(dir, "importmap.json"), "utf8")).imports;
@@ -43,7 +43,10 @@ export function measure(dir) {
       files: [...c].map(rel).sort(),
     };
   }
-  return { core: { js: [...core].reduce((n, x) => n + size(x), 0), files: [...core].map(rel).sort() }, entries };
+  // the runtime: what every page that renders loads (render and what it imports), modulepreloaded by a CDN app's page
+  const runtime = map["march/mod/dom/render"] ? closure(fileOf(map["march/mod/dom/render"])) : core;
+  const sum = (c) => ({ js: [...c].reduce((n, x) => n + size(x), 0), files: [...c].map(rel).sort() });
+  return { core: sum(core), runtime: sum(runtime), entries };
 }
 
 /** The budget file: { component, entry, core, limits: { spec: { limit, why } } } (gzip bytes). */
@@ -65,6 +68,7 @@ export function check(sizes, budget) {
     const n = spec === "march" ? e.js : e.added;
     if (limit != null && n > limit) over.push({ spec, size: n, limit });
   }
+  if (budget.runtime && sizes.runtime && sizes.runtime.js > budget.runtime) over.push({ spec: "runtime (march/mod/dom/render)", size: sizes.runtime.js, limit: budget.runtime });
   return over;
 }
 

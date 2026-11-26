@@ -3,7 +3,7 @@
 // a constant on a native element becomes a plain attribute at build time and only the CSS file is loaded.
 // New members are added with registerMProp(); the list is open.
 import { effect, computed, untrack, getOwner, runWithOwner, onCleanup, signal, reactive, isReactive, context, provide, useContext } from "../core/reactive.ts";
-import { registerNamespace, _prop } from "../dom/h.ts";
+import { registerNamespace, _prop } from "../dom/props.ts";
 import { sx as sxClasses, type Sx } from "../core/sx.ts";
 import { _builtin } from "../dom/extend.ts";
 import "../css/props.css";

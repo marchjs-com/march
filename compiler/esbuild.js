@@ -90,6 +90,10 @@ export function march(opts = {}) {
   return {
     name: "march",
     async setup(build) {
+      // a production build (process.env.NODE_ENV "production") leaves March's development-only code out: warnings,
+      // argument checks, component names on errors (src/core/reactive.ts › __MARCH_DEV__)
+      const define = (build.initialOptions.define ??= {});
+      if (!("globalThis.__MARCH_DEV__" in define) && define["process.env.NODE_ENV"]) define["globalThis.__MARCH_DEV__"] = String(define["process.env.NODE_ENV"] !== '"production"');
       const filter = opts.filter ?? /\.(jsx|tsx)$/;
       const auto = await loadAutoImports({ components: [].concat(opts.components ?? []).map((d) => resolve(d)) });
       const compiled = compileCache(opts, auto);

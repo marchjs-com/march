@@ -1,7 +1,7 @@
 // Keyed list <For> (its own module: a page that only needs If/Try does not pull it into its chunk).
 import { getOwner, untrack, onCleanup, effect, runWithOwner, _cell, _setCell, _owner, _dispose, type Accessor, type Cell, type Owner } from "../core/reactive.ts";
-import { insert, removeNode, disposeDetached, LEAVE } from "./h.ts";
-import { val, call } from "./flow.ts";
+import { insert, removeNode, disposeDetached, LEAVE, doc as document } from "./insert.ts";
+import { val, call } from "./val.ts";
 
 /** Installed by march/motion: (elements, mutate, opts) → void. Measures, runs `mutate`, animates the deltas. */
 export type FlipHook = (elements: Element[], mutate: () => void, opts: unknown) => void;
@@ -30,7 +30,7 @@ interface Row<T> { nodes: Node[]; item: Cell<T>; index: Cell<number> | null; o: 
  * appending take fast paths. `animate` (with march/motion loaded): FLIP-animate moves, enter and leave.
  */
 export function For<T>(props: ForProps<T>): DocumentFragment {
-  const doc = globalThis.document;
+  const doc = document();
   const start = doc.createComment("for"), end = doc.createComment("/for");
   const frag = doc.createDocumentFragment();
   frag.append(start, end);
@@ -40,7 +40,7 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
   let order: Row<T>[] = [];
   let fallback: { o: Owner; nodes: Node[] } | null = null;
   const render: unknown = props.children;
-  if (typeof render !== "function") throw new TypeError("March: <For> needs a row function.");
+  if (globalThis.__MARCH_DEV__ !== false && typeof render !== "function") throw new TypeError("March: <For> needs a row function.");
   const renderRow = render as ForProps<T>["children"];
   const wantsIndex = renderRow.length !== 1; // `(item) => …` never reads the index: no index signal per row
 
@@ -75,8 +75,17 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
         return true;
       };
       let s = 0, e1 = m - 1, e2 = n - 1;
-      while (s <= e1 && s <= e2 && same(s, old[s])) s++;
-      while (s <= e1 && s <= e2 && same(e2, old[e1])) { e1--; e2--; }
+      for (;;) {
+        while (s <= e1 && s <= e2 && same(s, old[s])) s++;
+        while (s <= e1 && s <= e2 && same(e2, old[e1])) { e1--; e2--; }
+        // the first and last rows of the middle traded places (a swap): move the two rows, no map, no reorder pass
+        const a = old[s] as Row<T>, b = old[e1] as Row<T>;
+        if (s >= e1 || s >= e2 || props.animate || !a.nodes.length || !b.nodes.length || keyOf(list[s] as T) !== b.k || keyOf(list[e2] as T) !== a.k) break;
+        const ref = (b.nodes[b.nodes.length - 1] as Node).nextSibling;
+        for (const x of b.nodes) host.insertBefore(x, a.nodes[0] as Node);
+        for (const x of a.nodes) host.insertBefore(x, ref);
+        same(s++, b); same(e2--, a); e1--;
+      }
       // the middle: old rows s…e1 become new rows s…e2 (reused by key, made, or dropped)
       const byKey = new Map<unknown, Row<T>>();
       for (let i = s; i <= e1; i++) byKey.set((old[i] as Row<T>).k, old[i] as Row<T>);
@@ -93,22 +102,16 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
         for (const x of fallback.nodes) host.insertBefore(x, end);
       }
       if (s > e2) return;
-      // rows on a longest increasing run of old positions stay; the others (moved or new) are gathered in order and
-      // inserted, one fragment at a time, before the next row that stays. Filling an empty list is one insert.
+      // rows on a longest increasing run of old positions stay; the others (moved or new) are inserted, last to
+      // first, straight before the next row that stays (no fragment: each node moves once)
       const place = (): void => {
         const keep = lis(was);
-        let ref: Node = e2 + 1 < n ? ((next[e2 + 1] as Row<T>).nodes[0] ?? end) : end, pending: DocumentFragment | null = null;
+        let ref: Node = e2 + 1 < n ? ((next[e2 + 1] as Row<T>).nodes[0] ?? end) : end;
         for (let i = e2; i >= s; i--) {
           const ns = (next[i] as Row<T>).nodes;
-          if (keep[i - s]) {
-            if (pending) { host.insertBefore(pending, ref); pending = null; }
-            if (ns.length) ref = ns[0] as Node;
-          } else {
-            pending ??= doc.createDocumentFragment();
-            for (let x = ns.length - 1; x >= 0; x--) pending.insertBefore(ns[x] as Node, pending.firstChild);
-          }
+          if (keep[i - s]) { if (ns.length) ref = ns[0] as Node; }
+          else for (let x = ns.length - 1; x >= 0; x--) { const nd = ns[x] as Node; host.insertBefore(nd, ref); ref = nd; }
         }
-        if (pending) host.insertBefore(pending, ref);
       };
       if (props.animate && flipHook) flipHook(next.flatMap((r) => r.nodes).filter((x): x is Element => x.nodeType === 1), place, props.animate);
       else place();
@@ -151,7 +154,7 @@ export function lis(a: ArrayLike<number>): Uint8Array {
 function collect(fn: () => unknown): Node[] {
   const v = fn();
   if (v && typeof v === "object" && (v as Node).nodeType === 1) return [v as Node]; // one element: no fragment
-  const frag = globalThis.document.createDocumentFragment();
+  const frag = document().createDocumentFragment();
   insert(frag, v);
   return [...frag.childNodes];
 }
