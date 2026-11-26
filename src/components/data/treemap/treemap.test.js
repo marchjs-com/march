@@ -93,3 +93,14 @@ test("Treemap: a leaving tile is removed at once without animation, kept while i
   assert.equal(b.querySelectorAll(".m-treemap-leaving").length, 1);
   dispose();
 });
+
+test("Treemap: a list of top rows with a custom childrenOf / value / label / id", () => {
+  const rows = [
+    { kod: "a", ad: "Yemek", alt: [{ kod: "a1", ad: "Market", tutar: 5 }, { kod: "a2", ad: "Restoran", tutar: 2 }] },
+    { kod: "b", ad: "Ev", alt: [{ kod: "b1", ad: "Kira", tutar: 14 }] },
+  ];
+  const [el, dispose] = mount(() => h(Treemap, { data: rows, childrenOf: "alt", value: "tutar", label: "ad", id: (d) => d.kod, depth: 2, width: 400, height: 240, animate: false }));
+  assert.equal(el.querySelectorAll(".m-treemap-group").length, 2);
+  assert.equal(el.querySelectorAll(".m-treemap-leaf").length, 3);
+  dispose();
+});
