@@ -13,6 +13,14 @@ export interface Accessor<T> { (): T; peek(): T }
 export interface Signal<T> extends Accessor<T> { set(v: T): T; update(fn: (v: T) => T): T; readonly signal: true; displayName?: string }
 export type Cleanup = () => void;
 
+declare global {
+  /**
+   * False in a production build: the March esbuild plugin defines `globalThis.__MARCH_DEV__` from process.env.NODE_ENV
+   * (march build and the CDN build set it), and development-only code guarded by `globalThis.__MARCH_DEV__ !== false`
+   * (warnings, argument checks, component names on errors) is left out of the bundle. Unset anywhere else: kept.
+   */
+  var __MARCH_DEV__: boolean | undefined;
+}
 /** Development switches: `enabled` turns on dev warnings, `warn` is where they go. */
 export const DEV: { enabled: boolean; warn: (...a: unknown[]) => void } = { warn: (...a) => console.warn("[march]", ...a), enabled: true };
 
@@ -173,7 +181,7 @@ function flush(): void {
     for (let i = 0; i < queue.length; i++) {
       const e = queue[i] as Computation;
       if (e.state !== CLEAN && !e.disposed) update(e);
-      if (i > 100_000) throw new Error("March: effect loop did not settle (an effect writes a signal it reads).");
+      if (i > 100_000) throw new Error(globalThis.__MARCH_DEV__ !== false ? "March: effect loop did not settle (an effect writes a signal it reads)." : "March: effect loop");
     }
   } finally {
     queue = [];
@@ -197,7 +205,7 @@ export function signal<T>(value: T, opts?: { equals?: Equals<T>; name?: string }
   const read = _cell(value, opts?.equals as Equals<unknown> | undefined) as unknown as Signal<T>, node = (read as unknown as Cell<T>).n;
   const w = read as unknown as Record<string | symbol, unknown>;
   w["set"] = (v: T): T => {
-    if (Listener && !Listener.effect && DEV.enabled) DEV.warn(`writing signal${opts?.name ? ` "${opts.name}"` : ""} in computed(); use an effect.`);
+    if (Listener && !Listener.effect && (globalThis.__MARCH_DEV__ !== false && DEV.enabled)) DEV.warn(`writing signal${opts?.name ? ` "${opts.name}"` : ""} in computed(); use an effect.`);
     write(node, v);
     return v;
   };
@@ -303,7 +311,7 @@ export function untrack<T>(fn: () => T): T {
 /** Register a callback that runs when the current owner is disposed or re-runs. */
 export function onCleanup(fn: Cleanup): Cleanup {
   if (Owner) (Owner.cleanups ??= []).push(fn);
-  else if (DEV.enabled) DEV.warn("onCleanup() outside a component or effect never runs.");
+  else if ((globalThis.__MARCH_DEV__ !== false && DEV.enabled)) DEV.warn("onCleanup() outside a component or effect never runs.");
   return fn;
 }
 
@@ -377,8 +385,8 @@ export function context<T>(defaultValue?: T): Context<T> {
 }
 /** Provide a context value for everything created after this call in the current owner. */
 export function provide<T>(ctx: { id: symbol }, value: T): void {
-  if (!Owner) throw new Error("March: provide() needs a component or root.");
-  (Owner.context ??= new Map()).set(ctx.id, value);
+  if (globalThis.__MARCH_DEV__ !== false && !Owner) throw new Error("March: provide() needs a component or root.");
+  ((Owner as OwnerNode).context ??= new Map()).set(ctx.id, value);
 }
 /** Read the nearest provided value (or the default). */
 export function useContext<T>(ctx: { id: symbol; defaultValue: T }): T {

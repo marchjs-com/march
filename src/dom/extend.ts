@@ -151,7 +151,7 @@ function changed(): void {
 
 function add(target: Target, ext: Extension, builtin?: Builtin): () => void {
   const keys = builtin ? builtin.keys : declared(ext);
-  if (DEV.enabled && keys && !builtin) {
+  if ((globalThis.__MARCH_DEV__ !== false && DEV.enabled) && keys && !builtin) {
     for (const e of entries) {
       if (e.builtin || !e.keys || !overlaps(e.target, target)) continue;
       for (const k of keys) if (e.keys.has(k)) DEV.warn(`extensions "${e.ext.name}" and "${ext.name}" both add the prop "${k}"`);
@@ -342,7 +342,7 @@ class Ctx implements ExtensionContext {
 }
 const RAW = /^(children$|ref$|on[A-Z:]|bind:|use:)/;
 function fail(e: Entry, c: AnyComp, err: unknown): void {
-  console.error(`[march] extension "${e.ext.name}" failed on <${infoOf(c).name}>${DEV.enabled ? " (skipped)" : ""}:`, err);
+  console.error(`[march] extension "${e.ext.name}" failed on <${infoOf(c).name}>${(globalThis.__MARCH_DEV__ !== false && DEV.enabled) ? " (skipped)" : ""}:`, err);
 }
 /** A live view over props: compiler thunks read as their value (tracked), the rest as they are. */
 function view(src: () => Props): Props {
@@ -402,7 +402,7 @@ function runPipeline(Comp: Component<Props>, raw0: Props, path?: readonly AnyCom
   if (!active.length) return [Comp, cur];
 
   const info = infoOf(c);
-  const trace: ExtensionTrace | null = DEV.enabled ? { component: info.name, steps: [] } : null;
+  const trace: ExtensionTrace | null = (globalThis.__MARCH_DEV__ !== false && DEV.enabled) ? { component: info.name, steps: [] } : null;
   const step = (e: Entry, did: string): ExtensionTrace["steps"][number] | undefined => {
     if (!trace || e.builtin) return undefined;
     let s = trace.steps.find((x) => x.name === e.ext.name);

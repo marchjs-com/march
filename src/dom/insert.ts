@@ -23,9 +23,9 @@ export function insert(parent: Node, value: unknown, before: Node | null = null,
 
 function toNode(v: unknown): Node | null {
   if (v == null || v === true || v === false) return null;
-  if (typeof v === "string" || typeof v === "number" || typeof v === "bigint") return doc().createTextNode(String(v));
   if (typeof v === "object" && (v as { nodeType?: number }).nodeType) return v as Node;
-  if (DEV.enabled) DEV.warn("cannot render value", v);
+  // text (string, number, bigint); anything else is shown as text too, with a warning in development
+  if ((globalThis.__MARCH_DEV__ !== false && DEV.enabled) && typeof v !== "string" && typeof v !== "number" && typeof v !== "bigint") DEV.warn("cannot render value", v);
   return doc().createTextNode(String(v));
 }
 

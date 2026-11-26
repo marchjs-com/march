@@ -1,7 +1,7 @@
 // March — components: a component is called once with its props (live props are getters), inside an owner; an async
 // component shows the loading content until its promise settles. h() (dom/h.ts) and the compiler's _c create them.
 import { untrack, getOwner, runWithOwner, reportError, isReactive, onCleanup, signal, DEV, useContext, createRoot, type Signal } from "../core/reactive.ts";
-import { doc } from "./insert.ts";
+import { _tpl } from "./tpl.ts";
 
 /** A component: called once with its props. May be async. */
 export type Component<P = Record<string, unknown>> = (props: P) => unknown;
@@ -34,8 +34,8 @@ export function createComponent(Comp: Component<Props>, raw: Props, children: un
     if (d.get) { Object.defineProperty(props, key, d); continue; }
     if (key.startsWith("bind:")) {
       const name = key.slice(5);
-      const s = v as Signal<unknown> | undefined;
-      if (!s?.signal) throw new TypeError(`March: bind:${name} needs a signal ($variable).`);
+      const s = v as Signal<unknown>;
+      if (globalThis.__MARCH_DEV__ !== false && !s?.signal) throw new TypeError(`March: bind:${name} needs a signal ($variable).`);
       Object.defineProperty(props, name, { get: s, enumerable: true });
       props[`set${name.charAt(0).toUpperCase()}${name.slice(1)}`] = s.set;
     } else if (isReactive(v) && !(v as Partial<Signal<unknown>>).signal && key !== "children" && !/^on[A-Z:]/.test(key)) {
@@ -51,7 +51,7 @@ export function createComponent(Comp: Component<Props>, raw: Props, children: un
   const call = (): unknown => untrack(() => {
     try { return Comp(props); }
     catch (e) {
-      if (DEV.enabled && e && typeof e === "object" && !(e as ErrorWithComponent).marchComponent) (e as ErrorWithComponent).marchComponent = Comp.name || "anonymous";
+      if ((globalThis.__MARCH_DEV__ !== false && DEV.enabled) && e && typeof e === "object" && !(e as ErrorWithComponent).marchComponent) (e as ErrorWithComponent).marchComponent = Comp.name || "anonymous";
       throw e;
     }
   });
@@ -65,14 +65,7 @@ export function createComponent(Comp: Component<Props>, raw: Props, children: un
 // ------------------------------------------------------------------ async components
 export const LoadingContext: { id: symbol; defaultValue: (() => unknown) | null } = { id: Symbol("m.loading"), defaultValue: null };
 /** The spinner shown while an async component (or the first value of an async generator) is on its way. */
-export function defaultLoading(): Element {
-  const s = doc().createElement("span");
-  s.className = "m-loading";
-  s.setAttribute("role", "status");
-  s.setAttribute("aria-live", "polite");
-  s.setAttribute("aria-label", "Loading");
-  return s;
-}
+export const defaultLoading: () => Element = _tpl(["span", [["class", "m-loading"], ["role", "status"], ["aria-live", "polite"], ["aria-label", "Loading"]]]);
 type AsyncState = { status: "pending" } | { status: "done"; value: unknown };
 function asyncRegion(promise: Promise<unknown>, Comp: Component<Props>): () => unknown {
   const owner = getOwner();
@@ -84,7 +77,7 @@ function asyncRegion(promise: Promise<unknown>, Comp: Component<Props>): () => u
     (value) => { if (alive) state.set({ status: "done", value }); },
     (error: unknown) => {
       if (!alive) return;
-      if (DEV.enabled && error && typeof error === "object") (error as ErrorWithComponent).marchComponent ??= Comp.name;
+      if ((globalThis.__MARCH_DEV__ !== false && DEV.enabled) && error && typeof error === "object") (error as ErrorWithComponent).marchComponent ??= Comp.name;
       runWithOwner(owner, () => reportError(error, owner));
     },
   );

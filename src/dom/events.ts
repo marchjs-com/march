@@ -35,7 +35,7 @@ function dispatch(e: Event): void {
  */
 export function _on(el: Element, name: string, handler: unknown): void {
   if (handler == null || handler === false) return;
-  if (typeof handler !== "function") throw new TypeError(`March: on${name} handler must be a function.`);
+  if (globalThis.__MARCH_DEV__ !== false && typeof handler !== "function") throw new TypeError(`March: on${name} handler must be a function.`);
   // onClick-style handlers inside a render() tree: one listener per event type on the document
   if (DELEGATED.has(name)) {
     const d = useContext(DelegateRoot);

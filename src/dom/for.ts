@@ -1,6 +1,6 @@
 // Keyed list <For> (its own module: a page that only needs If/Try does not pull it into its chunk).
 import { getOwner, untrack, onCleanup, effect, runWithOwner, _cell, _setCell, _owner, _dispose, type Accessor, type Cell, type Owner } from "../core/reactive.ts";
-import { insert, removeNode, disposeDetached, LEAVE } from "./insert.ts";
+import { insert, removeNode, disposeDetached, LEAVE, doc as document } from "./insert.ts";
 import { val, call } from "./val.ts";
 
 /** Installed by march/motion: (elements, mutate, opts) → void. Measures, runs `mutate`, animates the deltas. */
@@ -30,7 +30,7 @@ interface Row<T> { nodes: Node[]; item: Cell<T>; index: Cell<number> | null; o: 
  * appending take fast paths. `animate` (with march/motion loaded): FLIP-animate moves, enter and leave.
  */
 export function For<T>(props: ForProps<T>): DocumentFragment {
-  const doc = globalThis.document;
+  const doc = document();
   const start = doc.createComment("for"), end = doc.createComment("/for");
   const frag = doc.createDocumentFragment();
   frag.append(start, end);
@@ -40,7 +40,7 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
   let order: Row<T>[] = [];
   let fallback: { o: Owner; nodes: Node[] } | null = null;
   const render: unknown = props.children;
-  if (typeof render !== "function") throw new TypeError("March: <For> needs a row function.");
+  if (globalThis.__MARCH_DEV__ !== false && typeof render !== "function") throw new TypeError("March: <For> needs a row function.");
   const renderRow = render as ForProps<T>["children"];
   const wantsIndex = renderRow.length !== 1; // `(item) => …` never reads the index: no index signal per row
 
@@ -154,7 +154,7 @@ export function lis(a: ArrayLike<number>): Uint8Array {
 function collect(fn: () => unknown): Node[] {
   const v = fn();
   if (v && typeof v === "object" && (v as Node).nodeType === 1) return [v as Node]; // one element: no fragment
-  const frag = globalThis.document.createDocumentFragment();
+  const frag = document().createDocumentFragment();
   insert(frag, v);
   return [...frag.childNodes];
 }

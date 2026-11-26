@@ -24,30 +24,26 @@ import { tmpdir } from "node:os";
 // was read once and a plugin's editor or a debugger toggle never followed its value; +~40 bytes, measured 5.02 KB)
 // core 16.6 KB since shown texts follow the locale in i18n builds (_tr, _trf in core/i18n.ts; +~90 bytes, measured
 // 16.59 KB). Only an app built with i18n imports them: minimal and typical unchanged (docs/internal/size-watch.md).
-// core 16.75 KB since the list speed work (dom/for.ts: a swap moves two rows, no reorder pass, swap 0.9 -> 0.3 ms; dom/h.ts:
-// an event prop's name parsed once per name; +~140 bytes, measured 16.74 KB). A CDN page no longer loads this barrel:
-// each core module is a CDN entry of its own (tools/build-cdn.js), a page loads the ones it uses.
-// minimal 5.1 KB since the same work (a text binding made with its first value, a class written only when it changes, an
-// event name parsed once: create 1,000 rows 14-18 ms -> 8-9 ms script; measured 5.08 KB)
-// core 16.85 KB, minimal 5.15 KB since h.ts became modules (dom/insert, events, tpl, props, component) with the
-// compiler's small helpers (_c, _cls, _on, _attr): +~70 bytes in the barrel; what a CDN page loads first went 6.8 -> 4.1
-// KB, and an app whose templates need only classes, events and attributes no longer ships every prop kind (-272 B).
-export const BUDGET = { core: 16.85 * 1024, minimal: 5.15 * 1024 };
+// Measured as a production build (PROD below: development-only code left out, as march build and the CDN build ship it)
+// since the list speed work and the h.ts modules (dom/insert, events, tpl, props, component): the same budgets hold.
+export const BUDGET = { core: 16.6 * 1024, minimal: 5.05 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const ENTRIES = { core: "src/index.ts", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
 
+// measured as March builds ship (march build, the CDN build): production, development-only code left out
+const PROD = { "process.env.NODE_ENV": '"production"', "globalThis.__MARCH_DEV__": "false" };
 export async function sizes(names = Object.keys(ENTRIES)) {
   const esbuild = await import("esbuild");
   const out = {};
   for (const n of names) {
     try {
-      const r = await esbuild.build({ entryPoints: [resolve(ROOT, ENTRIES[n])], bundle: true, minify: true, format: "esm", write: false, logLevel: "silent", treeShaking: true });
+      const r = await esbuild.build({ entryPoints: [resolve(ROOT, ENTRIES[n])], bundle: true, minify: true, format: "esm", write: false, logLevel: "silent", treeShaking: true, define: PROD });
       const code = r.outputFiles[0].contents;
       out[n] = { min: code.length, gzip: gzipSync(code, { level: 9 }).length };
     } catch { /* module missing */ }
   }
   // minimal app: what a counter needs (signals + h + render), after tree shaking
-  const r = await esbuild.build({ stdin: { contents: 'export { signal, computed, effect, h, render } from "./src/index.ts";', resolveDir: ROOT }, bundle: true, minify: true, format: "esm", write: false, logLevel: "silent" });
+  const r = await esbuild.build({ stdin: { contents: 'export { signal, computed, effect, h, render } from "./src/index.ts";', resolveDir: ROOT }, bundle: true, minify: true, format: "esm", write: false, logLevel: "silent", define: PROD });
   const code = r.outputFiles[0].contents;
   out.minimal = { min: code.length, gzip: gzipSync(code, { level: 9 }).length };
   return out;
@@ -63,7 +59,7 @@ export async function buildApp(source) {
   const dir = mkdtempSync(join(tmpdir(), "m-size-"));
   try {
     writeFileSync(join(dir, "main.tsx"), source);
-    const r = await esbuild.build({ entryPoints: [join(dir, "main.tsx")], absWorkingDir: dir, bundle: true, minify: true, format: "esm", write: false,
+    const r = await esbuild.build({ entryPoints: [join(dir, "main.tsx")], absWorkingDir: dir, bundle: true, minify: true, format: "esm", write: false, define: PROD,
       outdir: join(dir, "out"), logLevel: "silent", plugins: [march({ components: join(dir, "components") })] });
     const pick = (ext) => r.outputFiles.filter((f) => f.path.endsWith(ext)).map((f) => f.text).join(String.fromCharCode(10));
     const js = pick(".js"), css = pick(".css");
@@ -103,10 +99,7 @@ render(() => <App />, document.body);
 // carries the link variant, pressed, pill and external links: about 0.2 KB). buttonJs 7.75 KB: measured 7.51 KB. Both
 // grew ~1.4 KB when Button's busy ring became the Spinner component itself (a part MarchIDE's Hierarchy lists and
 // m:parts={{ Spinner: … }} reaches): Spinner brings i18n (its default "Loading" label) and the colour lists
-// typicalJs 9.3 KB since the list speed work (a swap fast path in For, event names parsed once: measured 9.28 KB)
-// typicalJs 9.35 KB since the h.ts modules: march/ui's Button uses h(), so this app ships every prop kind and the small
-// helpers too (measured 9.31 KB; the same app without march/ui went 6.94 -> 6.67 KB)
-export const APP_BUDGET = { buttonJs: 7.75 * 1024, buttonCss: 5.5 * 1024, typicalJs: 9.35 * 1024 };
+export const APP_BUDGET = { buttonJs: 7.75 * 1024, buttonCss: 5.5 * 1024, typicalJs: 9.25 * 1024 };
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const s = await sizes();

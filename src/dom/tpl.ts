@@ -10,7 +10,7 @@ export function safeUrl(v: unknown, tag?: string): string {
   if (!/^[a-z][a-z0-9+.-]*:/i.test(s)) return s; // relative
   if (/^(https?|mailto|tel|sms):/i.test(s)) return s;
   if (/^(blob|data:image\/(png|jpe?g|gif|webp|avif);)/i.test(s) && (tag === "img" || tag === "image" || tag === "a" || tag === "audio" || tag === "video" || tag === "source")) return s;
-  if (DEV.enabled) DEV.warn(`blocked unsafe URL "${s.slice(0, 40)}"`);
+  if ((globalThis.__MARCH_DEV__ !== false && DEV.enabled)) DEV.warn(`blocked unsafe URL "${s.slice(0, 40)}"`);
   return "about:blank";
 }
 
