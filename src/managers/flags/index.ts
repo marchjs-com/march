@@ -15,7 +15,7 @@
 //   flags().load(await net.get("/flags"))                  // remote values win over the rules
 //   <section feature:newCheckout>…</section>   <p feature:newCheckout={false}>Old checkout</p>
 import { signal, computed, effect, untrack, type Accessor } from "../../core/reactive.ts";
-import { registerNamespace } from "../../dom/h.ts";
+import { registerNamespace } from "../../dom/props.ts";
 import { defineManager } from "../manager.ts";
 import { publisher } from "../publish.ts";
 import { storage } from "../storage/index.ts";

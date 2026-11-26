@@ -6,7 +6,8 @@
 //   raw props ─► m:extend filter ─► props interceptors (outer → inner) ─► built-ins (m:parts) ─► callbacks (on)
 //            ─► render interceptors around Comp(props) ─► output ─► setup (after render, with the root elements)
 import { computed, untrack, getOwner, runWithOwner, isReactive, reactive, provide, useContext, signal, DEV, onCleanup, _owner, type Owner } from "../core/reactive.ts";
-import { _componentHook, insert, Fragment, type Component } from "./h.ts";
+import { insert } from "./insert.ts";
+import { _componentHook, Fragment, type Component } from "./component.ts";
 import { If, Else, Try } from "./flow.ts";
 import { For } from "./for.ts";
 import { Switch, Match } from "./switch.ts";

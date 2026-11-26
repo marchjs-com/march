@@ -29,7 +29,10 @@ import { tmpdir } from "node:os";
 // each core module is a CDN entry of its own (tools/build-cdn.js), a page loads the ones it uses.
 // minimal 5.1 KB since the same work (a text binding made with its first value, a class written only when it changes, an
 // event name parsed once: create 1,000 rows 14-18 ms -> 8-9 ms script; measured 5.08 KB)
-export const BUDGET = { core: 16.75 * 1024, minimal: 5.1 * 1024 };
+// core 16.85 KB, minimal 5.15 KB since h.ts became modules (dom/insert, events, tpl, props, component) with the
+// compiler's small helpers (_c, _cls, _on, _attr): +~70 bytes in the barrel; what a CDN page loads first went 6.8 -> 4.1
+// KB, and an app whose templates need only classes, events and attributes no longer ships every prop kind (-272 B).
+export const BUDGET = { core: 16.85 * 1024, minimal: 5.15 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const ENTRIES = { core: "src/index.ts", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
 
@@ -101,7 +104,9 @@ render(() => <App />, document.body);
 // grew ~1.4 KB when Button's busy ring became the Spinner component itself (a part MarchIDE's Hierarchy lists and
 // m:parts={{ Spinner: … }} reaches): Spinner brings i18n (its default "Loading" label) and the colour lists
 // typicalJs 9.3 KB since the list speed work (a swap fast path in For, event names parsed once: measured 9.28 KB)
-export const APP_BUDGET = { buttonJs: 7.75 * 1024, buttonCss: 5.5 * 1024, typicalJs: 9.3 * 1024 };
+// typicalJs 9.35 KB since the h.ts modules: march/ui's Button uses h(), so this app ships every prop kind and the small
+// helpers too (measured 9.31 KB; the same app without march/ui went 6.94 -> 6.67 KB)
+export const APP_BUDGET = { buttonJs: 7.75 * 1024, buttonCss: 5.5 * 1024, typicalJs: 9.35 * 1024 };
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const s = await sizes();

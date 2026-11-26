@@ -1,6 +1,6 @@
 // <Await>: render a promise (pending, value, error) (its own module: see dom/flow.ts).
 import { signal, getOwner, runWithOwner, untrack, onCleanup, effect, reportError } from "../core/reactive.ts";
-import { val, call, type MaybeFn } from "./flow.ts";
+import { val, call, type MaybeFn } from "./val.ts";
 
 export interface AwaitProps<T> {
   /** The promise (or plain value, signal or function returning one) to wait for; a new one restarts the wait. @tr Beklenecek promise (ya da düz değer, sinyal veya onu döndüren fonksiyon); yenisi gelince bekleme baştan başlar. */

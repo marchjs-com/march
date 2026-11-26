@@ -12,7 +12,7 @@
 // The banner and the preferences panel are a separate, lazy module: march/managers/consent/ui.
 // Legal texts belong to the app; March gives the frame (categories, record, gates, UI).
 import { signal, computed, effect, untrack, getOwner, runWithOwner, onCleanup, DEV } from "../../core/reactive.ts";
-import { registerNamespace } from "../../dom/h.ts";
+import { registerNamespace } from "../../dom/props.ts";
 import { defineManager, emit } from "../manager.ts";
 
 /** Built-in categories. Apps may add their own ids. */

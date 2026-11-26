@@ -1,16 +1,12 @@
 // Control flow components: If/Else, Try (For: dom/for.ts, Switch/Match: dom/switch.ts, Await: dom/await.ts, Dynamic: dom/dynamic.ts,
 // Portal: dom/portal.ts — each in its own module, so a page that uses one does not put the others into a shared chunk).
 // Each returns a live region; only the active branch exists in the DOM and it is disposed (with its listeners) on switch.
-import { computed, signal, untrack, catchError, provide, isReactive } from "../core/reactive.ts";
-import { h, LoadingContext } from "./h.ts";
-
-/** A value, a signal or any function returning the value. */
-export type MaybeFn<T> = T | (() => T);
-
-// Call user render functions; keep reactive accessors (compiler thunks, signals) as live regions.
-// Flow props (when, each, for) accept a value, a signal or any function returning the value.
-export const val = <T>(v: MaybeFn<T>): T => (typeof v === "function" ? (v as () => T)() : v);
-export const call = (c: unknown, ...a: unknown[]): unknown => (typeof c === "function" && !isReactive(c) ? (c as (...x: unknown[]) => unknown)(...a) : c);
+import { computed, signal, untrack, catchError, provide } from "../core/reactive.ts";
+import { LoadingContext } from "./component.ts";
+import { doc } from "./insert.ts";
+import { _on } from "./events.ts";
+import { val, call, type MaybeFn } from "./val.ts";
+export { val, call, type MaybeFn };
 
 export interface IfProps<T = unknown> {
   /** The condition (value, signal or function); children render while it is truthy. @tr Koşul (değer, sinyal ya da fonksiyon); doğru (truthy) olduğu sürece children gösterilir. */
@@ -62,8 +58,16 @@ export function Try(props: TryProps): () => unknown {
     }, (x) => { if (props.log !== false) console.error(x); err.set(x); });
   };
 }
+// made with DOM calls, not h(): a page with <If> or <Try> does not load every prop kind for this one box
 function defaultError(e: unknown, reset: () => unknown): Element {
-  return h("div", { class: "m-error", role: "alert" },
-    h("p", {}, String((e as { message?: unknown } | null)?.message ?? e)),
-    h("button", { type: "button", class: "m-btn", onClick: reset }, "Retry"));
+  const d = doc(), box = d.createElement("div"), p = d.createElement("p"), b = d.createElement("button");
+  box.className = "m-error";
+  box.setAttribute("role", "alert");
+  p.textContent = String((e as { message?: unknown } | null)?.message ?? e);
+  b.type = "button";
+  b.className = "m-btn";
+  b.textContent = "Retry";
+  _on(b, "click", reset);
+  box.append(p, b);
+  return box;
 }

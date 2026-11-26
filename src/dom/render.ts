@@ -1,6 +1,7 @@
 // Mount a component tree into a container. Returns a disposer that removes the nodes and runs every cleanup.
 import { createRoot, provide } from "../core/reactive.ts";
-import { insert, clearBetween, removeNode, DelegateRoot } from "./h.ts";
+import { insert, clearBetween, removeNode } from "./insert.ts";
+import { DelegateRoot } from "./events.ts";
 
 /** `render(() => <App />, document.getElementById("app"))` */
 export function render(fn: () => unknown, container: Element | DocumentFragment | ShadowRoot | null | undefined): () => void {

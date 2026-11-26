@@ -9,7 +9,7 @@
 //   clipboard().onPaste(el, (p) => p.text, p.files)  // paste into an element
 //   <button copy:text={() => link}>Copy link</button>
 import { signal, untrack, type Accessor } from "../../core/reactive.ts";
-import { registerNamespace } from "../../dom/h.ts";
+import { registerNamespace } from "../../dom/props.ts";
 import { on } from "../../core/util.ts";
 import { openLayer } from "../../dom/portal.ts";
 import { defineManager } from "../manager.ts";

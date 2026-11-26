@@ -1,7 +1,7 @@
 // Keyed list <For> (its own module: a page that only needs If/Try does not pull it into its chunk).
 import { getOwner, untrack, onCleanup, effect, runWithOwner, _cell, _setCell, _owner, _dispose, type Accessor, type Cell, type Owner } from "../core/reactive.ts";
-import { insert, removeNode, disposeDetached, LEAVE } from "./h.ts";
-import { val, call } from "./flow.ts";
+import { insert, removeNode, disposeDetached, LEAVE } from "./insert.ts";
+import { val, call } from "./val.ts";
 
 /** Installed by march/motion: (elements, mutate, opts) → void. Measures, runs `mutate`, animates the deltas. */
 export type FlipHook = (elements: Element[], mutate: () => void, opts: unknown) => void;

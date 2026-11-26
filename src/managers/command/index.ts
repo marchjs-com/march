@@ -15,7 +15,7 @@
 // Commands appear in <CommandPalette> automatically (palette: false to opt out). Shortcuts are only checked for
 // conflicts here; bindCommandKeys() (./ui) binds them. onCommandRun() is the history hook (undo / redo, audit).
 import { signal, computed, effect, untrack, getOwner, onCleanup, DEV, type Accessor } from "../../core/reactive.ts";
-import { registerNamespace } from "../../dom/h.ts";
+import { registerNamespace } from "../../dom/props.ts";
 import { can as canAccess, type PermCheck } from "../../access/index.ts";
 import { registerCommands, type CommandEntry } from "../../ui/registry.ts";
 import { parseKey } from "../../ui/key-label.ts";
