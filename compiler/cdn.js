@@ -43,8 +43,9 @@ export async function loadCdn(base, cacheDir) {
     // sheets named by their rank (s/<rank>.css, since 0.3.24): the ranks alone; before that, each sheet's address
     if (own?.length) sheets[spec] = sheetList.named === "rank" ? { b: `${base}/s/`, r: own } : own.map((i) => [i, `${base}/${sheetList.sheets[i]}`]);
   }
-  // the core's files (every page loads them): index.html announces them up front
-  const core = (sizes.core?.files ?? []).map((f) => `${base}/${f}`);
+  // the runtime's files (every page that renders loads them; the core's other modules load when used):
+  // index.html announces them up front. Older versions: the whole core's files.
+  const core = (sizes.runtime?.files ?? sizes.core?.files ?? []).map((f) => `${base}/${f}`);
   return { base, url, size, css, sheets, core, exports: names?.exports ?? null, best: names?.best ?? null };
 }
 
@@ -154,7 +155,9 @@ export function cdnDynamic(code, cdn, local) {
     used = true;
     return `__mCdnLazy(${imp}, ${cssOf(spec, cdn)})`;
   });
-  return used ? `import { cdnLazy as __mCdnLazy } from "march-cdn:css";\n${out}` : out;
+  // prerendering (local): the sheets are linked, not waited for: the test DOM never loads a stylesheet, so each page
+  // would wait for the link helper's 4 s fallback before it counts as settled (every page with a lazy entry, the build)
+  return used ? `import { ${local ? "cdnLink" : "cdnLazy"} as __mCdnLazy } from "march-cdn:css";\n${out}` : out;
 }
 
 /** A stylesheet of the package (`import "march/css/tokens.css"`), or an entry's sheets (Sheets): linked from the CDN. */
@@ -196,4 +199,5 @@ export function cdnCss(css) {
   return Promise.all(list.map(([rank, href]) => link(href, rank))).then(() => undefined);
 }
 export const cdnLazy = (mod, css) => Promise.all([mod, cdnCss(css)]).then(([m]) => m);
+export const cdnLink = (mod, css) => { cdnCss(css); return mod; };
 `;

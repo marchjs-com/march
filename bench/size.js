@@ -24,22 +24,26 @@ import { tmpdir } from "node:os";
 // was read once and a plugin's editor or a debugger toggle never followed its value; +~40 bytes, measured 5.02 KB)
 // core 16.6 KB since shown texts follow the locale in i18n builds (_tr, _trf in core/i18n.ts; +~90 bytes, measured
 // 16.59 KB). Only an app built with i18n imports them: minimal and typical unchanged (docs/internal/size-watch.md).
+// Measured as a production build (PROD below: development-only code left out, as march build and the CDN build ship it)
+// since the list speed work and the h.ts modules (dom/insert, events, tpl, props, component): the same budgets hold.
 export const BUDGET = { core: 16.6 * 1024, minimal: 5.05 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const ENTRIES = { core: "src/index.ts", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
 
+// measured as March builds ship (march build, the CDN build): production, development-only code left out
+const PROD = { "process.env.NODE_ENV": '"production"', "globalThis.__MARCH_DEV__": "false" };
 export async function sizes(names = Object.keys(ENTRIES)) {
   const esbuild = await import("esbuild");
   const out = {};
   for (const n of names) {
     try {
-      const r = await esbuild.build({ entryPoints: [resolve(ROOT, ENTRIES[n])], bundle: true, minify: true, format: "esm", write: false, logLevel: "silent", treeShaking: true });
+      const r = await esbuild.build({ entryPoints: [resolve(ROOT, ENTRIES[n])], bundle: true, minify: true, format: "esm", write: false, logLevel: "silent", treeShaking: true, define: PROD });
       const code = r.outputFiles[0].contents;
       out[n] = { min: code.length, gzip: gzipSync(code, { level: 9 }).length };
     } catch { /* module missing */ }
   }
   // minimal app: what a counter needs (signals + h + render), after tree shaking
-  const r = await esbuild.build({ stdin: { contents: 'export { signal, computed, effect, h, render } from "./src/index.ts";', resolveDir: ROOT }, bundle: true, minify: true, format: "esm", write: false, logLevel: "silent" });
+  const r = await esbuild.build({ stdin: { contents: 'export { signal, computed, effect, h, render } from "./src/index.ts";', resolveDir: ROOT }, bundle: true, minify: true, format: "esm", write: false, logLevel: "silent", define: PROD });
   const code = r.outputFiles[0].contents;
   out.minimal = { min: code.length, gzip: gzipSync(code, { level: 9 }).length };
   return out;
@@ -55,7 +59,7 @@ export async function buildApp(source) {
   const dir = mkdtempSync(join(tmpdir(), "m-size-"));
   try {
     writeFileSync(join(dir, "main.tsx"), source);
-    const r = await esbuild.build({ entryPoints: [join(dir, "main.tsx")], absWorkingDir: dir, bundle: true, minify: true, format: "esm", write: false,
+    const r = await esbuild.build({ entryPoints: [join(dir, "main.tsx")], absWorkingDir: dir, bundle: true, minify: true, format: "esm", write: false, define: PROD,
       outdir: join(dir, "out"), logLevel: "silent", plugins: [march({ components: join(dir, "components") })] });
     const pick = (ext) => r.outputFiles.filter((f) => f.path.endsWith(ext)).map((f) => f.text).join(String.fromCharCode(10));
     const js = pick(".js"), css = pick(".css");

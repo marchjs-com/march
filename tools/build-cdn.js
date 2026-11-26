@@ -67,6 +67,10 @@ for (const [key, target] of Object.entries(pkg.exports)) {
 // (measured: at 30 or 60 KB, entries for the motion engine's modules split the code many components share finely enough
 // to push line-chart and roadmap past their budget; at 100 KB the heavy barrels' helpers get one, and no entry grows)
 const MOD_MIN = 100 * 1024;
+// The core's own modules (what the "march" entry re-exports) always get an entry: a page imports signal from
+// march/mod/core/reactive and For from march/mod/dom/for, and loads the code it uses, not the whole core (17 KB with
+// extensions, store, i18n, pipes, portals…). A page loads the rest of the core only when it uses it.
+const coreMods = new Set(exportMap(join(root, "src/index.ts")).values());
 const mods = [];
 {
   const have = new Set(entries.map((e) => e.in));
@@ -108,7 +112,7 @@ function paying(sizes) {
   return mods.filter((m) => {
     const own = sizes.entries[m.spec]?.added ?? Infinity;
     const elsewhere = Math.max(0, ...[...exportMap(m.in)].map(([name, def]) => cost.get(`${def}\0${name}`) ?? 0));
-    return elsewhere > MOD_MIN && own * 2 <= elsewhere && own <= limit;
+    return coreMods.has(m.in) || (elsewhere > MOD_MIN && own * 2 <= elsewhere && own <= limit);
   });
 }
 const first = await compile([...entries, ...mods]);
@@ -159,6 +163,15 @@ writeFileSync(join(out, "sw.js"), `/*! MarchJS v${version} | MIT | marchjs.com *
 ${swRuntime()}`);
 // the stylesheets the package exports as files
 cpSync(join(root, "src/css"), join(out, "css"), { recursive: true });
+// and the other stylesheets it exports as files, at their export path (march/motion/motion.css → motion/motion.css:
+// the theme waves and motion utilities, charts/charts.css, fx/fx.css, errors/errors.css). A page that imports one gets
+// it from here; without them those imports were 404s and their rules never applied.
+for (const [key, target] of Object.entries(pkg.exports)) {
+  if (!key.endsWith(".css") || typeof target !== "string" || target.startsWith("./src/css/")) continue;
+  const to = join(out, key.slice(2));
+  mkdirSync(dirname(to), { recursive: true });
+  cpSync(join(root, target), to);
+}
 // the fonts css/font.css points at (../fonts/…)
 cpSync(join(root, "src/fonts"), join(out, "fonts"), { recursive: true });
 // the version's data (API reference, MarchIDE types, components) for sites that render March without its sources
@@ -175,7 +188,9 @@ writeFileSync(join(out, "sizes.json"), `${JSON.stringify({ version, ...sizes })}
 // march.config.js › cdn (compiler/cdn.js) reads it instead of March's sources: the CLI and the browser's compiler alike
 {
   const own = entries.filter((e) => !e.out.startsWith("icons/"));
-  const size = Object.fromEntries(entries.map((e) => [e.spec, e.spec === "march" ? 0 : sizes.entries[e.spec]?.added ?? Infinity]));
+  // the whole download of each entry (its closure): a page no longer loads the core first, so a name of the core comes
+  // from the core module that defines it (march/mod/core/reactive: 2 KB), not from the core barrel (17 KB)
+  const size = Object.fromEntries(entries.map((e) => [e.spec, sizes.entries[e.spec]?.js ?? Infinity]));
   const target = cdnTargets({ url: Object.fromEntries(entries.map((e) => [e.spec, e.in])), size }, Object.fromEntries(own.map((e) => [e.spec, e.in])));
   const exportsOf = {}, best = {};
   for (const e of own) {

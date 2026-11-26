@@ -186,7 +186,7 @@ const metaOfProxy = (p: object): Meta => {
 /** Create a store from a plain object or array. Nested objects/arrays become reactive lazily. */
 export function store<T extends object>(initial: T): T {
   if (!isPlain(initial)) throw new TypeError("March: store() needs a plain object or array.");
-  const root: Root = { listeners: new Set(), pending: null, log: DEV.enabled ? [] : null };
+  const root: Root = { listeners: new Set(), pending: null, log: (globalThis.__MARCH_DEV__ !== false && DEV.enabled) ? [] : null };
   return wrap(initial, root, []);
 }
 

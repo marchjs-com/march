@@ -119,3 +119,12 @@ test("NetworkGraph: zoom keys change the view and Reset view fits again", () => 
   assert.equal(plot.getAttribute("transform"), t0);
   dispose();
 });
+
+test("NetworkGraph: draggable nodes carry the grab class (cursor), draggable={false} drops it", () => {
+  const draggable = signal(undefined);
+  const [el, dispose] = mount(() => h(NetworkGraph, { nodes, links, draggable, width: 400, height: 300, animate: false }));
+  assert.ok(el.querySelector(".m-network-nodes.m-network-draggable"), "on by default");
+  draggable.set(false);
+  assert.equal(el.querySelector(".m-network-draggable"), null);
+  dispose();
+});

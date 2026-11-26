@@ -1,8 +1,9 @@
 {
- "//": "CDN size budget (tools/cdn-size.mjs): gzip bytes a page downloads for one entry on top of the core; component: march/components/<category>/<name>; entry: every other entry; core: march itself (its whole closure); limits: an entry past its default, with the reason",
+ "//": "CDN size budget (tools/cdn-size.mjs): gzip bytes a page downloads for one entry on top of the core; component: march/components/<category>/<name>; entry: every other entry; core: march itself (its whole closure; a compiled page does not load this barrel); runtime: what every page that renders loads and modulepreloads (march/mod/dom/render and its closure; the rest of the core loads when a page uses it); limits: an entry past its default, with the reason",
  "component": 25600,
  "entry": 61440,
  "core": 25600,
+ "runtime": 4096,
  "limits": {
   "march/app-ui": {
    "limit": 215040,

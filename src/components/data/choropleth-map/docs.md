@@ -25,7 +25,7 @@ prefetching).
 | `data` | Rows: an array, a signal or a function returning one. |
 | `id` | The region of a row: a key or getter. Default "id". Matches id, plate code or name. |
 | `value` | The value of a row: a key or getter. Default "value". |
-| `map` | Built-in map: "turkey" (default). Ignored when `shapes` is given. |
+| `map` | Built-in map: "turkey" (default, the 81 provinces) or "turkey-regions" (the 7 geographic regions, rows matched by English id — "marmara", "aegean", "mediterranean", "central-anatolia", "black-sea", "eastern-anatolia", "southeastern-anatolia" — or by Turkish name, "Ege", "İç Anadolu"…). Ignored when `shapes` is given. |
 | `shapes` | Your regions: `[{ id, name, d, cx?, cy? }]` or a GeoJSON FeatureCollection (Polygon / MultiPolygon). |
 | `viewBox` | Coordinate box of `shapes`: `[w, h]` or `[x, y, w, h]`. Default: the shapes' bounds. |
 | `colorScale` | "sequential" (default), "diverging", or two / three CSS colours or tokens. |

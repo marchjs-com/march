@@ -35,8 +35,8 @@ export interface ChoroplethMapProps<D = unknown> extends ChartBaseProps {
   id?: Field<D> | undefined;
   /** The value of a row: a key or getter (default "value"). @tr Satırın değeri: bir anahtar ya da getter (varsayılan "value"). */
   value?: Field<D> | undefined;
-  /** Built-in map (default "turkey": the 81 provinces); ignored when `shapes` is given. @tr Hazır harita (varsayılan "turkey": 81 il); `shapes` verilince yok sayılır. */
-  map?: Opt<"turkey">;
+  /** Built-in map: "turkey" (default, the 81 provinces) or "turkey-regions" (the 7 geographic regions; rows match by id — marmara, aegean, mediterranean, central-anatolia, black-sea, eastern-anatolia, southeastern-anatolia — or by Turkish name); ignored when `shapes` is given. @tr Hazır harita: "turkey" (varsayılan, 81 il) ya da "turkey-regions" (7 coğrafi bölge; satırlar kimliğe — marmara, aegean, mediterranean, central-anatolia, black-sea, eastern-anatolia, southeastern-anatolia — ya da Türkçe ada göre eşleşir); `shapes` verilince yok sayılır. */
+  map?: Opt<"turkey" | "turkey-regions">;
   /** Your own regions: `[{ id, name, d, cx?, cy? }]` (with `viewBox`) or a GeoJSON FeatureCollection. @tr Kendi bölgeleriniz: `[{ id, name, d, cx?, cy? }]` (`viewBox` ile) ya da bir GeoJSON FeatureCollection. */
   shapes?: Opt<readonly MapShape[] | GeoCollection>;
   /** Coordinate box of `shapes`: `[width, height]` or `[x, y, width, height]` (default the shapes' bounds). @tr `shapes` koordinat kutusu: `[genişlik, yükseklik]` ya da `[x, y, genişlik, yükseklik]` (varsayılan şekillerin sınırları). */
@@ -88,6 +88,17 @@ const TURKEY_BOX: View = [0, 0, 1000, 423];
 const ACCENT = "var(--m-chart-hi, var(--m-accent, var(--m-primary)))";
 const DEEP = [`var(--m-chart-lo, color-mix(in oklab, ${ACCENT} 10%, var(--m-surface, #fff)))`, ACCENT, `var(--m-chart-deep, color-mix(in oklab, ${ACCENT} 55%, var(--m-text, #17171a)))`] as const;
 const ALIASES: Record<string, string> = { afyon: "tr03", icel: "tr33", maras: "tr46", urfa: "tr63", antep: "tr27" };
+// the 7 geographic regions: one letter per province, by plate code (1 = Adana … 81 = Düzce)
+const REGION_OF = "AGEDKIAKEMMDDKAMMIKEGMDDDIGKKDAAAMEDKIMIMIEDEAGEDIIKKMKGKIMKKDGEDIKIKIIGGKDDMKGAK";
+// the 7 geographic regions: an English id (data rows may use it) and the Turkish name shown on the map (rows may use it too)
+const REGIONS: Record<string, readonly [string, string]> = { M: ["marmara", "Marmara"], E: ["aegean", "Ege"], A: ["mediterranean", "Akdeniz"], I: ["central-anatolia", "İç Anadolu"], K: ["black-sea", "Karadeniz"], D: ["eastern-anatolia", "Doğu Anadolu"], G: ["southeastern-anatolia", "Güneydoğu Anadolu"] };
+/** The provinces merged into their regions: one shape each (the provinces' paths), labelled at their mean centre. */
+function regionsOf(list: readonly MapShape[]): MapShape[] {
+  const by = new Map<string, MapShape[]>();
+  for (const p of list) { const r = REGION_OF[(p.code ?? 0) - 1]; if (r) by.set(r, [...(by.get(r) ?? []), p]); }
+  return [...by].map(([r, ps]) => ({ id: REGIONS[r]![0], name: REGIONS[r]![1], d: ps.map((p) => p.d).join(""),
+    cx: ps.reduce((a, p) => a + (p.cx ?? 0), 0) / ps.length, cy: ps.reduce((a, p) => a + (p.cy ?? 0), 0) / ps.length }));
+}
 
 // ------------------------------------------------------------------ geometry helpers
 const f2 = (v: number): number => Math.round(v * 100) / 100;
@@ -191,7 +202,7 @@ export function ChoroplethMap<D>(props: ChoroplethMapProps<D>): Element {
     let list: readonly MapShape[], vb: View | null = null;
     if (isGeo(r)) { const p = projectGeo(r); list = p.shapes; vb = [0, 0, p.viewBox[0], p.viewBox[1]]; }
     else if (r) list = r;
-    else { list = turkey() ?? []; vb = TURKEY_BOX; }
+    else { const t = turkey() ?? []; list = read(props.map) === "turkey-regions" ? regionsOf(t) : t; vb = TURKEY_BOX; }
     const shapes: Shape[] = list.map((s) => {
       const box = pathBox(s.d);
       return { key: String(s.id), id: String(s.id), name: s.name ?? String(s.id), d: s.d, cx: s.cx ?? (box[0] + box[2]) / 2, cy: s.cy ?? (box[1] + box[3]) / 2, code: s.code, box, src: s };

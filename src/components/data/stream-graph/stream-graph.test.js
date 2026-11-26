@@ -37,3 +37,17 @@ test("StreamGraph: edges adds the edge class; legend toggling hides a layer; liv
   assert.equal(el.querySelectorAll("table tbody tr").length, 5);
   dispose();
 });
+
+test("StreamGraph: grid \"x\" (default) draws vertical lines only; \"both\" also rules the scale horizontally", () => {
+  const lines = (grid) => {
+    const [el, dispose] = mount(() => h(StreamGraph, { data: rows, x: "w", y: ["a", "b", "c"], grid, width: 400, height: 200, animate: false }));
+    const [hz, vt] = [...el.querySelectorAll(".m-chart-grid")].map((g) => g.querySelectorAll("line").length);
+    dispose();
+    return { hz, vt };
+  };
+  const x = lines(undefined), both = lines("both");
+  assert.equal(x.hz, 0, "a stream has no horizontal lines by default");
+  assert.ok(x.vt > 0);
+  assert.ok(both.hz > 0, "both adds horizontal lines");
+  assert.equal(both.vt, x.vt);
+});

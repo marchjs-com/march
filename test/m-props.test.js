@@ -30,7 +30,7 @@ test("compiler: a live value and every component go through mProps()", () => {
   assert.match(live, /import \{ mProps as _\$m \} from /);
   assert.match(live, /_\$m\(_\$t1\(\), \{"no-select": \(\) => \(\$lock\(\)\)\}\)/);
   const comp = c("const a = <Card m:no-select title=\"x\">hi</Card>");
-  assert.match(comp, /_\$m\(_\$h\(Card, \{title: "x"\}, .*\), \{"no-select": true\}\)/);
+  assert.match(comp, /_\$m\(_\$c\(Card, \{title: "x"\}, .*\), \{"no-select": true\}\)/);
   assert.doesNotMatch(comp, /m:no-select/); // never reaches the component's props
   // a name the compiler does not know is left to the runtime registry
   assert.match(c("const a = <div m:tone=\"calm\">x</div>"), /_\$m\(.*\{"tone": "calm"\}\)/);

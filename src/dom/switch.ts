@@ -1,6 +1,6 @@
 // <Switch>/<Match>: the first truthy Match renders (its own module: see dom/flow.ts).
 import { computed, untrack } from "../core/reactive.ts";
-import { val, call, type MaybeFn } from "./flow.ts";
+import { val, call, type MaybeFn } from "./val.ts";
 
 /** Descriptor produced by `<Match>`. */
 export interface MatchDescriptor { readonly __match: true; readonly when: unknown; readonly children: () => unknown }

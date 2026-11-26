@@ -1,7 +1,7 @@
 // <Dynamic>: a component chosen at runtime (its own module: see dom/flow.ts).
 import { read, untrack } from "../core/reactive.ts";
 import { h, type Component } from "./h.ts";
-import type { MaybeFn } from "./flow.ts";
+import type { MaybeFn } from "./val.ts";
 
 export type DynamicProps = {
   /** The component (or tag name) to render; null, undefined or false renders nothing. @tr Gösterilecek bileşen (ya da etiket adı); null, undefined veya false hiçbir şey göstermez. */

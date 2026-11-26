@@ -73,10 +73,43 @@ test("cdn: a lazy entry import is the CDN file itself, its stylesheet loaded alo
   assert.match(out, /const R = \(\) => import\("https:\/\/cdn\.test\/1\.0\.0\/router\.js"\);/);
   assert.match(out, /const s = "import\(\\"march\/router\\"\)";/, "text in a string stays");
   assert.match(cdnDynamic('import("march/router")', cdn, { "march/router": "C:\\m\\src\\router\\index.ts" }), /import\("C:\/m\/src\/router\/index\.ts"\)/, "prerender: the source");
+  // prerender: an entry with stylesheets links them without waiting for their load (the test DOM never loads one)
+  const local = cdnDynamic('import("march/components/actions/button")', cdn, { "march/components/actions/button": "C:\\m\\src\\components\\actions\\button\\index.ts" });
+  assert.match(local, /^import \{ cdnLink as __mCdnLazy \} from "march-cdn:css";/, "prerender: linked, not awaited");
+});
+
+test("cdn: cdnLink links the stylesheet and hands the module back at once (cdnLazy waits for the sheet)", async () => {
+  const { CDN_CSS } = await import("../compiler/cdn.js");
+  const head = { children: [], querySelectorAll: () => [], insertBefore(l) { this.children.push(l); } };
+  const make = () => { const a = {}; return { sheet: null, tagName: "LINK", setAttribute: (k, v) => { a[k] = v; }, getAttribute: (k) => a[k] ?? null, hasAttribute: (k) => k in a, addEventListener() {} }; };
+  const saved = globalThis.document;
+  globalThis.document = { head, createElement: make };
+  try {
+    const m = await import(`data:text/javascript,${encodeURIComponent(CDN_CSS)}`);
+    const t0 = Date.now();
+    assert.equal((await m.cdnLink(Promise.resolve({ ok: 1 }), "https://cdn.test/a.css")).ok, 1);
+    assert.ok(Date.now() - t0 < 500, "no wait for the sheet's load event");
+    assert.equal(head.children.length, 1, "the stylesheet is still linked (the prerendered page keeps it)");
+    assert.equal(head.children[0].getAttribute("href"), "https://cdn.test/a.css");
+  } finally { globalThis.document = saved; }
 });
 
 test("cdn: with the CDN's names.json the smallest entry comes from it, not from March's sources", () => {
   const t = cdnTargets({ ...cdn, best: { "march/ui": { Button: "march/components/actions/button" } } }, {});
   assert.equal(t("march/ui", "Button"), "march/components/actions/button");
   assert.equal(t("march/ui", "toast"), "march/ui", "a name it does not list stays");
+});
+
+test("cdn: a stylesheet the package exports as a file (march/motion/motion.css) links that file from the CDN", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "march-cdn-css-"));
+  try {
+    writeFileSync(join(dir, "main.ts"), 'import "march/motion/motion.css";\nimport "march/charts/charts.css";\nexport const x = 1;\n');
+    const withMotion = { ...cdn, url: { ...cdn.url, "march/motion": `${BASE}/motion.js` }, css: { ...cdn.css, "march/motion": `${BASE}/motion.css` } };
+    await esbuild.build({ entryPoints: [join(dir, "main.ts")], bundle: true, format: "esm", outdir: join(dir, "out"), write: true, logLevel: "silent", absWorkingDir: dir, plugins: [march({ cdn: withMotion })] });
+    const code = readdirSync(join(dir, "out")).filter((f) => f.endsWith(".js")).map((f) => readFileSync(join(dir, "out", f), "utf8")).join("\n");
+    // the file itself (the theme waves' rules live there) and, for an entry with sheets, the entry's sheets too
+    assert.match(code, /https:\/\/cdn\.test\/1\.0\.0\/motion\/motion\.css/);
+    assert.match(code, /https:\/\/cdn\.test\/1\.0\.0\/motion\.css/);
+    assert.match(code, /https:\/\/cdn\.test\/1\.0\.0\/charts\/charts\.css/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });

@@ -16,6 +16,11 @@ test("CDN build: modules, march.css, import map, file list, no latest/ copy", ()
   // css/font.css points at ../fonts/; a module a barrel re-exports from is an entry of its own (march/mod/<path>)
   assert.ok(existsSync(at(`${version}/fonts/inter-latin.woff2`)), "the fonts");
   assert.ok(existsSync(at(`${version}/mod/ui/theme.js`)), "march/mod/ui/theme");
+  // every stylesheet the package exports as a file is on the CDN at its export path (march/motion/motion.css holds
+  // the theme waves: a page importing it got a 404 and its waves never showed)
+  const pkg = JSON.parse(readFileSync(new URL("package.json", root), "utf8"));
+  for (const key of Object.keys(pkg.exports).filter((k) => k.endsWith(".css"))) assert.ok(existsSync(at(`${version}/${key.slice(2)}`)), key);
+  assert.match(readFileSync(at(`${version}/motion/motion.css`), "utf8"), /data-m-wave/, "the theme waves' rules");
   // names.json: an entry's names; the smallest entry per name of a barrel
   const names = JSON.parse(readFileSync(at(`${version}/names.json`), "utf8"));
   assert.ok(names.exports["march/components/actions/button"].includes("Button"));

@@ -415,7 +415,8 @@ export function NetworkGraph<N, L = unknown>(props: NetworkGraphProps<N, L>): El
     h("g", { class: "m-chart-plot m-network-plot", "class:m-network-focus": () => !!near(),
       transform: attr(() => { const v = view(); return `translate(${f1(size.width() / 2 + v.x)},${f1(size.height() / 2 + v.y)}) scale(${Math.round(v.k * 1000) / 1000})`; }) },
     h("g", { class: "m-network-links" }, each<GLink>({ each: lpres.items, key: (l) => l.key, children: linkEl })),
-    h("g", { class: "m-network-nodes" }, each<GNode<N>>({ each: npres.items, key: (n) => n.key, children: nodeEl })))),
+    // draggable nodes say so: a grab hand (CSS) instead of the plain pointer
+    h("g", { class: "m-network-nodes", "class:m-network-draggable": () => read(props.draggable) !== false }, each<GNode<N>>({ each: npres.items, key: (n) => n.key, children: nodeEl })))),
   ];
   const legendItems = (): readonly LegendItem[] => {
     const l = read(props.legend), gs = groups(), names = read(props.groupLabels);
