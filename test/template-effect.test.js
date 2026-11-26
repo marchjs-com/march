@@ -45,3 +45,14 @@ test("in one effect, a part writes only when its own value changes", () => {
   label.set("y");
   assert.equal(writes, first + 1);
 });
+
+test("an f() text part joins the template's effect when f is a signal or computed; any other function keeps a region", async () => {
+  const { compile } = await import("../compiler/index.js");
+  const out = compile(`const v = (f, view) => <p>{f()} | {view()}</p>`, { runtime: "march" }).code;
+  assert.match(out, /_\$acc\(f\)/, "f() is decided at runtime");
+  assert.match(out, /_\$acc\(view\)/, "so is view()");
+  const { signal, computed, createRoot: root, _acc } = await import("../src/index.ts");
+  assert.ok(_acc(signal(1)) && _acc(computed(() => 2)), "signals and computeds join");
+  assert.equal(_acc(() => document.createElement("i")), null, "a plain function keeps its own region");
+  void root;
+});

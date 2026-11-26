@@ -19,8 +19,8 @@ const { sx: resolveSx } = await importTs(new URL("../src/core/sx.ts", import.met
 const TEXT_ATTRS = new Set(["title", "placeholder", "label", "alt", "aria-label", "aria-description", "description", "hint", "message"]);
 // an object's fields whose string is read by people (lang.json collects them): `{ label: "Enerjik", hint: "…" }`
 const TEXT_KEYS = new Set(["label", "title", "text", "message", "description", "placeholder", "hint", "caption", "subtitle", "heading", "tooltip", "tip", "helperText", "emptyText", "confirmText", "cancelText", "okText"]);
-const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins", gen: "_$gen", tr: "_$tr", trf: "_$trf", c: "_$c", cp: "_$cp", cls: "_$cls", attr: "_$attr", on: "_$on", fx: "_$fx", txt: "_$txt", st: "_$st", scls: "_$scls", scl: "_$scl", sattr: "_$sattr" };
-const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert", gen: "_gen", tr: "_tr", trf: "_trf", c: "_c", cp: "_cp", cls: "_cls", attr: "_attr", on: "_on", fx: "effect", txt: "_txt", st: "_st", scls: "_scls", scl: "_scl", sattr: "_sattr" };
+const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins", gen: "_$gen", tr: "_$tr", trf: "_$trf", c: "_$c", cp: "_$cp", cls: "_$cls", attr: "_$attr", on: "_$on", fx: "_$fx", txt: "_$txt", st: "_$st", scls: "_$scls", scl: "_$scl", acc: "_$acc", sattr: "_$sattr" };
+const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert", gen: "_gen", tr: "_tr", trf: "_trf", c: "_c", cp: "_cp", cls: "_cls", attr: "_attr", on: "_on", fx: "effect", txt: "_txt", st: "_st", scls: "_scls", scl: "_scl", acc: "_acc", sattr: "_sattr" };
 // Templates: a native element subtree is built once (DOM calls, no HTML strings) and cloned; only its dynamic parts
 // (bound attributes, events, refs, directives, {expressions}, components) are wired on the clone. Not templated:
 // SVG (namespace), forbidden tags (h() throws for them), spreads.
@@ -34,6 +34,12 @@ const plainAttr = (key) => /^[a-z][a-z0-9-]*$/.test(key) && !PROP_KEYS.has(key) 
 // sibling part changes.
 const SAFE_FNS = new Set(["_$tr", "_$trf", "_$pipe", "String", "Number", "Boolean", "encodeURIComponent"]);
 const SAFE_METHODS = new Set(["toFixed", "toPrecision", "toString", "toLocaleString", "toUpperCase", "toLowerCase", "trim", "trimStart", "trimEnd", "padStart", "padEnd", "join", "slice", "substring", "replace", "replaceAll", "repeat", "at", "charAt", "stringify", "abs", "round", "floor", "ceil", "min", "max"]);
+/** `f()` or `a.b.c()`: a call with no arguments of a name or a member chain with no calls in it (a signal or computed
+ * read, or a function that may render nodes: decided at runtime, _acc). Returns the callee, or null. */
+export function accessorCall(code) {
+  const m = /^\s*([A-Za-z_$][\w$]*(?:\s*\.\s*[A-Za-z_$][\w$]*)*)\s*\(\s*\)\s*$/.exec(code);
+  return m ? m[1] : null;
+}
 export function textSafe(code) {
   if (/=>|\bfunction\b|\bnew\b|\bawait\b|\byield\b|`/.test(code)) return false;
   const s = code.replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, '""');
@@ -958,13 +964,24 @@ class Transformer {
       }
       for (const k of stat) if (k.tag && want.has(k)) walk(k, names.get(k));
       const eager = n.kids.some((k) => k.expr && !(FX && k.raw && textSafe(k.raw)));
+      const acc = (k) => FX && k.raw && !textSafe(k.raw) ? accessorCall(k.raw) : null;
+      // an accessor part is placed when the clone is wired; so are its siblings then (their order holds)
+      const eagerAll = n.kids.some((k) => k.expr && acc(k));
       n.kids.forEach((k, i) => {
         if (!k.expr) return;
         const next = nextStatic(n, i);
+        const callee = acc(k);
+        if (callee) {
+          // f(): a reactive accessor joins the template's effect; any other function keeps its own region
+          const av = `_a${++v}`, tv = `_x${++v}`, at = next ? names.get(next) : "null";
+          wire.push(`const ${av} = ${this.helper("acc")}(${callee}); let ${tv} = ${av} ? ${this.helper("txt")}(${ref}, ${at}) : (${this.helper("ins")}(${ref}, ${k.expr}, ${at}, 1), null);`);
+          fx.push(`if (${av}) ${tv} = ${this.helper("st")}(${tv}, ${ref}, ${at}, ${av}())`);
+          return;
+        }
         if (FX && k.raw && textSafe(k.raw)) {
           // the effect makes the text node with its first value; placed up front only when a sibling region needs the order
           const tv = `_x${++v}`, at = next ? names.get(next) : "null";
-          wire.push(eager ? `let ${tv} = ${this.helper("txt")}(${ref}, ${at});` : `let ${tv} = null;`);
+          wire.push(eager || eagerAll ? `let ${tv} = ${this.helper("txt")}(${ref}, ${at});` : `let ${tv} = null;`);
           fx.push(`${tv} = ${this.helper("st")}(${tv}, ${ref}, ${at}, ${k.raw})`);
           return;
         }

@@ -1,6 +1,6 @@
 // March — template clones (the compiler's output for native elements) and the props a template wires most: a class
 // binding (_cls) and a plain attribute (_attr). The other prop kinds go through _prop (dom/props.ts).
-import { effect, DEV } from "../core/reactive.ts";
+import { effect, DEV, isReactive } from "../core/reactive.ts";
 import { doc, insert, clearBetween, type MarchEl } from "./insert.ts";
 
 const URL_ATTRS = new Set(["href", "src", "action", "formaction", "xlink:href", "poster", "cite", "background"]);
@@ -94,6 +94,9 @@ export function _scl(el: Element, v: unknown, prev: unknown): unknown {
   setClass(el as MarchEl, v);
   return undefined;
 }
+/** Compiler helper (not for direct use): `f` when it is a reactive accessor (a signal, a computed: reading it creates
+ * nothing, so its text joins the template's effect), else null (the part keeps its own region). */
+export const _acc = (f: unknown): (() => unknown) | null => (isReactive(f) ? (f as () => unknown) : null);
 /** Compiler helper (not for direct use): a class inside a template's one effect. */
 export const _scls = (el: Element, v: unknown): void => setClass(el as MarchEl, v);
 /** Compiler helper (not for direct use): a plain attribute inside a template's one effect. */

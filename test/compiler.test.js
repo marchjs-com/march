@@ -126,10 +126,10 @@ test("compile errors point at the source", () => {
 
 test("templates: one effect per clone for its classes, attributes and text parts that cannot create nodes", () => {
   const out = c(`const r = (row) => <tr class={sel() === row().id ? "on" : ""} title={row().label}><td>{row().id}</td><td>{view()}</td><td>{$n}</td></tr>`);
-  assert.match(out, /_\$fx\(\(\) => \{ _k\d+ = _\$scl\(_r, sel\(\) === row\(\)\.id \? "on" : "", _k\d+\); _\$sattr\(_r, "tr", "title", row\(\)\.label\); _x\d+ = _\$st\(_x\d+, _\d+, null, row\(\)\.id\); _x\d+ = _\$st\(_x\d+, _\d+, null, \$n\); \}\)/, "class, attribute and text parts in one effect");
+  assert.match(out, /_\$fx\(\(\) => \{ _k\d+ = _\$scl\(_r, sel\(\) === row\(\)\.id \? "on" : "", _k\d+\); _\$sattr\(_r, "tr", "title", row\(\)\.label\); _x\d+ = _\$st\(_x\d+, _\d+, null, row\(\)\.id\); if \(_a\d+\) _x\d+ = _\$st\(_x\d+, _\d+, null, _a\d+\(\)\); _x\d+ = _\$st\(_x\d+, _\d+, null, \$n\); \}\)/, "class, attribute and text parts in one effect");
   assert.match(out, /let _x\d+ = null;/, "a text part's node is made by the effect, with its first value");
   assert.match(c(`const e = <td>{a()} {view()}</td>`.replace("a()", "$a")), /let _x\d+ = _\$txt\(/, "next to a region, a text part is placed up front (order)");
-  assert.match(out, /_\$ins\(_\d+, \(\) => \(view\(\)\), null, 1\)/, "{view()} may render a component: it keeps its own region");
+  assert.match(out, /const _a\d+ = _\$acc\(view\); let _x\d+ = _a\d+ \? _\$txt\(_\d+, null\) : \(_\$ins\(_\d+, \(\) => \(view\(\)\), null, 1\), null\);/, "{view()} joins the effect only if view is a signal or computed; else it keeps its own region");
   assert.doesNotMatch(c(`const e = <p>{a()}</p>`, { templateEffect: false }), /_\$fx/, "templateEffect: false keeps one region per part");
 });
 
