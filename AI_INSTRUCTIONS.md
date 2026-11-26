@@ -470,6 +470,10 @@ One interaction, written once, attached to any element; each behavior is its own
 - **swipe** — `swipeable(el, { axis, accept, onMove, onEnd, onTap, holdMs, onHold })` + `rubberBand`, `fling`, `nearest`:
   axis lock, veto, release velocity, tap / hold, click after a swipe swallowed (Drawer, PullToRefresh, ChatBubble,
   StoryViewer). Never write your own follow-the-finger pointer loop.
+- **mask** — `<input use:mask={"(999) 999 99 99"} />` / TextInput `mask={…}` (march/mask): formatted fields (phone,
+  card, IBAN, date, money, codes) with caret mapping, paste, beforeinput, IME and own undo; presets in
+  `march/mask/presets`, validators in `march/mask/validators`, `formatMask` / `unmask` for tables and the server. NEVER
+  write your own mask or digit-grouping onInput handler.
 - **dismiss** — `dismiss(panel, { inside, onDismiss(why), on, escape })`: outside press + Escape (capture phase) for
   popovers, menus and pickers. Never add document pointerdown / click / Escape listeners for that yourself.
 
@@ -720,7 +724,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | NumberInput | stable | Locale-aware number (never NaN) with IntInput, MoneyInput (currency side and decimals) and PercentInput. | — |
 | OptionList | experimental | A list of choices inside a panel: radio group, listbox (one or many) or command menu; rows with lead, label, hint, trailing part and tick; arrow keys, or driven by a field (aria-activedescendant). | ListRow, SectionLabel |
 | PasswordInput | stable | Password field with a show / hide button (aria-pressed). | Button, IconButton |
-| PhoneInput | stable | Phone number kept as "+" and digits; the country code is a prefix. | — |
+| PhoneInput | stable | Phone number kept as "+" and digits; the country code is a prefix. | TextInput |
 | RadioGroup | stable | Radio buttons for one value; classic, soft, chip, card or segmented look. | — |
 | Rating | stable | Star rating as a radio group: arrow keys (RTL mirrored), hover preview, half stars when read-only, any colour token. | — |
 | RowTools | experimental | The tools of a row in an editable list: move up, move down, remove (IconButtons); off at the ends, any subset, own names and icons. | IconButton |

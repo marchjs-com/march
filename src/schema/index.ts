@@ -33,6 +33,8 @@ export interface FieldSpec {
   maxLength?: number;
   pattern?: RegExp;
   patternMessage?: string;
+  /** A march/mask mask (preset or `pattern(…)`): the field's TextInput formats with it and validation checks it (complete, Luhn, IBAN…). */
+  mask?: unknown;
   /** pick/multi options: values or `{ value, label, hint }`; may be a function. */
   options?: readonly unknown[] | (() => readonly unknown[]);
   default?: unknown;
@@ -234,6 +236,14 @@ export function schema(spec: SchemaSpec, opts: SchemaOptions<Values> = {}): Sche
       if (minL != null && len != null && len < minL) return t`Must be at least ${minL} characters`;
       if (maxL != null && len != null && len > maxL) return t`Must be at most ${maxL} characters`;
       if (f.pattern && typeof v === "string" && !f.pattern.test(v)) return f.patternMessage ?? t`Invalid format`;
+      // a compiled march/mask (a preset, pattern(…)): the value must fill it and pass its own check (Luhn, IBAN, a real date)
+      const mk = f.mask as { format?: (raw: string) => { raw: string; complete: boolean }; parse?: (s: string) => string; check?: (raw: string, f: unknown) => string | null } | undefined;
+      if (mk && typeof mk.format === "function" && typeof mk.parse === "function" && (typeof v === "string" || typeof v === "number")) {
+        const fm = mk.format(mk.parse(String(v)));
+        if (!fm.complete) return f.patternMessage ?? t`Invalid format`;
+        const e = mk.check?.(fm.raw, fm);
+        if (e) return e;
+      }
       return (f.validate as ((v: unknown, values: Values) => Message) | undefined)?.(v, values) ?? null;
     },
     validate(values = {}) {

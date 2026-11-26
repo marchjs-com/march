@@ -840,13 +840,6 @@
    ],
    "hash": "bdc7b65891299fe126a0001af86b3799"
   },
-  "PhoneInput": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/forms/phone-input"
-   ],
-   "hash": "bccb1bbb60219531feb174924d25ec88"
-  },
   "Picture": {
    "frozen": "2026-11-20",
    "paths": [
@@ -1252,13 +1245,6 @@
     "src/components/forms/textarea"
    ],
    "hash": "fbf7a9941ff991082024f4339b61cc61"
-  },
-  "TextInput": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/forms/text-input"
-   ],
-   "hash": "71d1d204f729b85dd08d09e09bee955c"
   },
   "ThemeEditor": {
    "frozen": "2026-11-20",
@@ -4268,6 +4254,18 @@
    "name": "CodeEditor",
    "what": "refresh",
    "reason": "Comments quieter, full strength on the caret line and under the pointer"
+  },
+  {
+   "at": "2026-11-26",
+   "name": "TextInput",
+   "what": "thaw",
+   "reason": "input mask: mask prop on march/mask (maskValue, maskPlaceholder, maskMotion, maskDone, maskHint, onMaskState, onComplete)"
+  },
+  {
+   "at": "2026-11-26",
+   "name": "PhoneInput",
+   "what": "thaw",
+   "reason": "input mask: per-country format and caret-correct typing on march/mask (composes TextInput mask)"
   }
  ]
 }

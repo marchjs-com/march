@@ -75,7 +75,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | NumberInput | stable | Locale-aware number (never NaN) with IntInput, MoneyInput (currency side and decimals) and PercentInput. | — |
 | OptionList | experimental | A list of choices inside a panel: radio group, listbox (one or many) or command menu; rows with lead, label, hint, trailing part and tick; arrow keys, or driven by a field (aria-activedescendant). | [ListRow](#listrow), [SectionLabel](#sectionlabel) |
 | PasswordInput | stable | Password field with a show / hide button (aria-pressed). | [Button](#button), [IconButton](#iconbutton) |
-| PhoneInput | stable | Phone number kept as "+" and digits; the country code is a prefix. | — |
+| PhoneInput | stable | Phone number kept as "+" and digits; the country code is a prefix. | [TextInput](#textinput) |
 | RadioGroup | stable | Radio buttons for one value; classic, soft, chip, card or segmented look. | — |
 | Rating | stable | Star rating as a radio group: arrow keys (RTL mirrored), hover preview, half stars when read-only, any colour token. | — |
 | RowTools | experimental | The tools of a row in an editable list: move up, move down, remove (IconButtons); off at the ends, any subset, own names and icons. | [IconButton](#iconbutton) |
@@ -2112,10 +2112,13 @@ Full page: src/components/navigation/period-nav/docs.md
 
 ## PhoneInput
 
-A phone number stored as `+` and digits (`"+447700900123"`). With `country` the calling code is shown as a prefix and put in front of national numbers; `normalizePhone(text, country)` is the same rule as a function.
+A phone number typed in its country's format and stored as `+` and digits (`"+447700900123"`). It is a TextInput with march/mask's `phone()` mask: the caret stays where it belongs, a pasted "+44 …", "0044 …" or "0…" is read, and the country formats load on demand (one small chunk). With `country` (a calling code `"+44"` or an ISO code `"GB"`) the calling code is the prefix and the number is national; without it the number is international and the country is chosen by the calling code typed (`onMaskState` gets it as `name`). `normalizePhone(text, country)` is the plain rule as a function.
+
+Composed of: [TextInput](#textinput)
 
 ```tsx
-<Field label="Phone"><PhoneInput bind:value={$phone} country="+44" /></Field>
+<Field label="Phone"><PhoneInput bind:value={$phone} country="TR" /></Field>            // "(532) 111 22 33" → "+905321112233"
+<Field label="Phone"><PhoneInput bind:value={$intl} onMaskState={(s) => $cc = s.name} /></Field> // "+44 7700 900123"
 normalizePhone("0 (532) 111-22-33", "+90") // "+905321112233"
 ```
 

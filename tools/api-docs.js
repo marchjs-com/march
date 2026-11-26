@@ -35,6 +35,7 @@ export const MD_PENDING = new Set([
   "march/fx", "march/store", "march/props", "march/channel", "march/behaviors/drag",
   "march/behaviors/roving-focus", "march/behaviors/resize-handle", "march/behaviors/list-nav",
   "march/behaviors/dropzone", "march/behaviors/swipe", "march/behaviors/dismiss", "march/i18n",
+  "march/behaviors/mask", "march/mask", "march/mask/presets", "march/mask/validators",
   "march/icons", "march/icons/catalog", "march/theme", "march/net", "march/net/mock",
   "march/errors", "march/managers", "march/managers/consent/ui", "march/managers/command/ui",
   "march/managers/undo", "march/flow", "march/context-menu", "march/managers/undo/history",
