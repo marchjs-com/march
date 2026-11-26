@@ -130,7 +130,7 @@ const s = <svg viewBox="0 0 1 1"><path d="M0 0" /></svg>; const sp = <div {...p}
   const decl = out.match(/const _\$t\d+ = _\$tpl\(/g) ?? [];
   assert.equal(decl.length, 2, "one template for the row (inner cells taken in) and one for <b> inside the spread <div>");
   assert.match(out, /_\$tpl\(\["tr",\[\["class","row"\]\],\["td",\[\["class","c1"\]\]\],\["td",\[\],\["a",\[\]," !"\]\],\["td",\[\["hidden",""\]\]\]\]\)/);
-  assert.match(out, /_\$p\(_\d+, "a", "class", _\$r\(\(\) => \(\$sel\)\)\)/, "a bound class is wired");
+  assert.match(out, /_\$p\(_\d+, "a", "class", \(\) => \(\$sel\)\)/, "a bound class is wired (a plain thunk: _prop treats any function as live)");
   assert.match(out, /_\$p\(_\d+, "a", "onClick", go\)/, "events are wired, not template attributes");
   assert.match(out, /_\$p\(_\d+, "a", "href", "\/x"\)/, "URL attributes keep their runtime check");
   assert.match(out, /_\$ins\(_\d+, label, _\d+, 1\)/, "a child before static text is inserted before it (owned by the clone: no cleanup)");

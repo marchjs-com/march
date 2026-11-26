@@ -262,20 +262,28 @@ function dispatch(e: Event): void {
   } finally { delete (e as unknown as Record<string, unknown>)["currentTarget"]; }
 }
 
+/** `onClick` → "click", worked out once per prop name. */
+const EVENT_NAMES = new Map<string, string>();
+const NO_FLAGS: Record<string, boolean> = {};
 function listen(el: Element, key: string, handler: unknown): void {
   if (handler == null || handler === false) return;
-  let name: string, mods: string[] = [];
-  if (key.startsWith("on:")) { const [n = "", ...m] = key.slice(3).split("|"); name = n; mods = m; }
-  else name = key.slice(2).toLowerCase();
-  // the modifiers as flags, read once (not on every event)
-  const f: Record<string, boolean> = {};
-  for (const m of mods) { if (!MODS.has(m)) throw new Error(`March: unknown event modifier "${m}".`); f[m] = true; }
+  let name: string, f = NO_FLAGS;
+  if (key[2] === ":") {
+    const [n = "", ...mods] = key.slice(3).split("|");
+    name = n;
+    // the modifiers as flags, read once (not on every event)
+    if (mods.length) f = {};
+    for (const m of mods) { if (!MODS.has(m)) throw new Error(`March: unknown event modifier "${m}".`); f[m] = true; }
+  } else {
+    name = EVENT_NAMES.get(key) as string;
+    if (name === undefined) EVENT_NAMES.set(key, (name = key.slice(2).toLowerCase()));
+  }
   if (typeof handler !== "function") throw new TypeError(`March: ${key} handler must be a function.`);
   // onClick-style handlers (no modifiers) inside a render() tree: one listener per event type on the document
   if (key[2] !== ":" && DELEGATED.has(name)) {
     const d = useContext(DelegateRoot);
     if (d) {
-      (el as unknown as Record<string, unknown>)[`$m${name}`] = handler;
+      (el as unknown as Record<string, unknown>)["$m" + name] = handler;
       const on = ((d as unknown as { $m?: Set<string> }).$m ??= new Set());
       if (!on.has(name)) { on.add(name); d.addEventListener(name, dispatch); }
       return;

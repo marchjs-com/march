@@ -859,7 +859,8 @@ class Transformer {
         if (!/^[A-Za-z_$][\w$.]*$/.test(fn)) throw fail(this.src, this.pos, `invalid action name in ${a.name}`);
         this.used.add(fn.split(".")[0]);
         value = `[${fn}, ${a.code === "true" && !a.raw ? "undefined" : a.code}]`;
-      } else value = a.dynamic ? `${this.helper("r")}(() => (${a.code}))` : a.code;
+      // a plain thunk: _prop treats any function as live (no reactive() tag to set on every clone)
+      } else value = a.dynamic ? `() => (${a.code})` : a.code;
       props.push([a.name, value]);
     }
     const out = [];

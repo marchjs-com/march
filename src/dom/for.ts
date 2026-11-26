@@ -75,8 +75,17 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
         return true;
       };
       let s = 0, e1 = m - 1, e2 = n - 1;
-      while (s <= e1 && s <= e2 && same(s, old[s])) s++;
-      while (s <= e1 && s <= e2 && same(e2, old[e1])) { e1--; e2--; }
+      for (;;) {
+        while (s <= e1 && s <= e2 && same(s, old[s])) s++;
+        while (s <= e1 && s <= e2 && same(e2, old[e1])) { e1--; e2--; }
+        // the first and last rows of the middle traded places (a swap): move the two rows, no map, no reorder pass
+        const a = old[s] as Row<T>, b = old[e1] as Row<T>;
+        if (s >= e1 || s >= e2 || props.animate || !a.nodes.length || !b.nodes.length || keyOf(list[s] as T) !== b.k || keyOf(list[e2] as T) !== a.k) break;
+        const ref = (b.nodes[b.nodes.length - 1] as Node).nextSibling;
+        for (const x of b.nodes) host.insertBefore(x, a.nodes[0] as Node);
+        for (const x of a.nodes) host.insertBefore(x, ref);
+        same(s++, b); same(e2--, a); e1--;
+      }
       // the middle: old rows s…e1 become new rows s…e2 (reused by key, made, or dropped)
       const byKey = new Map<unknown, Row<T>>();
       for (let i = s; i <= e1; i++) byKey.set((old[i] as Row<T>).k, old[i] as Row<T>);
