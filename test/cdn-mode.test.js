@@ -73,6 +73,25 @@ test("cdn: a lazy entry import is the CDN file itself, its stylesheet loaded alo
   assert.match(out, /const R = \(\) => import\("https:\/\/cdn\.test\/1\.0\.0\/router\.js"\);/);
   assert.match(out, /const s = "import\(\\"march\/router\\"\)";/, "text in a string stays");
   assert.match(cdnDynamic('import("march/router")', cdn, { "march/router": "C:\\m\\src\\router\\index.ts" }), /import\("C:\/m\/src\/router\/index\.ts"\)/, "prerender: the source");
+  // prerender: an entry with stylesheets links them without waiting for their load (the test DOM never loads one)
+  const local = cdnDynamic('import("march/components/actions/button")', cdn, { "march/components/actions/button": "C:\\m\\src\\components\\actions\\button\\index.ts" });
+  assert.match(local, /^import \{ cdnLink as __mCdnLazy \} from "march-cdn:css";/, "prerender: linked, not awaited");
+});
+
+test("cdn: cdnLink links the stylesheet and hands the module back at once (cdnLazy waits for the sheet)", async () => {
+  const { CDN_CSS } = await import("../compiler/cdn.js");
+  const head = { children: [], querySelectorAll: () => [], insertBefore(l) { this.children.push(l); } };
+  const make = () => { const a = {}; return { sheet: null, tagName: "LINK", setAttribute: (k, v) => { a[k] = v; }, getAttribute: (k) => a[k] ?? null, hasAttribute: (k) => k in a, addEventListener() {} }; };
+  const saved = globalThis.document;
+  globalThis.document = { head, createElement: make };
+  try {
+    const m = await import(`data:text/javascript,${encodeURIComponent(CDN_CSS)}`);
+    const t0 = Date.now();
+    assert.equal((await m.cdnLink(Promise.resolve({ ok: 1 }), "https://cdn.test/a.css")).ok, 1);
+    assert.ok(Date.now() - t0 < 500, "no wait for the sheet's load event");
+    assert.equal(head.children.length, 1, "the stylesheet is still linked (the prerendered page keeps it)");
+    assert.equal(head.children[0].getAttribute("href"), "https://cdn.test/a.css");
+  } finally { globalThis.document = saved; }
 });
 
 test("cdn: with the CDN's names.json the smallest entry comes from it, not from March's sources", () => {
