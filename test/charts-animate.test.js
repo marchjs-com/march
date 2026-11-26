@@ -158,3 +158,19 @@ test("ChoroplethMap: provinces change color", async () => {
   const data = signal([{ id: "a", value: 1 }, { id: "b", value: 5 }]);
   await changes("ChoroplethMap", () => h(C.ChoroplethMap, { shapes, viewBox: [0, 0, 20, 10], data, width: 300 }), () => data.set([{ id: "a", value: 9 }, { id: "b", value: 2 }]));
 });
+
+test("Heatmap: a changed value makes its cell swell and settle (on the engine) and take its new level", async () => {
+  const data = signal([{ x: 1, y: 1, value: 2 }, { x: 2, y: 1, value: 4 }]);
+  const el = document.createElement("div"); document.body.appendChild(el);
+  const dispose = render(() => h(C.Heatmap, { data, width: 300 }), el);
+  await sleep(1800);
+  const cell = () => el.querySelectorAll("rect.m-heat-cell")[1];
+  const w0 = cell().getAttribute("width"), cls0 = cell().getAttribute("class");
+  data.set([{ x: 1, y: 1, value: 2 }, { x: 2, y: 1, value: 1 }]);
+  await sleep(60);
+  assert.notEqual(cell().getAttribute("width"), w0, "the changed cell is swelling");
+  await sleep(1800);
+  assert.equal(cell().getAttribute("width"), w0, "and settles back");
+  assert.notEqual(cell().getAttribute("class"), cls0, "with its new level");
+  dispose();
+});

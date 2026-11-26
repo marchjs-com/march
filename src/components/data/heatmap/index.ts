@@ -4,7 +4,7 @@
 // `calendar` mode lays out daily values as weeks (columns) × weekdays (rows): the last N weeks, or a whole year from
 // `from` to `to`, with month and weekday labels, gaps for days outside the range and a "less → more" legend.
 import "./heatmap.css";
-import { signal, computed, read, untrack } from "../../../core/reactive.ts";
+import { signal, computed, read, untrack, effect, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { toDate } from "../../../core/pipes.ts";
 import { locale, t } from "../../../core/i18n.ts";
@@ -17,6 +17,7 @@ import { clamp, type Handler } from "../../../core/util.ts";
 import { isActivateKey } from "../../../ui/behave.ts";
 import { ease, cssOf } from "../../../motion/engine/ease.ts";
 import { reducedMotion } from "../../../motion/env.ts";
+import { animateValue } from "../../../motion/engine/value.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
 
@@ -236,7 +237,20 @@ export function Heatmap<D>(props: HeatmapProps<D>): Element {
         // calendar moves on, and shrinks away when it leaves
         const g = tween(() => { const x = c(); return { xi: x.xi, yi: x.yi, s: x.leaving ? 0 : 1 }; }, ["xi", "yi", "s"], how, (to) => ({ ...to, s: 0 }),
           { index: () => { const x = untrack(c); return x.xi + x.yi; }, key, leaving: () => !!c().leaving, onSettle: () => { if (untrack(c).leaving) shown.done(key); } });
-        const geo = (): { x: number; y: number; w: number } => { const d = g(), p = pitch(), s = clamp(d.s, 0, 1.2), w = cs() * s; return { x: d.xi * p + (cs() - w) / 2, y: d.yi * p + (cs() - w) / 2, w }; };
+        // a changed value: the cell swells and settles back on the engine while its colour fades to the new level
+        const bump = signal(1);
+        let seen = untrack(c).value, run: { cancel(): void } | null = null;
+        effect(() => {
+          const v = c().value;
+          if (v === seen || untrack(c).leaving) return;
+          seen = v;
+          run?.cancel(); run = null;
+          const m = untrack(() => motionOf(how(), { index: 0, key, phase: "update" }));
+          if (!m || reducedMotion()) return;
+          run = animateValue(1.28, 1, { easing: m.easing === "spring" ? "spring-wobbly" : m.easing, ...(m.duration != null ? { duration: m.duration } : {}), onUpdate: (x: number) => bump.set(x), onComplete: () => bump.set(1) });
+        });
+        onCleanup(() => run?.cancel());
+        const geo = (): { x: number; y: number; w: number } => { const d = g(), p = pitch(), s = clamp(d.s, 0, 1.2) * bump(), w = cs() * s; return { x: d.xi * p + (cs() - w) / 2, y: d.yi * p + (cs() - w) / 2, w }; };
         return h("rect", {
           class: attr(() => `m-heat-cell m-heat-${Math.min(4, heatLevel(c().value, max(), levels()))}`), "class:m-chart-active": () => !c().leaving && active() === at().get(key),
           "class:is-leaving": () => !!c().leaving,
