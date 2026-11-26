@@ -12,7 +12,7 @@ import { loadAutoImports, MARCH_ROOT, MODULES } from "./autoimports.js";
 import { setupCssSplit } from "./css-split.js";
 import { deepImports } from "./deep-imports.js";
 import { pruneBareImports } from "./prune-imports.js";
-import { cdnTargets, cdnImports, cdnModule, cdnStylesheet, cdnDynamic, entryNames, CDN_CSS } from "./cdn.js";
+import { cdnTargets, cdnImports, cdnModule, cdnStylesheet, cdnDynamic, entryNames, hasCss, CDN_CSS } from "./cdn.js";
 
 // march/icons/<pack> and …/<pack>/pack: the icon packs made by `march icons add` (src/icons/packs/<id>/)
 function iconPackModules() {
@@ -122,10 +122,10 @@ export function march(opts = {}) {
         build.onResolve({ filter: /^march\/.+\.css$/ }, (a) => {
           if (a.path.startsWith("march/css/")) return { path: `${cdn.base}/${a.path.slice("march/".length)}`, namespace: "march-cdn-style" };
           const entry = a.path.replace(/\/[^/]+$/, "");
-          if (cdn.css[entry]) return { path: cdn.css[entry], namespace: "march-cdn-style" };
+          if (hasCss(entry, cdn)) return { path: cdn.sheets?.[entry] ? JSON.stringify(cdn.sheets[entry]) : cdn.css[entry], namespace: "march-cdn-style" };
           return { errors: [{ text: `${a.path}: no stylesheet of ${entry} on ${cdn.base} (march.config.js › cdn)` }] };
         });
-        build.onLoad({ filter: /.*/, namespace: "march-cdn-style" }, (a) => ({ contents: cdnStylesheet(a.path, opts.cdnLocal), loader: "js", resolveDir: cwd }));
+        build.onLoad({ filter: /.*/, namespace: "march-cdn-style" }, (a) => ({ contents: cdnStylesheet(a.path.startsWith("[") ? JSON.parse(a.path) : a.path, opts.cdnLocal), loader: "js", resolveDir: cwd }));
         build.onResolve({ filter: /^march-cdn:css$/ }, () => ({ path: "css", namespace: "march-cdn" }));
         build.onResolve({ filter: /^https:\/\// }, (a) => (a.path.startsWith(`${cdn.base}/`) ? { path: a.path, external: true } : undefined));
       }
@@ -146,7 +146,7 @@ export function march(opts = {}) {
         build.onResolve({ filter: /^march(\/[\w-]+)*$/ }, (a) => {
           // no stylesheet: the CDN file itself (no module in between, nothing of it in the app's files); with one, a
           // module that links the stylesheet next to it (cdnModule)
-          if (a.path in cdn.url) return !cdn.css[a.path] && !opts.cdnLocal ? { path: cdn.url[a.path], external: true } : { path: a.path, namespace: "march-cdn" };
+          if (a.path in cdn.url) return !hasCss(a.path, cdn) && !opts.cdnLocal ? { path: cdn.url[a.path], external: true } : { path: a.path, namespace: "march-cdn" };
           // prerendering in node may use what is not for browsers (march/testing's DOM)
           if (opts.cdnLocal) return undefined;
           return { errors: [{ text: `${a.path} is not on ${cdn.base} (march.config.js › cdn): only the package's browser entries are` }] };

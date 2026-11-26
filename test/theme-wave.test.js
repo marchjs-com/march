@@ -195,3 +195,14 @@ test("spotlight: every card near the pointer is lit from the pointer's place (al
   assert.equal(cards[2].classList.contains("is-lit"), false, "stopping puts the lights out");
   host.remove();
 });
+
+test("drip: time slows and picks up again also without frames (a hidden tab): the next theme change is not held back", async () => {
+  const P = await import("../src/motion/theme-paint.ts");
+  const raf = globalThis.requestAnimationFrame;
+  globalThis.requestAnimationFrame = () => 0; // frames never come
+  try {
+    const within = (p, ms) => Promise.race([p.then(() => true), tick(ms).then(() => false)]);
+    assert.ok(await within(P.warpTime(0, 40), 1500), "slowed to a stop without a frame");
+    assert.ok(await within(P.warpTime(1, 40), 1500), "and back");
+  } finally { globalThis.requestAnimationFrame = raf; }
+});
