@@ -6,7 +6,7 @@
 // pages the text instead of scrolling it; Space pauses, the arrow keys step through the scenes; screen readers hear
 // each scene's text.
 import "./led-board.css";
-import { signal, computed, effect, onCleanup, untrack } from "../../../core/reactive.ts";
+import { signal, computed, effect, onCleanup, untrack, getOwner, runWithOwner } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, isRtl, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
@@ -14,8 +14,7 @@ import { isActivateKey } from "../../../ui/behave.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
 import { watchVisibility } from "../../../motion/engine/visibility.ts";
 import { still } from "../../../motion/engine/parts.ts";
-import { liveSource } from "../../../audio/live.ts";
-import type { AudioSourceLike } from "../../../audio/index.ts";
+import type { AudioSource, AudioSourceLike } from "../../../audio/index.ts";
 import { ledFrame, clearFrame, ledColor, type LedFrame } from "../led-matrix/frame.ts";
 import { screenProps, type LedLookProps } from "../led-matrix/screen.ts";
 import { LedMatrix } from "../led-matrix/index.ts";
@@ -86,8 +85,19 @@ export function LedBoard(props: LedBoardProps): Element {
     return [{ text: props.text ?? "" }];
   });
   const calm = (): boolean => still(props.motion);
+  // the audio of a bars scene: march/audio loads only when a board has one (the shared liveSource, lazily)
   const audioGiven = signal<AudioSourceLike | undefined>(undefined);
-  const audio = liveSource(() => audioGiven());
+  const audio = signal<AudioSource | null>(null);
+  const owner = getOwner();
+  let loading = false;
+  effect(() => {
+    if (audioGiven() === undefined || loading) return;
+    loading = true;
+    void import("../../../audio/live.ts").then((m) => runWithOwner(owner, () => {
+      const src = m.liveSource(() => audioGiven());
+      effect(() => audio.set(src()));
+    }));
+  });
 
   // the board's own time: ms on the engine clock while playing and on screen
   const index = signal(0), held = signal(false), seen = signal(true), hover = signal(false);
@@ -177,6 +187,7 @@ export function LedBoard(props: LedBoardProps): Element {
     "data-paused": () => (held() ? "" : null),
   }, screen, sr) as HTMLElement;
   onCleanup(watchVisibility(el, (v) => seen.set(v)));
+  effect(() => { const a = audio(); if (a) onCleanup(a.use(el)); });
 
   face = faceMotion(el, {
     expression: () => faceExpr()?.eye, look: () => undefined, mouth: () => faceExpr()?.mouth,

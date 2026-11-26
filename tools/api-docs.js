@@ -19,7 +19,7 @@ export const DOCS = "docs/api";
 /** Subpaths still being written: their class members are not held to the member-summary rule yet. */
 export const PENDING = new Set([
   "march/base", "march/icons", "march/icons/packs", "march/landing", "march/motion",
-  "march/router", "march/seo/hydrate", "march/ui",
+  "march/router", "march/seo/hydrate", "march/ui", "march/led",
   "march/app-ui",
   "march/db", "march/vault", "march/ai",
   // large components outside their category barrel (march/components/<category>/<name>)
@@ -29,7 +29,7 @@ export const PENDING = new Set([
 /** Subpaths whose long-form docs (docs/api/<slug>/<name>.md) are still being written, in groups; the test fails for a
  *  missing doc of any other subpath, and when a listed subpath is already complete. */
 export const MD_PENDING = new Set([
-  "march", "march/app-ui", "march/base", "march/icons/packs", "march/landing", "march/seo/hydrate", "march/router", "march/data", "march/schema", "march/ui",
+  "march", "march/app-ui", "march/base", "march/icons/packs", "march/landing", "march/seo/hydrate", "march/router", "march/data", "march/schema", "march/ui", "march/led",
   "march/table", "march/charts", "march/crud",
   "march/lazy", "march/sw", "march/motion", "march/motion/text", "march/motion/text/meta",
   "march/fx", "march/store", "march/props", "march/channel", "march/behaviors/drag",

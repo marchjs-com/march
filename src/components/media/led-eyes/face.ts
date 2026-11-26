@@ -5,7 +5,6 @@ import { on, clamp } from "../../../ui/util.ts";
 import { t } from "../../../core/i18n.ts";
 import { onFrame, now, measure } from "../../../motion/engine/clock.ts";
 import { watchVisibility } from "../../../motion/engine/visibility.ts";
-import { track, animateValue } from "../../../motion/engine/value.ts";
 import { expressionState, eyeVec, vecEye, type EyeExpression, type MouthShape, type EyeState } from "./eyes.ts";
 
 /** What makes a face move: the parts LedEyes and LedBoard's eye scenes share. */
@@ -33,22 +32,47 @@ export function faceMotion(host: Element, p: FaceInput): FaceMotion {
     else if (neutral && glance()) { s.x = glance()!.x; s.y = glance()!.y; }
     return eyeVec(s);
   });
-  const moving = track(target, { spring: { stiffness: 240, damping: 22 } });
+  // The gaze is a spring and a blink a short lid curve, stepped on the engine clock (onFrame: global speed and pause
+  // apply). A face is a handful of numbers, so it steps them itself instead of loading the tween / timeline modules.
+  const n = eyeVec(expressionState("open")).length;
+  const pos = untrack(target).slice(), vel = new Array<number>(n).fill(0);
+  const moving = signal(pos.slice(), { equals: false });
+  let goal = pos.slice(), blinkAt = -1, stop: (() => void) | null = null;
+  const K = 240, C = 22, BLINK_DOWN = 70, BLINK_UP = 120;
+  const tick = (at: number, dt: number): void => {
+    let left = Math.min(dt / 1000, 0.1), busy = false;
+    while (left > 0) {
+      const h = Math.min(left, 1 / 240);
+      left -= h;
+      for (let i = 0; i < n; i++) { vel[i] = vel[i]! + (-K * (pos[i]! - goal[i]!) - C * vel[i]!) * h; pos[i] = pos[i]! + vel[i]! * h; }
+    }
+    for (let i = 0; i < n; i++) {
+      if (Math.abs(vel[i]!) > 0.002 || Math.abs(pos[i]! - goal[i]!) > 0.002) busy = true;
+      else { pos[i] = goal[i]!; vel[i] = 0; }
+    }
+    moving.set(pos.slice());
+    if (blinkAt >= 0) {
+      // down fast (ease in), up a little slower (ease out): a real blink
+      const e = at - blinkAt;
+      if (e >= BLINK_DOWN + BLINK_UP) { blinkAt = -1; blinkLid.set(0); }
+      else { blinkLid.set(e < BLINK_DOWN ? (e / BLINK_DOWN) ** 2 : 1 - (1 - (1 - (e - BLINK_DOWN) / BLINK_UP) ** 2)); busy = true; }
+    }
+    if (!busy) { stop?.(); stop = null; }
+  };
+  const wake = (): void => { if (!stop) stop = onFrame(tick); };
+  effect(() => { goal = target().slice(); untrack(wake); });
+  onCleanup(() => stop?.());
   const state = computed((): EyeState => {
     const s = vecEye(p.still() ? target() : moving());
     s.lid = Math.max(s.lid, blinkLid());
     return s;
   });
 
-  let run: { cancel(): void } | null = null;
   const blink = (): void => {
     if (p.still()) return;
-    run?.cancel();
-    // down fast, up a little slower: a real blink
-    run = animateValue(0, 1, { duration: 70, easing: "in", onUpdate: (v) => blinkLid.set(v),
-      onComplete: () => { run = animateValue(1, 0, { duration: 120, easing: "out", onUpdate: (v) => blinkLid.set(v), onComplete: () => blinkLid.set(0) }); } });
+    blinkAt = now();
+    wake();
   };
-  onCleanup(() => run?.cancel());
   // the "blink" expression blinks once each time it is set
   effect(() => { if (p.expression() === "blink") untrack(blink); });
 

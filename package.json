@@ -102,6 +102,7 @@
     "./managers/clipboard": "./src/managers/clipboard/index.ts",
     "./managers/undo": "./src/managers/undo/index.ts",
     "./flow": "./src/flow/index.ts",
+    "./led": "./src/led/index.ts",
     "./context-menu": "./src/components/overlays/context-menu/index.ts",
     "./managers/undo/history": "./src/managers/undo/history.ts",
     "./managers/dirty": "./src/managers/dirty/index.ts",

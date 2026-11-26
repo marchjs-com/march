@@ -1,6 +1,7 @@
 // Drawing a pair of LED eyes (and a mouth) into an LED frame from a few numbers: where the pupils look, how far the
 // lids are down, how big the eyes are, the mood of the lids and the mouth. Every LED is tested against the shapes, so
 // the face fits any screen size. The animation (blinks, glances, tweens) lives in index.ts; this file only draws.
+import { clamp } from "../../../core/util.ts";
 import { setLed, type LedFrame } from "../led-matrix/frame.ts";
 
 /** The face expressions. @tr Yüz ifadeleri. */
@@ -118,7 +119,7 @@ function drawMouth(f: LedFrame, m: MouthShape, talk: number, bx: number, by: num
       for (let y = y0; y <= yb; y++) setLed(f, x0 + i, y, 255, rgb);
     } else {
       // open, o, talk: an ellipse (a ring for "o"); talk opens and closes
-      const open = m === "talk" ? 0.25 + 0.75 * Math.max(0, Math.min(1, talk)) : 1;
+      const open = m === "talk" ? 0.25 + 0.75 * clamp(talk, 0, 1) : 1;
       const ry = Math.max(0.6, (mh / 2) * open), cy = y0 + mh / 2, rx = mw / 2, cxm = x0 + mw / 2;
       for (let y = Math.floor(cy - ry); y < Math.ceil(cy + ry); y++) {
         const d = ((x0 + i + 0.5 - cxm) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2;

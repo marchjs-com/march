@@ -2,7 +2,7 @@
 // draw itself at a time (ms since it started, on the motion engine's clock). Text scrolls in any direction (or pages
 // under reduced motion), clocks and scores roll their changed digits, emoji and pixel art scale up to the board, eyes
 // and mouths come from LedEyes, audio bars from a march/audio source. Transitions mix two frames LED by LED.
-import { val, type MaybeFn } from "../../../core/util.ts";
+import { val, clamp, type MaybeFn } from "../../../core/util.ts";
 import { t } from "../../../core/i18n.ts";
 import { ledColor, ledNoise, type LedFrame } from "../led-matrix/frame.ts";
 import { ledArt } from "../led-matrix/frame.ts";
@@ -91,7 +91,7 @@ const ease = (x: number): number => 1 - (1 - x) ** 3;
 
 /** Hue (degrees) → a stored LED color. */
 export function hueColor(h: number): number {
-  const f = (n: number): number => { const k = (n + h / 30) % 12; return Math.round(255 * (0.5 - 0.5 * Math.max(-1, Math.min(k - 3, 9 - k, 1)))); };
+  const f = (n: number): number => { const k = (n + h / 30) % 12; return Math.round(255 * (0.5 - 0.5 * clamp(Math.min(k - 3, 9 - k), -1, 1))); };
   return ledColor((f(0) << 16) | (f(8) << 8) | f(4));
 }
 
@@ -231,10 +231,10 @@ function moving(env: SceneEnv, text: string, spoken: () => string, sc: LedScene)
 
 const pad2 = (n: number): string => String(Math.max(0, Math.floor(n))).padStart(2, "0");
 function clockText(fmt: LedScene["clock"], fits: (s: string) => boolean): string {
-  const d = new Date(), hm = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`, hms = `${hm}:${pad2(d.getSeconds())}`;
-  if (fmt === "HH:mm") return hm;
+  const d = new Date(), hhmm = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`, hms = `${hhmm}:${pad2(d.getSeconds())}`;
+  if (fmt === "HH:mm") return hhmm;
   if (fmt === "HH:mm:ss") return hms;
-  return fits(hms) ? hms : hm;
+  return fits(hms) ? hms : hhmm;
 }
 function countdownText(to: LedScene["countdown"], done: string | undefined): string {
   const end = to instanceof Date ? to.getTime() : typeof to === "string" ? Date.parse(to) : Number(to);
