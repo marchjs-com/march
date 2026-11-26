@@ -241,3 +241,14 @@ test("packLoop: a pass with fewer small files but a row over budget is not the b
   const res = await packLoop({ build: async (p, s) => { disk = { p, s }; return true; }, left: () => small[disk.p], overBudget: () => over[disk.p], next: (p) => (p ?? 0) + 1, strategies: 3, start: { plan: 0, strategy: 0, small: 12 }, maxBuilds: 3, log: () => {} });
   assert.deepEqual([res.plan, disk.p], [2, 2], "pass 3 (7 small, nothing over budget) wins over pass 2 (3 small, a group over budget)");
 });
+
+test("packLoop: a planner that settles on a plan with a row over budget gets an earlier pass with none back", async () => {
+  const { packLoop } = await import("../compiler/pack-loop.js");
+  let disk = null;
+  const lines = [];
+  // passes 1-3; the planner settles after pass 3 (next → null), whose plan has a row over budget; pass 2 had none
+  const small = [133, 6, 9], over = [3, 0, 1];
+  const res = await packLoop({ build: async (p, s) => { disk = { p, s }; return true; }, left: () => small[disk.p], overBudget: () => over[disk.p], next: (p) => ((p ?? 0) < 2 ? (p ?? 0) + 1 : null), strategies: 1, maxBuilds: 3, log: (l) => lines.push(l) });
+  assert.deepEqual([res.plan, res.small, disk.p], [1, 6, 1], "pass 2 (6 small, nothing over budget) is back on disk");
+  assert.ok(lines.some((l) => /best again/.test(l)), "rebuilt as the best");
+});

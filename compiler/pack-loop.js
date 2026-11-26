@@ -60,9 +60,10 @@ export async function packLoop({ build, left, next, strategies, start = null, ov
   // the build on disk is the last one; its plan is `plan` (the passes may have ended on a newer, unbuilt plan)
   plan = onDisk.plan;
   let best = { plan, strategy: onDisk.strategy, n: small, o: lastOver };
-  // passes that did not settle: an earlier pass may have done better than the last one (fewer rows over budget, then
-  // fewer small files)
-  if (!settled) for (const x of seen) if (better(x, best)) best = { plan: x.plan, strategy: x.s, n: x.n, o: x.o };
+  // an earlier pass may have done better than the last one (fewer rows over budget, then fewer small files): also when
+  // the planner settled, since it can settle on a plan with a row over budget after a pass with none (the site's menu,
+  // cold: pass 4 none over budget, pass 5 settled with one)
+  for (const x of seen) if (better(x, best)) best = { plan: x.plan, strategy: x.s, n: x.n, o: x.o };
   const warm = settled && builds === 1 && start && small <= (start.small ?? 0);
   if (small > 0 && !stopped && !warm) {
     const plans = settled ? [{ plan, n: small }] : [...seen].sort((a, b) => (better(a, b) ? -1 : better(b, a) ? 1 : 0)).slice(0, 2);
