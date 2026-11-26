@@ -25,6 +25,16 @@ test("CDN build: modules, march.css, import map, file list, no latest/ copy", ()
   assert.match(css, /--m-accent:/, "the tokens are in");
   assert.match(css, /\.m-btn\{/, "the components' styles are in");
   assert.match(css, /\.m-color-danger\{/, "the sx utilities are in");
+  // css.json: every source stylesheet a sheet of its own, in one order; an entry's sheets, what it is made of first
+  // (StatsBand after Reveal, Counter and StatTile: its `.m-stats { display: grid }` wins over `.m-reveal-box`)
+  const sheets = JSON.parse(readFileSync(at(`${version}/css.json`), "utf8"));
+  const sb = sheets.entries["march/components/landing/stats-band"].map((i) => sheets.sheets[i]);
+  const rank = (p) => sb.indexOf(`s/components/${p}`);
+  for (const dep of ["landing/reveal/reveal.css", "landing/counter/counter.css", "data/stat-tile/stat-tile.css"]) assert.ok(rank(dep) >= 0 && rank(dep) < rank("landing/stats-band/stats-band.css"), dep);
+  assert.ok(sheets.sheets.every((s) => existsSync(at(`${version}/${s}`))), "every sheet is published");
+  for (const [spec, list] of Object.entries(sheets.entries)) assert.deepEqual(list, [...list].sort((a, b) => a - b), `${spec}: its sheets in order`);
+  const sbCss = readFileSync(at(`${version}/components/landing/stats-band.css`), "utf8");
+  assert.ok(sbCss.indexOf(".m-reveal-box{") >= 0 && sbCss.indexOf(".m-reveal-box{") < sbCss.indexOf(".m-stats{display:grid"), "stats-band.css: Reveal's rules before its own");
   const map = JSON.parse(readFileSync(at(`${version}/importmap.json`), "utf8")).imports;
   assert.equal(map["march"], `https://cdn.example/${version}/march.js`);
   assert.equal(map["march/ui"], `https://cdn.example/${version}/ui.js`);

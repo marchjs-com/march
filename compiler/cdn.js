@@ -15,7 +15,7 @@ import { exportMap, statementStarts } from "./deep-imports.js";
  * The version folder's importmap.json and sizes.json, kept in `cacheDir` (a version's files never change).
  * @param {string} base  e.g. "https://cdn.marchjs.com/0.3.10"
  * @param {string} [cacheDir]
- * @returns {Promise<{ base: string, url: Record<string, string>, size: Record<string, number>, css: Record<string, string>, core: string[], exports: Record<string, string[]> | null, best: Record<string, Record<string, string>> | null }>}
+ * @returns {Promise<{ base: string, url: Record<string, string>, size: Record<string, number>, css: Record<string, string>, sheets: Record<string, [number, string][]>, core: string[], exports: Record<string, string[]> | null, best: Record<string, Record<string, string>> | null }>}
  */
 export async function loadCdn(base, cacheDir) {
   base = base.replace(/\/+$/, "");
@@ -29,18 +29,22 @@ export async function loadCdn(base, cacheDir) {
     return JSON.parse(text);
   };
   // names.json (published since 0.3.13): the names and the smallest entry per name, from the CDN instead of March's sources
-  const [map, sizes, names] = await Promise.all([get("importmap.json"), get("sizes.json"), get("names.json").catch(() => null)]);
-  const url = {}, size = {}, css = {};
+  // css.json (published since 0.3.20): every source stylesheet as a sheet of its own, in the package's order, and per
+  // entry the sheets it needs (tools/cdn-css.mjs); before it, one stylesheet per entry (css)
+  const [map, sizes, names, sheetList] = await Promise.all([get("importmap.json"), get("sizes.json"), get("names.json").catch(() => null), get("css.json").catch(() => null)]);
+  const url = {}, size = {}, css = {}, sheets = {};
   for (const [spec, u] of Object.entries(map.imports ?? {})) {
     // the map's URLs point at the folder it was published for (latest/ or the version): use the one asked for
     url[spec] = `${base}/${u.replace(/^.*?\/(latest|\d+\.\d+\.\d+[\w.-]*)\//, "")}`;
     const e = sizes.entries?.[spec];
     size[spec] = spec === "march" ? 0 : e?.added ?? Infinity;
     if (e?.css) css[spec] = url[spec].replace(/\.js$/, ".css");
+    const own = sheetList?.entries?.[spec];
+    if (own?.length) sheets[spec] = own.map((i) => [i, `${base}/${sheetList.sheets[i]}`]);
   }
   // the core's files (every page loads them): index.html announces them up front
   const core = (sizes.core?.files ?? []).map((f) => `${base}/${f}`);
-  return { base, url, size, css, core, exports: names?.exports ?? null, best: names?.best ?? null };
+  return { base, url, size, css, sheets, core, exports: names?.exports ?? null, best: names?.best ?? null };
 }
 
 /**
@@ -113,14 +117,18 @@ export function entryNames(file) {
  * @param {string | null} local @param {string[]} names  what the entry exports
  */
 export function cdnModule(spec, cdn, local, names = []) {
-  const css = cdn.css[spec];
   const from = JSON.stringify(local ?? cdn.url[spec]);
   const re = local || !names.length ? `export * from ${from};` : `export { ${names.join(", ")} } from ${from};`;
-  if (!css) return re;
+  if (!hasCss(spec, cdn)) return re;
   return `${re}
 import { cdnCss } from "march-cdn:css";
-${local ? "" : "await "}cdnCss(${JSON.stringify(css)});`;
+${local ? "" : "await "}cdnCss(${cssOf(spec, cdn)});`;
 }
+
+/** Whether an entry has stylesheets on the CDN. @param {string} spec @param {{ css: Record<string, string>, sheets?: Record<string, [number, string][]> }} cdn */
+export const hasCss = (spec, cdn) => !!(cdn.sheets?.[spec] ?? cdn.css[spec]);
+/** What cdnCss links for an entry: its sheets in the package's order (`[[rank, href], …]`, css.json), else its one stylesheet. */
+export const cssOf = (spec, cdn) => JSON.stringify(cdn.sheets?.[spec] ?? cdn.css[spec]);
 
 /**
  * A lazy import of an entry (`import("march/x")`): the CDN file itself, with its stylesheet loaded alongside (no module
@@ -139,19 +147,24 @@ export function cdnDynamic(code, cdn, local) {
     const file = local ? local[spec] : cdn.url[spec];
     if (!file) return all;
     const imp = `import(${JSON.stringify(file.split("\\").join("/"))})`;
-    if (!cdn.css[spec]) return imp;
+    if (!hasCss(spec, cdn)) return imp;
     used = true;
-    return `__mCdnLazy(${imp}, ${JSON.stringify(cdn.css[spec])})`;
+    return `__mCdnLazy(${imp}, ${cssOf(spec, cdn)})`;
   });
   return used ? `import { cdnLazy as __mCdnLazy } from "march-cdn:css";\n${out}` : out;
 }
 
-/** A stylesheet of the package (`import "march/css/tokens.css"`): linked from the CDN. */
+/** A stylesheet of the package (`import "march/css/tokens.css"`), or an entry's sheets (`[[rank, href], …]`): linked from the CDN. */
 export const cdnStylesheet = (href, local) => `import { cdnCss } from "march-cdn:css";\n${local ? "" : "await "}cdnCss(${JSON.stringify(href)});`;
 
-/** The link helper the entry modules share (one <link> per URL; a prerendered page already has it in <head>). */
+/** The link helper the entry modules share (one <link> per URL; a prerendered page already has it in <head>). An entry's
+ *  sheets carry their rank in the package's order (css.json): each is linked before the first CDN sheet ranked after it,
+ *  so what a component is made of always comes before its own rules, whatever order the modules load in. A stylesheet
+ *  without a rank (march/css/…, an older CDN's one stylesheet per entry) goes after the other CDN stylesheets. Both go
+ *  before the app's own. */
 export const CDN_CSS = `const seen = new Map();
-export function cdnCss(href) {
+const rankOf = (x) => { const v = x.getAttribute("data-march-cdn"); return v ? Number(v) : Infinity; };
+function link(href, rank) {
   if (typeof document === "undefined") return;
   if (seen.has(href)) return seen.get(href);
   const head = document.head;
@@ -160,16 +173,23 @@ export function cdnCss(href) {
     l = document.createElement("link");
     l.setAttribute("rel", "stylesheet");
     l.setAttribute("href", href);
-    l.setAttribute("data-march-cdn", "");
+    l.setAttribute("data-march-cdn", rank == null ? "" : String(rank));
     // CORS (the CDN allows any origin): its rules readable from the page (theme-paint copies them)
     l.setAttribute("crossorigin", "anonymous");
-    // after the other CDN stylesheets, before the app's own
-    const first = [...head.children].find((x) => (x.tagName === "STYLE" || (x.tagName === "LINK" && x.getAttribute("rel") === "stylesheet")) && !x.hasAttribute("data-march-cdn"));
+    const kids = [...head.children];
+    const later = rank == null ? null : kids.find((x) => x.tagName === "LINK" && x.hasAttribute("data-march-cdn") && rankOf(x) > rank && rankOf(x) !== Infinity);
+    const first = later ?? kids.find((x) => (x.tagName === "STYLE" || (x.tagName === "LINK" && x.getAttribute("rel") === "stylesheet")) && !x.hasAttribute("data-march-cdn"));
     head.insertBefore(l, first ?? null);
   }
   const p = l.sheet ? Promise.resolve() : new Promise((r) => { l.addEventListener("load", r); l.addEventListener("error", r); setTimeout(r, 4000); });
   seen.set(href, p);
   return p;
 }
-export const cdnLazy = (mod, href) => Promise.all([mod, cdnCss(href)]).then(([m]) => m);
+/** Link a stylesheet (an address) or an entry's sheets ([[rank, address], …]); resolves when they are in. */
+export function cdnCss(css) {
+  if (typeof css === "string") return link(css);
+  if (typeof document === "undefined") return;
+  return Promise.all(css.map(([rank, href]) => link(href, rank))).then(() => undefined);
+}
+export const cdnLazy = (mod, css) => Promise.all([mod, cdnCss(css)]).then(([m]) => m);
 `;

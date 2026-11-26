@@ -2,7 +2,8 @@
 // The CDN build (cdn.marchjs.com): every browser entry of the package as a minified ES module, sharing its chunks, in
 // cdn/dist/<version>/ — march.js (the "." entry), ui.js, app-ui.js, behaviors/drag.js, icons/lucide.js… — with
 //   march.css        every stylesheet of every entry, in one file (a page links this one)
-//   <entry>.css      the stylesheets of one entry (when it has any)
+//   <entry>.css      the stylesheets of one entry (when it has any), what it is made of first
+//   s/<path>.css     each source stylesheet on its own; css.json: their order and each entry's (a CDN app links these)
 //   css/…            the stylesheets the package exports as files (tokens.css, themes/…)
 //   importmap.json   { imports: { "march": ".../march.js", "march/ui": ".../ui.js", … } } with absolute URLs
 //   sizes.json       per entry: gzip bytes a page downloads, on top of the core, and its closure (tools/cdn-size.mjs)
@@ -13,8 +14,8 @@
 //   files.json       every file of the version (a deploy uses it to keep the older versions)
 //   data/…           the version's data: API reference, MarchIDE types, components (tools/cdn-data.mjs)
 // (latest/ is served by the Worker as a redirect to it). Usage: node tools/build-cdn.js [--base https://cdn.marchjs.com]
-import { readFileSync, writeFileSync, rmSync, cpSync, readdirSync, statSync, existsSync, renameSync } from "node:fs";
-import { join, relative } from "node:path";
+import { readFileSync, writeFileSync, rmSync, cpSync, readdirSync, statSync, existsSync, mkdirSync } from "node:fs";
+import { join, relative, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 import { writeData } from "./cdn-data.mjs";
@@ -23,6 +24,7 @@ import { exportMap } from "../compiler/deep-imports.js";
 import { march } from "../compiler/esbuild.js";
 import { cdnTargets, entryNames } from "../compiler/cdn.js";
 import { swRuntime } from "../cli/perf.js";
+import { cssOrder, entrySheets, ownRules } from "./cdn-css.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
@@ -79,16 +81,17 @@ const loader = { ".woff2": "file", ".woff": "file", ".png": "file", ".svg": "fil
 const banner = { js: `/*! MarchJS v${version} | MIT | marchjs.com */`, css: `/*! MarchJS v${version} | MIT | marchjs.com */` };
 const t0 = performance.now();
 const url = (name) => `${BASE}/${version}/${name}`;
+let meta = null;
 /** The modules of `list` in the version folder, with its import map; returns their sizes (tools/cdn-size.mjs). */
 async function compile(list) {
   rmSync(out, { recursive: true, force: true });
-  await esbuild.build({
+  ({ metafile: meta } = await esbuild.build({ absWorkingDir: root, metafile: true,
     entryPoints: list.map((e) => ({ in: e.in, out: e.out })), outdir: out, bundle: true, splitting: true, format: "esm",
     target: "es2022", minify: true, legalComments: "none", banner, loader, chunkNames: "_/[name]-[hash]", assetNames: "_/[name]-[hash]",
     define: { "process.env.NODE_ENV": '"production"' }, logLevel: "warning",
     // March's own .tsx sources (app-ui's AI panels) compiled by March's compiler, not as React JSX
     plugins: [march({ filter: /\.tsx$/, cssSplit: false, deepImports: false, prune: false })],
-  });
+  }));
   writeFileSync(join(out, "importmap.json"), `${JSON.stringify({ imports: Object.fromEntries(list.map((e) => [e.spec, url(`${e.out}.js`)])) }, null, 2)}\n`);
   return measure(out);
 }
@@ -112,17 +115,43 @@ const keep = paying(first);
 if (keep.length < mods.length) await compile([...entries, ...keep]);
 console.log(`module entries: ${keep.length} of ${mods.length} pay (march/mod/…)`);
 entries.push(...keep);
-// march.css: every entry's stylesheets in one file (a JS entry that imports them all; only its CSS is kept)
-const all = join(dist, ".all.js");
-// the design tokens first and the sx utilities (an app imports march/css/tokens.css and sx.css itself; a CDN page
-// links march.css alone)
-const own = ["tokens.css", "sx.css"].map((f) => `import ${JSON.stringify(join(root, "src/css", f).replace(/\\/g, "/"))};\n`).join("");
-writeFileSync(all, own + entries.filter((e) => !e.out.startsWith("icons/")).map((e, i) => `export * as e${i} from ${JSON.stringify(e.in.replace(/\\/g, "/"))};`).join("\n"));
-await esbuild.build({ entryPoints: { march: all }, outdir: join(dist, ".css"), bundle: true, minify: true, legalComments: "none", banner, loader, assetNames: "_/[name]-[hash]", logLevel: "warning", write: true });
-renameSync(join(dist, ".css", "march.css"), join(out, "march.css"));
-if (existsSync(join(dist, ".css", "_"))) cpSync(join(dist, ".css", "_"), join(out, "_"), { recursive: true });
-rmSync(join(dist, ".css"), { recursive: true, force: true });
-rmSync(all, { force: true });
+// the stylesheets (tools/cdn-css.mjs): every source stylesheet as a sheet of its own (s/<path>.css) in one order for the
+// whole package, what a module is made of first. css.json lists the sheets in that order and, per entry, the ones its
+// closure needs: a page links each sheet once, in that order (compiler/cdn.js), whatever order its modules load in.
+// <entry>.css (one file per entry, for pages that link it by hand and for older compilers) and march.css (everything)
+// are those sheets put together in the same order.
+{
+  const rel = (p) => relative(root, p).split("\\").join("/");
+  const order = cssOrder(meta, entries.map((e) => rel(e.in)));
+  const closure = entrySheets(meta, rel(out));
+  const used = new Set([...closure.values()].flat());
+  const sheets = order.filter((k) => used.has(k));
+  const rank = new Map(sheets.map((k, i) => [k, i]));
+  const sheetOf = (k) => `s/${k.replace(/^src\//, "")}`;
+  const body = new Map();
+  for (const k of sheets) {
+    const { code } = await esbuild.transform(readFileSync(join(root, k), "utf8"), { loader: "css", minify: true, legalComments: "none" });
+    // a sheet is the source file as it is: an address relative to it would point elsewhere on the CDN
+    if (/url\(\s*["']?(?!data:|https?:|#)/.test(code)) throw new Error(`${k}: a relative url() in a component stylesheet (inline it as data: or put the file in src/css/)`);
+    body.set(k, ownRules(code));
+    mkdirSync(dirname(join(out, sheetOf(k))), { recursive: true });
+    writeFileSync(join(out, sheetOf(k)), `${banner.css}\n${body.get(k)}\n`);
+  }
+  const joined = (list) => [banner.css, ...list.map((k) => body.get(k)).filter(Boolean)].join("\n") + "\n";
+  const perEntry = {};
+  for (const e of entries) {
+    const list = (closure.get(e.out) ?? []).filter((k) => rank.has(k)).sort((a, b) => rank.get(a) - rank.get(b));
+    if (!list.length) continue;
+    perEntry[e.spec] = list.map((k) => rank.get(k));
+    writeFileSync(join(out, `${e.out}.css`), joined(list));
+  }
+  writeFileSync(join(out, "css.json"), `${JSON.stringify({ version, sheets: sheets.map(sheetOf), entries: perEntry })}\n`);
+  // march.css: the design tokens first and the sx utilities (an app imports march/css/tokens.css and sx.css itself; a
+  // CDN page links march.css alone), then every sheet
+  const own = [];
+  for (const f of ["tokens.css", "sx.css"]) own.push((await esbuild.transform(readFileSync(join(root, "src/css", f), "utf8"), { loader: "css", minify: true, legalComments: "none" })).code.trim());
+  writeFileSync(join(out, "march.css"), joined([]) + [...own, ...sheets.map((k) => body.get(k)).filter(Boolean)].join("\n") + "\n");
+}
 // sw.js: the service worker's code every March site runs (a site's own sw.js sets its settings and imports this one)
 writeFileSync(join(out, "sw.js"), `/*! MarchJS v${version} | MIT | marchjs.com */
 ${swRuntime()}`);
