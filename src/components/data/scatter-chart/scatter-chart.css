@@ -1,0 +1,19 @@
+/* ScatterChart: points (and bubbles) in the series color; while one is active the others step back and guides run
+   from it to both axes; a dashed least-squares trend per series. */
+.m-scatter-surface { fill: transparent; }
+.m-scatter-plot { cursor: crosshair; }
+.m-scatter-point {
+  fill: var(--m-c); fill-opacity: 0.78; stroke: var(--m-chart-bg); stroke-width: 1;
+  transition: opacity var(--m-chart-dur), fill-opacity var(--m-chart-dur);
+}
+.m-scatter-bubble { fill-opacity: 0.5; stroke: var(--m-c); stroke-width: 1.25; }
+.m-scatter-hovering .m-scatter-point:not(.m-chart-active) { opacity: 0.35; }
+.m-scatter-point.m-chart-active { fill-opacity: 1; }
+.m-scatter-leaving { pointer-events: none; }
+.m-scatter-focus { pointer-events: none; }
+.m-scatter-ring { fill: none; stroke: var(--m-c); stroke-width: 2; }
+.m-scatter-guide { stroke: var(--m-c); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.7; }
+.m-scatter-trend { pointer-events: none; }
+.m-scatter-trend line { stroke: var(--m-c); stroke-width: 2; stroke-dasharray: 7 5; stroke-linecap: round; }
+.m-chart .m-scatter-trend text { fill: var(--m-c); font-weight: 600; paint-order: stroke; stroke: var(--m-chart-bg); stroke-width: 3px; stroke-linejoin: round; }
+@media (prefers-reduced-motion: reduce) { .m-scatter-point { transition: none; } }

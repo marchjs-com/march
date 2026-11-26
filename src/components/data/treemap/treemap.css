@@ -1,0 +1,26 @@
+/* Treemap: tiles are soft mixes of their branch color with the chart background (readable text in light and dark),
+   groups a faint wash with a header, the zoomed-in root a fainter one behind everything. */
+.m-treemap-tile > rect {
+  fill: color-mix(in oklab, var(--m-c) var(--m-treemap-mix, 78%), var(--m-chart-bg));
+  stroke: none; transition: opacity var(--m-chart-dur), filter var(--m-chart-dur);
+}
+.m-treemap-shade-1 { --m-treemap-mix: 64%; }
+.m-treemap-shade-2 { --m-treemap-mix: 90%; }
+.m-treemap-group > rect { fill: color-mix(in oklab, var(--m-c) 16%, var(--m-chart-bg)); }
+.m-treemap-root > rect { fill: color-mix(in oklab, var(--m-c) 7%, var(--m-chart-bg)); cursor: zoom-out; }
+.m-treemap-scaled > rect { fill: var(--m-c); }
+.m-treemap-drillable { cursor: zoom-in; }
+.m-treemap-leaf:hover > rect { filter: brightness(1.08) saturate(1.1); }
+.m-treemap-group:hover > rect { filter: brightness(0.97); }
+.m-treemap-plot:hover .m-treemap-leaf:not(:hover):not(.m-chart-active) > rect { opacity: 0.88; }
+.m-treemap-tile.m-chart-active > rect { stroke: var(--m-chart-focus); stroke-width: 2; }
+.m-treemap-leaving { pointer-events: none; }
+.m-chart .m-treemap-label, .m-chart .m-treemap-header { fill: var(--m-chart-text); font-weight: 600; pointer-events: none; }
+.m-chart .m-treemap-value { fill: var(--m-chart-text); opacity: 0.72; font-variant-numeric: tabular-nums; pointer-events: none; }
+.m-chart .m-treemap-scaled .m-treemap-label, .m-chart .m-treemap-scaled .m-treemap-value {
+  paint-order: stroke; stroke: color-mix(in oklab, var(--m-chart-bg) 70%, transparent); stroke-width: 3px; stroke-linejoin: round;
+}
+.m-treemap-crumbs { order: -1; min-width: 0; }
+.m-treemap-scale { display: flex; align-items: center; gap: 8px; font-size: var(--m-chart-font-size); color: var(--m-chart-muted); font-variant-numeric: tabular-nums; }
+.m-treemap-scale-bar { flex: 0 1 160px; height: 8px; border-radius: 4px; }
+@media (prefers-reduced-motion: reduce) { .m-treemap-tile > rect { transition: none; } }

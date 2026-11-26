@@ -24,9 +24,19 @@ or your own list, as a gradient, equal segments or flowing around the ring.
 | `paint` | How several colors are laid out: "gradient" (default), "segments" or "cycle" (they flow). |
 | `format` | Format of the number in the middle. Default: rounded. |
 | `label` | Accessible name. Default "Score". |
+| `animate` | Change animation: `true` (default, a spring), `false`, an easing name or `{ duration, easing, delay, enter, update }`. |
 
 ## Accessibility
 
 - The ring is an image (`role="img"`) named "<label>: <value> of <max>"; the number in the middle is hidden from screen
   readers so it is not read twice.
 - The level is told by the number, not only by the color. A flowing ring stops with reduced motion.
+
+## Motion
+
+- The ring sweeps from 0 to its value when first drawn and from where it is to each new value; the number in the
+  middle counts along (rounded to the target's decimals, through `format`). Both play on the motion engine, so
+  `animate` sets the easing and length, `false` jumps, and reduced motion, global speed and pause apply.
+- The accessible name always says the target value, never a number mid-way.
+- The several-color ring sweeps the same way (its mask angle follows the tween); a flowing ring (`paint="cycle"`) keeps
+  turning until reduced motion stops it.

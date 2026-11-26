@@ -75,7 +75,7 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | NumberInput | stable | Locale-aware number (never NaN) with IntInput, MoneyInput (currency side and decimals) and PercentInput. | — |
 | OptionList | experimental | A list of choices inside a panel: radio group, listbox (one or many) or command menu; rows with lead, label, hint, trailing part and tick; arrow keys, or driven by a field (aria-activedescendant). | [ListRow](#listrow), [SectionLabel](#sectionlabel) |
 | PasswordInput | stable | Password field with a show / hide button (aria-pressed). | [Button](#button), [IconButton](#iconbutton) |
-| PhoneInput | stable | Phone number kept as "+" and digits; the country code is a prefix. | — |
+| PhoneInput | stable | Phone number kept as "+" and digits; the country code is a prefix. | [TextInput](#textinput) |
 | RadioGroup | stable | Radio buttons for one value; classic, soft, chip, card or segmented look. | — |
 | Rating | stable | Star rating as a radio group: arrow keys (RTL mirrored), hover preview, half stars when read-only, any colour token. | — |
 | RowTools | experimental | The tools of a row in an editable list: move up, move down, remove (IconButtons); off at the ends, any subset, own names and icons. | [IconButton](#iconbutton) |
@@ -100,14 +100,21 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | BarChart | experimental | Bar chart: grouped or stacked series, vertical or horizontal, bars that glide to new values, keyboard bars, tooltip, legend and a data table for screen readers. | — |
 | BarList | experimental | Ranked horizontal bars with labels for top-N lists (pages, countries, products): sorted, limited, formatted; rows become buttons with onSelect. | [OverflowText](#overflowtext) |
 | BatteryGauge | experimental | A battery: a case with a cap, a fill or segments that spring to the level, low / critical colours, a bolt while charging, a rolling percentage inside or beside; horizontal or vertical. | [CountRoll](#countroll) |
+| BoxPlot | experimental | Box and violin plot: quartiles, whiskers (1.5 IQR or min / max), outliers and the mean per category, kernel density violins, jittered raw points, vertical or horizontal, keyboard categories and boxes that grow from the median, morph and collapse away. | — |
+| BulletChart | experimental | Bullet chart: a measure as a bar against its target tick, qualitative ranges and last period, in rows or columns, compact for tables; bars fill, targets slide, ranges resize. | — |
+| CandlestickChart | experimental | Price chart: candles, OHLC bars or a close line over time, volume pane, moving averages, price marks, a live window that slides, range navigator, drag to zoom, a shared crosshair, keyboard candles, OHLC tooltip and a data table for screen readers. | — |
 | Card | stable | Surface with an optional header (title, subtitle, actions), a body and a footer; action() objects in the header render as buttons. | [PanelHeader](#panelheader) |
+| ChordChart | experimental | Chord diagram: groups as arcs on a ring, ribbons through the middle for the flows between them (directed with arrows or undirected), hover a group to keep only its ribbons; arcs and ribbons open from zero, turn to new angles and collapse when they go; keyboard, tooltip and a data table. | — |
+| ChoroplethMap | experimental | Choropleth map: Turkey's 81 provinces (lazy, Natural Earth) or your own shapes / GeoJSON coloured by value, continuous or in classes, with a colour legend, focus and zoom, keyboard regions, tooltip and a data table for screen readers. | — |
 | Compass | experimental | A compass: the rose turns under a lubber line (or a two-tone needle turns on a fixed rose), cardinal letters in the page's language, 4 or 8 points, a bearing marker and a rolling "045° NE" readout; damped spring motion. Built on Gauge. | [Gauge](#gauge), [CountRoll](#countroll) |
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | [SearchBox](#searchbox), [Button](#button), [Chip](#chip), [Menu](#menu), [Checkbox](#checkbox), [Chevron](#chevron), [Badge](#badge), [ResizeHandle](#resizehandle), [Empty](#empty), [LiveStatus](#livestatus), FilterControl, CellEditor |
 | DotMatrix | experimental | An LED dot-matrix display: text and numbers in a 5×7 font (Turkish letters, your own glyphs), lit and unlit dots, a window that scrolls long text, a wipe or dissolve on change, round or square dots in any theme colour. | — |
 | FlipClock | experimental | A flip clock: hours, minutes and seconds on split number cards (Odometer flip), blinking separators, a 12-hour AM / PM flap (SplitFlap), a time zone or your own time source. | [Odometer](#odometer), [SplitFlap](#splitflap) |
+| FunnelChart | experimental | Funnel chart: stages of a flow as smooth trapezoids, centered bars or a pyramid, with values, share of the first stage, step conversion and drop-off; stages pour in, morph and collapse. | — |
 | Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | [ListRow](#listrow), [ResizeHandle](#resizehandle), [Badge](#badge), [LiveStatus](#livestatus) |
 | Gauge | experimental | A dial with a needle: arc track, coloured zones, redline, ticks with labels, spring needle, peak mark and a rolling readout; speedometer, tachometer, half and VU looks, a number or an audio source; several needles, full circles that wrap, a turning scale and an inlay make it the dial of the clock, compass and aircraft instruments. | [CountRoll](#countroll), [Odometer](#odometer) |
-| Heatmap | experimental | Heatmap: a grid of intensities (day × hour) or a calendar of weeks, in tones of the theme accent; keyboard cells, tooltip and a data table for screen readers. | — |
+| Heatmap | experimental | Heatmap: a grid of intensities (day × hour) or a calendar heatmap (a year of weeks with month and weekday labels, a less → more legend), in tones of the theme accent; animated, keyboard cells, tooltip and a data table for screen readers. | — |
+| Histogram | experimental | Histogram: raw values binned on nice thresholds or a bin width, counts, densities or running totals, groups overlaid, a normal or kernel density curve, mean / median marks, keyboard bins and bars that grow, morph on a re-bin and shrink away. | — |
 | IconTile | stable | An icon in a tinted rounded square: a tone or any theme colour token; soft, outline or solid; square or round. | — |
 | JsonView | stable | Collapsible read-only JSON tree: typed colours, item / key counts when closed, circular references marked. | [Chevron](#chevron) |
 | Kanban | stable | Board of columns with toned headers, counts and cards you move by drag and drop or Alt+← / Alt+→. | [PanelHeader](#panelheader), [StatusDot](#statusdot), [Badge](#badge) |
@@ -115,21 +122,30 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | LevelMeter | experimental | A studio LED segment meter: a value or a live sound (march/audio), mono or stereo, green / amber / red zones, a peak light that holds then falls, a latched clip light, a dB scale. | [IconButton](#iconbutton), [StatusDot](#statusdot) |
 | LineChart | experimental | Line and area charts (AreaChart in the same folder): time, number or category x axis, several series, drag to zoom, keyboard points, tooltip, legend and a data table for screen readers. | — |
 | ListRow | experimental | The row lists are made of: lead (icon, avatar, dot, thumbnail) + title + sub text + trail and actions; a link, a button or a plain element that takes any role, ARIA and tabindex; active, selected, disabled; long text scrolls, is cut or wraps. | [OverflowText](#overflowtext) |
+| NetworkGraph | experimental | Network graph: nodes and links in a force layout simulated on the motion clock (or a circle / grid), node size by value, color by group with legend toggles, drag to move and pin, zoom and pan, neighbour highlight, keyboard by direction, tooltip and a data table for screen readers. | — |
 | Odometer | experimental | A counter on number drums (a mileage counter, a meter, a flip clock): fixed digits with leading zeros, red fraction drums, a unit; mechanical, digital or flip look. Rolls through CountRoll. | [CountRoll](#countroll) |
 | PieChart | experimental | Pie or donut chart: shares of a whole, the total in the donut hole, slices that turn to new angles, keyboard slices, tooltip, legend and a data table for screen readers. | — |
 | ProgressRing | experimental | A score ring 0–100 (or 0–max) with the number in the middle: low / mid / high levels from thresholds, one theme color or several (gradient, segments, flowing). | — |
+| RadarChart | experimental | Radar (spider) chart: one spoke per row, series as filled polygons with dots, polygon or circle grid, shared or per-axis scale, smooth shapes; shapes grow from the center and morph, keyboard spokes, tooltip, legend toggles and a data table for screen readers. | — |
+| RadialBarChart | experimental | Radial bar chart: concentric rings of round-capped bars on tracks, full circle or gauge arc, a max per chart or per row, the active ring's value in the middle; rings sweep in, morph and unwind, keyboard rings, tooltip and a data table for screen readers. | — |
+| SankeyChart | experimental | Sankey diagram: flows between nodes in columns, ribbons as wide as their value (gradient or source colored), hover lights a whole flow; ribbons draw in from their source and morph on change; keyboard nodes and links, tooltip and a data table. | — |
+| ScatterChart | experimental | Scatter and bubble chart: numeric or time axes, area-scaled bubbles, series with shapes and legend toggles, least-squares trend lines with r², reference marks, nearest-point hover, keyboard points and points that grow in, glide and shrink out. | — |
 | Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | [PanelHeader](#panelheader), [PeriodNav](#periodnav), [Button](#button), [Segmented](#segmented), [ResizeHandle](#resizehandle), [LiveStatus](#livestatus) |
-| Sparkline | experimental | A tiny trend line without axes, for table cells, list rows and KPI boxes: optional area and last-point dot; screen readers hear a summary of the values. | — |
+| Sparkline | experimental | A tiny trend line, column chart or win / loss strip without axes, for table cells, list rows and KPI boxes: optional area and last-point dot, animated changes; screen readers hear a summary of the values. | — |
 | SplitFlap | experimental | A split-flap departure board: each cell turns its reel of letters, digits and signs forward flap by flap to the new text, with a stagger; Turkish capitals, your own reel, any theme colour; the text is read once. | — |
 | Stat | experimental | KPI box: label, formatted value, the change against the previous period with an arrow (green or red, inverted for costs) and an optional sparkline. | [StatTile](#stattile), [Sparkline](#sparkline) |
 | StatTile | experimental | A value with its label and an optional hint: plain, soft tile or card; a button with onClick, a link with href, dt / dd inside a dl; the value may be a node (a rolling Counter). | — |
 | Stopwatch | experimental | A chronograph: a sweeping seconds hand, a 30-minute sub-dial, a digital readout, Start / Stop, Lap and Reset, a lap list with the best and worst lap; spring fly-back on reset. Built on Gauge and Button. | [Gauge](#gauge), [Button](#button) |
+| StreamGraph | experimental | Stream graph: categories over time as flowing layers around a moving centre line (wiggle, silhouette or 100 %), smooth curves, layers that swell and sink when data changes, keyboard points, tooltip, legend and a data table. | — |
+| SunburstChart | experimental | Sunburst chart: a hierarchy as rings colored by top branch, drill-in zoom (click / Enter in, center / Escape out) with a breadcrumb path, labels on wide arcs; arcs open, tween on zoom and data changes and collapse when they leave; keyboard rings, tooltip, legend and a data table. | [Breadcrumbs](#breadcrumbs) |
 | Thermometer | experimental | A glass thermometer: a liquid column that springs to the value, a scale in °C or °F (or both), coloured zones that also colour the liquid, a rolling readout. | [CountRoll](#countroll) |
 | TimeRuler | experimental | The ruler above a timeline: ticks, time labels and a playhead; read-only, or draggable with a slider playhead (onSeek). Own tick distances, labels, head and colour. | — |
 | Timeline | stable | Ordered list of events with toned dots, optional icons, formatted times (Date / epoch / ISO) or plain text, titles and bodies. | [StatusDot](#statusdot) |
 | Tree | stable | Expandable tree (role=tree) with icons, trailing meta, selection and the full keyboard model; long labels scroll with OverflowText. | [ListRow](#listrow), [Chevron](#chevron), [OverflowText](#overflowtext) |
 | TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | [ListRow](#listrow), [Chevron](#chevron), [Spinner](#spinner), [Button](#button), [Badge](#badge), [Empty](#empty) |
+| Treemap | experimental | Treemap: a hierarchy as squarified rectangles; groups with headers, drill-in with a breadcrumb row, color by branch or by a value through a color scale, tiles that grow, glide and shrink on change, keyboard tiles, tooltip and a data table. | [Breadcrumbs](#breadcrumbs) |
 | VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
+| WaterfallChart | experimental | Waterfall chart: a start value, positive and negative steps, subtotals and a total with connectors and +/− labels; bars build one after another, morph on change and shrink away. | — |
 
 ### Feedback — `march/feedback`
 
@@ -463,7 +479,7 @@ Full page: src/components/data/badge/docs.md
 
 ## BarChart
 
-Bars from rows of objects: one series, several side by side (grouped) or on top of each other (`stacked`), standing up or lying down (`horizontal`). Data may be a signal or a function; with `animate` the bars glide to new values while the axes take the new scale at once.
+Bars from rows of objects: one series, several side by side (grouped) or on top of each other (`stacked`), standing up or lying down (`horizontal`). Data may be a signal or a function; the bars glide to new values (`animate`) while the axes take the new scale at once.
 
 ```tsx
 <BarChart data={$week} x="day" y={["shop", "online"]} series={{ shop: "Shop", online: "Online" }}
@@ -544,6 +560,17 @@ off()                                                                           
 
 Full page: src/components/layout/bottom-right-controls/docs.md
 
+## BoxPlot
+
+The spread of values per category. Give the raw values (one row per value, or one row per category with a list); the chart works out the quartiles, the whiskers (1.5 × IQR, another multiple, or min / max), the outliers and the mean. `mode="violin"` draws a kernel density silhouette instead, `"both"` keeps a slim box inside it, and `showPoints` scatters every raw value beside the box with a deterministic jitter.
+
+```tsx
+<BoxPlot data={$waits} x="day" y="minutes" mode="both" showPoints format={(v) => `${v} dk`} title="Bekleme süreleri" />
+<BoxPlot data={teams} horizontal whisker="minmax" marks={[{ y: 40, label: "Hedef" }]} />
+```
+
+Full page: src/components/data/box-plot/docs.md
+
 ## BranchingStory
 
 A choose-your-own-path story. Every passage ends in choices; the reader's path collects as a trail at the top (any step rewinds the story to it) and the endings found so far are counted. A pick lights the chosen button, fades the others and turns the page: the new passage swings in from the reading direction, from the other side when going back, and mirrored in right-to-left text. Keys 1–9 pick a choice.
@@ -581,6 +608,18 @@ Composed of: [Button](#button), [Menu](#menu), [OverflowText](#overflowtext)
 ```
 
 Full page: src/components/navigation/breadcrumbs/docs.md
+
+## BulletChart
+
+A measure against its goal in little room: the bar is the measure, the tick is the target, the shaded bands behind are the qualitative ranges (poor / satisfactory / good) and a thin dashed marker shows a comparison such as last period. One row per measure with its name and subtitle; columns with `orientation="vertical"`; `compact` thin rows for tables.
+
+```tsx
+<BulletChart data={$kpis} title="Quarter KPIs" />
+<BulletChart data={{ label: "Revenue", value: 270, target: 250, ranges: [150, 225, 300] }} compact />
+<BulletChart data={teams} label="team" value="sold" target="quota" ranges={[50, 80, 100]} rangeTone="traffic" orientation="vertical" />
+```
+
+Full page: src/components/data/bullet-chart/docs.md
 
 ## Button
 
@@ -627,6 +666,18 @@ Composed of: [PeriodNav](#periodnav)
 ```
 
 Full page: src/components/forms/calendar/docs.md
+
+## CandlestickChart
+
+Prices over time: each row is one period with its open, high, low and close. Rising candles take the theme's good color, falling ones the bad color. Add `volume` for a volume pane, `ma` for moving averages, `marks` for price lines and bands, `window` to follow the latest candles of live data, and `navigator` for an overview strip to pick a range. Display only: no order entry.
+
+```tsx
+<CandlestickChart data={$btc} x="date" volume="vol" ma={[20, 50]} format={["money", "USD"]} title="BTC / USD" />
+<CandlestickChart data={$ticks} window={60} type="ohlc" marks={[{ y: 64000, label: "Hedef", color: "brand-blue" }]} sync="market" />
+<CandlestickChart data={history} type="line" navigator up="brand-green" down="brand-orange" />
+```
+
+Full page: src/components/data/candlestick-chart/docs.md
 
 ## Card
 
@@ -770,6 +821,31 @@ Composed of: [Segmented](#segmented), [RadioGroup](#radiogroup), [Combobox](#com
 ```
 
 Full page: src/components/forms/choice-picker/docs.md
+
+## ChordChart
+
+Who gives what to whom, drawn round: each group is an arc on the rim as long as its total, and ribbons through the middle join the groups that exchange something, as wide at each end as what goes that way. Give a square `matrix` (with `names`) or flow rows (`{ source, target, value }`). `directed` keeps every direction apart and ends the ribbons in an arrow at the target.
+
+```tsx
+<ChordChart matrix={$migration} names={["İzmir", "Ankara", "İstanbul"]} title="Moves between cities" />
+<ChordChart data={transfers} directed format={["money", "EUR"]} ribbonColor="target" ticks />
+<ChordChart matrix={deps} names={modules} padAngle={0.08} thickness={8} labels={false} legend="right" />
+```
+
+Full page: src/components/data/chord-chart/docs.md
+
+## ChoroplethMap
+
+Regions coloured by a value: population by province, rainfall, sales by region. The built-in map is Turkey's 81 provinces; rows find their province by plate code (`34`, `"34"`), ISO id (`"TR-34"`) or name (`"İstanbul"`, `"istanbul"`, `"ISTANBUL"`: case, diacritics and Turkish İ/ı do not matter). Bring your own regions with `shapes` (`[{ id, name, d, cx?, cy? }]` + `viewBox`, or a GeoJSON FeatureCollection, projected equirectangularly). The value becomes a colour on a continuous scale (sequential, diverging, your own colours) or in classes (`bins`); the legend under the map shows the gradient or the classes, and a class click highlights its regions.
+
+```tsx
+<ChoroplethMap data={$population} id="plate" value="people" format="compact" title="Nüfus" labels />
+<ChoroplethMap data={growth} colorScale="diverging" mid={0} format={["percent", 1]} legend="right" />
+<ChoroplethMap data={sales} bins={[100, 500, 1000]} colors={["#e0f2fe", "#38bdf8", "#0369a1", "#082f49"]} focus={["İzmir", "Manisa", "Aydın"]} />
+<ChoroplethMap shapes={myGeoJson} data={rows} id="name" onSelect={(p) => open(p.id)} />
+```
+
+Full page: src/components/data/choropleth-map/docs.md
 
 ## ClampText
 
@@ -1401,6 +1477,18 @@ Composed of: Toolbar, [IconButton](#iconbutton), Divider
 
 Full page: src/components/composite/format-toolbar/docs.md
 
+## FunnelChart
+
+The stages of a flow (visits → sign-ups → payments) and how many make it to the next one. Each stage is as wide as its value; inside it stand the value and its share of the first stage, between stages the step conversion and the drop-off. Three shapes: `"funnel"` (smooth trapezoids whose curved sides run into the next stage), `"bars"` (centered bars, with a faint ghost of the previous stage to show what was lost) and `"pyramid"` (a triangle, the first stage at its base). Vertical or horizontal; per-stage palette colors or one hue fading stage by stage.
+
+```tsx
+<FunnelChart data={$steps} x="stage" y="people" title="Checkout" />
+<FunnelChart data={signups} shape="bars" color="brand-blue" orientation="horizontal" conversionFormat={["percent", 0]} />
+<FunnelChart data={levels} shape="pyramid" showShare={false} label={(p) => `${p.label}: ${p.value}`} legend />
+```
+
+Full page: src/components/data/funnel-chart/docs.md
+
 ## Gantt
 
 A project timeline. Each task is a bar on a day / week / month scale with its progress filled in; dependency arrows link a predecessor's end to its successor's start (red and dashed while they overlap). Drag a bar to move it, drag its ends to resize it, drag the knob under it to set progress. With `cascade`, successors that would start before their predecessor ends are pushed later, keeping their length. A today line marks the current day; the task names stay pinned while the timeline scrolls.
@@ -1461,12 +1549,13 @@ Full page: src/components/layout/grid/docs.md
 
 ## Heatmap
 
-Intensities on a grid: `x` picks the column, `y` the row and `value` the number (duplicates are summed); cells take `levels` tones of the theme accent. With `calendar` the columns are weeks and the rows weekdays, the way a habit or a contribution graph reads. Data may be a signal or a function; with `animate` cells fade to their new tone.
+Intensities on a grid: `x` picks the column, `y` the row and `value` the number (duplicates are summed); cells take `levels` tones of the theme accent. With `calendar` the columns are weeks and the rows the days of the week, the way a habit or a contribution graph reads: month names over the weeks, Monday / Wednesday / Friday on the side (the week starts on the locale's first day, from Intl), a "less → more" legend under it, and gaps for the days outside the range. `from` and `to` give a whole year (53 weeks). Data may be a signal or a function; cells fade to their new tone.
 
 ```tsx
 <Heatmap data={visits} x="hour" y="day" value="people" yFormat={(d) => DAYS[d]} title="Café traffic" />
-<Heatmap data={pages} x="date" value="pages" calendar={{ weeks: 16 }} end="2026-11-20" levels={4} />
-<Heatmap data={errors} x="service" y="region" value="count" cell={20} max={50} onSelect={(c) => open(c)} />
+<Heatmap data={commits} x="date" value="count" calendar from="2026-01-01" to="2026-12-31" cellSize={11} radius={3} />
+<Heatmap data={pages} x="date" value="pages" calendar={{ weeks: 16 }} to="2026-11-20" levels={4} animate={{ stagger: 8 }} />
+<Heatmap data={errors} x="service" y="region" value="count" cellSize={20} max={50} onSelect={(c) => open(c)} />
 ```
 
 Full page: src/components/data/heatmap/docs.md
@@ -1489,6 +1578,18 @@ Composed of: [Reveal](#reveal), [Overlay](#overlay), [Badge](#badge), [VideoBack
 ```
 
 Full page: src/components/landing/hero/docs.md
+
+## Histogram
+
+How values spread: give the raw values, the chart bins them. Bins sit on nice thresholds (about `bins` of them) or a fixed `binWidth`; bars touch on a linear x axis. `cumulative` runs the totals up, `density` normalizes (the bars' area is 1), `curve` lays a fitted normal curve or a kernel density estimate over the bars, and `group` overlays several distributions in translucent colors on the same bins.
+
+```tsx
+<Histogram data={$times} bins={20} curve="kde" marks={[{ x: "median" }, { x: 30, label: "Hedef" }]}
+  xFormat={(v) => `${v} dk`} title="Teslimat süreleri" />
+<Histogram data={people} value="age" group="city" binWidth={5} density animate={{ stagger: 20 }} />
+```
+
+Full page: src/components/data/histogram/docs.md
 
 ## HonestCompare
 
@@ -1741,13 +1842,16 @@ Full page: src/components/social/like-button/docs.md
 
 ## LineChart
 
-Line and area charts from rows of objects. `x` picks the x value (dates give a time axis, numbers a linear one, anything else categories), `y` one series or a list of them. `AreaChart` (same folder) fills under the lines and can stack them. Data may be a signal or a function: the chart follows it and its container's width. Long series are downsampled (LTTB).
+Line, area and combo charts from rows of objects. `x` picks the x value (dates give a time axis, numbers a linear one, anything else categories), `y` one series or a list of them. `AreaChart` (same folder) fills under the lines and can stack them; `ComboChart` draws bars and lines on one x axis, often with a second value axis. A series can be a plain key or `{ key, value, label, type, axis, curve, dash, marker }`. Data may be a signal or a function: the chart follows it and its container's width. Long series are downsampled (LTTB).
 
 ```tsx
 <LineChart data={$days} x="day" y={["income", "spend"]} series={{ income: "Income", spend: "Spending" }}
-  format={["money", "USD"]} xFormat="date" zoom title="Income and spending" />
-<AreaChart data={$days} x="day" y={["web", "app"]} stacked height={200} />
-<LineChart data={temps} x="hour" y="c" zero={false} legend={false} onSelect={(p) => open(p.datum)} />
+  format={["money", "USD"]} curve="smooth" markers="auto" zoom title="Income and spending"
+  marks={[{ y: 5000, label: "Target", color: "success" }, { y: "average", series: "spend" }]} />
+<AreaChart data={$days} x="day" y={["web", "app"]} stacked offset="expand" height={200} />
+<ComboChart data={$months} x="month" y={[{ key: "orders", type: "bar" }, { key: "margin", type: "line", axis: "right", curve: "smooth" }]}
+  y2Format="percent" yTitle="Orders" y2Title="Margin" />
+<LineChart data={$ticks} x="t" y="price" window={{ ms: 60_000 }} navigator sync="market" />
 ```
 
 Full page: src/components/data/line-chart/docs.md
@@ -1990,6 +2094,18 @@ Composed of: [ListRow](#listrow), [SearchBox](#searchbox), [PanelHeader](#panelh
 ```
 
 Full page: src/components/composite/nav-sidebar/docs.md
+
+## NetworkGraph
+
+Who is connected to whom: nodes and the links between them, laid out by a force simulation (or on a circle or a grid). Node size follows `value` (or the number of links), color follows `group`; the legend toggles groups. Drag a node to move it (it stays pinned; double click releases it), drag the background to pan, wheel or pinch to zoom.
+
+```tsx
+<NetworkGraph nodes={$people} links={$follows} group="team" value="posts" directed title="Takip ağı" />
+<NetworkGraph links={edges} layout="circle" labels="hover" onSelect={(n) => open(n.id)} />
+<NetworkGraph nodes={$deps} links={$imports} charge={-260} linkDistance={80} nodeSize={[4, 22]} />
+```
+
+Full page: src/components/data/network-graph/docs.md
 
 ## NetworkThrottle
 
@@ -2245,10 +2361,13 @@ Full page: src/components/navigation/period-nav/docs.md
 
 ## PhoneInput
 
-A phone number stored as `+` and digits (`"+447700900123"`). With `country` the calling code is shown as a prefix and put in front of national numbers; `normalizePhone(text, country)` is the same rule as a function.
+A phone number typed in its country's format and stored as `+` and digits (`"+447700900123"`). It is a TextInput with march/mask's `phone()` mask: the caret stays where it belongs, a pasted "+44 …", "0044 …" or "0…" is read, and the country formats load on demand (one small chunk). With `country` (a calling code `"+44"` or an ISO code `"GB"`) the calling code is the prefix and the number is national; without it the number is international and the country is chosen by the calling code typed (`onMaskState` gets it as `name`). `normalizePhone(text, country)` is the plain rule as a function.
+
+Composed of: [TextInput](#textinput)
 
 ```tsx
-<Field label="Phone"><PhoneInput bind:value={$phone} country="+44" /></Field>
+<Field label="Phone"><PhoneInput bind:value={$phone} country="TR" /></Field>            // "(532) 111 22 33" → "+905321112233"
+<Field label="Phone"><PhoneInput bind:value={$intl} onMaskState={(s) => $cc = s.name} /></Field> // "+44 7700 900123"
 normalizePhone("0 (532) 111-22-33", "+90") // "+905321112233"
 ```
 
@@ -2433,6 +2552,30 @@ Composed of: [Button](#button)
 
 Full page: src/components/feedback/pull-to-refresh/docs.md
 
+## RadarChart
+
+Compare several things over the same set of qualities. Every row is a spoke (`x` names it), every series in `y` is a filled polygon with a dot on each value. The grid is a web of polygons or circles; all spokes share one scale (the largest value, or `max`) or each has its own (`scale="axis"`, `axisMax`). Shapes grow out of the center, morph to new values and shrink back into it when a series leaves.
+
+```tsx
+<RadarChart data={$skills} x="skill" y={["ada", "bora"]} series={["Ada", "Bora"]} max={10} title="Player skills" />
+<RadarChart data={laptops} x="spec" y="score" gridShape="circle" curve="smooth" fill={0.35} levels={5} />
+<RadarChart data={kpis} x="name" y={["thisYear", "lastYear"]} axisMax="target" fill={false} animate={{ stagger: 120 }} />
+```
+
+Full page: src/components/data/radar-chart/docs.md
+
+## RadialBarChart
+
+Progress of a few things side by side as concentric rings: every row is a ring (the first is the outermost), its bar sweeps from the start angle by its share of the max. By default the rings fill three quarters of a circle and their labels sit in the free quarter; `endAngle={360}` makes full circles, `startAngle={-135} endAngle={135}` a gauge-like arc. The middle shows the value of the ring under the pointer or keyboard (the first ring otherwise).
+
+```tsx
+<RadialBarChart data={$rings} x="label" y="value" rowMax="goal" title="Activity" />
+<RadialBarChart data={langs} max={100} endAngle={360} innerRadius={0.4} format="percent" legend="right" />
+<RadialBarChart data={stats} startAngle={-135} endAngle={135} rounded={false} center={(p) => p.label} />
+```
+
+Full page: src/components/data/radial-bar-chart/docs.md
+
 ## RadioGroup
 
 Radio buttons; the value is the chosen option value. Same looks as CheckboxGroup plus `segmented` (joined buttons). Radio boxes are always round.
@@ -2556,6 +2699,30 @@ Composed of: [IconButton](#iconbutton)
 ```
 
 Full page: src/components/forms/row-tools/docs.md
+
+## SankeyChart
+
+Flows between nodes: each link `{ source, target, value }` is a ribbon as wide as its value, nodes stand in columns (by their longest path from a source) and a few relaxation passes order them to cross as little as possible. Hover a node to light its whole flow upstream and downstream, or a ribbon to light that one link.
+
+```tsx
+<SankeyChart links={$flows} format={["money", "TRY"]} title="Where the money goes" />
+<SankeyChart links={funnel} nodes={steps} nodeLabel="name" align="left" linkColor="source" nodePadding={20} />
+<SankeyChart links={energy} linkColor="neutral" valueLabels={false} onSelect={(p) => p.kind === "node" && focus(p.key)} />
+```
+
+Full page: src/components/data/sankey-chart/docs.md
+
+## ScatterChart
+
+Points on two numeric (or time) axes. Give `size` and it becomes a bubble chart (the bubble's area follows the value), `group` colors the points by series with a symbol each and a legend that toggles them, `trend` fits a least-squares line per series and writes its r², and `marks` draws quadrant lines, targets and notes. The nearest point to the pointer answers (no voronoi), the keyboard walks the points from left to right.
+
+```tsx
+<ScatterChart data={$cities} x="income" y="happiness" size="population" group="region" label="city"
+  trend="linear" marks={[{ x: 50000 }, { y: 6.5, label: "Mutluluk ortası" }]} title="Gelir ve mutluluk" />
+<ScatterChart data={readings} x="time" y="temp" shape="diamond" radius={3} animate={{ stagger: 15 }} />
+```
+
+Full page: src/components/data/scatter-chart/docs.md
 
 ## Scheduler
 
@@ -2791,12 +2958,14 @@ Full page: src/components/layout/spacer/docs.md
 
 ## Sparkline
 
-A tiny trend line without axes: in a table cell, a list row or a KPI box (Stat uses it). `data` is a list of numbers, or objects read through `y`; it may be a signal or a function and the line follows it. Long series are downsampled (LTTB).
+A tiny trend line without axes: in a table cell, a list row or a KPI box (Stat uses it). `data` is a list of numbers, or objects read through `y`; it may be a signal or a function and the line follows it. Long series are downsampled (LTTB). `variant="bar"` draws tiny columns from the zero line; `variant="winloss"` draws an up block for every positive value, a down block for every negative one (good / bad colors) and a neutral tick for 0: a team's form, passed / failed builds.
 
 ```tsx
 <Sparkline data={$prices} area />
 <Sparkline data={rows} y="visits" width={160} height={40} color={2} dot={false} title="Visits" />
 <Sparkline data={latency} zero format={(v) => `${v} ms`} title="Latency" />
+<Sparkline data={sales} variant="bar" animate={{ stagger: 30 }} />
+<Sparkline data={[1, -1, 1, 1, 0, -1]} variant="winloss" title="Last games" />
 ```
 
 Full page: src/components/data/sparkline/docs.md
@@ -3025,6 +3194,32 @@ Composed of: [Dialog](#dialog), [Avatar](#avatar), [StoryProgress](#storyprogres
 ```
 
 Full page: src/components/composite/story-viewer/docs.md
+
+## StreamGraph
+
+Categories over time as flowing layers around a moving centre line: topics in the news, genres in a playlist, sources of traffic. Built on AreaChart's engine with a stream baseline, smooth curves and no value axis (the shape is the message; exact values are in the tooltip and the data table).
+
+```tsx
+<StreamGraph data={$weeks} x="week" y={["pop", "rock", "jazz", "rap"]} title="What we listened to" />
+<StreamGraph data={$days} x="day" y={["search", "social", "mail"]} offset="silhouette" edges legend="right" />
+<StreamGraph data={$share} x="month" y={["a", "b", "c"]} offset="expand" curve="step" animate={{ stagger: 80 }} />
+```
+
+Full page: src/components/data/stream-graph/docs.md
+
+## SunburstChart
+
+A hierarchy as rings: the top level around the middle, each level one ring further out, every arc as wide as its value. Branches take the series colors, their children lighter shades of them. Click a node (or Enter on it) to zoom in: its span opens to the full circle and the levels below follow; the middle, Escape, Backspace or the breadcrumb path go back up. Labels appear on arcs wide enough to hold them.
+
+Composed of: [Breadcrumbs](#breadcrumbs)
+
+```tsx
+<SunburstChart data={$budget} value="amount" format={["money", "TRY"]} title="Budget" />
+<SunburstChart data={disk} label="name" value="size" format="bytes" maxDepth={4} innerRadius={0.2} />
+<SunburstChart data={org} childrenOf="team" label="name" id="id" drill={false} labels={false} onSelect={(p) => open(p.datum)} />
+```
+
+Full page: src/components/data/sunburst-chart/docs.md
 
 ## Swatch
 
@@ -3291,6 +3486,20 @@ import { TreeView } from "march/components/data/tree-view";
 
 Full page: src/components/data/tree-view/docs.md
 
+## Treemap
+
+A hierarchy as nested rectangles: each tile's area is its value, groups carry a header with their tiles inside. Click a group (or Enter on it) to zoom in: its tile grows to the whole chart and its children lay out again; the breadcrumb row, a click on the background, Escape or Backspace go back up. Color by branch (the series palette) or by a number of each row through a color scale.
+
+Composed of: [Breadcrumbs](#breadcrumbs)
+
+```tsx
+<Treemap data={$budget} value="amount" format={["money", "TRY"]} title="Budget" />
+<Treemap data={files} depth={3} padding={1} radius={2} labels={false} onSelect={(p) => open(p.datum)} />
+<Treemap data={stocks} colorValue="change" colorScale="diverging" colorMid={0} format="compact" colorFormat="percent" />
+```
+
+Full page: src/components/data/treemap/docs.md
+
 ## TypingIndicator
 
 Three dots that lift in turn on the motion engine (a staggered loop; still with reduced motion) and an optional sentence: "HADİ is typing…", "HADİ and Beta are typing…", "3 people are typing…". It is a polite status, so screen readers hear the sentence once even when it is not shown. With no names it hides.
@@ -3352,6 +3561,18 @@ A long list that keeps only the rows near the viewport in the DOM, so 100,000 ro
 ```
 
 Full page: src/components/data/virtual-list/docs.md
+
+## WaterfallChart
+
+How a start value becomes an end value, step by step: each increase or decrease floats from where the previous one ended, subtotals and the total stand on the axis. Increases, decreases and totals take the theme's good / bad / neutral colors (override with `upColor`, `downColor`, `totalColor`), dashed connectors join the bars and every bar carries its signed value.
+
+```tsx
+<WaterfallChart data={$pnl} start={120000} totals="end" format="compact" title="Profit bridge" />
+<WaterfallChart data={cash} x="month" y="net" horizontal upColor="brand-blue" downColor="brand-orange" />
+<WaterfallChart data={rows} total="isSubtotal" marks={[{ y: 100000, label: "Goal" }]} connectors={false} />
+```
+
+Full page: src/components/data/waterfall-chart/docs.md
 
 ## Waveform
 

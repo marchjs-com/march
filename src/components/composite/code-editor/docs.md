@@ -127,7 +127,9 @@ bracket pair at the caret, the other places of the word, the find matches), the 
 top (its text is transparent; the caret and the selection are its own). Only the marks follow the caret, so moving it
 does not colour the code again. Every colour is a theme token (`--m-syn-kw`, `--m-syn-str`, `--m-syn-num`,
 `--m-syn-fn`, `--m-syn-type`, `--m-syn-prop`, `--m-syn-tag`, `--m-syn-attr`, `--m-syn-com`, `--m-syn-punct`,
-`--m-syn-br0…2` on `.m-ced`): set them to make your own palette.
+`--m-syn-br0…2` on `.m-ced`): set them to make your own palette. Comments are drawn quiet (`--m-ced-com-dim`, `.5`;
+`1` turns it off) so the code leads; the caret's line and the line under the pointer bring their comments to full
+strength (`.m-tok-com.is-lit`).
 
 **Not here, on purpose.** Folding and several carets need an editor that draws its own text: a `<textarea>` always
 holds the whole text and has one selection, so lines cannot be hidden in it and a second caret cannot be typed into.

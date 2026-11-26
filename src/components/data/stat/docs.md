@@ -26,11 +26,21 @@ bad (`invert` for costs, where a decrease is good). `spark` adds a trend line un
 | `icon` | An icon (march/icons) next to the label. |
 | `empty` | Shown when there is no value. Default "—". |
 | `class` | Extra classes on the root (`m-stat`). |
+| `animate` | Change animation: `true` (default, a spring), `false`, an easing name or `{ duration, easing, delay, enter, update }`. |
 
 ## Accessibility
 
 - The arrow is decoration; screen readers hear "Up", "Down" or "No change" before the change.
 - Good and bad are told by the arrow and the sign, not only by the color.
 - The sparkline is an image whose name is the label and a summary of its values.
+
+## Motion
+
+- A numeric value counts to its new number on the motion engine, formatted with `format` every frame and rounded to the
+  target's decimals (no "1 234.5671" mid-way). The first value counts up from 0; `animate={{ enter: false }}` shows it
+  at once.
+- The delta arrow is one arrow that turns: up, sideways for no change, down; a change of direction turns it smoothly.
+- `animate` is passed to the sparkline, which morphs to new data.
+- `animate={false}` shows every change at once; reduced motion jumps.
 
 Composed of StatTile (label over value) and Sparkline.

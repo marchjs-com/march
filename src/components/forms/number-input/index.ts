@@ -1,11 +1,16 @@
-// NumberInput family: NumberInput, IntInput, MoneyInput, PercentInput. Locale aware, never NaN.
+// NumberInput family: NumberInput, IntInput, MoneyInput, PercentInput. Locale aware, never NaN. The typing runs on
+// march/mask's number kind: separators in the locale, one decimal point (either "," or "."), the sign, max refused
+// while typing, min / max and the decimals applied when the field is left; ArrowUp / ArrowDown step.
 import "./number-input.css";
 import "../../../ui/field.css";
-import { signal, computed, effect, untrack } from "../../../core/reactive.ts";
+import { computed, effect, untrack, signal } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { locale } from "../../../core/i18n.ts";
-import { model, ctl, cx, extend, parseNumber, formatNumber, type ControlProps } from "../../../forms/util.ts";
-import { affix, textAttrs, inputOf, type AffixProps, type TextAttrProps } from "../../../forms/affix.ts";
+import { model, ctl, cx, extend, type ControlProps } from "../../../forms/util.ts";
+import { affix, textAttrs, type AffixProps, type TextAttrProps } from "../../../forms/affix.ts";
+import { number } from "../../../mask/number.ts";
+import { mask as maskBehavior } from "../../../behaviors/mask/mask.ts";
+import type { MaskController } from "../../../mask/input.ts";
 
 const precise = <N extends number | null | undefined>(n: N): N => (n == null ? n : (Number(n.toPrecision(15)) as N));
 
@@ -20,7 +25,7 @@ export interface NumberInputProps extends ControlProps<number | null>, TextAttrP
   decimals?: number | undefined;
   /** Decimal places always shown (padded with zeros). @tr Her zaman gösterilen ondalık basamak sayısı (sıfırla doldurulur). */
   minDecimals?: number | undefined;
-  /** Thousands separators while not editing (default false; MoneyInput: true). @tr Düzenlenmezken binlik ayırıcılar (varsayılan false; MoneyInput: true). */
+  /** Thousands separators (default false; MoneyInput: true). @tr Binlik ayırıcılar (varsayılan false; MoneyInput: true). */
   grouping?: boolean | undefined;
   /** Display = value × scale. @tr Gösterilen = değer × scale. */
   scale?: number | undefined;
@@ -28,64 +33,62 @@ export interface NumberInputProps extends ControlProps<number | null>, TextAttrP
   locale?: string | undefined;
   /** Called with the input element. @tr Girdi öğesiyle çağrılır. */
   ref?: ((el: HTMLInputElement) => void) | undefined;
+  /** The shake when a character is refused (a letter, a digit past max or the decimals): `false` turns it off, a function plays your own. @tr Bir karakter reddedilince (harf, en büyüğü ya da ondalıkları aşan rakam) alanın sallanması: `false` kapatır, işlev kendi hareketinizi oynatır. */
+  motion?: boolean | ((el: HTMLInputElement) => void) | undefined;
 }
 
 /**
- * Locale aware number: accepts "12,5" and "12.5", never produces NaN (bad text marks the input invalid and is reverted on blur).
+ * Locale aware number: accepts "12,5" and "12.5", never produces NaN (characters that make no number are refused).
  * Props: min, max, step (ArrowUp/Down), decimals, minDecimals, grouping, scale (display = value × scale), locale, prefix, suffix.
  */
 export function NumberInput(props: NumberInputProps): unknown {
   const [get, set] = model<number | null>(props, null);
-  const loc = () => props.locale ?? locale();
-  const scale = () => props.scale ?? 1;
-  const shown = (v: number | null) => (v == null ? "" : formatNumber(precise(v * scale()), loc(), { decimals: props.decimals, minDecimals: props.minDecimals ?? 0, grouping: !!props.grouping }));
-  const bad = signal(false);
-  const toRange = (v: number | null) => {
+  const loc = (): string => props.locale ?? locale();
+  const scale = (): number => props.scale ?? 1;
+  // the mask in display units (min / max scaled with it)
+  const spec = computed(() => number({
+    locale: loc(), decimals: props.decimals ?? 10, minDecimals: props.minDecimals, thousands: !!props.grouping,
+    negative: props.min == null || props.min < 0,
+    min: props.min == null ? null : precise(props.min * scale()), max: props.max == null ? null : precise(props.max * scale()),
+  }));
+  const err = signal(false);
+  const base = ctl(props);
+  const inv = base["aria-invalid"];
+  const toRange = (v: number | null): number | null => {
     if (v == null) return v;
     if (props.min != null && v < props.min) v = props.min;
     if (props.max != null && v > props.max) v = props.max;
     if (props.decimals != null) { const f = 10 ** props.decimals / scale(); v = Math.round(v * f) / f; }
     return precise(v);
   };
-  const base = ctl(props);
-  const inv = base["aria-invalid"];
-  let el: HTMLInputElement;
-  const commit = () => {
-    if (bad.peek()) bad.set(false);
-    else { const v = untrack(get), c = toRange(v); if (c !== v) set(c); }
-    el.value = untrack(() => shown(get()));
-  };
-  el = h("input", {
+  let ctlr!: MaskController;
+  const el = h("input", {
     ...base, ...textAttrs(props), type: "text", class: cx("m-input m-number", props.prefix == null && props.suffix == null && props.class),
     inputmode: props.inputmode ?? (props.decimals === 0 && (props.min ?? -1) >= 0 ? "numeric" : "decimal"), autocomplete: props.autocomplete ?? "off",
-    "aria-invalid": () => (bad() || inv() ? "true" : null),
-    onInput: (e: Event) => {
-      const n = parseNumber(inputOf(e).value, loc());
-      if (n === null) { bad.set(false); set(null); return; }
-      if (Number.isNaN(n)) { bad.set(/^[-+]$/.test(inputOf(e).value.trim()) ? false : true); return; }
-      bad.set(false);
-      const v = precise(n / scale());
-      if (v !== untrack(get)) set(v);
-    },
-    onBlur: (e: FocusEvent) => { commit(); props.onBlur?.(e); },
+    "aria-invalid": () => (err() || inv() ? "true" : null),
     onKeyDown: (e: KeyboardEvent) => {
       if ((e.key !== "ArrowUp" && e.key !== "ArrowDown") || props.readonly) return;
       e.preventDefault();
       const step = (props.step ?? 1) / scale();
       set(toRange(precise((untrack(get) ?? 0) + (e.key === "ArrowUp" ? step : -step))));
-      el.value = untrack(() => shown(get()));
     },
   }) as HTMLInputElement;
-  effect(() => {
-    const v = get(), s = shown(v);
-    untrack(() => {
-      if (globalThis.document?.activeElement === el) {
-        const cur = parseNumber(el.value, loc());
-        if (cur == null ? v == null : precise(cur / scale()) === v) return;
-      }
-      if (el.value !== s) el.value = s;
-    });
+  maskBehavior(el, {
+    mask: untrack(spec), value: "parsed", motion: props.motion, ref: (c) => { ctlr = c; },
+    onChange: (v) => {
+      const n = v == null ? null : precise((v as number) / scale());
+      // the field was left: clamp and round like before (the mask already did it in display units)
+      if (n !== untrack(get)) set(n);
+    },
   });
+  effect(() => { const s = spec(); untrack(() => ctlr.setMask(s)); });
+  // the bound value in (display units); a value outside min / max is shown as it is and marked
+  effect(() => {
+    const v = get();
+    untrack(() => { const d = v == null ? null : precise(v * scale()); if (ctlr.state().value !== d) ctlr.set(d); });
+  });
+  effect(() => { const st = ctlr.state(); untrack(() => err.set(!!st.error)); });
+  el.addEventListener("blur", () => { const v = untrack(get), c = toRange(v); if (c !== v) set(c); });
   props.ref?.(el);
   return affix(props, el);
 }

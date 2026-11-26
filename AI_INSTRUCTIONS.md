@@ -470,6 +470,10 @@ One interaction, written once, attached to any element; each behavior is its own
 - **swipe** — `swipeable(el, { axis, accept, onMove, onEnd, onTap, holdMs, onHold })` + `rubberBand`, `fling`, `nearest`:
   axis lock, veto, release velocity, tap / hold, click after a swipe swallowed (Drawer, PullToRefresh, ChatBubble,
   StoryViewer). Never write your own follow-the-finger pointer loop.
+- **mask** — `<input use:mask={"(999) 999 99 99"} />` / TextInput `mask={…}` (march/mask): formatted fields (phone,
+  card, IBAN, date, money, codes) with caret mapping, paste, beforeinput, IME and own undo; presets in
+  `march/mask/presets`, validators in `march/mask/validators`, `formatMask` / `unmask` for tables and the server. NEVER
+  write your own mask or digit-grouping onInput handler.
 - **dismiss** — `dismiss(panel, { inside, onDismiss(why), on, escape })`: outside press + Escape (capture phase) for
   popovers, menus and pickers. Never add document pointerdown / click / Escape listeners for that yourself.
 
@@ -720,7 +724,7 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | NumberInput | stable | Locale-aware number (never NaN) with IntInput, MoneyInput (currency side and decimals) and PercentInput. | — |
 | OptionList | experimental | A list of choices inside a panel: radio group, listbox (one or many) or command menu; rows with lead, label, hint, trailing part and tick; arrow keys, or driven by a field (aria-activedescendant). | ListRow, SectionLabel |
 | PasswordInput | stable | Password field with a show / hide button (aria-pressed). | Button, IconButton |
-| PhoneInput | stable | Phone number kept as "+" and digits; the country code is a prefix. | — |
+| PhoneInput | stable | Phone number kept as "+" and digits; the country code is a prefix. | TextInput |
 | RadioGroup | stable | Radio buttons for one value; classic, soft, chip, card or segmented look. | — |
 | Rating | stable | Star rating as a radio group: arrow keys (RTL mirrored), hover preview, half stars when read-only, any colour token. | — |
 | RowTools | experimental | The tools of a row in an editable list: move up, move down, remove (IconButtons); off at the ends, any subset, own names and icons. | IconButton |
@@ -745,14 +749,21 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | BarChart | experimental | Bar chart: grouped or stacked series, vertical or horizontal, bars that glide to new values, keyboard bars, tooltip, legend and a data table for screen readers. | — |
 | BarList | experimental | Ranked horizontal bars with labels for top-N lists (pages, countries, products): sorted, limited, formatted; rows become buttons with onSelect. | OverflowText |
 | BatteryGauge | experimental | A battery: a case with a cap, a fill or segments that spring to the level, low / critical colours, a bolt while charging, a rolling percentage inside or beside; horizontal or vertical. | CountRoll |
+| BoxPlot | experimental | Box and violin plot: quartiles, whiskers (1.5 IQR or min / max), outliers and the mean per category, kernel density violins, jittered raw points, vertical or horizontal, keyboard categories and boxes that grow from the median, morph and collapse away. | — |
+| BulletChart | experimental | Bullet chart: a measure as a bar against its target tick, qualitative ranges and last period, in rows or columns, compact for tables; bars fill, targets slide, ranges resize. | — |
+| CandlestickChart | experimental | Price chart: candles, OHLC bars or a close line over time, volume pane, moving averages, price marks, a live window that slides, range navigator, drag to zoom, a shared crosshair, keyboard candles, OHLC tooltip and a data table for screen readers. | — |
 | Card | stable | Surface with an optional header (title, subtitle, actions), a body and a footer; action() objects in the header render as buttons. | PanelHeader |
+| ChordChart | experimental | Chord diagram: groups as arcs on a ring, ribbons through the middle for the flows between them (directed with arrows or undirected), hover a group to keep only its ribbons; arcs and ribbons open from zero, turn to new angles and collapse when they go; keyboard, tooltip and a data table. | — |
+| ChoroplethMap | experimental | Choropleth map: Turkey's 81 provinces (lazy, Natural Earth) or your own shapes / GeoJSON coloured by value, continuous or in classes, with a colour legend, focus and zoom, keyboard regions, tooltip and a data table for screen readers. | — |
 | Compass | experimental | A compass: the rose turns under a lubber line (or a two-tone needle turns on a fixed rose), cardinal letters in the page's language, 4 or 8 points, a bearing marker and a rolling "045° NE" readout; damped spring motion. Built on Gauge. | Gauge, CountRoll |
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | SearchBox, Button, Chip, Menu, Checkbox, Chevron, Badge, ResizeHandle, Empty, LiveStatus, FilterControl, CellEditor |
 | DotMatrix | experimental | An LED dot-matrix display: text and numbers in a 5×7 font (Turkish letters, your own glyphs), lit and unlit dots, a window that scrolls long text, a wipe or dissolve on change, round or square dots in any theme colour. | — |
 | FlipClock | experimental | A flip clock: hours, minutes and seconds on split number cards (Odometer flip), blinking separators, a 12-hour AM / PM flap (SplitFlap), a time zone or your own time source. | Odometer, SplitFlap |
+| FunnelChart | experimental | Funnel chart: stages of a flow as smooth trapezoids, centered bars or a pyramid, with values, share of the first stage, step conversion and drop-off; stages pour in, morph and collapse. | — |
 | Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | ListRow, ResizeHandle, Badge, LiveStatus |
 | Gauge | experimental | A dial with a needle: arc track, coloured zones, redline, ticks with labels, spring needle, peak mark and a rolling readout; speedometer, tachometer, half and VU looks, a number or an audio source; several needles, full circles that wrap, a turning scale and an inlay make it the dial of the clock, compass and aircraft instruments. | CountRoll, Odometer |
-| Heatmap | experimental | Heatmap: a grid of intensities (day × hour) or a calendar of weeks, in tones of the theme accent; keyboard cells, tooltip and a data table for screen readers. | — |
+| Heatmap | experimental | Heatmap: a grid of intensities (day × hour) or a calendar heatmap (a year of weeks with month and weekday labels, a less → more legend), in tones of the theme accent; animated, keyboard cells, tooltip and a data table for screen readers. | — |
+| Histogram | experimental | Histogram: raw values binned on nice thresholds or a bin width, counts, densities or running totals, groups overlaid, a normal or kernel density curve, mean / median marks, keyboard bins and bars that grow, morph on a re-bin and shrink away. | — |
 | IconTile | stable | An icon in a tinted rounded square: a tone or any theme colour token; soft, outline or solid; square or round. | — |
 | JsonView | stable | Collapsible read-only JSON tree: typed colours, item / key counts when closed, circular references marked. | Chevron |
 | Kanban | stable | Board of columns with toned headers, counts and cards you move by drag and drop or Alt+← / Alt+→. | PanelHeader, StatusDot, Badge |
@@ -760,21 +771,30 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | LevelMeter | experimental | A studio LED segment meter: a value or a live sound (march/audio), mono or stereo, green / amber / red zones, a peak light that holds then falls, a latched clip light, a dB scale. | IconButton, StatusDot |
 | LineChart | experimental | Line and area charts (AreaChart in the same folder): time, number or category x axis, several series, drag to zoom, keyboard points, tooltip, legend and a data table for screen readers. | — |
 | ListRow | experimental | The row lists are made of: lead (icon, avatar, dot, thumbnail) + title + sub text + trail and actions; a link, a button or a plain element that takes any role, ARIA and tabindex; active, selected, disabled; long text scrolls, is cut or wraps. | OverflowText |
+| NetworkGraph | experimental | Network graph: nodes and links in a force layout simulated on the motion clock (or a circle / grid), node size by value, color by group with legend toggles, drag to move and pin, zoom and pan, neighbour highlight, keyboard by direction, tooltip and a data table for screen readers. | — |
 | Odometer | experimental | A counter on number drums (a mileage counter, a meter, a flip clock): fixed digits with leading zeros, red fraction drums, a unit; mechanical, digital or flip look. Rolls through CountRoll. | CountRoll |
 | PieChart | experimental | Pie or donut chart: shares of a whole, the total in the donut hole, slices that turn to new angles, keyboard slices, tooltip, legend and a data table for screen readers. | — |
 | ProgressRing | experimental | A score ring 0–100 (or 0–max) with the number in the middle: low / mid / high levels from thresholds, one theme color or several (gradient, segments, flowing). | — |
+| RadarChart | experimental | Radar (spider) chart: one spoke per row, series as filled polygons with dots, polygon or circle grid, shared or per-axis scale, smooth shapes; shapes grow from the center and morph, keyboard spokes, tooltip, legend toggles and a data table for screen readers. | — |
+| RadialBarChart | experimental | Radial bar chart: concentric rings of round-capped bars on tracks, full circle or gauge arc, a max per chart or per row, the active ring's value in the middle; rings sweep in, morph and unwind, keyboard rings, tooltip and a data table for screen readers. | — |
+| SankeyChart | experimental | Sankey diagram: flows between nodes in columns, ribbons as wide as their value (gradient or source colored), hover lights a whole flow; ribbons draw in from their source and morph on change; keyboard nodes and links, tooltip and a data table. | — |
+| ScatterChart | experimental | Scatter and bubble chart: numeric or time axes, area-scaled bubbles, series with shapes and legend toggles, least-squares trend lines with r², reference marks, nearest-point hover, keyboard points and points that grow in, glide and shrink out. | — |
 | Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | PanelHeader, PeriodNav, Button, Segmented, ResizeHandle, LiveStatus |
-| Sparkline | experimental | A tiny trend line without axes, for table cells, list rows and KPI boxes: optional area and last-point dot; screen readers hear a summary of the values. | — |
+| Sparkline | experimental | A tiny trend line, column chart or win / loss strip without axes, for table cells, list rows and KPI boxes: optional area and last-point dot, animated changes; screen readers hear a summary of the values. | — |
 | SplitFlap | experimental | A split-flap departure board: each cell turns its reel of letters, digits and signs forward flap by flap to the new text, with a stagger; Turkish capitals, your own reel, any theme colour; the text is read once. | — |
 | Stat | experimental | KPI box: label, formatted value, the change against the previous period with an arrow (green or red, inverted for costs) and an optional sparkline. | StatTile, Sparkline |
 | StatTile | experimental | A value with its label and an optional hint: plain, soft tile or card; a button with onClick, a link with href, dt / dd inside a dl; the value may be a node (a rolling Counter). | — |
 | Stopwatch | experimental | A chronograph: a sweeping seconds hand, a 30-minute sub-dial, a digital readout, Start / Stop, Lap and Reset, a lap list with the best and worst lap; spring fly-back on reset. Built on Gauge and Button. | Gauge, Button |
+| StreamGraph | experimental | Stream graph: categories over time as flowing layers around a moving centre line (wiggle, silhouette or 100 %), smooth curves, layers that swell and sink when data changes, keyboard points, tooltip, legend and a data table. | — |
+| SunburstChart | experimental | Sunburst chart: a hierarchy as rings colored by top branch, drill-in zoom (click / Enter in, center / Escape out) with a breadcrumb path, labels on wide arcs; arcs open, tween on zoom and data changes and collapse when they leave; keyboard rings, tooltip, legend and a data table. | Breadcrumbs |
 | Thermometer | experimental | A glass thermometer: a liquid column that springs to the value, a scale in °C or °F (or both), coloured zones that also colour the liquid, a rolling readout. | CountRoll |
 | TimeRuler | experimental | The ruler above a timeline: ticks, time labels and a playhead; read-only, or draggable with a slider playhead (onSeek). Own tick distances, labels, head and colour. | — |
 | Timeline | stable | Ordered list of events with toned dots, optional icons, formatted times (Date / epoch / ISO) or plain text, titles and bodies. | StatusDot |
 | Tree | stable | Expandable tree (role=tree) with icons, trailing meta, selection and the full keyboard model; long labels scroll with OverflowText. | ListRow, Chevron, OverflowText |
 | TreeView | experimental | Virtual tree for large hierarchies: lazy children, single / multiple selection, drag and drop (before / after / inside), search with highlighted hits, full keyboard model. | ListRow, Chevron, Spinner, Button, Badge, Empty |
+| Treemap | experimental | Treemap: a hierarchy as squarified rectangles; groups with headers, drill-in with a breadcrumb row, color by branch or by a value through a color scale, tiles that grow, glide and shrink on change, keyboard tiles, tooltip and a data table. | Breadcrumbs |
 | VirtualList | experimental | Long list with rows of any height: only the rows near the viewport are in the DOM, measured rows, scroll anchoring, own or parent scroll, onEndReached. | — |
+| WaterfallChart | experimental | Waterfall chart: a start value, positive and negative steps, subtotals and a total with connectors and +/− labels; bars build one after another, morph on change and shrink away. | — |
 
 ### Feedback — `march/feedback`
 

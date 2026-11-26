@@ -116,7 +116,7 @@ test("NumberInput parses decimal comma and point, never NaN", () => {
   type(input, "1.234"); assert.equal(v(), 1234, "de: dot followed by 3 digits is grouping");
   type(input, "12.5"); assert.equal(v(), 12.5, "decimal point accepted too");
   type(input, "abc"); assert.equal(v(), 12.5, "garbage does not change the value");
-  assert.equal(input.getAttribute("aria-invalid"), "true");
+  assert.equal(input.value, "12,5", "garbage is refused: the text stays");
   input.blur();
   assert.equal(input.value, "12,5");
   assert.equal(input.getAttribute("aria-invalid"), null);
@@ -153,14 +153,17 @@ test("MoneyInput: currency symbol side, 2 decimals, grouping on blur; PercentInp
   pi.focus(); type(pi, "7"); assert.equal(p(), 0.07);
 });
 
-test("PhoneInput normalizes digits with an optional country prefix", () => {
+test("PhoneInput normalizes digits with an optional country prefix", async () => {
   assert.equal(F.normalizePhone("0 (532) 111-22-33", "+90"), "+905321112233");
   assert.equal(F.normalizePhone("0044 20 7946 0000"), "+442079460000");
   const v = signal("");
   const { el } = mount(() => h(F.PhoneInput, { "bind:value": v, country: "+44" }));
+  // the mask part and the country formats load on demand
+  for (let i = 0; i < 40 && !el.querySelector(".m-mask-mirror"); i++) await new Promise((r) => setTimeout(r, 5));
+  await new Promise((r) => setTimeout(r, 20));
   type(el.querySelector("input"), "07700 900123");
   assert.equal(v(), "+447700900123");
-  assert.equal(el.querySelector("input").value, "7700900123");
+  assert.equal(el.querySelector("input").value, "7700 900123");
 });
 
 test("CodeInput: typing advances, paste fills all boxes, onComplete fires once", () => {

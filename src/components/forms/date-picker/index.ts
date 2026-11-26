@@ -1,7 +1,8 @@
-// DatePicker: a typed date (locale order) with a Calendar popover. Value: ISO date string or null.
+// DatePicker: a typed date (locale order) with a Calendar popover. Value: ISO date string or null. The typing runs on
+// march/mask's date kind: the separators come by themselves, month 13 or 31.02 cannot be typed, a single 4 becomes 04.
 import "./date-picker.css";
 import "../../../ui/field.css";
-import { signal, effect, untrack } from "../../../core/reactive.ts";
+import { signal, effect, untrack, computed } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, locale } from "../../../core/i18n.ts";
 import { model, ctl, cx, live, type ControlProps } from "../../../forms/util.ts";
@@ -13,6 +14,9 @@ import { Popover } from "../../overlays/popover/index.ts";
 import { calendar as calendarIcon } from "../../../icons/glyphs/calendar.ts";
 import type { IconProp } from "../../../icons/types.ts";
 import { locked } from "../../../ui/behave.ts";
+import { date as dateMask } from "../../../mask/date.ts";
+import { mask as maskBehavior } from "../../../behaviors/mask/mask.ts";
+import type { MaskController } from "../../../mask/input.ts";
 
 const NUMERIC: Intl.DateTimeFormatOptions = { year: "numeric", month: "2-digit", day: "2-digit" };
 
@@ -61,6 +65,10 @@ export interface DatePickerProps extends ControlProps<IsoDate | null> {
   labels?: { choose?: string | undefined; prevMonth?: string | undefined; nextMonth?: string | undefined } | undefined;
   /** Extra props for the Calendar in the popover (`{ renderDay, weekdays: false, prevIcon, nextIcon, isDisabled }`). @tr Açılır penceredeki Calendar'a ek özellikler (`{ renderDay, weekdays: false, prevIcon, nextIcon, isDisabled }`). */
   calendar?: Partial<CalendarProps> | undefined;
+  /** "lazy" (default; the separators appear while typing) or "eager" (the whole template: `__.__.____`). @tr "lazy" (varsayılan; ayraçlar yazarken çıkar) ya da "eager" (tüm şablon: `__.__.____`). */
+  maskPlaceholder?: "lazy" | "eager" | undefined;
+  /** The shake when a character is refused (a month 13, a day the month does not have): `false` turns it off, a function plays your own. @tr Bir karakter reddedilince alanın sallanması: `false` kapatır, işlev kendi hareketinizi oynatır. */
+  motion?: boolean | ((el: HTMLInputElement) => void) | undefined;
 }
 
 /** Date input with a calendar popover. Value: ISO date string or null. Props: min, max, firstDay, locale, placeholder. */
@@ -76,16 +84,23 @@ export function DatePicker(props: DatePickerProps): unknown {
     ...base, type: "text", class: "m-input m-date-input", autocomplete: "off", inputmode: "numeric",
     placeholder: () => props.placeholder ?? datePlaceholder(loc()), readonly: () => !!props.readonly,
     "aria-invalid": () => (bad() || inv() ? "true" : null),
-    onInput: (e: Event) => {
-      const v = parseDate((e.target as HTMLInputElement).value, loc());
-      if (v === undefined || (v && ((props.min && v < props.min) || (props.max && v > props.max)))) { bad.set(true); return; }
-      bad.set(false);
-      if (v !== untrack(get)) set(v);
-    },
-    onBlur: (e: FocusEvent) => { bad.set(false); input.value = untrack(() => formatDate(get(), loc())); props.onBlur?.(e); },
     onKeyDown: (e: KeyboardEvent) => { if (e.key === "ArrowDown" && (e.altKey || !input.value)) { e.preventDefault(); toggle(true); } },
   }) as HTMLInputElement;
-  effect(() => { const s = formatDate(get(), loc()); untrack(() => { if (globalThis.document?.activeElement !== input || parseDate(input.value, loc()) !== get()) input.value = s; }); });
+  // the typing: the date mask in the locale's order; a complete date out of min / max is marked, an empty field is null
+  let typed!: MaskController;
+  const spec = computed(() => dateMask({ locale: loc(), min: props.min, max: props.max }));
+  maskBehavior(input, {
+    mask: untrack(spec), value: "parsed", placeholder: props.maskPlaceholder, motion: props.motion, ref: (c) => { typed = c; },
+    onChange: (v) => { const iso = (v as IsoDate | null) || null; const st = typed.state(); if (st.raw && !st.complete) return; if (!st.error && iso !== untrack(get)) set(iso); else if (!st.raw && untrack(get) != null) set(null); },
+  });
+  effect(() => { const s = spec(); untrack(() => typed.setMask(s)); });
+  effect(() => { const v = get(); untrack(() => { if (typed.state().value !== v) typed.set(v); }); });
+  effect(() => { const st = typed.state(); untrack(() => bad.set(!!st.error)); });
+  // a half-typed date (or one out of min / max) is put back to the value when the field is left (onBlur comes from ctl)
+  input.addEventListener("blur", () => {
+    const st = typed.state();
+    if (st.raw && (!st.complete || st.error)) typed.set(untrack(get) ?? "");
+  });
   const toggle = (on = !open.peek()) => { if (!props.disabled && !props.readonly) open.set(on); };
   const close = (refocus?: boolean) => { open.set(false); if (refocus) input.focus(); };
   const choose = () => props.labels?.choose ?? t`Choose date`;

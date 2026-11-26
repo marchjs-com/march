@@ -377,11 +377,14 @@ export function warpTime(to: number, ms: number): Promise<void> {
     // its own real time: each warp step tells the clock, which then starts its next frame afresh (dt 0)
     const t0 = performance.now();
     let t = 0;
+    // no frames (a hidden tab, a page in the background): it is there a little after its time all the same, so a
+    // theme change never waits for frames that do not come (the drip held every later change back until then)
+    const late = setTimeout(() => { off(); setTimeWarp(to); resolve(); }, ms + 250);
     const off = onFrame(() => {
       t = Math.min(1, (performance.now() - t0) / ms);
       const k = to < from ? 1 - (1 - t) ** 3 : t ** 3;
       setTimeWarp(from + (to - from) * k);
-      if (t >= 1) { off(); resolve(); }
+      if (t >= 1) { clearTimeout(late); off(); resolve(); }
     }, { essential: true });
   });
 }

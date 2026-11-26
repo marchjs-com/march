@@ -133,6 +133,17 @@ swipeable(sheet, {
 PullToRefresh, ChatBubble (swipe to reply) and StoryViewer use it; `swipe()` in march/motion is the animation
 gesture effect (direction events), not this.
 
+## mask — `march/behaviors/mask`
+
+An input mask on any `<input>`, for your own fields (TextInput has it as the `mask` prop):
+`<input use:mask={"(999) 999 99 99"} />`, `<input use:mask={{ mask: cardNumber(), onChange: (raw) => …, placeholder: "eager" }} />`
+or a signal of a mask (the mask changes with it). The engine is march/mask: caret-correct typing, Backspace over literals,
+paste, `beforeinput` (Android), IME, its own undo / redo; `value: "raw" | "masked" | "parsed"` says what `onChange` gets;
+`ref(ctl)` hands over the controller (`state()`, `set()`, `undo()`, `setMask()`). A refused character shakes the field
+(`motion: false` or your own `(el) => …`). Pure helpers for tables, pipes and the server: `formatMask(value, mask)`,
+`unmask(text, mask)`; presets in `march/mask/presets`, validators (Luhn, IBAN, TC kimlik, VKN, e-mail, URL, IP) in
+`march/mask/validators`.
+
 ## dismiss — `march/behaviors/dismiss`
 
 Close a light surface — popover, menu, picker, a `<details>` menu — on a press outside it or Escape:

@@ -26,9 +26,15 @@ minute you pick closes it. 12-hour clocks get an AM / PM switch.
 | `disabled`, `readonly` | boolean | — | |
 | `class`, `color`, `id`, `name`, `disabled`, `readonly`, `required`, `invalid`, `aria-label` | | — | the props every control takes; `color` is a theme token |
 
+## Typing (march/mask)
+
+The time is typed on march/mask's time kind (24 hours): the colon comes by itself, a single 7 becomes 07, hour 25 and
+minute 7x cannot be typed (a short shake; `motion={false}` turns it off), seconds appear when `step` is under a minute,
+a complete time outside `min` / `max` is written and marked (as on a native time field), and a half-typed time is put back when the field is left.
+
 ## Accessibility
 
-A native `<input type="time">`: each part is spin-button editable with the arrow keys and announced by screen readers.
+A real text `<input>` with the numeric keypad (`inputmode="numeric"`) and the same typing in every browser; screen readers hear errors, not each digit.
 
 The clock dial opens in a dialog named by `labels.choose` (Alt+ArrowDown in the field opens it too). Its face is a
 slider: "Hours", then "Minutes", with the time as its value text; the arrow keys step, Page Up / Down jump (3 hours,
@@ -38,4 +44,4 @@ dimmed and cannot be picked.
 
 ## Composed of
 
-A styled native input; with `picker="clock"`, IconButton (the clock button) and Popover (the dial's panel).
+A styled input with the `mask` behavior (march/mask time kind); with `picker="clock"`, IconButton (the clock button) and Popover (the dial's panel).

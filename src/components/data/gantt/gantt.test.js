@@ -18,7 +18,7 @@ const bar = (el, id) => el.querySelector(`[data-task="${id}"]`);
 
 test("Gantt: rows, bars sized by days, links, accessible names", () => {
   locale.set("en-GB");
-  const m = mount(() => h(Gantt, { tasks: tasks(), scale: "day" }));
+  const m = mount(() => h(Gantt, { tasks: tasks(), scale: "day", animate: false }));
   assert.equal(m.el.querySelectorAll(".m-gantt-name").length, 4);
   assert.equal(bar(m.el, "a").style.getPropertyValue("width"), "200px"); // 5 days × 40 px
   assert.equal(m.el.querySelectorAll(".m-gantt-link").length, 3);
@@ -66,4 +66,38 @@ test("Gantt: own texts, parts off (names, hint, today line), own bar content and
   key(bar(b, "a"), "ArrowRight", { altKey: true });
   assert.match(b.querySelector(".m-gantt-status").textContent, /Design/);
   m.dispose();
+});
+
+const { signal } = await import("../../../index.ts");
+const { manualClock, step } = await import("../../../motion/engine/clock.ts");
+const run = (ms = 2000) => { for (let i = 0; i < ms / 16; i++) step(16); };
+const px = (el) => parseFloat(el.style.getPropertyValue("inset-inline-start"));
+
+test("Gantt: on new data bars glide to their new dates, new tasks grow in, removed tasks fade out", async () => {
+  locale.set("en-GB");
+  manualClock(true);
+  try {
+    const list = signal(tasks());
+    const m = mount(() => h(Gantt, { tasks: () => list(), scale: "day", animate: { easing: "out", duration: 300 } }));
+    assert.equal(bar(m.el, "a").style.getPropertyValue("width"), "0px", "a task grows in from its start day");
+    run();
+    assert.equal(bar(m.el, "a").style.getPropertyValue("width"), "200px");
+    const x0 = px(bar(m.el, "c"));
+    // Test moves two days later, Design is removed, Docs is added
+    list.set([...tasks().filter((x) => x.id !== "a").map((x) => (x.id === "c" ? { ...x, start: "2026-11-18", end: "2026-11-20" } : x)), { id: "d", name: "Docs", start: "2026-11-10", end: "2026-11-12" }]);
+    step(16); step(16); step(16);
+    const mid = px(bar(m.el, "c"));
+    const ghost = m.el.querySelector(".m-gantt-bar.is-leaving");
+    assert.ok(ghost, "the removed task fades out where it was");
+    assert.equal(ghost.getAttribute("aria-hidden"), "true");
+    assert.ok(parseFloat(bar(m.el, "d").style.getPropertyValue("width")) < 120, "the new task grows in");
+    run();
+    // the timeline starts a week later now (Design is gone): the bar glided two days on the new time origin
+    const x1 = px(bar(m.el, "c"));
+    assert.ok(mid > x1 - 80 && mid < x1, `gliding: ${x1 - 80} → ${mid} → ${x1}`);
+    assert.notEqual(x1, x0);
+    await new Promise((r) => setTimeout(r, 5));
+    assert.equal(m.el.querySelector(".m-gantt-bar.is-leaving"), null);
+    m.dispose();
+  } finally { manualClock(false); }
 });

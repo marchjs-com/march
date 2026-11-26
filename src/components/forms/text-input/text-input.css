@@ -3,3 +3,24 @@
 .m-input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
 .m-input-error { margin-block-start: var(--m-space-1); }
 .m-input-error.is-kept { min-block-size: 1.25em; }
+
+/* mask: the mirror draws the text over the (transparent) input text so its characters can move; one glyph per box,
+   kerning and ligatures off on both so they sit on the same advances */
+.m-mask { position: relative; display: block; inline-size: 100%; }
+.m-mask .m-input { font-variant-numeric: tabular-nums; }
+.m-mask-on .m-input { color: transparent; caret-color: var(--m-text); font-kerning: none; font-variant-ligatures: none; }
+.m-mask-on .m-input::selection { color: transparent; background: color-mix(in srgb, var(--m-accent, var(--m-focus)) 28%, transparent); }
+.m-mask-on .m-input::placeholder { color: var(--m-faint); }
+.m-mask-mirror { display: flex; position: absolute; overflow: hidden; pointer-events: none; align-items: center; white-space: pre; color: var(--m-text); font-kerning: none; font-variant-ligatures: none; box-sizing: border-box; }
+.m-mask:not(.m-mask-on) .m-mask-line { visibility: hidden; }
+.m-mask-line { display: inline-block; white-space: pre; }
+.m-mask-c { display: inline-block; white-space: pre; transform-origin: 50% 70%; }
+.m-mask-c.is-lit { color: var(--m-text-2); }
+.m-mask-c.is-ph { color: var(--m-faint); }
+.m-mask:has(.m-input:disabled) .m-mask-mirror { color: var(--m-muted); }
+/* the check mark of a complete value, at the inline end inside the field */
+.m-mask-has-done .m-input { padding-inline-end: calc(var(--m-space-3) + 1.25rem); }
+.m-mask-done { position: absolute; inset-block: 0; inset-inline-end: var(--m-space-3, .75rem); display: flex; align-items: center; color: var(--m-success); pointer-events: none; opacity: 0; transform: scale(0.4); transition: opacity var(--m-dur) var(--m-ease); }
+.m-mask-done.is-on { opacity: 1; transform: none; }
+.m-mask-done .m-svg, .m-mask-done-icon { inline-size: 1.1rem; block-size: 1.1rem; stroke-width: 2.5; }
+@media (prefers-reduced-motion: reduce) { .m-mask-done { transition: none; } }

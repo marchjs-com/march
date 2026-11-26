@@ -20,7 +20,10 @@ angles and a new slice opens from its edge.
 | `donut` | `true` for a ring (inner radius 60 %) or an inner radius ratio 0…0.95. |
 | `padAngle` | Gap between slices in radians. Default 0.01. |
 | `center` | Content in the donut hole. Default: the formatted total. |
-| `animate` | On a data change the slices turn: `true` (a spring) or an easing name. Default off. |
+| `animate` | Change animations (see Motion). Default on. |
+| `labels` | Text on the slices: "percent", "value", "label", `true` (= percent) or `false` (default). Thin slices stay bare. |
+| `pop` | The active slice moves out by this many px (default 6; 0 keeps it in place). |
+| `export` | Export buttons: `true` (PNG, SVG, CSV), a list of formats or options. |
 | `format` | Value format: a pipe name, `[pipe, ...args]` or a function. |
 | `legend` | `true`, `false`, "bottom" or "right". Items toggle slices. |
 | `tooltip` | `true` (default), `false` or `(point) => content`. |
@@ -29,6 +32,13 @@ angles and a new slice opens from its edge.
 | `xLabel` / `yLabel` / `empty` / `colors` / `width` / `height` / `class` | Table headers, no-data content, per-slice colors, size. |
 
 `pieLayout(values)` and `arcPath(...)` give the angles and SVG paths for your own drawing.
+
+## Motion
+
+Slices open from their start edge when first drawn, turn to new angles when the data changes and close onto their middle
+before a removed slice disappears; the active slice pops out. `animate`: `true` (default, a spring), `false`, an easing
+name, `{ duration, easing, stagger, delay, enter, update, exit }` or `({ index, key, phase }) => …`. On the engine clock:
+global speed, pause and reduced motion apply.
 
 ## Accessibility
 

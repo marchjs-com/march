@@ -8,6 +8,10 @@
    "limit": 215040,
    "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
   },
+  "march/charts": {
+   "limit": 168960,
+   "why": "the barrel of every chart (26 charts and their shared parts); pages load one chart's own entry (march/components/data/<chart>), not this barrel"
+  },
   "march/components/actions/overflow-toolbar": {
    "limit": 56320,
    "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
@@ -140,6 +144,30 @@
    "limit": 81920,
    "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
   },
+  "march/components/data/bar-chart": {
+   "limit": 29696,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026"
+  },
+  "march/components/data/box-plot": {
+   "limit": 31744,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026"
+  },
+  "march/components/data/bullet-chart": {
+   "limit": 28672,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026"
+  },
+  "march/components/data/candlestick-chart": {
+   "limit": 34304,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026; plus volume pane, moving averages, live window and range navigator"
+  },
+  "march/components/data/chord-chart": {
+   "limit": 28672,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026"
+  },
+  "march/components/data/choropleth-map": {
+   "limit": 30720,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026; Turkey's provinces load as their own chunk and are not counted here"
+  },
   "march/components/data/data-grid": {
    "limit": 102400,
    "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
@@ -148,29 +176,85 @@
    "limit": 40960,
    "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
   },
+  "march/components/data/heatmap": {
+   "limit": 28160,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026"
+  },
+  "march/components/data/histogram": {
+   "limit": 31744,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026"
+  },
   "march/components/data/kanban": {
    "limit": 35840,
    "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/data/line-chart": {
+   "limit": 35840,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026; the x/y engine (data-space morph, curves, second axis, live window, range navigator, synced crosshair)"
+  },
+  "march/components/data/network-graph": {
+   "limit": 29184,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026"
+  },
+  "march/components/data/sankey-chart": {
+   "limit": 27648,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026"
+  },
+  "march/components/data/scatter-chart": {
+   "limit": 31232,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026"
   },
   "march/components/data/scheduler": {
    "limit": 56320,
    "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
   },
+  "march/components/data/stat": {
+   "limit": 27136,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026"
+  },
+  "march/components/data/stream-graph": {
+   "limit": 36352,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026; it is LineChart's x/y engine with a stream baseline"
+  },
+  "march/components/data/sunburst-chart": {
+   "limit": 35328,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026; the Breadcrumbs path bar loads as its own chunk on first use"
+  },
   "march/components/data/tree-view": {
    "limit": 56320,
    "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+  },
+  "march/components/data/treemap": {
+   "limit": 35328,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026; the Breadcrumbs path bar loads as its own chunk on first use"
+  },
+  "march/components/data/waterfall-chart": {
+   "limit": 30208,
+   "why": "a chart animates every data change on the motion engine (enter, update, exit) and carries the shared chart parts (axes, tooltip, legend, data table, reference marks); measured 26 Nov 2026"
   },
   "march/components/forms/choice-picker": {
    "limit": 51200,
    "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
   },
+  "march/components/forms/date-picker": {
+   "limit": 32768,
+   "why": "typing on march/mask (caret mapping, real date / time validation while typing, own undo): the shared mask engine is part of its job"
+  },
   "march/components/forms/date-range-picker": {
    "limit": 46080,
    "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
   },
+  "march/components/forms/date-time-input": {
+   "limit": 37888,
+   "why": "typing on march/mask (caret mapping, real date / time validation while typing, own undo): the shared mask engine is part of its job"
+  },
   "march/components/forms/icon-picker": {
    "limit": 46080,
    "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/forms/time-input": {
+   "limit": 30720,
+   "why": "typing on march/mask (caret mapping, real date / time validation while typing, own undo): the shared mask engine is part of its job"
   },
   "march/components/landing/branching-story": {
    "limit": 56320,
@@ -245,8 +329,8 @@
    "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
   },
   "march/components/motion/easing-curve-editor": {
-   "limit": 35840,
-   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+   "limit": 38912,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job; typing on march/mask (caret mapping, real date / time validation while typing, own undo): the shared mask engine is part of its job"
   },
   "march/components/navigation/activity-bar": {
    "limit": 46080,

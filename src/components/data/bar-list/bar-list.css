@@ -10,3 +10,5 @@ button.m-barlist-row:focus-visible { outline: 2px solid var(--m-chart-1); border
 .m-barlist-fill { fill: var(--m-c); fill-opacity: 0.16; }
 .m-barlist-label { position: relative; flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .m-barlist-value { position: relative; flex: none; font-variant-numeric: tabular-nums; font-weight: 600; }
+/* a leaving row (it shrinks away while the motion engine fades it) takes no clicks */
+.m-barlist-item.is-leaving { pointer-events: none; }

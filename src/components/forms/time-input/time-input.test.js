@@ -12,16 +12,36 @@ const type = (el, v) => { el.value = v; fire(el, "input"); };
 const key = (el, k, more = {}) => fire(el, "keydown", { key: k, ...more });
 void tick; void type; void key; void signal;
 
-test("TimeInput: native time input with min / max / step and a two-way value", () => {
+test("TimeInput: typed time on the mask with min / max / step and a two-way value", () => {
   const v = signal("09:30");
   const { el } = mount(() => h(TimeInput, { "bind:value": v, min: "09:00", max: "18:00", step: 60 }));
   const input = el.querySelector("input");
-  assert.equal(input.getAttribute("type"), "time");
-  assert.equal(input.getAttribute("min"), "09:00");
-  assert.equal(input.getAttribute("step"), "60");
+  assert.equal(input.getAttribute("inputmode"), "numeric");
   assert.equal(input.value, "09:30");
+  input.focus();
   type(input, "10:15");
   assert.equal(v(), "10:15");
+  assert.equal(input.getAttribute("min"), "09:00");
+  // out of min / max: written and marked, as on a native time field
+  type(input, "19:00");
+  assert.equal(input.getAttribute("aria-invalid"), "true");
+  assert.equal(v(), "19:00");
+  // half-typed: put back when the field is left
+  type(input, "1");
+  input.blur();
+  assert.equal(input.value, "19:00");
+  // typing digit by digit: the colon comes by itself, a single 7 becomes 07, hour 25 is refused
+  const t = signal("");
+  const m2 = mount(() => h(TimeInput, { "bind:value": t }));
+  const i2 = m2.el.querySelector("input");
+  i2.focus(); i2.selectionStart = i2.selectionEnd = 0;
+  i2.setSelectionRange = (a, b) => { i2.selectionStart = a; i2.selectionEnd = b; };
+  const press = (d) => { const e = new Event("beforeinput", { bubbles: true, cancelable: true }); Object.assign(e, { inputType: "insertText", data: d }); i2.dispatchEvent(e); };
+  press("7"); assert.equal(i2.value, "07");
+  press("3"); press("0"); assert.equal(i2.value, "07:30");
+  assert.equal(t(), "07:30");
+  const s = mount(() => h(TimeInput, { value: "09:30:15", step: 1 }));
+  assert.equal(s.el.querySelector("input").value, "09:30:15");
 });
 
 test("TimeInput picker=clock: the button opens the dial; the keyboard picks the hour, then the minutes, then closes", async () => {

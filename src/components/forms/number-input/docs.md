@@ -29,11 +29,20 @@ put back on blur), clamps to `min` / `max` and steps with ArrowUp / ArrowDown. T
 
 `currencyInfo(locale, currency)` returns the symbol, its side and the minor digits.
 
+## Typing (march/mask)
+
+The field types on march/mask's number kind: the locale's separators (grouping while typing with `grouping`), one decimal
+point (either "," or "." is taken), "-" toggles the sign when `min` allows negatives, a digit past `max` or past the
+decimals is refused with a short shake (`motion={false}` turns it off, a function plays your own), text that makes no
+number is refused, and `min`, `max` and the decimals apply when the field is left. Undo / redo (Ctrl+Z, Ctrl+Y) work.
+
 ## Accessibility
 
 A text input with `inputmode="decimal"` (or `numeric` for whole, positive numbers) so phones show the right keypad;
 invalid text sets `aria-invalid` until it is fixed or the field is left.
 
 ## Composed of
+
+The `mask` behavior (march/mask number kind) on its input.
 
 Nothing: one native input; Int, Money and Percent are NumberInput with preset props.
