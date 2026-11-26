@@ -5,10 +5,11 @@
 // written in the clock's write phase, only while the wrapper is on screen; with reduced motion twice a second.
 import "./audio-reactive.css";
 import { h } from "../../../dom/h.ts";
-import { onCleanup } from "../../../core/reactive.ts";
+import { effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { val, cx, rest, clamp, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { mutate } from "../../../motion/engine/clock.ts";
-import { toAudioSource, type AudioSourceLike } from "../../../audio/index.ts";
+import type { AudioSource, AudioSourceLike } from "../../../audio/index.ts";
+import { liveSource } from "../../../audio/live.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 
 /** The readings AudioReactive can write. @tr AudioReactive'in yazabildiği okumalar. */
@@ -71,9 +72,6 @@ export function AudioReactive(props: AudioReactiveProps): Element {
     style: () => ({ "--m-ar-k": clamp(val(props.intensity) ?? 1, 0, 2) }),
   }, props.children) as HTMLElement;
 
-  // SAMPLE audio: read on the clock while on screen, write in the write phase
-  const src = toAudioSource(props.source);
-  src.use(el);
   const cur: AudioLevels = { level: 0, bass: 0, mid: 0, treble: 0, peak: 0 };
   const shown: Partial<Record<string, string>> = {};
   let queued = false, gone = false;
@@ -90,7 +88,9 @@ export function AudioReactive(props: AudioReactiveProps): Element {
     }
     if (report) props.onLevel?.({ ...cur });
   };
-  onCleanup(src.onUpdate((s) => {
+  // SAMPLE audio: read on the clock while on screen, write in the write phase. A new `source` is listened to instead
+  // (the one made from the old input stops with this run)
+  const listen = (s: AudioSource): void => {
     const off = val(props.motion) === false, g = Math.max(0, val(props.gain) ?? 1), sm = clamp(val(props.smoothing) ?? 0, 0, 0.99);
     const b = s.bands();
     const next: AudioLevels = { level: s.level(), bass: b.bass, mid: b.mid, treble: b.treble, peak: s.peak() };
@@ -100,7 +100,12 @@ export function AudioReactive(props: AudioReactiveProps): Element {
       cur[k] = k === "peak" || x > cur[k] ? x : cur[k] * sm + x * (1 - sm);
     }
     if (!queued) { queued = true; mutate(() => write()); }
-  }));
+  };
+  const source = liveSource(() => props.source);
+  effect(() => {
+    const src = source();
+    if (src) untrack(() => { src.use(el); onCleanup(src.onUpdate(listen)); });
+  });
   write(false); // every variable starts at 0, so CSS that reads it works before the first reading
   return el;
 }

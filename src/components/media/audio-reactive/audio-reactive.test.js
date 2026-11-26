@@ -65,3 +65,17 @@ test("AudioReactive: smoothing slows the fall, not the rise", () => {
   level.set(0.8); E.step(16); assert.equal(v(el, "--m-level"), "0.800");
   dispose();
 });
+
+test("AudioReactive: a new source (a getter) is listened to instead; the old one no longer writes", () => {
+  const a = signal(0.2), b = signal(0.7), which = signal("a");
+  const one = () => a(), two = () => b();
+  const [root, dispose] = mount(() => h(AudioReactive, { get source() { return which() === "a" ? one : two; } }, "x"));
+  const el = root.querySelector(".m-ar");
+  E.step(16);
+  assert.equal(v(el, "--m-peak"), "0.200");
+  which.set("b"); E.step(16);
+  assert.equal(v(el, "--m-peak"), "0.700", "the new source");
+  a.set(0.95); E.step(16);
+  assert.equal(v(el, "--m-peak"), "0.700", "the old one is gone");
+  dispose();
+});

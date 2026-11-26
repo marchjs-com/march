@@ -2,17 +2,18 @@
 // as high ones) with falling peak caps, mirrored around the middle, around a circle or as a line; one theme color, the
 // four HADİ colors or your own tokens. It reads any march/audio source and draws on the motion clock.
 import "./spectrum.css";
-import { signal, effect, onCleanup } from "../../../core/reactive.ts";
+import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, clamp, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { colorAttr, colorList, tokenColor, type ColorToken, type MultiColors } from "../../../theme/colors.ts";
 import { still } from "../../../motion/engine/parts.ts";
-import { now } from "../../../motion/engine/clock.ts";
-import { toAudioSource, type AudioSourceLike } from "../../../audio/index.ts";
+import { now, mutate } from "../../../motion/engine/clock.ts";
+import { type AudioSource, type AudioSourceLike } from "../../../audio/index.ts";
 import { audioCanvas } from "../../../audio/canvas.ts";
 import { barEdges, barValues } from "./bands.ts";
 import { levelInWords, hzInWords } from "../oscilloscope/words.ts";
+import { liveSource } from "../../../audio/live.ts";
 
 /** What an own drawing layer gets after each frame. @tr Kendi çizim katmanının her karede aldığı. */
 export interface SpectrumFrame {
@@ -83,12 +84,14 @@ const bar = (ctx: Ctx, x: number, y: number, w: number, hgt: number, r: number):
 
 /** `<Spectrum source={song} variant="mirror" colors="brand" />` */
 export function Spectrum(props: SpectrumProps): Element {
-  const src = props.source != null ? toAudioSource(props.source) : null;
-  const on = (): boolean => !!src?.active();
-  const list = colorList(props.colors);
+  // the source as given now (another one later: the view follows it)
+  const source = liveSource(() => props.source);
+  let src: AudioSource | null = null;
+  const on = (): boolean => !!source()?.active();
+  const colors = computed(() => colorList(props.colors), { equals: (a, b) => JSON.stringify(a) === JSON.stringify(b) });
   const heard = signal({ level: 0, hz: 0 });
   const size = (): string | undefined => { const x = val(props.height); return x == null ? undefined : typeof x === "number" ? `${x}px` : x; };
-  const spec = new Float32Array(src ? src.bins : 1024);
+  let spec = new Float32Array(1024);
   let values: Float32Array = new Float32Array(0), peaks: Float32Array = new Float32Array(0), edges: Float32Array = new Float32Array(0), edgeKey = "", last = now();
   const layout = (): number => {
     const n = Math.max(1, Math.round(val(props.bars) ?? 48));
@@ -109,13 +112,16 @@ export function Spectrum(props: SpectrumProps): Element {
     const fall = (val(props.peakFall) ?? 0.5) * dt;
     for (let i = 0; i < n; i++) peaks[i] = caps ? Math.max(values[i]!, peaks[i]! - fall) : values[i]!;
   };
-  const colorVars: Record<string, string> = {};
-  list?.forEach((tok, i) => { colorVars[`--m-spec-c${i}`] = tokenColor(tok); });
+  const colorVars = (): Record<string, string> => {
+    const out: Record<string, string> = {};
+    colors()?.forEach((tok, i) => { out[`--m-spec-c${i}`] = tokenColor(tok); });
+    return out;
+  };
 
   const canvas = h("canvas", { class: "m-spec-canvas", "aria-hidden": "true" }) as HTMLCanvasElement;
   const root = h("div", {
     class: () => cx("m-spec", `m-spec-${val(props.variant) ?? "bars"}`, !on() && "is-idle", val(props.class)),
-    "data-m-color": () => colorAttr(val(props.color)), "data-m-colors": list ? (Array.isArray(props.colors) ? "custom" : String(props.colors)) : null,
+    "data-m-color": () => colorAttr(val(props.color)), "data-m-colors": () => (colors() ? (Array.isArray(props.colors) ? "custom" : String(props.colors)) : null),
     role: "img",
     "aria-label": () => {
       const name = val(props.label) ?? t`Spectrum`;
@@ -123,13 +129,13 @@ export function Spectrum(props: SpectrumProps): Element {
       const { level, hz } = heard(), words = levelInWords(level);
       return `${name}: ${level < 0.02 || !hz ? words : t`${words}, loudest near ${hzInWords(hz)}`}`;
     },
-    style: () => ({ "--m-spec-h": size(), ...colorVars }),
+    style: () => ({ "--m-spec-h": size(), ...colorVars() }),
   },
   canvas,
   () => { const idle = val(props.idleText); return idle === false ? null : h("span", { class: "m-spec-idle", "aria-hidden": "true" }, () => (typeof idle === "string" ? idle : t`No signal`)); }) as HTMLElement;
 
   const view = audioCanvas(canvas, (ctx, w, hgt, color) => {
-    const n = layout(), live = on() && !!src, variant = val(props.variant) ?? "bars", caps = live && capsOn();
+    const n = layout(), live = on() && !!src, variant = val(props.variant) ?? "bars", caps = live && capsOn(), list = untrack(colors);
 
     ctx.clearRect(0, 0, w, hgt);
     // the paint: one color, or the list from low to high (a gradient or hard segments); a ring gets it around itself
@@ -202,21 +208,33 @@ export function Spectrum(props: SpectrumProps): Element {
     if (props.draw) { ctx.save(); props.draw(ctx, { width: w, height: hgt, values, peaks, edges, color: list ? color("--m-spec-c0") : color("--m-spec-bar"), active: live }); ctx.restore(); }
   });
 
-  if (src) {
-    src.use(root);
-    let said = -1e9;
-    onCleanup(src.onUpdate((s) => {
-      sample(); view.draw();
-      // the spoken summary (level and loudest band) changes at most once a second
-      const at = now();
-      if (at - said < 1000) return;
-      said = at;
-      let top = 0;
-      for (let i = 1; i < values.length; i++) if (values[i]! > values[top]!) top = i;
-      const hz = values[top]! > 0.05 ? Math.sqrt(edges[top]! * edges[top + 1]!) : 0;
-      heard.set({ level: s.level(), hz: Math.round(hz) });
-    }));
-  }
-  effect(() => { val(props.color); val(props.variant); if (!on()) { layout(); values.fill(0); peaks.fill(0); } view.refresh(); });
+  effect(() => {
+    const given = source();
+    untrack(() => {
+      src = given;
+      if (given && spec.length !== given.bins) spec = new Float32Array(given.bins);
+      if (!given) return;
+      given.use(root);
+      let said = -1e9;
+      onCleanup(given.onUpdate((s) => {
+        sample(); view.draw();
+        // the spoken summary (level and loudest band) changes at most once a second
+        const at = now();
+        if (at - said < 1000) return;
+        said = at;
+        let top = 0;
+        for (let i = 1; i < values.length; i++) if (values[i]! > values[top]!) top = i;
+        const hz = values[top]! > 0.05 ? Math.sqrt(edges[top]! * edges[top + 1]!) : 0;
+        heard.set({ level: s.level(), hz: Math.round(hz) });
+      }));
+    });
+  });
+  // a new color, colors, variant or idle state: read the theme colors again and redraw
+  effect(() => { val(props.color); colors(); val(props.variant); if (!on()) { layout(); values.fill(0); peaks.fill(0); } view.refresh(); });
+  // any other drawn prop: draw again (an idle or paused view too)
+  effect(() => {
+    layout(); val(props.gap); val(props.radius); val(props.gain); val(props.peakFall); capsOn(); void props.paint;
+    mutate(view.draw);
+  });
   return root;
 }

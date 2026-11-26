@@ -81,7 +81,7 @@ export function Odometer(props: OdometerProps): Element {
   const root = h("span", {
     class: () => cx("m-odo", `m-odo-${variant()}`, typeof size() === "string" && `m-odo-${size()}`, val(props.frame) === false && "m-odo-bare", val(props.class)),
     role: "img",
-    "data-m-color": colorAttr(props.color),
+    "data-m-color": () => colorAttr(val(props.color)),
     "aria-label": () => `${val(props.label) ?? t`Odometer`}: ${spoken(value())}`,
     style: () => ({ "--m-odo-h": typeof size() === "number" ? `${size()}px` : null }),
   },
@@ -93,8 +93,9 @@ export function Odometer(props: OdometerProps): Element {
       formatter: (n: number) => drumText(n, digits(), decimals(), decimalMark()),
       spoken,
       roll: () => !still(props.motion),
-      duration: props.duration ?? DURATION[variant()],
-      stagger: props.stagger ?? 40,
+      // read at each roll: a new look or time applies to the next one
+      get duration() { return props.duration ?? DURATION[variant()]; },
+      get stagger() { return props.stagger ?? 40; },
       class: () => cx("m-odo-roll", decimals() > 0 && "is-frac"),
     })),
   () => {

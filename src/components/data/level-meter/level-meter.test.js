@@ -100,3 +100,25 @@ test("LevelMeter: a source drives it on the clock; dB scale, ticks, horizontal, 
   assert.deepEqual([...b.querySelectorAll(".m-lm-tick")].map((x) => x.style.getPropertyValue("--p")), ["0", "0.5", "1"]);
   dispose();
 });
+
+test("LevelMeter: source and channels follow later values (getters): a value, then a source, then mono", async () => {
+  const which = signal("value"), ch = signal(undefined);
+  const src = () => 0.5;
+  const [el, dispose] = mount(() => h(LevelMeter, { value: 0.25, segments: 20, get source() { return which() === "src" ? src : undefined; }, get channels() { return ch(); } }));
+  assert.equal(el.querySelectorAll(".m-lm-meter").length, 1);
+  assert.equal(lit(el.querySelector(".m-lm-meter")), "5", "the value");
+  which.set("src");
+  assert.equal(el.querySelectorAll(".m-lm-meter").length, 2, "a source is stereo");
+  await import("../../../audio/index.ts"); await new Promise((r) => setTimeout(r, 0));
+  E.step(16); E.step(16);
+  assert.equal(lit(el.querySelectorAll(".m-lm-meter")[1]), "10", "the source drives both channels");
+  ch.set(1);
+  assert.equal(el.querySelectorAll(".m-lm-meter").length, 1, "mono");
+  E.step(16); E.step(16);
+  assert.equal(lit(el.querySelector(".m-lm-meter")), "10");
+  which.set("value");
+  assert.equal(lit(el.querySelector(".m-lm-meter")), "5", "back to the value");
+  E.step(16); E.step(16);
+  assert.equal(lit(el.querySelector(".m-lm-meter")), "5", "the old source writes no more");
+  dispose();
+});

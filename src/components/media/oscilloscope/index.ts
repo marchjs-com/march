@@ -3,16 +3,17 @@
 // left channel against the right (a Lissajous figure; a mono input is paired with itself a quarter period later).
 // Two looks: a clean modern panel and a retro CRT. It reads any march/audio source and draws on the motion clock.
 import "./oscilloscope.css";
-import { signal, effect, onCleanup } from "../../../core/reactive.ts";
+import { signal, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../ui/util.ts";
 import { colorAttr, type ColorToken } from "../../../theme/colors.ts";
 import { still } from "../../../motion/engine/parts.ts";
-import { now } from "../../../motion/engine/clock.ts";
-import { toAudioSource, type AudioSourceLike } from "../../../audio/index.ts";
+import { now, mutate } from "../../../motion/engine/clock.ts";
+import { type AudioSource, type AudioSourceLike } from "../../../audio/index.ts";
 import { audioCanvas } from "../../../audio/canvas.ts";
 import { triggerIndex, periodOf, isMono } from "./trace.ts";
+import { liveSource } from "../../../audio/live.ts";
 import { levelInWords } from "./words.ts";
 
 /** What an own drawing layer gets after each trace. @tr Kendi çizim katmanının her izden sonra aldığı. */
@@ -70,8 +71,10 @@ const fit = (x: number): number => (x < -1 ? -1 : x > 1 ? 1 : x);
 
 /** `<Oscilloscope source={song} look="crt" />` */
 export function Oscilloscope(props: OscilloscopeProps): Element {
-  const src = props.source != null ? toAudioSource(props.source) : null;
-  const on = (): boolean => !!src?.active();
+  // the source as given now (another one later: the view follows it)
+  const source = liveSource(() => props.source);
+  let src: AudioSource | null = null;
+  const on = (): boolean => !!source()?.active();
   const heard = signal(0);
   const look = (): "modern" | "crt" => (val(props.look) === "crt" ? "crt" : "modern");
   const grid = (): { x: number; y: number } | null => {
@@ -79,8 +82,7 @@ export function Oscilloscope(props: OscilloscopeProps): Element {
     return g === false ? null : { x: (typeof g === "object" && g.x) || 10, y: (typeof g === "object" && g.y) || 8 };
   };
   const size = (): string | undefined => { const x = val(props.height); return x == null ? undefined : typeof x === "number" ? `${x}px` : x; };
-  const n = src ? src.bins * 2 : 1024;
-  const left = new Float32Array(n), right = new Float32Array(n);
+  let n = 1024, left = new Float32Array(n), right = new Float32Array(n);
 
   const canvas = h("canvas", { class: "m-osc-canvas", "aria-hidden": "true" }) as HTMLCanvasElement;
   const root = h("div", {
@@ -148,17 +150,29 @@ export function Oscilloscope(props: OscilloscopeProps): Element {
     if (props.draw) { ctx.save(); props.draw(ctx, { width: w, height: hgt, samples: left, color: line, active: live }); ctx.restore(); }
   });
 
-  if (src) {
-    src.use(root);
-    let said = -1e9;
-    onCleanup(src.onUpdate((s) => {
-      view.draw();
-      // the spoken level changes at most once a second
-      const at = now();
-      if (at - said >= 1000) { said = at; heard.set(s.level()); }
-    }));
-  }
+  effect(() => {
+    const s = source();
+    untrack(() => {
+      src = s;
+      const want = s ? s.bins * 2 : 1024;
+      if (want !== n) { n = want; left = new Float32Array(n); right = new Float32Array(n); }
+      if (!s) return;
+      s.use(root);
+      let said = -1e9;
+      onCleanup(s.onUpdate((x) => {
+        view.draw();
+        // the spoken level changes at most once a second
+        const at = now();
+        if (at - said >= 1000) { said = at; heard.set(x.level()); }
+      }));
+    });
+  });
   // a new color, look or idle state: read the theme colors again and redraw
   effect(() => { val(props.color); look(); on(); view.refresh(); });
+  // any other drawn prop: draw again (a paused or idle screen too)
+  effect(() => {
+    val(props.mode); val(props.lineWidth); val(props.glow); val(props.gain); val(props.trigger); val(props.timebase);
+    val(props.persistence); still(props.motion); mutate(view.draw);
+  });
   return root;
 }

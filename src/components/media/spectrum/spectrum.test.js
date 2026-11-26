@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
-const { h, render, setLocale } = await import("../../../index.ts");
+const { h, render, signal, setLocale } = await import("../../../index.ts");
 const E = await import("../../../motion/engine/clock.ts");
 const { Spectrum } = await import("./index.ts");
 const { audioSource } = await import("../../../audio/index.ts");
@@ -67,5 +67,52 @@ test("Spectrum: a live source says its level and loudest band in words; idle aga
   assert.ok(hz > 150 && hz < 320, `the number input is a 220 Hz tone (${hz})`);
   src.stop();
   assert.equal(s.getAttribute("aria-label"), "Spectrum: No signal");
+  dispose();
+});
+
+// a canvas that draws: a box from a stand-in ResizeObserver and a 2D context that takes every call
+function fakeCanvas() {
+  const ctx = new Proxy({}, { get: (o, k) => (k in o ? o[k] : () => ({ addColorStop() {} })), set: (o, k, v) => { o[k] = v; return true; } });
+  const proto = Object.getPrototypeOf(document.createElement("canvas"));
+  const had = proto.getContext, RO = globalThis.ResizeObserver;
+  proto.getContext = () => ctx;
+  globalThis.ResizeObserver = class { constructor(fn) { this.fn = fn; } observe() { this.fn([{ contentRect: { width: 200, height: 100 } }]); } disconnect() {} };
+  return () => { proto.getContext = had; globalThis.ResizeObserver = RO; };
+}
+
+test("Spectrum: props changed later: colors and paint, bars and the frequency range draw again (idle too)", () => {
+  const restore = fakeCanvas();
+  const colors = signal(undefined), bars = signal(48), minHz = signal(30);
+  const frames = [];
+  const [el, dispose] = mount(() => h(Spectrum, { get colors() { return colors(); }, bars, minHz, draw: (_c, f) => { frames.push(f); } }));
+  const spec = el.querySelector(".m-spec");
+  E.step(16);
+  assert.equal(spec.getAttribute("data-m-colors"), null);
+  colors.set("brand");
+  assert.equal(spec.getAttribute("data-m-colors"), "brand");
+  assert.equal(spec.style.getPropertyValue("--m-spec-c0"), "var(--m-brand-orange, var(--m-cat-1))");
+  const n = frames.length;
+  bars.set(12);
+  E.step(16);
+  assert.ok(frames.length > n, "drawn again");
+  assert.equal(frames.at(-1).values.length, 12);
+  minHz.set(200);
+  E.step(16);
+  assert.ok(Math.abs(frames.at(-1).edges[0] - 200) < 1e-3, "the new lowest edge");
+  dispose();
+  restore();
+});
+
+test("Spectrum: the source follows the prop: none → a number → none", () => {
+  const given = signal(undefined);
+  const [el, dispose] = mount(() => h(Spectrum, { get source() { return given(); } }));
+  const spec = el.querySelector(".m-spec");
+  assert.ok(spec.classList.contains("is-idle"));
+  given.set(0.7);
+  E.step(16);
+  assert.ok(!spec.classList.contains("is-idle"));
+  assert.match(spec.getAttribute("aria-label"), /^Spectrum: loud/);
+  given.set(undefined);
+  assert.ok(spec.classList.contains("is-idle"));
   dispose();
 });

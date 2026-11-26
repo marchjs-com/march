@@ -17,8 +17,9 @@ import { formatDuration } from "../../../ui/format.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
 import { onFrame, mutate } from "../../../motion/engine/clock.ts";
 import { still } from "../../../motion/engine/parts.ts";
-import { toAudioSource, type AudioSourceLike } from "../../../audio/index.ts";
+import type { AudioSourceLike } from "../../../audio/index.ts";
 import { audioCanvas } from "../../../audio/canvas.ts";
+import { liveSource } from "../../../audio/live.ts";
 
 /** A stretch of the sound (a chapter, a highlight). @tr Sesin bir bölümü (bölüm, öne çıkan an). */
 export interface WaveformRegion {
@@ -143,10 +144,11 @@ export function decodePeaks(url: string, count = 1024): Promise<WaveformData> {
 /** `<Waveform peaks={voice.peaks} currentTime={$t} duration={voice.length} seekable onSeek={(p, s) => audio.currentTime = s} />` */
 export function Waveform(props: WaveformProps): Element {
   if (props.live && !props.source) return WaveformBars(props);
-  const bw = Math.max(1, props.barWidth ?? 3), gap = Math.max(0, props.gap ?? 2);
+  // live bars from a source; the source as given now (another one later, or none: the view follows it)
+  const source = liveSource(() => props.source);
   const data = signal<WaveformData | null>(null), state = signal<"idle" | "loading" | "ready" | "error">("idle");
   const drag = signal<number | null>(null), hover = signal<number | null>(null), own = signal(0);
-  const seekable = (): boolean => !!val(props.seekable) && !props.source;
+  const seekable = (): boolean => !!val(props.seekable) && !source();
   const D = computed(() => num(val(props.duration)) ?? data()?.duration ?? 0);
   const given = computed<number | null>(() => {
     const p = num(val(props.progress));
@@ -165,10 +167,11 @@ export function Waveform(props: WaveformProps): Element {
   let grow = 1, scratch = new Float32Array(0);
   const view = audioCanvas(canvas, (ctx, w, hh, color) => {
     ctx.clearRect(0, 0, w, hh);
+    const bw = Math.max(1, props.barWidth ?? 3), gap = Math.max(0, props.gap ?? 2);
     const n = Math.max(1, props.bars ?? Math.floor((w + gap) / (bw + gap)));
     const width = props.bars ? Math.max(1, (w - gap * (n - 1)) / n) : bw, stride = width + gap;
     if (scratch.length !== n) scratch = new Float32Array(n);
-    if (props.source) {
+    if (untrack(source)) {
       // newest at the inline end; empty slots stay at the floor
       scratch.fill(0);
       const k = Math.min(n, history.length);
@@ -213,15 +216,15 @@ export function Waveform(props: WaveformProps): Element {
   onCleanup(() => stopGrow?.());
 
   // the playhead and the regions (DOM: they mirror with the inline direction by themselves)
-  const head = props.playhead === false ? null : h("span", { class: "m-wave-playhead", "aria-hidden": "true", hidden: () => pos() == null }) as HTMLElement;
+  const head = (): HTMLElement | null => (props.playhead === false ? null : h("span", { class: "m-wave-playhead", "aria-hidden": "true", hidden: () => pos() == null, style: () => ({ "--m-wave-p": pos() ?? 0 }) }) as HTMLElement);
   const bands = h("span", { class: "m-wave-regions", "aria-hidden": "true" }, () => regions().map((g, i) => {
     const a = frac(g.start), b = Math.max(a, frac(g.end));
     return h("span", { class: "m-wave-region", "data-m-color": g.color ?? `cat-${(i % 8) + 1}`, style: { insetInlineStart: `${a * 100}%`, width: `${(b - a) * 100}%` } });
   }));
-  const marks = props.regionLabels === false ? null : h("div", { class: "m-wave-marks", "aria-hidden": "true", hidden: () => !regions().some((g) => g.label) }, () => regions().map((g, i) => {
+  const marks = (): HTMLElement | null => (props.regionLabels === false ? null : h("div", { class: "m-wave-marks", "aria-hidden": "true", hidden: () => !regions().some((g) => g.label) }, () => regions().map((g, i) => {
     const a = frac(g.start), b = Math.max(a, frac(g.end));
     return g.label ? h("span", { class: "m-wave-mark", "data-m-color": g.color ?? `cat-${(i % 8) + 1}`, style: { insetInlineStart: `${a * 100}%`, maxWidth: `${(b - a) * 100}%` } }, g.label) : null;
-  }));
+  })) as HTMLElement);
   // seeking: press, drag, release; arrows ±5 %, Home, End
   const commit = (f: number): void => { own.set(f); props.onSeek?.(f, f * D()); };
   const at = (clientX: number): number => {
@@ -262,22 +265,31 @@ export function Waveform(props: WaveformProps): Element {
   const root = shell(props, {
     onPointerDown: press, onPointerMove: move, onPointerLeave: () => hover.set(null), onKeyDown: key,
   }, h("div", { class: "m-wave-track" }, bands, canvas, head), marks);
-  effect(() => { const p = pos(); if (head) head.style.setProperty("--m-wave-p", String(p ?? 0)); hover(); redraw(); });
+  effect(() => { pos(); hover(); redraw(); });
+  // the look drawn on the canvas: draw again when it changes; a new bar color is read from the theme again
+  effect(() => { void [props.bars, props.barWidth, props.gap, props.rounded, props.align]; redraw(); });
+  let firstLook = true;
+  effect(() => { void [props.color, props.progressColor]; if (firstLook) firstLook = false; else view.refresh(); });
 
-  // live: a bar of the loudest level every 70 ms (each reading under reduced motion)
-  if (props.source) {
-    const src = toAudioSource(props.source);
-    let acc = 0, last = 0;
-    onCleanup(src.onUpdate((s) => {
-      acc = Math.max(acc, s.peak(), s.level());
-      const now = performance.now();
-      if (now - last < 70 && !still(props.motion)) return;
-      last = now; history.push(acc); acc = 0;
-      if (history.length > 1024) history.splice(0, history.length - 1024);
-      view.draw();
-    }));
-    src.use(root);
-  } else {
+  // live: a bar of the loudest level every 70 ms (each reading under reduced motion); a new source starts a new history
+  effect(() => {
+    const src = source();
+    untrack(() => {
+      history.length = 0; redraw();
+      if (!src) return;
+      let acc = 0, last = 0;
+      onCleanup(src.onUpdate((s) => {
+        acc = Math.max(acc, s.peak(), s.level());
+        const now = performance.now();
+        if (now - last < 70 && !still(props.motion)) return;
+        last = now; history.push(acc); acc = 0;
+        if (history.length > 1024) history.splice(0, history.length - 1024);
+        view.draw();
+      }));
+      src.use(root);
+    });
+  });
+  {
     // the peaks: given, or decoded from `src` once it is on screen
     let shown = false;
     const load = (): void => {
@@ -296,7 +308,7 @@ export function Waveform(props: WaveformProps): Element {
     let had = false;
     effect(() => { const p = val(props.peaks); if (p && p.length && !had) { had = true; untrack(growIn); } else redraw(); });
   }
-  effect(() => root.setAttribute("data-state", props.source ? "live" : state()));
+  effect(() => root.setAttribute("data-state", source() ? "live" : state()));
 
   // a slider while seekable, else an image
   const valueText = (f: number): string => {
@@ -306,7 +318,7 @@ export function Waveform(props: WaveformProps): Element {
     return g ? `${text}, ${g.label}` : text;
   };
   effect(() => {
-    const label = val(props.label) ?? (props.source ? t`Live waveform` : t`Waveform`);
+    const label = val(props.label) ?? (source() ? t`Live waveform` : t`Waveform`);
     const set = (k: string, v: string | null): void => { if (v == null) root.removeAttribute(k); else root.setAttribute(k, v); };
     set("aria-label", label);
     if (seekable()) {
@@ -322,7 +334,7 @@ export function Waveform(props: WaveformProps): Element {
       set("role", "img"); set("tabindex", null);
       for (const k of ["aria-valuemin", "aria-valuemax", "aria-valuenow", "aria-orientation"]) set(k, null);
       set("aria-valuetext", null);
-      if (d > 0 && !props.source) set("aria-label", `${label}, ${formatDuration(d * 1000)}`);
+      if (d > 0 && !source()) set("aria-label", `${label}, ${formatDuration(d * 1000)}`);
     }
     root.classList.toggle("is-seekable", seekable());
   });

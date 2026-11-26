@@ -105,3 +105,47 @@ test("Waveform: src is fetched and decoded once, then gives the duration", async
   dispose();
   delete globalThis.fetch; delete globalThis.OfflineAudioContext;
 });
+
+test("Waveform: props changed later reach the view: sizes, colors, playhead, region labels, regions, the source", () => {
+  manualClock(true);
+  const look = signal({ height: 40, gap: 2, color: "cat-2", progressColor: "brand-blue", playhead: true, regionLabels: true, regions: [{ start: 0, end: 0.5, label: "A" }] });
+  const p = {
+    peaks: [0.5, 0.8], progress: 0.3,
+    get height() { return look().height; }, get gap() { return look().gap; }, get color() { return look().color; }, get progressColor() { return look().progressColor; },
+    get playhead() { return look().playhead; }, get regionLabels() { return look().regionLabels; }, regions: () => look().regions,
+  };
+  const [el, dispose] = mount(() => h(Waveform, p));
+  const root = el.querySelector(".m-wave");
+  assert.equal(root.style.getPropertyValue("--m-wave-h"), "40px");
+  assert.ok(root.querySelector(".m-wave-playhead") && root.querySelector(".m-wave-mark"));
+  look.set({ height: 72, gap: 5, color: "neutral", progressColor: "brand-orange", playhead: false, regionLabels: false, regions: [] });
+  assert.equal(root.style.getPropertyValue("--m-wave-h"), "72px");
+  assert.equal(root.style.getPropertyValue("--m-wave-gap"), "5px");
+  assert.equal(root.style.getPropertyValue("--m-wave-bar"), "var(--m-neutral)");
+  assert.equal(root.getAttribute("data-m-color"), "brand-orange");
+  assert.equal(root.querySelector(".m-wave-playhead"), null);
+  assert.equal(root.querySelector(".m-wave-marks"), null);
+  assert.equal(root.querySelectorAll(".m-wave-region").length, 0, "an empty list clears the regions");
+  dispose();
+  // a source given later: the bars go live; taken away: the peaks again
+  const given = signal(undefined);
+  const [el2, d2] = mount(() => h(Waveform, { peaks: [0.4], get source() { return given(); } }));
+  const w = el2.querySelector(".m-wave");
+  assert.equal(w.getAttribute("data-state"), "idle");
+  given.set(0.6);
+  assert.equal(w.getAttribute("data-state"), "live");
+  assert.equal(w.getAttribute("aria-label"), "Live waveform");
+  given.set(undefined);
+  assert.equal(w.getAttribute("aria-label"), "Waveform");
+  d2();
+  manualClock(false);
+});
+
+test("Waveform: the decorative bars follow a later bar count", () => {
+  const bars = signal(12);
+  const [el, dispose] = mount(() => h(Waveform, { live: true, get bars() { return bars(); }, motion: false }));
+  assert.equal(el.querySelectorAll(".m-wave-bars i").length, 12);
+  bars.set(20);
+  assert.equal(el.querySelectorAll(".m-wave-bars i").length, 20);
+  dispose();
+});

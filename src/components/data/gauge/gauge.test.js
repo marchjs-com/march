@@ -119,3 +119,38 @@ test("Gauge: peak holds the highest value (onPeak), a number marks it; zones, co
   for (const k of ["ticks", "labels", "hub", "glass", "needle"]) assert.equal(q.querySelector(`.m-gauge-${k}`), null, k);
   dispose();
 });
+
+test("Gauge: needle, readout and color follow later values (getters)", () => {
+  const ne = signal("none"), ro = signal(true), co = signal(undefined), v = signal(0);
+  const [el, dispose] = mount(() => h(Gauge, { get value() { return v(); }, get needle() { return ne(); }, get readout() { return ro(); }, get color() { return co(); } }));
+  const root = el.querySelector(".m-gauge");
+  v.set(100); E.step(16);
+  assert.equal(needle(el), 135, "needle none: at once");
+  ne.set("spring"); v.set(0); E.step(16);
+  assert.ok(needle(el) > 0, "a spring needle is on its way down");
+  run(3000);
+  assert.ok(Math.abs(needle(el) + 135) < 1, "and lands");
+  assert.ok(el.querySelector(".m-gauge-value"), "a rolling number");
+  ro.set("odometer");
+  assert.ok(el.querySelector(".m-gauge-readout .m-odo"), "drums");
+  ro.set(false);
+  assert.equal(el.querySelector(".m-gauge-readout"), null);
+  co.set("brand-blue");
+  assert.equal(root.getAttribute("data-m-color"), "brand-blue");
+  dispose();
+});
+
+test("Gauge: a source given later (a getter) drives the needle; taking it away returns to the value", async () => {
+  const on = signal(false);
+  const loud = () => 0.5;
+  const [el, dispose] = mount(() => h(Gauge, { value: 10, motion: false, get source() { return on() ? loud : undefined; } }));
+  const root = el.querySelector(".m-gauge");
+  assert.equal(root.getAttribute("aria-valuenow"), "10");
+  on.set(true);
+  await import("../../../audio/index.ts"); await new Promise((r) => setTimeout(r, 0));
+  E.step(16);
+  assert.equal(needle(el), 0, "half of 0–100 points up");
+  on.set(false);
+  assert.equal(needle(el), -108, "back on 10");
+  dispose();
+});
