@@ -35,6 +35,11 @@
 .m-ced.is-ide .m-tok-tag { color: var(--m-syn-tag); }
 .m-ced.is-ide .m-tok-attr { color: var(--m-syn-attr); }
 .m-ced.is-ide .m-tok-com { color: var(--m-syn-com); font-style: italic; }
+/* comments are quiet so the code leads; the caret's line and the line under the pointer bring theirs forward.
+   --m-ced-com-dim: 1 turns the dimming off. */
+.m-ced .m-tok-com { opacity: var(--m-ced-com-dim, .5); transition: opacity var(--m-dur-fast) var(--m-ease); }
+.m-ced .m-tok-com.is-lit { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .m-ced .m-tok-com { transition: none; } }
 .m-ced.is-ide .m-tok-punct { color: var(--m-syn-punct); }
 /* brackets by depth (bracketColors); one with no mate is red */
 .m-ced { --m-syn-br0: var(--m-cat-6-text, var(--m-warn-text)); --m-syn-br1: var(--m-cat-4-text, var(--m-special-text)); --m-syn-br2: var(--m-cat-2-text, var(--m-info-text)); }

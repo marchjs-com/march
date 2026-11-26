@@ -452,9 +452,13 @@ export function CodeEditor(props: CodeEditorProps): Element {
     const g = ghost();
     let ghostDone = !g;
     const ghostNode = (): unknown => h("span", { class: "m-ced-ghost-at" }, h("span", { class: "m-ced-ghost" }, g?.rest ?? ""));
+    let vl = 1; // the (view) line the next piece starts on
     const push = (kind: string, text: string, mark: CodeMark | null): void => {
       const col = kind === "str" ? colorAt(text) : null;
-      const node = col ? h("span", { class: `m-tok-${kind} m-ced-color`, style: { "--m-ced-swatch": col } }, text) : kind ? h("span", { class: `m-tok-${kind}` }, text) : text;
+      // a comment knows its (view) line: the caret's line brings its comments forward (lightComments)
+      const node = col ? h("span", { class: `m-tok-${kind} m-ced-color`, style: { "--m-ced-swatch": col } }, text)
+        : kind === "com" ? h("span", { class: "m-tok-com", "data-vl": vl }, text) : kind ? h("span", { class: `m-tok-${kind}` }, text) : text;
+      for (let i = text.indexOf("\n"); i >= 0; i = text.indexOf("\n", i + 1)) vl++;
       if (!mark) { out.push(node); return; }
       const key = `${mark.kind ?? "flash"}:${mark.from}:${mark.to}:${src.slice(mark.from, mark.to)}`;
       const flash = (mark.kind ?? "flash") === "flash";
@@ -573,6 +577,22 @@ export function CodeEditor(props: CodeEditorProps): Element {
     return out;
   };
   const deco = h("pre", { class: "m-ced-deco", "aria-hidden": "true" }, h("code", {}, decorate)) as HTMLElement;
+  // comments are drawn quiet (--m-ced-com-dim); the ones on the caret's line or the line under the pointer come forward
+  let litLine = 0, pointerY = -1;
+  const lightComments = (): void => {
+    for (const c of (code.querySelectorAll?.(".m-tok-com") ?? []) as Iterable<HTMLElement>) {
+      let on = litLine > 0 && Number(c.getAttribute("data-vl")) === litLine;
+      if (!on && pointerY >= 0) { const r = c.getBoundingClientRect(); on = pointerY >= r.top && pointerY < r.bottom; }
+      c.classList.toggle("is-lit", on);
+    }
+  };
+  effect(() => {
+    const src = text(), [a] = sel();
+    let n = 0;
+    if (focused()) { n = 1; for (let i = src.indexOf("\n"); i >= 0 && i < a; i = src.indexOf("\n", i + 1)) n++; }
+    litLine = n;
+    queueMicrotask(lightComments); // after the coloured copy is drawn for this text
+  });
   // a new flash mark glows once (motion engine: reduced motion and global speed apply)
   effect(() => {
     get(); marks();
@@ -1190,6 +1210,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
   };
   const hideHover = (): void => { clearTimeout(hoverTimer); hoverN++; if (hoverDoc.peek()) hoverDoc.set(null); };
   const onPointerMove = (e: PointerEvent): void => {
+    if (pointerY !== e.clientY) { pointerY = e.clientY; lightComments(); }
     if (!props.hover || e.buttons) return;
     clearTimeout(hoverTimer); clearTimeout(hideTimer);
     const shown0 = hoverDoc.peek();
@@ -1361,7 +1382,7 @@ export function CodeEditor(props: CodeEditorProps): Element {
       }
     },
     onPointerMove: onPointerMove,
-    onPointerLeave: () => { clearTimeout(hoverTimer); hideTimer = setTimeout(() => hoverDoc.set(null), 250); },
+    onPointerLeave: () => { pointerY = -1; lightComments(); clearTimeout(hoverTimer); hideTimer = setTimeout(() => hoverDoc.set(null), 250); },
     onFocus: () => { focused.set(true); readSel(); offSel(); offSel = listen(globalThis.document, "selectionchange", onSelChange); },
     onBlur: (e: FocusEvent) => { close(); ghost.set(null); closeSignature(); focused.set(false); offSel(); props.onBlur?.(e); },
   }) as HTMLTextAreaElement;

@@ -570,3 +570,23 @@ test("CodeEditor undo: Ctrl+Z undoes the editor's own steps (a command, typed te
   assert.ok(!key(caretOf(el2.querySelector("textarea")), "z", { ctrlKey: true, code: "KeyZ" }).defaultPrevented);
   dispose2();
 });
+
+test("CodeEditor: comments are quiet; the caret's line brings its comment forward", async () => {
+  const [el] = mount(() => h(CodeEditor, { value: "a()\n// note\nb() // end", lang: "ts" }));
+  await tick();
+  const input = caretOf(el.querySelector("textarea"));
+  const coms = () => [...el.querySelectorAll(".m-ced-paint .m-tok-com")];
+  assert.equal(coms().length, 2, "two comments are coloured");
+  assert.deepEqual(coms().map((c) => c.getAttribute("data-vl")), ["2", "3"], "each knows its line");
+  input.setSelectionRange(6, 6); // inside "// note"
+  input.dispatchEvent(new Event("focus"));
+  await tick();
+  assert.deepEqual(coms().map((c) => c.classList.contains("is-lit")), [true, false], "only line 2's comment is lit");
+  input.setSelectionRange(input.value.length, input.value.length);
+  input.dispatchEvent(new Event("focus")); // the test DOM has no active element: focus reads the caret again
+  await tick();
+  assert.deepEqual(coms().map((c) => c.classList.contains("is-lit")), [false, true], "it follows the caret");
+  input.dispatchEvent(new Event("blur"));
+  await tick();
+  assert.deepEqual(coms().map((c) => c.classList.contains("is-lit")), [false, false], "none without the focus");
+});
