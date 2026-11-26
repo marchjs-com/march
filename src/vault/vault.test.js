@@ -73,7 +73,9 @@ test("change passphrase keeps the data; reset removes it", async () => {
 });
 
 test("auto-lock and live values", async () => {
-  const v = make({ autoLock: 30 });
+  // 300 ms: long enough that a slow CI machine does not lock it between the writes and the reads below (with 30 ms
+  // node 22 on CI once saw it locked before the first read); the lock is checked after 360 ms without use
+  const v = make({ autoLock: 300 });
   await v.create(PASS);
   await v.set("k", "a");
   const seen = [];
@@ -83,8 +85,8 @@ test("auto-lock and live values", async () => {
   await v.set("k", "b");
   await tick(5);
   assert.equal(seen.at(-1), "b");
-  await tick(60);
-  assert.equal(v.state(), "locked", "locked after 30 ms without use");
+  await tick(360);
+  assert.equal(v.state(), "locked", "locked after 300 ms without use");
   await tick(5);
   assert.equal(seen.at(-1), undefined, "a locked vault shows nothing");
   dispose();
