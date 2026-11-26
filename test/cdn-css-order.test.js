@@ -80,6 +80,9 @@ test("cdn css: an entry module links its sheets with their ranks (css.json), els
   assert.match(cdnModule("march/x", cdn), /await cdnCss\(\[\[2,"https:\/\/cdn\.test\/1\.0\.0\/s\/b\.css"\],\[7,"https:\/\/cdn\.test\/1\.0\.0\/s\/x\.css"\]\]\)/);
   assert.match(cdnModule("march/y", cdn), /await cdnCss\("https:\/\/cdn\.test\/1\.0\.0\/y\.css"\)/);
   assert.match(cdnDynamic('import("march/x")', cdn, null), /__mCdnLazy\(import\("https:\/\/cdn\.test\/1\.0\.0\/x\.js"\), \[\[2,/);
+  // sheets named by their rank (s/<rank>.css): the ranks alone, a few bytes per entry
+  const byRank = { ...cdn, sheets: { "march/x": { b: "https://cdn.test/1.0.0/s/", r: [2, 7] } } };
+  assert.match(cdnModule("march/x", byRank), /await cdnCss\(\{"b":"https:\/\/cdn\.test\/1\.0\.0\/s\/","r":\[2,7\]\}\)/);
 });
 
 /** A head with just what the link helper uses. */
@@ -105,8 +108,8 @@ test("cdn css: the link helper puts each sheet by its rank, whatever order the m
     void mod.cdnCss([[3, "s/reveal.css"]]);
     void mod.cdnCss([[1, "s/button.css"]]);
     void mod.cdnCss("css/tokens.css");
-    void mod.cdnCss([[5, "s/counter.css"]]);
+    void mod.cdnCss({ b: "s/", r: [5] });
     const hrefs = head.children.map((c) => c.getAttribute("href"));
-    assert.deepEqual(hrefs, ["s/button.css", "s/reveal.css", "s/counter.css", "s/stats-band.css", "css/tokens.css", "/app.css"]);
+    assert.deepEqual(hrefs, ["s/button.css", "s/reveal.css", "s/5.css", "s/stats-band.css", "css/tokens.css", "/app.css"]);
   } finally { globalThis.document = prev; }
 });
