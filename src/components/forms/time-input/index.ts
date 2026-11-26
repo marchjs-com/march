@@ -1,11 +1,12 @@
-// TimeInput: the native time field; value "HH:MM". With picker="clock" a clock button opens a clock dial (the hour
-// on a clock face, then the minutes), as on Android.
+// TimeInput: a time field typed on march/mask's time kind (24 hours, "HH:MM", seconds when step < 60: the colon comes by
+// itself, 25 or 7x minutes cannot be typed, a single 7 becomes 07); value "HH:MM". With picker="clock" a clock button
+// opens a clock dial (the hour on a clock face, then the minutes), as on Android.
 import "./time-input.css";
 import "../../../ui/field.css";
-import { signal } from "../../../core/reactive.ts";
+import { signal, effect, untrack, computed } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, locale } from "../../../core/i18n.ts";
-import { model, ctl, cx, live, syncValue, type ControlProps } from "../../../forms/util.ts";
+import { model, ctl, cx, live, type ControlProps } from "../../../forms/util.ts";
 import { ownPart } from "../../../ui/parts.ts";
 import { IconButton } from "../../actions/icon-button/index.ts";
 import { Popover } from "../../overlays/popover/index.ts";
@@ -13,6 +14,9 @@ import { clock as clockIcon } from "../../../icons/glyphs/clock.ts";
 import type { IconProp } from "../../../icons/types.ts";
 import { ClockDial } from "./dial.ts";
 import { locked } from "../../../ui/behave.ts";
+import { time as timeMask } from "../../../mask/date.ts";
+import { mask as maskBehavior } from "../../../behaviors/mask/mask.ts";
+import type { MaskController } from "../../../mask/input.ts";
 
 export interface TimeInputProps extends ControlProps<string> {
   /** Earliest allowed time ("HH:MM"). @tr İzin verilen en erken saat ("HH:MM"). */
@@ -31,6 +35,10 @@ export interface TimeInputProps extends ControlProps<string> {
   icon?: IconProp;
   /** Accessible names: `choose` (the button and the dial, default "Choose time"), `hours`, `minutes`. @tr Erişilebilir adlar: `choose` (düğme ve kadran, varsayılan "Choose time"), `hours`, `minutes`. */
   labels?: { choose?: string | undefined; hours?: string | undefined; minutes?: string | undefined } | undefined;
+  /** "lazy" (default; the colon appears while typing) or "eager" (the whole template: `__:__`). @tr "lazy" (varsayılan; iki nokta yazarken çıkar) ya da "eager" (tüm şablon: `__:__`). */
+  maskPlaceholder?: "lazy" | "eager" | undefined;
+  /** The shake when a character is refused (hour 25, minute 7x): `false` turns it off, a function plays your own. @tr Bir karakter reddedilince alanın sallanması (saat 25, dakika 7x): `false` kapatır, işlev kendi hareketinizi oynatır. */
+  motion?: boolean | ((el: HTMLInputElement) => void) | undefined;
 }
 
 /** Does a locale write the time on a 12-hour clock? */
@@ -42,14 +50,27 @@ const periods = (loc: string): [string, string] => {
   return [at(9), at(21)];
 };
 
-/** Native time input; value "HH:MM". Props: min, max, step (seconds); picker="clock" adds a clock dial. */
+/** Time field; value "HH:MM" ("HH:MM:SS" with a step under a minute). Props: min, max, step (seconds); picker="clock" adds a clock dial. */
 export function TimeInput(props: TimeInputProps): unknown {
   const [get, set] = model(props, "");
+  const base = ctl(props);
+  const bad = signal(false);
   const el = h("input", {
-    ...ctl(props), type: "time", class: cx("m-input m-time", props.picker !== "clock" && props.class), min: () => props.min ?? null, max: () => props.max ?? null,
-    step: () => props.step ?? null, readonly: () => !!props.readonly, onInput: (e: Event) => set((e.target as HTMLInputElement).value),
+    ...base, type: "text", inputmode: "numeric", autocomplete: "off", class: cx("m-input m-time", props.picker !== "clock" && props.class),
+    placeholder: () => (props.step && props.step < 60 ? "--:--:--" : "--:--"), readonly: () => !!props.readonly,
+    "aria-invalid": () => (bad() || base["aria-invalid"]() ? "true" : null),
   }) as HTMLInputElement;
-  syncValue(el, get);
+  // the typing: the time mask; a complete time out of min / max is marked and not written
+  let typed!: MaskController;
+  const spec = computed(() => timeMask({ seconds: !!props.step && props.step < 60, min: props.min, max: props.max }));
+  maskBehavior(el, {
+    mask: untrack(spec), value: "parsed", placeholder: props.maskPlaceholder, motion: props.motion, ref: (c) => { typed = c; },
+    onChange: (v) => { const st = typed.state(); if (!st.raw) set(""); else if (st.complete && !st.error) set(String(v)); },
+  });
+  effect(() => { const s = spec(); untrack(() => typed.setMask(s)); });
+  effect(() => { const v = get() ?? ""; untrack(() => { if ((typed.state().value ?? "") !== v) typed.set(v); }); });
+  effect(() => { const st = typed.state(); untrack(() => bad.set(!!st.error)); });
+  el.addEventListener("blur", () => { const st = typed.state(); if (st.raw && (!st.complete || st.error)) typed.set(untrack(get) ?? ""); });
   if (props.picker !== "clock") return el;
 
   // the clock picker: the field, a clock button and the dial in a popover anchored to both

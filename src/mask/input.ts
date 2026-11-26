@@ -174,6 +174,8 @@ export function maskInput(el: HTMLInputElement, spec: MaskSpec, o: MaskInputOpti
     const v = el.value, caret = el.selectionStart ?? v.length;
     const before = state.peek();
     const raw = m.parse(v);
+    // text with nothing the mask takes (junk pasted or autofilled) is refused: the field keeps its value
+    if (v.trim() && !raw && before.raw) { el.value = shown(before); o.onReject?.(v, before); return; }
     commit(raw, [...m.parse(v.slice(0, caret))].length, "type", [before.raw, [...before.raw].length]);
   };
   const onInput = (): void => {

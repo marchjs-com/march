@@ -116,7 +116,7 @@ test("NumberInput parses decimal comma and point, never NaN", () => {
   type(input, "1.234"); assert.equal(v(), 1234, "de: dot followed by 3 digits is grouping");
   type(input, "12.5"); assert.equal(v(), 12.5, "decimal point accepted too");
   type(input, "abc"); assert.equal(v(), 12.5, "garbage does not change the value");
-  assert.equal(input.getAttribute("aria-invalid"), "true");
+  assert.equal(input.value, "12,5", "garbage is refused: the text stays");
   input.blur();
   assert.equal(input.value, "12,5");
   assert.equal(input.getAttribute("aria-invalid"), null);

@@ -217,13 +217,6 @@
    ],
    "hash": "af4c8d98ad5c791cb6914cf9c24f0ef4"
   },
-  "CodeInput": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/forms/code-input"
-   ],
-   "hash": "011e8662e7c92c3b7978942338f532c8"
-  },
   "CodeView": {
    "frozen": "2026-11-20",
    "paths": [
@@ -315,26 +308,12 @@
    ],
    "hash": "a0a6d681986ccaae0cecadb6a1ff9af9"
   },
-  "DatePicker": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/forms/date-picker"
-   ],
-   "hash": "a79bb06ce53a984f3deb04c4c501d261"
-  },
   "DateRangePicker": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/date-range-picker"
    ],
    "hash": "14b3972b4ae953d1d3d6598f62a06d07"
-  },
-  "DateTimeInput": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/forms/date-time-input"
-   ],
-   "hash": "dfacc076b6742cf1227f9f85bfad5994"
   },
   "Debugger": {
    "frozen": "2026-11-20",
@@ -755,13 +734,6 @@
     "src/components/landing/not-for-you"
    ],
    "hash": "da5fab1b5fd4dc80f5d28ed054989241"
-  },
-  "NumberInput": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/forms/number-input"
-   ],
-   "hash": "dcb93d80b924aebaa835efef4ac00510"
   },
   "OptionList": {
    "frozen": "2026-11-20",
@@ -1266,13 +1238,6 @@
     "src/components/navigation/thread-nav"
    ],
    "hash": "f9b83bc494a012280d17fb3897b4a2a0"
-  },
-  "TimeInput": {
-   "frozen": "2026-11-20",
-   "paths": [
-    "src/components/forms/time-input"
-   ],
-   "hash": "6dee72535a43ba9f5c55c1738855e154"
   },
   "Timeline": {
    "frozen": "2026-11-20",
@@ -4266,6 +4231,36 @@
    "name": "PhoneInput",
    "what": "thaw",
    "reason": "input mask: per-country format and caret-correct typing on march/mask (composes TextInput mask)"
+  },
+  {
+   "at": "2026-11-26",
+   "name": "NumberInput",
+   "what": "thaw",
+   "reason": "input mask: typing on the march/mask number kind (locale separators, sign, max refused while typing); refused-character motion"
+  },
+  {
+   "at": "2026-11-26",
+   "name": "DatePicker",
+   "what": "thaw",
+   "reason": "input mask: typed date on the march/mask date kind (real validation while typing, padding, eager template)"
+  },
+  {
+   "at": "2026-11-26",
+   "name": "TimeInput",
+   "what": "thaw",
+   "reason": "input mask: typed time on the march/mask time kind (24 h, padding, refused 25 / 7x, seconds with step)"
+  },
+  {
+   "at": "2026-11-26",
+   "name": "DateTimeInput",
+   "what": "thaw",
+   "reason": "input mask: its date and time fields type on march/mask (test refreshed)"
+  },
+  {
+   "at": "2026-11-26",
+   "name": "CodeInput",
+   "what": "thaw",
+   "reason": "input mask: box characters filtered by march/mask (other keyboards' digits, locale capitals)"
   }
  ]
 }

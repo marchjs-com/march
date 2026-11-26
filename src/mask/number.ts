@@ -10,6 +10,8 @@ export interface NumberMaskOptions {
   decimals?: number | undefined;
   /** Pads the decimals with zeros when the field is left (money: "12,50"). @tr Alandan çıkınca ondalıkları sıfırla doldurur (para: "12,50"). */
   fixed?: boolean | undefined;
+  /** Decimals always shown when the field is left (padded with zeros; `fixed` pads all). @tr Alandan çıkınca her zaman gösterilen ondalık sayısı (sıfırla doldurulur; `fixed` hepsini doldurur). */
+  minDecimals?: number | undefined;
   /** Thousands separators (default true). @tr Binlik ayırıcılar (varsayılan true). */
   thousands?: boolean | undefined;
   /** Allows negative numbers ("-" toggles the sign; default false). @tr Negatif sayılara izin verir ("-" işareti değiştirir; varsayılan false). */
@@ -51,6 +53,9 @@ export function numberSeparators(loc: string): { dec: string; grp: string } {
 /** A number mask: `number({ decimals: 2, prefix: "₺", min: 0 })`. Raw "-1234.5", display per locale. */
 export function number(o: NumberMaskOptions = {}): Mask {
   const dp = Math.max(0, o.decimals ?? 0);
+  const minDp = o.fixed ? dp : Math.min(dp, Math.max(0, o.minDecimals ?? 0));
+  // a number as raw text: rounded to dp, at least minDp decimals, never an exponent
+  const toRaw = (n: number): string => { let s = n.toFixed(dp); if (dp > minDp) s = s.replace(new RegExp(`0{1,${dp - minDp}}$`), "").replace(/\.$/, ""); return s; };
   const loc = (): string => o.locale ?? untrack(locale) ?? "en";
   const sep = (): { dec: string; grp: string } => { const s = numberSeparators(loc()); return { dec: o.decimal ?? s.dec, grp: o.group ?? s.grp }; };
   const pre = o.prefix ?? "", suf = o.suffix ?? "";
@@ -104,7 +109,7 @@ export function number(o: NumberMaskOptions = {}): Mask {
     const neg = /-|\(\s*\d/.test(s) && !!o.negative;
     s = s.replace(/[^\d.,]/g, "");
     let decimal: string | null = null;
-    if (dp > 0) {
+    {
       const lc = s.lastIndexOf(","), lp = s.lastIndexOf(".");
       if (lc >= 0 && lp >= 0) decimal = lc > lp ? "," : ".";
       else if (lc >= 0 || lp >= 0) {
@@ -114,6 +119,9 @@ export function number(o: NumberMaskOptions = {}): Mask {
     }
     if (decimal) { const at = s.lastIndexOf(decimal); s = s.slice(0, at).replace(/[.,]/g, "") + "." + s.slice(at + 1).replace(/[.,]/g, ""); }
     else s = s.replace(/[.,]/g, "");
+    // more decimals than allowed (a paste, a stored value): rounded, not cut
+    const d = s.indexOf(".");
+    if (d >= 0 && s.length - d - 1 > dp && /\d/.test(s)) s = toRaw(Number(s));
     return norm((neg ? "-" : "") + s);
   };
   const insert = (raw: string, from: number, to: number, text: string): { raw: string; at: number } | null => {
@@ -154,13 +162,12 @@ export function number(o: NumberMaskOptions = {}): Mask {
     let n = Number(raw);
     if (o.min != null && n < o.min) n = o.min;
     if (o.max != null && n > o.max) n = o.max;
-    const s = o.fixed ? n.toFixed(dp) : String(Number(n.toFixed(dp)));
-    return norm(s.includes("e") ? n.toFixed(dp) : s, true);
+    return norm(toRaw(n), true);
   };
   return {
     kind: "number", format, parse, insert, commit, name: o.name,
     toValue: (raw) => (/\d/.test(raw) ? Number(raw) : null),
-    fromValue: (v) => (v == null || v === "" || !Number.isFinite(Number(v)) ? "" : norm(o.fixed ? Number(v).toFixed(dp) : String(Number(Number(v).toFixed(dp))))),
+    fromValue: (v) => (v == null || v === "" || !Number.isFinite(Number(v)) ? "" : norm(toRaw(Number(v)))),
     check: (raw) => {
       const n = Number(raw);
       if (!/\d/.test(raw) || !Number.isFinite(n)) return null;

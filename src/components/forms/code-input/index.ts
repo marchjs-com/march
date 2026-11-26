@@ -9,6 +9,7 @@ import { inputOf } from "../../../forms/affix.ts";
 import { type ColorToken } from "../../../theme/colors.ts";
 import { clamp, type Handler } from "../../../core/util.ts";
 import { ownPart } from "../../../ui/parts.ts";
+import { text as textMask } from "../../../mask/text.ts";
 
 export interface CodeInputProps extends ControlProps<string> {
   /** Number of boxes, 3–12 (default 6). @tr Kutu sayısı, 3–12 (varsayılan 6). */
@@ -61,11 +62,9 @@ export function CodeInput(props: CodeInputProps): unknown {
   const [get, set] = model(props, "");
   const kind = props.pattern ?? (props.numeric === false ? "alphanumeric" : "numeric");
   const upper = props.uppercase ?? kind !== "numeric";
-  const clean = (s: unknown): string => {
-    const x = String(s ?? "");
-    const kept = kind === "numeric" ? x.replace(/\D/g, "") : kind === "alpha" ? x.replace(/[^\p{L}]/gu, "") : x.replace(/[^\p{L}\p{N}]/gu, "");
-    return upper ? kept.toLocaleUpperCase() : kept;
-  };
+  // the characters a box takes, filtered by march/mask (other keyboards' digits read as 0–9, capitals in the locale)
+  const filter = textMask({ allow: kind === "numeric" ? /^[0-9]$/ : kind === "alpha" ? /^\p{L}$/u : /^[\p{L}\p{N}]$/u, case: upper ? "upper" : undefined });
+  const clean = (s: unknown): string => filter.parse(String(s ?? ""));
   const masked = (): boolean => { const m = props.mask ?? props.masked; return typeof m === "function" ? m() : !!m; };
   const cells = signal(Array.from({ length: n }, (_, i) => clean(untrack(get))[i] ?? ""));
   let completed: string | null = null;

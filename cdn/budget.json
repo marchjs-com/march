@@ -164,13 +164,25 @@
    "limit": 51200,
    "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
   },
+  "march/components/forms/date-picker": {
+   "limit": 32768,
+   "why": "typing on march/mask (caret mapping, real date / time validation while typing, own undo): the shared mask engine is part of its job"
+  },
   "march/components/forms/date-range-picker": {
    "limit": 46080,
    "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
   },
+  "march/components/forms/date-time-input": {
+   "limit": 37888,
+   "why": "typing on march/mask (caret mapping, real date / time validation while typing, own undo): the shared mask engine is part of its job"
+  },
   "march/components/forms/icon-picker": {
    "limit": 46080,
    "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
+  },
+  "march/components/forms/time-input": {
+   "limit": 30720,
+   "why": "typing on march/mask (caret mapping, real date / time validation while typing, own undo): the shared mask engine is part of its job"
   },
   "march/components/landing/branching-story": {
    "limit": 56320,
@@ -245,8 +257,8 @@
    "why": "measured 23 Nov 2026 past the default, more than its job suggests: to look at (what it pulls in statically)"
   },
   "march/components/motion/easing-curve-editor": {
-   "limit": 35840,
-   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job"
+   "limit": 38912,
+   "why": "a full tool built from many components (editor, grid, canvas, player…): its weight is its job; typing on march/mask (caret mapping, real date / time validation while typing, own undo): the shared mask engine is part of its job"
   },
   "march/components/navigation/activity-bar": {
    "limit": 46080,
