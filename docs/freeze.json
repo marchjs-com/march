@@ -203,6 +203,13 @@
    ],
    "hash": "af4c8d98ad5c791cb6914cf9c24f0ef4"
   },
+  "CodeInput": {
+   "frozen": "2026-11-26",
+   "paths": [
+    "src/components/forms/code-input"
+   ],
+   "hash": "02c7724bb3d16fd0ef14863c3a50393d"
+  },
   "CodeView": {
    "frozen": "2026-11-20",
    "paths": [
@@ -294,12 +301,26 @@
    ],
    "hash": "a0a6d681986ccaae0cecadb6a1ff9af9"
   },
+  "DatePicker": {
+   "frozen": "2026-11-26",
+   "paths": [
+    "src/components/forms/date-picker"
+   ],
+   "hash": "462315582e3ce31d8d9653af8631f6ff"
+  },
   "DateRangePicker": {
    "frozen": "2026-11-20",
    "paths": [
     "src/components/forms/date-range-picker"
    ],
    "hash": "14b3972b4ae953d1d3d6598f62a06d07"
+  },
+  "DateTimeInput": {
+   "frozen": "2026-11-26",
+   "paths": [
+    "src/components/forms/date-time-input"
+   ],
+   "hash": "21267a3d514ecbd68fb68eefe1c51b17"
   },
   "Debugger": {
    "frozen": "2026-11-20",
@@ -700,6 +721,13 @@
    ],
    "hash": "da5fab1b5fd4dc80f5d28ed054989241"
   },
+  "NumberInput": {
+   "frozen": "2026-11-26",
+   "paths": [
+    "src/components/forms/number-input"
+   ],
+   "hash": "ceca653f86aaf13be26fa96ff04d4c1d"
+  },
   "OptionList": {
    "frozen": "2026-11-20",
    "paths": [
@@ -776,6 +804,13 @@
     "src/components/navigation/period-nav"
    ],
    "hash": "bdc7b65891299fe126a0001af86b3799"
+  },
+  "PhoneInput": {
+   "frozen": "2026-11-26",
+   "paths": [
+    "src/components/forms/phone-input"
+   ],
+   "hash": "f90171feb88538e112deb8aaa147e7e8"
   },
   "Picture": {
    "frozen": "2026-11-20",
@@ -1155,6 +1190,13 @@
    ],
    "hash": "fbf7a9941ff991082024f4339b61cc61"
   },
+  "TextInput": {
+   "frozen": "2026-11-26",
+   "paths": [
+    "src/components/forms/text-input"
+   ],
+   "hash": "562e690931c0088ed785f1cbd53a01fa"
+  },
   "ThemeEditor": {
    "frozen": "2026-11-20",
    "paths": [
@@ -1175,6 +1217,13 @@
     "src/components/navigation/thread-nav"
    ],
    "hash": "f9b83bc494a012280d17fb3897b4a2a0"
+  },
+  "TimeInput": {
+   "frozen": "2026-11-26",
+   "paths": [
+    "src/components/forms/time-input"
+   ],
+   "hash": "09fe0abd68fee4757d51071683f28dcd"
   },
   "Timeline": {
    "frozen": "2026-11-20",

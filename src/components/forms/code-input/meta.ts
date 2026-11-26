@@ -3,6 +3,7 @@ import { defineMeta } from "../../meta.ts";
 export default defineMeta({
   name: "CodeInput",
   status: "stable",
+  frozen: "2026-11-26",
   since: "0.1.0",
   summary: "One-time code / PIN boxes: typing advances, paste fills, HADİ colors and display font in the HADİ theme.",
   category: "forms",
