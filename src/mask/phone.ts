@@ -57,7 +57,8 @@ export function phone(o: PhoneMaskOptions = {}): Mask {
   // international: "+" and the calling code, then the country's grouping
   const intl = (raw: string): Mask => {
     const r = dialOf(raw);
-    if (!r) return memo("+", () => pattern(`+${GENERIC.replace("999 999", "999999")}`, { inputmode: "tel", autocomplete: "tel" }));
+    // no calling code recognised yet: "+" and plain groups; a pasted "00" prefix is the international "+"
+    if (!r) return memo("+", () => pattern(`+${GENERIC.replace("999 999", "999999")}`, { inputmode: "tel", autocomplete: "tel", prepare: (s) => digits(s).replace(/^00/, "") }));
     // the calling code's digits are part of the raw value, then the country's own grouping
     return memo(r[0], () => pattern(`+${"9".repeat(r[1].length)} ${r[2]}`,{ name: r[0], inputmode: "tel", autocomplete: "tel", prepare: (s) => digits(s).replace(/^00/, "") }));
   };

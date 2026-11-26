@@ -96,12 +96,10 @@ export function DatePicker(props: DatePickerProps): unknown {
   effect(() => { const s = spec(); untrack(() => typed.setMask(s)); });
   effect(() => { const v = get(); untrack(() => { if (typed.state().value !== v) typed.set(v); }); });
   effect(() => { const st = typed.state(); untrack(() => bad.set(!!st.error)); });
-  input.addEventListener("blur", (e) => {
-    // a half-typed date is put back to the value
+  // a half-typed date (or one out of min / max) is put back to the value when the field is left (onBlur comes from ctl)
+  input.addEventListener("blur", () => {
     const st = typed.state();
     if (st.raw && (!st.complete || st.error)) typed.set(untrack(get) ?? "");
-    if (!untrack(get) && st.raw && !st.complete) typed.set("");
-    props.onBlur?.(e);
   });
   const toggle = (on = !open.peek()) => { if (!props.disabled && !props.readonly) open.set(on); };
   const close = (refocus?: boolean) => { open.set(false); if (refocus) input.focus(); };

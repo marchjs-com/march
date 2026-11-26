@@ -58,19 +58,21 @@ export function TimeInput(props: TimeInputProps): unknown {
   const el = h("input", {
     ...base, type: "text", inputmode: "numeric", autocomplete: "off", class: cx("m-input m-time", props.picker !== "clock" && props.class),
     placeholder: () => (props.step && props.step < 60 ? "--:--:--" : "--:--"), readonly: () => !!props.readonly,
+    // the range and the step stay on the element, as on a native time field (read by forms and tests)
+    min: () => props.min ?? null, max: () => props.max ?? null, step: () => props.step ?? null,
     "aria-invalid": () => (bad() || base["aria-invalid"]() ? "true" : null),
   }) as HTMLInputElement;
-  // the typing: the time mask; a complete time out of min / max is marked and not written
+  // the typing: the time mask; a complete time is written, one out of min / max is marked (as a native time field does)
   let typed!: MaskController;
   const spec = computed(() => timeMask({ seconds: !!props.step && props.step < 60, min: props.min, max: props.max }));
   maskBehavior(el, {
     mask: untrack(spec), value: "parsed", placeholder: props.maskPlaceholder, motion: props.motion, ref: (c) => { typed = c; },
-    onChange: (v) => { const st = typed.state(); if (!st.raw) set(""); else if (st.complete && !st.error) set(String(v)); },
+    onChange: (v) => { const st = typed.state(); if (!st.raw) set(""); else if (st.complete) set(String(v)); },
   });
   effect(() => { const s = spec(); untrack(() => typed.setMask(s)); });
   effect(() => { const v = get() ?? ""; untrack(() => { if ((typed.state().value ?? "") !== v) typed.set(v); }); });
   effect(() => { const st = typed.state(); untrack(() => bad.set(!!st.error)); });
-  el.addEventListener("blur", () => { const st = typed.state(); if (st.raw && (!st.complete || st.error)) typed.set(untrack(get) ?? ""); });
+  el.addEventListener("blur", () => { const st = typed.state(); if (st.raw && !st.complete) typed.set(untrack(get) ?? ""); });
   if (props.picker !== "clock") return el;
 
   // the clock picker: the field, a clock button and the dial in a popover anchored to both

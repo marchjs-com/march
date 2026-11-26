@@ -30,7 +30,7 @@ minute you pick closes it. 12-hour clocks get an AM / PM switch.
 
 The time is typed on march/mask's time kind (24 hours): the colon comes by itself, a single 7 becomes 07, hour 25 and
 minute 7x cannot be typed (a short shake; `motion={false}` turns it off), seconds appear when `step` is under a minute,
-a complete time outside `min` / `max` is marked and not written, and a half-typed time is put back when the field is left.
+a complete time outside `min` / `max` is written and marked (as on a native time field), and a half-typed time is put back when the field is left.
 
 ## Accessibility
 

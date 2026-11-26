@@ -21,12 +21,15 @@ test("TimeInput: typed time on the mask with min / max / step and a two-way valu
   input.focus();
   type(input, "10:15");
   assert.equal(v(), "10:15");
-  // out of min / max: marked, not written; put back when the field is left
+  assert.equal(input.getAttribute("min"), "09:00");
+  // out of min / max: written and marked, as on a native time field
   type(input, "19:00");
   assert.equal(input.getAttribute("aria-invalid"), "true");
-  assert.equal(v(), "10:15");
+  assert.equal(v(), "19:00");
+  // half-typed: put back when the field is left
+  type(input, "1");
   input.blur();
-  assert.equal(input.value, "10:15");
+  assert.equal(input.value, "19:00");
   // typing digit by digit: the colon comes by itself, a single 7 becomes 07, hour 25 is refused
   const t = signal("");
   const m2 = mount(() => h(TimeInput, { "bind:value": t }));
