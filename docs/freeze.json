@@ -215,7 +215,7 @@
    "paths": [
     "src/components/composite/code-editor"
    ],
-   "hash": "c3015e2db393e8aa70cee2ee1fbe3b47"
+   "hash": "af4c8d98ad5c791cb6914cf9c24f0ef4"
   },
   "CodeInput": {
    "frozen": "2026-11-20",
@@ -4262,6 +4262,12 @@
    "name": "ChatComposer",
    "what": "refresh",
    "reason": "Kayıt dalgası Waveform bileşenine taşındı (aynı davranış)"
+  },
+  {
+   "at": "2026-11-26",
+   "name": "CodeEditor",
+   "what": "refresh",
+   "reason": "Founder: comments quieter, brighter on the caret line and under the pointer (26 Nov 2026)"
   }
  ]
 }
