@@ -74,6 +74,10 @@
   "version": "Kitaplık sürümü."
  },
  "march/audio": {
+  "loudness": "Bir ses kaynağının LUFS okumaları (anlık, kısa süreli, bütünleşik; K ağırlıklı) ve stereo korelasyonu, sinyal olarak; `reset()` ile yeniden başlar.",
+  "kWeighting": "BS.1770 K ağırlıklandırma süzgecinin katsayıları (verilen örnekleme hızı için): LUFS ölçümünün ilk adımı.",
+  "lufs": "Ortalama kare enerjiyi LUFS'a çevirir (−0,691 + 10·log10); sessizlik LUFS_FLOOR'da kalır.",
+  "LUFS_FLOOR": "Ses yüksekliği okumalarının alt sınırı: sessizlik −70 LUFS okunur.",
   "audioContext": "Her ses kaynağının ve efekt zincirinin paylaştığı tek AudioContext; ilk kullanımda yapılır, Web Audio yoksa null.",
   "mediaChain": "Bir medya öğesinin tek ses yolu `{ input, output }`: varsayılan input → output → hoparlör; efektler arasına girer, ölçerler `output`'u okur.",
   "audioSource": "Ölçerler ve görselleştiriciler için bir ses kaynağı: `audioSource(\"mic\" | \"demo\" | audioEl | stream | () => 0.4)`; düzey, bas/orta/tiz bantları, sol/sağ kanal, dalga biçimi ve spektrum verir; yalnız kullanıldığı ve ekranda olduğu sürece okur.",
@@ -118,6 +122,15 @@
   "hrefOf": "Rotanın sayfaya yazılacak bağlantısı: geçmiş kipinde geçerli adrese göre göreli (\"../flow\"), her kökte ve yeni sekmede doğru; hash kipinde \"#/flow\"."
  },
  "march/data": {
+  "normHeading": "Bir yönü 0–360 aralığına getirir: `normHeading(-30)` → 330.",
+  "glyphOf": "DotMatrix'in 5×7 yazı tipinde bir karakterin sütunları (kendi glifleriniz önce bakılır).",
+  "textColumns": "Bir metnin DotMatrix sütunları: her karakterin glifi ve aralarındaki boşluk.",
+  "FLAP_REEL": "SplitFlap'in varsayılan harf makarası: boşluk, Türkçe büyük harfler, rakamlar ve işaretler.",
+  "toCelsius": "Fahrenheit'ı Celsius'a çevirir.",
+  "toFahrenheit": "Celsius'u Fahrenheit'a çevirir.",
+  "DotMatrix": "`<DotMatrix value=\"ANKARA 14:05\" />` — 5×7 noktalı LED ekran: metin ve sayılar, kayan yazı, silme / dağılma geçişi, kendi glifleriniz.",
+  "SplitFlap": "`<SplitFlap value=\"İSTANBUL\" length={10} />` — yaprak tabela: her hücre harf makarasını kanat kanat yeni metne çevirir; Türkçe büyük harf, kendi makaranız.",
+  "FlipClock": "`<FlipClock timeZone=\"Europe/Istanbul\" />` — yaprak saat: saat, dakika, saniye kartları, yanıp sönen ayraç, 12 saatte ÖÖ/ÖS kanadı, kendi zaman kaynağınız.",
   "AnalogClock": "`<AnalogClock />` — Akrep, yelkovan ve saniye ibreli 12 saatlik kadran; tik tak ya da süzülen saniye, saat dilimi, kendi zaman kaynağı.",
   "Stopwatch": "`<Stopwatch />` — Kronometre: süzülen saniye ibresi, 30 dakikalık alt kadran, başlat / durdur / tur / sıfırla ve tur listesi.",
   "Compass": "`<Compass heading={$h} />` — Pusula: dönen gül ya da ibre, yerel dilde yön harfleri, hedef rota işareti ve yuvarlanan yön göstergesi.",
@@ -125,7 +138,6 @@
   "AttitudeIndicator": "`<AttitudeIndicator pitch={$p} roll={$r} />` — Yapay ufuk: yatışla dönen, yunuslamayla kayan gök ve yer, yatış ölçeği ve uçak simgesi.",
   "Thermometer": "`<Thermometer value={$t} />` — Cam termometre: yaylı sıvı sütunu, °C / °F ölçek, renkli bölgeler.",
   "BatteryGauge": "`<BatteryGauge value={$pil} />` — Pil göstergesi: yaylı dolgu ya da hücreler, düşük / kritik renkleri, şarjda şimşek.",
-  "throttled": "Bir işlevi en fazla `ms` aralıkla çalıştıran sarmalayıcı: ölçerlerin ekran okuyucuya söylediği değer saniyede en çok dört kez güncellenir.",
   "unwrap": "Daire üzerinde kısa yoldan dönen açı: `unwrap(350, 10, 360)` → 370, ibre 12'yi geçerken geri dönmez.",
   "Gauge": "`<Gauge value={$hız} max={240} unit=\"km/h\" />` — ibreli kadran: renkli bölgeler, kırmızı çizgi, yaylı ibre, tepe işareti ve dönen gösterge; hız, devir, yarım ve VU görünümü, sayı ya da ses kaynağı.",
   "Odometer": "`<Odometer value={$km} digits={6} decimals={1} unit=\"km\" />` — sayı çarklarında sayaç: sabit hane, kırmızı kesir çarkı, birim; mekanik, dijital ya da yaprak saat görünümü.",
@@ -177,6 +189,9 @@
   "TYPES": "Alan türleri ve temel davranışları. `fieldType(name, def)` ile genişletilir."
  },
  "march/ui": {
+  "vuDb": "Bir ses düzeyini (0–1) VU desibeline çevirir; `reference` 0 VU'nun düzeyidir (varsayılan 0,5).",
+  "StereoVu": "`<StereoVu source={şarkı} />` — stereo VU çifti: tek panelde sol / sağ ibreli VU ölçer, tepe ışıkları, 0 VU referansı.",
+  "LoudnessGraph": "`<LoudnessGraph source={şarkı} />` — ses yüksekliği geçmişi: anlık / kısa süreli / bütünleşik LUFS, −14 / −23 hedef çizgileri, stereo korelasyon.",
   "AudioReactive": "`<AudioReactive source={mic} effect=\"ring\">…</AudioReactive>` — sesle hareket eden sarmalayıcı: kaynaktan --m-level, --m-bass, --m-mid, --m-treble, --m-peak değişkenlerini yazar; hazır nabız / ışıltı / halka / zıplama efektleri.",
   "audioVarNames": "AudioReactive'in `vars` ayarına göre her okumanın CSS değişkeni adı (yazılmayan null).",
   "Oscilloscope": "`<Oscilloscope source={song} look=\"crt\" />` — sesin dalga biçimini canlı çizer: tetiklenen iz, fosfor izi, ölçek ızgarası, XY Lissajous; modern ya da retro CRT görünüm.",

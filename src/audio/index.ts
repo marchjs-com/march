@@ -15,6 +15,8 @@ import { val, type MaybeFn, clamp } from "../core/util.ts";
 import { onFrame } from "../motion/engine/clock.ts";
 import { watchVisibility } from "../motion/engine/visibility.ts";
 import { reducedMotion } from "../motion/engine/prefs.ts";
+// loudness readings of a source (LUFS momentary / short-term / integrated, stereo correlation): loudness.ts
+export { loudness, kWeighting, lufs, LUFS_FLOOR, type Loudness, type LoudnessOptions } from "./loudness.ts";
 
 /** What a source listens to. @tr Bir kaynağın dinlediği şey. */
 export type AudioInput = "mic" | "demo" | HTMLMediaElement | MediaStream | AudioNode | MaybeFn<number>;

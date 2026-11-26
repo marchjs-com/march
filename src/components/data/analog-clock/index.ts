@@ -8,8 +8,8 @@ import "./analog-clock.css";
 import { signal, computed, effect, untrack, onCleanup } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { t, locale } from "../../../core/i18n.ts";
-import { val, cx, later, type MaybeFn, type ClassProp } from "../../../core/util.ts";
-import { whenVisible } from "../../../ui/observe.ts";
+import { val, cx, type MaybeFn, type ClassProp } from "../../../core/util.ts";
+import { clockParts, secondBeat } from "../../../ui/clock.ts";
 import { onFrame } from "../../../motion/engine/clock.ts";
 import { still } from "../../../motion/engine/parts.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
@@ -19,8 +19,6 @@ import { Gauge, unwrap, type GaugeNeedle } from "../gauge/index.ts";
 export type ClockHand = Omit<GaugeNeedle, "value">;
 /** The parts of the dial on or off. @tr Kadranın parçaları açık ya da kapalı. */
 export interface ClockParts { face?: boolean; ticks?: boolean; numbers?: boolean; hub?: boolean; glass?: boolean; caption?: boolean }
-/** The time of day on the dial. @tr Kadrandaki günün saati. */
-export interface ClockTime { hours: number; minutes: number; seconds: number; ms: number }
 
 export interface AnalogClockProps {
   /** Your own time source: a Date, a timestamp (ms) or a live accessor of one. Default: the system clock. @tr Kendi zaman kaynağınız: bir Date, bir zaman damgası (ms) ya da bunun canlı erişimcisi. Varsayılan: sistem saati. */
@@ -54,24 +52,13 @@ export interface AnalogClockProps {
 }
 
 const ROMAN = ["XII", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI"];
-const zoneFormats = new Map<string, Intl.DateTimeFormat>();
-/** The time of day of `d`, on the device or in a time zone. */
-export function clockTime(d: Date, timeZone?: string): ClockTime {
-  if (!timeZone) return { hours: d.getHours(), minutes: d.getMinutes(), seconds: d.getSeconds(), ms: d.getMilliseconds() };
-  let f = zoneFormats.get(timeZone);
-  if (!f) zoneFormats.set(timeZone, (f = new Intl.DateTimeFormat("en-US", { timeZone, hourCycle: "h23", hour: "numeric", minute: "numeric", second: "numeric" })));
-  const p: Record<string, number> = {};
-  for (const x of f.formatToParts(d)) if (x.type !== "literal") p[x.type] = Number(x.value);
-  return { hours: (p.hour ?? 0) % 24, minutes: p.minute ?? 0, seconds: p.second ?? 0, ms: d.getMilliseconds() };
-}
-
 /** `<AnalogClock timeZone="Europe/Istanbul" />` */
 export function AnalogClock(props: AnalogClockProps): Element {
   // the clock's heartbeat: bumped every second (and every frame while a smooth hand sweeps)
-  const beat = signal(0);
-  const date = computed((): Date => { beat(); const x = val(props.time); return x == null ? new Date() : new Date(x); });
+  const tick = secondBeat();
+  const date = computed((): Date => { tick.beat(); const x = val(props.time); return x == null ? new Date() : new Date(x); });
   const zone = computed(() => val(props.timeZone) || undefined);
-  const parts = computed(() => clockTime(date(), zone()));
+  const parts = computed(() => clockParts(date(), { timeZone: zone() }));
   const mode = computed(() => { const s = val(props.seconds) ?? "tick"; return s === "smooth" && still(props.motion) ? "tick" : s; });
 
   // hand values on a 0–60 scale, continuous: a hand passing 12 (or a time set back) takes the short way round
@@ -125,25 +112,10 @@ export function AnalogClock(props: AnalogClockProps): Element {
     "aria-label": () => `${val(props.label) ?? t`Clock`}: ${spoken()}`,
   }, gauge) as HTMLElement;
 
-  // TIMER: a beat on each whole second (time keeps true even while motion is paused), and every frame while a smooth
-  // second hand sweeps; both only while the clock is on screen (OBSERVE visible). The chain of `later` calls runs
-  // outside the owner, so one cleanup clears whichever timer is pending.
-  const visible = signal(false);
-  whenVisible(root, (v) => visible.set(v));
+  // TIMER: the shared clock beat (ui/clock.ts: each whole second while on screen); OBSERVE visible
+  tick.watch(root, () => props.onTick?.(date()));
   effect(() => {
-    if (!visible()) return;
-    const wait = (): number => 1000 - (Date.now() % 1000) + 2;
-    let id: ReturnType<typeof setTimeout>;
-    const second = (): void => {
-      beat.set(beat.peek() + 1);
-      untrack(() => props.onTick?.(date()));
-      id = later(second, wait());
-    };
-    id = later(second, wait());
-    onCleanup(() => clearTimeout(id));
-  });
-  effect(() => {
-    if (visible() && mode() === "smooth") onCleanup(onFrame(() => beat.set(beat.peek() + 1), { phase: "update" }));
+    if (tick.visible() && mode() === "smooth") onCleanup(onFrame(tick.bump, { phase: "update" }));
   });
   return root;
 }

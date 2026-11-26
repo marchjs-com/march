@@ -11,6 +11,7 @@
 import "./gauge.css";
 import { signal, computed, effect, untrack, onCleanup, getOwner, runWithOwner, type Accessor } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
+import { throttled } from "../../../ui/spoken.ts";
 import { t, locale } from "../../../core/i18n.ts";
 import { val, cx, clamp, later, type MaybeFn, type ClassProp } from "../../../core/util.ts";
 import { still } from "../../../motion/engine/parts.ts";
@@ -162,19 +163,6 @@ export function dialGeometry(variant: GaugeVariant, sweep: number): { cx: number
   if (variant === "vu") return { cx: 100, cy: 152, r: 112, h: 126, readY: 92, capY: 106 };
   if (sweep > 180) return { cx: 100, cy: 100, r: 88, h: 200, readY: 142, capY: 66 };
   return { cx: 100, cy: 100, r: 88, h: 150, readY: 130, capY: 68 };
-}
-
-/** A value for screen readers that follows `fn` at most once every `ms` (a live needle would flood a screen reader). */
-export function throttled<T>(fn: () => T, ms = 250): Accessor<T> {
-  const out = signal(untrack(fn)), owner = getOwner();
-  let pending = false;
-  effect(() => {
-    fn();
-    if (pending) return;
-    pending = true;
-    runWithOwner(owner, () => later(() => { pending = false; out.set(untrack(fn)); }, ms));
-  });
-  return out;
 }
 
 /** `<Gauge value={$speed} max={240} unit="km/h" />` */

@@ -4,7 +4,7 @@ import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal, setLocale } = await import("../../../index.ts");
 const E = await import("../../../motion/engine/clock.ts");
-const { Compass, norm } = await import("./index.ts");
+const { Compass, normHeading } = await import("./index.ts");
 
 setLocale("en");
 E.manualClock(true);
@@ -13,9 +13,9 @@ const rot = (el, sel) => Number(/rotate\(([-\d.]+)/.exec(el.querySelector(sel).g
 const run = (ms) => { for (let i = 0; i < ms / 16; i++) E.step(16); };
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-test("norm keeps a heading within one turn", () => {
-  assert.equal(norm(-90), 270);
-  assert.equal(norm(725), 5);
+test("normHeading keeps a heading within one turn", () => {
+  assert.equal(normHeading(-90), 270);
+  assert.equal(normHeading(725), 5);
 });
 
 test("Compass rose: the scale turns by -heading, N E S W letters, a lubber line, a meter with the heading in words", async () => {

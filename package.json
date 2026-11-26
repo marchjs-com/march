@@ -331,7 +331,19 @@
     "./components/data/odometer": "./src/components/data/odometer/index.ts",
     "./components/media/oscilloscope": "./src/components/media/oscilloscope/index.ts",
     "./components/media/spectrum": "./src/components/media/spectrum/index.ts",
-    "./components/media/waveform": "./src/components/media/waveform/index.ts"
+    "./components/media/waveform": "./src/components/media/waveform/index.ts",
+    "./components/data/altimeter": "./src/components/data/altimeter/index.ts",
+    "./components/data/analog-clock": "./src/components/data/analog-clock/index.ts",
+    "./components/data/attitude-indicator": "./src/components/data/attitude-indicator/index.ts",
+    "./components/data/battery-gauge": "./src/components/data/battery-gauge/index.ts",
+    "./components/data/compass": "./src/components/data/compass/index.ts",
+    "./components/data/dot-matrix": "./src/components/data/dot-matrix/index.ts",
+    "./components/data/flip-clock": "./src/components/data/flip-clock/index.ts",
+    "./components/media/loudness-graph": "./src/components/media/loudness-graph/index.ts",
+    "./components/data/split-flap": "./src/components/data/split-flap/index.ts",
+    "./components/media/stereo-vu": "./src/components/media/stereo-vu/index.ts",
+    "./components/data/stopwatch": "./src/components/data/stopwatch/index.ts",
+    "./components/data/thermometer": "./src/components/data/thermometer/index.ts"
   },
   "bin": {
     "march": "./cli/march.js"

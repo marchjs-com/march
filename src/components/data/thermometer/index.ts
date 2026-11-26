@@ -3,10 +3,11 @@
 // always given in °C; `unit="F"` shows the scale and the readout in Fahrenheit with round Fahrenheit ticks.
 //   <Thermometer value={$temp} />   <Thermometer value={$t} unit="F" secondary zones={[{ from: 30, to: 50, color: "danger" }]} />
 import "./thermometer.css";
-import { signal, computed, effect, untrack, getOwner, runWithOwner, type Accessor } from "../../../core/reactive.ts";
+import { computed, untrack, type Accessor } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
+import { throttled } from "../../../ui/spoken.ts";
 import { t, locale } from "../../../core/i18n.ts";
-import { val, cx, clamp, later, type MaybeFn, type ClassProp } from "../../../core/util.ts";
+import { val, cx, clamp, type MaybeFn, type ClassProp } from "../../../core/util.ts";
 import { still } from "../../../motion/engine/parts.ts";
 import { track } from "../../../motion/engine/value.ts";
 import { niceStep } from "../../../charts/scale.ts";
@@ -62,7 +63,6 @@ const TOP = 16, BOTTOM = 196, X = 50;
 /** `<Thermometer value={$temp} unit="C" />` */
 export function Thermometer(props: ThermometerProps): Element {
   const p = props.parts ?? {};
-  const owner = getOwner();
   const lo = computed(() => Number(val(props.min) ?? -30));
   const hi = computed(() => { const m = Number(val(props.max) ?? 50); return m > lo() ? m : lo() + 1; });
   const unit = computed((): TemperatureUnit => (val(props.unit) === "F" ? "F" : "C"));
@@ -121,9 +121,7 @@ export function Thermometer(props: ThermometerProps): Element {
     p.glass === false ? null : h("path", { class: "m-thermo-shine", d: `M${X - 3.5} ${TOP}V${BOTTOM - 6}` }));
 
   // the spoken value at most 4 times a second (a live sensor would flood a screen reader)
-  const spoken = signal(untrack(value));
-  let pending = false;
-  effect(() => { value(); if (pending) return; pending = true; runWithOwner(owner, () => later(() => { pending = false; spoken.set(untrack(value)); }, 250)); });
+  const spoken = throttled(value);
 
   const shownValue: Accessor<number> = computed(() => show(value()));
   return h("div", {

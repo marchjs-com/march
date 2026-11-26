@@ -4,7 +4,8 @@ import { installDom } from "../../../testing/dom.ts";
 const { document } = installDom({ url: "http://localhost/" });
 const { h, render, signal, setLocale } = await import("../../../index.ts");
 const E = await import("../../../motion/engine/clock.ts");
-const { AnalogClock, clockTime } = await import("./index.ts");
+const { AnalogClock } = await import("./index.ts");
+const { clockParts } = await import("../../../ui/clock.ts");
 
 setLocale("en");
 E.manualClock(true);
@@ -13,11 +14,11 @@ const rot = (el, cls) => Number(/rotate\(([-\d.]+)/.exec(el.querySelector(`.${cl
 const run = (ms) => { for (let i = 0; i < ms / 16; i++) E.step(16); };
 const at = (hh, mm, ss, ms = 0) => new Date(2026, 10, 26, hh, mm, ss, ms);
 
-test("clockTime: the device's time, or a time zone's", () => {
+test("clockParts (ui/clock): the device's time, or a time zone's", () => {
   const d = new Date(Date.UTC(2026, 10, 26, 9, 30, 15));
-  assert.deepEqual(clockTime(d, "UTC"), { hours: 9, minutes: 30, seconds: 15, ms: 0 });
-  assert.equal(clockTime(d, "Asia/Tokyo").hours, 18);
-  assert.equal(clockTime(at(3, 4, 5)).minutes, 4);
+  assert.deepEqual(clockParts(d, { timeZone: "UTC" }), { hours: 9, minutes: 30, seconds: 15, ms: 0, period: "" });
+  assert.equal(clockParts(d, { timeZone: "Asia/Tokyo" }).hours, 18);
+  assert.equal(clockParts(at(3, 4, 5)).minutes, 4);
 });
 
 test("AnalogClock: a Gauge dial with hour / minute / second hands at the right angles, numerals, a spoken time", () => {

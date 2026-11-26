@@ -12,7 +12,8 @@ import { val, cx, clamp, type MaybeFn, type ClassProp } from "../../../core/util
 import { still } from "../../../motion/engine/parts.ts";
 import { track } from "../../../motion/engine/value.ts";
 import { tokenColor, type ColorToken } from "../../../theme/colors.ts";
-import { Gauge, throttled } from "../gauge/index.ts";
+import { Gauge } from "../gauge/index.ts";
+import { throttled } from "../../../ui/spoken.ts";
 
 /** The parts on or off. @tr Parçalar açık ya da kapalı. */
 export interface AttitudeParts { face?: boolean; ladder?: boolean; labels?: boolean; rollScale?: boolean; pointer?: boolean; aircraft?: boolean; glass?: boolean }

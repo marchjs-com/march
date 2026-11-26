@@ -93,13 +93,20 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| Altimeter | experimental | An aircraft altimeter: hundreds, thousands and ten-thousands hands on one 0–9 dial, a pressure (Kollsman) window in hPa or inHg whose digits roll, spring-moving hands that spin through big climbs. Built on Gauge. | [Gauge](#gauge), [CountRoll](#countroll) |
+| AnalogClock | experimental | A 12-hour clock dial with hour, minute and second hands: ticking (spring) or sweeping second hand, a time zone or your own time source, arabic / roman / quarter numerals, a caption and a date window. Built on Gauge. | [Gauge](#gauge) |
+| AttitudeIndicator | experimental | An artificial horizon: sky and ground with a pitch ladder that tilt with the bank and move with the pitch, a roll scale with a sky pointer, a fixed aircraft symbol; gyro-like spring motion. Built on Gauge. | [Gauge](#gauge) |
 | Badge | stable | Small status label in a tone, a dot badge, or a count badge (hidden at 0, 120 → 99+) with an accessible label; a pulsing dot, a mini size and a clickable (button) form. | [StatusDot](#statusdot) |
 | BarChart | experimental | Bar chart: grouped or stacked series, vertical or horizontal, bars that glide to new values, keyboard bars, tooltip, legend and a data table for screen readers. | — |
 | BarList | experimental | Ranked horizontal bars with labels for top-N lists (pages, countries, products): sorted, limited, formatted; rows become buttons with onSelect. | [OverflowText](#overflowtext) |
+| BatteryGauge | experimental | A battery: a case with a cap, a fill or segments that spring to the level, low / critical colours, a bolt while charging, a rolling percentage inside or beside; horizontal or vertical. | [CountRoll](#countroll) |
 | Card | stable | Surface with an optional header (title, subtitle, actions), a body and a footer; action() objects in the header render as buttons. | [PanelHeader](#panelheader) |
+| Compass | experimental | A compass: the rose turns under a lubber line (or a two-tone needle turns on a fixed rose), cardinal letters in the page's language, 4 or 8 points, a bearing marker and a rolling "045° NE" readout; damped spring motion. Built on Gauge. | [Gauge](#gauge), [CountRoll](#countroll) |
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | [SearchBox](#searchbox), [Button](#button), [Chip](#chip), [Menu](#menu), [Checkbox](#checkbox), [Chevron](#chevron), [Badge](#badge), [ResizeHandle](#resizehandle), [Empty](#empty), [LiveStatus](#livestatus), FilterControl, CellEditor |
+| DotMatrix | experimental | An LED dot-matrix display: text and numbers in a 5×7 font (Turkish letters, your own glyphs), lit and unlit dots, a window that scrolls long text, a wipe or dissolve on change, round or square dots in any theme colour. | — |
+| FlipClock | experimental | A flip clock: hours, minutes and seconds on split number cards (Odometer flip), blinking separators, a 12-hour AM / PM flap (SplitFlap), a time zone or your own time source. | [Odometer](#odometer), [SplitFlap](#splitflap) |
 | Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | [ListRow](#listrow), [ResizeHandle](#resizehandle), [Badge](#badge), [LiveStatus](#livestatus) |
-| Gauge | experimental | A dial with a needle: arc track, coloured zones, redline, ticks with labels, spring needle, peak mark and a rolling readout; speedometer, tachometer, half and VU looks, a number or an audio source. | [CountRoll](#countroll), [Odometer](#odometer) |
+| Gauge | experimental | A dial with a needle: arc track, coloured zones, redline, ticks with labels, spring needle, peak mark and a rolling readout; speedometer, tachometer, half and VU looks, a number or an audio source; several needles, full circles that wrap, a turning scale and an inlay make it the dial of the clock, compass and aircraft instruments. | [CountRoll](#countroll), [Odometer](#odometer) |
 | Heatmap | experimental | Heatmap: a grid of intensities (day × hour) or a calendar of weeks, in tones of the theme accent; keyboard cells, tooltip and a data table for screen readers. | — |
 | IconTile | stable | An icon in a tinted rounded square: a tone or any theme colour token; soft, outline or solid; square or round. | — |
 | JsonView | stable | Collapsible read-only JSON tree: typed colours, item / key counts when closed, circular references marked. | [Chevron](#chevron) |
@@ -113,8 +120,11 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | ProgressRing | experimental | A score ring 0–100 (or 0–max) with the number in the middle: low / mid / high levels from thresholds, one theme color or several (gradient, segments, flowing). | — |
 | Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | [PanelHeader](#panelheader), [PeriodNav](#periodnav), [Button](#button), [Segmented](#segmented), [ResizeHandle](#resizehandle), [LiveStatus](#livestatus) |
 | Sparkline | experimental | A tiny trend line without axes, for table cells, list rows and KPI boxes: optional area and last-point dot; screen readers hear a summary of the values. | — |
+| SplitFlap | experimental | A split-flap departure board: each cell turns its reel of letters, digits and signs forward flap by flap to the new text, with a stagger; Turkish capitals, your own reel, any theme colour; the text is read once. | — |
 | Stat | experimental | KPI box: label, formatted value, the change against the previous period with an arrow (green or red, inverted for costs) and an optional sparkline. | [StatTile](#stattile), [Sparkline](#sparkline) |
 | StatTile | experimental | A value with its label and an optional hint: plain, soft tile or card; a button with onClick, a link with href, dt / dd inside a dl; the value may be a node (a rolling Counter). | — |
+| Stopwatch | experimental | A chronograph: a sweeping seconds hand, a 30-minute sub-dial, a digital readout, Start / Stop, Lap and Reset, a lap list with the best and worst lap; spring fly-back on reset. Built on Gauge and Button. | [Gauge](#gauge), [Button](#button) |
+| Thermometer | experimental | A glass thermometer: a liquid column that springs to the value, a scale in °C or °F (or both), coloured zones that also colour the liquid, a rolling readout. | [CountRoll](#countroll) |
 | TimeRuler | experimental | The ruler above a timeline: ticks, time labels and a playhead; read-only, or draggable with a slider playhead (onSeek). Own tick distances, labels, head and colour. | — |
 | Timeline | stable | Ordered list of events with toned dots, optional icons, formatted times (Date / epoch / ISO) or plain text, titles and bodies. | [StatusDot](#statusdot) |
 | Tree | stable | Expandable tree (role=tree) with icons, trailing meta, selection and the full keyboard model; long labels scroll with OverflowText. | [ListRow](#listrow), [Chevron](#chevron), [OverflowText](#overflowtext) |
@@ -172,11 +182,13 @@ Grouped by category (src/components/categories.ts). Each category is a subpath: 
 | AudioReactive | experimental | A wrapper that moves with a sound: writes --m-level, --m-bass, --m-mid, --m-treble and --m-peak (0–1) on itself from a source, with ready pulse / glow / ring / bounce effects. | — |
 | Carousel | stable | Scroll-snap carousel: one to four slides per view, previous / next buttons and dots, swipe on touch, one slide on phones. | [IconButton](#iconbutton), [PageDots](#pagedots) |
 | CornerMark | experimental | A small round mark in a corner of a picture, card or avatar (video sign, open arrow, add badge): corner, icon, colour, size, look, shown always or on hover. | — |
+| LoudnessGraph | experimental | A loudness meter's history: momentary / short-term / integrated LUFS (K-weighted, march/audio loudness()) on LineChart with −14 / −23 target lines, the stereo correlation graph and bar, tweening readouts. | [LineChart](#linechart) |
 | Media | stable | An image, video or audio element that fits its container (kind from the extension), a text fallback when loading fails; openMedia() shows it in a dialog. | [Dialog](#dialog) |
 | Oscilloscope | experimental | The shape of a sound, live: a triggered waveform trace with glow and phosphor afterglow over a graticule, or left against right (X/Y Lissajous); a modern panel or a retro CRT look; reads any march/audio source. | — |
 | Overlay | stable | A decorative layer inside its container: an image, a muted looping video, an SVG, a canvas drawing or a CSS effect (glass, mesh, noise …); never takes input. | — |
 | Picture | experimental | An image from a picture object ({ src, alt, width, height, srcset, sizes }) or a ready node passed through: lazy by default, eager for the first screen, fit and a fallback. | — |
 | Spectrum | experimental | The frequencies of a sound, live: log-frequency bars with falling peak caps, mirrored, around a circle or as a line; one theme color, the four HADİ colors or your own tokens; reads any march/audio source. | — |
+| StereoVu | experimental | A stereo VU-meter pair on one panel: two needle VU meters (Gauge vu) for left and right from a march/audio source or two numbers, peak lights that hold or latch, a 0 VU reference, metal / dark / wood panels. | [Gauge](#gauge), [IconButton](#iconbutton), [StatusDot](#statusdot) |
 | Waveform | experimental | The bars of a sound (voice message, podcast): from peaks, an audio file (decoded lazily) or a live march/audio source; playhead with played bars, chapter regions, seek by pointer and keyboard; decorative recording bars. | — |
 
 ### Motion — `march/motion`
@@ -320,6 +332,35 @@ Composed of: [IconButton](#iconbutton)
 
 Full page: src/components/feedback/alert/docs.md
 
+## Altimeter
+
+An aircraft's three-pointer altimeter: the long hand counts hundreds (one turn per 1,000), the short wide hand thousands (one turn per 10,000), the thin pointer with a wedge tip ten thousands, all on one 0–9 dial, and a pressure (Kollsman) window at 3 o'clock whose digits roll. For flight simulators, drone telemetry, hiking and elevation dashboards, a game cockpit. The hands move on springs and spin through big climbs like the real instrument.
+
+Composed of: [Gauge](#gauge), [CountRoll](#countroll)
+
+```tsx
+<Altimeter value={$altitude} pressure={1013} />
+<Altimeter value={$alt} unit="m" pressure={29.92} pressureUnit="inHg" />
+<Altimeter value={$alt} parts={{ tenThousands: false, window: false }} hands={{ hundreds: { color: "warning" } }} />
+```
+
+Full page: src/components/data/altimeter/docs.md
+
+## AnalogClock
+
+A 12-hour clock dial with hour, minute and second hands, as on a wall clock or a fine watch: the time in another city, a world-clock row, an office dashboard, a booking screen. The second hand ticks once a second with a small spring (a quartz tick) or sweeps smoothly; the time is the system clock, a time zone's, or your own source.
+
+Composed of: [Gauge](#gauge)
+
+```tsx
+<AnalogClock />
+<AnalogClock timeZone="Asia/Tokyo" caption="Tokyo" seconds="smooth" />
+<AnalogClock numerals="roman" seconds={false} hands={{ hour: { color: "brand-blue" } }} />
+<AnalogClock time={$meetingTime} readout={(d) => d.toLocaleDateString()} />
+```
+
+Full page: src/components/data/analog-clock/docs.md
+
 ## AppShell
 
 The application frame. Desktop: a sticky sidebar column (usually a NavMenu or NavSidebar) and a scrolling main area; above the main column an optional banner slot (`top`, for update or offline banners) and a sticky header (`header`, for the title, search and user menu). Narrow screens: a slim top bar with the menu button and a full-width main. A "Skip to content" link comes first. It is its own module, so an app's entry does not pull in page scaffolding.
@@ -348,6 +389,20 @@ Composed of: [DockLayout](#docklayout), [Menu](#menu), [CodeEditor](#codeeditor)
 ```
 
 Full page: src/components/composite/app-ui/docs.md
+
+## AttitudeIndicator
+
+An artificial horizon, the instrument at the centre of every cockpit: sky and ground meet at a horizon that tilts with the bank and moves with the pitch, a pitch ladder marks every 5° and 10°, a roll scale (10, 20, 30, 45, 60°) sits on the bezel with a sky pointer that follows the bank, and a fixed aircraft symbol stays in the middle. For flight simulators, drone and robot telemetry, a phone's tilt (device orientation), a game HUD.
+
+Composed of: [Gauge](#gauge)
+
+```tsx
+<AttitudeIndicator pitch={$pitch} roll={$roll} />
+<AttitudeIndicator pitch={$p} roll={$r} range={20} colors={{ sky: "brand-blue", ground: "brand-gold" }} />
+<AttitudeIndicator pitch={$p} roll={$r} parts={{ labels: false, pointer: false }} motion={false} />
+```
+
+Full page: src/components/data/attitude-indicator/docs.md
 
 ## AudioReactive
 
@@ -432,6 +487,20 @@ Composed of: [OverflowText](#overflowtext)
 ```
 
 Full page: src/components/data/bar-list/docs.md
+
+## BatteryGauge
+
+A battery's charge in the familiar battery shape: a case with a terminal cap, a fill (or lit cells) that springs to the level, colours that turn amber when low and red when critical, a bolt while charging and a rolling percentage inside or beside it. For device lists, IoT and fleet dashboards, a phone mock-up, an electric car's range card, a game's energy.
+
+Composed of: [CountRoll](#countroll)
+
+```tsx
+<BatteryGauge value={$battery} charging={$plugged} />
+<BatteryGauge value={18} variant="segments" segments={5} />
+<BatteryGauge value={$level} orientation="vertical" readout="outside" low={30} onStateChange={(s) => s === "critical" && warn()} />
+```
+
+Full page: src/components/data/battery-gauge/docs.md
 
 ## BeforeAfter
 
@@ -815,6 +884,21 @@ registerCommands([{ id: "doc.new", title: "New document", group: "Document", sho
 
 Full page: src/components/composite/command-palette/docs.md
 
+## Compass
+
+A heading on a compass rose: a ship's or an aircraft's compass, a map's orientation, a drone's heading, a wind direction. Two ways to read it: the rose turns under a fixed lubber line (`mode="rose"`, default), or a two-tone needle turns on a fixed rose (`mode="needle"`, a hiking compass, a wind dial). Cardinal letters come in the page's language, a bearing marker shows a course to steer, and the readout rolls ("045° NE"). The card moves on a damped spring, always the short way round (350° → 10° turns 20° forward).
+
+Composed of: [Gauge](#gauge), [CountRoll](#countroll)
+
+```tsx
+<Compass heading={$heading} />
+<Compass heading={$heading} bearing={120} points={8} />
+<Compass heading={$wind} mode="needle" readout={false} />
+<Compass heading={$h} cardinals={["K", "D", "G", "B"]} color="brand-blue" />
+```
+
+Full page: src/components/data/compass/docs.md
+
 ## ConsentBanner
 
 The consent manager's UI. A bottom banner asks until there is a valid decision for the current policy version (Reject all sits next to Accept all, with the same weight); the preferences panel lists every category as a Card with a Toggle (a Dialog on wide screens, a bottom sheet on phones); `ConsentGate` keeps third-party content behind a placeholder that can allow it in place. The module is lazy on purpose: load it with `lazy(() => import("march/managers/consent/ui"), { pick: "ConsentBanner" })`.
@@ -1063,6 +1147,21 @@ Composed of: [Tabs](#tabs), [IconButton](#iconbutton), [Button](#button), [Resiz
 
 Full page: src/components/composite/dock-layout/docs.md
 
+## DotMatrix
+
+An LED dot-matrix display: the destination board of a bus, a stock ticker, a scoreboard, a "now playing" sign. Text and numbers are drawn in a 5×7 dot font (ASCII, the Turkish letters and °; add your own glyphs) as lit dots over the faint unlit grid, in a dark housing that stays dark in every theme. A new value appears with a wipe (column by column) or a dissolve (dot by dot) on the motion engine; a change that arrives mid-way starts from the board as it is. Text wider than the window (`columns`) scrolls like a marquee, a whole column at a time, after a short hold; it pauses while the pointer is over it and while `paused`, and only runs while the board is on screen.
+
+```tsx
+<DotMatrix value="ANKARA  14:05" />
+<DotMatrix value={$score} columns={3} align="end" color="danger" size="lg" />
+<DotMatrix value={$temp} format={{ maximumFractionDigits: 1, style: "unit", unit: "celsius" }} columns={7} align="end" />
+<DotMatrix value="Kapılar kapanıyor, lütfen geri çekilin" columns={16} speed={24} />
+<DotMatrix value="I ♥ MARCH" glyphs={{ "♥": [".#.#.", "#####", "#####", ".###.", "..#..", ".....", "....."] }} />
+<DotMatrix value={$text} transition="dissolve" duration={600} dot="square" parts={{ glow: false }} />
+```
+
+Full page: src/components/data/dot-matrix/docs.md
+
 ## Drawer
 
 A sheet that slides in from an edge: `start` / `end` (mirrored in right-to-left layouts), `top` or `bottom`. It can be dragged toward its edge to close, rest on snap points, and be modal (scrim, focus trap, the page inert) or non-modal (the page stays usable).
@@ -1203,6 +1302,22 @@ Composed of: [Progress](#progress), [ListRow](#listrow), [IconButton](#iconbutto
 
 Full page: src/components/forms/file-upload/docs.md
 
+## FlipClock
+
+A flip clock: the bedside clock whose number cards fall over every second. Hours, minutes and seconds are Odometer's flip cards (only the cards whose digit changed move, on the motion engine), the separators blink once a second, and a 12-hour clock shows its morning / afternoon text on a small split-flap (SplitFlap) in the page's language. The time is the system clock, a time zone's, or your own: a Date, a timestamp or a live accessor (a countdown, a match clock, a replay). It ticks only while it is on screen.
+
+Composed of: [Odometer](#odometer), [SplitFlap](#splitflap)
+
+```tsx
+<FlipClock />
+<FlipClock timeZone="Asia/Tokyo" label="Tokyo" seconds={false} />
+<FlipClock hour12 size="lg" color="warning" />
+<FlipClock time={() => $end - $now} timeZone="UTC" />          // a countdown: a duration shown as UTC time
+<FlipClock separator="." blink={false} parts={{ frame: false }} />
+```
+
+Full page: src/components/data/flip-clock/docs.md
+
 ## FlowCanvas
 
 A node editor on an endless canvas: pan and zoom, snap to the grid, nodes with ports and form fields, bezier edges, values flowing along the edges as moving dots, box and multi selection, copy / paste, undo, a minimap, layered auto layout, groups, a context menu and full keyboard use. The flow lives in a store (`createFlow`) that FlowPalette adds to and FlowControls runs; it reads and writes a readable JSON schema (`march.flow/v1`).
@@ -1314,6 +1429,8 @@ Composed of: [CountRoll](#countroll), [Odometer](#odometer)
 <Gauge variant="half" value={$load} unit="%" zones={[{ from: 0, to: 60, color: "success" }, { from: 60, to: 85, color: "warning" }]} redline={85} peak />
 <Gauge variant="vu" source={audioSource("demo")} />                      // a needle VU meter in dB (march/audio)
 <Gauge value={$mbps} max={1000} readout="odometer" needle="vu" color="brand-blue" />
+<Gauge value={$now} needles={[{ value: $avg, label: "Average", color: "info", length: 0.7 }]} />   // several needles
+<Gauge min={0} max={60} sweep={360} start={0} needles={hands} />          // a full circle that wraps (a clock face)
 ```
 
 Full page: src/components/data/gauge/docs.md
@@ -1749,6 +1866,22 @@ Composed of: Marquee, [Grid](#grid), [Picture](#picture), [Reveal](#reveal)
 ```
 
 Full page: src/components/landing/logo-cloud/docs.md
+
+## LoudnessGraph
+
+The history graph of a broadcast or streaming loudness meter. It reads a live sound's loudness with march/audio's `loudness()` (momentary and short-term loudness in LUFS with the K-weighting of ITU-R BS.1770, the gated integrated loudness and the stereo correlation) or readings you feed it, records them a few times a second, and draws the last seconds on the chart family's LineChart with target lines (−14 LUFS for streaming services, −23 LUFS for broadcast, EBU R128), a second LineChart for the correlation (−1 out of phase … 0 wide … +1 mono), and readouts that tween to each new reading on the motion engine. It samples only while it is on screen and not `paused`.
+
+Composed of: [LineChart](#linechart)
+
+```tsx
+const song = audioSource(audioEl)
+<LoudnessGraph source={song} />
+<LoudnessGraph source={mic} show={["shortTerm", "integrated"]} targets={[{ value: -16, label: "Podcast" }]} span={60} />
+<LoudnessGraph value={$serverMeter} rate={4} parts={{ correlation: false }} />      // readings from elsewhere
+<LoudnessGraph source={song} range={[-36, -6]} colors={{ momentary: "brand-blue", shortTerm: "brand-pink" }} />
+```
+
+Full page: src/components/media/loudness-graph/docs.md
 
 ## MadeWithMarch
 
@@ -2694,6 +2827,19 @@ A ring that turns while something loads. Three sizes; in a multicolour theme (HA
 
 Full page: src/components/feedback/spinner/docs.md
 
+## SplitFlap
+
+A split-flap board: the clattering departure board of a station or an airport, a scoreboard, a counter of letters. Each cell is a reel of flaps (a blank, the Turkish alphabet, Q W X, digits and signs); when the value changes every cell turns forward, one flap at a time, until it shows its character, the cells starting one after another. The leaf folds over the hinge on the motion engine's clock, so global speed, pause, reduced motion and off-screen pausing all apply. A new value mid-way keeps each reel turning from the flap it shows (reels only go forward, as real ones do).
+
+```tsx
+<SplitFlap value="İSTANBUL" length={10} />
+<SplitFlap value={$gate} length={3} align="end" color="warning" size="lg" />
+<SplitFlap value={$status} length={12} flapTime={50} stagger={30} live="polite" label="Durum" />
+<SplitFlap value={$code} chars=" 0123456789" length={4} onSettle={(t) => console.log("shown", t)} />
+```
+
+Full page: src/components/data/split-flap/docs.md
+
 ## Splitter
 
 Two panes side by side with a handle between them. Drag the handle, or focus it and use ← → (mirrored in RTL), Home / End for the limits and Enter to go back to the initial share. Each pane keeps at least `min` of the width.
@@ -2813,6 +2959,36 @@ Composed of: [CheckMark](#checkmark)
 ```
 
 Full page: src/components/navigation/steps/docs.md
+
+## StereoVu
+
+The stereo VU-meter pair of a tape deck or a mixing console: two needle VU meters side by side on one panel, left and right, each with a peak light that flashes when its channel goes over a level. The meters are Gauge `variant="vu"` (a dB scale that crowds towards the top, as a real VU meter's does, and needles with 300 ms VU ballistics on the motion engine); the panel feeds them the left and right levels of a live sound (`source`, see march/audio) or two numbers (`value`). It reads only while it is on screen.
+
+Composed of: [Gauge](#gauge), [IconButton](#iconbutton), [StatusDot](#statusdot)
+
+```tsx
+const song = audioSource(audioEl)
+<StereoVu source={song} />
+<StereoVu source={mic} reference={0.126} panel="dark" peak={2} />            // 0 VU = −18 dBFS, as in a studio
+<StereoVu value={[$left, $right]} peakHold={0} onPeak={(ch) => warn(ch)} />   // latched lights, reset by a press
+<StereoVu source={song} panel="wood" size={180} needle="spring" caption="dB" />
+```
+
+Full page: src/components/media/stereo-vu/docs.md
+
+## Stopwatch
+
+A chronograph: a sweeping seconds hand on a 60-second dial, a 30-minute sub-dial, a digital readout, Start / Stop, Lap and Reset buttons and a lap list with the best and the worst lap marked. For workouts, cooking, speed runs, presentations, lab timing. It measures real time (`performance.now`), so the global motion speed or a paused engine never changes the time it shows; on Reset the hands fly back to zero on a spring, the short way round.
+
+Composed of: [Gauge](#gauge), [Button](#button)
+
+```tsx
+<Stopwatch />
+<Stopwatch running={$on} onLap={(l) => save(l.lap)} decimals={1} />
+<Stopwatch subDial={false} texts={{ start: "Başlat", stop: "Durdur", resume: "Sürdür", lap: "Tur", reset: "Sıfırla", lapName: (n) => `Tur ${n}` }} />
+```
+
+Full page: src/components/data/stopwatch/docs.md
 
 ## StoryProgress
 
@@ -2973,6 +3149,20 @@ Composed of: Dropdown, ThemeSwatch, [OverflowText](#overflowtext), [SectionLabel
 ```
 
 Full page: src/components/composite/theme-menu/docs.md
+
+## Thermometer
+
+A glass thermometer: a liquid column that rises and falls on a spring, a scale in °C or °F (or both, one on each side), coloured zones beside the tube that also colour the liquid, and a rolling readout under the bulb. For weather cards, smart-home rooms, server and engine temperatures, a fever chart. Values are always given in °C; `unit="F"` shows the scale and the readout in Fahrenheit with round Fahrenheit ticks.
+
+Composed of: [CountRoll](#countroll)
+
+```tsx
+<Thermometer value={$temp} />
+<Thermometer value={$t} unit="F" secondary />
+<Thermometer value={$t} min={-20} max={40} zones={[{ from: -20, to: 0, color: "info" }, { from: 28, to: 40, color: "danger" }]} />
+```
+
+Full page: src/components/data/thermometer/docs.md
 
 ## ThreadNav
 

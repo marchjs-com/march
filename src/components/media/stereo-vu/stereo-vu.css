@@ -1,0 +1,54 @@
+/* March — StereoVu. Two Gauge VU dials on one panel: brushed metal (theme surfaces), a black console or a walnut
+   cabinet (warm tones mixed from --m-warn and --m-scrim), screws in the corners, the channel letter and the peak light
+   under each dial. The panel always reads left then right (a stereo pair is physical, also in a right-to-left page).
+   Hooks: .m-svu (root; .m-svu-metal|dark|wood, .m-svu-bare, .m-svu-noglass), .m-svu-ch (.is-left / .is-right),
+   .m-svu-meter (the Gauge), .m-svu-foot, .m-svu-label, .m-svu-light (.is-on). */
+.m-svu {
+  --m-svu-w: 220px;
+  --m-svu-pad: calc(var(--m-svu-w) * .08);
+  --m-svu-face: var(--m-surface);
+  --m-svu-ink: var(--m-text-2);
+  --m-svu-screw: radial-gradient(circle at 35% 35%, var(--m-surface), var(--m-border-strong) 70%);
+  position: relative; display: inline-flex; flex-wrap: wrap; justify-content: center; gap: var(--m-svu-pad);
+  box-sizing: border-box; max-inline-size: 100%; vertical-align: middle; direction: ltr;
+  padding: var(--m-svu-pad) calc(var(--m-svu-pad) * 1.3) calc(var(--m-svu-pad) * .7);
+  border-radius: calc(var(--m-svu-w) * .06);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--m-surface) 70%, transparent), transparent 40%),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--m-text) 3%, transparent) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, color-mix(in srgb, var(--m-text) 5%, var(--m-surface-2)), color-mix(in srgb, var(--m-text) 14%, var(--m-surface-2)));
+  border: var(--m-border-w, 1px) solid var(--m-border-strong);
+  box-shadow: var(--m-shadow-3), var(--m-highlight, inset 0 1px 0 transparent);
+  color: var(--m-svu-ink);
+}
+/* four screws */
+.m-svu::before, .m-svu::after {
+  content: ""; position: absolute; inset-block: calc(var(--m-svu-pad) * .35); inline-size: calc(var(--m-svu-w) * .035);
+  background: var(--m-svu-screw) top / 100% auto no-repeat, var(--m-svu-screw) bottom / 100% auto no-repeat;
+  background-size: 100% calc(var(--m-svu-w) * .035); pointer-events: none;
+}
+.m-svu::before { inset-inline-start: calc(var(--m-svu-pad) * .35); }
+.m-svu::after { inset-inline-end: calc(var(--m-svu-pad) * .35); }
+
+.m-svu-dark {
+  --m-svu-ink: color-mix(in srgb, var(--m-on-scrim) 80%, transparent);
+  --m-svu-screw: radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--m-on-scrim) 40%, var(--m-scrim)), var(--m-scrim) 70%);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--m-scrim) 76%, var(--m-surface)), color-mix(in srgb, var(--m-scrim) 92%, var(--m-surface)));
+  border-color: color-mix(in srgb, var(--m-scrim) 60%, var(--m-border-strong));
+}
+.m-svu-wood {
+  --m-svu-ink: color-mix(in srgb, var(--m-on-scrim) 82%, var(--m-warn));
+  background:
+    repeating-linear-gradient(100deg, color-mix(in srgb, var(--m-scrim) 12%, transparent) 0 2px, transparent 2px 9px),
+    linear-gradient(180deg, color-mix(in srgb, var(--m-warn) 38%, var(--m-scrim)), color-mix(in srgb, var(--m-warn) 22%, var(--m-scrim)));
+  border-color: color-mix(in srgb, var(--m-warn) 30%, var(--m-scrim));
+}
+.m-svu-bare { padding: 0; border: 0; background: none; box-shadow: none; }
+.m-svu-bare::before, .m-svu-bare::after { content: none; }
+.m-svu-noglass .m-gauge-glass { display: none; }
+
+.m-svu-ch { display: flex; flex-direction: column; align-items: center; gap: calc(var(--m-svu-w) * .04); min-inline-size: 0; }
+.m-svu-foot { display: flex; align-items: center; gap: calc(var(--m-svu-w) * .05); min-block-size: 1.5rem; }
+.m-svu-label { font: 700 calc(var(--m-svu-w) * .07) / 1 var(--m-font); letter-spacing: .12em; }
+.m-svu-light .m-status-dot { transition: box-shadow var(--m-dur-fast) var(--m-ease); }
+.m-svu-light.is-on .m-status-dot { box-shadow: 0 0 calc(var(--m-svu-w) * .04) var(--m-danger); }

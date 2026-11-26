@@ -589,5 +589,17 @@ const tr: Record<string, string> = {
   "charging": "şarj oluyor",
   "critical": "kritik",
   "low": "düşük",
+  // displays and audio (DotMatrix, SplitFlap, FlipClock, StereoVu, LoudnessGraph)
+  "Display": "Gösterge",
+  "Board": "Tablo",
+  "Stereo VU": "Stereo VU",
+  "Reset peak": "Tepe ışığını söndür",
+  "Loudness": "Ses yüksekliği",
+  "Momentary": "Anlık",
+  "Short-term": "Kısa süreli",
+  "Integrated": "Bütünleşik",
+  "Correlation": "Korelasyon",
+  "Target": "Hedef",
+  "no reading": "okuma yok",
 };
 export default tr;

@@ -1,0 +1,32 @@
+/* March — DotMatrix. An LED board: a dark housing (--m-scrim, dark in every theme, as a real sign), unlit dots as a faint
+   grid, lit dots in the colour token with a soft glow. The SVG is one dot per viewBox unit, so the dot pitch
+   (--m-dm-dot) sets the size: its height is 7 dots, its width the window's columns (--m-dm-cols).
+   Hooks: .m-dm (root; .is-scrolling, .is-changing), .m-dm-screen, .m-dm-off, .m-dm-lit (.is-glow). */
+.m-dm {
+  --m-dm-dot: 6px;
+  --m-dm-on: var(--m-warn);
+  --m-dm-housing: color-mix(in srgb, var(--m-scrim) 92%, var(--m-text) 8%);
+  --m-dm-unlit: color-mix(in srgb, var(--m-on-scrim) 9%, transparent);
+  --m-dm-glow: .6px; /* in dots: a filter inside the SVG measures in its viewBox units */
+  display: inline-block; box-sizing: border-box; vertical-align: middle; max-inline-size: 100%;
+  padding: calc(var(--m-dm-dot) * 1.1); border-radius: calc(var(--m-dm-dot) * 1.2);
+  background:
+    radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--m-on-scrim) 6%, transparent), transparent 70%),
+    var(--m-dm-housing);
+  border: var(--m-border-w, 1px) solid color-mix(in srgb, var(--m-scrim) 60%, var(--m-border-strong));
+  box-shadow: var(--m-shadow-2), inset 0 1px 0 color-mix(in srgb, var(--m-on-scrim) 10%, transparent),
+    inset 0 calc(var(--m-dm-dot) * .4) calc(var(--m-dm-dot) * 1.4) color-mix(in srgb, var(--m-scrim) 70%, transparent);
+  line-height: 0;
+}
+.m-dm[data-m-color] { --m-dm-on: var(--m-accent); }
+.m-dm-sm { --m-dm-dot: 4px; }
+.m-dm-lg { --m-dm-dot: 9px; }
+.m-dm-bare { padding: 0; border: 0; background: none; box-shadow: none; --m-dm-unlit: color-mix(in srgb, var(--m-text) 8%, transparent); }
+
+.m-dm-screen {
+  display: block; overflow: hidden; max-inline-size: 100%;
+  inline-size: calc(var(--m-dm-cols) * var(--m-dm-dot)); block-size: auto; aspect-ratio: var(--m-dm-cols) / 7;
+}
+.m-dm-off { fill: var(--m-dm-unlit); }
+.m-dm-lit { fill: var(--m-dm-on); }
+.m-dm-lit.is-glow { filter: drop-shadow(0 0 var(--m-dm-glow) color-mix(in srgb, var(--m-dm-on) 70%, transparent)); }

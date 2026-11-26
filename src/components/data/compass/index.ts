@@ -44,8 +44,8 @@ export interface CompassProps {
   class?: ClassProp;
 }
 
-/** A heading within one turn, 0–359.9…: `norm(-90)` → 270. */
-export const norm = (deg: number): number => ((deg % 360) + 360) % 360;
+/** A heading within one turn, 0–359.9…: `normHeading(-90)` → 270. */
+export const normHeading = (deg: number): number => ((deg % 360) + 360) % 360;
 
 /** `<Compass heading={$heading} bearing={120} />` */
 export function Compass(props: CompassProps): Element {
@@ -62,8 +62,8 @@ export function Compass(props: CompassProps): Element {
     return points() === 8 ? [t`N`, t`NE`, t`E`, t`SE`, t`S`, t`SW`, t`W`, t`NW`] : [t`N`, t`E`, t`S`, t`W`];
   });
   // the name of the nearest point (8 points when given, else 4)
-  const point = (deg: number): string => { const n = names(), k = n.length; return n[Math.round(norm(deg) / (360 / k)) % k]!; };
-  const fmt = (v: number): string => `${String(Math.round(norm(v)) % 360).padStart(3, "0")}° ${point(v)}`;
+  const point = (deg: number): string => { const n = names(), k = n.length; return n[Math.round(normHeading(deg) / (360 / k)) % k]!; };
+  const fmt = (v: number): string => `${String(Math.round(normHeading(v)) % 360).padStart(3, "0")}° ${point(v)}`;
   const label = (v: number): string => {
     const n = names(), step = 360 / n.length;
     return v % step === 0 ? n[v / step]! : String(v / 10);
@@ -78,8 +78,8 @@ export function Compass(props: CompassProps): Element {
   const readout = (): Node | false => {
     const ro = props.readout ?? true;
     return !ro || p.readout === false ? false
-      : typeof ro === "function" ? h("span", { class: "m-compass-readout" }, () => ro(norm(heading())))
-      : h("span", { class: "m-compass-readout" }, h(CountRoll, { value: () => Math.round(norm(heading())) % 360, formatter: fmt, spoken: fmt, roll: () => !still(props.motion), duration: 240 }));
+      : typeof ro === "function" ? h("span", { class: "m-compass-readout" }, () => ro(normHeading(heading())))
+      : h("span", { class: "m-compass-readout" }, h(CountRoll, { value: () => Math.round(normHeading(heading())) % 360, formatter: fmt, spoken: fmt, roll: () => !still(props.motion), duration: 240 }));
   };
 
   const gauge = h(Gauge, {

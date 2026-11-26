@@ -38,7 +38,7 @@ lubber line and the "045° NE" text.
 | `label` | Accessible name. Default "Compass". |
 
 Class hooks: `m-compass` (+ `m-compass-rose`, `m-compass-needle`), `m-compass-lubber`, `m-compass-north`,
-`m-compass-south`, `m-compass-readout`, and the Gauge hooks inside. `export const norm(deg)` keeps a heading in 0–360.
+`m-compass-south`, `m-compass-readout`, and the Gauge hooks inside. `export const normHeading(deg)` keeps a heading in 0–360.
 
 ## Accessibility
 

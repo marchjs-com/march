@@ -1,0 +1,24 @@
+/* March — FlipClock. Odometer's flip cards (their look lives in odometer.css) in a dark housing, groups of two cards
+   with separators that blink once a second (.is-odd dims them; the fade runs on the theme's duration token), and the
+   12-hour flap (SplitFlap) beside them. Hooks: .m-flipclock (root; .is-blink, .is-odd, .m-flipclock-bare),
+   .m-flipclock-cards, .m-flipclock-h / -m / -s (the Odometers), .m-flipclock-sep, .m-flipclock-period. */
+.m-flipclock {
+  --m-flipclock-h: 40px;
+  --m-flipclock-ink: color-mix(in srgb, var(--m-on-scrim) 90%, transparent);
+  display: inline-flex; vertical-align: middle; max-inline-size: 100%;
+  padding: calc(var(--m-flipclock-h) * .28) calc(var(--m-flipclock-h) * .36);
+  border-radius: calc(var(--m-flipclock-h) * .3);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--m-scrim) 66%, var(--m-surface)), color-mix(in srgb, var(--m-scrim) 82%, var(--m-surface)));
+  box-shadow: var(--m-shadow-3), inset 0 1px 0 color-mix(in srgb, var(--m-on-scrim) 10%, transparent);
+}
+.m-flipclock-bare { padding: 0; background: none; box-shadow: none; --m-flipclock-ink: var(--m-text); }
+.m-flipclock[data-m-color] .m-odo { --m-odo-ink: var(--m-accent); }
+.m-flipclock[data-m-color] .m-flap { --m-flap-ink: var(--m-accent); }
+.m-flipclock-cards { display: inline-flex; align-items: center; gap: calc(var(--m-flipclock-h) * .22); direction: ltr; }
+.m-flipclock-sep {
+  font: 800 calc(var(--m-flipclock-h) * .8) / 1 var(--m-font); color: var(--m-flipclock-ink);
+  padding-block-end: calc(var(--m-flipclock-h) * .1);
+  transition: opacity var(--m-dur-slow) var(--m-ease);
+}
+.m-flipclock.is-blink.is-odd .m-flipclock-sep { opacity: .25; }
+.m-flipclock-period { align-self: flex-start; margin-inline-start: calc(var(--m-flipclock-h) * .1); }

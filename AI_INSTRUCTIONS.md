@@ -738,13 +738,20 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 
 | Component | Status | What | Composed of |
 |---|---|---|---|
+| Altimeter | experimental | An aircraft altimeter: hundreds, thousands and ten-thousands hands on one 0–9 dial, a pressure (Kollsman) window in hPa or inHg whose digits roll, spring-moving hands that spin through big climbs. Built on Gauge. | Gauge, CountRoll |
+| AnalogClock | experimental | A 12-hour clock dial with hour, minute and second hands: ticking (spring) or sweeping second hand, a time zone or your own time source, arabic / roman / quarter numerals, a caption and a date window. Built on Gauge. | Gauge |
+| AttitudeIndicator | experimental | An artificial horizon: sky and ground with a pitch ladder that tilt with the bank and move with the pitch, a roll scale with a sky pointer, a fixed aircraft symbol; gyro-like spring motion. Built on Gauge. | Gauge |
 | Badge | stable | Small status label in a tone, a dot badge, or a count badge (hidden at 0, 120 → 99+) with an accessible label; a pulsing dot, a mini size and a clickable (button) form. | StatusDot |
 | BarChart | experimental | Bar chart: grouped or stacked series, vertical or horizontal, bars that glide to new values, keyboard bars, tooltip, legend and a data table for screen readers. | — |
 | BarList | experimental | Ranked horizontal bars with labels for top-N lists (pages, countries, products): sorted, limited, formatted; rows become buttons with onSelect. | OverflowText |
+| BatteryGauge | experimental | A battery: a case with a cap, a fill or segments that spring to the level, low / critical colours, a bolt while charging, a rolling percentage inside or beside; horizontal or vertical. | CountRoll |
 | Card | stable | Surface with an optional header (title, subtitle, actions), a body and a footer; action() objects in the header render as buttons. | PanelHeader |
+| Compass | experimental | A compass: the rose turns under a lubber line (or a two-tone needle turns on a fixed rose), cardinal letters in the page's language, 4 or 8 points, a bearing marker and a rolling "045° NE" readout; damped spring motion. Built on Gauge. | Gauge, CountRoll |
 | DataGrid | experimental | Spreadsheet-like grid for 100k+ rows: virtual rows and columns, sort, filter, group with aggregates, pinned / resizable / draggable columns, cell editing, keyboard cursor, CSV. | SearchBox, Button, Chip, Menu, Checkbox, Chevron, Badge, ResizeHandle, Empty, LiveStatus, FilterControl, CellEditor |
+| DotMatrix | experimental | An LED dot-matrix display: text and numbers in a 5×7 font (Turkish letters, your own glyphs), lit and unlit dots, a window that scrolls long text, a wipe or dissolve on change, round or square dots in any theme colour. | — |
+| FlipClock | experimental | A flip clock: hours, minutes and seconds on split number cards (Odometer flip), blinking separators, a 12-hour AM / PM flap (SplitFlap), a time zone or your own time source. | Odometer, SplitFlap |
 | Gantt | experimental | Project timeline: bars with progress, finish-to-start dependency arrows, drag to move / resize / set progress with cascading successors, today line, day / week / month scales. | ListRow, ResizeHandle, Badge, LiveStatus |
-| Gauge | experimental | A dial with a needle: arc track, coloured zones, redline, ticks with labels, spring needle, peak mark and a rolling readout; speedometer, tachometer, half and VU looks, a number or an audio source. | CountRoll, Odometer |
+| Gauge | experimental | A dial with a needle: arc track, coloured zones, redline, ticks with labels, spring needle, peak mark and a rolling readout; speedometer, tachometer, half and VU looks, a number or an audio source; several needles, full circles that wrap, a turning scale and an inlay make it the dial of the clock, compass and aircraft instruments. | CountRoll, Odometer |
 | Heatmap | experimental | Heatmap: a grid of intensities (day × hour) or a calendar of weeks, in tones of the theme accent; keyboard cells, tooltip and a data table for screen readers. | — |
 | IconTile | stable | An icon in a tinted rounded square: a tone or any theme colour token; soft, outline or solid; square or round. | — |
 | JsonView | stable | Collapsible read-only JSON tree: typed colours, item / key counts when closed, circular references marked. | Chevron |
@@ -758,8 +765,11 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | ProgressRing | experimental | A score ring 0–100 (or 0–max) with the number in the middle: low / mid / high levels from thresholds, one theme color or several (gradient, segments, flowing). | — |
 | Scheduler | experimental | Month / week / day calendar: drag events to move, drag edges to resize, drag empty slots to create; Intl dates, first day of week from the locale, keyboard moves. | PanelHeader, PeriodNav, Button, Segmented, ResizeHandle, LiveStatus |
 | Sparkline | experimental | A tiny trend line without axes, for table cells, list rows and KPI boxes: optional area and last-point dot; screen readers hear a summary of the values. | — |
+| SplitFlap | experimental | A split-flap departure board: each cell turns its reel of letters, digits and signs forward flap by flap to the new text, with a stagger; Turkish capitals, your own reel, any theme colour; the text is read once. | — |
 | Stat | experimental | KPI box: label, formatted value, the change against the previous period with an arrow (green or red, inverted for costs) and an optional sparkline. | StatTile, Sparkline |
 | StatTile | experimental | A value with its label and an optional hint: plain, soft tile or card; a button with onClick, a link with href, dt / dd inside a dl; the value may be a node (a rolling Counter). | — |
+| Stopwatch | experimental | A chronograph: a sweeping seconds hand, a 30-minute sub-dial, a digital readout, Start / Stop, Lap and Reset, a lap list with the best and worst lap; spring fly-back on reset. Built on Gauge and Button. | Gauge, Button |
+| Thermometer | experimental | A glass thermometer: a liquid column that springs to the value, a scale in °C or °F (or both), coloured zones that also colour the liquid, a rolling readout. | CountRoll |
 | TimeRuler | experimental | The ruler above a timeline: ticks, time labels and a playhead; read-only, or draggable with a slider playhead (onSeek). Own tick distances, labels, head and colour. | — |
 | Timeline | stable | Ordered list of events with toned dots, optional icons, formatted times (Date / epoch / ISO) or plain text, titles and bodies. | StatusDot |
 | Tree | stable | Expandable tree (role=tree) with icons, trailing meta, selection and the full keyboard model; long labels scroll with OverflowText. | ListRow, Chevron, OverflowText |
@@ -817,11 +827,13 @@ separate button handler. Manager events are on channels: `onManager("command:*",
 | AudioReactive | experimental | A wrapper that moves with a sound: writes --m-level, --m-bass, --m-mid, --m-treble and --m-peak (0–1) on itself from a source, with ready pulse / glow / ring / bounce effects. | — |
 | Carousel | stable | Scroll-snap carousel: one to four slides per view, previous / next buttons and dots, swipe on touch, one slide on phones. | IconButton, PageDots |
 | CornerMark | experimental | A small round mark in a corner of a picture, card or avatar (video sign, open arrow, add badge): corner, icon, colour, size, look, shown always or on hover. | — |
+| LoudnessGraph | experimental | A loudness meter's history: momentary / short-term / integrated LUFS (K-weighted, march/audio loudness()) on LineChart with −14 / −23 target lines, the stereo correlation graph and bar, tweening readouts. | LineChart |
 | Media | stable | An image, video or audio element that fits its container (kind from the extension), a text fallback when loading fails; openMedia() shows it in a dialog. | Dialog |
 | Oscilloscope | experimental | The shape of a sound, live: a triggered waveform trace with glow and phosphor afterglow over a graticule, or left against right (X/Y Lissajous); a modern panel or a retro CRT look; reads any march/audio source. | — |
 | Overlay | stable | A decorative layer inside its container: an image, a muted looping video, an SVG, a canvas drawing or a CSS effect (glass, mesh, noise …); never takes input. | — |
 | Picture | experimental | An image from a picture object ({ src, alt, width, height, srcset, sizes }) or a ready node passed through: lazy by default, eager for the first screen, fit and a fallback. | — |
 | Spectrum | experimental | The frequencies of a sound, live: log-frequency bars with falling peak caps, mirrored, around a circle or as a line; one theme color, the four HADİ colors or your own tokens; reads any march/audio source. | — |
+| StereoVu | experimental | A stereo VU-meter pair on one panel: two needle VU meters (Gauge vu) for left and right from a march/audio source or two numbers, peak lights that hold or latch, a 0 VU reference, metal / dark / wood panels. | Gauge, IconButton, StatusDot |
 | Waveform | experimental | The bars of a sound (voice message, podcast): from peaks, an audio file (decoded lazily) or a live march/audio source; playhead with played bars, chapter regions, seek by pointer and keyboard; decorative recording bars. | — |
 
 ### Motion — `march/motion`

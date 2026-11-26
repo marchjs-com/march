@@ -11,7 +11,8 @@ import { t, locale } from "../../../core/i18n.ts";
 import { val, cx, type MaybeFn, type ClassProp } from "../../../core/util.ts";
 import { still } from "../../../motion/engine/parts.ts";
 import type { ColorToken } from "../../../theme/colors.ts";
-import { Gauge, throttled, type GaugeNeedle } from "../gauge/index.ts";
+import { Gauge, type GaugeNeedle } from "../gauge/index.ts";
+import { throttled } from "../../../ui/spoken.ts";
 import { CountRoll } from "../../social/count-roll/index.ts";
 
 /** The parts on or off. @tr Parçalar açık ya da kapalı. */
