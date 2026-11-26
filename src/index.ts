@@ -3,7 +3,7 @@ export { signal, computed, effect, batch, untrack, selector, onCleanup, createRo
 export { store, patch, unwrap } from "./core/store.ts";
 export { h } from "./dom/h.ts";
 export { insert } from "./dom/insert.ts";
-export { Fragment, lazyChildren, _c } from "./dom/component.ts";
+export { Fragment, lazyChildren, _c, _cp } from "./dom/component.ts";
 export { safeUrl, _tpl, _cls, _attr, _txt, _st, _scls, _sattr } from "./dom/tpl.ts";
 export { registerTransition, _prop } from "./dom/props.ts";
 export { _on } from "./dom/events.ts";

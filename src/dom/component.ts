@@ -1,6 +1,6 @@
 // March — components: a component is called once with its props (live props are getters), inside an owner; an async
 // component shows the loading content until its promise settles. h() (dom/h.ts) and the compiler's _c create them.
-import { untrack, getOwner, runWithOwner, reportError, isReactive, onCleanup, signal, DEV, useContext, createRoot, type Signal } from "../core/reactive.ts";
+import { untrack, reactive, getOwner, runWithOwner, reportError, isReactive, onCleanup, signal, DEV, useContext, createRoot, type Signal } from "../core/reactive.ts";
 import { _tpl } from "./tpl.ts";
 
 /** A component: called once with its props. May be async. */
@@ -25,10 +25,15 @@ let hook: ComponentHook | undefined;
 /** Not for direct use: extend() / intercept() / withExtensions() install the pipeline with it. */
 export const _componentHook = (fn: ComponentHook | undefined): void => { hook = fn; };
 
-export function createComponent(Comp: Component<Props>, raw: Props, children: unknown[]): unknown {
-  if (hook) [Comp, raw] = hook(Comp, raw);
-  const props: Props = {};
-  for (const key of Object.keys(raw)) {
+export function createComponent(Comp: Component<Props>, raw: Props, children: unknown[], ready?: boolean): unknown {
+  if (hook) {
+    // extensions see props as before: live values as thunks, children apart
+    if (ready) { const t = thunked(raw); raw = t.raw; children = t.children; }
+    [Comp, raw] = hook(Comp, raw); ready = false;
+  }
+  // ready: props the compiler wrote as the component reads them (live props and children already getters): used as is
+  const props: Props = ready ? raw : {};
+  if (!ready) for (const key of Object.keys(raw)) {
     // a getter prop (`h(C, { get value() { … } })`) stays a getter: the component reads it live
     const d = Object.getOwnPropertyDescriptor(raw, key)!, v = d.value;
     if (d.get) { Object.defineProperty(props, key, d); continue; }
@@ -88,6 +93,19 @@ function asyncRegion(promise: Promise<unknown>, Comp: Component<Props>): () => u
   };
 }
 
-/** Compiler helper (not for direct use): create a component (`<Comp …>`), as h(Comp, props, …children) does. */
 // generic like h(Comp, props): `march check` type-checks a component's props through this signature
+/** A ready props object in the form h() takes: getters become reactive thunks, the children getter lazy children. */
+function thunked(ready: Props): { raw: Props; children: unknown[] } {
+  const raw: Props = {}, children: unknown[] = [];
+  for (const key of Object.keys(ready)) {
+    const d = Object.getOwnPropertyDescriptor(ready, key)!;
+    if (!d.get) raw[key] = d.value;
+    else if (key === "children") children.push(lazyChildren(() => [(d.get as () => unknown).call(ready)]));
+    else raw[key] = reactive(() => (d.get as () => unknown).call(ready));
+  }
+  return { raw, children };
+}
+/** Compiler helper (not for direct use): create a component whose props object the compiler wrote ready (getters). */
+export function _cp<P extends object>(Comp: Component<P>, props: P): unknown { return createComponent(Comp as unknown as Component<Props>, props as unknown as Props, [], true); }
+/** Compiler helper (not for direct use): create a component (`<Comp …>`), as h(Comp, props, …children) does. */
 export function _c<P extends object>(Comp: Component<P>, props: P | null, ...children: unknown[]): unknown { return createComponent(Comp as unknown as Component<Props>, (props ?? {}) as Props, children); }

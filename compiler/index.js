@@ -19,8 +19,8 @@ const { sx: resolveSx } = await importTs(new URL("../src/core/sx.ts", import.met
 const TEXT_ATTRS = new Set(["title", "placeholder", "label", "alt", "aria-label", "aria-description", "description", "hint", "message"]);
 // an object's fields whose string is read by people (lang.json collects them): `{ label: "Enerjik", hint: "…" }`
 const TEXT_KEYS = new Set(["label", "title", "text", "message", "description", "placeholder", "hint", "caption", "subtitle", "heading", "tooltip", "tip", "helperText", "emptyText", "confirmText", "cancelText", "okText"]);
-const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins", gen: "_$gen", tr: "_$tr", trf: "_$trf", c: "_$c", cls: "_$cls", attr: "_$attr", on: "_$on", fx: "_$fx", txt: "_$txt", st: "_$st", scls: "_$scls", sattr: "_$sattr" };
-const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert", gen: "_gen", tr: "_tr", trf: "_trf", c: "_c", cls: "_cls", attr: "_attr", on: "_on", fx: "effect", txt: "_txt", st: "_st", scls: "_scls", sattr: "_sattr" };
+const H = { sx: "_$sx", h: "_$h", lazy: "_$lazy", r: "_$r", signal: "_$signal", computed: "_$computed", pipe: "_$pipe", getOwner: "_$getOwner", enter: "_$enter", leave: "_$leave", tpl: "_$tpl", p: "_$p", ins: "_$ins", gen: "_$gen", tr: "_$tr", trf: "_$trf", c: "_$c", cp: "_$cp", cls: "_$cls", attr: "_$attr", on: "_$on", fx: "_$fx", txt: "_$txt", st: "_$st", scls: "_$scls", sattr: "_$sattr" };
+const HELPER_SOURCE = { sx: "sxValue", h: "h", lazy: "lazyChildren", r: "reactive", signal: "signal", computed: "computed", pipe: "applyPipe", getOwner: "getOwner", enter: "_enter", leave: "_leave", tpl: "_tpl", p: "_prop", ins: "insert", gen: "_gen", tr: "_tr", trf: "_trf", c: "_c", cp: "_cp", cls: "_cls", attr: "_attr", on: "_on", fx: "effect", txt: "_txt", st: "_st", scls: "_scls", sattr: "_sattr" };
 // Templates: a native element subtree is built once (DOM calls, no HTML strings) and cloned; only its dynamic parts
 // (bound attributes, events, refs, directives, {expressions}, components) are wired on the clone. Not templated:
 // SVG (namespace), forbidden tags (h() throws for them), spreads.
@@ -1057,12 +1057,21 @@ class Transformer {
         props.push(`${key}: [${fn}, ${a.code === "true" && !a.raw ? "undefined" : a.code}]`);
         continue;
       }
+      if (isComp && !this.opts.typecheck && a.name.startsWith("bind:")) {
+        // a bound component prop: a live getter and its setter, written in the props object (no runtime conversion)
+        const prop = a.name.slice(5), pk = /^[A-Za-z_$][\w$]*$/.test(prop) ? prop : JSON.stringify(prop);
+        props.push(`get ${pk}() { return ${a.code}(); }`, `${JSON.stringify(`set${prop.charAt(0).toUpperCase()}${prop.slice(1)}`)}: ${a.code}.set`);
+        continue;
+      }
       if (this.opts.typecheck && isComp && a.name.startsWith("bind:")) {
         // type-check view: a bound component prop is the value plus its setter (what the component receives)
         const prop = a.name.slice(5);
         props.push(`${prop}: ${a.code}(), set${prop.charAt(0).toUpperCase()}${prop.slice(1)}: ${a.code}.set`);
         continue;
       }
+      // a component's live prop is a getter in the props object, as the component reads it (no runtime conversion);
+      // event props keep their thunk, as before
+      if (isComp && a.dynamic && !this.opts.typecheck && !/^on[A-Z:]/.test(a.name) && a.name !== "children") { props.push(`get ${key}() { return (${a.code}); }`); continue; }
       // typecheck mode keeps values unwrapped so prop types are checked against the component's parameter type
       props.push(`${key}: ${a.dynamic && !this.opts.typecheck ? `${this.helper("r")}(() => (${a.code}))` : a.code}`);
     }
@@ -1071,9 +1080,16 @@ class Transformer {
     const childCode = (k) => (k.dynamic ? `() => (${k.code})` : k.code);
     let code;
     if (isComp) {
-      const body = kids.length ? `, ${this.helper("lazy")}(() => [${kids.map(childCode).join(", ")}])` : "";
-      // _c: a component without h()'s element path (every prop kind), which a page then loads only if it uses it
-      code = `${this.helper("c")}(${tagCode}, {${props.join(", ")}}${body})`;
+      if (!this.opts.typecheck && !attrs.some((a) => a.spread)) {
+        // _cp: the props object is the component's props as written here (live props and children are getters)
+        const kc = kids.map(childCode);
+        if (kc.length) props.push(`get children() { return ${kc.length === 1 ? kc[0] : `[${kc.join(", ")}]`}; }`);
+        code = `${this.helper("cp")}(${tagCode}, {${props.join(", ")}})`;
+      } else {
+        const body = kids.length ? `, ${this.helper("lazy")}(() => [${kids.map(childCode).join(", ")}])` : "";
+        // _c: a component without h()'s element path (every prop kind), which a page then loads only if it uses it
+        code = `${this.helper("c")}(${tagCode}, {${props.join(", ")}}${body})`;
+      }
     } else {
       const tn = this.opts.typecheck || this.opts.templates === false ? null : this.tnode(tag, attrs, kids, childCode);
       if (tn) {
@@ -1100,7 +1116,7 @@ export function isStaticCode(code) {
   if (/^`[^`$]*`$/.test(c)) return true;
   if (/^(async\s+)?function\b/.test(c)) return true;
   if (/^(async\s*)?(\([^()]*(\([^()]*\)[^()]*)*\)|[A-Za-z_$][\w$]*)\s*=>/.test(c)) return true;
-  if ((c.startsWith(`${H.h}(`) || c.startsWith(`${H.c}(`)) && balancedCall(c)) return true;
+  if ((c.startsWith(`${H.h}(`) || c.startsWith(`${H.c}(`) || c.startsWith(`${H.cp}(`)) && balancedCall(c)) return true;
   if (/^_\$t\d+\(/.test(c) && balancedCall(c)) return true; // a template clone
   if (c.startsWith(`${M_HELPER}(`) && balancedCall(c)) return true; // an element / component with m: props
   if (c.startsWith(`${PARTS_HELPER}(`) && balancedCall(c)) return true; // … inside an m:parts scope

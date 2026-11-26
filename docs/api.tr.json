@@ -15,6 +15,7 @@
   "_enter": "Eşzamansız bileşenler için derleyici kancası: `await` sonrasında sahibi geri yükler (doğrudan kullanım için değil).",
   "_attr": "Derleyici yardımcısı (doğrudan kullanım için değil): şablon kopyasındaki bir öğeye düz bir öznitelik bağlar (null / false kaldırır, true boş değer; URL öznitelikleri denetlenir).",
   "_c": "Derleyici yardımcısı (doğrudan kullanım için değil): bir bileşeni h(Comp, props, …children) gibi oluşturur, ama h()'nin öğe yolunu (her özellik türünü) yüklemeden.",
+  "_cp": "Derleyici yardımcısı (doğrudan kullanım için değil): derleyicinin hazır yazdığı props nesnesiyle (canlı değerler ve children birer getter) bir bileşen oluşturur; çalışma anında kopya yok.",
   "_cls": "Derleyici yardımcısı (doğrudan kullanım için değil): şablon kopyasındaki bir öğeye class bağlar (dizgi, dizi ya da nesne; değişmediyse yazmaz).",
   "_on": "Derleyici yardımcısı (doğrudan kullanım için değil): değiştiricisiz bir olay işleyicisi (onClick) bağlar; render() ağacında belgeye devredilir, değilse doğrudan dinleyici.",
   "_prop": "Derleyici yardımcısı (doğrudan kullanım için değil): şablon kopyasındaki bir öğeye tek bir JSX özelliğini h() gibi uygular (bağlı öznitelik, olay, ref, yönerge).",

@@ -66,7 +66,7 @@ test("directives, shorthand attributes, bind needs a $variable", () => {
   assert.match(out, /"class:on": _\$r\(\(\) => \(\$v\(\)\)\)/);
   assert.match(out, /"use:focus": \[focus, 1\]/);
   assert.match(out, /"transition:fade": true/);
-  assert.match(out, /_\$c\(Row, \{user: user, v: _\$r\(\(\) => \(\$v\(\)\)\)\}\)/);
+  assert.match(out, /_\$cp\(Row, \{user: user, get v\(\) \{ return \(\$v\(\)\); \}\}\)/, "a live component prop is a getter in the props object");
   assert.throws(() => c("const e = <input bind:value={x} />"), /needs a \$variable/);
 });
 
@@ -85,8 +85,8 @@ test("sx literal resolves at build time; invalid sx fails the build", () => {
 
 test("components get lazy children; If/Else split", () => {
   const out = body("const e = <Card title='x'><p>a</p>{b}</Card>; const f = <If when={ok}>yes<Else>no</Else></If>", NOTPL);
-  assert.match(out, /_\$c\(Card, \{title: "x"\}, _\$lazy\(\(\) => \[_\$h\("p", null, "a"\), b\]\)\)/);
-  assert.match(out, /_\$c\(If, \{when: ok, else: \(\) => \["no"\]\}, _\$lazy\(\(\) => \["yes"\]\)\)/);
+  assert.match(out, /_\$cp\(Card, \{title: "x", get children\(\) \{ return \[_\$h\("p", null, "a"\), b\]; \}\}\)/, "children are a getter of the props object");
+  assert.match(out, /_\$cp\(If, \{when: ok, else: \(\) => \["no"\], get children\(\) \{ return "yes"; \}\}\)/);
 });
 
 test("async functions keep their owner across await", () => {
@@ -266,8 +266,8 @@ test("texts: a string a JSX expression shows as a whole value (a branch of ?: / 
 
 test("compiler: a component's type arguments (<List<User> …>, <Pick<{ a: () => void }> …>) are erased like other types", () => {
   const out = c(`export const A = () => <div><List<string> items={[]} /><Pick<{ from: number; f: () => void }> open={() => true}>x</Pick></div>`);
-  assert.match(out, /_\$c\(List, \{items:/);
-  assert.match(out, /_\$c\(Pick, \{open:/);
+  assert.match(out, /_\$cp\(List, \{get items\(\) \{ return \(\[\]\); \}\}\)/);
+  assert.match(out, /_\$cp\(Pick, \{open:/);
   assert.doesNotMatch(out, /List</);
 });
 
