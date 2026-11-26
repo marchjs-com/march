@@ -360,8 +360,11 @@ ${css}`);
       }
       return true;
     };
+    // a group's size is what its report row counts: the members and everything they import that start-up does not
+    // already hold (a group of small members can import a big shared chunk; counting the members alone let it pass)
+    const rowSize = (grp) => { const got = new Set(); for (const t of grp) for (const x of g.closure(t)) if (!have.has(x)) got.add(x); let n = 0; for (const x of got) n += gz(x); return n; };
     for (const t of cand) {
-      const i = groups.findIndex((x) => x.reduce((s, y) => s + gz(y), 0) + gz(t) <= partLimit && fitsAll(groups.map((y) => (y === x ? [...y, t] : y)), [...x, t]));
+      const i = groups.findIndex((x) => rowSize([...x, t]) <= partLimit && fitsAll(groups.map((y) => (y === x ? [...y, t] : y)), [...x, t]));
       if (i >= 0) groups[i].push(t); else groups.push([t]);
     }
     if (DBG) console.log("[common] groups:", groups.map((x) => x.map(base).join("+")).join(" | "));
