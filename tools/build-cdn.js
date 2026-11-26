@@ -159,6 +159,15 @@ writeFileSync(join(out, "sw.js"), `/*! MarchJS v${version} | MIT | marchjs.com *
 ${swRuntime()}`);
 // the stylesheets the package exports as files
 cpSync(join(root, "src/css"), join(out, "css"), { recursive: true });
+// and the other stylesheets it exports as files, at their export path (march/motion/motion.css → motion/motion.css:
+// the theme waves and motion utilities, charts/charts.css, fx/fx.css, errors/errors.css). A page that imports one gets
+// it from here; without them those imports were 404s and their rules never applied.
+for (const [key, target] of Object.entries(pkg.exports)) {
+  if (!key.endsWith(".css") || typeof target !== "string" || target.startsWith("./src/css/")) continue;
+  const to = join(out, key.slice(2));
+  mkdirSync(dirname(to), { recursive: true });
+  cpSync(join(root, target), to);
+}
 // the fonts css/font.css points at (../fonts/…)
 cpSync(join(root, "src/fonts"), join(out, "fonts"), { recursive: true });
 // the version's data (API reference, MarchIDE types, components) for sites that render March without its sources
