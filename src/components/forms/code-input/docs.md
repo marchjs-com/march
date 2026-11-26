@@ -34,6 +34,11 @@ HADİ color and the display font, as in the HADİ apps; boxes shrink on narrow s
 Your own parts: `<CodeInput groups={[3, 3]} separator="·" boxLabel={(i, n) => `${n} hanenin ${i}.`}
 animate={(box) => animate(box, { opacity: [0, 1] }, { duration: 200 })} />`; `separator={false}` keeps the gap only.
 
+## Characters (march/mask)
+
+The characters a box takes are filtered by march/mask: digits typed on other keyboards (Arabic-Indic, Persian,
+full-width) are read as 0–9, and letters become capitals in the app's locale (Turkish i → İ).
+
 ## Accessibility
 
 A `role="group"` labelled by its Field; each box is named "Character 2 of 6". The first box carries

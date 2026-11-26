@@ -17,11 +17,21 @@ test("NumberInput: decimal comma and point, never NaN, arrow steps clamp", () =>
   const input = el.querySelector("input");
   input.focus();
   type(input, "12,5"); assert.equal(v(), 12.5);
+  // text that makes no number is refused: the field keeps its value
   type(input, "abc"); assert.equal(v(), 12.5);
-  assert.equal(input.getAttribute("aria-invalid"), "true");
+  assert.equal(input.value, "12,5");
   input.blur();
   assert.equal(input.value, "12,5");
-  assert.equal(input.getAttribute("aria-invalid"), null);
+  // a typed character past max is refused while typing (march/mask number kind)
+  const big = signal(null);
+  const mb = mount(() => h(NumberInput, { "bind:value": big, max: 100, locale: "en", grouping: true }));
+  const bi = mb.el.querySelector("input");
+  bi.focus();
+  bi.selectionStart = bi.selectionEnd = 0;
+  bi.setSelectionRange = (a, b) => { bi.selectionStart = a; bi.selectionEnd = b; };
+  for (const d of "1000") { const e = new Event("beforeinput", { bubbles: true, cancelable: true }); Object.assign(e, { inputType: "insertText", data: d }); bi.dispatchEvent(e); }
+  assert.equal(big(), 100);
+  assert.equal(bi.value, "100");
   const n = signal(5);
   const m2 = mount(() => h(NumberInput, { "bind:value": n, min: 0, max: 6, locale: "en" }));
   const i2 = m2.el.querySelector("input");

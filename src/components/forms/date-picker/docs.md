@@ -26,6 +26,14 @@ parseDate("14.3.2026", "de") // "2026-03-14"
 `<DatePicker bind:value={$d} icon={() => <Icon of={clock} />} labels={{ choose: "Gün seç" }}
 calendar={{ weekdays: false, renderDay: (iso, d) => d }} />`; `icon={false}` leaves a plain typed field.
 
+## Typing (march/mask)
+
+The date is typed on march/mask's date kind in the locale's order: the separators come by themselves, a single 4 in the
+day becomes 04, month 13 and days the month does not have (31.02, 29.02.2023) cannot be typed (a short shake;
+`motion={false}` turns it off), an ISO text ("2026-03-14") is read, a complete date outside `min` / `max` is marked and
+not written, and a half-typed date is put back when the field is left. `maskPlaceholder="eager"` shows the whole
+template (`__.__.____`).
+
 ## Accessibility
 
 The calendar button says "Choose date" and has `aria-haspopup="dialog"` / `aria-expanded`; Alt+ArrowDown (or

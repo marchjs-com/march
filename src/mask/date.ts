@@ -98,8 +98,18 @@ export function date(o: DateMaskOptions = {}): Mask {
     accept, template: o.template ?? tpl, hint: o.template ?? tpl, inputmode: "numeric",
     autocomplete: o.autocomplete, name: o.name,
   });
+  const fromValue = (v: unknown): string => {
+    const m = /^(?:(\d{4})-(\d{1,2})-(\d{1,2}))?[T ]?(?:(\d{1,2}):(\d{2})(?::(\d{2}))?)?/.exec(String(v ?? "").trim());
+    if (!m || !m[0]) return "";
+    const parts: Record<string, string | undefined> = { Y: m[1], M: m[2], D: m[3], H: m[4], m: m[5], s: m[6] ?? "00" };
+    let raw = "";
+    for (const f of fields) { const p = parts[f.key]; if (p == null) break; raw += f.key === "Y" ? p.slice(-f.len).padStart(f.len, "0") : p.padStart(f.len, "0"); }
+    return raw;
+  };
   return {
-    ...base, kind: "date",
+    ...base, kind: "date", fromValue,
+    // an ISO text ("2026-03-14", "09:30") is read in any order
+    parse: (text: string): string => (/^\s*\d{4}-\d{1,2}-\d{1,2}/.test(String(text ?? "")) || (!hasDate && /^\s*\d{1,2}:\d{2}/.test(String(text ?? ""))) ? fromValue(text) : base.parse(text)),
     check: (raw: string, f: Formatted): string | null => {
       if (!f.complete) return null;
       if (!okay(raw)) return hasDate ? t`Enter a valid date` : t`Enter a valid time`;
@@ -109,14 +119,6 @@ export function date(o: DateMaskOptions = {}): Mask {
       return null;
     },
     toValue: (raw) => iso(raw),
-    fromValue: (v) => {
-      const m = /^(?:(\d{4})-(\d{2})-(\d{2}))?[T ]?(?:(\d{2}):(\d{2})(?::(\d{2}))?)?/.exec(String(v ?? ""));
-      if (!m || !m[0]) return "";
-      const parts: Record<string, string | undefined> = { Y: m[1], M: m[2], D: m[3], H: m[4], m: m[5], s: m[6] ?? "00" };
-      let raw = "";
-      for (const f of fields) { const p = parts[f.key]; if (p == null) break; raw += f.key === "Y" ? p.slice(-f.len).padStart(f.len, "0") : p.padStart(f.len, "0"); }
-      return raw;
-    },
     hint: o.template ?? tpl, dir: "ltr", ...(hasTime && !hasDate ? { autocomplete: o.autocomplete } : null),
   };
 }

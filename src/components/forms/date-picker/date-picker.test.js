@@ -22,8 +22,20 @@ test("DatePicker: locale typing, invalid dates, calendar popover picks and close
   assert.equal(input.getAttribute("placeholder"), "DD.MM.YYYY");
   input.focus(); type(input, "14.3.2026");
   assert.equal(v(), "2026-03-14");
+  // a day the month does not have cannot be typed (march/mask date kind): the field stops at "31.0", the value stays
   type(input, "31.02.2026");
-  assert.equal(input.getAttribute("aria-invalid"), "true");
+  assert.equal(input.value, "31.0");
+  assert.equal(v(), "2026-03-14");
+  // with min / max a complete date outside them is marked
+  const r = signal(null);
+  const ranged = mount(() => h(DatePicker, { "bind:value": r, locale: "de", min: "2026-01-01", max: "2026-12-31" }));
+  const ri = ranged.el.querySelector("input");
+  ri.focus(); type(ri, "01.01.2030");
+  assert.equal(ri.getAttribute("aria-invalid"), "true");
+  assert.equal(r(), null);
+  ri.blur();
+  assert.equal(ri.value, "");
+  input.focus();
   input.blur();
   assert.equal(input.value, "14.03.2026");
   const btn = el.querySelector("button");
