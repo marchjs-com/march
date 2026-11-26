@@ -34,8 +34,12 @@ export function hierarchy<D>(data: D | readonly D[], o: HierOptions<D> = {}): HN
     return node;
   };
   if (Array.isArray(data)) {
-    const root = make({ children: data } as D, 0, null, 0, 0);
-    root.key = ""; return root;
+    // a list of top rows: a synthetic root holds them (its children are the rows themselves, whatever `children`
+    // reads inside a row)
+    const root: HNode<D> = { key: "", label: "", value: 0, depth: 0, datum: { children: data } as D, parent: null, children: [], branch: 0 };
+    root.children = (data as readonly D[]).map((d, i) => make(d, 1, root, i, i));
+    root.value = root.children.reduce((a, c) => a + c.value, 0);
+    return root;
   }
   return make(data as D, 0, null, 0, 0);
 }
