@@ -335,7 +335,23 @@
     "./components/data/odometer": "./src/components/data/odometer/index.ts",
     "./components/media/oscilloscope": "./src/components/media/oscilloscope/index.ts",
     "./components/media/spectrum": "./src/components/media/spectrum/index.ts",
-    "./components/media/waveform": "./src/components/media/waveform/index.ts"
+    "./components/media/waveform": "./src/components/media/waveform/index.ts",
+    "./components/data/box-plot": "./src/components/data/box-plot/index.ts",
+    "./components/data/bullet-chart": "./src/components/data/bullet-chart/index.ts",
+    "./components/data/candlestick-chart": "./src/components/data/candlestick-chart/index.ts",
+    "./components/data/chord-chart": "./src/components/data/chord-chart/index.ts",
+    "./components/data/choropleth-map": "./src/components/data/choropleth-map/index.ts",
+    "./components/data/funnel-chart": "./src/components/data/funnel-chart/index.ts",
+    "./components/data/histogram": "./src/components/data/histogram/index.ts",
+    "./components/data/network-graph": "./src/components/data/network-graph/index.ts",
+    "./components/data/radar-chart": "./src/components/data/radar-chart/index.ts",
+    "./components/data/radial-bar-chart": "./src/components/data/radial-bar-chart/index.ts",
+    "./components/data/sankey-chart": "./src/components/data/sankey-chart/index.ts",
+    "./components/data/scatter-chart": "./src/components/data/scatter-chart/index.ts",
+    "./components/data/stream-graph": "./src/components/data/stream-graph/index.ts",
+    "./components/data/sunburst-chart": "./src/components/data/sunburst-chart/index.ts",
+    "./components/data/treemap": "./src/components/data/treemap/index.ts",
+    "./components/data/waterfall-chart": "./src/components/data/waterfall-chart/index.ts"
   },
   "bin": {
     "march": "./cli/march.js"

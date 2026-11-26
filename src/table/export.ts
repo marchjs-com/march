@@ -49,8 +49,8 @@ export function toJSON<R>(rows: readonly R[], columns: readonly Column<R>[], opt
   return JSON.stringify(out, null, space);
 }
 
-/** Save text as a file through a temporary object URL. */
-export function download(filename: string, text: string, type = "text/plain;charset=utf-8"): string {
+/** Save text (or a Blob) as a file through a temporary object URL. */
+export function download(filename: string, text: string | Blob, type = "text/plain;charset=utf-8"): string {
   const doc = globalThis.document;
   const url = URL.createObjectURL(new Blob([text], { type }));
   const a = doc.createElement("a");

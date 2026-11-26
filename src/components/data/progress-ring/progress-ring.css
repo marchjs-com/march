@@ -1,6 +1,7 @@
-/* ProgressRing: the track, the value arc in the level color (or a chosen color), the number in the middle. */
+/* ProgressRing: the track, the value arc in the level color (or a chosen color), the number in the middle. The sweep is
+   drawn by the motion engine (the `animate` prop), not by a CSS transition. */
 .m-ring-track { fill: none; stroke: var(--m-chart-grid); }
-.m-ring-value { fill: none; stroke: var(--m-ring-high); stroke-linecap: round; transition: stroke-dasharray var(--m-ring-dur) ease; }
+.m-ring-value { fill: none; stroke: var(--m-ring-high); stroke-linecap: round; }
 .m-ring-low .m-ring-value { stroke: var(--m-ring-low); }
 .m-ring-mid .m-ring-value { stroke: var(--m-ring-mid); }
 .m-ring[data-m-color] .m-ring-value { stroke: var(--m-accent); } /* a chosen color wins over the level colors */
@@ -8,11 +9,11 @@
 
 /* several colors: a conic paint masked to the ring and to the progress angle */
 @property --m-ring-p { syntax: "<number>"; inherits: true; initial-value: 0; }
-.m-ring-multi { position: relative; display: inline-grid; place-items: center; overflow: clip; transition: --m-ring-p var(--m-ring-fill-dur) var(--m-ease-out, ease); }
+.m-ring-multi { position: relative; display: inline-grid; place-items: center; overflow: clip; }
 .m-ring-multi > * { grid-area: 1 / 1; }
 .m-ring-multi .m-ring-value { display: none; }
 .m-ring-paint { width: var(--m-ring-s); height: var(--m-ring-s); border-radius: 50%; background: var(--m-ring-paint); pointer-events: none;
   -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--m-ring-t)), black calc(100% - var(--m-ring-t) + .5px)), conic-gradient(black calc(var(--m-ring-p) * 1turn), transparent 0);
   -webkit-mask-composite: source-in; mask: radial-gradient(farthest-side, transparent calc(100% - var(--m-ring-t)), black calc(100% - var(--m-ring-t) + .5px)) intersect, conic-gradient(black calc(var(--m-ring-p) * 1turn), transparent 0); }
 .m-ring-paint.is-cycle { animation: m-spin var(--m-ring-spin) linear infinite; }
-@media (prefers-reduced-motion: reduce) { .m-ring-value { transition: none; } .m-ring-paint.is-cycle { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .m-ring-paint.is-cycle { animation: none; } }

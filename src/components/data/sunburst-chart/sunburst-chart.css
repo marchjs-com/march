@@ -1,0 +1,15 @@
+/* SunburstChart: rings of arcs in their branch color, lighter level by level; the zoomed node in the middle, its path above. */
+.m-sunburst-node { cursor: default; transition: opacity var(--m-chart-dur); }
+.m-sunburst-node.m-sunburst-parent { cursor: zoom-in; }
+.m-sunburst-arc { fill: color-mix(in oklab, var(--m-c) var(--m-sb-mix, 100%), var(--m-chart-bg)); stroke: var(--m-chart-bg); stroke-width: 1; }
+.m-sunburst-focus .m-sunburst-node:not(.m-sunburst-path) { opacity: 0.45; }
+.m-sunburst-node.m-chart-active .m-sunburst-arc { stroke: var(--m-chart-focus); stroke-width: 1.5; }
+.m-sunburst-node.m-chart-leaving { pointer-events: none; }
+.m-chart text.m-sunburst-label { fill: var(--m-chart-text); font-size: 10.5px; font-weight: 550; pointer-events: none; }
+.m-sunburst-center circle { fill: var(--m-chart-bg); stroke: var(--m-chart-grid); }
+.m-sunburst-center.m-sunburst-up { cursor: zoom-out; }
+.m-sunburst-center.m-sunburst-up:hover circle { fill: var(--m-chart-grid); }
+.m-chart text.m-sunburst-center-label { fill: var(--m-chart-muted); font-size: 11px; }
+.m-chart text.m-sunburst-center-value { fill: var(--m-chart-text); font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.m-sunburst-crumbs { order: -1; min-width: 0; }
+@media (prefers-reduced-motion: reduce) { .m-sunburst-node { transition: none; } }

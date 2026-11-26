@@ -1,36 +1,15 @@
 /// <reference path="../css.d.ts" />
 // Shared helpers for chart components: reading props, accessors, formatting, series, sizing, ids.
 import "./charts.css";
-import { signal, computed, read, onCleanup, untrack, effect, type Accessor, type Signal } from "../core/reactive.ts";
-import { animateValue } from "../motion/engine/value.ts";
-import { reducedMotion } from "../motion/env.ts";
+import { signal, computed, read, onCleanup, untrack, type Accessor, type Signal } from "../core/reactive.ts";
 import { applyPipe, toDate } from "../core/pipes.ts";
 import { h } from "../dom/h.ts";
 import { For, type ForProps } from "../dom/for.ts";
 import { uid } from "../core/util.ts";
+import type { ExportProp } from "./tools.ts";
 
-/** A chart's `animate` prop: off, `true` (a spring) or an easing name. */
-export type AnimateProp = boolean | string | null | undefined;
-/**
- * The shape a mark is drawn with: the target at once, or (animate on) a tween of the numeric `keys` from what is drawn
- * now. `first` is where a new mark starts (default: its target, no entrance). Off with reduced motion.
- */
-export function tween<T extends object>(target: () => T, keys: readonly (keyof T)[], how: () => AnimateProp, first?: (to: T) => T): () => T {
-  const shown = signal(untrack(() => (first ? first(target()) : target())));
-  let run: { cancel(): void } | null = null;
-  effect(() => {
-    const to = target(), mode = untrack(how), from = untrack(shown);
-    run?.cancel(); run = null;
-    if (!mode || reducedMotion() || keys.every((k) => from[k] === to[k])) return void shown.set(to);
-    run = untrack(() => animateValue(0, 1, { easing: mode === true ? "spring" : mode, onUpdate: (t: number) => {
-      const o = { ...to } as Record<keyof T, unknown>;
-      for (const k of keys) o[k] = (from[k] as number) + ((to[k] as number) - (from[k] as number)) * t;
-      shown.set(o as T);
-    } }));
-  });
-  onCleanup(() => run?.cancel());
-  return shown;
-}
+// The `animate` prop and the tween marks are drawn with live in motion.ts (re-exported here for the charts that import them from util).
+export { tween, motionOf, presence, animated, animateOf, playMarks, type AnimateProp, type AnimateOptions, type MotionContext, type Present } from "./motion.ts";
 
 /** A prop that may be a plain value or a reactive accessor (signal, computed, compiler thunk). */
 export type MaybeReactive<T> = T | (() => T);
@@ -73,6 +52,8 @@ export interface ChartBaseProps {
   width?: MaybeReactive<number | string | null | undefined> | undefined;
   /** Height in px (default 240; bar charts 260). @tr px cinsinden yükseklik (varsayılan 240; çubuk grafiklerde 260). */
   height?: MaybeReactive<number | string | null | undefined> | undefined;
+  /** Export buttons: `true` (PNG, SVG, CSV), a list of formats or `{ formats, filename, labels, scale, background, onExport }`. @tr Dışa aktarma düğmeleri: `true` (PNG, SVG, CSV), bir biçim listesi ya da `{ formats, filename, labels, scale, background, onExport }`. */
+  export?: MaybeReactive<ExportProp> | undefined;
 }
 
 /** One decimal place (SVG coordinates). */

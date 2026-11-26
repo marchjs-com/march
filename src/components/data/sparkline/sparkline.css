@@ -1,3 +1,9 @@
-/* Sparkline: an inline image on the text line; a thinner stroke than a chart's line. */
+/* Sparkline: an inline image on the text line; a thinner stroke than a chart's line. Columns take the series color,
+   win / loss blocks the good / bad tokens; a tie is a neutral tick on the middle line. */
 .m-sparkline { display: inline-block; vertical-align: middle; overflow: visible; }
 .m-sparkline .m-chart-line { stroke-width: 1.5; }
+.m-sparkline-block { fill: var(--m-c, var(--m-chart-1)); }
+.m-sparkline-bar .m-sparkline-block.is-neg { fill-opacity: .55; }
+.m-sparkline-winloss .m-sparkline-block.is-pos { fill: var(--m-chart-good); }
+.m-sparkline-winloss .m-sparkline-block.is-neg { fill: var(--m-chart-bad); }
+.m-sparkline-winloss .m-sparkline-block.is-tie { fill: var(--m-chart-muted); }

@@ -1,0 +1,14 @@
+/* FunnelChart: stages in the series colors (or one fading hue), values on a halo inside, conversions between stages. */
+.m-funnel-shape { fill: var(--m-c); transition: opacity var(--m-chart-dur); }
+.m-funnel-ghost { fill: var(--m-c); opacity: 0.16; }
+.m-funnel-chart .m-chart-plot:hover .m-funnel-stage:not(.m-chart-active) .m-funnel-shape { opacity: 0.72; }
+.m-funnel-stage.m-chart-active .m-funnel-shape { stroke: var(--m-chart-focus); stroke-width: 1.5; }
+.m-funnel-stage { cursor: default; }
+.m-funnel-chart text.m-funnel-value { fill: var(--m-chart-text); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums;
+  paint-order: stroke; stroke: var(--m-chart-bg); stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
+.m-funnel-chart text.m-funnel-name { fill: var(--m-chart-text); font-size: 12px; }
+.m-funnel-chart text.m-funnel-between { fill: var(--m-chart-muted); font-variant-numeric: tabular-nums; }
+.m-funnel-stage text { transition: opacity var(--m-chart-dur); }
+.m-funnel-leaving { pointer-events: none; }
+.m-funnel-leaving text { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .m-funnel-shape, .m-funnel-stage text { transition: none; } }

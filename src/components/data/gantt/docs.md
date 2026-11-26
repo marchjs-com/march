@@ -32,7 +32,7 @@ import { Gantt } from "march/components/data/gantt";
 | `help` | boolean / node | `true` | the hint under the chart: the text of `labels`, off, or your own node |
 | `barLabel` | `(task) => node` | the task name | content of a bar |
 | `labels` | `Partial<GanttLabels>` | built-in texts | `today`, `task`, `help`, `helpReadonly`, and the functions `days(n)`, `done(percent)`, `after(names)`, `moved(name, start, end)`, `pushed(n)` |
-| `animate` | boolean | `true` | arrow drawing, settle and scale-change animations |
+| `animate` | `AnimateProp` | `true` | change animation: `true` (a spring), `false`, an easing name or `{ duration, easing, stagger, delay, enter, update, exit }` (see Motion) |
 | `label` | string | "Project timeline" | accessible name |
 | `class` | class | — | extra class on the root |
 
@@ -50,8 +50,19 @@ Dates come from `core/date` (`diffDays`, `addDays`, `startOfWeek`, `dateFormat` 
 Each bar is a button named with the task, its dates, progress and predecessors. One bar is in the tab order; ↑ ↓ move
 between tasks, Enter selects, Alt+← → moves a task by a day and Alt+Shift+← → changes its end (mirrored in RTL); every
 change is announced. Hovering or focusing a bar highlights its row and its arrows. The arrows draw themselves in, a
-dropped bar settles with a spring and pushed tasks fade in at their new place — all on the motion engine, so reduced
+dropped bar settles with a spring and pushed tasks glide to their new place — all on the motion engine, so reduced
 motion and the global pause apply.
+
+## Motion
+
+- When `tasks` change, every bar glides from where it was drawn to its new dates and row (a pushed successor slides
+  along, a task whose predecessor was removed moves up a row); the dependency arrows hang on the drawn bars and follow.
+- While you drag, the bar follows the pointer at once; when you drop it, it stays where it was dropped and settles with
+  a small pop. A cancelled drag glides home.
+- New tasks grow in from their start day (with `stagger`, row after row on the first drawing); removed tasks fade out
+  where they were, then go.
+- A scale change places the bars at once and fades the canvas in; the arrows draw themselves in.
+- `animate={false}` turns all of it off; reduced motion jumps; global speed and pause apply (motion engine).
 
 ## Composed of
 

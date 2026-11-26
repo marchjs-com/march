@@ -1,0 +1,13 @@
+/* ChordChart: solid group arcs on the rim, translucent ribbons through the middle; hovering a group keeps only its
+   ribbons in color. */
+.m-chord-arc { fill: var(--m-c); stroke: var(--m-chart-bg); stroke-width: 1; transition: opacity var(--m-chart-dur); }
+.m-chord-ribbon { fill: var(--m-c); fill-opacity: var(--m-chord-ribbon-opacity, 0.55); stroke: var(--m-c); stroke-opacity: 0.25; stroke-width: 0.5; transition: fill-opacity var(--m-chart-dur), opacity var(--m-chart-dur); }
+.m-chord-ribbon:hover { fill-opacity: 0.85; }
+.m-chord-focus .m-chord-ribbon:not(.m-chord-on) { opacity: 0.1; }
+.m-chord-focus .m-chord-group:not(.m-chord-on) .m-chord-arc { opacity: 0.5; }
+.m-chord-ribbon.m-chart-active, .m-chord-group.m-chart-active .m-chord-arc { stroke: var(--m-chart-focus); stroke-width: 1.5; stroke-opacity: 1; fill-opacity: 0.85; }
+.m-chord-group, .m-chord-ribbon { cursor: pointer; }
+.m-chart .m-chord-label { fill: var(--m-chart-text); font-weight: 600; pointer-events: none; }
+.m-chord-ticks line { stroke: var(--m-chart-axis); stroke-width: 1; }
+.m-chart .m-chord-tick-label { font-size: 9px; fill: var(--m-chart-muted); }
+@media (prefers-reduced-motion: reduce) { .m-chord-arc, .m-chord-ribbon { transition: none; } }

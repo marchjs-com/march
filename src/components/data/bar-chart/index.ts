@@ -7,10 +7,11 @@ import "./bar-chart.css";
 import { signal, computed, read, untrack } from "../../../core/reactive.ts";
 import { h } from "../../../dom/h.ts";
 import { scaleLinear, scaleBand, niceTicks } from "../../../charts/scale.ts";
-import { rowsOf, accessor, formatter, num, seriesOf, seriesClass, colorStyle, useSize, attr, textWidth, navIndex, sameBox, each, tween, type AnimateProp,
+import { rowsOf, accessor, formatter, num, seriesOf, seriesClass, colorStyle, useSize, attr, textWidth, navIndex, sameBox, each, tween, presence, animateOf, type AnimateProp, type Present,
   type MaybeReactive, type DataProp, type Field, type SeriesSpec, type SeriesLabels, type FormatSpec, type ChartBaseProps, type ChartPoint, type TooltipProp, type Box, f1 } from "../../../charts/util.ts";
 import { Frame, Axis, Grid, tooltipState, showTip, tipBody, thin, type Tick } from "../../../charts/parts.ts";
 import { clamp, type Handler } from "../../../core/util.ts";
+import { RefMarks, statOf, type RefMarksProp } from "../../../charts/marks.ts";
 import { isActivateKey } from "../../../ui/behave.ts";
 
 type Opt<T> = MaybeReactive<T | null | undefined> | undefined;
@@ -46,14 +47,21 @@ export interface BarChartProps<D = unknown> extends ChartBaseProps {
   tooltip?: TooltipProp<ChartPoint<D>>;
   /** Called with the point on click, or Enter / Space on the focused one. @tr Tıklanınca ya da odaktaki öğede Enter / Space'e basılınca noktayla çağrılır. */
   onSelect?: Handler<[p: ChartPoint<D>]> | undefined;
-  /** When the data changes the bars glide to their new size, the axes take the new scale at once: `true` (a spring) or an easing name ("spring-wobbly", "out"…); default off. @tr Veri değişince çubuklar yeni boylarına kayar, eksenler yeni ölçeğe hemen geçer: `true` (yay) ya da bir easing adı ("spring-wobbly", "out"…); varsayılan kapalı. */
-  animate?: Opt<boolean | string>;
+  /** Change animations: bars grow from the baseline (one after another with `stagger`), glide to new values and sink when they leave. `true` (default, a spring), `false`, an easing name, `{ duration, easing, stagger, delay, enter, update, exit }` or `(ctx) => …`. @tr Değişim animasyonları: çubuklar tabandan büyür (`stagger` ile sırayla), yeni değerlere kayar ve ayrılırken çöker. `true` (varsayılan, yay), `false`, bir easing adı, `{ duration, easing, stagger, delay, enter, update, exit }` ya da `(ctx) => …`. */
+  animate?: AnimateProp | (() => AnimateProp);
+  /** Value labels on the bars: `true` / "outside" (past the end), "inside" (in the bar), or `false` (default). @tr Çubuklarda değer etiketleri: `true` / "outside" (ucun ötesinde), "inside" (çubuğun içinde) ya da `false` (varsayılan). */
+  labels?: Opt<boolean | "inside" | "outside">;
+  /** Reference lines, bands and averages on the value axis (vertical bars): `[{ y: 100, label: "Hedef" }, { y: "average" }, { x: ["Mar", "May"] }]`. @tr Değer ekseninde referans çizgileri, bantlar ve ortalamalar (dikey çubuklar): `[{ y: 100, label: "Hedef" }, { y: "average" }, { x: ["Mar", "May"] }]`. */
+  marks?: RefMarksProp;
 }
-interface Bar { key: string; index: number; si: number; x: number; y: number; width: number; height: number }
+interface Bar { key: string; index: number; si: number; x: number; y: number; width: number; height: number; value: number; neg: boolean; z: number }
 
-/** The geometry a bar is drawn with: its place at once, or (animate) a glide from where it is drawn now. */
-function glide(target: () => Bar, how: () => AnimateProp): () => Bar {
-  const g = tween(target, ["x", "y", "width", "height"], how);
+/** The geometry a bar is drawn with: grows in from the baseline, glides to new values, sinks back when it leaves. */
+function glide(target: () => Present<Bar>, how: () => AnimateProp, hz: boolean, done: (k: string) => void): () => Bar {
+  const flat = (b: Bar): Bar => (hz ? { ...b, x: b.z, width: 0 } : { ...b, y: b.z, height: 0 });
+  const key = untrack(target).key;
+  const g = tween(() => { const b = target(); return b.leaving ? flat(b) : b; }, ["x", "y", "width", "height"], how, flat,
+    { index: () => target().index, key, leaving: () => !!target().leaving, onSettle: () => { if (target().leaving) done(key); } });
   return () => { const b = g(); return b.width < 0 || b.height < 0 ? { ...b, width: Math.max(0, b.width), height: Math.max(0, b.height) } : b; };
 }
 
@@ -116,7 +124,7 @@ export function BarChart<D>(props: BarChartProps<D>): Element {
         const p0 = a === 0 ? zero : v(a), p1 = v(b);
         const along = bs(i) + (stacked() ? 0 : j * inner), lo = Math.min(p0, p1), len = Math.abs(p1 - p0);
         const geo = horizontal() ? { x: lo, y: along, width: len, height: inner } : { x: along, y: lo, width: inner, height: len };
-        out.push({ key: `${String(c[i])}|${s.key}`, index: i, si: s.index, ...geo });
+        out.push({ key: `${String(c[i])}|${s.key}`, index: i, si: s.index, value: x, neg: x < 0, z: zero, ...geo });
       });
     }
     return out;
@@ -155,20 +163,45 @@ export function BarChart<D>(props: BarChartProps<D>): Element {
   };
 
   const hz = untrack(horizontal);
+  const how = (): AnimateProp => animateOf(props.animate);
+  const live = presence(bars, (b) => b.key, how);
+  const labelMode = computed(() => { const l = read(props.labels); return l === true ? "outside" : l || null; });
+  const scales = {
+    box,
+    x: (v: unknown): number | null => { const i = cats().findIndex((c) => String(c) === String(v)); return i < 0 ? null : band().center(i); },
+    xBand: () => band().step,
+    y: (v: number) => vs()(v),
+    stat: (st: "average" | "median" | "min" | "max", key: string | undefined) => {
+      const sr = visible().find((x) => x.key === key) ?? visible()[0];
+      return sr ? statOf(rows().map((d, i) => num(sr.get(d, i))), st) : null;
+    },
+    fmtX: (v: unknown) => xFmt()(v),
+    fmtY: (v: unknown) => yFmt()(v),
+  };
   const body = [
     Grid({ dir: hz ? "v" : "h", ticks: () => (read(props.grid) ?? true ? valTicks() : []), box }),
     Axis({ side: hz ? "bottom" : "left", ticks: valTicks, box }),
     Axis({ side: hz ? "left" : "bottom", ticks: catTicks, box }),
+    hz ? null : RefMarks({ marks: props.marks, scales, layer: "back" }),
     h("g", { class: "m-chart-plot", transform: attr(() => `translate(${box().x},${box().y})`), onPointerLeave: hide },
       h("rect", { class: "m-chart-band", visibility: () => (active() >= 0 ? "visible" : "hidden"),
         ...(hz ? { x: 0, width: () => box().w, y: () => f1(band().center(Math.max(0, active())) - band().step / 2), height: () => f1(band().step) }
           : { y: 0, height: () => box().h, x: () => f1(band().center(Math.max(0, active())) - band().step / 2), width: () => f1(band().step) }) }),
-      each<Bar>({ each: bars, key: (b) => b.key, children: (b) => { const g = glide(b, () => read(props.animate)); return h("rect", {
-        class: () => `m-chart-bar ${seriesClass(b().si)}`, "class:m-chart-active": () => active() === b().index,
+      each<Present<Bar>>({ each: live.items, key: (b) => b.key, children: (b) => { const g = glide(b, how, hz, live.done); return [h("rect", {
+        class: () => `m-chart-bar ${seriesClass(b().si)}`, "class:m-chart-active": () => active() === b().index, "class:m-chart-leaving": () => !!b().leaving,
         style: () => colorStyle(props.colors, b().si),
         x: attr(() => f1(g().x)), y: attr(() => f1(g().y)), width: attr(() => f1(g().width)), height: attr(() => f1(g().height)),
         onPointerEnter: () => show(b().index), onPointerMove: () => { if (active.peek() !== b().index) show(b().index); }, onClick: () => select(b().index),
-      }); } })),
+      }), () => {
+        const m = labelMode();
+        if (!m || b().leaving) return null;
+        const inside = m === "inside";
+        // the label rides on the drawn bar end (it moves with the animation)
+        const at = attr(() => { const q = g(), neg = b().neg; return hz ? { x: f1(neg ? q.x + (inside ? 6 : -6) : q.x + q.width + (inside ? -6 : 6)), y: f1(q.y + q.height / 2) } : { x: f1(q.x + q.width / 2), y: f1(neg ? q.y + q.height + (inside ? -6 : 12) : q.y + (inside ? 12 : -6)) }; });
+        return h("text", { class: inside ? "m-chart-value m-chart-value-inside" : "m-chart-value", x: () => at().x, y: () => at().y, "dominant-baseline": hz ? "middle" : null,
+          "text-anchor": () => (hz ? ((b().neg ? !inside : inside) ? "end" : "start") : "middle") }, () => String(yFmt()(b().value)));
+      }]; } })),
+    hz ? null : RefMarks({ marks: props.marks, scales, layer: "front" }),
   ];
 
   return Frame<D>(props, {

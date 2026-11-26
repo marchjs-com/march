@@ -3,6 +3,14 @@ import { signal, read, untrack, type Signal } from "../core/reactive.ts";
 import { h } from "../dom/h.ts";
 import { nextId, seriesClass, colorStyle, toggleIn, attr, each, type Box, type ChartBaseProps, type Size } from "./util.ts";
 import type { Handler } from "../core/util.ts";
+import type { ExportProp } from "./tools.ts";
+
+// The export toolbar is its own chunk: only a chart with `export` loads it (a plain import(), no lazy() wrapper, so a
+// chart without export pays nothing for it).
+type ToolsFn = (o: { root: () => Element | null; spec: () => ExportProp; title: () => unknown }) => Element;
+const tools = signal<{ fn: ToolsFn } | null>(null);
+let toolsLoading = false;
+const loadTools = (): void => { if (toolsLoading) return; toolsLoading = true; void import("./tools.ts").then((m) => tools.set({ fn: m.ChartTools })); };
 
 /** Tooltip position (CSS px relative to the wrapper) and lazily rendered content. */
 export interface TipAt { x: number; y: number; left: boolean; content: () => unknown }
@@ -34,7 +42,8 @@ export function Frame<R>(props: ChartBaseProps, o: FrameOptions<R>): Element {
   const id = nextId();
   const { width, height, responsive, observe } = o.size;
   const legendPos = (): "right" | "bottom" => { const l = read(props.legend); return l === "right" ? "right" : "bottom"; };
-  return h("div", { class: () => ["m-chart", `m-${o.kind}-chart`, o.legend && `m-chart-legend-at-${legendPos()}`, read(props.class)].filter(Boolean).join(" "), ref: observe },
+  let root: Element | null = null;
+  return h("div", { class: () => ["m-chart", `m-${o.kind}-chart`, o.legend && `m-chart-legend-at-${legendPos()}`, read(props.class)].filter(Boolean).join(" "), ref: (el: Element) => { root = el; observe(el); } },
     h("svg", {
       class: "m-chart-svg", role: "img", "aria-labelledby": `${id}-t ${id}-d`, tabindex: o.onKeyDown ? "0" : null, focusable: o.onKeyDown ? "true" : "false",
       viewBox: () => `0 0 ${width()} ${height()}`, preserveAspectRatio: "xMinYMin meet",
@@ -46,6 +55,7 @@ export function Frame<R>(props: ChartBaseProps, o: FrameOptions<R>): Element {
     ...o.body,
     () => (o.empty?.() ? h("text", { class: "m-chart-empty", x: () => width() / 2, y: () => height() / 2, "text-anchor": "middle", "dominant-baseline": "middle" }, () => read(props.empty) ?? "No data") : null)),
     ...(o.extra ?? []),
+    () => { if (!read(props.export)) return null; const T = tools(); if (!T) { loadTools(); return null; } return untrack(() => T.fn({ root: () => root, spec: () => read(props.export), title: () => read(props.title) })); },
     o.tip ? Tooltip(o.tip) : null,
     o.legend ? Legend({ ...o.legend, position: legendPos, colors: () => props.colors }) : null,
     o.table ? DataTable(o.table) : null);
@@ -101,14 +111,17 @@ export function DataTable<R>({ caption, columns, rows, limit = 1000 }: DataTable
 }
 
 /** Axis. `ticks()` → [{key, pos, label}]; `box()` → {x, y, w, h} plot area. */
-export function Axis({ side, ticks, box }: { side: "bottom" | "left"; ticks: () => readonly Tick[]; box: () => Box }): Element {
-  const bottom = side === "bottom";
-  return h("g", { class: `m-chart-axis m-chart-axis-${bottom ? "x" : "y"}`, "aria-hidden": "true",
-    transform: attr(() => { const b = box(); return bottom ? `translate(${b.x},${b.y + b.h})` : `translate(${b.x},${b.y})`; }) },
-  h("line", { class: "m-chart-domain", x2: attr(() => (bottom ? box().w : 0)), y2: attr(() => (bottom ? 0 : box().h)) }),
-  each<Tick>({ each: ticks, key: (t) => t.key, children: (t) => h("g", { class: "m-chart-tick", transform: attr(() => (bottom ? `translate(${t().pos},0)` : `translate(0,${t().pos})`)) },
-    h("line", bottom ? { y2: 5 } : { x2: -5 }),
-    h("text", bottom ? { y: 18, "text-anchor": "middle" } : { x: -8, dy: "0.32em", "text-anchor": "end" }, attr(() => t().label))) }));
+export function Axis({ side, ticks, box, title }: { side: "bottom" | "left" | "right" | "top"; ticks: () => readonly Tick[]; box: () => Box; title?: () => unknown }): Element {
+  const horiz = side === "bottom" || side === "top", far = side === "bottom" || side === "right", k = far ? 1 : -1;
+  return h("g", { class: `m-chart-axis m-chart-axis-${horiz ? "x" : "y"} m-chart-axis-${side}`, "aria-hidden": "true",
+    transform: attr(() => { const b = box(); return side === "bottom" ? `translate(${b.x},${b.y + b.h})` : side === "right" ? `translate(${b.x + b.w},${b.y})` : `translate(${b.x},${b.y})`; }) },
+  h("line", { class: "m-chart-domain", x2: attr(() => (horiz ? box().w : 0)), y2: attr(() => (horiz ? 0 : box().h)) }),
+  each<Tick>({ each: ticks, key: (t) => t.key, children: (t) => h("g", { class: "m-chart-tick", transform: attr(() => (horiz ? `translate(${t().pos},0)` : `translate(0,${t().pos})`)) },
+    h("line", horiz ? { y2: 5 * k } : { x2: 5 * k }),
+    h("text", horiz ? { y: far ? 18 : -9, "text-anchor": "middle" } : { x: 8 * k, dy: "0.32em", "text-anchor": far ? "start" : "end" }, attr(() => t().label))) }),
+  // the axis title is drawn only while there is one (no empty text node for tests and screen readers to trip on)
+  title ? () => { const t = title(); return t == null || t === "" ? null : h("text", { class: "m-chart-axis-title", "text-anchor": "middle",
+    transform: attr(() => { const b = box(); return horiz ? `translate(${b.w / 2},${far ? 34 : -26})` : `translate(${far ? 40 : -40},${b.h / 2}) rotate(${far ? 90 : -90})`; }) }, String(t)); } : null);
 }
 
 /** Grid lines across the plot area for the given ticks (`dir` "h" = horizontal lines at y ticks). */

@@ -1,0 +1,16 @@
+/* RadarChart: a web of grid rings and spokes, translucent series shapes with dots, axis names around the rim. */
+.m-radar-ring { fill: none; stroke: var(--m-chart-grid); stroke-width: 1; }
+.m-radar-ring:last-child { stroke: var(--m-chart-axis); }
+.m-radar-spoke { stroke: var(--m-chart-grid); stroke-width: 1; transition: stroke var(--m-chart-dur); }
+.m-radar-spoke.m-chart-active { stroke: var(--m-chart-focus); stroke-dasharray: 3 3; }
+.m-chart text.m-radar-label { fill: var(--m-chart-muted); font-weight: 500; transition: fill var(--m-chart-dur); }
+.m-chart text.m-radar-label.m-chart-active { fill: var(--m-chart-text); font-weight: 650; }
+.m-chart text.m-radar-level { font-size: 10px; opacity: 0.8; }
+.m-radar-hit { fill: transparent; pointer-events: all; cursor: crosshair; }
+.m-radar-series { pointer-events: none; }
+.m-radar-shape { fill: var(--m-c); fill-opacity: var(--m-radar-fill, 0.22); stroke: var(--m-c); stroke-width: 2; stroke-linejoin: round; transition: fill-opacity var(--m-chart-dur); }
+.m-radar-focus .m-radar-shape { fill-opacity: calc(var(--m-radar-fill, 0.22) * 0.75); }
+.m-radar-dot { fill: var(--m-chart-bg); stroke: var(--m-c); stroke-width: 2; transition: r var(--m-chart-dur); }
+.m-radar-dot.m-chart-active { fill: var(--m-c); }
+.m-radar-series.m-chart-leaving { opacity: 0.6; }
+@media (prefers-reduced-motion: reduce) { .m-radar-spoke, .m-radar-shape, .m-radar-dot, .m-chart text.m-radar-label { transition: none; } }
