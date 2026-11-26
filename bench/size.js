@@ -28,7 +28,9 @@ import { tmpdir } from "node:os";
 // since the list speed work and the h.ts modules (dom/insert, events, tpl, props, component): the same budgets hold.
 // core 16.65 KB since components take compiler-ready props (_cp, with the copying path reached only through h(), _c or
 // an installed extension: an app made by the compiler no longer bundles it; the site's bench app went 4.88 -> 4.62 KB)
-export const BUDGET = { core: 16.65 * 1024, minimal: 5.05 * 1024 };
+// core 16.7 KB since <For> puts each new row into the page as soon as it is made when no row is reused (+~70 bytes):
+// the browser's style, layout and paint work for 1,000 new rows drops ~20% against making them all first.
+export const BUDGET = { core: 16.7 * 1024, minimal: 5.05 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const ENTRIES = { core: "src/index.ts", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
 
