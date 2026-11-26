@@ -75,9 +75,12 @@ export function planSmallLazy(meta, { cwd, entryKey, minSize, allow = {}, boot =
   const takenApart = (ms) => { for (const m of ms) plan.apart[m.key] = (plan.apart[m.key] ?? 0) + 1; };
   for (const [name, ms] of Object.entries(plan.groups)) {
     const k = outByEntry.get(`march-group:${name}`);
+    // no output: a group of a cached plan (node_modules/.cache/march/plan.json) that this build did not make; nothing
+    // to measure yet, it stays planned and the next build makes it
+    if (plan.boot.includes(name) || !k || !plan.est[name]) continue;
     // measured on disk: the metafile size is before the build's own rewrites
     const real = existsSync(resolve(cwd, k)) ? readFileSync(resolve(cwd, k)).length : bytes(k);
-    if (plan.boot.includes(name) || !k || !plan.est[name] || real >= minSize) continue;
+    if (real >= minSize) continue;
     delete plan.groups[name];
     for (const [imp, list] of Object.entries(plan.inline)) plan.inline[imp] = list.filter((x) => x.group !== name);
     for (const m of ms) plan.shrink[m.key] = Math.min(plan.shrink[m.key] ?? 1, (real / plan.est[name]) * 0.95);
