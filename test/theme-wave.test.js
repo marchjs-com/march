@@ -206,3 +206,30 @@ test("drip: time slows and picks up again also without frames (a hidden tab): th
     assert.ok(await within(P.warpTime(1, 40), 1500), "and back");
   } finally { globalThis.requestAnimationFrame = raf; }
 });
+
+test("drip with time stopped: where frames never come, the picture still goes (the transition is dropped) and the next change runs", async () => {
+  const P = await import("../src/motion/theme-paint.ts");
+  const raf = globalThis.requestAnimationFrame;
+  globalThis.requestAnimationFrame = () => 0; // a page that is not drawn
+  const vts = [];
+  document.startViewTransition = (cb) => {
+    cb();
+    let skip;
+    const finished = new Promise((r) => { skip = r; });
+    const vt = { ready: Promise.resolve(), finished, skipTransition: () => { vt.skipped = true; skip(); } };
+    vts.push(vt);
+    return vt;
+  };
+  try {
+    let changed = 0;
+    const within = (p, ms) => Promise.race([p.then(() => true), tick(ms).then(() => false)]);
+    assert.ok(await within(P.frozenDrip(document, () => changed++, { duration: 50 }), 6000), "the drip ends without frames");
+    assert.equal(changed, 1);
+    assert.ok(vts[0].skipped, "its transition was dropped");
+    assert.equal(root.hasAttribute("data-m-wave"), false);
+    // not held: the next change runs as a drip of its own (a stuck one would apply it at once, without a transition)
+    void P.frozenDrip(document, () => changed++, { duration: 50 });
+    await tick(800);
+    assert.equal(vts.length, 2, "the next change starts its own transition");
+  } finally { globalThis.requestAnimationFrame = raf; delete document.startViewTransition; }
+});
