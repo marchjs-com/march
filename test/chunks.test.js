@@ -96,6 +96,21 @@ test("min-chunks: start-up pieces (budget.boot) group only with each other, neve
   assert.equal(smallFiles(meta, { cwd: process.cwd(), minSize: 10240, entryKey: "dist/main.js", boot: ["src/shell-a.tsx"], plan }).length, 0);
 });
 
+test("min-chunks: a cached plan's group that this build did not make is not measured (no crash on a stale plan.json)", async () => {
+  const { planSmallLazy } = await import("../compiler/min-chunks.js");
+  const out = (entryPoint, bytes) => ({ entryPoint, bytes, imports: [], inputs: { [entryPoint]: {} } });
+  const meta = {
+    outputs: { "dist/main.js": { entryPoint: "src/main.tsx", bytes: 40000, imports: [], inputs: { "src/main.tsx": {} } }, "dist/page.js": out("src/pages/page.tsx", 20000) },
+    inputs: { "src/main.tsx": { imports: [{ path: "src/pages/page.tsx", kind: "dynamic-import", original: "./pages/page.tsx" }] } },
+  };
+  // the previous build grouped two modules that this build's code no longer has: no "march-group:old" output
+  const prev = { inline: {}, groups: { old: [{ key: "src/gone-a.ts" }, { key: "src/gone-b.ts" }] }, boot: [], keep: [], est: { old: 9000 } };
+  let plan;
+  assert.doesNotThrow(() => { plan = planSmallLazy(meta, { cwd: process.cwd(), entryKey: "dist/main.js", minSize: 10240, maxLoad: 61440, prev }); });
+  // nothing to change: the group stays as planned (not measured, not taken apart)
+  assert.equal(plan, null);
+});
+
 test("min-chunks: a lazy module that a start-up piece loads stays lazy (idle extras, a breadcrumb): never inlined into start-up", async () => {
   const { planSmallLazy } = await import("../compiler/min-chunks.js");
   const out = (entryPoint, bytes, imports = []) => ({ entryPoint, bytes, imports: imports.map((p) => ({ path: p, kind: "import-statement" })), inputs: { [entryPoint]: {} } });
