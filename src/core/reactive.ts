@@ -79,7 +79,9 @@ function track(node: Source): void {
   else if (obs === l) return;
   else if (obs instanceof Set) { if (obs.has(l)) return; obs.add(l); }
   else node.observers = new Set([obs, l]);
-  if (l.sources) l.sources.push(node); else l.sources = [node];
+  // exact-size arrays for the first two sources (a push onto a one-element array would allocate room for 17)
+  const src = l.sources;
+  if (src && src.length > 1) src.push(node); else l.sources = src ? [src[0] as Source, node] : [node];
 }
 
 function markObservers(node: Source, state: State): void {

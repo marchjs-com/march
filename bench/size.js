@@ -105,7 +105,9 @@ render(() => <App />, document.body);
 // carries the link variant, pressed, pill and external links: about 0.2 KB). buttonJs 7.75 KB: measured 7.51 KB. Both
 // grew ~1.4 KB when Button's busy ring became the Spinner component itself (a part MarchIDE's Hierarchy lists and
 // m:parts={{ Spinner: … }} reaches): Spinner brings i18n (its default "Loading" label) and the colour lists
-export const APP_BUDGET = { buttonJs: 7.75 * 1024, buttonCss: 5.5 * 1024, typicalJs: 9.25 * 1024 };
+// typicalJs 9.3 KB since a computation's sources are kept in exact-size arrays (a push onto a one-element array allocates
+// room for 17: ~5% less memory for 1,000 list rows; +15 bytes).
+export const APP_BUDGET = { buttonJs: 7.75 * 1024, buttonCss: 5.5 * 1024, typicalJs: 9.3 * 1024 };
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const s = await sizes();
