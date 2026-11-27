@@ -5,7 +5,7 @@
 // as before (no hook installed). Once something is registered, each component goes through one ordered pipeline:
 //   raw props ─► m:extend filter ─► props interceptors (outer → inner) ─► built-ins (m:parts) ─► callbacks (on)
 //            ─► render interceptors around Comp(props) ─► output ─► setup (after render, with the root elements)
-import { computed, untrack, getOwner, runWithOwner, isReactive, reactive, provide, useContext, signal, DEV, onCleanup, _owner, type Owner } from "../core/reactive.ts";
+import { computed, untrack, getOwner, runWithOwner, isReactive, reactive, provide, useContext, signal, DEV, onCleanup, _owner, _adopt, type Owner } from "../core/reactive.ts";
 import { insert } from "./insert.ts";
 import { _componentHook, createComponent, Fragment, type Component } from "./component.ts";
 import { If, Else, Try } from "./flow.ts";
@@ -271,8 +271,8 @@ const CLEAR = new Set<unknown>([Fragment, If, Else, Try, For, Switch, Match, Awa
 /** Run a component under an owner of its own that carries its path (disposed with the owner it was created in). */
 function underPath(fn: Component<Props>, path: readonly AnyComp[]): Component<Props> {
   return (p) => {
-    const parent = getOwner(), o = _owner(parent) as Owner & { owned: Owner[] | null; context: Map<symbol, unknown> | null };
-    if (parent) ((parent as typeof o).owned ??= []).push(o);
+    const o = _owner(getOwner()) as Owner & { context: Map<symbol, unknown> | null };
+    _adopt(o);
     o.context = new Map([[PathCtx.id, path]]);
     return runWithOwner(o, () => untrack(() => fn(p)));
   };

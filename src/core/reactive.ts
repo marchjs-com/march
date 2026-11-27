@@ -25,7 +25,8 @@ declare global {
 export const DEV: { enabled: boolean; warn: (...a: unknown[]) => void } = { warn: (...a) => console.warn("[march]", ...a), enabled: true };
 
 class OwnerNode {
-  owned: OwnerNode[] | null = null;
+  /** What it owns: one owner as is (a list row's one effect: no array), more in an array. */
+  owned: OwnerNode | OwnerNode[] | null = null;
   cleanups: Cleanup[] | null = null;
   context: Map<symbol, unknown> | null = null;
   disposed = false;
@@ -107,8 +108,10 @@ function cleanNode(c: Computation): void {
 }
 
 function disposeChildren(o: OwnerNode): void {
-  if (o.owned) {
-    for (let i = o.owned.length - 1; i >= 0; i--) disposeOwner(o.owned[i] as OwnerNode);
+  const w = o.owned;
+  if (w) {
+    if (Array.isArray(w)) for (let i = w.length - 1; i >= 0; i--) disposeOwner(w[i] as OwnerNode);
+    else disposeOwner(w);
     o.owned = null;
   }
   if (o.cleanups) {
@@ -131,7 +134,11 @@ function disposeOwner(o: OwnerNode): void {
   } else disposeChildren(o);
 }
 
-function adopt(o: OwnerNode): void { if (Owner) (Owner.owned ??= []).push(o); }
+/** The current owner owns `o` (disposed with it). */
+function adopt(o: OwnerNode): void {
+  const p = Owner;
+  if (p) { const w = p.owned; if (!w) p.owned = o; else if (Array.isArray(w)) w.push(o); else p.owned = [w, o]; }
+}
 
 /** Bring a computation up to date (pull). */
 function update(c: Computation): void {
@@ -237,6 +244,13 @@ export function _cell<T>(value: T, equals?: Equals<unknown>): Cell<T> {
 }
 export function _setCell<T>(f: Cell<T>, v: T, force?: boolean): void { write(f.n, v, force); }
 
+/** A selector's node for one key (no closure per key: it leaves its map through the shared drop()). */
+class SelectorKey implements Source {
+  observers: Observers = null;
+  m: Map<unknown, SelectorKey>; k: unknown;
+  constructor(m: Map<unknown, SelectorKey>, k: unknown) { this.m = m; this.k = k; }
+  drop(): void { this.m.delete(this.k); }
+}
 /**
  * Selector: `const isSelected = selector(() => $selected)`, then `isSelected(row.id)` in each row. A row reading it
  * re-runs only when its own answer changes (the old and the new key), not on every change of the source: choosing one
@@ -244,7 +258,7 @@ export function _setCell<T>(f: Cell<T>, v: T, force?: boolean): void { write(f.n
  */
 export function selector<T>(source: () => T, equals: (key: T, value: T) => boolean = Object.is): (key: T) => boolean {
   // one source node per key that is read; a node leaves the map when its last reader goes
-  const map = new Map<unknown, Source>();
+  const map = new Map<unknown, SelectorKey>();
   let prev: T;
   effect(() => {
     const v = source(), p = prev;
@@ -254,7 +268,7 @@ export function selector<T>(source: () => T, equals: (key: T, value: T) => boole
   return (key: T): boolean => {
     if (Listener) {
       let n = map.get(key);
-      if (!n) map.set(key, (n = { observers: null, drop: () => map.delete(key) }));
+      if (!n) map.set(key, (n = new SelectorKey(map, key)));
       track(n);
     }
     return equals(key, prev);
@@ -406,4 +420,4 @@ export const read = <T>(v: T | (() => T)): T => (isReactive(v) ? (v as () => T)(
 export const _internal = { Computation, disposeOwner };
 /** A bare owner for a list row (<For>): run code in it with runWithOwner, dispose it with _dispose. */
 export const _owner = (parent: Owner | null): Owner => new OwnerNode(parent);
-export { disposeOwner as _dispose };
+export { disposeOwner as _dispose, adopt as _adopt, OwnerNode as _OwnerNode };

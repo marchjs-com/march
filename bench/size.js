@@ -30,7 +30,9 @@ import { tmpdir } from "node:os";
 // an installed extension: an app made by the compiler no longer bundles it; the site's bench app went 4.88 -> 4.62 KB)
 // core 16.7 KB since <For> puts each new row into the page as soon as it is made when no row is reused (+~70 bytes):
 // the browser's style, layout and paint work for 1,000 new rows drops ~20% against making them all first.
-export const BUDGET = { core: 16.7 * 1024, minimal: 5.05 * 1024 };
+// core 16.8 KB since a list row is its own owner and the reactive core allocates less per row (an owner keeps one child
+// without an array, selector keys share one drop(), delegated event keys are built once; +~65 bytes).
+export const BUDGET = { core: 16.8 * 1024, minimal: 5.05 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const ENTRIES = { core: "src/index.ts", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
 
