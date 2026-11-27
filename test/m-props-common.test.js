@@ -20,7 +20,7 @@ test("compiler: a text constant on a native element is its attribute; on a compo
   assert.doesNotMatch(out, /mProps/, "no runtime for constants on native elements");
   // the theme needs its stylesheet loaded: runtime
   assert.match(c('const a = <div m:theme="night">x</div>'), /_\$m\(.*\{"theme": "night"\}\)/);
-  assert.match(c('const a = <Card m:color="brand-blue" />'), /_\$m\(_\$c\(Card.*\{"color": "brand-blue"\}\)/);
+  assert.match(c('const a = <Card m:color="brand-blue" />'), /_\$m\(_\$cp\(Card.*\{"color": "brand-blue"\}\)/);
   assert.match(c('let $c = "info"\nconst a = <div m:color={$c}>x</div>'), /"color": \(\) => \(\$c\(\)\)/);
   assert.match(c('const a = <button m:tip="Copy" m:reveal m:can={ok}>x</button>'), /"tip": "Copy", "reveal": true, "can": ok/);
 });
@@ -101,7 +101,7 @@ test("sx color: a colour token's text tone (and muted); the colours left sx text
 });
 
 test("sx on a component: the compiler sends it to mProps; its classes go on the root beside the root's own class", () => {
-  assert.match(c('const a = <Card sx={{ p: 2, display: "flex" }} />'), /_\$m\(_\$c\(Card, \{\}\), \{"sx": "m-p-2 m-display-flex"\}\)/);
+  assert.match(c('const a = <Card sx={{ p: 2, display: "flex" }} />'), /_\$m\(_\$cp\(Card, \{\}\), \{"sx": "m-p-2 m-display-flex"\}\)/);
   assert.match(c('let $x = 1\nconst a = <Card sx={$x ? { p: 2 } : null} />'), /"sx": \(\) => \(/);
   const el = document.createElement("div");
   el.setAttribute("class", "m-card");

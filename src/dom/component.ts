@@ -20,15 +20,18 @@ export function lazyChildren<F extends () => unknown>(fn: F): F { (fn as unknown
 
 /** The extension pipeline (dom/extend.ts), installed only while something is registered: it may replace the props
  * and the function a component is created with (a wrapper that runs the interceptors around it). */
-type ComponentHook = (Comp: Component<Props>, raw: Props) => [Component<Props>, Props];
-let hook: ComponentHook | undefined;
-/** Not for direct use: extend() / intercept() / withExtensions() install the pipeline with it. */
-export const _componentHook = (fn: ComponentHook | undefined): void => { hook = fn; };
+type ComponentHook = (Comp: Component<Props>, raw: Props, ready?: boolean) => [Component<Props>, Props];
+let hook: ComponentHook | undefined, viaHook: typeof createComponent | undefined;
+/** Not for direct use: extend() / intercept() / withExtensions() install the pipeline with it (and createComponent, which
+ * compiler-ready props then go through: an app without extensions, h() or _c does not bundle the copying path). */
+export const _componentHook = (fn: ComponentHook | undefined, create?: typeof createComponent): void => { hook = fn; viaHook = fn && create; };
 
-export function createComponent(Comp: Component<Props>, raw: Props, children: unknown[]): unknown {
-  if (hook) [Comp, raw] = hook(Comp, raw);
-  const props: Props = {};
-  for (const key of Object.keys(raw)) {
+export function createComponent(Comp: Component<Props>, raw: Props, children: unknown[], ready?: boolean): unknown {
+  // extensions (dom/extend.ts) get ready props in the form h() gives them: live values as thunks
+  if (hook) { [Comp, raw] = hook(Comp, raw, ready); ready = false; }
+  // ready: props the compiler wrote as the component reads them (live props and children already getters): used as is
+  const props: Props = ready ? raw : {};
+  if (!ready) for (const key of Object.keys(raw)) {
     // a getter prop (`h(C, { get value() { … } })`) stays a getter: the component reads it live
     const d = Object.getOwnPropertyDescriptor(raw, key)!, v = d.value;
     if (d.get) { Object.defineProperty(props, key, d); continue; }
@@ -48,6 +51,11 @@ export function createComponent(Comp: Component<Props>, raw: Props, children: un
       Object.defineProperty(props, "children", { get: () => { const r = (c as () => unknown)(); return Array.isArray(r) && r.length === 1 ? r[0] : r; }, enumerable: true });
     } else props["children"] = c;
   }
+  return mount(Comp, props);
+}
+
+/** Call a component with its props (untracked), under the current owner or a root of its own. */
+function mount(Comp: Component<Props>, props: Props): unknown {
   const call = (): unknown => untrack(() => {
     try { return Comp(props); }
     catch (e) {
@@ -88,6 +96,10 @@ function asyncRegion(promise: Promise<unknown>, Comp: Component<Props>): () => u
   };
 }
 
-/** Compiler helper (not for direct use): create a component (`<Comp …>`), as h(Comp, props, …children) does. */
+/** Compiler helper (not for direct use): create a component whose props object the compiler wrote ready (getters). */
+export function _cp<P extends object>(Comp: Component<P>, props: P): unknown {
+  return viaHook ? viaHook(Comp as unknown as Component<Props>, props as unknown as Props, [], true) : mount(Comp as unknown as Component<Props>, props as unknown as Props);
+}
 // generic like h(Comp, props): `march check` type-checks a component's props through this signature
+/** Compiler helper (not for direct use): create a component (`<Comp …>`), as h(Comp, props, …children) does. */
 export function _c<P extends object>(Comp: Component<P>, props: P | null, ...children: unknown[]): unknown { return createComponent(Comp as unknown as Component<Props>, (props ?? {}) as Props, children); }

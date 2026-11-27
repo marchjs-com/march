@@ -1,5 +1,5 @@
 // Keyed list <For> (its own module: a page that only needs If/Try does not pull it into its chunk).
-import { getOwner, untrack, onCleanup, effect, runWithOwner, _cell, _setCell, _owner, _dispose, type Accessor, type Cell, type Owner } from "../core/reactive.ts";
+import { getOwner, untrack, onCleanup, effect, runWithOwner, _runIn, _cell, _setCell, _dispose, _OwnerNode, type Accessor, type Cell, type Owner } from "../core/reactive.ts";
 import { insert, removeNode, disposeDetached, LEAVE, doc as document } from "./insert.ts";
 import { val, call } from "./val.ts";
 
@@ -21,7 +21,14 @@ export interface ForProps<T> {
   /** FLIP-animate moves, enter and leave (needs march/motion). @tr Yer değiştirme, giriş ve çıkışı FLIP ile canlandırır (march/motion gerekir). */
   animate?: unknown;
 }
-interface Row<T> { nodes: Node[]; item: Cell<T>; index: Cell<number> | null; o: Owner; /** key */ k: unknown; /** position in the previous order */ at: number }
+/** A row is its own owner (what it creates is disposed with it) carrying its item, index, key and nodes: one object. */
+class Row<T> extends _OwnerNode {
+  item: Cell<T>; index: Cell<number> | null; /** key */ k: unknown; /** position in the previous order */ at: number;
+  nodes = null as unknown as Node[];
+  constructor(parent: Owner | null, item: Cell<T>, index: Cell<number> | null, k: unknown, at: number) {
+    super(parent); this.item = item; this.index = index; this.k = k; this.at = at;
+  }
+}
 
 /**
  * Keyed list. `<For each={items} key="id">{(item, index) => …}</For>`; `item` and `index` are accessors.
@@ -38,21 +45,23 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
   const pk = props.key;
   const keyOf: (x: T) => unknown = typeof pk === "function" ? pk : typeof pk === "string" ? (x) => (x as Record<string, unknown> | null | undefined)?.[pk] : (x) => x;
   let order: Row<T>[] = [];
-  let fallback: { o: Owner; nodes: Node[] } | null = null;
+  let fallback: Row<null> | null = null;
   const render: unknown = props.children;
   if (globalThis.__MARCH_DEV__ !== false && typeof render !== "function") throw new TypeError("March: <For> needs a row function.");
   const renderRow = render as ForProps<T>["children"];
   const wantsIndex = renderRow.length !== 1; // `(item) => …` never reads the index: no index signal per row
 
+  // a row's nodes, drawn under the row's owner (one function for the list: no closures per row)
+  const draw = (item: Accessor<T>, index: Accessor<number>): Node[] => collect(renderRow(item, index));
   const make = (it: T, i: number, k: unknown): Row<T> => {
-    const item = _cell(it), index = wantsIndex ? _cell(i) : null;
-    const o = _owner(owner);
-    return { item, index, o, k, at: i, nodes: runWithOwner(o, () => collect(() => renderRow(item, index as Accessor<number>))) };
+    const r = new Row(owner, _cell(it), wantsIndex ? _cell(i) : null, k, i);
+    r.nodes = _runIn(r, draw, r.item, r.index as Accessor<number>);
+    return r;
   };
   /** Drop rows; when they are every row of a parent the list owns alone, empty the parent at once. */
   const drop = (rs: Map<unknown, Row<T>>, all: boolean, host: Node): void => {
     if (all && host.firstChild === start && host.lastChild === end && host.nodeType === 1 && !props.animate && everyPlain(rs)) {
-      disposeDetached(() => { for (const r of rs.values()) _dispose(r.o); });
+      disposeDetached(() => { for (const r of rs.values()) _dispose(r); });
       (host as Element).textContent = "";
       host.appendChild(start); host.appendChild(end);
     } else for (const r of rs.values()) dropRow(r);
@@ -89,24 +98,31 @@ export function For<T>(props: ForProps<T>): DocumentFragment {
       // the middle: old rows s…e1 become new rows s…e2 (reused by key, made, or dropped)
       const byKey = new Map<unknown, Row<T>>();
       for (let i = s; i <= e1; i++) byKey.set((old[i] as Row<T>).k, old[i] as Row<T>);
+      // no middle row is reused (a first render, an append, a replace): drop the old ones first, then put each new row
+      // into the page as soon as it is made. Making every row first and inserting them afterwards leaves the browser
+      // ~20% more style, layout and paint work for the same nodes (measured on 1,000 rows in Chrome and Edge).
+      let live = !props.animate;
+      for (let i = s; i <= e2 && live && byKey.size; i++) live = !byKey.has(keyOf(list[i] as T));
+      if (live && byKey.size) { drop(byKey, byKey.size === m, host); byKey.clear(); }
+      const at: Node = e2 + 1 < n ? ((next[e2 + 1] as Row<T>).nodes[0] ?? end) : end;
       const was = new Int32Array(e2 >= s ? e2 - s + 1 : 0); // old position of each middle row (-1: new)
       for (let i = s; i <= e2; i++) {
         const it = list[i] as T, k = keyOf(it), r = byKey.size ? byKey.get(k) : undefined;
         if (r) { byKey.delete(k); was[i - s] = r.at; same(i, r); }
-        else { was[i - s] = -1; next[i] = make(it, i, k); }
+        else { was[i - s] = -1; const nw = (next[i] = make(it, i, k)); if (live) for (const x of nw.nodes) host.insertBefore(x, at); }
       }
       if (byKey.size) drop(byKey, byKey.size === m, host);
       if (!n && props.fallback != null && !fallback) {
-        const o = _owner(owner);
-        fallback = { o, nodes: runWithOwner(o, () => collect(() => call(props.fallback))) };
-        for (const x of fallback.nodes) host.insertBefore(x, end);
+        const o = (fallback = new Row(owner, null as unknown as Cell<null>, null, null, 0));
+        o.nodes = runWithOwner(o, () => collect(call(props.fallback)));
+        for (const x of o.nodes) host.insertBefore(x, end);
       }
-      if (s > e2) return;
+      if (s > e2 || live) return;
       // rows on a longest increasing run of old positions stay; the others (moved or new) are inserted, last to
       // first, straight before the next row that stays (no fragment: each node moves once)
       const place = (): void => {
         const keep = lis(was);
-        let ref: Node = e2 + 1 < n ? ((next[e2 + 1] as Row<T>).nodes[0] ?? end) : end;
+        let ref = at;
         for (let i = e2; i >= s; i--) {
           const ns = (next[i] as Row<T>).nodes;
           if (keep[i - s]) { if (ns.length) ref = ns[0] as Node; }
@@ -130,8 +146,8 @@ function everyPlain(rs: Map<unknown, { nodes: Node[] }>): boolean {
   for (const r of rs.values()) if (!plain(r)) return false;
   return true;
 }
-function dropRow(r: { o: Owner; nodes: Node[] }): void {
-  if (plain(r)) disposeDetached(() => _dispose(r.o)); else _dispose(r.o);
+function dropRow(r: Owner & { nodes: Node[] }): void {
+  if (plain(r)) disposeDetached(() => _dispose(r)); else _dispose(r);
   for (const n of r.nodes) removeNode(n);
 }
 
@@ -151,8 +167,7 @@ export function lis(a: ArrayLike<number>): Uint8Array {
 }
 
 /** Render a value into a detached fragment and return its top-level nodes. */
-function collect(fn: () => unknown): Node[] {
-  const v = fn();
+function collect(v: unknown): Node[] {
   if (v && typeof v === "object" && (v as Node).nodeType === 1) return [v as Node]; // one element: no fragment
   const frag = document().createDocumentFragment();
   insert(frag, v);

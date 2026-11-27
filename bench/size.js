@@ -26,7 +26,13 @@ import { tmpdir } from "node:os";
 // 16.59 KB). Only an app built with i18n imports them: minimal and typical unchanged (docs/internal/size-watch.md).
 // Measured as a production build (PROD below: development-only code left out, as march build and the CDN build ship it)
 // since the list speed work and the h.ts modules (dom/insert, events, tpl, props, component): the same budgets hold.
-export const BUDGET = { core: 16.6 * 1024, minimal: 5.05 * 1024 };
+// core 16.65 KB since components take compiler-ready props (_cp, with the copying path reached only through h(), _c or
+// an installed extension: an app made by the compiler no longer bundles it; the site's bench app went 4.88 -> 4.62 KB)
+// core 16.7 KB since <For> puts each new row into the page as soon as it is made when no row is reused (+~70 bytes):
+// the browser's style, layout and paint work for 1,000 new rows drops ~20% against making them all first.
+// core 16.8 KB since a list row is its own owner and the reactive core allocates less per row (an owner keeps one child
+// without an array, selector keys share one drop(), delegated event keys are built once; +~65 bytes).
+export const BUDGET = { core: 16.8 * 1024, minimal: 5.05 * 1024 };
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const ENTRIES = { core: "src/index.ts", router: "src/router/index.ts", data: "src/data/index.ts", schema: "src/schema/index.ts", ui: "src/ui/index.ts", table: "src/table/index.ts", charts: "src/charts/index.ts" };
 
@@ -99,7 +105,9 @@ render(() => <App />, document.body);
 // carries the link variant, pressed, pill and external links: about 0.2 KB). buttonJs 7.75 KB: measured 7.51 KB. Both
 // grew ~1.4 KB when Button's busy ring became the Spinner component itself (a part MarchIDE's Hierarchy lists and
 // m:parts={{ Spinner: … }} reaches): Spinner brings i18n (its default "Loading" label) and the colour lists
-export const APP_BUDGET = { buttonJs: 7.75 * 1024, buttonCss: 5.5 * 1024, typicalJs: 9.25 * 1024 };
+// typicalJs 9.3 KB since a computation's sources are kept in exact-size arrays (a push onto a one-element array allocates
+// room for 17: ~5% less memory for 1,000 list rows; +15 bytes).
+export const APP_BUDGET = { buttonJs: 7.75 * 1024, buttonCss: 5.5 * 1024, typicalJs: 9.3 * 1024 };
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const s = await sizes();

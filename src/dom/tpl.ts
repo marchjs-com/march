@@ -1,7 +1,7 @@
 // March — template clones (the compiler's output for native elements) and the props a template wires most: a class
 // binding (_cls) and a plain attribute (_attr). The other prop kinds go through _prop (dom/props.ts).
-import { effect, DEV } from "../core/reactive.ts";
-import { doc, type MarchEl } from "./insert.ts";
+import { effect, DEV, isReactive } from "../core/reactive.ts";
+import { doc, insert, clearBetween, type MarchEl } from "./insert.ts";
 
 const URL_ATTRS = new Set(["href", "src", "action", "formaction", "xlink:href", "poster", "cite", "background"]);
 /** Allow only safe URL schemes (relative URLs are fine). */
@@ -28,11 +28,11 @@ function buildSpec(d: Document, s: TemplateSpec): Element {
  * cloned per use. `tpl(wire)` returns a clone after `wire(clone)` has bound its dynamic parts.
  */
 export function _tpl(spec: TemplateSpec): (wire?: (root: Element) => void) => Element {
-  let node: Element | null = null;
+  let node: Element | null = null, at: Document | null = null; // the template and the document it was built for
   return (wire) => {
     const d = doc();
-    if (!node || node.ownerDocument !== d) node = buildSpec(d, spec);
-    const r = node.cloneNode(true) as Element;
+    if (at !== d) node = buildSpec((at = d), spec); // compared in JS: no ownerDocument read per clone
+    const r = (node as Element).cloneNode(true) as Element;
     if (wire) wire(r);
     return r;
   };
@@ -60,12 +60,54 @@ export function setClass(el: MarchEl, v: unknown): void {
   el.setAttribute("class", s.trim());
 }
 
+// One effect per template clone: the compiler gathers a template's class, plain-attribute and text parts into one
+// effect (fewer computations per row, as Svelte 5's template effects). A text part joins only when its expression cannot
+// create nodes (compiler/index.js › textSafe); the others keep their own region.
+/** A text part: its end marker once it holds nodes; `v` the text last written by an update (compared in JS, not read
+ * back from the DOM; until the first update the node's own data is compared). */
+type Part = Text & { e?: Comment; v?: string };
+/** Compiler helper (not for direct use): an empty text part placed up front (when a sibling region needs the order). */
+export const _txt = (parent: Node, before: Node | null): Text => parent.insertBefore(doc().createTextNode(""), before);
+/**
+ * Compiler helper (not for direct use): draw a text part as a region draws its value (text in place; anything else
+ * between the text node and an end marker) and return its text node. The first call makes the node with its value
+ * (one node, one write); `t = _st(t, parent, before, value)`.
+ */
+export function _st(t: Part | null, parent: Node, before: Node | null, v: unknown): Part {
+  if (!t) {
+    // made with its value, nothing kept on the node: a row's texts add no property to their nodes until they change
+    if (typeof v === "string" || typeof v === "number") return parent.insertBefore(doc().createTextNode("" + v), before);
+    t = parent.insertBefore(doc().createTextNode(""), before);
+  } else if (!t.e && (typeof v === "string" || typeof v === "number")) { const s = "" + v; if ((t.v ?? t.data) !== s) t.data = t.v = s; return t; }
+  const host = t.parentNode;
+  if (!host) return t;
+  if (!t.e) { t.data = t.v = ""; host.insertBefore((t.e = doc().createComment("")), t.nextSibling); }
+  clearBetween(t, t.e);
+  insert(host, v, t.e);
+  return t;
+}
+/**
+ * Compiler helper (not for direct use): a class inside a template's one effect, on an element nothing else sets classes
+ * on (no sx, no class:x): a class string is compared with the one last written (`prev`, kept by the compiler), so the
+ * DOM is never read. Returns the new `prev`.
+ */
+export function _scl(el: Element, v: unknown, prev: unknown): unknown {
+  if (typeof v === "string") { if (v !== prev) (el as HTMLElement).className = v; return v; }
+  setClass(el as MarchEl, v);
+  return undefined;
+}
+/** Compiler helper (not for direct use): `f` when it is a reactive accessor (a signal, a computed: reading it creates
+ * nothing, so its text joins the template's effect), else null (the part keeps its own region). */
+export const _acc = (f: unknown): (() => unknown) | null => (isReactive(f) ? (f as () => unknown) : null);
+/** Compiler helper (not for direct use): a class inside a template's one effect. */
+export const _scls = (el: Element, v: unknown): void => setClass(el as MarchEl, v);
+/** Compiler helper (not for direct use): a plain attribute inside a template's one effect. */
+export const _sattr = (el: Element, tag: string, attr: string, v: unknown): void => setAttr(el, tag, attr, v);
 /** Compiler helper (not for direct use): a class binding on an element of a template clone. */
 export function _cls(el: Element, value: unknown): void { bindValue(value, (v) => setClass(el as MarchEl, v)); }
 /** Compiler helper (not for direct use): a plain attribute (removed for null / false, "" for true; URL attributes are checked). */
-export function _attr(el: Element, tag: string, attr: string, value: unknown): void {
-  bindValue(value, (v) => {
-    if (v == null || v === false) el.removeAttribute(attr);
-    else el.setAttribute(attr, v === true ? "" : URL_ATTRS.has(attr) ? safeUrl(v, tag) : String(v));
-  });
+export function _attr(el: Element, tag: string, attr: string, value: unknown): void { bindValue(value, (v) => setAttr(el, tag, attr, v)); }
+function setAttr(el: Element, tag: string, attr: string, v: unknown): void {
+  if (v == null || v === false) el.removeAttribute(attr);
+  else el.setAttribute(attr, v === true ? "" : URL_ATTRS.has(attr) ? safeUrl(v, tag) : String(v));
 }

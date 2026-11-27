@@ -3,8 +3,8 @@ export { signal, computed, effect, batch, untrack, selector, onCleanup, createRo
 export { store, patch, unwrap } from "./core/store.ts";
 export { h } from "./dom/h.ts";
 export { insert } from "./dom/insert.ts";
-export { Fragment, lazyChildren, _c } from "./dom/component.ts";
-export { safeUrl, _tpl, _cls, _attr } from "./dom/tpl.ts";
+export { Fragment, lazyChildren, _c, _cp } from "./dom/component.ts";
+export { safeUrl, _tpl, _cls, _attr, _txt, _st, _acc, _scls, _scl, _sattr } from "./dom/tpl.ts";
 export { registerTransition, _prop } from "./dom/props.ts";
 export { _on } from "./dom/events.ts";
 export { extend, intercept, inside, partOf, defineExtension, withExtensions, Extensions, extensions, type Extension, type ExtensionDef, type ExtensionTarget, type ExtensionContext, type SetupContext, type ExtensionPropSpec, type ExtensionTrace, type ComponentInfo, type ExtensionProps, type ComponentExtensions, type ExtensionPropsOf, type ExtensionTest, type PathStep, type PathTarget } from "./dom/extend.ts";

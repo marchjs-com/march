@@ -33,19 +33,19 @@ function region(parent: Node, fn: () => unknown, before: Node | null, owned?: un
   // A text node marks the start and, while the value is text (the usual case), is the region itself; an end marker
   // is added the first time the value is something else (nodes, a list, nothing). When the effect runs at once
   // (outside batch()), the text node is made with its first value: one node, one insert.
-  let start = null as unknown as Text, end: Comment | null = null;
-  const place = (s: string): void => { parent.insertBefore((start = doc().createTextNode(s)), before); };
+  let start = null as unknown as Text, end: Comment | null = null, last = ""; // last: the text written (no DOM read to compare)
+  const place = (s: string): void => { parent.insertBefore((start = doc().createTextNode((last = s))), before); };
   effect(() => {
     const v = fn();
     if (!end && (typeof v === "string" || typeof v === "number")) {
       const s = "" + v;
-      if (!start) place(s); else if (start.data !== s) start.data = s;
+      if (!start) place(s); else if (last !== s) start.data = last = s;
       return;
     }
     start || place("");
     const host = start.parentNode;
     if (!host) return;
-    if (!end) { start.data = ""; host.insertBefore((end = doc().createComment("")), start.nextSibling); }
+    if (!end) { start.data = last = ""; host.insertBefore((end = doc().createComment("")), start.nextSibling); }
     clearBetween(start, end);
     insert(host, v, end);
   });
